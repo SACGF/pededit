@@ -211,3 +211,10 @@ __marimo__/
 *node_modules/*
 
 /layout-engine/node_modules/
+/layout-engine/dist/
+
+# Frontend build output
+/frontend/dist/
+
+# Backend virtualenv
+/backend/.venv/

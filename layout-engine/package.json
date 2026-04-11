@@ -2,10 +2,18 @@
   "name": "@pedigree-editor/layout-engine",
   "version": "0.1.0",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:types": "tsc --project tsconfig.json --noEmitOnError false"
   },
   "devDependencies": {
     "typescript": "^5.4",

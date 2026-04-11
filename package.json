@@ -1,0 +1,12 @@
+{
+  "name": "peded",
+  "private": true,
+  "workspaces": [
+    "layout-engine",
+    "frontend"
+  ],
+  "scripts": {
+    "test:layout": "npm -w layout-engine run test",
+    "dev:frontend": "npm -w frontend run dev"
+  }
+}

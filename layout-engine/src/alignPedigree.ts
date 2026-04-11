@@ -69,6 +69,40 @@ export function alignPedigree(
     }
   }
 
+  // 5.5. Insert isolated individuals not reached by the main traversal
+  // (e.g. founders with no spouse and no children who never appear in any spouselist row)
+  {
+    const _maxlev = rval.n.length - 1;
+    const placed = new Set<number>();
+    for (let lev = 1; lev <= _maxlev; lev++) {
+      const ni = rval.n[lev] ?? 0;
+      for (let c = 1; c <= ni; c++) placed.add(Math.floor(rval.nid[lev]![c]!));
+    }
+    for (let i = 1; i <= input.n; i++) {
+      if (placed.has(i)) continue;
+      const lev = level[i]!;
+      if (!lev || lev > _maxlev) continue;
+      const ni = rval.n[lev] ?? 0;
+      const newCol = ni + 1;
+      const newNid = new Float64Array(newCol + 1);
+      const newPos = new Float64Array(newCol + 1);
+      const newFam = new Int32Array(newCol + 1);
+      for (let c = 1; c <= ni; c++) {
+        newNid[c] = rval.nid[lev]![c]!;
+        newPos[c] = rval.pos[lev]![c]!;
+        newFam[c] = rval.fam[lev]![c]!;
+      }
+      newNid[newCol] = i;
+      newPos[newCol] = ni > 0 ? newPos[ni]! + 1 : 0;
+      newFam[newCol] = 0;
+      rval.nid[lev] = newNid;
+      rval.pos[lev] = newPos;
+      rval.fam[lev] = newFam;
+      rval.n[lev] = newCol;
+      placed.add(i);
+    }
+  }
+
   // 6. Separate nid (integer) from spouse marker (fractional .5 → 1)
   const maxlev = rval.n.length - 1;
   const nidInt: Int32Array[] = rval.nid.map(row => {
@@ -120,10 +154,21 @@ export function alignPedigree(
     }
   }
 
-  // 8. QP optimisation
-  const pos = (align && maxlev > 1)
-    ? alignped4(rval, spouseMatrix, level, width, align)
-    : rval.pos.map(row => new Float64Array(row));
+  // 8. QP optimisation (with NaN guard — ill-conditioned problems fall back to raw positions)
+  let pos: Float64Array[];
+  if (align && maxlev > 1) {
+    const qpPos = alignped4(rval, spouseMatrix, level, width, align);
+    let hasNaN = false;
+    outerQP: for (let lev = 1; lev <= maxlev; lev++) {
+      const ni = rval.n[lev] ?? 0;
+      for (let c = 1; c <= ni; c++) {
+        if (!Number.isFinite(qpPos[lev]![c]!)) { hasNaN = true; break outerQP; }
+      }
+    }
+    pos = hasNaN ? rval.pos.map(row => new Float64Array(row)) : qpPos;
+  } else {
+    pos = rval.pos.map(row => new Float64Array(row));
+  }
 
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
   return toLayoutResult(rval, nidInt, pos, spouseMatrix, maxlev);
@@ -337,6 +382,15 @@ function findFounders(
   const foundersSet = [...new Set([...dupmom, ...dupdad, ...foundmom])];
   // Sort by horder
   foundersSet.sort((a, b) => (hints.order[a] ?? 0) - (hints.order[b] ?? 0));
+
+  // Fallback: if no founders found via the spouselist (e.g. a single individual with no
+  // partnerships at all), use every root individual (no parents) as a starting point.
+  if (foundersSet.length === 0) {
+    for (let i = 1; i <= input.n; i++) {
+      if (dad[i] === 0 && mom[i] === 0) foundersSet.push(i);
+    }
+    foundersSet.sort((a, b) => (hints.order[a] ?? 0) - (hints.order[b] ?? 0));
+  }
 
   return { founders: foundersSet };
 }

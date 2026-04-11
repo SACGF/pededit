@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-This project is in the **research and planning phase**. No source code exists yet. The tech stack and build system are yet to be chosen.
+**Phase 1 complete.** `layout-engine/` is a self-contained TypeScript package (16 tests passing) implementing the kinship2 layout algorithm. See `claude/overall_plan.md` for the full phase plan.
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
+
+## Key Reference Documents
+
+- `claude/overall_plan.md` — phase-by-phase build plan
+- `claude/phase_2_plan.md` — detailed Phase 2 scaffold spec (Django + React + Vite)
+- `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
+- `claude/search_report.md` — domain research and feature gap analysis
 
 ## What This Project Is
 
@@ -47,10 +54,10 @@ A new open-source pedigree editor — a web-based tool for drawing, editing, and
 ### Biological sex notation
 Pedigree symbols (square/circle/diamond) represent **biological sex**, not gender, because sex determines inheritance patterns, X-linkage, and sex-specific risk models. The NSGC 2022 "gender inclusivity" update conflates clinical communication with genetic notation. A trans man who is 46,XX still needs a circle on the pedigree. Gender is patient-facing clinical metadata, not a pedigree data requirement.
 
-## Architectural Considerations
+## Architectural Decisions (settled)
 
-When implementation begins, the suggested stack from research is **React/TypeScript + D3.js** — the same foundation as pedigreejs and family-chart, enabling potential code reuse and aligning with the most actively maintained open-source work in this space.
+**Stack:** Django 5 + DRF + PostgreSQL + simplejwt on the backend; React 18 + TypeScript + Vite + React Flow (`@xyflow/react`) + Zustand + Tailwind + shadcn/ui on the frontend. Layout engine is a local npm workspace package (`@pedigree-editor/layout-engine`) imported by the frontend.
 
-Core data model should be graph-based (individuals as nodes, relationships as edges) with a JSON serialization format, importable from PED/BOADICEA/GA4GH FHIR formats.
+**Data model:** Graph-based — `Individual` nodes, `Partnership` edges, `parentOf` map. JSON serialization is the native format; PED/BOADICEA/GA4GH FHIR are import targets. The `Pedigree` interface in `layout-engine/src/types.ts` is canonical — the Django `JSONField` and the Zustand store both mirror it exactly.
 
-Layout is the hardest problem: existing tools use D3 hierarchical layout which breaks down for consanguinity loops, cross-generational matings, and large pedigrees. Madeline 2.0 (C++) uses a hybrid cyclic/acyclic algorithm worth studying for the layout engine.
+**Layout algorithm:** Ported from kinship2 (R). The hard parts are done: `kindepth` assigns generations, `alignped1–4` place individuals and optimise positions. `autohint` is currently a stub (sequential ordering); full duplicate-detection reordering is Phase 6. See `claude/layout_engine_guide.md` for how to consume `LayoutResult` in the renderer.

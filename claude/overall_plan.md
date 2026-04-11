@@ -12,26 +12,19 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ---
 
-## Phase 1 — Data model + layout algorithm (pure TypeScript, no UI)
+## Phase 1 — Data model + layout algorithm (pure TypeScript, no UI) ✅ COMPLETE
 
-**What:** Define the core domain types and implement the auto-layout algorithm as a self-contained TypeScript library with unit tests.
+**Delivered:** `layout-engine/` — self-contained TypeScript package, 16 tests passing.
 
-**Data model:**
-- `Individual` — id, sex (male/female/unknown), affected status, name, DOB, deceased, carrier, proband, notes
-- `Partnership` — id, individual_a, individual_b, consanguineous, same_sex, donor/surrogate flags
-- `Pedigree` — collections of individuals and partnerships, with parent→child links attached to partnerships (not to individuals directly)
-- `Layout` — output type: `{ id → { x, y } }` plus edge route coordinates
+**What was built:**
+- Full domain type hierarchy: `Individual`, `Partnership`, `Pedigree`, `LayoutInput`, `LayoutResult`, `AlignState`, `Hints`
+- `kindepth` — generation depth assignment with couple-alignment pass
+- `alignped1` / `alignped2` / `alignped3` / `alignped4` — all four kinship2 sub-routines ported
+- `alignPedigree` — orchestrator: converts `Pedigree` → layout, runs algorithm, returns `LayoutResult`
+- `autohint` — stub (sequential ordering); produces valid layouts but not visually optimised for large families with cross-generational couples
+- `utils` — `buildLayoutInput` / `buildPedigreeFromFlat` for tests
 
-Partnerships are first-class entities (not just edges between individuals). Children attach to a partnership node, not to individual parents. This is the only model that correctly handles half-siblings, multiple marriages, donor situations, and consanguinity without hacks.
-
-**Layout algorithm:**
-Port the kinship2 `align.pedigree()` algorithm to TypeScript:
-1. Assign each individual to a generation (level)
-2. Within each generation, order individuals to minimise edge crossings using a horizontal sweep
-3. Handle consanguinity by identifying loop pairs and routing their connector below the main diagram
-4. Return `(x, y)` per individual and route coordinates per relationship line
-
-**Why first:** Everything downstream depends on this. A wrong data model means all UI work is wrong. The layout algorithm is the highest-risk piece in the entire project — validate it with unit tests (assert on relative positions, generation assignments, crossing counts) before any UI exists. If the algorithm needs rethinking, the cost here is a few days; the cost in Phase 4 is weeks.
+**Known limitation:** Full `autohint` (duplicate detection → sibling reordering → spouse hints) is not yet implemented. This affects visual quality for complex pedigrees (e.g. kinship2's SAMPLE_PED_1 produces `n = [8,19,22,8]` in R; the stub produces different but structurally valid counts). Layout correctness — monotonically increasing positions, valid fam pointers, all individuals placed — is verified. Autohint can be completed as part of Phase 6 layout improvements if needed, or earlier if visual quality becomes a blocker.
 
 **Defer:** No UI, no Django, no React. Just types and algorithms.
 

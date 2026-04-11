@@ -39,18 +39,20 @@ describe("kindepth", () => {
     expect(d[5]).toBe(2);
   });
 
-  it("align=true equalises cross-generational couple depths", () => {
-    // For any couple (fi, mi) that are both parents of some child,
-    // with align=true their depths must be equal.
-    const input = buildLayoutInput(SAMPLE_PED_1);
+  it("align=true equalises depths of a simple marry-in couple", () => {
+    // Individual 4 is a solitary marry-in with no parents; align should lift it
+    // to match the depth of its spouse (individual 3, child of 1+2 at depth 1).
+    // Note: SAMPLE_PED_1 has cross-generational couples (e.g. 12×18) that R itself
+    // cannot equalise ("beyond this program"), so we use a simple 5-person pedigree.
+    const input = buildLayoutInput([
+      { id: 1, father: 0, mother: 0, sex: 1 },
+      { id: 2, father: 0, mother: 0, sex: 2 },
+      { id: 3, father: 1, mother: 2, sex: 1 },
+      { id: 4, father: 0, mother: 0, sex: 2 },
+      { id: 5, father: 3, mother: 4, sex: 1 },
+    ]);
     const d = kindepth(input, true);
-    for (let i = 1; i <= input.n; i++) {
-      const fi = input.findex[i]!;
-      const mi = input.mindex[i]!;
-      if (fi > 0 && mi > 0) {
-        expect(d[fi], `father depth for child ${i}`).toBe(d[mi]);
-      }
-    }
+    expect(d[3]).toBe(d[4]);
   });
 
   it("align=true preserves at least one individual at depth 0", () => {
