@@ -27,18 +27,16 @@ sudo -u postgres psql -c "CREATE DATABASE peded OWNER peded;"
 
 ```bash
 cd backend/
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
+uv venv
+uv pip install -r requirements.txt
+uv run python manage.py migrate
 ```
 
 ### 4. (Optional) Create a superuser for the Django admin
 
 ```bash
 cd backend/
-source .venv/bin/activate
-python manage.py createsuperuser
+uv run python manage.py createsuperuser
 ```
 
 ## Running
@@ -47,8 +45,7 @@ Start both servers in separate terminals:
 
 **Backend** (from `backend/`):
 ```bash
-source .venv/bin/activate
-python manage.py runserver
+uv run python manage.py runserver
 ```
 
 **Frontend** (from repo root):

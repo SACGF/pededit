@@ -54,6 +54,10 @@ A new open-source pedigree editor — a web-based tool for drawing, editing, and
 ### Biological sex notation
 Pedigree symbols (square/circle/diamond) represent **biological sex**, not gender, because sex determines inheritance patterns, X-linkage, and sex-specific risk models. The NSGC 2022 "gender inclusivity" update conflates clinical communication with genetic notation. A trans man who is 46,XX still needs a circle on the pedigree. Gender is patient-facing clinical metadata, not a pedigree data requirement.
 
+## Tooling Preferences
+
+**Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
+
 ## Architectural Decisions (settled)
 
 **Stack:** Django 5 + DRF + PostgreSQL + simplejwt on the backend; React 18 + TypeScript + Vite + React Flow (`@xyflow/react`) + Zustand + Tailwind + shadcn/ui on the frontend. Layout engine is a local npm workspace package (`@pedigree-editor/layout-engine`) imported by the frontend.
