@@ -1,1 +1,1 @@
-# peded
+# PedEd - the Pedigree Editor
