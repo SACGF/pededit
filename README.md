@@ -7,6 +7,7 @@ A web-based pedigree editor for clinical genetics, genetic counseling, and medic
 - Node.js 20+
 - Python 3.10+
 - PostgreSQL 14+
+- [uv](https://docs.astral.sh/uv/)
 
 ## Setup
 
@@ -28,15 +29,17 @@ sudo -u postgres psql -c "CREATE DATABASE peded OWNER peded;"
 ```bash
 cd backend/
 uv venv
+source .venv/bin/activate
 uv pip install -r requirements.txt
-uv run python manage.py migrate
+python manage.py migrate
 ```
 
 ### 4. (Optional) Create a superuser for the Django admin
 
 ```bash
 cd backend/
-uv run python manage.py createsuperuser
+source .venv/bin/activate
+python manage.py createsuperuser
 ```
 
 ## Running
@@ -45,7 +48,8 @@ Start both servers in separate terminals:
 
 **Backend** (from `backend/`):
 ```bash
-uv run python manage.py runserver
+source .venv/bin/activate
+python manage.py runserver
 ```
 
 **Frontend** (from repo root):
