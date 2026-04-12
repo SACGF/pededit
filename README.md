@@ -1,4 +1,4 @@
-# PedEd - the Pedigree Editor
+# PedEdit - the Pedigree Editor
 
 A web-based pedigree editor for clinical genetics, genetic counseling, and medical research.
 

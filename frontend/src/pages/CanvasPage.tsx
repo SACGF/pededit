@@ -42,7 +42,7 @@ export default function CanvasPage() {
   // Page title
   const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
   useEffect(() => {
-    document.title = activeTitle ? `PedEd: ${activeTitle}` : "PedEd: Pedigree Editor";
+    document.title = activeTitle ? `PedEdit: ${activeTitle}` : "PedEdit: Pedigree Editor";
   }, [activeTitle]);
 
   const handleNew = async () => {
@@ -78,8 +78,11 @@ export default function CanvasPage() {
         </div>
 
         <div className="p-3 flex-1 overflow-y-auto">
-          <Button size="sm" className="w-full mb-2 h-7 text-xs" onClick={handleNew}>
+          <Button size="sm" className="w-full mb-1 h-7 text-xs" onClick={handleNew}>
             New pedigree
+          </Button>
+          <Button size="sm" variant="outline" className="w-full mb-2 h-7 text-xs" onClick={() => setImportOpen(true)}>
+            Import PED…
           </Button>
           <ul className="space-y-0.5">
             {pedigrees.map((p) => (
@@ -136,19 +139,8 @@ export default function CanvasPage() {
         {hasPedigree && (
           <Toolbar
             onSettingsClick={() => setSettingsOpen(true)}
-            onImportClick={() => setImportOpen(true)}
             onExportSvgClick={() => setExportDialogOpen(true)}
           />
-        )}
-        {!hasPedigree && (
-          <div className="flex items-center px-2 py-1 border-b bg-white">
-            <button
-              className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
-              onClick={() => setImportOpen(true)}
-            >
-              Import PED…
-            </button>
-          </div>
         )}
 
         <div className="flex flex-1 overflow-hidden">
