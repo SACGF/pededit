@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-**Phases 1–5a complete.** See `claude/overall_plan.md` for the full phase plan.
+**Phases 1–5b complete.** See `claude/overall_plan.md` for the full phase plan.
 
 - **Phase 1:** `layout-engine/` — TypeScript package, 16 tests, kinship2 layout algorithm
 - **Phase 2:** Django + React scaffold — auth, CRUD, empty canvas
 - **Phase 3:** Visual renderer — NSGC symbols, couple/sibship/consanguinity edges, read-only pan/zoom canvas. 32 tests in `frontend/src/pedigree/__tests__/`.
 - **Phase 4:** Core interaction — toolbar (add male/female/unknown), hover pill (add parents/children/siblings), more menu (mark affected/deceased/proband, set sex, delete, move sib), edit panel (name/DOB/notes), settings panel (sibling order), undo/redo, keyboard shortcuts, auto-save on pedigree switch.
-- **Phase 5a:** PED file import/export — `frontend/src/io/ped/` (parser, validator, converter, exporter), `ImportPedDialog`, toolbar Import/Export buttons. 129 tests. Next: Phase 5b (SVG export).
+- **Phase 5a:** PED file import/export — `frontend/src/io/ped/` (parser, validator, converter, exporter), `ImportPedDialog`, toolbar Import/Export buttons. 129 tests.
+- **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`. Next: Phase 5c small features (see `claude/new_features.md`), then Phase 6.
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
 

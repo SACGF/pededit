@@ -60,15 +60,31 @@ This report surveys pedigree drawing/editing software across open-source project
 | Attribute | Detail |
 |-----------|--------|
 | **URL** | https://www.genecascade.org/DrawPed/ |
-| **Source** | https://git-ext.charite.de/genecascade/drawped |
-| **Language** | Perl (backend), plain JavaScript (frontend, no libraries) |
-| **Type** | Web app (also runs locally without server) |
-| **License** | Open source |
+| **Source** | https://git-ext.charite.de/genecascade/drawped (GitLab, Charité Berlin) |
+| **Language** | Perl CGI (backend), plain JavaScript (frontend — **no libraries at all**, not even d3) |
+| **Type** | Web app; can run locally without server |
+| **License** | CC BY-SA 4.0 |
 | **Last updated** | 2024 (active) |
-| **Paper** | *Nucleic Acids Research* 52(W1):W61, 2024 |
-| **Key features** | Auto-draws from PED files, interactive editing, create from scratch, SVG output (publication-ready), handles deceased/consanguinity, works offline |
-| **Drag & drop** | Partial (interactive editing, click-to-add) |
-| **Notes** | Very recent publication (2024). Lightweight, no JS framework dependencies. From Charite Berlin. |
+| **Paper** | Hotz et al., *Nucleic Acids Research* 52(W1):W61, 2024. PMC: PMC11223805 |
+| **Key features** | PED import/export, interactive editing (click-to-add), publication-ready SVG, automatic consanguinity detection, deceased/proband/consultand markers, privacy-first (no server storage), URL-encoded permalinks for sharing, batch API via HTTP POST |
+| **Drag & drop** | No — click-to-add only, no repositioning |
+| **Supported symbols** | Deceased (crossed slash), proband/consultand (arrow), consanguinity (double line), miscarriage; **no carrier dot** (deliberate — see notes), no twins |
+| **Missing features** | Twins, carrier dots, multiple traits, manual repositioning, user accounts, non-binary/gender-inclusive symbols, assisted reproduction |
+| **Cost** | Free |
+
+**Layout algorithm:** Custom two-phase hand-coded algorithm (no external layout library). Phase 1: depth-first traversal assigning generation numbers and within-generation indices. Phase 2: iterative horizontal adjustment to centre children under parents and eliminate overlaps. Males are always placed on the left of couples per NSGC convention. The algorithm enforces biological correctness constraints (preventing impossible relationships) but cannot handle nested consanguinity loops, generation-spanning parents, or backcrossing.
+
+**Data model:** Standard PED format (PLINK-compatible). Additional annotations stored as comment-style extra columns: `#DECEASED`, `#PROBAND`, `#CONSULTAND`, `#CONSANGUINEOUS`, `#MISCARRIAGE`. Internal pedigree state encoded as compressed URL fragment for permalink sharing (7-day server collaboration projects also available).
+
+**Notable design decisions:**
+- **No carrier dots by design** — developers argue heterozygous carrier status requires genotype/penetrance data the tool cannot assume. This is a principled position but blocks clinical pedigree workflows where carrier notation is standard.
+- **No external JS dependencies** — plain JavaScript with no d3, no React, no frameworks. Result: fast, offline-capable, minimal attack surface. Tradeoff: limited interactivity.
+- **API access** — `curl -F svg=1 -F pedfile=@family.ped https://www.genecascade.org/DrawPed/` returns SVG directly. Perl script available for batch processing multi-family PED files. No comparable API exists in any other open-source tool.
+- **Privacy model** — no tracking, no external APIs, pedigree data never leaves the browser except for explicit collaboration use.
+
+**Notes:** Most technically disciplined of the open-source web tools. The comparison table at `genecascade.org/DrawPed/comparison.html` is useful competitive intelligence (compares vs. pedigreejs, HaploPainter, Madeline 2.0, etc.). The Perl backend is legacy tech but the tool's value is in the algorithm and data model, not the server.
+
+**What to learn from DrawPed:** Automatic consanguinity detection from parent relationships (no user input required); URL-based pedigree encoding for privacy-preserving sharing; batch processing HTTP API pattern; aggressive validation of biological constraints at edit time.
 
 ### QuickPed
 | Attribute | Detail |
@@ -316,12 +332,28 @@ This report surveys pedigree drawing/editing software across open-source project
 | Attribute | Detail |
 |-----------|--------|
 | **URL** | https://pedigreetool.com/ |
-| **Type** | Web app |
-| **Status** | Research version available; Clinical License launching later 2026 |
-| **Key features** | NSGC 2022 nomenclature (sex/gender inclusive), drag-and-drop canvas, color-coded disease status, carriers, annotations, consanguinity, twins, multiplets, export PDF/SVG/PNG/JSON/PED/CSV |
+| **Type** | Web app (SaaS) |
+| **Advisor** | Birgitt Schuele MD, Associate Professor of Pathology, Stanford University |
+| **Status** | Free beta (no credit card); Clinical License launching later 2026 |
+| **Tech stack** | Modern JavaScript framework (React or Vue — not disclosed); SVG canvas; WordPress marketing site separate from app |
+| **Key features** | Drag-and-drop canvas, NSGC 2022 nomenclature, carrier dots, twins/multiplets, consanguinity, multiple partners, single parents, annotations, HPO/MONDO phenotype integration via EMBL-EBI OLS auto-complete, export PDF/SVG/PNG/JSON/PED/CSV |
 | **Drag & drop** | Yes |
-| **Cost** | Free (research); Commercial (clinical, coming 2026) |
-| **Notes** | New entrant with modern NSGC standards. Not fully launched yet. |
+| **Export formats** | SVG, PNG, PDF, JSON, PED, CSV — richest export set of any tool surveyed |
+| **Symbols** | Full NSGC 2022 including diamond for non-binary (gender-inclusive per NSGC 2022 guidance) |
+| **Cost** | Free beta (research); Clinical License TBD 2026 (early adopter 30% discount offered) |
+| **License** | Proprietary / closed-source |
+
+**What's notable:**
+- **HPO/MONDO integration** — free-text phenotype fields with real-time ontology suggestions from EMBL-EBI Ontology Lookup Service. No other open-source tool does this. Allows structured clinical phenotyping alongside the pedigree diagram.
+- **Richest export set** — PDF export (for reports/referrals) and CSV export (for spreadsheet analysis) are not available in any open-source tool. JSON export enables programmatic integration.
+- **Stanford-connected, clinical-aware team** — backed by a medical genetics researcher, not a general-purpose dev shop. Likely to get clinical workflow details right.
+- **Clinical version** promises: survey-based intake (patient fills in family history before appointment), patient-facing portal, organisational licensing (one licence per institution, not per user).
+
+**On the NSGC 2022 gender-inclusive symbols:** PedigreeTool implements the diamond symbol for non-binary per the NSGC 2022 update. Our CLAUDE.md has a considered position that pedigree symbols represent **biological sex** (which determines inheritance patterns and risk model inputs), not gender identity. PedigreeTool follows NSGC 2022 literally; we follow the clinical genetics reasoning that a trans man who is 46,XX still needs a circle on the pedigree because that is what the risk model requires. These are incompatible design positions, not one correct and one wrong — the relevant question is what the target user (genetic counsellors using risk models) actually needs.
+
+**Limitations:** Closed-source. No public API (DrawPed has one). No GitHub. Clinical features are vaporware until launch. Startup risk — if the company folds, users lose access.
+
+**What to learn from PedigreeTool:** PDF export for clinical reports; CSV export for data analysis; HPO/MONDO phenotype annotation as a structured field (not free text); organisational licensing model; the richness of their export format set signals what clinicians actually ask for.
 
 ### FastFamilyTree
 | Attribute | Detail |
@@ -380,7 +412,7 @@ This report surveys pedigree drawing/editing software across open-source project
 |------|------|----------|-------------|-------------|--------|-------|-------|-------------|
 | **pedigreejs** | Web lib | JS/D3 | Yes | GPL-3 | Yes | 73 | 2018 | Yes |
 | **Open Pedigree** | Web app | JS | Yes | LGPL-2.1 | No (2019) | 55 | - | Yes |
-| **DrawPed** | Web app | Perl/JS | Partial | Yes | Yes | - | 2024 | Yes |
+| **DrawPed** | Web app | Perl/JS (no libs) | No (click-to-add) | CC BY-SA 4.0 | Yes | - | 2024 | Yes |
 | **QuickPed** | Web app | R/Shiny | No | GPL-3 | Yes | 31 | 2022 | Research |
 | **family-chart** | JS lib | TS/D3 | Yes | MIT | Yes | 712 | - | No (general) |
 | **Madeline 2.0** | CLI | C++ | No | GPL | No | - | 2007 | Research |
@@ -390,7 +422,7 @@ This report surveys pedigree drawing/editing software across open-source project
 | **Progeny** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
 | **TrakGene** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
 | **FamGenix** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
-| **PedigreeTool** | Web app | Proprietary | Yes | No | Yes | - | - | Coming 2026 |
+| **PedigreeTool** | Web app | Proprietary | Yes | No | Beta | - | - | Beta/Coming 2026 |
 | **FastFamilyTree** | Web app | Proprietary | ? | No | Yes | - | - | Yes |
 | **f-tree** | Desktop+iOS | Proprietary | ? | No | Yes | - | 2017 | Yes |
 | **Cyrillic** | Desktop | Proprietary | Yes | No | Legacy | - | - | Yes |
@@ -662,6 +694,70 @@ Each item cites where people complained about it.
 4. Round-trip SVG editing (nobody does this)
 5. Interactive editing at scale (hundreds of individuals) (nobody does this interactively)
 6. Modern web tech (React/Svelte + TypeScript + D3.js) with zero-install deployment (nobody has this in open source)
+
+---
+
+## 10. Technical Learnings from DrawPed and PedigreeTool
+
+*Added 2026-04-12 following deep-read of the DrawPed NAR 2024 paper, DrawPed source and documentation, and PedigreeTool website.*
+
+---
+
+### DrawPed — specific technical learnings
+
+**1. Automatic consanguinity detection — no user input required.**
+DrawPed detects consanguinity by checking whether the two parents of a child share any ancestor in the pedigree graph. This is an ancestor-reachability check: for each couple, compute the ancestor sets of both partners and test for intersection. Our converter already does this for PED import (`converter.ts`). It should also run automatically when editing in the UI — any time a new partnership is created, silently check whether the partners are related and set `consanguineous: true` on the `Partnership` if so. Currently we require the user to mark this manually via the more-menu. This is a meaningful usability gap.
+
+**2. URL-encoded pedigree sharing.**
+DrawPed encodes the entire pedigree into a compressed URL fragment for permalink sharing. The pedigree never leaves the browser except via the URL. This matters in clinical contexts: sharing a pedigree image link without a server storing the data is a meaningfully different privacy posture than emailing a file. Implementation: JSON-stringify the `Pedigree` object, gzip (using `CompressionStream`), base64url-encode, append as `#data=...` fragment. Receiving end reverses the process. This is a 1–2 day feature that enables "share this pedigree" without requiring the recipient to have an account.
+
+**3. Batch processing HTTP POST API.**
+DrawPed exposes `curl -F svg=1 -F pedfile=@family.ped https://...` to produce SVG programmatically. No other open-source tool has anything comparable. Researchers processing large cohorts (hundreds of families) cannot click through a GUI. Our Django backend is already structured to serve this: adding a `POST /api/pedigrees/render-svg/` endpoint that accepts a PED file body and returns SVG is a small change. This unlocks research pipeline integration that none of our open-source competitors offer.
+
+**4. Edit-time biological constraint validation.**
+DrawPed disables or grays out actions that would produce an impossible pedigree (e.g. marking a deceased person as pregnant). Our more-menu and hover pill currently do not enforce this — you can add a child to a deceased individual. Adding constraint checks at action time (in `usePedigreeStore.ts`) would prevent nonsensical pedigrees and align with DrawPed's "enforced correctness" design philosophy.
+
+**5. DrawPed's algorithm limitations are documented and explicit.**
+The DrawPed FAQs and paper explicitly list what the tool cannot do: nested consanguinity loops without line crossings, cross-generational matings, backcrossing, multiple traits. This is good practice — being explicit about limitations builds trust. Consider a similar "known limitations" section in our docs or a visible indicator when a pedigree exceeds the layout engine's handling.
+
+**6. DrawPed's layout algorithm is custom and relatively simple.**
+It is not kinship2, not force-directed, not a published algorithm. It does: depth-first traversal for generation assignment, then iterative centering of children under parents. The result is good for simple pedigrees but breaks on complex ones — which is exactly the gap our kinship2 port is designed to close. This confirms our algorithmic differentiation is real.
+
+---
+
+### PedigreeTool — specific technical learnings
+
+**1. HPO/MONDO phenotype annotation via EMBL-EBI OLS.**
+PedigreeTool integrates the EMBL-EBI Ontology Lookup Service for free-text phenotype fields, offering real-time autocomplete suggestions from HPO (Human Phenotype Ontology) and MONDO (disease ontology). This transforms the "notes" field from free text into structured clinical data. Implementation would mean: an `hpoTerms: string[]` field on `Individual` (list of HPO codes like `HP:0001250`), a phenotype search input component that queries `https://www.ebi.ac.uk/ols4/api/search?q=...&ontology=hp,mondo`, and a tag display in the edit panel. The OLS API is free and open. This is a Phase 7+ feature but the data model slot should be planned now.
+
+**2. PDF export for clinical reports.**
+PedigreeTool exports PDF in addition to SVG/PNG. In clinical settings, pedigrees go into referral letters and patient records as PDFs, not SVGs. Our SVG exporter (Phase 5b) produces the geometric foundation — converting SVG to PDF can be done client-side via `jsPDF` (imports the SVG) or server-side via Inkscape/Puppeteer on the Django backend. This is a low-effort addition to Phase 5b that would meaningfully close the feature gap with PedigreeTool.
+
+**3. CSV export for data analysis.**
+Exporting individuals as a CSV (one row per individual: ID, sex, affected, dob, parents, phenotypes) enables downstream Excel/R analysis without parsing PED format. Easy to add to our exporter layer alongside PED export.
+
+**4. Organisational licensing model.**
+PedigreeTool sells one clinical licence per institution, not per user. This dramatically reduces procurement friction for hospitals and university genetics departments (a single PO instead of per-seat negotiation). Relevant for Phase 8 when we consider monetisation.
+
+**5. Stanford advisor signals the target user.**
+Birgitt Schuele's lab works on neurodegeneration (Parkinson's, related movement disorders) — a heavy pedigree user domain. Her involvement suggests PedigreeTool is optimised for the kind of pedigrees that appear in neurogenetics: moderately complex, 3–4 generation, focused on a specific phenotype, destined for case reports and grant applications. Not necessarily the large consanguineous pedigrees of clinical genetics referral centres. This matters for feature prioritisation: their target user may not need the kinship2-quality layout we're building.
+
+---
+
+### Cross-tool summary: what both reveal about the market
+
+| Observation | DrawPed | PedigreeTool | Implication |
+|---|---|---|---|
+| PED format is the lingua franca | Core format | Supported | Our PED import/export (Phase 5a) is the right call |
+| SVG as primary export | Yes | Yes | Phase 5b (SVG export) is table stakes |
+| No manual repositioning | No (by design) | Yes | Our Phase 6 drag-and-drop is still a differentiator even vs. PedigreeTool |
+| Automatic consanguinity detection | Yes | Presumably yes | We should add auto-detection in the edit path, not just import |
+| Carrier dots | No (deliberate) | Yes | We already have carrier dots — advantage over DrawPed |
+| Twins | No | Yes | Deferred to Phase 7; DrawPed's absence confirms it's not trivial |
+| Privacy-first architecture | Strongly | Not stated | URL encoding is worth implementing as a sharing feature |
+| Phenotype ontology integration | None | HPO/MONDO | Phase 7 data model should reserve space for `hpoTerms: string[]` |
+| Batch / API access | Yes (curl) | No | Our Django backend makes this easier than DrawPed's Perl CGI |
+| Open source | CC BY-SA 4.0 | No | Our open-source model is a structural advantage over PedigreeTool |
 
 ---
 

@@ -3,6 +3,7 @@ import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed } from "../io/ped/index.js";
+import { exportCsv } from "../io/csv/exporter";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -45,6 +46,17 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
     const a = document.createElement("a");
     a.href = url;
     a.download = `${activeTitle ?? "pedigree"}.ped`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleExportCsv() {
+    const text = exportCsv(pedigree, "FAM001");
+    const blob = new Blob([text], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeTitle ?? "pedigree"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -127,7 +139,19 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
         onClick={handleExportPed}
       >
         <Download size={12} />
-        Export
+        Export PED
+      </Button>
+
+      {/* Export CSV */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Export as CSV file"
+        disabled={!hasPedigree}
+        onClick={handleExportCsv}
+      >
+        <Download size={12} />
+        Export CSV
       </Button>
 
       {/* Export SVG/PNG */}

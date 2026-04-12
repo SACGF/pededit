@@ -65,3 +65,32 @@ describe("kindepth", () => {
     expect(hasZero).toBe(true);
   });
 });
+
+describe("kindepth force fallback", () => {
+  it("does not throw on a cross-generational pedigree via try/catch pattern", () => {
+    // Cross-generational: grandpa married to granddaughter.
+    // This creates a depth contradiction in some align passes.
+    // The try/catch pattern should always produce valid depths.
+    const input = buildLayoutInput([
+      { id: 1, father: 0, mother: 0, sex: 1 }, // grandpa
+      { id: 2, father: 0, mother: 0, sex: 2 }, // grandma
+      { id: 3, father: 1, mother: 2, sex: 2 }, // daughter
+      { id: 4, father: 0, mother: 0, sex: 1 }, // marry-in male
+      { id: 5, father: 4, mother: 3, sex: 2 }, // granddaughter
+      // grandpa(1) also fathers a child with granddaughter(5)
+      { id: 6, father: 1, mother: 5, sex: 1 },
+    ]);
+    expect(() => {
+      let depth: Int32Array;
+      try {
+        depth = kindepth(input, true);
+      } catch {
+        depth = kindepth(input, false);
+      }
+      // All depths must be non-negative
+      for (let i = 1; i <= input.n; i++) {
+        expect(depth[i]).toBeGreaterThanOrEqual(0);
+      }
+    }).not.toThrow();
+  });
+});

@@ -33,7 +33,15 @@ export function alignPedigree(
   const input = pedigreeToLayoutInput(pedigree);
 
   // 2. Assign generations
-  const depth = kindepth(input, true);
+  let depth: Int32Array;
+  try {
+    depth = kindepth(input, true);
+  } catch {
+    // Inbred pedigree that fails the couple-alignment pass.
+    // Fall back to depth-only: parents may end up at different depths,
+    // but the layout will not crash. Rare in practice.
+    depth = kindepth(input, false);
+  }
   const level = new Int32Array(input.n + 1);
   for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
 

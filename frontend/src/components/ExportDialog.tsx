@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { exportSvg, exportPng } from "../io/svg/index";
+import { exportSvg, exportPng, exportPdf } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 interface ExportDialogProps {
@@ -21,7 +21,7 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDialogProps) {
-  const [format, setFormat]         = useState<"svg" | "png">("svg");
+  const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
   const [pngScale, setPngScale]     = useState<1 | 2 | 3>(2);
@@ -38,9 +38,12 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
 
       if (format === "svg") {
         downloadBlob(new Blob([svgString], { type: "image/svg+xml" }), `${title}.svg`);
-      } else {
+      } else if (format === "png") {
         const blob = await exportPng(svgString, pngScale);
         downloadBlob(blob, `${title}.png`);
+      } else {
+        const blob = await exportPdf(svgString, title);
+        downloadBlob(blob, `${title}.pdf`);
       }
 
       onOpenChange(false);
@@ -61,7 +64,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
           <div className="space-y-1.5">
             <div className="text-xs font-medium text-gray-700">Format</div>
             <div className="flex gap-4">
-              {(["svg", "png"] as const).map(f => (
+              {(["svg", "png", "pdf"] as const).map(f => (
                 <label key={f} className="flex items-center gap-1.5 text-xs cursor-pointer">
                   <input
                     type="radio"

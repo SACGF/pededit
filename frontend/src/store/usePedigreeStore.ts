@@ -3,6 +3,7 @@ import { produce } from "immer";
 import type {
   Pedigree, Individual, Sex, SiblingOrderSettings, Partnership
 } from "@pedigree-editor/layout-engine";
+import { shareAncestor } from "../utils/pedigreeRelationship";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -336,6 +337,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         draft.partnerships.push(partnership);
         if (!draft.parentOf[partnership.id]) {
           draft.parentOf[partnership.id] = [];
+        }
+        // Auto-detect consanguinity: set flag if the two individuals share an ancestor
+        if (shareAncestor(draft as unknown as Pedigree, individualId, partner.id)) {
+          partnership.consanguineous = true;
         }
       });
     },
