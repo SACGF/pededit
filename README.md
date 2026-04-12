@@ -82,6 +82,10 @@ npm run test:layout
 npm -w @pedigree-editor/frontend run typecheck
 ```
 
+## Production deployment
+
+See [INSTALL.md](INSTALL.md) for step-by-step instructions to deploy on Ubuntu 24.04 with Nginx, Gunicorn, and PostgreSQL.
+
 ## Project structure
 
 ```

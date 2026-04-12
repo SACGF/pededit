@@ -1,0 +1,6 @@
+{
+  "database_url": "postgres://pededit:pededit@localhost:5432/pededit",
+  "allowed_hosts": ["localhost", "127.0.0.1", "your-domain.example.com"],
+  "cors_allowed_origins": ["https://your-domain.example.com"],
+  "debug": false
+}

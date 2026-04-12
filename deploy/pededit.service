@@ -1,0 +1,27 @@
+[Unit]
+Description=PedEdit Gunicorn daemon
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+User=pededit
+Group=pededit
+WorkingDirectory=/opt/pededit/backend
+ExecStart=/opt/pededit/backend/.venv/bin/gunicorn \
+  peded.wsgi:application \
+  --bind 127.0.0.1:8000 \
+  --workers 3 \
+  --timeout 30 \
+  --access-logfile - \
+  --error-logfile -
+Restart=on-failure
+RestartSec=5
+
+# Hardening
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/pededit/backend
+ReadOnlyPaths=/etc/pededit
+
+[Install]
+WantedBy=multi-user.target
