@@ -30,56 +30,54 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ---
 
-## Phase 2 — Project scaffold
+## Phase 2 — Project scaffold ✅ COMPLETE
 
-**What:** Wire up the full stack with working but empty plumbing.
+**Delivered:** Full-stack scaffold with working but empty plumbing.
 
-**Backend (Django + DRF):**
-- Django project with DRF
-- `Pedigree` model: owner, title, data (JSONField), created/updated timestamps
-- CRUD endpoints: `POST /api/pedigrees/`, `GET /api/pedigrees/{id}/`, `PATCH`, `DELETE`
-- Simple JWT auth (register/login/refresh)
-- Postgres
+**What was built:**
+- Django 5 + DRF: `Pedigree` model (owner, title, data JSONField, timestamps), CRUD endpoints (`POST/GET/PATCH/DELETE /api/pedigrees/`), simplejwt auth (login/refresh/me), Postgres
+- React 18 + TypeScript + Vite: Zustand store (auth + pedigree list + active pedigree), API client (axios), Tailwind + shadcn/ui, `@xyflow/react` installed and rendering an empty canvas
+- `CanvasPage`: sidebar with pedigree list, "New pedigree" button, empty ReactFlow canvas
 
-**Frontend (React + TypeScript + Vite):**
-- Vite project with React 18 + TypeScript
-- React Flow (xyflow) installed and rendering an empty canvas
-- Zustand store wired up (empty pedigree state)
-- Tailwind + shadcn/ui
-- API client pointing at Django
-
-**Why here:** Get the full-stack wiring done before there is real UI to complicate it. Auth and storage are plumbing — easier to add to an empty app than retrofit onto a working one. Django model design is informed by the Phase 1 data model.
-
-**Milestone:** Register `peded.io` on Cloudflare — Phase 1 proving out means the project is real.
-
-**Defer:** No pedigree-specific rendering yet, no actual editor features.
+**Defer:** No pedigree-specific rendering, no editor features.
 
 ---
 
-## Phase 3 — Visual renderer (read-only)
+## Phase 3 — Visual renderer (read-only) ✅ COMPLETE
 
-**What:** Given a `Pedigree` + `Layout`, render it correctly as interactive React Flow components. No editing yet — just display.
+**Delivered:** `Pedigree` + `LayoutResult` renders as a correct, interactive (pan/zoom) React Flow pedigree. Read-only.
 
-**Node components (React Flow custom nodes) for all NSGC symbols:**
-- Square/circle/diamond (male/female/unknown sex)
-- Filled/unfilled/half-filled/dot (affected/unaffected/carrier/obligate carrier)
-- Diagonal slash overlay (deceased)
-- Proband arrow
-- Pregnancy triangle, miscarriage/termination symbols
-- Grouped siblings node (n inside symbol)
+**What was built:**
 
-**Edge components (React Flow custom edges) for all relationship line types:**
-- Horizontal couple line with vertical drop to sibship line
-- Sibship horizontal line with drops to each child
-- Consanguinity double-line
-- Loop routing for distant consanguinity (line goes below the diagram)
-- Dashed line for non-biological relationships
+*`frontend/src/pedigree/` package:*
+- `constants.ts` — `SLOT_WIDTH=80`, `ROW_HEIGHT=120`, `NODE_SIZE=40`, `SIB_BAR_FACTOR=0.5`
+- `layoutToFlow.ts` — pure `Pedigree → FlowData` transformer: `buildNodes` (with `nid+0.5` floor stripping, duplicate detection), `buildCoupleEdges`, `buildSibshipEdges` (pre-computes all geometry as edge data)
+- `PedigreeCanvas.tsx` — ReactFlow wrapper: all node/edge types registered, `nodeOrigin=[0.5,0.5]`, `useMemo`, global SVG defs for proband arrow, read-only flags
+- `nodes/symbols.tsx` — `SymbolShape` (square/circle/diamond), filled/empty/carrier-dot fills, `DeceasedSlash`, `ProbandArrow`, `DuplicateSuperscript`
+- `nodes/PedigreeSymbolNode.tsx` — custom node with four invisible handles (`couple-out/in`, `sibship-out/in`)
+- `edges/CoupleEdge.tsx` — single horizontal line
+- `edges/ConsanguineousEdge.tsx` — double parallel horizontal line
+- `edges/SibshipEdge.tsx` — T-shape: vertical drop from couple midpoint → sibship bar → per-child drops
 
-**Why here:** Separating rendering from interaction means you can verify "does this pedigree look visually correct" before adding any edit operations. Easier to catch rendering bugs when the state is static. The consanguinity loop routing is the trickiest rendering problem — solve it here in isolation.
+*Fixtures (`frontend/src/fixtures/`):*
+- `simpleFamily.ts` — 3-generation nuclear family (8 individuals, deceased father, proband, carrier)
+- `consanguineous.ts` — sibling consanguinity family (6 individuals, double couple line)
 
-**Deliverable:** Hard-coded example pedigrees render correctly. Someone reviewing the repo can see it looks like a real pedigree tool.
+*Tests (`frontend/src/pedigree/__tests__/layoutToFlow.test.ts`):*
+- 32 passing tests covering node count/ids/individuals/positions, couple edge types and handles, sibship edge geometry for both fixtures, edge cases (single individual, empty throws)
+- 1 `todo` test for `isDuplicate` detection (blocked on Phase 6 `autohint`)
 
-**Defer:** No editing, no drag-and-drop, no format I/O.
+*`CanvasPage.tsx` updated:* renders `PedigreeCanvas` from Zustand `activePedigree`; placeholder text when none selected or empty.
+
+**Deferred to later phases:**
+- Pregnancy triangle, miscarriage/TOPFA symbols (Phase 4/5)
+- Label rendering — name, DOB, age below symbol (Phase 4)
+- Dashed line for non-biological relationships / adoption (Phase 5)
+- Distant consanguinity loop routing for non-adjacent partners (Phase 7)
+- Grouped siblings node, half-fill multi-trait display (Phase 7)
+- `autohint` duplicate detection → duplicate superscript ordering (Phase 6)
+
+**Known behaviour:** `alignPedigree` throws on empty input; `CanvasPage` guards against this with `individuals.length > 0`.
 
 ---
 

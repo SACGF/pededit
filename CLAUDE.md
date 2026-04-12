@@ -4,14 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-**Phase 1 complete.** `layout-engine/` is a self-contained TypeScript package (16 tests passing) implementing the kinship2 layout algorithm. See `claude/overall_plan.md` for the full phase plan.
+**Phases 1–3 complete.** See `claude/overall_plan.md` for the full phase plan.
+
+- **Phase 1:** `layout-engine/` — TypeScript package, 16 tests, kinship2 layout algorithm
+- **Phase 2:** Django + React scaffold — auth, CRUD, empty canvas
+- **Phase 3:** Visual renderer — NSGC symbols, couple/sibship/consanguinity edges, read-only pan/zoom canvas. 32 tests in `frontend/src/pedigree/__tests__/`. Next: Phase 4 (core interaction).
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
 
 ## Key Reference Documents
 
 - `claude/overall_plan.md` — phase-by-phase build plan
-- `claude/phase_2_plan.md` — detailed Phase 2 scaffold spec (Django + React + Vite)
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
 - `claude/search_report.md` — domain research and feature gap analysis
 
