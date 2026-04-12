@@ -1,7 +1,7 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Image, List } from "lucide-react";
 import { exportPed } from "../io/ped/index.js";
 import { exportCsv } from "../io/csv/exporter";
 
@@ -31,9 +31,10 @@ function UnknownIcon() {
 interface ToolbarProps {
   onSettingsClick: () => void;
   onExportSvgClick: () => void;
+  onLegendClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
+export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree } = usePedigreeStore();
   const { activePedigreeId, pedigrees } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
@@ -164,6 +165,18 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
       >
         <Image size={12} />
         SVG/PNG
+      </Button>
+
+      {/* Legend */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Figure legend"
+        disabled={!hasPedigree}
+        onClick={onLegendClick}
+      >
+        <List size={12} />
+        Legend
       </Button>
 
       <div className="w-px h-5 bg-gray-200 mx-0.5" />

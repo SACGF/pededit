@@ -9,6 +9,7 @@ import { EditPanel } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
+import { LegendDialog } from "../components/LegendDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -37,6 +38,7 @@ export default function CanvasPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -197,6 +199,7 @@ export default function CanvasPage() {
         <Toolbar
           onSettingsClick={() => setSettingsOpen(true)}
           onExportSvgClick={() => setExportDialogOpen(true)}
+          onLegendClick={() => setLegendOpen(true)}
         />
 
         <div className="flex flex-1 overflow-hidden">
@@ -231,6 +234,14 @@ export default function CanvasPage() {
           onOpenChange={setExportDialogOpen}
           pedigree={pedigree}
           title={activeTitle ?? "pedigree"}
+        />
+      )}
+
+      {activePedigreeId && (
+        <LegendDialog
+          open={legendOpen}
+          onOpenChange={setLegendOpen}
+          pedigree={pedigree}
         />
       )}
     </div>
