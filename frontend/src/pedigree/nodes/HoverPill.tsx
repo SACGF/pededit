@@ -35,12 +35,20 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
           ↑
         </PillButton>
 
-        {/* +child */}
+        {/* +son */}
         <PillButton
-          title="Add child"
-          onClick={() => addChild(individualId)}
+          title="Add son"
+          onClick={() => addChild(individualId, "male")}
         >
-          ↓
+          □↓
+        </PillButton>
+
+        {/* +daughter */}
+        <PillButton
+          title="Add daughter"
+          onClick={() => addChild(individualId, "female")}
+        >
+          ○↓
         </PillButton>
 
         {/* +sib */}

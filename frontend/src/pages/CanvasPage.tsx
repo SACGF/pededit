@@ -7,19 +7,57 @@ import { Toolbar } from "../components/Toolbar";
 import { EditPanel } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import type { PedigreeMeta } from "../api/client";
+
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60_000) return "just now";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return `${Math.floor(diff / 86_400_000)}d ago`;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString();
+}
 
 export default function CanvasPage() {
-  const { user, pedigrees, activePedigreeId, loadPedigrees, createPedigree, openPedigree, logout, saveActivePedigree } = useAppStore();
+  const {
+    user, pedigrees, activePedigreeId,
+    loadPedigrees, createPedigree, openPedigree, logout,
+    saveActivePedigree, renamePedigree,
+  } = useAppStore();
   const { isDirty } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
 
   useKeyboardShortcuts();
-
   useEffect(() => { loadPedigrees(); }, [loadPedigrees]);
+
+  // Page title
+  const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+  useEffect(() => {
+    document.title = activeTitle ? `PedEd: ${activeTitle}` : "PedEd: Pedigree Editor";
+  }, [activeTitle]);
 
   const handleNew = async () => {
     const id = await createPedigree("Untitled pedigree");
     await openPedigree(id);
+    setEditingId(id);
+    setEditingName("Untitled pedigree");
+  };
+
+  const startEditing = (p: PedigreeMeta) => {
+    setEditingId(p.id);
+    setEditingName(p.title);
+  };
+
+  const commitRename = async () => {
+    if (!editingId) return;
+    const trimmed = editingName.trim() || "Untitled pedigree";
+    await renamePedigree(editingId, trimmed);
+    setEditingId(null);
   };
 
   const hasPedigree = activePedigreeId !== null;
@@ -34,6 +72,7 @@ export default function CanvasPage() {
             Sign out
           </Button>
         </div>
+
         <div className="p-3 flex-1 overflow-y-auto">
           <Button size="sm" className="w-full mb-2 h-7 text-xs" onClick={handleNew}>
             New pedigree
@@ -41,15 +80,32 @@ export default function CanvasPage() {
           <ul className="space-y-0.5">
             {pedigrees.map((p) => (
               <li key={p.id}>
-                <button
-                  className={`
-                    w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100 truncate
-                    ${activePedigreeId === p.id ? "bg-gray-100 font-medium" : ""}
-                  `}
-                  onClick={() => openPedigree(p.id)}
-                >
-                  {p.title}
-                </button>
+                {editingId === p.id ? (
+                  <input
+                    autoFocus
+                    value={editingName}
+                    onChange={e => setEditingName(e.target.value)}
+                    onBlur={commitRename}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") { e.preventDefault(); commitRename(); }
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black"
+                  />
+                ) : (
+                  <button
+                    className={`
+                      w-full text-left px-2 py-1.5 rounded text-xs hover:bg-gray-100
+                      ${activePedigreeId === p.id ? "bg-gray-100 font-medium" : ""}
+                    `}
+                    onClick={() => openPedigree(p.id)}
+                    onDoubleClick={(e) => { e.preventDefault(); startEditing(p); }}
+                    title={`Created: ${formatDate(p.created)}\nModified: ${formatDate(p.updated)}`}
+                  >
+                    <span className="block truncate">{p.title}</span>
+                    <span className="text-[9px] text-gray-400 font-normal">{relativeTime(p.updated)}</span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -71,12 +127,11 @@ export default function CanvasPage() {
         )}
       </div>
 
-      {/* Right column: toolbar + editing area */}
+      {/* Right column: toolbar (when active) + editing area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <Toolbar onSettingsClick={() => setSettingsOpen(true)} />
+        {hasPedigree && <Toolbar onSettingsClick={() => setSettingsOpen(true)} />}
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Canvas */}
           <div className="flex-1">
             {hasPedigree ? (
               <PedigreeCanvas />
@@ -87,7 +142,6 @@ export default function CanvasPage() {
             )}
           </div>
 
-          {/* Right sidebar — edit panel */}
           {hasPedigree && (
             <div className="w-52 border-l bg-white shrink-0 overflow-y-auto">
               <EditPanel />

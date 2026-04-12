@@ -114,7 +114,7 @@ interface PedigreeState {
   // Structural mutations (each snapshots before mutating)
   addIndividual: (sex: Sex) => void;
   addParent: (individualId: string, sex: Sex) => void;
-  addChild: (individualId: string) => void;
+  addChild: (individualId: string, sex: Sex) => void;
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
   deleteIndividual: (individualId: string) => void;
@@ -263,14 +263,13 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     /**
-     * Add a child to individualId.
+     * Add a child of the given sex to individualId.
      *
      * - If individual has an existing partnership → add child there
      * - If individual has multiple partnerships → use first one (sufficient for Phase 4)
-     * - If individual has no partnership → create unknown-sex partner + partnership
-     * New child sex: unknown (diamond). User can change via hover pill.
+     * - If individual has no partnership → create an opposite-sex partner + partnership
      */
-    addChild: (individualId) => {
+    addChild: (individualId, sex) => {
       mutate(draft => {
         let partnershipId: string;
         const ownPs = findOwnPartnerships(draft, individualId);
@@ -278,8 +277,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (ownPs.length > 0) {
           partnershipId = ownPs[0]!;
         } else {
-          // No partnership — create one with an unknown placeholder partner
-          const placeholder = makeIndividual("unknown", 0);
+          // No partnership — create one with an opposite-sex partner
+          const ind = draft.individuals.find(i => i.id === individualId)!;
+          const partnerSex: Sex =
+            ind.sex === "male" ? "female" :
+            ind.sex === "female" ? "male" : "unknown";
+          const placeholder = makeIndividual(partnerSex, 0);
           const partnership: Partnership = {
             id: newId(),
             individual1: individualId,
@@ -291,7 +294,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           partnershipId = partnership.id;
         }
 
-        const child = makeIndividual("unknown", nextSibOrderInFamily(draft, partnershipId));
+        const child = makeIndividual(sex, nextSibOrderInFamily(draft, partnershipId));
         draft.individuals.push(child);
         draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
       });

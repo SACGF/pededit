@@ -75,6 +75,7 @@ export function PedigreeCanvas() {
         nodesConnectable={false}
         fitView
         onPaneClick={handlePaneClick}
+        proOptions={{ hideAttribution: true }}
       >
         {pedigree.individuals.length === 0 && (
           <div

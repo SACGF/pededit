@@ -39,12 +39,17 @@ export function kindepth(input: LayoutInput, align = false): Int32Array {
       }
     }
 
-    // Check for progress
+    // Check whether the child set changed from the previous iteration.
     let sameAsOld = true;
     for (let i = 1; i <= n; i++) {
       if (child[i] !== childOld[i]) { sameAsOld = false; break; }
     }
-    if (sameAsOld) throw new Error(`Impossible pedigree: no progress at iteration ${iter}`);
+    // At iter 1, childOld is all-zero; if child is also all-zero it just means
+    // there are no parent-child relationships in the pedigree at all (e.g. multiple
+    // isolated founders). That is valid — everyone stays at depth 0.  The !anyChild
+    // break below will then exit cleanly.
+    // At iter > 1, no change means a genuine cycle, which is an error.
+    if (sameAsOld && iter > 1) throw new Error(`Impossible pedigree: no progress at iteration ${iter}`);
 
     let anyChild = false;
     const nextParents: number[] = [];

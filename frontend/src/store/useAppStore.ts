@@ -23,6 +23,7 @@ interface AppState {
   createPedigree: (title: string) => Promise<string>; // returns new id
   deletePedigree: (id: string) => Promise<void>;
   saveActivePedigree: () => Promise<void>;
+  renamePedigree: (id: string, title: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -91,5 +92,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const pedigree = usePedigreeStore.getState().getPedigree();
     await pedigreeApi.update(activePedigreeId, { data: pedigree });
     usePedigreeStore.setState({ isDirty: false });
+  },
+
+  renamePedigree: async (id, title) => {
+    const { data } = await pedigreeApi.update(id, { title });
+    set(state => ({
+      pedigrees: state.pedigrees.map(p =>
+        p.id === id
+          ? { id: data.id, title: data.title, created: data.created, updated: data.updated }
+          : p
+      ),
+    }));
   },
 }));

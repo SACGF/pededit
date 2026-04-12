@@ -24,6 +24,19 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
 
+  // Collect sexes that would create a same-sex pairing (grey them out)
+  const disabledSexes = new Set<string>();
+  for (const p of pedigree.partnerships) {
+    const partnerId =
+      p.individual1 === individualId ? p.individual2 :
+      p.individual2 === individualId ? p.individual1 : null;
+    if (!partnerId) continue;
+    const partner = pedigree.individuals.find(i => i.id === partnerId);
+    if (partner && partner.sex !== "unknown") {
+      disabledSexes.add(partner.sex);
+    }
+  }
+
   function action(fn: () => void) {
     fn();
     setOpen(false);
@@ -79,6 +92,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
               key={sex}
               onClick={() => action(() => setSex(individualId, sex))}
               active={individual.sex === sex}
+              disabled={disabledSexes.has(sex)}
             >
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </MenuItem>
@@ -112,17 +126,20 @@ interface MenuItemProps {
   children: React.ReactNode;
   active?: boolean;
   destructive?: boolean;
+  disabled?: boolean;
 }
 
-function MenuItem({ onClick, children, active, destructive }: MenuItemProps) {
+function MenuItem({ onClick, children, active, destructive, disabled }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`
         w-full text-left px-2 py-1 rounded text-xs
         hover:bg-gray-100 transition-colors
         ${active ? "font-medium" : ""}
         ${destructive ? "text-red-600 hover:bg-red-50" : ""}
+        ${disabled ? "opacity-30 cursor-not-allowed hover:bg-transparent" : ""}
       `}
     >
       {children}
