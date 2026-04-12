@@ -275,7 +275,7 @@ def from_ped(request):
     for ped in pedigrees_data:
         title = ped.get("id") or "Imported pedigree"
         obj = Pedigree.objects.create(owner=request.user, title=title, data=ped)
-        created.append({"id": obj.pk, "title": obj.title})
+        created.append({"id": str(obj.pk), "title": obj.title})
     return Response(created, status=201)
 ```
 
@@ -290,7 +290,7 @@ from .views.from_ped import from_ped
 urlpatterns += [
     path("pedigrees/render-svg/",   render_svg_from_ped),   # POST
     path("pedigrees/render-svg/",   render_svg_from_data),  # GET  (Django routes by method)
-    path("pedigrees/<int:pk>/svg/", render_svg_stored),
+    path("pedigrees/<uuid:pk>/svg/", render_svg_stored),
     path("pedigrees/from-ped/",     from_ped),
 ]
 ```
@@ -318,7 +318,7 @@ POST /api/pedigrees/from-ped/
 Content-Type: text/plain
 Authorization: Bearer <token>
 <PED file content>
-→ 201  [{ "id": 42, "title": "FAM001" }, ...]
+→ 201  [{ "id": "550e8400-e29b-41d4-a716-446655440000", "title": "FAM001" }, ...]
 → 400  { "error": "..." }
 → 413  { "error": "PED file too large" }
 
