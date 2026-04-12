@@ -9,6 +9,10 @@ export interface Individual {
   deceased?: boolean;
   carrier?: boolean;
   proband?: boolean;
+  sibOrder: number;      // 0-indexed position within sibling group
+  name?: string;         // display name
+  dob?: string;          // ISO date string "YYYY-MM-DD"
+  notes?: string;        // free text clinical notes
 }
 
 /** A partnership (union) between two individuals. Children attach here, not to parents. */
@@ -19,11 +23,19 @@ export interface Partnership {
   consanguineous?: boolean;
 }
 
+export type SiblingOrderMode = "insertion" | "manual" | "birthDate";
+
+export interface SiblingOrderSettings {
+  mode: SiblingOrderMode;
+  affectedFirst: boolean;
+}
+
 export interface Pedigree {
   individuals: Individual[];
   partnerships: Partnership[];
   /** parentOf[partnershipId] = string[] of Individual.id children */
   parentOf: Record<string, string[]>;
+  siblingOrder: SiblingOrderSettings;
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

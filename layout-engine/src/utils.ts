@@ -40,10 +40,11 @@ export function buildLayoutInput(rows: FlatPedRow[]): LayoutInput {
  * Creates one Partnership per unique (father, mother) pair.
  */
 export function buildPedigreeFromFlat(rows: FlatPedRow[]): Pedigree {
-  const individuals: Individual[] = rows.map(row => ({
+  const individuals: Individual[] = rows.map((row, i) => ({
     id: String(row.id),
     sex: row.sex === 1 ? "male" : row.sex === 2 ? "female" : "unknown",
     affected: false,
+    sibOrder: i,
   }));
 
   // Group children by (father, mother) pair
@@ -73,5 +74,5 @@ export function buildPedigreeFromFlat(rows: FlatPedRow[]): Pedigree {
     parentOf[`p_${key}`] = val.children;
   }
 
-  return { individuals, partnerships, parentOf };
+  return { individuals, partnerships, parentOf, siblingOrder: { mode: "insertion", affectedFirst: false } };
 }

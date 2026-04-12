@@ -38,7 +38,7 @@ export function alignPedigree(
   for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
 
   // 3. Get ordering hints
-  const hints = options.hints ?? autohint(input, depth);
+  const hints = options.hints ?? autohint(input, pedigree);
 
   // 4. Build spouselist
   const { spouselist, spouselistRows } = buildSpouseList(input, hints, pedigree);

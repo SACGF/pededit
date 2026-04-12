@@ -264,6 +264,7 @@ describe("layoutToFlow — edge cases", () => {
       individuals: [],
       partnerships: [],
       parentOf: {},
+      siblingOrder: { mode: "insertion", affectedFirst: false },
     });
     expect(nodes).toHaveLength(0);
     expect(coupleEdges).toHaveLength(0);
@@ -272,9 +273,10 @@ describe("layoutToFlow — edge cases", () => {
 
   it("single individual: one node, no edges", () => {
     const { nodes, coupleEdges, sibshipEdges } = layoutToFlow({
-      individuals: [{ id: "x1", sex: "male", affected: false }],
+      individuals: [{ id: "x1", sex: "male", affected: false, sibOrder: 0 }],
       partnerships: [],
       parentOf: {},
+      siblingOrder: { mode: "insertion", affectedFirst: false },
     });
     expect(nodes).toHaveLength(1);
     expect(nodes[0]!.data.individual.id).toBe("x1");

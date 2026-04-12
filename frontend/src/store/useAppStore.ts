@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { authApi, pedigreeApi, PedigreeMeta, UserInfo } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { usePedigreeStore } from "./usePedigreeStore";
 
 interface AppState {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -12,8 +13,6 @@ interface AppState {
 
   // ── Active pedigree ────────────────────────────────────────────────────────
   activePedigreeId: string | null;
-  activePedigree: Pedigree | null;
-  isDirty: boolean;
 
   // ── Actions ────────────────────────────────────────────────────────────────
   login: (username: string, password: string) => Promise<void>;
@@ -23,7 +22,6 @@ interface AppState {
   openPedigree: (id: string) => Promise<void>;
   createPedigree: (title: string) => Promise<string>; // returns new id
   deletePedigree: (id: string) => Promise<void>;
-  markDirty: () => void;
   saveActivePedigree: () => Promise<void>;
 }
 
@@ -32,8 +30,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   isAuthenticated: !!localStorage.getItem("access_token"),
   pedigrees: [],
   activePedigreeId: null,
-  activePedigree: null,
-  isDirty: false,
 
   login: async (username, password) => {
     const { data } = await authApi.login(username, password);
@@ -46,7 +42,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
   logout: () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigree: null, activePedigreeId: null });
+    usePedigreeStore.getState().reset();
+    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null });
   },
 
   fetchMe: async () => {
@@ -61,11 +58,17 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   openPedigree: async (id) => {
     const { data } = await pedigreeApi.get(id);
-    set({
-      activePedigreeId: id,
-      activePedigree: data.data as Pedigree,
-      isDirty: false,
+    const pedigree = data.data as Pedigree;
+    // Ensure siblingOrder is present (backwards compat with pedigrees saved before Phase 4)
+    if (!pedigree.siblingOrder) {
+      pedigree.siblingOrder = { mode: "insertion", affectedFirst: false };
+    }
+    // Ensure each individual has sibOrder
+    pedigree.individuals.forEach((ind, i) => {
+      if (ind.sibOrder === undefined) ind.sibOrder = i;
     });
+    usePedigreeStore.getState().initialize(pedigree);
+    set({ activePedigreeId: id });
   },
 
   createPedigree: async (title) => {
@@ -79,16 +82,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((state) => ({
       pedigrees: state.pedigrees.filter((p) => p.id !== id),
       activePedigreeId: state.activePedigreeId === id ? null : state.activePedigreeId,
-      activePedigree: state.activePedigreeId === id ? null : state.activePedigree,
     }));
   },
 
-  markDirty: () => set({ isDirty: true }),
-
   saveActivePedigree: async () => {
-    const { activePedigreeId, activePedigree } = get();
-    if (!activePedigreeId || !activePedigree) return;
-    await pedigreeApi.update(activePedigreeId, { data: activePedigree });
-    set({ isDirty: false });
+    const { activePedigreeId } = get();
+    if (!activePedigreeId) return;
+    const pedigree = usePedigreeStore.getState().getPedigree();
+    await pedigreeApi.update(activePedigreeId, { data: pedigree });
+    usePedigreeStore.setState({ isDirty: false });
   },
 }));

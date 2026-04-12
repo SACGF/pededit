@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import {
   ReactFlow,
   Background,
@@ -8,16 +8,14 @@ import {
   type EdgeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { usePedigreeStore } from "../store/usePedigreeStore";
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 
-const nodeTypes: NodeTypes = {
-  pedigreeSymbol: PedigreeSymbolNode,
-};
+const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
 
 const edgeTypes: EdgeTypes = {
   coupleEdge:         CoupleEdge,
@@ -25,19 +23,38 @@ const edgeTypes: EdgeTypes = {
   sibshipEdge:        SibshipEdge,
 };
 
-interface PedigreeCanvasProps {
-  pedigree: Pedigree;
-}
+// Tool → sex mapping
+const ADD_TOOLS = { addMale: "male", addFemale: "female", addUnknown: "unknown" } as const;
 
-export function PedigreeCanvas({ pedigree }: PedigreeCanvasProps) {
+export function PedigreeCanvas() {
+  const { pedigree, activeTool, addIndividual, setSelectedId } = usePedigreeStore();
+
+  // Re-derive layout whenever pedigree data changes
   const { nodes, coupleEdges, sibshipEdges } = useMemo(
-    () => layoutToFlow(pedigree),
+    () => pedigree.individuals.length > 0
+      ? layoutToFlow(pedigree)
+      : { nodes: [], coupleEdges: [], sibshipEdges: [] },
     [pedigree],
   );
   const edges = [...coupleEdges, ...sibshipEdges];
 
+  const handlePaneClick = useCallback(() => {
+    // Deselect on bare canvas click
+    setSelectedId(null);
+
+    // Add individual if in an add-tool mode
+    if (activeTool in ADD_TOOLS) {
+      const sex = ADD_TOOLS[activeTool as keyof typeof ADD_TOOLS];
+      addIndividual(sex);
+      // Stay in add mode — user can switch to select when done
+    }
+  }, [activeTool, addIndividual, setSelectedId]);
+
+  const cursor =
+    activeTool === "select" ? "default" : "crosshair";
+
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div style={{ width: "100%", height: "100%", position: "relative", cursor }}>
       {/* Global SVG defs — proband arrowhead marker, registered once */}
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
@@ -53,11 +70,30 @@ export function PedigreeCanvas({ pedigree }: PedigreeCanvasProps) {
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        nodeOrigin={[0.5, 0.5]}   // node position = centre of symbol
-        nodesDraggable={false}     // read-only for now
-        nodesConnectable={false}   // read-only
+        nodeOrigin={[0.5, 0.5]}
+        nodesDraggable={false}    // Phase 6
+        nodesConnectable={false}
         fitView
+        onPaneClick={handlePaneClick}
       >
+        {pedigree.individuals.length === 0 && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "none",
+            }}
+          >
+            <span className="text-sm text-gray-300">
+              {activeTool === "select"
+                ? "Select a tool above to add individuals"
+                : "Click to place an individual"}
+            </span>
+          </div>
+        )}
         <Background />
         <Controls />
         <MiniMap />

@@ -18,6 +18,8 @@ export interface RFNodeData extends Record<string, unknown> {
    * superscript glyph. Undefined when isDuplicate = false.
    */
   duplicateIndex?: 1 | 2;
+  /** True if individual has a parent partnership in the pedigree. */
+  hasParents: boolean;
 }
 
 /** No extra data needed — geometry is derived from source/target handle positions. */
@@ -86,6 +88,10 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
       nidOccurrence.set(baseNid, occurrence);
       const isDuplicate = (nidSlotCount.get(baseNid) ?? 1) > 1;
 
+      const hasParents = Object.values(pedigree.parentOf).some(
+        children => children.includes(individual.id)
+      );
+
       nodes.push({
         id:       `${level}-${slot}`,
         type:     "pedigreeSymbol",
@@ -97,6 +103,7 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
           individual,
           isDuplicate,
           duplicateIndex: isDuplicate ? (occurrence as 1 | 2) : undefined,
+          hasParents,
         },
       });
     }
