@@ -442,12 +442,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     /**
-     * Mark as proband. Only one proband per pedigree — clears previous proband first.
+     * Toggle proband for id. Only one proband per pedigree — clears previous proband first.
+     * If id is already the proband, clears it.
      */
     setProband: (id) => {
       mutate(draft => {
+        const target = draft.individuals.find(i => i.id === id);
+        const isAlreadyProband = !!target?.proband;
         for (const ind of draft.individuals) {
-          ind.proband = ind.id === id ? true : undefined;
+          ind.proband = (!isAlreadyProband && ind.id === id) ? true : undefined;
         }
       });
     },

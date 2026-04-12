@@ -1,5 +1,8 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePedigreeStore } from "../store/usePedigreeStore";
+import { useAppStore } from "../store/useAppStore";
 import type { SiblingOrderMode } from "@pedigree-editor/layout-engine";
 
 interface SettingsPanelProps {
@@ -12,6 +15,22 @@ interface SettingsPanelProps {
 export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: SettingsPanelProps) {
   const { pedigree, updateSiblingOrderSettings } = usePedigreeStore();
   const { mode, affectedFirst } = pedigree.siblingOrder;
+  const { activePedigreeId, pedigrees, deletePedigree } = useAppStore();
+  const navigate = useNavigate();
+  const [deleteExpanded, setDeleteExpanded] = useState(false);
+
+  async function handleDeletePedigree() {
+    if (!activePedigreeId) return;
+    const remaining = pedigrees.filter(p => p.id !== activePedigreeId);
+    await deletePedigree(activePedigreeId);
+    setDeleteExpanded(false);
+    onClose();
+    if (remaining.length > 0) {
+      navigate(`/p/${remaining[0].id}`);
+    } else {
+      navigate("/");
+    }
+  }
 
   const modes: { value: SiblingOrderMode; label: string; description: string }[] = [
     {
@@ -32,7 +51,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
   ];
 
   return (
-    <Dialog open={open} onOpenChange={v => !v && onClose()}>
+    <Dialog open={open} onOpenChange={v => { if (!v) { setDeleteExpanded(false); onClose(); } }}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-sm font-medium">Pedigree settings</DialogTitle>
@@ -96,6 +115,41 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
               </div>
             </label>
           </div>
+          {activePedigreeId && (
+            <div className="border-t pt-4">
+              <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                Danger zone
+              </div>
+              {!deleteExpanded ? (
+                <button
+                  onClick={() => setDeleteExpanded(true)}
+                  className="text-xs text-red-600 hover:underline"
+                >
+                  Delete this pedigree…
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-500">
+                    This will permanently delete the pedigree and cannot be undone.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleDeletePedigree}
+                      className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                    >
+                      Delete permanently
+                    </button>
+                    <button
+                      onClick={() => setDeleteExpanded(false)}
+                      className="px-3 py-1 text-xs border rounded hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

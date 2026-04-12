@@ -9,12 +9,13 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
-export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
+export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
   const { individual, isDuplicate, duplicateIndex, hasParents } = data;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId } = usePedigreeStore();
+  const { setHoveredId, setSelectedId, selectedId } = usePedigreeStore();
+  const isSelected = individual.id === selectedId;
 
   function scheduleHide() {
     hideTimeout.current = setTimeout(() => {
@@ -42,23 +43,16 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
 
   return (
     <div
-      style={{ width: NODE_SIZE, height: NODE_SIZE, position: "relative" }}
+      style={{
+        width: NODE_SIZE,
+        height: NODE_SIZE,
+        position: "relative",
+        boxShadow: isSelected ? "0 0 0 2px #ef4444" : undefined,
+      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => setSelectedId(individual.id)}
     >
-      {/* Selection ring */}
-      {selected && (
-        <div
-          style={{
-            position: "absolute",
-            inset: -3,
-            border: "2px solid #000",
-            borderRadius: 2,
-            pointerEvents: "none",
-          }}
-        />
-      )}
 
       {/* Main pedigree symbol */}
       <svg
