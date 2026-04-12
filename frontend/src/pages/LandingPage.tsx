@@ -7,10 +7,19 @@ import { EXAMPLES } from "../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export default function LandingPage() {
-  const { isAuthenticated, user, createPedigree, createPedigreeFromData, logout } = useAppStore();
+  const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout } = useAppStore();
   const navigate = useNavigate();
   const [importOpen, setImportOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+
+  // Populate user state after a page reload. fetchMe will trigger the token
+  // refresh interceptor if the access token is expired, so this also warms up
+  // the auth state before MyPedigrees fires loadPedigrees.
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      fetchMe().catch(() => { /* interceptor handles auth failures */ });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCreateBlank = async () => {
     setLoading("blank");

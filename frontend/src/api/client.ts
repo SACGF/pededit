@@ -14,6 +14,12 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// Shared in-flight refresh promise — prevents multiple concurrent 401 responses
+// from each triggering their own refresh when ROTATE_REFRESH_TOKENS is true.
+// The second caller waits for the first caller's refresh rather than starting
+// a new one with an already-consumed refresh token.
+let tokenRefreshInProgress: Promise<string> | null = null;
+
 // On 401, try to refresh the token once
 apiClient.interceptors.response.use(
   (response) => response,
@@ -29,11 +35,24 @@ apiClient.interceptors.response.use(
         window.location.href = "/";
         return Promise.reject(error);
       }
+
+      // Start a refresh if none is already in progress; otherwise reuse it.
+      if (!tokenRefreshInProgress) {
+        tokenRefreshInProgress = axios
+          .post("/api/auth/token/refresh/", { refresh })
+          .then(({ data }) => {
+            localStorage.setItem("access_token", data.access);
+            localStorage.setItem("refresh_token", data.refresh);
+            return data.access as string;
+          })
+          .finally(() => {
+            tokenRefreshInProgress = null;
+          });
+      }
+
       try {
-        const { data } = await axios.post("/api/auth/token/refresh/", { refresh });
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
-        original.headers.Authorization = `Bearer ${data.access}`;
+        const newToken = await tokenRefreshInProgress;
+        original.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(original);
       } catch {
         localStorage.removeItem("access_token");
