@@ -222,7 +222,56 @@ These are the features that exist nowhere in open-source and partially in commer
 
 ---
 
-## Phase 8 — Ecosystem + embeddability
+## Phase 8 — Deploy
+
+**What:** Get the app running at a public URL, with a basic production configuration.
+
+**Infrastructure:**
+- Backend: Django on a VPS or PaaS (Fly.io / Railway / Render) — gunicorn + PostgreSQL
+- Frontend: Vite build served as static files, either via Django's `STATIC_ROOT` or a CDN (Cloudflare Pages / Vercel)
+- Environment: `SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` from env vars (already wired)
+- HTTPS: Let's Encrypt via the platform or a reverse proxy (nginx/Caddy)
+- Domain name
+
+**Minimum-viable hardening:**
+- `DEBUG=False`, `SECURE_HSTS_SECONDS`, `SECURE_SSL_REDIRECT`
+- Rate limiting on auth endpoints (e.g. `django-ratelimit`)
+- Static file serving via `whitenoise` (avoids needing a separate nginx just for static files)
+
+**Ops basics:**
+- Automated DB backups (platform-provided or `pg_dump` cron)
+- Error logging (Sentry free tier or equivalent)
+- Basic health-check endpoint (`/api/health/`)
+
+**Why here:** Deploy early enough to get real users but late enough that the core editor is stable. The anonymous-pedigree model means there's no auth friction for first-time users, so the app is immediately usable once it's live.
+
+---
+
+## Phase 9 — Social login (GitHub + Google)
+
+**What:** Replace username/password auth with OAuth via GitHub and Google. No password management, no email verification flow.
+
+**Approach:** Use [Clerk](https://clerk.com/) as the identity provider — it handles the OAuth dance, session management, and token issuance. The Django backend verifies Clerk-issued JWTs against Clerk's JWKS endpoint; no allauth or session complexity.
+
+**Backend changes:**
+- Remove `simplejwt` token issuance; validate incoming Clerk JWTs instead (via `PyJWT` + JWKS fetch)
+- `User` records created on first login from Clerk's `sub` claim (email, display name populated from Clerk's user object)
+- Remove `/api/auth/register/` and `/api/auth/token/` endpoints; keep `/api/auth/me/`
+
+**Frontend changes:**
+- Replace login form with Clerk's `<SignIn />` component (or headless `useSignIn` hook for a custom UI matching the existing aesthetic)
+- Remove username/password fields; the "Sign in" button launches Clerk's hosted flow
+- After sign-in, Clerk provides a session token the frontend attaches to API requests as before
+
+**Migration path for existing users:**
+- Anonymous pedigrees are unaffected (no owner)
+- Any username/password accounts created in earlier phases can be migrated by matching on email
+
+**Why after deploy:** Clerk requires a registered domain for OAuth redirect URIs — `localhost` works for dev but you need the production URL configured before it's usable end-to-end. Also, HTTPS is mandatory for Google OAuth, which deploy provides.
+
+---
+
+## Phase 10 — Ecosystem + embeddability
 
 **What:** Make the project adoptable by others.
 
@@ -252,5 +301,5 @@ These are the features that exist nowhere in open-source and partially in commer
 - Patient record management, EHR integration, clinical notes
 - HIPAA/GDPR compliance infrastructure
 - Risk model UI (the R bridge is plumbing for someone else to build on)
-- Collaborative real-time editing (Phase 8 lays groundwork; WebSocket sync is a separate project)
+- Collaborative real-time editing (Phase 10 lays groundwork; WebSocket sync is a separate project)
 - Mobile / tablet optimisation
