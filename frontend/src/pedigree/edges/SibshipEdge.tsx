@@ -1,14 +1,29 @@
-import type { Edge, EdgeProps } from "@xyflow/react";
+import { useNodes } from "@xyflow/react";
+import type { Edge, EdgeProps, Node } from "@xyflow/react";
 import type { SibshipEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 
 export type SibshipEdgeType = Edge<SibshipEdgeData, "sibshipEdge">;
 
 export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
+  const nodes = useNodes();
   if (!data) return null;
-  const { coupleX, coupleY, sibBarY, childXs, childY } = data;
 
-  if (!childXs || childXs.length === 0) return null;
+  const { leftParentId, rightParentId, childIds } = data;
+  const leftParent  = nodes.find(n => n.id === leftParentId);
+  const rightParent = nodes.find(n => n.id === rightParentId);
+  const children    = (childIds ?? [])
+    .map(id => nodes.find(n => n.id === id))
+    .filter((n): n is Node => !!n);
+
+  if (!leftParent || !rightParent || children.length === 0) return null;
+
+  // Couple midpoint: horizontal centre of the couple line.
+  const coupleX  = (leftParent.position.x + rightParent.position.x) / 2;
+  const coupleY  = (leftParent.position.y + rightParent.position.y) / 2;
+  const childY   = children[0].position.y;
+  const sibBarY  = (coupleY + childY) / 2;
+  const childXs  = children.map(c => c.position.x);
 
   // The bar must span from the couple-drop x to the outermost child x so that
   // the vertical from the couple always connects to the bar even when a child

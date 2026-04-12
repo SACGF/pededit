@@ -28,11 +28,20 @@ export interface RFNodeData extends Record<string, unknown> {
 export type CoupleEdgeData = Record<string, unknown>;
 
 /**
- * All geometry for a sibship connection is pre-computed here and passed as
- * edge data. The SibshipEdge renderer ignores sourceX/Y, targetX/Y and uses
- * this data instead.
+ * All geometry for a sibship connection. The SibshipEdge renderer uses
+ * leftParentId/rightParentId/childIds to look up current node positions
+ * dynamically (via useNodes), so edges stay correct as nodes are dragged.
+ * The pre-computed coupleX/Y/sibBarY/childXs/childY values are kept for
+ * the minimap renderer which doesn't need real-time updates.
  */
 export interface SibshipEdgeData extends Record<string, unknown> {
+  /** React Flow node ID of the left parent. */
+  leftParentId: string;
+  /** React Flow node ID of the right parent. */
+  rightParentId: string;
+  /** React Flow node IDs of the children, in slot order. */
+  childIds: string[];
+  // Pre-computed geometry used by the minimap:
   /** x (canvas px) of the midpoint of the couple line above this family. */
   coupleX: number;
   /** y (canvas px) of the parent generation centre = (level-1) * ROW_HEIGHT. */
@@ -189,7 +198,8 @@ function buildSibshipEdges(
       const childXs  = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
 
       // Source = left parent node; target = leftmost child node.
-      // The SibshipEdge renderer ignores these positions and uses data instead.
+      // The SibshipEdge renderer uses leftParentId/rightParentId/childIds to
+      // look up current node positions dynamically via useNodes().
       edges.push({
         id:           `sibship-${level}-${f}`,
         source:       `${level - 1}-${leftParentSlot}`,
@@ -197,7 +207,12 @@ function buildSibshipEdges(
         sourceHandle: "sibship-out",
         targetHandle: "sibship-in",
         type:         "sibshipEdge",
-        data:         { coupleX, coupleY, sibBarY, childXs, childY },
+        data:         {
+          leftParentId:  `${level - 1}-${leftParentSlot}`,
+          rightParentId: `${level - 1}-${rightParentSlot}`,
+          childIds:      slots.map(s => `${level}-${s}`),
+          coupleX, coupleY, sibBarY, childXs, childY,
+        },
       });
     }
   }

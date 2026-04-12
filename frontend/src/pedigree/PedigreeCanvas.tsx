@@ -154,7 +154,9 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
-  const { pedigree, setSelectedId, pinIndividual } = usePedigreeStore();
+  const { pedigree, setSelectedId, pinIndividual, resetLayout } = usePedigreeStore();
+  const hasPinnedNodes = !!pedigree.pinnedPositions &&
+    Object.keys(pedigree.pinnedPositions).length > 0;
 
   const { nodes: computedNodes, coupleEdges, sibshipEdges } = useMemo(
     () => pedigree.individuals.length > 0
@@ -236,6 +238,24 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
               Use the toolbar above to add individuals
             </span>
           </div>
+        )}
+        {hasPinnedNodes && (
+          <Panel position="top-left">
+            <button
+              onClick={resetLayout}
+              style={{
+                padding: "4px 10px",
+                fontSize: 12,
+                background: "white",
+                border: "1px solid #d1d5db",
+                borderRadius: 4,
+                cursor: "pointer",
+                color: "#374151",
+              }}
+            >
+              Auto arrange
+            </button>
+          </Panel>
         )}
         <Background />
         <Controls />
