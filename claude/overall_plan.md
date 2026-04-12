@@ -121,8 +121,6 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ## Phase 5a — PED file import/export ✅ COMPLETE
 
-**Detailed plan:** `claude/phase5a_ped_plan.md`
-
 **What:** PED file (standard LINKAGE/PLINK format) import and export. Makes the tool interoperable with every clinical genetics tool, R package, and GWAS pipeline that reads/writes PED.
 
 **Import:**
