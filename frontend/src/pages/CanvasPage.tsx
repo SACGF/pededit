@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
+import { PedigreeCanvas } from "../pedigree/PedigreeCanvas";
 
 export default function CanvasPage() {
-  const { user, pedigrees, loadPedigrees, createPedigree, openPedigree, logout } = useAppStore();
+  const { user, pedigrees, activePedigree, loadPedigrees, createPedigree, openPedigree, logout } = useAppStore();
 
   useEffect(() => {
     loadPedigrees();
@@ -47,11 +46,13 @@ export default function CanvasPage() {
 
       {/* Canvas */}
       <div className="flex-1">
-        <ReactFlow nodes={[]} edges={[]} fitView>
-          <Background />
-          <Controls />
-          <MiniMap />
-        </ReactFlow>
+        {activePedigree && activePedigree.individuals.length > 0 ? (
+          <PedigreeCanvas pedigree={activePedigree} />
+        ) : (
+          <div className="flex h-full items-center justify-center text-gray-400 text-sm">
+            Select or create a pedigree
+          </div>
+        )}
       </div>
     </div>
   );

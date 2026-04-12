@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@pedigree-editor/layout-engine": "*",
@@ -32,6 +34,7 @@
     "postcss": "^8.4.40",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.5.3",
-    "vite": "^5.3.4"
+    "vite": "^5.3.4",
+    "vitest": "^4.1.4"
   }
 }

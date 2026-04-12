@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "test:layout": "npm -w layout-engine run test",
+    "test:frontend": "npm -w frontend run test",
     "dev:frontend": "npm -w frontend run dev"
   }
 }
