@@ -110,6 +110,25 @@ describe("exportCsv", () => {
     expect(rows[1]!.proband).toBe("0");
   });
 
+  it("hpo_terms are semicolon-joined", () => {
+    const ped = makePedigree({
+      individuals: [{
+        id: "i1", sex: "male", affected: false, sibOrder: 0,
+        hpoTerms: ["HP:0001250", "HP:0002069"],
+      }],
+    });
+    const rows = parseRows(exportCsv(ped));
+    expect(rows[0]!.hpo_terms).toBe("HP:0001250;HP:0002069");
+  });
+
+  it("hpo_terms is empty string when undefined", () => {
+    const ped = makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],
+    });
+    const rows = parseRows(exportCsv(ped));
+    expect(rows[0]!.hpo_terms).toBe("");
+  });
+
   it("uses custom familyId when provided", () => {
     const ped = makePedigree({
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],

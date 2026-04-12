@@ -13,6 +13,7 @@ export interface Individual {
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"
   notes?: string;        // free text clinical notes
+  hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
 }
 
 /** A partnership (union) between two individuals. Children attach here, not to parents. */
