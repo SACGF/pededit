@@ -112,12 +112,14 @@ export function alignped4(
     }
   }
 
-  // Small leftward pull on widest row to make the problem positive-definite
+  // Small leftward pull on widest row to make the problem positive-definite.
+  // Uses row 0 (always zero-initialised, unused by the penalty loops above which
+  // write rows 1..npenal) so it never overwrites a real penalty term.
   let maxRowLev = 1;
   for (let i = 2; i <= maxlev; i++) {
     if ((rval.n[i] ?? 0) >= (rval.n[maxRowLev] ?? 0)) maxRowLev = i;
   }
-  pmat[npenal]![myid[maxRowLev]![1]!] = 1e-5;
+  pmat[0]![myid[maxRowLev]![1]!] = 1e-5;
 
   // Constraint matrix: (n + maxlev) × nTotal
   // For each level: (ni-1) spacing constraints + 1 lower bound + 1 upper bound
@@ -184,7 +186,60 @@ export function alignped4(
     }
     return newpos;
   } catch {
-    // quadprog unavailable or solve failed: return raw positions
-    return rval.pos.map(row => new Float64Array(row));
+    // quadprog unavailable or solve failed (e.g. browser environment):
+    // run a pure-JS centering pass to center each child group under its parents.
+    return centerChildrenFallback(rval);
   }
+}
+
+/**
+ * Simple centering fallback used when quadprog is unavailable.
+ *
+ * For each generation, shifts each family's children so their midpoint aligns
+ * with the midpoint of their parent couple. Processes families left-to-right
+ * to avoid cascading shifts within a level.
+ */
+function centerChildrenFallback(rval: AlignState): Float64Array[] {
+  const maxlev = rval.n.length - 1;
+  const pos = rval.pos.map(row => new Float64Array(row));
+
+  for (let lev = 2; lev <= maxlev; lev++) {
+    const ni = rval.n[lev] ?? 0;
+    const famRow = rval.fam[lev]!;
+
+    // Collect family groups (fam value → 1-based child slots)
+    const families = new Map<number, number[]>();
+    for (let c = 1; c <= ni; c++) {
+      const f = famRow[c] ?? 0;
+      if (f > 0) {
+        if (!families.has(f)) families.set(f, []);
+        families.get(f)!.push(c);
+      }
+    }
+
+    // Sort by left-parent position so we process left-to-right
+    const sortedFamilies = [...families.entries()].sort(
+      ([fa], [fb]) => (pos[lev - 1]![fa] ?? 0) - (pos[lev - 1]![fb] ?? 0),
+    );
+
+    for (const [f, slots] of sortedFamilies) {
+      const niParent = rval.n[lev - 1] ?? 0;
+      if (f < 1 || f + 1 > niParent) continue;
+
+      const leftParentPos  = pos[lev - 1]![f]!;
+      const rightParentPos = pos[lev - 1]![f + 1]!;
+      const parentMid = (leftParentPos + rightParentPos) / 2;
+
+      const childMid = slots.reduce((s, c) => s + pos[lev]![c]!, 0) / slots.length;
+      const shift = parentMid - childMid;
+
+      if (Math.abs(shift) > 1e-6) {
+        for (const c of slots) {
+          pos[lev]![c] = pos[lev]![c]! + shift;
+        }
+      }
+    }
+  }
+
+  return pos;
 }

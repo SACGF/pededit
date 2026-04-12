@@ -6,10 +6,12 @@ interface HoverPillProps {
   nodeId: string;          // React Flow node ID (for NodeToolbar)
   individualId: string;    // pedigree Individual.id
   isVisible: boolean;
-  hasParents: boolean;     // disable +dad/+mom if already has both parents filled
+  hasParents: boolean;     // disable +parents if already has both parents filled
+  onPillEnter: () => void; // called when mouse enters pill (cancel hide timer)
+  onPillLeave: () => void; // called when mouse leaves pill (schedule hide)
 }
 
-export function HoverPill({ nodeId, individualId, isVisible, hasParents }: HoverPillProps) {
+export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillEnter, onPillLeave }: HoverPillProps) {
   const { addParent, addChild, addSibling } = usePedigreeStore();
 
   return (
@@ -19,23 +21,18 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents }: Hover
       position={Position.Bottom}
       offset={6}
     >
-      <div className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-sm text-xs">
-        {/* +dad */}
+      <div
+        className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-sm text-xs"
+        onMouseEnter={onPillEnter}
+        onMouseLeave={onPillLeave}
+      >
+        {/* +parents */}
         <PillButton
-          title="Add father"
+          title="Add parents"
           disabled={hasParents}
           onClick={() => addParent(individualId, "male")}
         >
-          □↑
-        </PillButton>
-
-        {/* +mom */}
-        <PillButton
-          title="Add mother"
-          disabled={hasParents}
-          onClick={() => addParent(individualId, "female")}
-        >
-          ○↑
+          ↑
         </PillButton>
 
         {/* +child */}

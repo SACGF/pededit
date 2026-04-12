@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
@@ -12,16 +12,32 @@ export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
   const { individual, isDuplicate, duplicateIndex, hasParents } = data;
   const nodeId = useNodeId()!;
-  const [isHovered, setIsHovered] = useState(false);
+  const [isPillVisible, setIsPillVisible] = useState(false);
+  const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { setHoveredId, setSelectedId } = usePedigreeStore();
 
+  function scheduleHide() {
+    hideTimeout.current = setTimeout(() => {
+      setIsPillVisible(false);
+      setHoveredId(null);
+    }, 150);
+  }
+
+  function cancelHide() {
+    if (hideTimeout.current) {
+      clearTimeout(hideTimeout.current);
+      hideTimeout.current = null;
+    }
+  }
+
   function handleMouseEnter() {
-    setIsHovered(true);
+    cancelHide();
+    setIsPillVisible(true);
     setHoveredId(individual.id);
   }
+
   function handleMouseLeave() {
-    setIsHovered(false);
-    setHoveredId(null);
+    scheduleHide();
   }
 
   return (
@@ -90,8 +106,10 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       <HoverPill
         nodeId={nodeId}
         individualId={individual.id}
-        isVisible={isHovered}
+        isVisible={isPillVisible}
         hasParents={hasParents}
+        onPillEnter={cancelHide}
+        onPillLeave={scheduleHide}
       />
     </div>
   );
