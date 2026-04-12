@@ -85,6 +85,10 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
     }
   }
 
+  // Determine which individuals are draggable.
+  const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
+  const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
+
   // Second pass: emit one React Flow node per (level, slot).
   const nidOccurrence = new Map<number, number>();
   const nodes: Node<RFNodeData>[] = [];
@@ -103,6 +107,7 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
       );
 
       const pinnedPos = pedigree.pinnedPositions?.[individual.id];
+      const isMoveable = nodesMoveable || unlockedSet.has(individual.id);
 
       nodes.push({
         id:       `${level}-${slot}`,
@@ -111,6 +116,7 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
           x: result.pos[level][slot] * SLOT_WIDTH,
           y: level * ROW_HEIGHT,
         },
+        draggable: isMoveable,
         width:  NODE_SIZE,
         height: NODE_SIZE,
         data: {

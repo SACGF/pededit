@@ -13,8 +13,9 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: SettingsPanelProps) {
-  const { pedigree, updateSiblingOrderSettings } = usePedigreeStore();
+  const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeStore();
   const { mode, affectedFirst } = pedigree.siblingOrder;
+  const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: 10 };
   const { activePedigreeId, pedigrees, deletePedigree } = useAppStore();
   const navigate = useNavigate();
   const [deleteExpanded, setDeleteExpanded] = useState(false);
@@ -75,6 +76,61 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
                 </div>
               </div>
             </label>
+          </div>
+
+          <div>
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+              Layout
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={canvasSettings.nodesMoveable}
+                  onChange={e => updateCanvasSettings({ nodesMoveable: e.target.checked })}
+                />
+                <div>
+                  <div className="text-sm">Nodes moveable by default</div>
+                  <div className="text-xs text-gray-400">
+                    All nodes can be dragged without unlocking individually
+                  </div>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={canvasSettings.snapToGrid}
+                  onChange={e => updateCanvasSettings({ snapToGrid: e.target.checked })}
+                />
+                <div>
+                  <div className="text-sm">Snap to grid</div>
+                  <div className="text-xs text-gray-400">
+                    Dragged nodes snap to a fixed grid
+                  </div>
+                </div>
+              </label>
+
+              {canvasSettings.snapToGrid && (
+                <label className="flex items-center gap-2 ml-6">
+                  <span className="text-xs text-gray-500">Grid size</span>
+                  <input
+                    type="number"
+                    min={4}
+                    max={80}
+                    value={canvasSettings.snapGridSize}
+                    onChange={e => {
+                      const v = parseInt(e.target.value, 10);
+                      if (!isNaN(v) && v >= 4 && v <= 80) {
+                        updateCanvasSettings({ snapGridSize: v });
+                      }
+                    }}
+                    className="w-16 text-xs border rounded px-1.5 py-0.5"
+                  />
+                  <span className="text-xs text-gray-400">px</span>
+                </label>
+              )}
+            </div>
           </div>
 
           <div>

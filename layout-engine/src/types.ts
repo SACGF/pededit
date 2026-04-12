@@ -31,6 +31,13 @@ export interface SiblingOrderSettings {
   affectedFirst: boolean;
 }
 
+export interface CanvasSettings {
+  /** When true all nodes are draggable without individual unlock. Default false. */
+  nodesMoveable: boolean;
+  snapToGrid: boolean;
+  snapGridSize: number;
+}
+
 export interface Pedigree {
   individuals: Individual[];
   partnerships: Partnership[];
@@ -39,6 +46,10 @@ export interface Pedigree {
   siblingOrder: SiblingOrderSettings;
   /** Manual drag overrides: individualId → canvas pixel position */
   pinnedPositions?: Record<string, { x: number; y: number }>;
+  /** Canvas / drag / snap settings. Absent = all defaults (locked, no snap). */
+  canvasSettings?: CanvasSettings;
+  /** Individual IDs unlocked for dragging when canvasSettings.nodesMoveable is false. */
+  unlockedIndividuals?: string[];
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

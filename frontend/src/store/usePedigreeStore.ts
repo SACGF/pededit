@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 
@@ -136,6 +136,13 @@ interface PedigreeState {
   pinIndividual: (individualId: string, pos: { x: number; y: number }) => void;
   unpinIndividual: (individualId: string) => void;
   resetLayout: () => void;
+
+  // Lock / unlock per-node
+  unlockIndividual: (individualId: string) => void;
+  lockIndividual: (individualId: string) => void;
+
+  // Canvas settings
+  updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
 }
 
 // ── Store implementation ───────────────────────────────────────────────────────
@@ -498,6 +505,48 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     resetLayout: () => {
       mutate(draft => {
         delete draft.pinnedPositions;
+      });
+    },
+
+    // ── Lock / unlock per-node ────────────────────────────────────────────────
+
+    unlockIndividual: (individualId) => {
+      mutate(draft => {
+        if (!draft.unlockedIndividuals) draft.unlockedIndividuals = [];
+        if (!draft.unlockedIndividuals.includes(individualId)) {
+          draft.unlockedIndividuals.push(individualId);
+        }
+      });
+    },
+
+    lockIndividual: (individualId) => {
+      mutate(draft => {
+        if (draft.unlockedIndividuals) {
+          draft.unlockedIndividuals = draft.unlockedIndividuals.filter(id => id !== individualId);
+          if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
+        }
+        // Locking also removes any pinned position so the node returns to auto-layout.
+        if (draft.pinnedPositions) {
+          delete draft.pinnedPositions[individualId];
+          if (Object.keys(draft.pinnedPositions).length === 0) delete draft.pinnedPositions;
+        }
+      });
+    },
+
+    // ── Canvas settings ───────────────────────────────────────────────────────
+
+    updateCanvasSettings: (settings) => {
+      mutate(draft => {
+        if (!draft.canvasSettings) {
+          draft.canvasSettings = {
+            nodesMoveable: false,
+            snapToGrid: false,
+            snapGridSize: 10,
+            ...settings,
+          };
+        } else {
+          Object.assign(draft.canvasSettings, settings);
+        }
       });
     },
   };

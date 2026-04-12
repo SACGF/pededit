@@ -208,8 +208,13 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         nodeOrigin={[0.5, 0.5]}
-        nodesDraggable={true}
+        nodesDraggable={false}
         nodesConnectable={false}
+        snapToGrid={pedigree.canvasSettings?.snapToGrid ?? false}
+        snapGrid={[
+          pedigree.canvasSettings?.snapGridSize ?? 10,
+          pedigree.canvasSettings?.snapGridSize ?? 10,
+        ]}
         onNodesChange={onNodesChange}
         fitView
         onPaneClick={handlePaneClick}

@@ -1,4 +1,5 @@
 import { NodeToolbar, Position } from "@xyflow/react";
+import { Lock, Unlock } from "lucide-react";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { MoreMenu } from "./MoreMenu";
 
@@ -12,7 +13,9 @@ interface HoverPillProps {
 }
 
 export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillEnter, onPillLeave }: HoverPillProps) {
-  const { addParent, addChild, addSibling } = usePedigreeStore();
+  const { addParent, addChild, addSibling, pedigree, unlockIndividual, lockIndividual } = usePedigreeStore();
+  const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
+  const isUnlocked = nodesMoveable || (pedigree.unlockedIndividuals ?? []).includes(individualId);
 
   return (
     <NodeToolbar
@@ -59,6 +62,21 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
         >
           ←│→
         </PillButton>
+
+        {/* Lock / unlock — only shown when global "nodes moveable" is off */}
+        {!nodesMoveable && (
+          <>
+            <div className="w-px h-3 bg-gray-300 mx-0.5" />
+            <PillButton
+              title={isUnlocked ? "Lock position" : "Unlock to drag"}
+              onClick={() => isUnlocked ? lockIndividual(individualId) : unlockIndividual(individualId)}
+            >
+              {isUnlocked
+                ? <Unlock size={10} strokeWidth={1.5} />
+                : <Lock    size={10} strokeWidth={1.5} />}
+            </PillButton>
+          </>
+        )}
 
         <div className="w-px h-3 bg-gray-300 mx-0.5" />
 

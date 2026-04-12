@@ -1,6 +1,6 @@
 import { alignPedigree } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE, SIB_BAR_FACTOR } from "../../pedigree/constants";
+import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE } from "../../pedigree/constants";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 
@@ -11,6 +11,30 @@ const PROBAND_TAIL = 18;     // matches ProbandArrow in symbols.tsx
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
 const LABEL_OFFSET_Y = NODE_SIZE / 2 + 4; // below symbol centre
+
+// ── Slot positions ────────────────────────────────────────────────────────────
+
+type SlotPos = Map<string, { x: number; y: number }>;
+
+/**
+ * Build a map from "level-slot" → canvas pixel position.
+ * Pinned individuals use their stored position; others use the algorithm result.
+ */
+function buildSlotPositions(pedigree: Pedigree, result: LayoutResult): SlotPos {
+  const map: SlotPos = new Map();
+  for (let level = 0; level < result.n.length; level++) {
+    for (let slot = 0; slot < result.n[level]; slot++) {
+      const nid = Math.floor(result.nid[level][slot]);
+      const ind = pedigree.individuals[nid - 1];
+      const pinned = pedigree.pinnedPositions?.[ind.id];
+      map.set(`${level}-${slot}`, pinned ?? {
+        x: result.pos[level][slot] * SLOT_WIDTH,
+        y: level * ROW_HEIGHT,
+      });
+    }
+  }
+  return map;
+}
 
 // ── Bounds ────────────────────────────────────────────────────────────────────
 
@@ -23,22 +47,20 @@ interface CanvasBounds {
 
 function computeBounds(
   pedigree: Pedigree,
-  result: LayoutResult,
+  slotPos: SlotPos,
   options: SvgExportOptions,
 ): CanvasBounds {
   const padding = options.padding ?? 40;
   const titleHeight = options.title ? 24 : 0;
 
   let rawMinX = Infinity, rawMaxX = -Infinity;
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const x = result.pos[level][slot] * SLOT_WIDTH;
-      rawMinX = Math.min(rawMinX, x);
-      rawMaxX = Math.max(rawMaxX, x);
-    }
+  let rawMinY = Infinity, rawMaxY = -Infinity;
+  for (const { x, y } of slotPos.values()) {
+    if (x < rawMinX) rawMinX = x;
+    if (x > rawMaxX) rawMaxX = x;
+    if (y < rawMinY) rawMinY = y;
+    if (y > rawMaxY) rawMaxY = y;
   }
-  const numLevels = result.n.length;
-  const rawMaxY = (numLevels - 1) * ROW_HEIGHT;
 
   const hasProband = pedigree.individuals.some(i => i.proband);
   const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
@@ -47,10 +69,10 @@ function computeBounds(
   const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0);
 
   const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
-  const offsetY = padding + NODE_SIZE / 2 + titleHeight;
+  const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
 
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
-  const contentH = rawMaxY + NODE_SIZE + labelHeight + probandExtra;
+  const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra;
 
   return {
     offsetX,
@@ -73,22 +95,27 @@ function svgDefs(): string {
 
 // ── Couple lines ──────────────────────────────────────────────────────────────
 
-function renderCoupleLines(result: LayoutResult): string[] {
+function renderCoupleLines(result: LayoutResult, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
       const sp = result.spouse[level][slot];
       if (sp === 0) continue;
 
-      const x1 = result.pos[level][slot]     * SLOT_WIDTH;
-      const x2 = result.pos[level][slot + 1] * SLOT_WIDTH;
-      const y  = level * ROW_HEIGHT;
+      const left  = slotPos.get(`${level}-${slot}`)!;
+      const right = slotPos.get(`${level}-${slot + 1}`)!;
 
       if (sp === 1) {
-        lines.push(`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="black" stroke-width="${STROKE}"/>`);
+        lines.push(`<line x1="${left.x}" y1="${left.y}" x2="${right.x}" y2="${right.y}" stroke="black" stroke-width="${STROKE}"/>`);
       } else {
-        lines.push(`<line x1="${x1}" y1="${y - CONSANG_GAP / 2}" x2="${x2}" y2="${y - CONSANG_GAP / 2}" stroke="black" stroke-width="${STROKE}"/>`);
-        lines.push(`<line x1="${x1}" y1="${y + CONSANG_GAP / 2}" x2="${x2}" y2="${y + CONSANG_GAP / 2}" stroke="black" stroke-width="${STROKE}"/>`);
+        // Consanguineous: two parallel lines offset perpendicular to the connecting vector
+        const dx = right.x - left.x;
+        const dy = right.y - left.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len * (CONSANG_GAP / 2); // normal vector, scaled to half-gap
+        const ny =  dx / len * (CONSANG_GAP / 2);
+        lines.push(`<line x1="${left.x + nx}" y1="${left.y + ny}" x2="${right.x + nx}" y2="${right.y + ny}" stroke="black" stroke-width="${STROKE}"/>`);
+        lines.push(`<line x1="${left.x - nx}" y1="${left.y - ny}" x2="${right.x - nx}" y2="${right.y - ny}" stroke="black" stroke-width="${STROKE}"/>`);
       }
     }
   }
@@ -101,7 +128,7 @@ function seg(x1: number, y1: number, x2: number, y2: number): string {
   return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function renderSibshipLines(result: LayoutResult): string[] {
+function renderSibshipLines(result: LayoutResult, slotPos: SlotPos): string[] {
   const lines: string[] = [];
 
   for (let level = 1; level < result.n.length; level++) {
@@ -114,22 +141,23 @@ function renderSibshipLines(result: LayoutResult): string[] {
     }
 
     for (const [f, slots] of groups) {
-      const coupleX = (
-        result.pos[level - 1][f - 1] + result.pos[level - 1][f]
-      ) / 2 * SLOT_WIDTH;
-      const coupleY  = (level - 1) * ROW_HEIGHT;
-      const sibBarY  = (level - SIB_BAR_FACTOR) * ROW_HEIGHT;
-      const childY   = level * ROW_HEIGHT;
-      const sibLeftX  = result.pos[level][slots[0]] * SLOT_WIDTH;
-      const sibRightX = result.pos[level][slots[slots.length - 1]] * SLOT_WIDTH;
+      const leftPos  = slotPos.get(`${level - 1}-${f - 1}`)!;
+      const rightPos = slotPos.get(`${level - 1}-${f}`)!;
+      const coupleX  = (leftPos.x + rightPos.x) / 2;
+      const coupleY  = (leftPos.y + rightPos.y) / 2;
+      const childY   = slotPos.get(`${level}-${slots[0]}`)!.y;
+      const sibBarY  = (coupleY + childY) / 2;
+
+      const childXs = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
+      const sibLeftX  = Math.min(...childXs);
+      const sibRightX = Math.max(...childXs);
 
       // 1. Vertical drop from couple midpoint to sibship bar
       lines.push(seg(coupleX, coupleY, coupleX, sibBarY));
       // 2. Horizontal sibship bar
       lines.push(seg(sibLeftX, sibBarY, sibRightX, sibBarY));
       // 3. Vertical drops from bar to top of each child symbol
-      for (const slot of slots) {
-        const cx = result.pos[level][slot] * SLOT_WIDTH;
+      for (const cx of childXs) {
         lines.push(seg(cx, sibBarY, cx, childY - NODE_SIZE / 2));
       }
     }
@@ -179,7 +207,7 @@ function renderDuplicateMark(): string {
   return `<text x="${half + 2}" y="${-half + 8}" font-family="sans-serif" font-size="9" fill="black">¹</text>`;
 }
 
-function renderSymbols(pedigree: Pedigree, result: LayoutResult): string[] {
+function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos): string[] {
   const elems: string[] = [];
   const seen = new Set<number>();
 
@@ -187,8 +215,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult): string[] {
     for (let slot = 0; slot < result.n[level]; slot++) {
       const nid = Math.floor(result.nid[level][slot]);
       const ind = pedigree.individuals[nid - 1];
-      const cx  = result.pos[level][slot] * SLOT_WIDTH;
-      const cy  = level * ROW_HEIGHT;
+      const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
       const isDuplicate = seen.has(nid);
       seen.add(nid);
 
@@ -214,7 +241,7 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(pedigree: Pedigree, result: LayoutResult): string[] {
+function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos): string[] {
   const elems: string[] = [];
   const seen = new Set<number>();
 
@@ -225,8 +252,7 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult): string[] {
       seen.add(nid);
 
       const ind = pedigree.individuals[nid - 1];
-      const cx  = result.pos[level][slot] * SLOT_WIDTH;
-      const cy  = level * ROW_HEIGHT;
+      const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
       const labelBaseY = cy + LABEL_OFFSET_Y;
 
       if (ind.name) {
@@ -252,7 +278,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 
   const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
   const result  = alignPedigree(working);
-  const bounds  = computeBounds(working, result, options);
+  const slotPos = buildSlotPositions(working, result);
+  const bounds  = computeBounds(working, slotPos, options);
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [
@@ -270,10 +297,10 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   }
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
-  lines.push(...renderCoupleLines(result));
-  lines.push(...renderSibshipLines(result));
-  lines.push(...renderSymbols(working, result));
-  lines.push(...renderLabels(working, result));
+  lines.push(...renderCoupleLines(result, slotPos));
+  lines.push(...renderSibshipLines(result, slotPos));
+  lines.push(...renderSymbols(working, result, slotPos));
+  lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);
   lines.push(`</svg>`);
 
