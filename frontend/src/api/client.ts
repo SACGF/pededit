@@ -99,6 +99,9 @@ export const pedigreeApi = {
       data: { individuals: [], partnerships: [], parentOf: {} },
     }),
 
+  createWithData: (title: string, data: unknown) =>
+    apiClient.post<PedigreePayload>("/pedigrees/", { title, data }),
+
   update: (id: string, patch: { title?: string; data?: unknown }) =>
     apiClient.patch<PedigreePayload>(`/pedigrees/${id}/`, patch),
 

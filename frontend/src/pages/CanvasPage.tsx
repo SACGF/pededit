@@ -6,6 +6,7 @@ import { PedigreeCanvas } from "../pedigree/PedigreeCanvas";
 import { Toolbar } from "../components/Toolbar";
 import { EditPanel } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
+import { ImportPedDialog } from "../components/ImportPedDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
 
@@ -24,11 +25,12 @@ function formatDate(iso: string): string {
 export default function CanvasPage() {
   const {
     user, pedigrees, activePedigreeId,
-    loadPedigrees, createPedigree, openPedigree, logout,
+    loadPedigrees, createPedigree, createPedigreeFromData, openPedigree, logout,
     saveActivePedigree, renamePedigree,
   } = useAppStore();
   const { isDirty } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
 
@@ -129,7 +131,22 @@ export default function CanvasPage() {
 
       {/* Right column: toolbar (when active) + editing area */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {hasPedigree && <Toolbar onSettingsClick={() => setSettingsOpen(true)} />}
+        {hasPedigree && (
+          <Toolbar
+            onSettingsClick={() => setSettingsOpen(true)}
+            onImportClick={() => setImportOpen(true)}
+          />
+        )}
+        {!hasPedigree && (
+          <div className="flex items-center px-2 py-1 border-b bg-white">
+            <button
+              className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+              onClick={() => setImportOpen(true)}
+            >
+              Import PED…
+            </button>
+          </div>
+        )}
 
         <div className="flex flex-1 overflow-hidden">
           <div className="flex-1">
@@ -151,6 +168,20 @@ export default function CanvasPage() {
       </div>
 
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+      <ImportPedDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImport={async (pending) => {
+          let lastId: string | null = null;
+          for (const { title, pedigree } of pending) {
+            const id = await createPedigreeFromData(title, pedigree);
+            lastId = id;
+          }
+          // Open the last imported pedigree
+          if (lastId) await openPedigree(lastId);
+        }}
+      />
     </div>
   );
 }

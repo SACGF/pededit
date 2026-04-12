@@ -21,6 +21,7 @@ interface AppState {
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
   createPedigree: (title: string) => Promise<string>; // returns new id
+  createPedigreeFromData: (title: string, data: Pedigree) => Promise<string>; // returns new id
   deletePedigree: (id: string) => Promise<void>;
   saveActivePedigree: () => Promise<void>;
   renamePedigree: (id: string, title: string) => Promise<void>;
@@ -84,6 +85,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const { data } = await pedigreeApi.create(title);
     set((state) => ({ pedigrees: [data, ...state.pedigrees] }));
     return data.id;
+  },
+
+  createPedigreeFromData: async (title, data) => {
+    const { data: created } = await pedigreeApi.createWithData(title, data);
+    set((state) => ({ pedigrees: [created, ...state.pedigrees] }));
+    return created.id;
   },
 
   deletePedigree: async (id) => {

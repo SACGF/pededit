@@ -1,7 +1,8 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, RotateCw, Settings } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Upload, Download } from "lucide-react";
+import { exportPed } from "../io/ped/index.js";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -28,12 +29,25 @@ function UnknownIcon() {
 
 interface ToolbarProps {
   onSettingsClick: () => void;
+  onImportClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick }: ToolbarProps) {
-  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future } = usePedigreeStore();
-  const { activePedigreeId } = useAppStore();
+export function Toolbar({ onSettingsClick, onImportClick }: ToolbarProps) {
+  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree } = usePedigreeStore();
+  const { activePedigreeId, pedigrees } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
+  const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+
+  function handleExportPed() {
+    const text = exportPed(pedigree, { familyId: "1" });
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeTitle ?? "pedigree"}.ped`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="flex items-center gap-1 px-2 py-1 border-b bg-white">
@@ -103,6 +117,31 @@ export function Toolbar({ onSettingsClick }: ToolbarProps) {
       </Button>
 
       <div className="flex-1" />
+
+      {/* Import PED */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Import PED file"
+        onClick={onImportClick}
+      >
+        <Upload size={12} />
+        Import
+      </Button>
+
+      {/* Export PED */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Export as PED file"
+        disabled={!hasPedigree}
+        onClick={handleExportPed}
+      >
+        <Download size={12} />
+        Export
+      </Button>
+
+      <div className="w-px h-5 bg-gray-200 mx-0.5" />
 
       {/* Settings */}
       <Button

@@ -119,19 +119,57 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ---
 
-## Phase 5 — Format I/O + SVG export
+## Phase 5a — PED file import/export ✅ COMPLETE
 
-**What:** Make the tool interoperable with existing clinical workflows and useful for publication.
+**Detailed plan:** `claude/phase5a_ped_plan.md`
+
+**What:** PED file (standard LINKAGE/PLINK format) import and export. Makes the tool interoperable with every clinical genetics tool, R package, and GWAS pipeline that reads/writes PED.
 
 **Import:**
-- PED file (standard linkage format) — trivial parse, maps directly to data model
-- BOADICEA format — enables migration from pedigreejs
-- JSON (native format) — round-trip of internal data model
+- Parse whitespace-delimited PED text → `PedRow[]`
+- Validate: duplicate IIDs, self-as-parent, circular ancestry (errors); phantom parents, single parent, sex mismatch, unknown codes (warnings)
+- Convert: one `Pedigree` per FID, with phantom Individual creation for missing parents, consanguinity detection via ancestor reachability
+- Import dialog: file picker, error/warning display, multi-family selector
 
 **Export:**
-- JSON (native) — save to Django backend with shareable URL
-- PED file
-- SVG (publication quality) — **this is a separate rendering pass**, not a DOM screenshot. Takes layout output and writes clean, minimal SVG suitable for Inkscape / journal submission (Nature max 18×24cm, Cell max 6.5×8in). No React, no inline styles, just geometry.
+- `Pedigree` → PED text, one row per individual, tab-delimited
+- Download as `.ped` file from toolbar
+- Note: PED format does not carry deceased/carrier/proband/name/dob/notes; those are silently dropped on export
+
+**Test data:** `test-data/ped/` — hand-authored + collected files covering simple, consanguineous, large, edge cases, and malformed inputs, each with a README.md.
+
+**What was built:**
+
+*`frontend/src/io/ped/` package:*
+- `types.ts` — `PedRow`, `ValidationIssue`, `ValidationIssueCode` enum, `ImportResult`
+- `parser.ts` — text → `PedRow[]`: handles BOM, CRLF, comments, headers, extra columns, whitespace variants
+- `validator.ts` — structural checks: duplicate IID, self-as-parent (0-safe), circular ancestry (DFS), phantom parents, single parent, sex mismatch, unknown codes
+- `converter.ts` — `PedRow[]` → `Pedigree`: phantom parent creation, single-parent phantom partners, consanguinity detection via ancestor reachability, `sibOrder` assignment
+- `exporter.ts` — `Pedigree` → PED text: tab-delimited, optional header, custom FID
+- `index.ts` — `importPed()` (never throws, errors in `result.issues`), `exportPed()`
+
+*`frontend/src/components/ImportPedDialog.tsx`:* file picker, error/warning/info display, multi-family selector with checkboxes, import confirmation
+
+*`frontend/src/components/Toolbar.tsx` updated:* Import (always visible) + Export PED (disabled without active pedigree) buttons added
+
+*`frontend/src/store/useAppStore.ts` updated:* `createPedigreeFromData(title, data)` for import
+
+*`frontend/src/api/client.ts` updated:* `pedigreeApi.createWithData()` endpoint
+
+*`frontend/src/pages/CanvasPage.tsx` updated:* Import dialog wired with `onImport` callback that creates pedigree(s) from imported data and opens the last one
+
+*Tests (129 passing):* `parser.test.ts` (17), `validator.test.ts` (18), `converter.test.ts` (13), `exporter.test.ts` (10), `roundtrip.test.ts` (37) — covers all test-data files in `test-data/ped/`
+
+**Why PED before SVG:** PED is structural (data model) — it must be correct before export concerns. SVG is presentational — it requires the renderer to be stable but doesn't affect data integrity.
+
+---
+
+## Phase 5b — SVG export
+
+**What:** Publication-quality SVG export. A separate rendering pass — not a DOM screenshot.
+
+**Export:**
+- SVG (publication quality) — takes `LayoutResult` and writes clean, minimal SVG suitable for Inkscape / journal submission (Nature max 18×24cm, Cell max 6.5×8in). No React, no inline styles, just geometry.
 - PNG (rasterise the SVG)
 
 **De-identification mode (export option):**
@@ -141,7 +179,7 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 - Numbering is derived from the layout pass (generation already known, left-to-right order already known) — no separate algorithm needed
 - Display-layer only: the data model retains real names; the export renderer substitutes notation
 
-**Why here:** Format I/O is what makes the tool useful to people with existing data. SVG export quality is a key signal of "this is a serious tool" to the academic/clinical audience. Doing it after the renderer is proven means the export geometry is consistent with what the user sees on screen.
+**Why here:** Doing it after the renderer is proven means the export geometry is consistent with what the user sees on screen. SVG export quality is a key signal of "this is a serious tool" to the academic/clinical audience.
 
 ---
 
