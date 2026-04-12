@@ -5,9 +5,11 @@ import type { SiblingOrderMode } from "@pedigree-editor/layout-engine";
 interface SettingsPanelProps {
   open: boolean;
   onClose: () => void;
+  showMinimap: boolean;
+  onToggleMinimap: (v: boolean) => void;
 }
 
-export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
+export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: SettingsPanelProps) {
   const { pedigree, updateSiblingOrderSettings } = usePedigreeStore();
   const { mode, affectedFirst } = pedigree.siblingOrder;
 
@@ -37,6 +39,25 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         </DialogHeader>
 
         <div className="space-y-4">
+          <div>
+            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+              Display
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showMinimap}
+                onChange={e => onToggleMinimap(e.target.checked)}
+              />
+              <div>
+                <div className="text-sm">Show minimap</div>
+                <div className="text-xs text-gray-400">
+                  Overview of the full pedigree in the bottom-right corner
+                </div>
+              </div>
+            </label>
+          </div>
+
           <div>
             <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
               Sibling order

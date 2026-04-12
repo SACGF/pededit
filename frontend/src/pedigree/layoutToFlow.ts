@@ -1,7 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigree } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR } from "./constants";
+import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR, NODE_SIZE } from "./constants";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -99,6 +99,8 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
           x: result.pos[level][slot] * SLOT_WIDTH,
           y: level * ROW_HEIGHT,
         },
+        width:  NODE_SIZE,
+        height: NODE_SIZE,
         data: {
           individual,
           isDuplicate,

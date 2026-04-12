@@ -36,6 +36,7 @@ export default function CanvasPage() {
   } = useAppStore();
   const { isDirty, pedigree } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") === "true");
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
@@ -204,7 +205,7 @@ export default function CanvasPage() {
 
         <div className="flex flex-1 overflow-hidden">
           <div className="flex-1">
-            <PedigreeCanvas />
+            <PedigreeCanvas showMinimap={showMinimap} />
           </div>
 
           <div className="w-52 border-l bg-white shrink-0 overflow-y-auto">
@@ -213,7 +214,12 @@ export default function CanvasPage() {
         </div>
       </div>
 
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <SettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        showMinimap={showMinimap}
+        onToggleMinimap={v => { setShowMinimap(v); localStorage.setItem("showMinimap", String(v)); }}
+      />
 
       <ImportPedDialog
         open={importOpen}
