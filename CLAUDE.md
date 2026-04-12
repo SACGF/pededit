@@ -24,6 +24,8 @@ A new open-source pedigree editor — a web-based tool for drawing, editing, and
 
 **Target users:** Genetic counselors, clinical genetics teams, research geneticists.
 
+**North star:** Every open-source pedigree tool trades correct layout for simplicity, and none have drag-and-drop repositioning. The layout problem is solved in the [kinship2](https://cran.r-project.org/package=kinship2) R package — we ported it to TypeScript, giving us publication-quality automatic layout as a native npm package for the first time. Everything else is built on top of that foundation.
+
 ## Key Research Findings (from `claude/search_report.md`)
 
 ### Best open-source reference implementations
