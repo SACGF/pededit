@@ -81,25 +81,41 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ---
 
-## Phase 4 — Core interaction
+## Phase 4 — Core interaction ✅ COMPLETE
 
-**What:** The first interactive version. Users can build a pedigree from scratch.
+**Delivered:** A working pedigree editor. A user can build a 3-generation clinical pedigree from scratch.
 
-**Editing operations:**
-- Click empty canvas → add individual (sex selector)
-- Click individual + drag to another → connect as partner or parent-child (context-sensitive)
-- Context menu on individual: add partner, add child, add sibling, set sex, set affected, mark deceased, mark proband
-- Click to select, delete key to remove
-- Edit panel (sidebar): name, DOB, notes, condition labels
-- Auto-layout reruns after every structural edit
+**What was built:**
 
-**State:**
-- Zustand store holds canonical `Pedigree` data model
-- Every mutation goes through an action that snapshots state → full undo/redo via snapshot stack (Immer makes this cheap)
+*Data model additions:*
+- `Individual` gains `sibOrder`, `name`, `dob`, `notes`
+- `SiblingOrderSettings` (`mode: "insertion" | "manual" | "birthDate"`, `affectedFirst`) added to `Pedigree`
+- Layout engine `autohint` updated to sort siblings by effective order (birthDate / sibOrder / affected-first)
 
-**Why here:** By Phase 4 the renderer is proven and the data model is solid, so interaction can be built on a known-good foundation. Undo/redo via snapshots is trivial to add here and nearly impossible to retrofit later.
+*`usePedigreeStore.ts` (new):*
+- Owns active pedigree data, undo/redo snapshot stacks (Immer), active tool, selected/hovered IDs
+- Full structural mutations: `addIndividual`, `addParent`, `addChild(sex)`, `addSibling`, `addPartner`, `deleteIndividual`, `moveSibLeft/Right`
+- Individual property mutations: `updateIndividual`, `setAffected`, `setDeceased`, `setProband`, `setSex`
+- Pedigree-level: `updateSiblingOrderSettings`
 
-**Deliverable:** A working pedigree editor. Can build a 3-generation clinical pedigree from scratch. This is the first thing worth showing to genetic counsellors for feedback.
+*UI components (new):*
+- `Toolbar.tsx` — add individual buttons (direct action, no click-to-place mode), undo/redo, settings
+- `HoverPill.tsx` — NodeToolbar pill: +parents, +son, +daughter, +sibling; debounced hide on mouse-leave
+- `MoreMenu.tsx` — Popover with add partner, move sib left/right, mark affected/deceased/proband, set sex, delete
+- `EditPanel.tsx` — sidebar: name, DOB, notes text fields; status summary (sex, affected, deceased, proband)
+- `SettingsPanel.tsx` — modal dialog: sibling order mode radio buttons, affected-first toggle
+- `useKeyboardShortcuts.ts` — Cmd/Ctrl+Z undo, Cmd/Ctrl+Y/Shift+Z redo, Delete/Backspace removes selected, Escape returns to select
+
+*`useAppStore` updates:*
+- `openPedigree` auto-saves dirty state before switching pedigrees
+- `logout` auto-saves dirty state before clearing tokens
+- Both added to prevent data loss on navigation
+
+*`CanvasPage` updates:*
+- Toolbar, EditPanel, SettingsPanel wired in
+- Pedigree rename via double-click in sidebar
+- Relative timestamps ("5m ago") on pedigree list items
+- Auto-save on pedigree switch and logout
 
 ---
 
