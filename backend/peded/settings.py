@@ -1,15 +1,12 @@
 from datetime import timedelta
 from pathlib import Path
-import environ
+import site_config as _secrets
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-environ.Env.read_env(BASE_DIR / ".env")
-
-SECRET_KEY = env("SECRET_KEY")
-DEBUG = env.bool("DEBUG", default=False)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+SECRET_KEY     = _secrets.SECRET_KEY
+DEBUG          = _secrets.DEBUG
+ALLOWED_HOSTS  = _secrets.ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -57,8 +54,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "peded.wsgi.application"
 
+import environ
 DATABASES = {
-    "default": env.db()   # reads DATABASE_URL
+    "default": environ.Env().db_url_config(_secrets.DATABASE_URL)
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -90,14 +88,13 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,       # new refresh token on every refresh
-    "BLACKLIST_AFTER_ROTATION": False,   # skip blacklist app for now
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
-# Allow Authorization header (needed for JWT)
+CORS_ALLOWED_ORIGINS = _secrets.CORS_ALLOWED_ORIGINS
 CORS_ALLOW_HEADERS = [
     "accept",
     "authorization",
