@@ -407,7 +407,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         const current = draft.individuals.find(i => i.id === individualId)!;
         const leftNeighbour = draft.individuals.find(i => i.id === siblings[idx - 1]!.id)!;
-        [current.sibOrder, leftNeighbour.sibOrder] = [leftNeighbour.sibOrder, current.sibOrder];
+        const tmp = current.sibOrder;
+        current.sibOrder = leftNeighbour.sibOrder;
+        leftNeighbour.sibOrder = tmp;
+        // Ensure manual mode so the swap takes effect regardless of current sort mode.
+        draft.siblingOrder.mode = "manual";
       });
     },
 
@@ -426,7 +430,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         const current = draft.individuals.find(i => i.id === individualId)!;
         const rightNeighbour = draft.individuals.find(i => i.id === siblings[idx + 1]!.id)!;
-        [current.sibOrder, rightNeighbour.sibOrder] = [rightNeighbour.sibOrder, current.sibOrder];
+        const tmp = current.sibOrder;
+        current.sibOrder = rightNeighbour.sibOrder;
+        rightNeighbour.sibOrder = tmp;
+        // Ensure manual mode so the swap takes effect regardless of current sort mode.
+        draft.siblingOrder.mode = "manual";
       });
     },
 
