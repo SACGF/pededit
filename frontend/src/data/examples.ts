@@ -285,6 +285,64 @@ export const EXAMPLES: ExamplePedigree[] = [
     },
   },
   {
+    label: "Uncle-niece",
+    description: "3 generations · consanguineous cross-generational mating",
+    data: {
+      siblingOrder,
+      individuals: [
+        // Gen I — founders
+        { id: "un_gf",    sex: "male",   affected: false, deceased: true,  carrier: false, proband: false, sibOrder: 0 },
+        { id: "un_gm",    sex: "female", affected: false, deceased: true,  carrier: false, proband: false, sibOrder: 1 },
+        // Gen II — uncle (son of founders) and his sister
+        { id: "un_uncle", sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "un_sis",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 1 },
+        { id: "un_bil",   sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 2 },
+        // Gen III — niece (daughter of sister), who marries the uncle
+        { id: "un_niece", sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "un_c1",    sex: "male",   affected: true,  deceased: false, carrier: false, proband: true,  sibOrder: 1 },
+        { id: "un_c2",    sex: "female", affected: false, deceased: false, carrier: true,  proband: false, sibOrder: 2 },
+      ],
+      partnerships: [
+        { id: "un_pp1", individual1: "un_gf",    individual2: "un_gm",    consanguineous: false },
+        { id: "un_pp2", individual1: "un_bil",   individual2: "un_sis",   consanguineous: false },
+        { id: "un_pp3", individual1: "un_uncle", individual2: "un_niece", consanguineous: true  },
+      ],
+      parentOf: {
+        un_pp1: ["un_uncle", "un_sis"],
+        un_pp2: ["un_niece"],
+        un_pp3: ["un_c1", "un_c2"],
+      },
+    },
+  },
+  {
+    label: "Remarriage · half-siblings",
+    description: "2 generations · father with two partnerships · half-siblings",
+    data: {
+      siblingOrder,
+      individuals: [
+        // Gen I
+        { id: "rm_dad",  sex: "male",   affected: true,  deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "rm_mom1", sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 1 },
+        { id: "rm_mom2", sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 2 },
+        // Gen II — first marriage
+        { id: "rm_c1a",  sex: "male",   affected: true,  deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "rm_c1b",  sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 1 },
+        // Gen II — second marriage
+        { id: "rm_c2a",  sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 2 },
+        { id: "rm_c2b",  sex: "female", affected: true,  deceased: false, carrier: false, proband: true,  sibOrder: 3 },
+        { id: "rm_c2c",  sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 4 },
+      ],
+      partnerships: [
+        { id: "rm_pp1", individual1: "rm_dad", individual2: "rm_mom1", consanguineous: false },
+        { id: "rm_pp2", individual1: "rm_dad", individual2: "rm_mom2", consanguineous: false },
+      ],
+      parentOf: {
+        rm_pp1: ["rm_c1a", "rm_c1b"],
+        rm_pp2: ["rm_c2a", "rm_c2b", "rm_c2c"],
+      },
+    },
+  },
+  {
     label: "High complexity",
     description: "4 generations · consanguinity · multiple traits",
     data: {
