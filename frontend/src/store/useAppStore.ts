@@ -16,7 +16,7 @@ interface AppState {
 
   // ── Actions ────────────────────────────────────────────────────────────────
   login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
@@ -40,7 +40,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
     await get().fetchMe();
   },
 
-  logout: () => {
+  logout: async () => {
+    const { activePedigreeId } = get();
+    if (activePedigreeId && usePedigreeStore.getState().isDirty) {
+      await get().saveActivePedigree();
+    }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();
@@ -58,6 +62,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   openPedigree: async (id) => {
+    const { activePedigreeId } = get();
+    if (activePedigreeId && activePedigreeId !== id && usePedigreeStore.getState().isDirty) {
+      await get().saveActivePedigree();
+    }
     const { data } = await pedigreeApi.get(id);
     const pedigree = data.data as Pedigree;
     // Ensure siblingOrder is present (backwards compat with pedigrees saved before Phase 4)

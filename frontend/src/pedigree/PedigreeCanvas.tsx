@@ -23,11 +23,8 @@ const edgeTypes: EdgeTypes = {
   sibshipEdge:        SibshipEdge,
 };
 
-// Tool → sex mapping
-const ADD_TOOLS = { addMale: "male", addFemale: "female", addUnknown: "unknown" } as const;
-
 export function PedigreeCanvas() {
-  const { pedigree, activeTool, addIndividual, setSelectedId } = usePedigreeStore();
+  const { pedigree, setSelectedId } = usePedigreeStore();
 
   // Re-derive layout whenever pedigree data changes
   const { nodes, coupleEdges, sibshipEdges } = useMemo(
@@ -39,22 +36,11 @@ export function PedigreeCanvas() {
   const edges = [...coupleEdges, ...sibshipEdges];
 
   const handlePaneClick = useCallback(() => {
-    // Deselect on bare canvas click
     setSelectedId(null);
-
-    // Add individual if in an add-tool mode
-    if (activeTool in ADD_TOOLS) {
-      const sex = ADD_TOOLS[activeTool as keyof typeof ADD_TOOLS];
-      addIndividual(sex);
-      // Stay in add mode — user can switch to select when done
-    }
-  }, [activeTool, addIndividual, setSelectedId]);
-
-  const cursor =
-    activeTool === "select" ? "default" : "crosshair";
+  }, [setSelectedId]);
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative", cursor }}>
+    <div style={{ width: "100%", height: "100%", position: "relative" }}>
       {/* Global SVG defs — proband arrowhead marker, registered once */}
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
@@ -89,9 +75,7 @@ export function PedigreeCanvas() {
             }}
           >
             <span className="text-sm text-gray-300">
-              {activeTool === "select"
-                ? "Select a tool above to add individuals"
-                : "Click to place an individual"}
+              Use the toolbar above to add individuals
             </span>
           </div>
         )}

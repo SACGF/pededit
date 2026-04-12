@@ -1,4 +1,4 @@
-import { usePedigreeStore, ActiveTool } from "../store/usePedigreeStore";
+import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, RotateCw, Settings } from "lucide-react";
@@ -30,36 +30,55 @@ interface ToolbarProps {
   onSettingsClick: () => void;
 }
 
-const TOOLS: { tool: ActiveTool; label: string; icon: React.ReactNode }[] = [
-  { tool: "select",     label: "Select",         icon: "↖" },
-  { tool: "addMale",    label: "Add male",        icon: <MaleIcon /> },
-  { tool: "addFemale",  label: "Add female",      icon: <FemaleIcon /> },
-  { tool: "addUnknown", label: "Add unknown sex", icon: <UnknownIcon /> },
-];
-
 export function Toolbar({ onSettingsClick }: ToolbarProps) {
-  const { activeTool, setActiveTool, undo, redo, past, future } = usePedigreeStore();
+  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future } = usePedigreeStore();
   const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
 
   return (
     <div className="flex items-center gap-1 px-2 py-1 border-b bg-white">
-      {/* Tool buttons */}
-      <div className="flex items-center gap-0.5">
-        {TOOLS.map(({ tool, label, icon }) => (
-          <Button
-            key={tool}
-            variant={activeTool === tool ? "secondary" : "ghost"}
-            size="sm"
-            title={label}
-            disabled={!hasPedigree}
-            onClick={() => setActiveTool(tool)}
-            className="h-7 w-7 p-0"
-          >
-            {icon}
-          </Button>
-        ))}
-      </div>
+      {/* Select mode */}
+      <Button
+        variant={activeTool === "select" ? "secondary" : "ghost"}
+        size="sm"
+        title="Select"
+        disabled={!hasPedigree}
+        onClick={() => setActiveTool("select")}
+        className="h-7 w-7 p-0"
+      >
+        ↖
+      </Button>
+
+      <div className="w-px h-5 bg-gray-200 mx-0.5" />
+
+      {/* Add individual — action buttons, not mode toggles */}
+      <Button
+        variant="ghost" size="sm"
+        title="Add male"
+        disabled={!hasPedigree}
+        onClick={() => addIndividual("male")}
+        className="h-7 w-7 p-0"
+      >
+        <MaleIcon />
+      </Button>
+      <Button
+        variant="ghost" size="sm"
+        title="Add female"
+        disabled={!hasPedigree}
+        onClick={() => addIndividual("female")}
+        className="h-7 w-7 p-0"
+      >
+        <FemaleIcon />
+      </Button>
+      <Button
+        variant="ghost" size="sm"
+        title="Add unknown sex"
+        disabled={!hasPedigree}
+        onClick={() => addIndividual("unknown")}
+        className="h-7 w-7 p-0"
+      >
+        <UnknownIcon />
+      </Button>
 
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
