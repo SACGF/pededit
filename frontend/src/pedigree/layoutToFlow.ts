@@ -50,6 +50,9 @@ export interface FlowData {
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(pedigree: Pedigree): FlowData {
+  if (pedigree.individuals.length === 0) {
+    return { nodes: [], coupleEdges: [], sibshipEdges: [] };
+  }
   const result: LayoutResult = alignPedigree(pedigree);
   return {
     nodes:        buildNodes(pedigree, result),

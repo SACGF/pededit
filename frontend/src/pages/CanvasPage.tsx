@@ -46,7 +46,7 @@ export default function CanvasPage() {
 
       {/* Canvas */}
       <div className="flex-1">
-        {activePedigree && activePedigree.individuals.length > 0 ? (
+        {activePedigree ? (
           <PedigreeCanvas pedigree={activePedigree} />
         ) : (
           <div className="flex h-full items-center justify-center text-gray-400 text-sm">

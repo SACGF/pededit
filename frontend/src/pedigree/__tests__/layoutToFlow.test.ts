@@ -259,12 +259,15 @@ describe("layoutToFlow — consanguineousFamily", () => {
 // ── Edge cases ────────────────────────────────────────────────────────────────
 
 describe("layoutToFlow — edge cases", () => {
-  it("empty pedigree throws (CanvasPage guards against this with individuals.length > 0 check)", () => {
-    // alignPedigree throws on empty input — layoutToFlow inherits this.
-    // CanvasPage.tsx prevents calling layoutToFlow on an empty pedigree.
-    expect(() =>
-      layoutToFlow({ individuals: [], partnerships: [], parentOf: {} })
-    ).toThrow();
+  it("empty pedigree returns no nodes or edges (alignPedigree throws on empty input, layoutToFlow guards it)", () => {
+    const { nodes, coupleEdges, sibshipEdges } = layoutToFlow({
+      individuals: [],
+      partnerships: [],
+      parentOf: {},
+    });
+    expect(nodes).toHaveLength(0);
+    expect(coupleEdges).toHaveLength(0);
+    expect(sibshipEdges).toHaveLength(0);
   });
 
   it("single individual: one node, no edges", () => {

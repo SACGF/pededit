@@ -61,6 +61,19 @@ Pedigree symbols (square/circle/diamond) represent **biological sex**, not gende
 
 **Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
 
+## Visual Design Direction
+
+**Black and white minimalist.** The UI should look like a clinical pedigree chart — not a generic SaaS app. The pedigree symbols (squares, circles, filled/unfilled, slashes, connecting lines) are the visual language; the chrome around them should get out of the way.
+
+- Pedigree canvas: white background, black symbols and lines, no colour except where clinically meaningful (e.g. multi-trait shading in Phase 7)
+- App UI: minimal, low-contrast chrome — the pedigree is the focus, not the toolbar
+- No gradients, drop shadows, rounded-corner cards, or decorative colour on pedigree elements
+- Typography: clean sans-serif, small, functional
+
+This is the established aesthetic for clinical and publication pedigrees. Maintain it across all phases.
+
+---
+
 ## Architectural Decisions (settled)
 
 **Stack:** Django 5 + DRF + PostgreSQL + simplejwt on the backend; React 18 + TypeScript + Vite + React Flow (`@xyflow/react`) + Zustand + Tailwind + shadcn/ui on the frontend. Layout engine is a local npm workspace package (`@pedigree-editor/layout-engine`) imported by the frontend.
