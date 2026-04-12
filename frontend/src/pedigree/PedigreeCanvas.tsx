@@ -83,8 +83,8 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
         {sibshipEdges.map(edge => {
           const data = edge.data as SibshipEdgeData;
           if (!data?.childXs?.length) return null;
-          const sibLeftX  = Math.min(...data.childXs);
-          const sibRightX = Math.max(...data.childXs);
+          const sibLeftX  = Math.min(data.coupleX, ...data.childXs);
+          const sibRightX = Math.max(data.coupleX, ...data.childXs);
           const childTopY = data.childY - half;
           const d = [
             `M ${mx(data.coupleX)} ${my(data.coupleY)} L ${mx(data.coupleX)} ${my(data.sibBarY)}`,
