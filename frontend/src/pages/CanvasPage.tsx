@@ -7,6 +7,7 @@ import { Toolbar } from "../components/Toolbar";
 import { EditPanel } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
+import { ExportDialog } from "../components/ExportDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
 
@@ -28,9 +29,10 @@ export default function CanvasPage() {
     loadPedigrees, createPedigree, createPedigreeFromData, openPedigree, logout,
     saveActivePedigree, renamePedigree,
   } = useAppStore();
-  const { isDirty } = usePedigreeStore();
+  const { isDirty, pedigree } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
 
@@ -135,6 +137,7 @@ export default function CanvasPage() {
           <Toolbar
             onSettingsClick={() => setSettingsOpen(true)}
             onImportClick={() => setImportOpen(true)}
+            onExportSvgClick={() => setExportDialogOpen(true)}
           />
         )}
         {!hasPedigree && (
@@ -174,14 +177,23 @@ export default function CanvasPage() {
         onClose={() => setImportOpen(false)}
         onImport={async (pending) => {
           let lastId: string | null = null;
-          for (const { title, pedigree } of pending) {
-            const id = await createPedigreeFromData(title, pedigree);
+          for (const { title, pedigree: importedPedigree } of pending) {
+            const id = await createPedigreeFromData(title, importedPedigree);
             lastId = id;
           }
           // Open the last imported pedigree
           if (lastId) await openPedigree(lastId);
         }}
       />
+
+      {activePedigreeId && (
+        <ExportDialog
+          open={exportDialogOpen}
+          onOpenChange={setExportDialogOpen}
+          pedigree={pedigree}
+          title={activeTitle ?? "pedigree"}
+        />
+      )}
     </div>
   );
 }

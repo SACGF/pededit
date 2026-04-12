@@ -1,7 +1,7 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, RotateCw, Settings, Upload, Download } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Upload, Download, Image } from "lucide-react";
 import { exportPed } from "../io/ped/index.js";
 
 // SVG icons matching NSGC pedigree symbols
@@ -30,9 +30,10 @@ function UnknownIcon() {
 interface ToolbarProps {
   onSettingsClick: () => void;
   onImportClick: () => void;
+  onExportSvgClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick, onImportClick }: ToolbarProps) {
+export function Toolbar({ onSettingsClick, onImportClick, onExportSvgClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree } = usePedigreeStore();
   const { activePedigreeId, pedigrees } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
@@ -139,6 +140,18 @@ export function Toolbar({ onSettingsClick, onImportClick }: ToolbarProps) {
       >
         <Download size={12} />
         Export
+      </Button>
+
+      {/* Export SVG/PNG */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Export as SVG or PNG"
+        disabled={!hasPedigree}
+        onClick={onExportSvgClick}
+      >
+        <Image size={12} />
+        SVG/PNG
       </Button>
 
       <div className="w-px h-5 bg-gray-200 mx-0.5" />
