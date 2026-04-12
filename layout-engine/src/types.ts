@@ -37,6 +37,8 @@ export interface Pedigree {
   /** parentOf[partnershipId] = string[] of Individual.id children */
   parentOf: Record<string, string[]>;
   siblingOrder: SiblingOrderSettings;
+  /** Manual drag overrides: individualId → canvas pixel position */
+  pinnedPositions?: Record<string, { x: number; y: number }>;
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

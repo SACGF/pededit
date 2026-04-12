@@ -1,7 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigree } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR, NODE_SIZE } from "./constants";
+import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE } from "./constants";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -20,6 +20,8 @@ export interface RFNodeData extends Record<string, unknown> {
   duplicateIndex?: 1 | 2;
   /** True if individual has a parent partnership in the pedigree. */
   hasParents: boolean;
+  /** True if this individual has a manually dragged (pinned) position. */
+  isPinned: boolean;
 }
 
 /** No extra data needed — geometry is derived from source/target handle positions. */
@@ -56,10 +58,18 @@ export function layoutToFlow(pedigree: Pedigree): FlowData {
     return { nodes: [], coupleEdges: [], sibshipEdges: [] };
   }
   const result: LayoutResult = alignPedigree(pedigree);
+  const nodes = buildNodes(pedigree, result);
+
+  // Map from slot id ("level-slot") → final pixel position (reflects pin overrides).
+  const slotPos = new Map<string, { x: number; y: number }>();
+  for (const node of nodes) {
+    slotPos.set(node.id, node.position);
+  }
+
   return {
-    nodes:        buildNodes(pedigree, result),
+    nodes,
     coupleEdges:  buildCoupleEdges(result),
-    sibshipEdges: buildSibshipEdges(result),
+    sibshipEdges: buildSibshipEdges(result, slotPos),
   };
 }
 
@@ -92,10 +102,12 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
         children => children.includes(individual.id)
       );
 
+      const pinnedPos = pedigree.pinnedPositions?.[individual.id];
+
       nodes.push({
         id:       `${level}-${slot}`,
         type:     "pedigreeSymbol",
-        position: {
+        position: pinnedPos ?? {
           x: result.pos[level][slot] * SLOT_WIDTH,
           y: level * ROW_HEIGHT,
         },
@@ -106,6 +118,7 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
           isDuplicate,
           duplicateIndex: isDuplicate ? (occurrence as 1 | 2) : undefined,
           hasParents,
+          isPinned: !!pinnedPos,
         },
       });
     }
@@ -141,7 +154,10 @@ function buildCoupleEdges(result: LayoutResult): Edge<CoupleEdgeData>[] {
 
 // ── Sibship edges ─────────────────────────────────────────────────────────────
 
-function buildSibshipEdges(result: LayoutResult): Edge<SibshipEdgeData>[] {
+function buildSibshipEdges(
+  result: LayoutResult,
+  slotPos: Map<string, { x: number; y: number }>,
+): Edge<SibshipEdgeData>[] {
   const edges: Edge<SibshipEdgeData>[] = [];
 
   for (let level = 1; level < result.n.length; level++) {
@@ -158,15 +174,13 @@ function buildSibshipEdges(result: LayoutResult): Edge<SibshipEdgeData>[] {
       const leftParentSlot  = f - 1;  // 0-based
       const rightParentSlot = f;       // 0-based
 
-      const coupleX = (
-        result.pos[level - 1][leftParentSlot] +
-        result.pos[level - 1][rightParentSlot]
-      ) / 2 * SLOT_WIDTH;
-
-      const coupleY  = (level - 1) * ROW_HEIGHT;
-      const sibBarY  = (level - SIB_BAR_FACTOR) * ROW_HEIGHT;
-      const childY   = level * ROW_HEIGHT;
-      const childXs  = slots.map((s) => result.pos[level][s] * SLOT_WIDTH);
+      const leftPos  = slotPos.get(`${level - 1}-${leftParentSlot}`)!;
+      const rightPos = slotPos.get(`${level - 1}-${rightParentSlot}`)!;
+      const coupleX  = (leftPos.x + rightPos.x) / 2;
+      const coupleY  = (leftPos.y + rightPos.y) / 2;
+      const childY   = slotPos.get(`${level}-${slots[0]}`)!.y;
+      const sibBarY  = (coupleY + childY) / 2;
+      const childXs  = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
 
       // Source = left parent node; target = leftmost child node.
       // The SibshipEdge renderer ignores these positions and uses data instead.

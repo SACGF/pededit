@@ -131,6 +131,11 @@ interface PedigreeState {
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
+
+  // Pin / drag
+  pinIndividual: (individualId: string, pos: { x: number; y: number }) => void;
+  unpinIndividual: (individualId: string) => void;
+  resetLayout: () => void;
 }
 
 // ── Store implementation ───────────────────────────────────────────────────────
@@ -467,6 +472,32 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     updateSiblingOrderSettings: (settings) => {
       mutate(draft => {
         Object.assign(draft.siblingOrder, settings);
+      });
+    },
+
+    // ── Pin / drag ───────────────────────────────────────────────────────────
+
+    pinIndividual: (individualId, pos) => {
+      mutate(draft => {
+        if (!draft.pinnedPositions) draft.pinnedPositions = {};
+        draft.pinnedPositions[individualId] = pos;
+      });
+    },
+
+    unpinIndividual: (individualId) => {
+      mutate(draft => {
+        if (draft.pinnedPositions) {
+          delete draft.pinnedPositions[individualId];
+          if (Object.keys(draft.pinnedPositions).length === 0) {
+            delete draft.pinnedPositions;
+          }
+        }
+      });
+    },
+
+    resetLayout: () => {
+      mutate(draft => {
+        delete draft.pinnedPositions;
       });
     },
   };

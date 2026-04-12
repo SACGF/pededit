@@ -19,10 +19,13 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
     moveSibRight,
     deleteIndividual,
     setSelectedId,
+    unpinIndividual,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
+
+  const isPinned = !!pedigree.pinnedPositions?.[individualId];
 
   // Collect sexes that would create a same-sex pairing (grey them out)
   const disabledSexes = new Set<string>();
@@ -107,6 +110,14 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
             Delete
           </MenuItem>
         </div>
+
+        {isPinned && (
+          <div className="border-t mt-1 pt-1">
+            <MenuItem onClick={() => action(() => unpinIndividual(individualId))}>
+              Unpin position
+            </MenuItem>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );

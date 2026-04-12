@@ -35,9 +35,10 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: ToolbarProps) {
-  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree } = usePedigreeStore();
+  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
   const { activePedigreeId, pedigrees } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
+  const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
 
   function handleExportPed() {
@@ -130,6 +131,18 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: To
       </Button>
 
       <div className="flex-1" />
+
+      {/* Reset layout — only visible when pins exist */}
+      {hasPins && (
+        <Button
+          variant="ghost" size="sm"
+          className="h-7 px-2 gap-1 text-xs text-gray-500"
+          title="Clear all manual node positions and restore auto-layout"
+          onClick={resetLayout}
+        >
+          Reset layout
+        </Button>
+      )}
 
       {/* Export PED */}
       <Button

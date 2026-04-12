@@ -10,7 +10,7 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
-  const { individual, isDuplicate, duplicateIndex, hasParents } = data;
+  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned } = data;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -103,6 +103,23 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         >
           {individual.id}
         </div>
+      )}
+
+      {/* Pin indicator — small grey dot in top-right corner */}
+      {isPinned && (
+        <div
+          style={{
+            position: "absolute",
+            top: -3,
+            right: -3,
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: "#9ca3af",
+            border: "1.5px solid white",
+            pointerEvents: "none",
+          }}
+        />
       )}
 
       {/* Duplicate superscript */}

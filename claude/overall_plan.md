@@ -184,34 +184,12 @@ Small self-contained improvements. Suggested order: auto-consang → CSV → PDF
 - ~~**Layout: `kindepth` force fallback**~~ ✅ — `alignPedigree.ts` wraps `kindepth(input, true)` in a try/catch that retries with `kindepth(input, false)`.
 - ~~**Layout: autohint spouse hints**~~ ✅ — `autohint.ts` now populates `hints.spouse` via `buildSpouseHints()`.
 - ~~**Layout: QP bundling**~~ ✅ — `alignped4.ts` uses a static `import quadprogPkg from "quadprog"` instead of `require()`; `vite.config.ts` adds `optimizeDeps: { include: ["quadprog"] }`. QP optimiser now runs in the browser.
+- ~~**Auto-detect consanguinity on edit**~~ ✅ — `frontend/src/utils/pedigreeRelationship.ts` (`getAncestors`, `shareAncestor`); called from `usePedigreeStore.ts` `addPartner`.
+- ~~**CSV export**~~ ✅ — `frontend/src/io/csv/exporter.ts`; "Export CSV" button in `Toolbar.tsx`; 9 tests. Columns: `family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms`.
+- ~~**PDF export**~~ ✅ — `frontend/src/io/svg/pdfExporter.ts` (jsPDF + svg2pdf.js); "PDF" option in `ExportDialog.tsx`.
+- ~~**`hpoTerms` data model slot**~~ ✅ — `hpoTerms?: string[]` added to `Individual` in `layout-engine/src/types.ts`; emitted as semicolon-joined `hpo_terms` column in CSV export. UI in Phase 7.
 
-**Remaining:**
-
-### Auto-detect consanguinity on edit
-
-When the user creates a new partnership via "add partner", automatically check whether the two individuals share any ancestor and set `consanguineous: true` on the `Partnership`. Currently requires manual user action.
-
-**Where:** `frontend/src/store/usePedigreeStore.ts` — `addPartner` mutation (and anywhere else a new `Partnership` is created). The ancestor-intersection logic already exists in `converter.ts` (`areRelated` or equivalent) — extract into a shared util and call from the store.
-
-**Acceptance:** Creating a partnership between cousins automatically draws the double consanguinity line. Manual toggle in the more-menu remains for incomplete data.
-
-### CSV export
-
-Export the pedigree as a CSV file — one row per individual, suitable for Excel or R/Python.
-
-**Where:** New file `frontend/src/io/csv/exporter.ts`, add to toolbar Export menu alongside Export PED. No new dependencies.
-
-**Format:** `family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes`
-
-Build a parent lookup from `pedigree.partnerships` + `pedigree.parentOf`, then map each `Individual` to a row. Escape commas in notes fields. Tests: ~6 cases (empty, with/without parents, notes with commas, flags, proband).
-
-### PDF export
-
-Add PDF as an export option alongside SVG and PNG in the existing `ExportDialog`. Clinicians need PDF for referral letters.
-
-**Where:** New file `frontend/src/io/svg/pdfExporter.ts`. Use `jsPDF` (MIT, ~250 kB gzip) — pass the existing SVG string from `exportSvg()` to `jsPDF`'s `svg()` method. Fit to A4, landscape if wider than tall. Add "PDF" option to the format radio group in `ExportDialog.tsx`.
-
-**Dependencies:** `npm install jspdf svg2pdf.js --workspace frontend`
+**Remaining:** (none — Phase 5c complete)
 
 ---
 

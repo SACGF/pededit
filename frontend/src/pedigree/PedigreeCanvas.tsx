@@ -1,13 +1,16 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
   Panel,
+  applyNodeChanges,
   type NodeTypes,
   type EdgeTypes,
   type Edge,
   type Node,
+  type NodeChange,
+  type NodeMouseHandler,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore } from "../store/usePedigreeStore";
@@ -151,19 +154,42 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
-  const { pedigree, setSelectedId } = usePedigreeStore();
+  const { pedigree, setSelectedId, pinIndividual } = usePedigreeStore();
 
-  const { nodes, coupleEdges, sibshipEdges } = useMemo(
+  const { nodes: computedNodes, coupleEdges, sibshipEdges } = useMemo(
     () => pedigree.individuals.length > 0
       ? layoutToFlow(pedigree)
       : { nodes: [], coupleEdges: [], sibshipEdges: [] },
     [pedigree],
   );
+
+  // Local node state so React Flow can track positions during drag.
+  // Synced from computedNodes whenever the store changes (structure edits,
+  // undo/redo, pin commits) — but not on intermediate drag moves.
+  const [rfNodes, setRfNodes] = useState<Node<RFNodeData>[]>(computedNodes);
+  useEffect(() => {
+    setRfNodes(computedNodes);
+  }, [computedNodes]);
+
+  const onNodesChange = useCallback(
+    (changes: NodeChange<Node<RFNodeData>>[]) => {
+      setRfNodes(prev => applyNodeChanges(changes, prev));
+    },
+    [],
+  );
+
   const edges = [...coupleEdges, ...sibshipEdges];
 
   const handlePaneClick = useCallback(() => {
     setSelectedId(null);
   }, [setSelectedId]);
+
+  const handleNodeDragStop: NodeMouseHandler<Node<RFNodeData>> = useCallback(
+    (_event, node) => {
+      pinIndividual(node.data.individual.id, node.position);
+    },
+    [pinIndividual],
+  );
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
@@ -177,15 +203,17 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
       </svg>
 
       <ReactFlow
-        nodes={nodes}
+        nodes={rfNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         nodeOrigin={[0.5, 0.5]}
-        nodesDraggable={false}
+        nodesDraggable={true}
         nodesConnectable={false}
+        onNodesChange={onNodesChange}
         fitView
         onPaneClick={handlePaneClick}
+        onNodeDragStop={handleNodeDragStop}
         proOptions={{ hideAttribution: true }}
       >
         {pedigree.individuals.length === 0 && (
@@ -208,7 +236,7 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
         <Controls />
         {showMinimap && (
           <PedigreeMinimap
-            nodes={nodes as Node<RFNodeData>[]}
+            nodes={rfNodes as Node<RFNodeData>[]}
             coupleEdges={coupleEdges as Edge<CoupleEdgeData>[]}
             sibshipEdges={sibshipEdges as Edge<SibshipEdgeData>[]}
           />
