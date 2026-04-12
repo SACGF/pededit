@@ -17,7 +17,7 @@ import { solveQP } from "quadprog";
 export function alignped4(
   rval: AlignState,
   spouse: number[][], // 1-based Boolean matrix: spouse[lev][col] > 0 iff left of couple
-  level: Int32Array,
+  _level: Int32Array,
   width: number,
   align: boolean | [number, number],
 ): Float64Array[] {

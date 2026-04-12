@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import "svg2pdf.js"; // jsPDF plugin for SVG rendering
 
-export async function exportPdf(svgString: string, title: string): Promise<Blob> {
+export async function exportPdf(svgString: string, _title: string): Promise<Blob> {
   // Parse SVG dimensions from the string
   const match = svgString.match(/width="(\d+\.?\d*)"[^>]*height="(\d+\.?\d*)"/);
   const svgWidth  = parseFloat(match?.[1] ?? "400");

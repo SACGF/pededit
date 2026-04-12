@@ -369,7 +369,7 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
 function buildSpouseList(
   input: LayoutInput,
   hints: Hints,
-  pedigree?: Pedigree,
+  _pedigree?: Pedigree,
 ): { spouselist: Int32Array; spouselistRows: number } {
   const n = input.n;
   const rows: [number, number, number, number][] = [];

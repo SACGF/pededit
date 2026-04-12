@@ -17,8 +17,6 @@ export function alignped3(x1: AlignState, x2: AlignState, packed: boolean, space
   let maxcol = 0;
   for (let i = 1; i <= maxlev; i++) maxcol = Math.max(maxcol, (x1.n[i] ?? 0) + (x2.n[i] ?? 0));
 
-  const n1max = Math.max(...Array.from(x1.n).slice(1)); // R: max(x1$n)
-
   // Allocate output arrays (1-based)
   const n = new Int32Array(maxlev + 1);
   const nid: Float64Array[] = [];
