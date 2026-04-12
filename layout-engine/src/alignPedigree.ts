@@ -178,8 +178,96 @@ export function alignPedigree(
     pos = rval.pos.map(row => new Float64Array(row));
   }
 
+  // 8.5. Post-QP centering: shift each sibship toward its parent midpoint where spacing allows
+  pos = postQPCenter(rval, pos);
+
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
   return toLayoutResult(rval, nidInt, pos, spouseMatrix, maxlev);
+}
+
+/**
+ * Post-QP centering pass.
+ *
+ * After the QP optimisation, each sibship's children are shifted toward
+ * their parent couple midpoint as far as spacing constraints allow.
+ *
+ * The QP minimises a combined objective (spouse adjacency + centering) and
+ * for cross-family couples the spouse-adjacency penalty dominates, leaving
+ * children off-centre even though a simple shift would fix it.  This pass
+ * corrects that by greedily shifting each sibship leftward or rightward,
+ * clamped so no child is moved closer than 1 unit to its non-sibling neighbour.
+ *
+ * Levels are processed top→bottom so that a corrected parent position is
+ * visible when we compute grandchild shifts.  Within each level, families
+ * are processed left→right to ensure left-family shifts don't remove the
+ * gap headroom that right families rely on.
+ *
+ * All arrays use 1-based indexing to match the internal AlignState convention.
+ */
+function postQPCenter(rval: AlignState, pos: Float64Array[]): Float64Array[] {
+  const maxlev = rval.n.length - 1;
+
+  for (let lev = 2; lev <= maxlev; lev++) {
+    const ni = rval.n[lev] ?? 0;
+    const famRow = rval.fam[lev]!;
+
+    // Group child slots (1-based) by family index
+    const families = new Map<number, number[]>();
+    for (let c = 1; c <= ni; c++) {
+      const f = famRow[c] ?? 0;
+      if (f > 0) {
+        if (!families.has(f)) families.set(f, []);
+        families.get(f)!.push(c);
+      }
+    }
+
+    // Sort families left→right by parent position
+    const niParent = rval.n[lev - 1] ?? 0;
+    const sorted = [...families.entries()].sort(
+      ([fa], [fb]) => (pos[lev - 1]![fa] ?? 0) - (pos[lev - 1]![fb] ?? 0),
+    );
+
+    for (const [f, slots] of sorted) {
+      // f is the 1-based slot index of the LEFT parent; f+1 is the right parent
+      if (f < 1 || f + 1 > niParent) continue;
+
+      const leftParentPos  = pos[lev - 1]![f]!;
+      const rightParentPos = pos[lev - 1]![f + 1]!;
+      const parentMid = (leftParentPos + rightParentPos) / 2;
+
+      const childMid = slots.reduce((s, c) => s + pos[lev]![c]!, 0) / slots.length;
+      let shift = parentMid - childMid;
+      if (Math.abs(shift) < 1e-6) continue;
+
+      const sortedSlots = [...slots].sort((a, b) => a - b);
+      const leftmostSlot  = sortedSlots[0]!;
+      const rightmostSlot = sortedSlots[sortedSlots.length - 1]!;
+
+      if (shift < 0) {
+        // Shifting left — check the immediate left neighbour
+        const leftNeighbor = leftmostSlot - 1;
+        if (leftNeighbor >= 1 && !slots.includes(leftNeighbor)) {
+          const gap = pos[lev]![leftmostSlot]! - pos[lev]![leftNeighbor]!;
+          shift = Math.max(shift, -(gap - 1));
+        }
+      } else {
+        // Shifting right — check the immediate right neighbour
+        const rightNeighbor = rightmostSlot + 1;
+        if (rightNeighbor <= ni && !slots.includes(rightNeighbor)) {
+          const gap = pos[lev]![rightNeighbor]! - pos[lev]![rightmostSlot]!;
+          shift = Math.min(shift, gap - 1);
+        }
+      }
+
+      if (Math.abs(shift) < 1e-6) continue;
+
+      for (const c of slots) {
+        pos[lev]![c] = pos[lev]![c]! + shift;
+      }
+    }
+  }
+
+  return pos;
 }
 
 /**

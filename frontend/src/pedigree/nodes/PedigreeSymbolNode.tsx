@@ -91,6 +91,26 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         </div>
       )}
 
+      {/* Dev-mode ID label — always visible so you can screenshot the canvas for bug reports */}
+      {import.meta.env.DEV && (
+        <div
+          style={{
+            position: "absolute",
+            top: NODE_SIZE + (individual.name ? 14 : 2),
+            left: "50%",
+            transform: "translateX(-50%)",
+            whiteSpace: "nowrap",
+            fontSize: 8,
+            fontFamily: "monospace",
+            lineHeight: 1.2,
+            color: "#888",
+            pointerEvents: "none",
+          }}
+        >
+          {individual.id}
+        </div>
+      )}
+
       {/* Duplicate superscript */}
       {isDuplicate && duplicateIndex !== undefined && (
         <DuplicateSuperscript index={duplicateIndex} />

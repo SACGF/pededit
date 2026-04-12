@@ -14,13 +14,10 @@
  * Couple lines fit          │ All scenarios  ← see note B below for duplicate handling
  *
  * NOTE A — "Children centred" is NOT a universal invariant.
- *   When two individuals from DIFFERENT parent-families marry each other (e.g. first cousins),
- *   the QP must balance centering-under-parents against keeping spouses adjacent. For a
- *   single child of two different-family parents, the QP optimum mathematically lands the
- *   child at (parentA_mid + parentB_mid)/2, NOT at parentA_mid or parentB_mid individually.
- *   This is expected kinship2 behaviour — the same result appears in the original R package.
- *   Centering is only checked for the four UI examples (simple, three-gen, large, high-complex)
- *   plus simple PED cases where all same-row marriages come from the same family unit.
+ *   For most pedigrees the post-QP centering pass (alignPedigree.ts postQPCenter) brings all
+ *   sibships to exact centre.  The remaining exceptions are pedigrees where a spacing
+ *   constraint prevents the shift (a non-sibling neighbour is already at minimum distance).
+ *   The high-complexity pedigree has two such cases; kinship2-fam1 has several.
  *
  * NOTE B — "Couple lines fit" looks up nodes by (id, cx) to handle duplicated individuals.
  *   An individual can appear in two slots when they belong to two separate family contexts
@@ -350,12 +347,11 @@ const SCENARIOS: Array<{ label: string; ped: Pedigree; count: number; centred: b
   // PED scenarios
   // uncle-niece: individual 3 (uncle) appears at two levels — duplicate but centring holds
   { label: "ped/uncle-niece",         ped: UNCLE_NIECE,           count: 7,  centred: true  },
-  // cross-family marriages — centring trade-off expected (NOTE A)
-  { label: "ped/first-cousin",        ped: FIRST_COUSIN,          count: 9,  centred: false },
-  { label: "ped/double-first-cousin", ped: DOUBLE_FIRST_COUSIN,   count: 11, centred: false },
-  // two families each contributing one child who marry — same trade-off
-  { label: "ped/three-gen",           ped: THREE_GENERATION_PED,  count: 10, centred: false },
-  // large multi-generation
+  // post-QP centering pass fixes cross-family marriage cases
+  { label: "ped/first-cousin",        ped: FIRST_COUSIN,          count: 9,  centred: true  },
+  { label: "ped/double-first-cousin", ped: DOUBLE_FIRST_COUSIN,   count: 11, centred: true  },
+  { label: "ped/three-gen",           ped: THREE_GENERATION_PED,  count: 10, centred: true  },
+  // large multi-generation — some sibships spacing-constrained (see NOTE A)
   { label: "ped/kinship2-fam1",       ped: KINSHIP2_FAM1,         count: 41, centred: false },
 ];
 
@@ -390,18 +386,6 @@ describe("all examples — children centred under parents (simple pedigrees only
       assertChildrenCentred(geo, label);
     });
   }
-
-  it.todo(
-    "ped/first-cousin — centring trade-off (see NOTE A): cousins' children are at the " +
-    "QP optimum (~1.0/2.0 units) not the geometric midpoints (~0.5/2.5) because the " +
-    "spouse adjacency penalty dominates when cross-family children marry. " +
-    "Would require increasing centering weight or post-QP snapping for single children.",
-  );
-
-  it.todo(
-    "ped/three-gen — same cross-family marriage trade-off as first-cousin. " +
-    "Single child from each family ends up at integer slot, not half-slot midpoint.",
-  );
 
   it.todo(
     "ui/high-complexity h3d misalignment — spacing constraint from h3b (240 px) " +
