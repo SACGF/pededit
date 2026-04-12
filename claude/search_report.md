@@ -190,17 +190,22 @@ This report surveys pedigree drawing/editing software across open-source project
 | **Forks** | 6 |
 | **Last updated** | May 2023 |
 | **Key features** | Pedigree S3 class, kinship matrix calculation, pedigree plotting (genetics counselor standards), handles inbreeding/MZ twins/X-linked, pedigree shrinking |
-| **Notes** | Foundation package used by many other tools (QuickPed, Pedixplorer, ggped). Standard for R-based pedigree work. |
+| **Notes** | Foundation package used by many other tools (QuickPed, Pedixplorer, ggped). Standard for R-based pedigree work. **Superseded by Pedixplorer** — the same authors moved development to Bioconductor under the new name. Our TypeScript layout engine is a port of kinship2's algorithm. |
 
 ### Pedixplorer
 | Attribute | Detail |
 |-----------|--------|
-| **URL** | https://bioconductor.org/packages/release/bioc/html/Pedixplorer.html |
+| **URL** | https://github.com/LouisLeNezet/Pedixplorer |
+| **Bioconductor** | https://bioconductor.org/packages/release/bioc/html/Pedixplorer.html |
 | **Web app** | https://pedixplorer.univ-rennes.fr |
 | **Language** | R (S4 classes) |
-| **Paper** | *Bioinformatics* 41(6), 2025 |
-| **Key features** | Builds on kinship2 with Bioconductor standards, Shiny web app, pedigree filtering/trimming, customizable visualization, proband selection, large complex pedigree support |
-| **Notes** | Most modern R pedigree package (2025). Successor to kinship2 with S4 OOP and Bioconductor integration. |
+| **Version** | 1.7.1 (Bioconductor, active) |
+| **Paper** | Le Nézet et al., *Bioinformatics* 41(6):btaf329, 2025. DOI: 10.1093/bioinformatics/btaf329 |
+| **License** | Open source (Bioconductor) |
+| **Key features** | Direct successor to kinship2; S4 object model with 23-slot Ped class; `auto_hint()` (489-line graph-based founder/spouse ordering); `best_hint()` QP optimisation; `useful_inds()` and `shrink()` for large-pedigree filtering; gradient colouring for quantitative traits; Shiny web app; ggplot2 + plotly backends; 17/17 Pedigree Standardisation Task Force features supported |
+| **Notes** | **Same core layout algorithm as kinship2** (kindepth + alignped1–4) — not a new algorithm, but with improved hint generation and better edge-case handling. The primary additions relevant to our TypeScript port are: (1) a real `auto_hint()` using igraph for founder ordering and spouse anchoring (vs our stub); (2) `force=TRUE` for inbred pedigrees that fail standard alignment; (3) enhanced consanguinity and cross-generational mating handling. Shiny/ggplot2/plotly features are irrelevant to our architecture. |
+
+**Assessment for our TypeScript port:** See `claude/pedixplorer_improvements_plan.md` for a detailed diff analysis and specific changes worth porting. Short summary: port `auto_hint` logic (our biggest quality gap), add `force` fallback to `kindepth`, skip everything presentation-related.
 
 ### pedsuite
 | Attribute | Detail |
@@ -381,7 +386,7 @@ This report surveys pedigree drawing/editing software across open-source project
 | **Madeline 2.0** | CLI | C++ | No | GPL | No | - | 2007 | Research |
 | **ped_draw** | CLI+web | Python | No | MIT | No (2020) | 24 | 2020 | Research |
 | **Pedixplorer** | R pkg | R | No | Yes | Yes | - | 2025 | Research |
-| **kinship2** | R pkg | R | No | Yes | Partial | 17 | - | Research |
+| **kinship2** | R pkg | R | No | Yes | Partial → superseded | 17 | - | Research |
 | **Progeny** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
 | **TrakGene** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
 | **FamGenix** | SaaS | Proprietary | Yes | No | Yes | - | - | Yes |
