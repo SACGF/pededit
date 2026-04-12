@@ -9,14 +9,14 @@ import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR } from "../constants";
 // simpleFamily:
 //   n       = [2, 3, 3]
 //   nid     = [[1,2], [3,5,4], [6,7,8]]
-//   pos     = [[0,1], [0,1,2], [0,1,2]]
+//   pos     = [[1,2], [0.5,1.5,2.5], [0,1,2]]   ← QP centres gen-0 over gen-1 children
 //   fam     = [[0,0], [1,0,1], [1,1,1]]
 //   spouse  = [[1,0], [1,0,0], [0,0,0]]
 //
 // consanguineousFamily:
 //   n       = [2, 2, 2]
 //   nid     = [[1,2], [3,4], [5,6]]
-//   pos     = [[0,1], [0,1], [0,1]]
+//   pos     = [[0,1], [0,1], [0,1]]              ← compact symmetric family; QP leaves at 0/1
 //   fam     = [[0,0], [1,1], [1,1]]
 //   spouse  = [[1,0], [2,0], [0,0]]
 
@@ -84,10 +84,17 @@ describe("layoutToFlow — simpleFamily", () => {
       const n01 = nodes.find((n) => n.id === "0-1")!;
       const n12 = nodes.find((n) => n.id === "1-2")!;
       const n22 = nodes.find((n) => n.id === "2-2")!;
-      expect(n00.position).toEqual({ x: px(0), y: py(0) });
-      expect(n01.position).toEqual({ x: px(1), y: py(0) });
-      expect(n12.position).toEqual({ x: px(2), y: py(1) });
-      expect(n22.position).toEqual({ x: px(2), y: py(2) });
+      // QP centres grandparents over their two children at slots 0.5 and 2.5,
+      // shifting them from [0,1] to ≈[1,2]; use toBeCloseTo for QP-optimised x values.
+      expect(n00.position.x).toBeCloseTo(px(1), 0);
+      expect(n00.position.y).toBe(py(0));
+      expect(n01.position.x).toBeCloseTo(px(2), 0);
+      expect(n01.position.y).toBe(py(0));
+      expect(n12.position.x).toBeCloseTo(px(2.5), 0);
+      expect(n12.position.y).toBe(py(1));
+      // gen-2 grandchildren: QP may introduce tiny floating-point errors
+      expect(n22.position.x).toBeCloseTo(px(2), 3);
+      expect(n22.position.y).toBe(py(2));
     });
 
     it("no individual appears in two slots → isDuplicate is false for all", () => {
@@ -144,13 +151,14 @@ describe("layoutToFlow — simpleFamily", () => {
     it("gen-1 sibship geometry: coupleX midpoint, correct bar and child positions", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
       const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
-      // parents at pos[0][0]=0 and pos[0][1]=1 → midpoint = 0.5 → × SLOT_WIDTH = 40
-      expect(coupleX).toBe(0.5 * SLOT_WIDTH);
+      // grandparents at pos≈[1,2] → midpoint ≈ 1.5 × SLOT_WIDTH
+      expect(coupleX).toBeCloseTo(1.5 * SLOT_WIDTH, 0);
       expect(coupleY).toBe(py(0));
       expect(sibBarY).toBe((1 - SIB_BAR_FACTOR) * ROW_HEIGHT);
       expect(childY).toBe(py(1));
-      // children at slots 0 (i3, pos=0) and 2 (i4, pos=2) — slot 1 (i5) has fam=0
-      expect(childXs).toEqual([px(0), px(2)]);
+      // children i3 at pos≈0.5, i4 at pos≈2.5 (slot 1 = i5 has fam=0, not a child here)
+      expect(childXs[0]).toBeCloseTo(0.5 * SLOT_WIDTH, 0);
+      expect(childXs[1]).toBeCloseTo(2.5 * SLOT_WIDTH, 0);
     });
 
     it("gen-2 sibship edge: i6+i7+i8 under i3–i5 (fam=1)", () => {
@@ -163,12 +171,15 @@ describe("layoutToFlow — simpleFamily", () => {
     it("gen-2 sibship geometry: three children, correct positions", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
       const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
-      // parents i3 and i5 at pos[1][0]=0 and pos[1][1]=1 → midpoint = 0.5 → 40px
-      expect(coupleX).toBe(0.5 * SLOT_WIDTH);
+      // parents i3 at pos≈0.5 and i5 at pos≈1.5 → midpoint ≈ 1.0 × SLOT_WIDTH
+      expect(coupleX).toBeCloseTo(1.0 * SLOT_WIDTH, 0);
       expect(coupleY).toBe(py(1));
       expect(sibBarY).toBe((2 - SIB_BAR_FACTOR) * ROW_HEIGHT);
       expect(childY).toBe(py(2));
-      expect(childXs).toEqual([px(0), px(1), px(2)]);
+      // grandchildren at positions ≈[0,1,2] × SLOT_WIDTH (QP may add tiny float error)
+      expect(childXs[0]).toBeCloseTo(px(0), 3);
+      expect(childXs[1]).toBeCloseTo(px(1), 3);
+      expect(childXs[2]).toBeCloseTo(px(2), 3);
     });
 
     it("all sibship edges use correct handles", () => {
@@ -238,20 +249,22 @@ describe("layoutToFlow — consanguineousFamily", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
       expect(edge).toBeDefined();
       const { coupleX, sibBarY, childXs } = edge.data!;
-      expect(coupleX).toBe(0.5 * SLOT_WIDTH);
-      expect(sibBarY).toBe((1 - SIB_BAR_FACTOR) * ROW_HEIGHT);
-      expect(childXs).toEqual([px(0), px(1)]);
+      expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
+      expect(sibBarY).toBeCloseTo((1 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
+      expect(childXs[0]).toBeCloseTo(px(0), 5);
+      expect(childXs[1]).toBeCloseTo(px(1), 5);
     });
 
     it("gen-2 sibship: i5+i6 under i3–i4", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
       expect(edge).toBeDefined();
       const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
-      expect(coupleX).toBe(0.5 * SLOT_WIDTH);
-      expect(coupleY).toBe(py(1));
-      expect(sibBarY).toBe((2 - SIB_BAR_FACTOR) * ROW_HEIGHT);
-      expect(childY).toBe(py(2));
-      expect(childXs).toEqual([px(0), px(1)]);
+      expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
+      expect(coupleY).toBeCloseTo(py(1), 5);
+      expect(sibBarY).toBeCloseTo((2 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
+      expect(childY).toBeCloseTo(py(2), 5);
+      expect(childXs[0]).toBeCloseTo(px(0), 5);
+      expect(childXs[1]).toBeCloseTo(px(1), 5);
     });
   });
 });

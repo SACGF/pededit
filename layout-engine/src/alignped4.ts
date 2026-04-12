@@ -31,8 +31,12 @@ export function alignped4(
   for (let i = 1; i <= maxlev; i++) maxN = Math.max(maxN, rval.n[i] ?? 0);
   width = Math.max(width, maxN + 0.01);
 
-  // Build myid: for each plotting position, its 1-based index in the flat parameter vector
-  const myid: Int32Array[] = Array.from({ length: maxlev + 1 }, () => new Int32Array((rval.nid[1]?.length ?? 1)));
+  // Build myid: for each plotting position, its 1-based index in the flat parameter vector.
+  // Each level gets its own Int32Array sized to that level's nid row — using a fixed size
+  // based on level 1 would silently truncate writes for any level wider than level 1.
+  const myid: Int32Array[] = Array.from({ length: maxlev + 1 }, (_, i) =>
+    new Int32Array(i === 0 ? 1 : (rval.nid[i]?.length ?? 1))
+  );
   let paramIdx = 0;
   for (let i = 1; i <= maxlev; i++) {
     const ni = rval.n[i] ?? 0;
@@ -149,37 +153,44 @@ export function alignped4(
     dvec[coff] = 1 - width;
   }
 
-  // Try to solve using quadprog
+  // Try to solve using quadprog.
+  // NOTE: the quadprog npm package (like the R package it wraps) uses 1-based arrays.
+  // All matrices and vectors must be (size+1)-length with index 0 unused.
+  // The solution is also 1-based: fit.solution[pid] for 1-based param index pid.
   try {
-    // D = pmat^T * pmat + epsilon * I (make it positive definite)
+    // D = pmat^T * pmat + epsilon * I (positive definite).
+    // Build as 1-indexed (length nTotal+1, index 0 unused).
     const eps = 1e-8;
-    const D: number[][] = Array.from({ length: nTotal }, (_, i) =>
-      Array.from({ length: nTotal }, (__, j) => {
+    const D: number[][] = Array.from({ length: nTotal + 1 }, (_, i) =>
+      Array.from({ length: nTotal + 1 }, (__, j) => {
+        if (i === 0 || j === 0) return 0;
         let s = 0;
-        for (let k = 0; k <= npenal; k++) s += (pmat[k]![i + 1] ?? 0) * (pmat[k]![j + 1] ?? 0);
+        for (let k = 0; k <= npenal; k++) s += (pmat[k]![i] ?? 0) * (pmat[k]![j] ?? 0);
         return s + (i === j ? eps : 0);
       })
     );
 
-    // Amat: nTotal × ncon (quadprog expects cols = constraints)
-    // R: t(cmat) passed as Amat; our cmat is [ncon × nTotal] (rows=constraints, cols=vars)
-    // quadprog npm: solve_QP(Dmat, dvec, Amat, bvec) where Amat is nvar × ncon
-    // So we need to transpose cmat from [ncon × nTotal] to [nTotal × ncon]
-    const Amat: number[][] = Array.from({ length: nTotal }, (_, i) =>
-      Array.from({ length: coff }, (__, j) => cmat[j + 1]![i + 1] ?? 0)
+    // Amat: (nTotal+1) × (coff+1), 1-indexed. quadprog expects Amat^T * x >= bvec.
+    // cmat is already 1-indexed [constraint][variable], so Amat[var][con] = cmat[con][var].
+    const Amat: number[][] = Array.from({ length: nTotal + 1 }, (_, i) =>
+      Array.from({ length: coff + 1 }, (__, j) => {
+        if (i === 0 || j === 0) return 0;
+        return cmat[j]![i] ?? 0;
+      })
     );
-    const bvec = dvec.slice(1, coff + 1);
-    const dvecQP = new Array(nTotal).fill(0);
+    // dvec (linear objective term) and bvec (constraint RHS) are also 1-indexed.
+    const dvecQP = new Array(nTotal + 1).fill(0);
+    const bvec = dvec.slice(0, coff + 1); // dvec is already 1-indexed with values at [1..coff]
 
     const fit = solveQP(D, dvecQP, Amat, bvec);
 
-    // Unpack solution into newpos
+    // Unpack solution into newpos. fit.solution is 1-indexed: fit.solution[pid] for param pid.
     const newpos = rval.pos.map(row => new Float64Array(row));
     for (let i = 1; i <= maxlev; i++) {
       const ni = rval.n[i] ?? 0;
       for (let c = 1; c <= ni; c++) {
         const pid = myid[i]![c]!;
-        if (pid > 0) newpos[i]![c] = fit.solution[pid - 1]!;
+        if (pid > 0) newpos[i]![c] = fit.solution[pid]!;
       }
     }
     return newpos;
