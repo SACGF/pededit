@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(username, password);
-      navigate("/");
+      navigate("/", { replace: true });
     } catch {
       setError("Invalid username or password.");
     } finally {
@@ -33,6 +33,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
+          <Link to="/" className="text-xs text-gray-400 hover:text-gray-600">
+            ← Back
+          </Link>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -60,7 +60,9 @@ class PedigreeSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created", "updated"]
 
     def create(self, validated_data):
-        validated_data["owner"] = self.context["request"].user
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            validated_data["owner"] = request.user
         return super().create(validated_data)
 
 

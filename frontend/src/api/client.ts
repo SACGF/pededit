@@ -23,10 +23,10 @@ apiClient.interceptors.response.use(
       original._retry = true;
       const refresh = localStorage.getItem("refresh_token");
       if (!refresh) {
-        // No refresh token — force logout
+        // No refresh token — clear any stale tokens and go to landing
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        window.location.href = "/login";
+        window.location.href = "/";
         return Promise.reject(error);
       }
       try {
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
       } catch {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        window.location.href = "/login";
+        window.location.href = "/";
         return Promise.reject(error);
       }
     }

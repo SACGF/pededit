@@ -5,7 +5,14 @@ from django.contrib.auth.models import User
 
 class Pedigree(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pedigrees")
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="pedigrees",
+        null=True,
+        blank=True,
+        default=None,
+    )
     title = models.CharField(max_length=255, default="Untitled Pedigree")
     data = models.JSONField(
         default=dict,
@@ -22,4 +29,5 @@ class Pedigree(models.Model):
         ordering = ["-updated"]
 
     def __str__(self):
-        return f"{self.title} ({self.owner.username})"
+        owner_str = self.owner.username if self.owner_id else "anonymous"
+        return f"{self.title} ({owner_str})"

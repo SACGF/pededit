@@ -8,7 +8,7 @@ interface AppState {
   user: UserInfo | null;
   isAuthenticated: boolean;
 
-  // ── Pedigree list ──────────────────────────────────────────────────────────
+  // ── Pedigree list (only populated for authenticated users) ─────────────────
   pedigrees: PedigreeMeta[];
 
   // ── Active pedigree ────────────────────────────────────────────────────────
@@ -20,8 +20,8 @@ interface AppState {
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
-  createPedigree: (title: string) => Promise<string>; // returns new id
-  createPedigreeFromData: (title: string, data: Pedigree) => Promise<string>; // returns new id
+  createPedigree: (title: string) => Promise<string>;
+  createPedigreeFromData: (title: string, data: Pedigree) => Promise<string>;
   deletePedigree: (id: string) => Promise<void>;
   saveActivePedigree: () => Promise<void>;
   renamePedigree: (id: string, title: string) => Promise<void>;
@@ -58,6 +58,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   loadPedigrees: async () => {
+    if (!get().isAuthenticated) return;
     const { data } = await pedigreeApi.list();
     set({ pedigrees: data });
   },
@@ -69,7 +70,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     }
     const { data } = await pedigreeApi.get(id);
     const pedigree = data.data as Pedigree;
-    // Ensure siblingOrder is present (backwards compat with pedigrees saved before Phase 4)
+    // Ensure siblingOrder is present (backwards compat)
     if (!pedigree.siblingOrder) {
       pedigree.siblingOrder = { mode: "insertion", affectedFirst: false };
     }
@@ -83,13 +84,17 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   createPedigree: async (title) => {
     const { data } = await pedigreeApi.create(title);
-    set((state) => ({ pedigrees: [data, ...state.pedigrees] }));
+    if (get().isAuthenticated) {
+      set((state) => ({ pedigrees: [data, ...state.pedigrees] }));
+    }
     return data.id;
   },
 
   createPedigreeFromData: async (title, data) => {
     const { data: created } = await pedigreeApi.createWithData(title, data);
-    set((state) => ({ pedigrees: [created, ...state.pedigrees] }));
+    if (get().isAuthenticated) {
+      set((state) => ({ pedigrees: [created, ...state.pedigrees] }));
+    }
     return created.id;
   },
 
