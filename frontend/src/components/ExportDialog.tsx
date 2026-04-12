@@ -54,7 +54,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Export pedigree</DialogTitle>
         </DialogHeader>

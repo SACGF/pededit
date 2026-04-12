@@ -53,7 +53,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) { setDeleteExpanded(false); onClose(); } }}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="text-sm font-medium">Pedigree settings</DialogTitle>
         </DialogHeader>

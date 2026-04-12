@@ -60,6 +60,67 @@ export interface FlowData {
   sibshipEdges: Edge<SibshipEdgeData>[];
 }
 
+// ── Orphan duplicate detection ────────────────────────────────────────────────
+
+/**
+ * When both spouses have parents, alignped1 processes one family first and
+ * "claims" the other spouse — consuming the couple row. The second family then
+ * has that spouse appear as a childless, partnerless orphan.
+ *
+ * This function finds same-level duplicate slots where one copy has no couple
+ * edge (the orphan). Returns:
+ *   orphanSlotIds  — slot IDs to suppress in node output
+ *   redirectSlot   — maps orphan slot ID → canonical (couple-connected) slot ID,
+ *                    so sibship edges can be redirected to the correct position
+ */
+function findOrphanDuplicates(result: LayoutResult): {
+  orphanSlotIds: Set<string>;
+  redirectSlot:  Map<string, string>;
+} {
+  const orphanSlotIds = new Set<string>();
+  const redirectSlot  = new Map<string, string>();
+
+  // Group slots by (baseNid, level) to find same-level duplicates.
+  const nidLevelSlots = new Map<string, number[]>(); // "${nid}-${lev}" → [slot, ...]
+  for (let lev = 0; lev < result.n.length; lev++) {
+    for (let sl = 0; sl < result.n[lev]; sl++) {
+      const baseNid = Math.floor(result.nid[lev][sl]);
+      const key = `${baseNid}-${lev}`;
+      if (!nidLevelSlots.has(key)) nidLevelSlots.set(key, []);
+      nidLevelSlots.get(key)!.push(sl);
+    }
+  }
+
+  for (const [key, slots] of nidLevelSlots) {
+    if (slots.length < 2) continue;
+
+    const lev = parseInt(key.split("-").at(-1)!);
+    const spouseRow = result.spouse[lev] ?? [];
+
+    // Canonical = the slot that participates in a couple edge.
+    // A slot is the left partner if spouse[lev][sl] > 0.
+    // A slot is the right partner if spouse[lev][sl-1] > 0.
+    let canonical: number | null = null;
+    for (const sl of slots) {
+      const isLeft  = sl < result.n[lev] - 1 && (spouseRow[sl]     ?? 0) > 0;
+      const isRight = sl > 0                  && (spouseRow[sl - 1] ?? 0) > 0;
+      if (isLeft || isRight) {
+        canonical = sl;
+        break;
+      }
+    }
+    if (canonical === null) continue;
+
+    for (const sl of slots) {
+      if (sl === canonical) continue;
+      orphanSlotIds.add(`${lev}-${sl}`);
+      redirectSlot.set(`${lev}-${sl}`, `${lev}-${canonical}`);
+    }
+  }
+
+  return { orphanSlotIds, redirectSlot };
+}
+
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(pedigree: Pedigree): FlowData {
@@ -67,7 +128,12 @@ export function layoutToFlow(pedigree: Pedigree): FlowData {
     return { nodes: [], coupleEdges: [], sibshipEdges: [] };
   }
   const result: LayoutResult = alignPedigree(pedigree);
-  const nodes = buildNodes(pedigree, result);
+
+  // Detect orphan duplicates (both-spouses-have-parents case) and build
+  // a redirect map so their parents' sibship edges point to the right node.
+  const { orphanSlotIds, redirectSlot } = findOrphanDuplicates(result);
+
+  const nodes = buildNodes(pedigree, result, orphanSlotIds);
 
   // Map from slot id ("level-slot") → final pixel position (reflects pin overrides).
   const slotPos = new Map<string, { x: number; y: number }>();
@@ -78,17 +144,22 @@ export function layoutToFlow(pedigree: Pedigree): FlowData {
   return {
     nodes,
     coupleEdges:  buildCoupleEdges(result),
-    sibshipEdges: buildSibshipEdges(result, slotPos),
+    sibshipEdges: buildSibshipEdges(result, slotPos, redirectSlot),
   };
 }
 
 // ── Nodes ─────────────────────────────────────────────────────────────────────
 
-function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[] {
-  // First pass: count how many slots each baseNid occupies (across all levels).
+function buildNodes(
+  pedigree: Pedigree,
+  result: LayoutResult,
+  orphanSlotIds: Set<string>,
+): Node<RFNodeData>[] {
+  // First pass: count non-orphan slots per baseNid to compute isDuplicate correctly.
   const nidSlotCount = new Map<number, number>();
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
+      if (orphanSlotIds.has(`${level}-${slot}`)) continue;
       const baseNid = Math.floor(result.nid[level][slot]);
       nidSlotCount.set(baseNid, (nidSlotCount.get(baseNid) ?? 0) + 1);
     }
@@ -98,12 +169,14 @@ function buildNodes(pedigree: Pedigree, result: LayoutResult): Node<RFNodeData>[
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
 
-  // Second pass: emit one React Flow node per (level, slot).
+  // Second pass: emit one React Flow node per (level, slot), skipping orphans.
   const nidOccurrence = new Map<number, number>();
   const nodes: Node<RFNodeData>[] = [];
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
+      if (orphanSlotIds.has(`${level}-${slot}`)) continue;
+
       const baseNid = Math.floor(result.nid[level][slot]);
       const individual = pedigree.individuals[baseNid - 1]; // 1-based → 0-based
 
@@ -172,6 +245,7 @@ function buildCoupleEdges(result: LayoutResult): Edge<CoupleEdgeData>[] {
 function buildSibshipEdges(
   result: LayoutResult,
   slotPos: Map<string, { x: number; y: number }>,
+  redirectSlot: Map<string, string>,
 ): Edge<SibshipEdgeData>[] {
   const edges: Edge<SibshipEdgeData>[] = [];
 
@@ -189,28 +263,38 @@ function buildSibshipEdges(
       const leftParentSlot  = f - 1;  // 0-based
       const rightParentSlot = f;       // 0-based
 
+      // Resolve any orphan-duplicate children to their canonical slot.
+      const resolvedChildIds = slots.map(s => {
+        const slotId = `${level}-${s}`;
+        return redirectSlot.get(slotId) ?? slotId;
+      });
+
       const leftPos  = slotPos.get(`${level - 1}-${leftParentSlot}`)!;
       const rightPos = slotPos.get(`${level - 1}-${rightParentSlot}`)!;
+      if (!leftPos || !rightPos) continue; // parent node was suppressed (shouldn't happen)
+
       const coupleX  = (leftPos.x + rightPos.x) / 2;
       const coupleY  = (leftPos.y + rightPos.y) / 2;
-      const childY   = slotPos.get(`${level}-${slots[0]}`)!.y;
-      const sibBarY  = (coupleY + childY) / 2;
-      const childXs  = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
 
-      // Source = left parent node; target = leftmost child node.
-      // The SibshipEdge renderer uses leftParentId/rightParentId/childIds to
-      // look up current node positions dynamically via useNodes().
+      // Use canonical child positions for geometry.
+      const firstChildPos = slotPos.get(resolvedChildIds[0]!);
+      if (!firstChildPos) continue; // canonical child not found
+      const childY   = firstChildPos.y;
+      const sibBarY  = (coupleY + childY) / 2;
+      const childXs  = resolvedChildIds.map(id => slotPos.get(id)?.x ?? 0);
+
+      // Source = left parent node; target = leftmost resolved child node.
       edges.push({
         id:           `sibship-${level}-${f}`,
         source:       `${level - 1}-${leftParentSlot}`,
-        target:       `${level}-${slots[0]}`,
+        target:       resolvedChildIds[0]!,
         sourceHandle: "sibship-out",
         targetHandle: "sibship-in",
         type:         "sibshipEdge",
         data:         {
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
-          childIds:      slots.map(s => `${level}-${s}`),
+          childIds:      resolvedChildIds,
           coupleX, coupleY, sibBarY, childXs, childY,
         },
       });

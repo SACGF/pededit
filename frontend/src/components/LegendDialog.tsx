@@ -162,7 +162,7 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xs">
+      <DialogContent className="max-w-xs" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Figure legend</DialogTitle>
         </DialogHeader>

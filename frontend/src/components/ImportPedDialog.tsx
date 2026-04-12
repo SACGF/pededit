@@ -81,7 +81,7 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Import PED file</DialogTitle>
         </DialogHeader>
