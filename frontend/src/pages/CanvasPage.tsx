@@ -53,6 +53,13 @@ export default function CanvasPage() {
     openPedigree(id).catch(() => setNotFound(true));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-save: debounce 2 s after the last mutation so changes survive a reload.
+  useEffect(() => {
+    if (!isDirty || !activePedigreeId) return;
+    const timer = setTimeout(() => { saveActivePedigree(); }, 2000);
+    return () => clearTimeout(timer);
+  }, [pedigree]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load pedigree list for authenticated users
   useEffect(() => {
     if (isAuthenticated) loadPedigrees();

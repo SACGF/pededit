@@ -121,6 +121,92 @@ function findOrphanDuplicates(result: LayoutResult): {
   return { orphanSlotIds, redirectSlot };
 }
 
+// ── Orphan position adjustment ────────────────────────────────────────────────
+
+/**
+ * When both partners have parents the orphan-redirect produces a layout where
+ * one parent-pair sits on the wrong side of its child (because alignped1 placed
+ * the child as a spouse copy next to the other partner first, then the second
+ * family placed it again further right as a child).
+ *
+ * This function post-processes node positions so that:
+ *   - Each redirected child (canonical) is centred under its own parents.
+ *   - Its couple-partner is centred under the partner's own parents.
+ *
+ * Both slotPos and the nodes array are mutated in-place (positions only).
+ * Pinned nodes are left untouched.
+ */
+function adjustOrphanPositions(
+  result: LayoutResult,
+  redirectSlot: Map<string, string>,
+  nodes: Node<RFNodeData>[],
+  slotPos: Map<string, { x: number; y: number }>,
+): void {
+  for (const [orphanSlotId, canonicalSlotId] of redirectSlot) {
+    const parts = orphanSlotId.split("-");
+    const orphanLevel = parseInt(parts[0]!);
+    const orphanSlot  = parseInt(parts[1]!);
+
+    if (orphanLevel < 1) continue;
+
+    // Orphan's parents via fam (1-based left-parent slot in level above).
+    const orphanFam = result.fam[orphanLevel]?.[orphanSlot] ?? 0;
+    if (!orphanFam) continue;
+
+    const parentLevel      = orphanLevel - 1;
+    const leftParentSlot   = orphanFam - 1;  // 0-based
+    const rightParentSlot  = orphanFam;       // 0-based
+
+    const leftParentPos  = slotPos.get(`${parentLevel}-${leftParentSlot}`);
+    const rightParentPos = slotPos.get(`${parentLevel}-${rightParentSlot}`);
+    if (!leftParentPos || !rightParentPos) continue;
+
+    const newCanonicalX = (leftParentPos.x + rightParentPos.x) / 2;
+
+    // Update canonical child position (the spouse-copy that was already placed).
+    const canonicalPos = slotPos.get(canonicalSlotId);
+    if (!canonicalPos) continue;
+
+    const setPos = (slotId: string, x: number) => {
+      const pos = slotPos.get(slotId);
+      if (!pos) return;
+      slotPos.set(slotId, { ...pos, x });
+      const node = nodes.find(n => n.id === slotId);
+      if (node && !node.data.isPinned) {
+        node.position = { ...node.position, x };
+      }
+    };
+
+    setPos(canonicalSlotId, newCanonicalX);
+
+    // Also centre the couple-partner under its own parents.
+    const cParts        = canonicalSlotId.split("-");
+    const canonicalLevel = parseInt(cParts[0]!);
+    const canonicalSlot  = parseInt(cParts[1]!);
+
+    const spouseRow = result.spouse[canonicalLevel] ?? [];
+    let partnerSlot: number | null = null;
+    if (canonicalSlot < result.n[canonicalLevel] - 1 && (spouseRow[canonicalSlot] ?? 0) > 0) {
+      partnerSlot = canonicalSlot + 1;
+    } else if (canonicalSlot > 0 && (spouseRow[canonicalSlot - 1] ?? 0) > 0) {
+      partnerSlot = canonicalSlot - 1;
+    }
+    if (partnerSlot === null) continue;
+
+    const partnerFam = result.fam[canonicalLevel]?.[partnerSlot] ?? 0;
+    if (!partnerFam) continue;
+
+    const pLeftParentPos  = slotPos.get(`${parentLevel}-${partnerFam - 1}`);
+    const pRightParentPos = slotPos.get(`${parentLevel}-${partnerFam}`);
+    if (!pLeftParentPos || !pRightParentPos) continue;
+
+    setPos(
+      `${canonicalLevel}-${partnerSlot}`,
+      (pLeftParentPos.x + pRightParentPos.x) / 2,
+    );
+  }
+}
+
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(pedigree: Pedigree): FlowData {
@@ -139,6 +225,14 @@ export function layoutToFlow(pedigree: Pedigree): FlowData {
   const slotPos = new Map<string, { x: number; y: number }>();
   for (const node of nodes) {
     slotPos.set(node.id, node.position);
+  }
+
+  // When both partners have parents the orphan-redirect can leave a partner
+  // visually offset from its parents.  Centre each redirected child under its
+  // own parents, and centre the couple-partner under their parents too, so
+  // both sibship lines drop vertically rather than diagonally.
+  if (redirectSlot.size > 0) {
+    adjustOrphanPositions(result, redirectSlot, nodes, slotPos);
   }
 
   return {
