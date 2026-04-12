@@ -162,22 +162,56 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 
 ---
 
-## Phase 5b — SVG export
+## Phase 5b — SVG export ✅ COMPLETE
 
 **What:** Publication-quality SVG export. A separate rendering pass — not a DOM screenshot.
 
-**Export:**
-- SVG (publication quality) — takes `LayoutResult` and writes clean, minimal SVG suitable for Inkscape / journal submission (Nature max 18×24cm, Cell max 6.5×8in). No React, no inline styles, just geometry.
-- PNG (rasterise the SVG)
+**Delivered:**
+- SVG (publication quality) — pure TypeScript renderer, no React, no inline styles, suitable for Inkscape / journal submission
+- PNG (rasterise the SVG via Canvas API)
+- De-identification mode: replaces names with NSGC generation/individual notation (I-1, II-3, etc.), strips DOB/notes, optional age-range buckets
+- `ExportDialog` with format selector (SVG/PNG), de-ident toggle, age-bucket toggle, PNG scale selector
 
-**De-identification mode (export option):**
-- One-click toggle before export: replaces all names with standard generation/individual notation (I-1, I-2, II-1, etc.) per NSGC convention
-- Also strips DOB/death dates and any free-text notes fields
-- Ages optionally bucketed into ranges (infant / child / 20s / 30s / etc.) rather than hidden entirely, since age ranges preserve clinically relevant information
-- Numbering is derived from the layout pass (generation already known, left-to-right order already known) — no separate algorithm needed
-- Display-layer only: the data model retains real names; the export renderer substitutes notation
+**See:** `claude/phase_5b_plan.md` for full implementation detail.
 
-**Why here:** Doing it after the renderer is proven means the export geometry is consistent with what the user sees on screen. SVG export quality is a key signal of "this is a serious tool" to the academic/clinical audience.
+---
+
+## Phase 5c — Small features (before Phase 6)
+
+Small self-contained improvements. Suggested order: auto-consang → CSV → PDF.
+
+**Done:**
+- ~~**Layout: `kindepth` force fallback**~~ ✅ — `alignPedigree.ts` wraps `kindepth(input, true)` in a try/catch that retries with `kindepth(input, false)`.
+- ~~**Layout: autohint spouse hints**~~ ✅ — `autohint.ts` now populates `hints.spouse` via `buildSpouseHints()`.
+- ~~**Layout: QP bundling**~~ ✅ — `alignped4.ts` uses a static `import quadprogPkg from "quadprog"` instead of `require()`; `vite.config.ts` adds `optimizeDeps: { include: ["quadprog"] }`. QP optimiser now runs in the browser.
+
+**Remaining:**
+
+### Auto-detect consanguinity on edit
+
+When the user creates a new partnership via "add partner", automatically check whether the two individuals share any ancestor and set `consanguineous: true` on the `Partnership`. Currently requires manual user action.
+
+**Where:** `frontend/src/store/usePedigreeStore.ts` — `addPartner` mutation (and anywhere else a new `Partnership` is created). The ancestor-intersection logic already exists in `converter.ts` (`areRelated` or equivalent) — extract into a shared util and call from the store.
+
+**Acceptance:** Creating a partnership between cousins automatically draws the double consanguinity line. Manual toggle in the more-menu remains for incomplete data.
+
+### CSV export
+
+Export the pedigree as a CSV file — one row per individual, suitable for Excel or R/Python.
+
+**Where:** New file `frontend/src/io/csv/exporter.ts`, add to toolbar Export menu alongside Export PED. No new dependencies.
+
+**Format:** `family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes`
+
+Build a parent lookup from `pedigree.partnerships` + `pedigree.parentOf`, then map each `Individual` to a row. Escape commas in notes fields. Tests: ~6 cases (empty, with/without parents, notes with commas, flags, proband).
+
+### PDF export
+
+Add PDF as an export option alongside SVG and PNG in the existing `ExportDialog`. Clinicians need PDF for referral letters.
+
+**Where:** New file `frontend/src/io/svg/pdfExporter.ts`. Use `jsPDF` (MIT, ~250 kB gzip) — pass the existing SVG string from `exportSvg()` to `jsPDF`'s `svg()` method. Fit to A4, landscape if wider than tall. Add "PDF" option to the format radio group in `ExportDialog.tsx`.
+
+**Dependencies:** `npm install jspdf svg2pdf.js --workspace frontend`
 
 ---
 
@@ -190,10 +224,22 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 - When a node has a manually-set position, auto-layout preserves it and fits other nodes around it
 - Visual indicator that a node is manually positioned; "reset layout" button restores full auto-layout
 
-**Layout improvements:**
+**Layout improvements (Pedixplorer-informed):**
 - Compact mode: tighten inter-generation spacing for presentation
 - Fit-to-page: reorganise layout to fit a target aspect ratio (not just scale — actually reorganise)
 - Large family handling: pagination / viewport clipping for pedigrees > ~80 individuals
+- Full `auto_hint` graph-based optimisation (founder ordering using connected-component traversal, replacing current stub)
+
+**URL-encoded pedigree sharing:**
+- Encode the `Pedigree` JSON as a gzip + base64url URL fragment (`#data=...`)
+- Allows sharing a pedigree without requiring the recipient to have an account
+- Pedigree data never leaves the browser except via the URL — meaningful privacy advantage
+- Implementation: `CompressionStream` API (modern browsers), ~1 day
+
+**Batch SVG API:**
+- `POST /api/pedigrees/render-svg/` Django endpoint: accepts a PED file body, returns SVG
+- Enables research pipeline integration (DrawPed has this; no other open-source tool does)
+- 1–2 days given existing SVG exporter and PED importer
 
 **Why here:** This builds on the solid interaction model from Phase 4. Manual repositioning requires the state management to already be right (undo/redo must include position overrides). Layout improvements are iterative on the Phase 1 algorithm.
 
@@ -216,7 +262,16 @@ These are the features that exist nowhere in open-source and partially in commer
 **Complex structure improvements:**
 - Cross-generational matings with correct alignment
 - Half-sibling layout without tangled lines
-- Age-based sibling ordering
+- Twins (monozygotic and dizygotic notation)
+- Assisted reproduction symbols (sperm/egg donor, surrogate)
+
+**HPO/MONDO phenotype annotation:**
+- Add `hpoTerms: string[]` to the `Individual` data model (list of HPO term codes, e.g. `["HP:0001250"]`)
+- Edit panel: phenotype search field with autocomplete from EMBL-EBI OLS API (`https://www.ebi.ac.uk/ols4/api/search?q=...&ontology=hp,mondo`)
+- Chips/tags display for selected terms in the edit panel
+- HPO terms preserved through PED round-trips as extended annotations; exported in CSV/JSON
+- No other open-source tool does this; PedigreeTool is the only tool that does (and it's closed-source)
+- *Data model slot should be reserved in Phase 5c even if UI is Phase 7*
 
 **Why last:** These are iterative improvements on a working editor. They require real user feedback to prioritise correctly — a genetic counsellor will tell you which matters most. Building them before Phase 4 is speculation.
 
@@ -280,6 +335,7 @@ These are the features that exist nowhere in open-source and partially in commer
 - Curated example pedigrees (standard teaching cases: autosomal dominant, X-linked, consanguineous)
 - BOADICEA v6 / GA4GH FHIR format support (for risk model ecosystem)
 - rpy2 bridge in Django for risk model calls (BOADICEA etc.) — this is where the R integration lands, as an optional module
+- Organisational licensing model (single licence per institution, not per user) — reduces procurement friction for hospitals and genetics departments
 
 **Why last:** The npm package is only worth publishing when the API is stable. Documentation written after real users have used it is dramatically better than documentation written upfront.
 

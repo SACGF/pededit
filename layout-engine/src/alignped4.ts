@@ -1,4 +1,5 @@
 import type { AlignState } from "./types.js";
+import { solveQP } from "quadprog";
 
 /**
  * Port of R alignped4().
@@ -150,9 +151,6 @@ export function alignped4(
 
   // Try to solve using quadprog
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { solveQP } = require("quadprog") as { solveQP: (Dmat: number[][], dvec: number[], Amat: number[][], bvec: number[], meq?: number) => { solution: number[] } };
-
     // D = pmat^T * pmat + epsilon * I (make it positive definite)
     const eps = 1e-8;
     const D: number[][] = Array.from({ length: nTotal }, (_, i) =>
@@ -186,8 +184,7 @@ export function alignped4(
     }
     return newpos;
   } catch {
-    // quadprog unavailable or solve failed (e.g. browser environment):
-    // run a pure-JS centering pass to center each child group under its parents.
+    // Solve failed (ill-conditioned problem) — fall back to centering.
     return centerChildrenFallback(rval);
   }
 }
