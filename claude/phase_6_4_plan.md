@@ -336,6 +336,7 @@ Authorization: Bearer <token>   (or public if pedigree.is_public)
 
 ## Notes
 
+- Pedigree IDs are UUIDs (`Pedigree.id = UUIDField(primary_key=True)`). The URL pattern uses `<uuid:pk>` and `from_ped` returns `str(obj.pk)`. This prevents sequential enumeration — an attacker cannot walk `/pedigrees/1/svg/`, `/pedigrees/2/svg/` to harvest other users' family health data.
 - Rate limit `POST /render-svg/` and `POST /from-ped/` (10 req/min per IP) via `django-ratelimit`. The GET endpoints are cheap once cached and don't need rate limiting.
 - `GET /render-svg/?data=` uses `immutable` because the URL is content-addressed — the same data always produces the same SVG.
 - `GET /{id}/svg/` uses `private` because pedigrees are user-owned. Upgrade to `public` if a `is_public` flag is added later.
