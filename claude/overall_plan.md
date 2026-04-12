@@ -208,12 +208,6 @@ Small self-contained improvements. Suggested order: auto-consang → CSV → PDF
 - Large family handling: pagination / viewport clipping for pedigrees > ~80 individuals
 - Full `auto_hint` graph-based optimisation (founder ordering using connected-component traversal, replacing current stub)
 
-**URL-encoded pedigree sharing:**
-- Encode the `Pedigree` JSON as a gzip + base64url URL fragment (`#data=...`)
-- Allows sharing a pedigree without requiring the recipient to have an account
-- Pedigree data never leaves the browser except via the URL — meaningful privacy advantage
-- Implementation: `CompressionStream` API (modern browsers), ~1 day
-
 **Batch SVG API:**
 - `POST /api/pedigrees/render-svg/` Django endpoint: accepts a PED file body, returns SVG
 - Enables research pipeline integration (DrawPed has this; no other open-source tool does)
@@ -226,6 +220,12 @@ Small self-contained improvements. Suggested order: auto-consang → CSV → PDF
 ## Phase 7 — Advanced features (the "nobody does this" tier)
 
 These are the features that exist nowhere in open-source and partially in commercial tools. Build them after the core is stable and you have real user feedback.
+
+**URL-encoded pedigree sharing:**
+- Encode the `Pedigree` JSON as a gzip + base64url URL fragment (`#data=...`)
+- Allows sharing a pedigree without requiring the recipient to have an account
+- No server storage, no expiration logic, no compliance surface
+- Implementation: `CompressionStream` API (modern browsers); see `claude/phase_7_1_plan.md` for full detail
 
 **Branch collapsing:**
 - Right-click any subtree → "collapse to n individuals" node
