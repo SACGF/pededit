@@ -6,9 +6,9 @@ A web-based pedigree editor for clinical genetics, genetic counseling, and medic
 
 ## Why we built this
 
-Every open-source pedigree tool makes the same trade-off: simple layout or correct layout, but not both, and none support drag-and-drop repositioning of nodes. Tools like [pedigreejs](https://github.com/nicpottier/pedigreejs) and [DrawPed](https://github.com/aehrc/DrawPed) produce clean diagrams for straightforward families but struggle with complex structures (multiple partnerships, consanguinity loops, cross-generational matings). The only tool with manual repositioning is FamGenix, a $500+/year commercial product.
+Existing browser-based pedigree editors use simple tree layouts that break down with consanguinity, multiple mates, and complex family structures. The correct algorithms exist in R packages like [kinship2](https://cran.r-project.org/package=kinship2), but those aren't interactive web tools.
 
-The root of the layout problem is that good pedigree layout is a solved problem in academic statistics. The [kinship2](https://cran.r-project.org/package=kinship2) R package has been the reference implementation for over a decade, used in published clinical research worldwide. But kinship2 is R-only, so no web tool has ever been able to use it. We ported the full kinship2 layout algorithm into TypeScript (`layout-engine/`), making it available as a native npm package for the first time. This gives us publication-quality automatic layout as the foundation, on top of which we can layer modern React interaction, including the drag-and-drop repositioning that no open-source tool has managed to ship.
+We ported kinship2's layout engine to TypeScript, giving us publication-quality automatic layout natively in the browser. Then we built an interactive editor on top of it, with drag-and-drop repositioning that even most commercial tools don't offer.
 
 ## Prerequisites
 

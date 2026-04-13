@@ -99,7 +99,7 @@ export default function LandingPage() {
           <p className="text-sm text-gray-500 mb-8">
             A pedigree editor for clinical genetics.
             {!isAuthenticated && (
-              <> No account required — each pedigree gets a unique URL you can bookmark or share. Just keep track of your links.{" "}
+              <> No account required. Each pedigree gets a unique URL you can bookmark or share. Just keep track of your links.{" "}
               <span
                 className="text-black underline underline-offset-2 cursor-pointer"
                 onClick={() => navigate("/login")}

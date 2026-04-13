@@ -66,6 +66,10 @@ Pedigree symbols (square/circle/diamond) represent **biological sex**, not gende
 
 **Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
 
+## Writing Style
+
+No em-dashes. Use commas, periods, or rewrite the sentence instead.
+
 ## Visual Design Direction
 
 **Black and white minimalist.** The UI should look like a clinical pedigree chart — not a generic SaaS app. The pedigree symbols (squares, circles, filled/unfilled, slashes, connecting lines) are the visual language; the chrome around them should get out of the way.
