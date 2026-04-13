@@ -4,14 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-**Phases 1–5b complete.** See `claude/overall_plan.md` for the full phase plan.
+**Phases 1-5c complete. Phase 6 partially complete (manual repositioning done). Phase 8 partially complete (infrastructure done). Phase 9 partially complete (social login done).** See `claude/overall_plan.md` for the full phase plan.
 
 - **Phase 1:** `layout-engine/` — TypeScript package, 16 tests, kinship2 layout algorithm
 - **Phase 2:** Django + React scaffold — auth, CRUD, empty canvas
 - **Phase 3:** Visual renderer — NSGC symbols, couple/sibship/consanguinity edges, read-only pan/zoom canvas. 32 tests in `frontend/src/pedigree/__tests__/`.
 - **Phase 4:** Core interaction — toolbar (add male/female/unknown), hover pill (add parents/children/siblings), more menu (mark affected/deceased/proband, set sex, delete, move sib), edit panel (name/DOB/notes), settings panel (sibling order), undo/redo, keyboard shortcuts, auto-save on pedigree switch.
 - **Phase 5a:** PED file import/export — `frontend/src/io/ped/` (parser, validator, converter, exporter), `ImportPedDialog`, toolbar Import/Export buttons. 129 tests.
-- **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`. Next: Phase 5c small features (see `claude/overall_plan.md`), then Phase 6.
+- **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`.
+- **Phase 5c:** Small features — kindepth force fallback, autohint spouse hints, QP bundling, auto-detect consanguinity on edit, CSV export, PDF export, `hpoTerms` data model slot.
+- **Phase 6 (partial):** Manual repositioning — pin/unpin, visual indicator, reset layout, drag persistence, canvas settings (nodesMoveable, snapToGrid). Remaining: compact mode, fit-to-page, large family handling, full auto_hint, batch SVG API.
+- **Phase 8 (partial):** Deploy infrastructure — Gunicorn + Nginx + systemd on VPS, deploy scripts, INSTALL.md, domain (pededit.com). Remaining: Django security settings, rate limiting, health check, Sentry, automated backups.
+- **Phase 9 (partial):** Social login — Google and GitHub OAuth via direct OAuth flow (not Clerk as originally planned). Remaining: remove legacy username/password auth endpoints.
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
 

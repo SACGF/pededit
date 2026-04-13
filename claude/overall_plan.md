@@ -197,21 +197,21 @@ Small self-contained improvements. Suggested order: auto-consang → CSV → PDF
 
 **This is the primary differentiator.** No open-source tool has this. FamGenix charges $500+/year for it.
 
-**Manual repositioning:**
-- React Flow node dragging already works; wire it to persist overridden positions in the data model
-- When a node has a manually-set position, auto-layout preserves it and fits other nodes around it
-- Visual indicator that a node is manually positioned; "reset layout" button restores full auto-layout
+**Done:**
+- ~~**Manual repositioning**~~ ✅ — Full pin/unpin system: `pinnedPositions` persisted in `Pedigree` data model (`usePedigreeStore.ts`), auto-layout preserves pinned positions (`layoutToFlow.ts`), grey dot visual indicator on pinned nodes (`PedigreeSymbolNode.tsx`), "Reset layout" button in toolbar and canvas panel, per-node lock/unlock controls (`HoverPill.tsx`), canvas-level settings for `nodesMoveable`, `snapToGrid`, `snapGridSize` (`SettingsPanel.tsx`). Drag-stop handler persists new positions immediately.
 
-**Layout improvements (Pedixplorer-informed):**
+**Remaining:**
+
+*Layout improvements (Pedixplorer-informed):*
 - Compact mode: tighten inter-generation spacing for presentation
-- Fit-to-page: reorganise layout to fit a target aspect ratio (not just scale — actually reorganise)
+- Fit-to-page: reorganise layout to fit a target aspect ratio (not just scale, actually reorganise)
 - Large family handling: pagination / viewport clipping for pedigrees > ~80 individuals
 - Full `auto_hint` graph-based optimisation (founder ordering using connected-component traversal, replacing current stub)
 
-**Batch SVG API:**
+*Batch SVG API:*
 - `POST /api/pedigrees/render-svg/` Django endpoint: accepts a PED file body, returns SVG
 - Enables research pipeline integration (DrawPed has this; no other open-source tool does)
-- 1–2 days given existing SVG exporter and PED importer
+- 1-2 days given existing SVG exporter and PED importer
 
 **Why here:** This builds on the solid interaction model from Phase 4. Manual repositioning requires the state management to already be right (undo/redo must include position overrides). Layout improvements are iterative on the Phase 1 algorithm.
 
@@ -259,20 +259,18 @@ These are the features that exist nowhere in open-source and partially in commer
 
 **What:** Get the app running at a public URL, with a basic production configuration.
 
-**Infrastructure:**
-- Backend: Django on a VPS or PaaS (Fly.io / Railway / Render) — gunicorn + PostgreSQL
-- Frontend: Vite build served as static files, either via Django's `STATIC_ROOT` or a CDN (Cloudflare Pages / Vercel)
-- Environment: `SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` from env vars (already wired)
-- HTTPS: Let's Encrypt via the platform or a reverse proxy (nginx/Caddy)
-- Domain name
+**Done:**
+- ~~**Infrastructure**~~ ✅ — VPS deployment with Gunicorn + Nginx + PostgreSQL. `deploy/` directory contains: `pededit.service` (systemd unit), `pededit-nginx.conf` (reverse proxy, SPA routing, hashed-asset caching), `pededit.json.example` (config template), `deploy.sh` (automated deploy/update script). Environment config (`SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`) loaded from `/etc/pededit/pededit.json` via `site_config.py`. Comprehensive `INSTALL.md` with full production guide (system packages, PostgreSQL setup, uv venv, systemd, nginx, Let's Encrypt, firewall). Domain configured (pededit.com). Frontend SEO metadata (Open Graph, Twitter cards) in `index.html`.
 
-**Minimum-viable hardening:**
-- `DEBUG=False`, `SECURE_HSTS_SECONDS`, `SECURE_SSL_REDIRECT`
+**Remaining:**
+
+*Minimum-viable hardening:*
+- `SECURE_HSTS_SECONDS`, `SECURE_SSL_REDIRECT` in Django settings
 - Rate limiting on auth endpoints (e.g. `django-ratelimit`)
-- Static file serving via `whitenoise` (avoids needing a separate nginx just for static files)
+- Static file serving via `whitenoise` (currently Nginx handles this, which works but isn't Django-native)
 
-**Ops basics:**
-- Automated DB backups (platform-provided or `pg_dump` cron)
+*Ops basics:*
+- Automated DB backups (`pg_dump` cron)
 - Error logging (Sentry free tier or equivalent)
 - Basic health-check endpoint (`/api/health/`)
 
@@ -284,23 +282,19 @@ These are the features that exist nowhere in open-source and partially in commer
 
 **What:** Replace username/password auth with OAuth via GitHub and Google. No password management, no email verification flow.
 
-**Approach:** Use [Clerk](https://clerk.com/) as the identity provider — it handles the OAuth dance, session management, and token issuance. The Django backend verifies Clerk-issued JWTs against Clerk's JWKS endpoint; no allauth or session complexity.
+**Done (approach differs from original plan, implemented via direct OAuth instead of Clerk):**
+- ~~**Google OAuth**~~ ✅ — `@react-oauth/google` on frontend (`LoginPage.tsx`), backend validates Google ID tokens via `google.oauth2` and creates/matches user by email (`social_auth.py`), returns simplejwt tokens.
+- ~~**GitHub OAuth**~~ ✅ — Manual OAuth flow on frontend (redirect to GitHub, exchange code), backend exchanges code via GitHub API, creates/matches user by email (`social_auth.py`), returns simplejwt tokens.
+- ~~**User creation from OAuth**~~ ✅ — Users auto-created on first social login from email + display name.
 
-**Backend changes:**
-- Remove `simplejwt` token issuance; validate incoming Clerk JWTs instead (via `PyJWT` + JWKS fetch)
-- `User` records created on first login from Clerk's `sub` claim (email, display name populated from Clerk's user object)
-- Remove `/api/auth/register/` and `/api/auth/token/` endpoints; keep `/api/auth/me/`
+**Remaining:**
+- Remove username/password registration (`/api/auth/register/`, `RegisterView`, `RegisterSerializer` still present)
+- Remove simplejwt direct token issuance (`/api/auth/token/` endpoints still exposed alongside social auth)
+- Decide whether to migrate to Clerk (as originally planned) or keep direct OAuth (current working implementation)
 
-**Frontend changes:**
-- Replace login form with Clerk's `<SignIn />` component (or headless `useSignIn` hook for a custom UI matching the existing aesthetic)
-- Remove username/password fields; the "Sign in" button launches Clerk's hosted flow
-- After sign-in, Clerk provides a session token the frontend attaches to API requests as before
+**Original plan called for Clerk as identity provider.** Current implementation uses direct OAuth with simplejwt token storage, which is simpler but means we own the OAuth plumbing. The core user-facing goal (sign in with GitHub/Google, no password) is achieved.
 
-**Migration path for existing users:**
-- Anonymous pedigrees are unaffected (no owner)
-- Any username/password accounts created in earlier phases can be migrated by matching on email
-
-**Why after deploy:** Clerk requires a registered domain for OAuth redirect URIs — `localhost` works for dev but you need the production URL configured before it's usable end-to-end. Also, HTTPS is mandatory for Google OAuth, which deploy provides.
+**Why after deploy:** OAuth redirect URIs require a registered domain. HTTPS is mandatory for Google OAuth, which deploy provides.
 
 ---
 
