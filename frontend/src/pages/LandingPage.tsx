@@ -97,7 +97,7 @@ export default function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-8 py-16">
         <div className="w-full max-w-lg">
           <p className="text-sm text-gray-500 mb-3">
-            Automatic layout from kinship2, handling consanguinity and complex families. Drag-and-drop repositioning. Open source.
+            Automatic layout from <a href="https://cran.r-project.org/package=kinship2" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">kinship2</a>, handling consanguinity and complex families. Drag-and-drop repositioning. <a href="https://github.com/SACGF/pededit" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">Open source</a>.
           </p>
           {!isAuthenticated && (
             <p className="text-sm text-gray-500 mb-8">
