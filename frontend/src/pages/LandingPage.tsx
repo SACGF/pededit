@@ -96,16 +96,19 @@ export default function LandingPage() {
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-8 py-16">
         <div className="w-full max-w-lg">
-          <p className="text-sm text-gray-500 mb-8">
-            A pedigree editor for clinical genetics.
-            {!isAuthenticated && (
-              <> No account required. Each pedigree gets a unique URL you can bookmark or share. Just keep track of your links.{" "}
+          <p className="text-sm text-gray-500 mb-3">
+            Automatic layout from kinship2, handling consanguinity and complex families. Drag-and-drop repositioning. Open source.
+          </p>
+          {!isAuthenticated && (
+            <p className="text-sm text-gray-500 mb-8">
+              No account required. Each pedigree gets a unique URL you can bookmark or share. Just keep track of your links.{" "}
               <span
                 className="text-black underline underline-offset-2 cursor-pointer"
                 onClick={() => navigate("/login")}
-              >Sign in</span> to manage all your pedigrees in one place.</>
-            )}
-          </p>
+              >Sign in</span> to manage all your pedigrees in one place.
+            </p>
+          )}
+          {isAuthenticated && <div className="mb-8" />}
 
           {/* Primary actions */}
           <div className="flex gap-2 mb-10">
