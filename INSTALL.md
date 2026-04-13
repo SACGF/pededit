@@ -325,25 +325,13 @@ sudo ufw enable
 
 ## 10. Updating
 
-To deploy a new version:
+Use the deploy script, which pulls social login client IDs from `/etc/pededit/pededit.json` automatically:
 
 ```bash
-cd /opt/pededit
-sudo -u pededit git pull
-
-# Rebuild frontend (include VITE_ env vars if using social login)
-sudo -u pededit npm ci
-sudo -u pededit npm -w @pedigree-editor/frontend run build
-
-# Update backend
-cd backend
-sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
-sudo -u pededit .venv/bin/python manage.py migrate
-sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
-
-sudo systemctl restart pededit
-# Nginx does not need a restart — it serves the new static files immediately
+sudo bash /opt/pededit/deploy/deploy.sh
 ```
+
+This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn. Nginx does not need a restart.
 
 ## Troubleshooting
 
