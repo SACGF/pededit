@@ -57,7 +57,7 @@ sudo snap install astral-uv --classic
 Run the application as a dedicated unprivileged user:
 
 ```bash
-sudo useradd --system --shell /usr/sbin/nologin pededit
+sudo useradd --system --create-home --shell /usr/sbin/nologin pededit
 ```
 
 ## 3. PostgreSQL
@@ -82,8 +82,7 @@ cd /opt/pededit
 
 ```bash
 cd /opt/pededit
-sudo -u pededit npm ci --cache /opt/pededit/.npm-cache
-sudo -u pededit npm -w @pedigree-editor/frontend run build
+sudo -u pededit npm cisudo -u pededit npm -w @pedigree-editor/frontend run build
 ```
 
 This produces the SPA bundle in `frontend/dist/`.
@@ -231,8 +230,7 @@ cd /opt/pededit
 sudo -u pededit git pull
 
 # Rebuild frontend
-sudo -u pededit npm ci --cache /opt/pededit/.npm-cache
-sudo -u pededit npm -w @pedigree-editor/frontend run build
+sudo -u pededit npm cisudo -u pededit npm -w @pedigree-editor/frontend run build
 
 # Update backend
 cd backend
