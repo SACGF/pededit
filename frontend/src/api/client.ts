@@ -76,6 +76,8 @@ export interface UserInfo {
   id: number;
   username: string;
   email: string;
+  first_name: string;
+  last_name: string;
 }
 
 export interface PedigreeMeta {
@@ -103,6 +105,12 @@ export const authApi = {
 
   login: (username: string, password: string) =>
     apiClient.post<TokenPair>("/auth/token/", { username, password }),
+
+  googleLogin: (credential: string) =>
+    apiClient.post<TokenPair>("/auth/google/", { credential }),
+
+  githubLogin: (code: string) =>
+    apiClient.post<TokenPair>("/auth/github/", { code }),
 
   me: () => apiClient.get<UserInfo>("/auth/me/"),
 };

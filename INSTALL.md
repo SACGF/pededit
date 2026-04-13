@@ -1,3 +1,97 @@
+# Installation
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 20+
+- Python 3.10+
+- PostgreSQL 14+
+- [uv](https://docs.astral.sh/uv/)
+
+### 1. Install Node dependencies
+
+```bash
+npm install
+```
+
+### 2. Create the database
+
+```bash
+sudo -u postgres psql -c "CREATE USER pededit WITH PASSWORD 'pededit';"
+sudo -u postgres psql -c "CREATE DATABASE pededit OWNER pededit;"
+```
+
+### 3. Create the application config
+
+The backend reads its configuration from `/etc/pededit/pededit.json`:
+
+```bash
+sudo mkdir -p /etc/pededit
+sudo tee /etc/pededit/pededit.json > /dev/null <<'EOF'
+{
+  "database_url": "postgres://pededit:pededit@localhost:5432/pededit",
+  "allowed_hosts": ["localhost", "127.0.0.1"],
+  "cors_allowed_origins": ["http://localhost:5173"],
+  "debug": true
+}
+EOF
+```
+
+### 4. Set up the backend
+
+```bash
+cd backend/
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+python manage.py migrate
+```
+
+### 5. (Optional) Create a superuser for the Django admin
+
+```bash
+cd backend/
+source .venv/bin/activate
+python manage.py createsuperuser
+```
+
+### Running
+
+Start both servers in separate terminals:
+
+**Backend** (from `backend/`):
+```bash
+source .venv/bin/activate
+python manage.py runserver
+```
+
+**Frontend** (from repo root):
+```bash
+npm run dev:frontend
+```
+
+Then open `http://localhost:5173`.
+
+**Sign-in options:**
+
+- **Google / GitHub:** Add the client IDs to `/etc/pededit/pededit.json` (see the example config), then create a `frontend/.env.local` with your client IDs:
+  ```
+  VITE_GOOGLE_CLIENT_ID=your-id.apps.googleusercontent.com
+  VITE_GITHUB_CLIENT_ID=your-github-client-id
+  ```
+  For Google, add `http://localhost:5173` to "Authorized JavaScript origins" in the Google Cloud Console.
+  For GitHub, set the callback URL to `http://localhost:5173/auth/github/callback`.
+
+- **Username/password:** Register an account via the API or Django admin:
+  ```bash
+  curl -s -X POST http://localhost:8000/api/auth/register/ \
+    -H "Content-Type: application/json" \
+    -d '{"username":"you","email":"you@example.com","password":"yourpassword"}'
+  ```
+
+---
+
 # Production Deployment on Ubuntu 24.04
 
 This guide deploys PedEdit on a single Ubuntu 24.04 server with:
@@ -80,10 +174,18 @@ cd /opt/pededit
 
 ### Install Node dependencies and build the frontend
 
+If you've configured Google or GitHub sign-in (see step 5), pass the client IDs as environment variables at build time:
+
 ```bash
 cd /opt/pededit
-sudo -u pededit npm cisudo -u pededit npm -w @pedigree-editor/frontend run build
+sudo -u pededit npm ci
+sudo -u pededit \
+  VITE_GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com" \
+  VITE_GITHUB_CLIENT_ID="your-github-client-id" \
+  npm -w @pedigree-editor/frontend run build
 ```
+
+If you don't set these, the social sign-in buttons simply won't appear — username/password login still works.
 
 This produces the SPA bundle in `frontend/dist/`.
 
@@ -229,8 +331,9 @@ To deploy a new version:
 cd /opt/pededit
 sudo -u pededit git pull
 
-# Rebuild frontend
-sudo -u pededit npm cisudo -u pededit npm -w @pedigree-editor/frontend run build
+# Rebuild frontend (include VITE_ env vars if using social login)
+sudo -u pededit npm ci
+sudo -u pededit npm -w @pedigree-editor/frontend run build
 
 # Update backend
 cd backend

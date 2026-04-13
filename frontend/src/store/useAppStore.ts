@@ -16,6 +16,8 @@ interface AppState {
 
   // ── Actions ────────────────────────────────────────────────────────────────
   login: (username: string, password: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
+  githubLogin: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
@@ -35,6 +37,22 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   login: async (username, password) => {
     const { data } = await authApi.login(username, password);
+    localStorage.setItem("access_token", data.access);
+    localStorage.setItem("refresh_token", data.refresh);
+    set({ isAuthenticated: true });
+    await get().fetchMe();
+  },
+
+  googleLogin: async (credential) => {
+    const { data } = await authApi.googleLogin(credential);
+    localStorage.setItem("access_token", data.access);
+    localStorage.setItem("refresh_token", data.refresh);
+    set({ isAuthenticated: true });
+    await get().fetchMe();
+  },
+
+  githubLogin: async (code) => {
+    const { data } = await authApi.githubLogin(code);
     localStorage.setItem("access_token", data.access);
     localStorage.setItem("refresh_token", data.refresh);
     set({ isAuthenticated: true });

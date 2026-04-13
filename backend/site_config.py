@@ -41,3 +41,8 @@ DATABASE_URL     = _cfg["database_url"]
 CORS_ALLOWED_ORIGINS = _cfg.get("cors_allowed_origins", [])
 DEBUG            = _cfg.get("debug", False)
 ALLOWED_HOSTS    = _cfg.get("allowed_hosts", ["localhost", "127.0.0.1"])
+
+# ── Social auth ──────────────────────────────────────────────────────────────
+GOOGLE_CLIENT_ID     = _cfg.get("google_client_id", "")
+GITHUB_CLIENT_ID     = _cfg.get("github_client_id", "")
+GITHUB_CLIENT_SECRET = _cfg.get("github_client_secret", "")

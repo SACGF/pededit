@@ -102,3 +102,8 @@ CORS_ALLOW_HEADERS = [
     "content-type",
     "x-csrftoken",
 ]
+
+# ── Social auth ──────────────────────────────────────────────────────────────
+GOOGLE_CLIENT_ID     = _secrets.GOOGLE_CLIENT_ID
+GITHUB_CLIENT_ID     = _secrets.GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET = _secrets.GITHUB_CLIENT_SECRET

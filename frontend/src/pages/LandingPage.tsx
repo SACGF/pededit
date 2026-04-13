@@ -64,7 +64,11 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <>
-              <span className="text-xs text-gray-500">{user?.username}</span>
+              <span className="text-xs text-gray-500">
+                {user?.first_name
+                  ? `${user.first_name} ${user.last_name}`.trim()
+                  : user?.email || user?.username}
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -148,6 +152,18 @@ export default function LandingPage() {
           {isAuthenticated && <MyPedigrees />}
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t px-8 py-4 text-center">
+        <a
+          href="https://github.com/SACGF/pededit"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          GitHub
+        </a>
+      </footer>
 
       <ImportPedDialog
         open={importOpen}

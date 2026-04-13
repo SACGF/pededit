@@ -2,11 +2,13 @@
 
 A web-based pedigree editor for clinical genetics, genetic counseling, and medical research.
 
+**Live at [pededit.com](https://pededit.com)**
+
 ## Why we built this
 
-Every open-source pedigree tool makes the same trade-off: simple layout or correct layout, but not both — and none support drag-and-drop repositioning of nodes. Tools like [pedigreejs](https://github.com/nicpottier/pedigreejs) and [DrawPed](https://github.com/aehrc/DrawPed) produce clean diagrams for straightforward families but struggle with complex structures (multiple partnerships, consanguinity loops, cross-generational matings). The only tool with manual repositioning is FamGenix, a $500+/year commercial product.
+Every open-source pedigree tool makes the same trade-off: simple layout or correct layout, but not both, and none support drag-and-drop repositioning of nodes. Tools like [pedigreejs](https://github.com/nicpottier/pedigreejs) and [DrawPed](https://github.com/aehrc/DrawPed) produce clean diagrams for straightforward families but struggle with complex structures (multiple partnerships, consanguinity loops, cross-generational matings). The only tool with manual repositioning is FamGenix, a $500+/year commercial product.
 
-The root of the layout problem is that good pedigree layout is a solved problem in academic statistics — the [kinship2](https://cran.r-project.org/package=kinship2) R package has been the reference implementation for over a decade, used in published clinical research worldwide. But kinship2 is R-only, so no web tool has ever been able to use it. We ported the full kinship2 layout algorithm into TypeScript (`layout-engine/`), making it available as a native npm package for the first time. This gives us publication-quality automatic layout as the foundation, on top of which we can layer modern React interaction — including the drag-and-drop repositioning that no open-source tool has managed to ship.
+The root of the layout problem is that good pedigree layout is a solved problem in academic statistics. The [kinship2](https://cran.r-project.org/package=kinship2) R package has been the reference implementation for over a decade, used in published clinical research worldwide. But kinship2 is R-only, so no web tool has ever been able to use it. We ported the full kinship2 layout algorithm into TypeScript (`layout-engine/`), making it available as a native npm package for the first time. This gives us publication-quality automatic layout as the foundation, on top of which we can layer modern React interaction, including the drag-and-drop repositioning that no open-source tool has managed to ship.
 
 ## Prerequisites
 
@@ -26,11 +28,27 @@ npm install
 ### 2. Create the database
 
 ```bash
-sudo -u postgres psql -c "CREATE USER peded WITH PASSWORD 'peded';"
-sudo -u postgres psql -c "CREATE DATABASE peded OWNER peded;"
+sudo -u postgres psql -c "CREATE USER pededit WITH PASSWORD 'pededit';"
+sudo -u postgres psql -c "CREATE DATABASE pededit OWNER pededit;"
 ```
 
-### 3. Set up the backend
+### 3. Create the application config
+
+The backend reads its configuration from `/etc/pededit/pededit.json`:
+
+```bash
+sudo mkdir -p /etc/pededit
+sudo tee /etc/pededit/pededit.json > /dev/null <<'EOF'
+{
+  "database_url": "postgres://pededit:pededit@localhost:5432/pededit",
+  "allowed_hosts": ["localhost", "127.0.0.1"],
+  "cors_allowed_origins": ["http://localhost:5173"],
+  "debug": true
+}
+EOF
+```
+
+### 4. Set up the backend
 
 ```bash
 cd backend/
@@ -40,7 +58,7 @@ uv pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 4. (Optional) Create a superuser for the Django admin
+### 5. (Optional) Create a superuser for the Django admin
 
 ```bash
 cd backend/
@@ -63,7 +81,7 @@ python manage.py runserver
 npm run dev:frontend
 ```
 
-Then open `http://localhost:5173`. You'll be redirected to `/login` — register an account via the API or the Django admin, then sign in.
+Then open `http://localhost:5173`. You'll be redirected to `/login`. Register an account via the API or the Django admin, then sign in.
 
 To register an account from the command line:
 ```bash
@@ -89,7 +107,7 @@ See [INSTALL.md](INSTALL.md) for step-by-step instructions to deploy on Ubuntu 2
 ## Project structure
 
 ```
-peded/
+pededit/
 ├── layout-engine/   # TypeScript layout algorithm (npm workspace)
 ├── backend/         # Django + DRF API
 └── frontend/        # Vite + React + TypeScript
