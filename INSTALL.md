@@ -81,6 +81,7 @@ cd /opt/pededit
 ### Install Node dependencies and build the frontend
 
 ```bash
+cd /opt/pededit
 sudo -u pededit npm ci --cache /opt/pededit/.npm-cache
 sudo -u pededit npm -w @pedigree-editor/frontend run build
 ```
@@ -92,7 +93,8 @@ This produces the SPA bundle in `frontend/dist/`.
 ```bash
 cd /opt/pededit/backend
 sudo -u pededit uv venv
-sudo -u pededit bash -c 'source .venv/bin/activate && uv pip install -r requirements.txt && uv pip install gunicorn'
+sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
+sudo -u pededit uv pip install --python .venv/bin/python gunicorn
 ```
 
 ## 5. Application config
@@ -115,15 +117,18 @@ The `secret_key` field is optional — if omitted, one is auto-generated and sav
 
 ```bash
 cd /opt/pededit/backend
-sudo -u pededit bash -c 'source .venv/bin/activate && python manage.py migrate && python manage.py collectstatic --noinput'
+sudo -u pededit .venv/bin/python manage.py migrate
+sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
 ```
 
 The Django static files (admin CSS/JS) will be collected to `backend/staticfiles/`.
 
-### Create a superuser
+### (Optional) Create a superuser for Django admin
+
+Only needed if you want access to the Django admin panel at `/admin/`. Not required for normal use — users register through the app.
 
 ```bash
-sudo -u pededit bash -c 'cd /opt/pededit/backend && source .venv/bin/activate && python manage.py createsuperuser'
+sudo -u pededit .venv/bin/python manage.py createsuperuser
 ```
 
 ## 6. Gunicorn systemd service
@@ -231,7 +236,9 @@ sudo -u pededit npm -w @pedigree-editor/frontend run build
 
 # Update backend
 cd backend
-sudo -u pededit bash -c 'source .venv/bin/activate && uv pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput'
+sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
+sudo -u pededit .venv/bin/python manage.py migrate
+sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
 
 sudo systemctl restart pededit
 # Nginx does not need a restart — it serves the new static files immediately
