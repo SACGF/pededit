@@ -1,12 +1,14 @@
 import { useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID } from "../config";
+
+type CredentialResponse = { credential?: string };
 
 export default function LoginPage() {
   const { login, googleLogin } = useAppStore();
