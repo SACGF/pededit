@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { exportSvg, exportPng, exportPdf } from "../io/svg/index";
+import { exportSvg, exportUShapeSvg, exportPng, exportPdf } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 interface ExportDialogProps {
@@ -25,12 +25,14 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
   const [pngScale, setPngScale]     = useState<1 | 2 | 3>(2);
+  const [uShape, setUShape]         = useState(false);
   const [busy, setBusy]             = useState(false);
 
   async function handleDownload() {
     setBusy(true);
     try {
-      const svgString = exportSvg(pedigree, {
+      const exportFn = uShape ? exportUShapeSvg : exportSvg;
+      const svgString = exportFn(pedigree, {
         deidentify: deident,
         ageBuckets: deident && ageBuckets,
         title: deident ? undefined : title,
@@ -121,6 +123,18 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
                 <span>Include age range (infant / child / 30s …)</span>
               </label>
             )}
+          </div>
+
+          {/* U-shape layout */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-xs cursor-pointer">
+              <input
+                type="checkbox"
+                checked={uShape}
+                onChange={e => setUShape(e.target.checked)}
+              />
+              <span className="font-medium">U-shape layout (horseshoe)</span>
+            </label>
           </div>
         </div>
 
