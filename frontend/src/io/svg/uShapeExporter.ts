@@ -5,25 +5,26 @@ import type { SvgExportOptions } from "./types";
 // ─────────────────────────────────────────────────────────────────────────────
 // U-shape (horseshoe / "house of parliament") pedigree export.
 //
-// The founder couple sits at the bottom centre. Blood descendants only are
-// drawn (married-in spouses are removed, which is what makes the horseshoe
-// readable). Each generation is a concentric arc above the founder; a subtree
-// is allocated an angular slice proportional to the number of leaf descendants
-// it contains, so leaves end up evenly spread around the outer rim. Children of
-// a blood ancestor fan out perpendicular to the ring (a radial spur from the
-// parent to a sibship arc carrying the children).
+// Blood descendants only are drawn (married-in spouses are removed, which is
+// what makes the horseshoe readable).
 //
-// Orientation: angle 0 points straight DOWN (the founder's descent line); the
-// fan wraps wide to both sides so the founder at radius 0 sits in the middle of
-// the figure and the deepest generations form the horseshoe rim, with the gap
-// (opening) at the top. y grows downward (SVG).
+// Model: the blood tree is laid out as a tidy tree, then bent around a U-shaped
+// spine (two vertical arms + a semicircular bottom). The youngest generation
+// sits on the outer rim; each older generation is offset inward (toward the U
+// interior) by a fixed step, so the founder ends up in the centre of the U
+// opening with its descent line pointing down, and the family wraps around the
+// horseshoe. This keeps the arms parallel (unlike a radial fan) and generalises
+// to arbitrary branching because placement along the rim is just an in-order
+// leaf ordering. y grows downward (SVG); the opening is at the top.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const HALF_SPAN = (145 * Math.PI) / 180; // half the fan; ~290° total, gap at top
-const BASE_RING_GAP = 120;              // min radial distance between generations
-const MIN_NODE_ARC = 64;                // min spacing between siblings on a ring
-const COUPLE_GAP = 46;                  // founder couple horizontal separation
+const RING_GAP = 66;        // perpendicular (inward) distance between generations
+const MIN_LEAF_ARC = 58;    // min spacing between nodes along the rim
+const ARM_RATIO = 1.7;      // arm height as a multiple of the curve radius
+const INNER_PAD = 34;       // curve radius slack so the founder ring stays open
+const MIN_W = 90;           // min half-width (curve radius / half arm separation)
+const COUPLE_GAP = 44;      // founder couple horizontal separation
 
 const NODE_SIZE = 40;
 const STROKE = 2;
@@ -43,8 +44,7 @@ interface TreeNode {
   id: string;
   depth: number;       // tree depth; 0 = founder
   children: string[];  // assigned blood children (forms a tree even with loops)
-  weight: number;      // number of leaf descendants
-  angle: number;       // radians, 0 = straight up
+  frac: number;        // position along the rim, 0 = left tip … 1 = right tip
 }
 
 interface BloodTree {
@@ -128,10 +128,15 @@ function buildBloodTree(pedigree: Pedigree): BloodTree {
   }
 
   if (!rootPid) {
+    // No partnership with children: just the founder (single) or a childless
+    // couple. Seed a lone founder node so the layout has a valid root.
     const first = pedigree.individuals[0];
+    const rootMale = first?.id || "";
+    const nodes = new Map<string, TreeNode>();
+    if (rootMale) nodes.set(rootMale, { id: rootMale, depth: 0, children: [], frac: 0.5 });
     return {
-      nodes: new Map(),
-      rootMale: first?.id || "",
+      nodes,
+      rootMale,
       rootFemale: pedigree.individuals[1]?.id || first?.id || "",
       consang: false,
     };
@@ -160,7 +165,7 @@ function buildBloodTree(pedigree: Pedigree): BloodTree {
   // it first, so consanguineous loops still yield a single spanning tree.
   const nodes = new Map<string, TreeNode>();
   const assigned = new Set<string>([rootMale, rootFemale]);
-  nodes.set(rootMale, { id: rootMale, depth: 0, children: [], weight: 1, angle: 0 });
+  nodes.set(rootMale, { id: rootMale, depth: 0, children: [], frac: 0 });
 
   const queue: string[] = [rootMale];
   // Seed with the founder partnership's children explicitly (the founder node
@@ -171,7 +176,7 @@ function buildBloodTree(pedigree: Pedigree): BloodTree {
   for (const kid of seedKids) {
     if (assigned.has(kid)) continue;
     assigned.add(kid);
-    nodes.set(kid, { id: kid, depth: 1, children: [], weight: 1, angle: 0 });
+    nodes.set(kid, { id: kid, depth: 1, children: [], frac: 0 });
     rootNode.children.push(kid);
     queue.push(kid);
   }
@@ -185,7 +190,7 @@ function buildBloodTree(pedigree: Pedigree): BloodTree {
       .sort((a, b) => sibOrderOf(a) - sibOrderOf(b));
     for (const kid of kids) {
       assigned.add(kid);
-      nodes.set(kid, { id: kid, depth: node.depth + 1, children: [], weight: 1, angle: 0 });
+      nodes.set(kid, { id: kid, depth: node.depth + 1, children: [], frac: 0 });
       node.children.push(kid);
       queue.push(kid);
     }
@@ -200,64 +205,98 @@ function buildBloodTree(pedigree: Pedigree): BloodTree {
   };
 }
 
-// ── Weight + angular allocation ───────────────────────────────────────────────
+// ── Rim ordering (in-order leaf placement) ────────────────────────────────────
 
-function computeWeights(tree: BloodTree, rootMale: string): number {
-  const node = tree.nodes.get(rootMale);
-  if (!node) return 1;
-  if (node.children.length === 0) {
-    node.weight = 1;
-    return 1;
-  }
-  let w = 0;
-  for (const c of node.children) w += computeWeights(tree, c);
-  node.weight = w;
-  return w;
+/**
+ * Assign each node a fractional rim position in [0,1] via an in-order DFS:
+ * leaves are spread evenly along the rim, internal nodes are centred over their
+ * descendants. Returns the leaf count and the deepest generation.
+ */
+function assignFractions(tree: BloodTree): { leafCount: number; maxDepth: number } {
+  const root = tree.rootMale;
+  const leaves: string[] = [];
+  let maxDepth = 0;
+
+  const collect = (id: string) => {
+    const n = tree.nodes.get(id)!;
+    maxDepth = Math.max(maxDepth, n.depth);
+    if (n.children.length === 0) { leaves.push(id); return; }
+    for (const c of n.children) collect(c);
+  };
+  collect(root);
+
+  const N = Math.max(1, leaves.length);
+  leaves.forEach((id, i) => { tree.nodes.get(id)!.frac = (i + 0.5) / N; });
+
+  const setFrac = (id: string): number => {
+    const n = tree.nodes.get(id)!;
+    if (n.children.length === 0) return n.frac;
+    let sum = 0;
+    for (const c of n.children) sum += setFrac(c);
+    n.frac = sum / n.children.length;
+    return n.frac;
+  };
+  setFrac(root);
+
+  return { leafCount: N, maxDepth };
 }
 
-function allocateAngles(tree: BloodTree, id: string, lo: number, hi: number): void {
-  const node = tree.nodes.get(id);
-  if (!node) return;
-  node.angle = (lo + hi) / 2;
-  if (node.children.length === 0) return;
-  const total = node.weight || 1;
-  let a = lo;
-  for (const c of node.children) {
-    const cw = tree.nodes.get(c)!.weight;
-    const span = (cw / total) * (hi - lo);
-    allocateAngles(tree, c, a, a + span);
-    a += span;
+// ── U-spine geometry ──────────────────────────────────────────────────────────
+
+interface Geom { W: number; armH: number; L: number; curveLen: number; }
+
+function computeGeom(leafCount: number, maxDepth: number): Geom {
+  // Curve radius W must clear the deepest inward offset so no inner ring inverts
+  // through the centre (the founder, at maxDepth·gap inward, sits just inside).
+  const wDepth = maxDepth * RING_GAP + INNER_PAD;
+  // Rim length must also hold every leaf at MIN_LEAF_ARC spacing: L = (2·ratio+π)·W.
+  const k = 2 * ARM_RATIO + Math.PI;
+  const wLeaves = (MIN_LEAF_ARC * leafCount) / k;
+  const W = Math.max(MIN_W, wDepth, wLeaves);
+  const armH = ARM_RATIO * W;
+  const curveLen = Math.PI * W;
+  return { W, armH, L: 2 * armH + curveLen, curveLen };
+}
+
+interface SpinePoint { x: number; y: number; nx: number; ny: number; } // nx,ny = inward normal
+
+/** Point on the rim at arc-length s (0 = left tip), plus the inward normal. */
+function spineAt(s: number, g: Geom): SpinePoint {
+  const { W, armH, curveLen } = g;
+  if (s <= armH) {
+    // Left arm: top tip (s=0) down to the curve junction (s=armH).
+    return { x: -W, y: -armH + s, nx: 1, ny: 0 };
+  } else if (s <= armH + curveLen) {
+    // Bottom semicircle, centred on the origin, radius W.
+    const phi = (s - armH) / W;          // 0 … π
+    const x = -W * Math.cos(phi);
+    const y = W * Math.sin(phi);
+    return { x, y, nx: -x / W, ny: -y / W };
+  } else {
+    // Right arm: junction (y=0) up to the right tip.
+    const u = s - (armH + curveLen);     // 0 … armH
+    return { x: W, y: -u, nx: -1, ny: 0 };
   }
 }
 
-/** Choose a radial gap so the narrowest node slice still clears MIN_NODE_ARC. */
-function computeRingGap(tree: BloodTree, rootWeight: number): number {
-  let gap = BASE_RING_GAP;
-  const fullSpan = 2 * HALF_SPAN;
-  for (const node of tree.nodes.values()) {
-    if (node.depth < 1) continue;
-    const sliceAngle = (node.weight / rootWeight) * fullSpan;
-    if (sliceAngle <= 0) continue;
-    // width at this ring = depth * gap * sliceAngle  ≥  MIN_NODE_ARC
-    const need = MIN_NODE_ARC / (node.depth * sliceAngle);
-    if (need > gap) gap = need;
-  }
-  return gap;
+/** Final position of a node: on its rim slot, offset inward by its generation. */
+function nodePos(frac: number, depth: number, g: Geom, maxDepth: number): Pos {
+  const sp = spineAt(frac * g.L, g);
+  const inward = (maxDepth - depth) * RING_GAP;
+  return { x: sp.x + sp.nx * inward, y: sp.y + sp.ny * inward };
 }
 
-// ── Position assignment ───────────────────────────────────────────────────────
-
-function assignPositions(tree: BloodTree, ringGap: number): Map<string, Pos> {
+function assignPositions(tree: BloodTree, g: Geom, maxDepth: number): Map<string, Pos> {
   const pos = new Map<string, Pos>();
-  // Founder couple at the bottom centre.
-  pos.set(tree.rootMale, { x: -COUPLE_GAP / 2, y: 0 });
-  if (tree.rootFemale && tree.rootFemale !== tree.rootMale) {
-    pos.set(tree.rootFemale, { x: COUPLE_GAP / 2, y: 0 });
-  }
   for (const node of tree.nodes.values()) {
     if (node.depth === 0) continue;
-    const R = node.depth * ringGap;
-    pos.set(node.id, { x: R * Math.sin(node.angle), y: R * Math.cos(node.angle) });
+    pos.set(node.id, nodePos(node.frac, node.depth, g, maxDepth));
+  }
+  // Founder couple straddle the founder's rim slot, side by side.
+  const f = nodePos(tree.nodes.get(tree.rootMale)!.frac, 0, g, maxDepth);
+  pos.set(tree.rootMale, { x: f.x - COUPLE_GAP / 2, y: f.y });
+  if (tree.rootFemale && tree.rootFemale !== tree.rootMale) {
+    pos.set(tree.rootFemale, { x: f.x + COUPLE_GAP / 2, y: f.y });
   }
   return pos;
 }
@@ -270,18 +309,21 @@ function seg(x1: number, y1: number, x2: number, y2: number): string {
   return `<line x1="${r(x1)}" y1="${r(y1)}" x2="${r(x2)}" y2="${r(y2)}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function point(angle: number, R: number): Pos {
-  // angle 0 = straight down; positive sweeps toward the right.
-  return { x: R * Math.sin(angle), y: R * Math.cos(angle) };
-}
-
-/** Circular arc (centred on the origin) from angle a1 to a2 at radius R. */
-function arcPath(a1: number, a2: number, R: number): string {
-  const p1 = point(a1, R);
-  const p2 = point(a2, R);
-  const large = Math.abs(a2 - a1) > Math.PI ? 1 : 0;
-  const sweep = a2 >= a1 ? 0 : 1; // increasing angle = counter-clockwise on screen
-  return `<path d="M ${r(p1.x)} ${r(p1.y)} A ${r(R)} ${r(R)} 0 ${large} ${sweep} ${r(p2.x)} ${r(p2.y)}" fill="none" stroke="black" stroke-width="${STROKE}"/>`;
+/**
+ * A polyline following the inward-offset rim curve between two fractional
+ * positions, at a given generation depth. Used for sibship bars so they hug the
+ * U on the curved bottom and stay straight on the arms.
+ */
+function offsetCurvePath(f1: number, f2: number, depth: number, g: Geom, maxDepth: number): string {
+  const span = Math.abs(f2 - f1) * g.L;
+  const steps = Math.max(1, Math.ceil(span / 16));
+  const pts: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const f = f1 + ((f2 - f1) * i) / steps;
+    const p = nodePos(f, depth, g, maxDepth);
+    pts.push(`${r(p.x)},${r(p.y)}`);
+  }
+  return `<polyline points="${pts.join(" ")}" fill="none" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
 function svgDefs(): string {
@@ -337,7 +379,7 @@ function renderProbandArrow(): string {
 
 // ── Connectors ────────────────────────────────────────────────────────────────
 
-function renderConnectors(tree: BloodTree, pos: Map<string, Pos>, ringGap: number): string[] {
+function renderConnectors(tree: BloodTree, pos: Map<string, Pos>, g: Geom, maxDepth: number): string[] {
   const lines: string[] = [];
 
   // Founder couple line (double if consanguineous).
@@ -355,20 +397,22 @@ function renderConnectors(tree: BloodTree, pos: Map<string, Pos>, ringGap: numbe
   for (const node of tree.nodes.values()) {
     if (node.children.length === 0) continue;
 
-    const childRadius = (node.depth + 1) * ringGap;
-    const childAngles = node.children.map(c => tree.nodes.get(c)!.angle);
-    const aMin = Math.min(...childAngles);
-    const aMax = Math.max(...childAngles);
+    const childDepth = node.depth + 1;
+    const childFracs = node.children.map(c => tree.nodes.get(c)!.frac);
+    const fMin = Math.min(...childFracs);
+    const fMax = Math.max(...childFracs);
 
-    // Radial spur from the parent (or founder couple midpoint) out to the
-    // children's ring, at the parent's angle.
-    const start = node.depth === 0 ? { x: 0, y: 0 } : pos.get(node.id)!;
-    const spurEnd = point(node.angle, childRadius);
-    lines.push(seg(start.x, start.y, spurEnd.x, spurEnd.y));
+    // Descent line: from the parent (couple midpoint for the founder) inward-
+    // out to the children's generation level, at the parent's rim slot.
+    const start = node.depth === 0
+      ? nodePos(node.frac, 0, g, maxDepth)
+      : pos.get(node.id)!;
+    const sibAttach = nodePos(node.frac, childDepth, g, maxDepth);
+    lines.push(seg(start.x, start.y, sibAttach.x, sibAttach.y));
 
-    // Sibship arc joining the children along their ring.
+    // Sibship bar: the offset rim curve at the children's level, joining them.
     if (node.children.length > 1) {
-      lines.push(arcPath(aMin, aMax, childRadius));
+      lines.push(offsetCurvePath(fMin, fMax, childDepth, g, maxDepth));
     }
   }
 
@@ -414,17 +458,15 @@ function renderLabels(pedigree: Pedigree, pos: Map<string, Pos>, ids: Set<string
   return elems;
 }
 
-// ── Debug rings (the invisible spine made visible) ────────────────────────────
+// ── Debug spine (the invisible rim curves made visible) ───────────────────────
 
-function renderDebugRings(maxDepth: number, ringGap: number): string {
+function renderDebugRings(maxDepth: number, g: Geom): string {
   const lines: string[] = [];
-  for (let g = 1; g <= maxDepth; g++) {
-    const R = g * ringGap;
-    const p1 = point(-HALF_SPAN, R);
-    const p2 = point(HALF_SPAN, R);
-    const large = 2 * HALF_SPAN > Math.PI ? 1 : 0;
+  for (let d = 0; d <= maxDepth; d++) {
     lines.push(
-      `<path d="M ${r(p1.x)} ${r(p1.y)} A ${r(R)} ${r(R)} 0 ${large} 0 ${r(p2.x)} ${r(p2.y)}" fill="none" stroke="red" stroke-width="0.75" stroke-dasharray="4 3"/>`,
+      offsetCurvePath(0, 1, d, g, maxDepth)
+        .replace('stroke="black"', 'stroke="red"')
+        .replace(`stroke-width="${STROKE}"`, 'stroke-width="0.75" stroke-dasharray="4 3"'),
     );
   }
   return lines.join("\n");
@@ -478,12 +520,10 @@ export function exportUShapeSvg(
   drawn.add(tree.rootMale);
   if (tree.rootFemale) drawn.add(tree.rootFemale);
 
-  const rootWeight = computeWeights(tree, tree.rootMale);
-  allocateAngles(tree, tree.rootMale, -HALF_SPAN, HALF_SPAN);
-  const ringGap = computeRingGap(tree, rootWeight);
-  const pos = assignPositions(tree, ringGap);
+  const { leafCount, maxDepth } = assignFractions(tree);
+  const geom = computeGeom(leafCount, maxDepth);
+  const pos = assignPositions(tree, geom, maxDepth);
 
-  const maxDepth = Math.max(0, ...[...tree.nodes.values()].map(n => n.depth));
   const bounds = computeBounds(pos, drawn);
   const { offsetX, offsetY, width, height } = bounds;
 
@@ -504,9 +544,9 @@ export function exportUShapeSvg(
 
   out.push(`<g transform="translate(${r(offsetX)} ${r(offsetY)})">`);
   if (options.debugSpine && maxDepth > 0) {
-    out.push(renderDebugRings(maxDepth, ringGap));
+    out.push(renderDebugRings(maxDepth, geom));
   }
-  out.push(...renderConnectors(tree, pos, ringGap));
+  out.push(...renderConnectors(tree, pos, geom, maxDepth));
   out.push(...renderSymbols(working, pos, drawn));
   out.push(...renderLabels(working, pos, drawn));
   out.push(`</g>`);

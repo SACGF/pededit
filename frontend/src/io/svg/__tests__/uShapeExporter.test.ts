@@ -81,10 +81,10 @@ describe("U-shape SVG visual snapshots", () => {
 });
 
 describe("U-shape structural", () => {
-  it("contains U-curve SVG arc path", () => {
+  it("draws sibship bars that follow the U rim", () => {
     const svg = exportUShapeSvg(simpleFamily);
-    expect(svg).toContain("<path");
-    expect(svg).toMatch(/A \d/); // SVG arc command
+    // Sibships are rendered as polylines hugging the offset rim curve.
+    expect(svg).toContain("<polyline");
   });
 
   // The founder couple are the only two symbols sharing a y value and separated
@@ -93,7 +93,7 @@ describe("U-shape structural", () => {
     for (let i = 0; i < positions.length; i++) {
       for (let j = i + 1; j < positions.length; j++) {
         const a = positions[i], b = positions[j];
-        if (Math.abs(a.y - b.y) < 1 && Math.abs(Math.abs(a.x - b.x) - 46) < 2) {
+        if (Math.abs(a.y - b.y) < 1 && Math.abs(Math.abs(a.x - b.x) - 44) < 2) {
           return a.y;
         }
       }
