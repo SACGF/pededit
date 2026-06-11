@@ -2,15 +2,28 @@ import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 
-// Controlled by SvgExportOptions.debugSpine at runtime
+// ─────────────────────────────────────────────────────────────────────────────
+// U-shape (horseshoe / "house of parliament") pedigree export.
+//
+// The founder couple sits at the bottom centre. Blood descendants only are
+// drawn (married-in spouses are removed, which is what makes the horseshoe
+// readable). Each generation is a concentric arc above the founder; a subtree
+// is allocated an angular slice proportional to the number of leaf descendants
+// it contains, so leaves end up evenly spread around the outer rim. Children of
+// a blood ancestor fan out perpendicular to the ring (a radial spur from the
+// parent to a sibship arc carrying the children).
+//
+// Orientation: angle 0 points straight DOWN (the founder's descent line); the
+// fan wraps wide to both sides so the founder at radius 0 sits in the middle of
+// the figure and the deepest generations form the horseshoe rim, with the gap
+// (opening) at the top. y grows downward (SVG).
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ── Spine constants ──────────────────────────────────────────────────────────
-const U_ROW_HEIGHT = 70;
-const U_CHILD_VERT_SPACING = 60;
-const U_CHILD_OUTWARD = 70;
-const U_ARM_GAP = 200;
-const U_PADDING = 60;
-const COUPLE_GAP = 80;
+// ── Layout constants ──────────────────────────────────────────────────────────
+const HALF_SPAN = (145 * Math.PI) / 180; // half the fan; ~290° total, gap at top
+const BASE_RING_GAP = 120;              // min radial distance between generations
+const MIN_NODE_ARC = 64;                // min spacing between siblings on a ring
+const COUPLE_GAP = 46;                  // founder couple horizontal separation
 
 const NODE_SIZE = 40;
 const STROKE = 2;
@@ -18,107 +31,49 @@ const DECEASED_OVERHANG = 4;
 const PROBAND_TAIL = 18;
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
-const LABEL_OFFSET_Y = NODE_SIZE / 2 + 4;
+const LABEL_OFFSET_Y = NODE_SIZE / 2 + 12;
+const CONSANG_OFFSET = 4;
+const PADDING = 48;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-interface SpinePoint {
-  x: number;
-  y: number;
-  tx: number;
-  ty: number;
-  nx: number;
-  ny: number;
-}
+interface Pos { x: number; y: number; }
 
-interface SpineConfig {
-  leftStemX: number;
-  rightStemX: number;
-  foundersY: number;
-  curveRadius: number;
-}
-
-interface NodePosition { x: number; y: number; }
-
-interface BloodNode {
+interface TreeNode {
   id: string;
-  generation: number;
-  arm: "left" | "right" | "root";
-  spouse?: string;
-  spouseChildren: string[];
+  depth: number;       // tree depth; 0 = founder
+  children: string[];  // assigned blood children (forms a tree even with loops)
+  weight: number;      // number of leaf descendants
+  angle: number;       // radians, 0 = straight up
 }
 
-type BloodTree = Map<string, BloodNode>;
-
-// ── Spine geometry ───────────────────────────────────────────────────────────
-// Root couple at BOTTOM (positive y). Curve dips down from arm bases (y=0).
-// Arms go UP (negative y) from arm bases.
-
-function spinePoint(
-  arcDist: number,
-  arm: "left" | "right",
-  config: SpineConfig,
-): SpinePoint {
-  const { leftStemX, rightStemX, foundersY, curveRadius } = config;
-  const centreX = (leftStemX + rightStemX) / 2;
-  const curveHalfArc = (Math.PI * curveRadius) / 2;
-
-  if (arcDist <= curveHalfArc) {
-    // On the curved portion at the bottom
-    const theta = arcDist / curveRadius;
-    const sign = arm === "left" ? -1 : 1;
-
-    // Curve dips DOWN (positive y) from arm bases
-    const x = centreX + sign * curveRadius * Math.sin(theta);
-    const y = foundersY + curveRadius * Math.cos(theta);
-
-    // Tangent: direction of increasing arc (toward arm tips = upward)
-    const tx = sign * Math.cos(theta);
-    const ty = -Math.sin(theta);
-
-    // Normal: perpendicular, pointing outward from U centre
-    const normalX = arm === "left" ? ty : -ty;
-    const normalY = arm === "left" ? -tx : tx;
-
-    return { x, y, tx, ty, nx: normalX, ny: normalY };
-  } else {
-    // Straight arm portion going UP (negative y)
-    const straightDist = arcDist - curveHalfArc;
-    const stemX = arm === "left" ? leftStemX : rightStemX;
-
-    return {
-      x: stemX,
-      y: foundersY - straightDist,
-      tx: 0,
-      ty: -1,
-      nx: arm === "left" ? -1 : 1,
-      ny: 0,
-    };
-  }
+interface BloodTree {
+  nodes: Map<string, TreeNode>;
+  rootMale: string;
+  rootFemale: string;
+  rootPartnership?: string;
+  consang: boolean;     // founder partnership is consanguineous
 }
 
-// ── Blood tree extraction ────────────────────────────────────────────────────
+// ── Generation assignment (longest path from a founder) ───────────────────────
 
 function computeGenerations(pedigree: Pedigree): Map<string, number> {
   const childToPartnership = new Map<string, string>();
   for (const [pid, children] of Object.entries(pedigree.parentOf)) {
-    for (const cid of children) {
-      childToPartnership.set(cid, pid);
-    }
+    for (const cid of children) childToPartnership.set(cid, pid);
   }
 
   const gen = new Map<string, number>();
   for (const ind of pedigree.individuals) {
-    if (!childToPartnership.has(ind.id)) {
-      gen.set(ind.id, 0);
-    }
+    if (!childToPartnership.has(ind.id)) gen.set(ind.id, 0);
   }
 
   let changed = true;
   while (changed) {
     changed = false;
     for (const [pid, children] of Object.entries(pedigree.parentOf)) {
-      const partnership = pedigree.partnerships.find(p => p.id === pid)!;
+      const partnership = pedigree.partnerships.find(p => p.id === pid);
+      if (!partnership) continue;
       const g1 = gen.get(partnership.individual1);
       const g2 = gen.get(partnership.individual2);
       if (g1 === undefined || g2 === undefined) continue;
@@ -132,329 +87,201 @@ function computeGenerations(pedigree: Pedigree): Map<string, number> {
       }
     }
   }
-
   return gen;
 }
 
-function findPartnershipWithChildren(pedigree: Pedigree, individualId: string): string | undefined {
-  for (const p of pedigree.partnerships) {
-    if (p.individual1 === individualId || p.individual2 === individualId) {
-      if ((pedigree.parentOf[p.id] || []).length > 0) {
-        return p.id;
+function countDescendants(pedigree: Pedigree, partnershipId: string, seen: Set<string>): number {
+  let count = 0;
+  for (const cid of pedigree.parentOf[partnershipId] || []) {
+    if (seen.has(cid)) continue;
+    seen.add(cid);
+    count++;
+    for (const p of pedigree.partnerships) {
+      if (p.individual1 === cid || p.individual2 === cid) {
+        count += countDescendants(pedigree, p.id, seen);
       }
     }
   }
-  return undefined;
+  return count;
 }
 
-function computeBloodSet(pedigree: Pedigree, rootMale: string, rootFemale: string): Set<string> {
-  const blood = new Set<string>();
-  blood.add(rootMale);
-  blood.add(rootFemale);
+// ── Blood-descendant tree extraction ──────────────────────────────────────────
 
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const [pid, children] of Object.entries(pedigree.parentOf)) {
-      const p = pedigree.partnerships.find(pp => pp.id === pid)!;
-      if (blood.has(p.individual1) || blood.has(p.individual2)) {
-        for (const cid of children) {
-          if (!blood.has(cid)) {
-            blood.add(cid);
-            changed = true;
-          }
-        }
-      }
-    }
-  }
-
-  return blood;
-}
-
-function buildBloodTree(pedigree: Pedigree): {
-  bloodTree: BloodTree;
-  rootMale: string;
-  rootFemale: string;
-} {
+function buildBloodTree(pedigree: Pedigree): BloodTree {
   const gen = computeGenerations(pedigree);
 
+  // Pick the founder partnership: both partners generation 0, with children,
+  // and the most descendants. Fall back to any partnership with children.
   let rootPid: string | undefined;
-  let bestDepth = -1;
+  let bestCount = -1;
   for (const p of pedigree.partnerships) {
-    if (gen.get(p.individual1) === 0 && gen.get(p.individual2) === 0) {
-      const children = pedigree.parentOf[p.id] || [];
-      if (children.length > 0) {
-        const depth = maxDescendantDepth(pedigree, p.id, gen);
-        if (depth > bestDepth) {
-          bestDepth = depth;
-          rootPid = p.id;
-        }
-      }
-    }
-  }
-
-  if (!rootPid) {
-    for (const p of pedigree.partnerships) {
-      if ((pedigree.parentOf[p.id] || []).length > 0) {
-        rootPid = p.id;
-        break;
-      }
+    const hasKids = (pedigree.parentOf[p.id] || []).length > 0;
+    if (!hasKids) continue;
+    const founders = gen.get(p.individual1) === 0 && gen.get(p.individual2) === 0;
+    const count = countDescendants(pedigree, p.id, new Set());
+    // Prefer founder couples; among those (or otherwise), prefer more descendants.
+    const score = (founders ? 1_000_000 : 0) + count;
+    if (score > bestCount) {
+      bestCount = score;
+      rootPid = p.id;
     }
   }
 
   if (!rootPid) {
     const first = pedigree.individuals[0];
     return {
-      bloodTree: new Map(),
+      nodes: new Map(),
       rootMale: first?.id || "",
       rootFemale: pedigree.individuals[1]?.id || first?.id || "",
+      consang: false,
     };
   }
 
   const rootP = pedigree.partnerships.find(p => p.id === rootPid)!;
-  const ind1 = pedigree.individuals.find(i => i.id === rootP.individual1)!;
-  const rootMale = ind1.sex === "male" ? rootP.individual1 : rootP.individual2;
-  const rootFemale = ind1.sex === "male" ? rootP.individual2 : rootP.individual1;
+  const ind1 = pedigree.individuals.find(i => i.id === rootP.individual1);
+  const rootMale = ind1?.sex === "male" ? rootP.individual1 : rootP.individual2;
+  const rootFemale = ind1?.sex === "male" ? rootP.individual2 : rootP.individual1;
 
-  const rootChildren = pedigree.parentOf[rootPid] || [];
-  const bloodTree: BloodTree = new Map();
+  const sibOrderOf = (id: string) =>
+    pedigree.individuals.find(i => i.id === id)?.sibOrder ?? 0;
 
-  bloodTree.set(rootMale, {
-    id: rootMale, generation: 0, arm: "root",
-    spouse: rootFemale, spouseChildren: rootChildren,
-  });
-
-  const leftStart = rootChildren[0];
-  const rightStart = rootChildren.length > 1 ? rootChildren[1] : undefined;
-
-  function processChain(startId: string, arm: "left" | "right") {
-    let currentId: string | undefined = startId;
-    let generation = 1;
-
-    while (currentId) {
-      const pid = findPartnershipWithChildren(pedigree, currentId);
-      let spouse: string | undefined;
-      let children: string[] = [];
-
-      if (pid) {
-        const p = pedigree.partnerships.find(pp => pp.id === pid)!;
-        spouse = p.individual1 === currentId ? p.individual2 : p.individual1;
-        children = pedigree.parentOf[pid] || [];
-      }
-
-      bloodTree.set(currentId, {
-        id: currentId, generation, arm, spouse, spouseChildren: children,
-      });
-
-      currentId = undefined;
-      for (const childId of children) {
-        if (findPartnershipWithChildren(pedigree, childId)) {
-          currentId = childId;
-          break;
-        }
-      }
-      generation++;
-    }
-  }
-
-  if (leftStart) processChain(leftStart, "left");
-  if (rightStart) processChain(rightStart, "right");
-
-  return { bloodTree, rootMale, rootFemale };
-}
-
-function maxDescendantDepth(pedigree: Pedigree, partnershipId: string, gen: Map<string, number>): number {
-  let maxD = 0;
-  const children = pedigree.parentOf[partnershipId] || [];
-  for (const cid of children) {
-    const d = gen.get(cid) || 0;
-    if (d > maxD) maxD = d;
+  // Collect the blood children of an individual across all their partnerships.
+  const childrenOf = (id: string): string[] => {
+    const kids: string[] = [];
     for (const p of pedigree.partnerships) {
-      if (p.individual1 === cid || p.individual2 === cid) {
-        const childDepth = maxDescendantDepth(pedigree, p.id, gen);
-        if (childDepth > maxD) maxD = childDepth;
+      if (p.individual1 === id || p.individual2 === id) {
+        for (const c of pedigree.parentOf[p.id] || []) kids.push(c);
       }
     }
+    return kids;
+  };
+
+  // BFS from the founder. A child is attached to whichever blood parent reaches
+  // it first, so consanguineous loops still yield a single spanning tree.
+  const nodes = new Map<string, TreeNode>();
+  const assigned = new Set<string>([rootMale, rootFemale]);
+  nodes.set(rootMale, { id: rootMale, depth: 0, children: [], weight: 1, angle: 0 });
+
+  const queue: string[] = [rootMale];
+  // Seed with the founder partnership's children explicitly (the founder node
+  // represents the couple, so use the couple's children directly).
+  const seedKids = [...new Set(pedigree.parentOf[rootPid] || [])]
+    .sort((a, b) => sibOrderOf(a) - sibOrderOf(b));
+  const rootNode = nodes.get(rootMale)!;
+  for (const kid of seedKids) {
+    if (assigned.has(kid)) continue;
+    assigned.add(kid);
+    nodes.set(kid, { id: kid, depth: 1, children: [], weight: 1, angle: 0 });
+    rootNode.children.push(kid);
+    queue.push(kid);
   }
-  return maxD;
-}
 
-// ── Coordinate assignment ────────────────────────────────────────────────────
-
-function assignCoordinates(
-  pedigree: Pedigree,
-  bloodTree: BloodTree,
-  bloodSet: Set<string>,
-  rootMale: string,
-  rootFemale: string,
-  config: SpineConfig,
-): Map<string, NodePosition> {
-  const positions = new Map<string, NodePosition>();
-  const curveHalfArc = (Math.PI * config.curveRadius) / 2;
-
-  // Root couple on TOP of the curve at arm base level
-  const centreX = (config.leftStemX + config.rightStemX) / 2;
-  positions.set(rootMale, {
-    x: centreX - COUPLE_GAP / 2,
-    y: config.foundersY,
-  });
-  positions.set(rootFemale, {
-    x: centreX + COUPLE_GAP / 2,
-    y: config.foundersY,
-  });
-
-  // Place root couple's children
-  const rootNode = bloodTree.get(rootMale);
-  if (rootNode) {
-    // Place spine children (on their arm)
-    for (const childId of rootNode.spouseChildren) {
-      if (!bloodSet.has(childId)) continue;
-      const childBlood = bloodTree.get(childId);
-      if (childBlood) {
-        const arcDist = curveHalfArc + 1 * U_ROW_HEIGHT;
-        const sp = spinePoint(arcDist, childBlood.arm as "left" | "right", config);
-        positions.set(childId, { x: sp.x, y: sp.y });
-      }
-    }
-
-    // Place non-spine children of root couple
-    // Centered on root couple's y (foundersY), between the curve and gen 1
-    const nonSpineRootChildren = rootNode.spouseChildren.filter(
-      cid => bloodSet.has(cid) && !bloodTree.has(cid) && !positions.has(cid),
-    );
-
-    if (nonSpineRootChildren.length > 0) {
-      // Place between root couple and gen 1, split between arms
-      const leftChildren = nonSpineRootChildren.filter((_, i) => i % 2 === 0);
-      const rightChildren = nonSpineRootChildren.filter((_, i) => i % 2 === 1);
-
-      // y position: at arm base level (same y as root couple)
-      const rootChildY = config.foundersY;
-
-      for (const [children, stemX, nx] of [
-        [leftChildren, config.leftStemX, -1],
-        [rightChildren, config.rightStemX, 1],
-      ] as const) {
-        if (children.length === 0) continue;
-        const totalHeight = (children.length - 1) * U_CHILD_VERT_SPACING;
-        const startY = rootChildY - totalHeight / 2;
-        for (let i = 0; i < children.length; i++) {
-          positions.set(children[i], {
-            x: stemX + nx * U_CHILD_OUTWARD,
-            y: startY + i * U_CHILD_VERT_SPACING,
-          });
-        }
-      }
+  let head = 1; // rootMale already processed via seed
+  while (head < queue.length) {
+    const id = queue[head++];
+    const node = nodes.get(id)!;
+    const kids = [...new Set(childrenOf(id))]
+      .filter(c => !assigned.has(c))
+      .sort((a, b) => sibOrderOf(a) - sibOrderOf(b));
+    for (const kid of kids) {
+      assigned.add(kid);
+      nodes.set(kid, { id: kid, depth: node.depth + 1, children: [], weight: 1, angle: 0 });
+      node.children.push(kid);
+      queue.push(kid);
     }
   }
-
-  // Place blood descendants and their non-spine children
-  for (const arm of ["left", "right"] as const) {
-    const armNodes = [...bloodTree.values()]
-      .filter(n => n.arm === arm)
-      .sort((a, b) => a.generation - b.generation);
-
-    for (const node of armNodes) {
-      if (!positions.has(node.id)) {
-        const arcDist = curveHalfArc + node.generation * U_ROW_HEIGHT;
-        const sp = spinePoint(arcDist, arm, config);
-        positions.set(node.id, { x: sp.x, y: sp.y });
-      }
-
-      // Non-spine children: centered vertically on parent's y,
-      // outward offset increases with generation so levels don't overlap
-      if (node.spouseChildren.length > 0) {
-        const parentArc = curveHalfArc + node.generation * U_ROW_HEIGHT;
-        const parentSpine = spinePoint(parentArc, arm, config);
-
-        const nonSpineChildren = node.spouseChildren.filter(
-          cid => bloodSet.has(cid) && !bloodTree.has(cid) && !positions.has(cid),
-        );
-
-        if (nonSpineChildren.length > 0) {
-          const outward = (node.generation + 1) * U_CHILD_OUTWARD;
-          const totalHeight = (nonSpineChildren.length - 1) * U_CHILD_VERT_SPACING;
-          const startY = parentSpine.y - totalHeight / 2;
-
-          for (let i = 0; i < nonSpineChildren.length; i++) {
-            const childId = nonSpineChildren[i];
-            positions.set(childId, {
-              x: parentSpine.x + parentSpine.nx * outward,
-              y: startY + i * U_CHILD_VERT_SPACING,
-            });
-          }
-        }
-      }
-    }
-  }
-
-  return positions;
-}
-
-// ── Bounding box ─────────────────────────────────────────────────────────────
-
-interface CanvasBounds { offsetX: number; offsetY: number; width: number; height: number; }
-
-function computeUBounds(
-  positions: Map<string, NodePosition>,
-  bloodTree: BloodTree,
-  config: SpineConfig,
-): CanvasBounds {
-  const padding = U_PADDING;
-  const nodeHalf = NODE_SIZE / 2;
-
-  const hasArmNodes = [...bloodTree.values()].some(n => n.arm === "left" || n.arm === "right");
-  if (!hasArmNodes) {
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const pos of positions.values()) {
-      if (pos.x < minX) minX = pos.x;
-      if (pos.x > maxX) maxX = pos.x;
-      if (pos.y < minY) minY = pos.y;
-      if (pos.y > maxY) maxY = pos.y;
-    }
-    if (minX === Infinity) { minX = maxX = minY = maxY = 0; }
-    return {
-      offsetX: padding + nodeHalf - minX,
-      offsetY: padding + nodeHalf - minY,
-      width: Math.ceil(maxX - minX + 2 * (padding + nodeHalf)),
-      height: Math.ceil(maxY - minY + 2 * (padding + nodeHalf) + 30),
-    };
-  }
-
-  // Top: highest arm tip (smallest y)
-  const maxGen = Math.max(0, ...[...bloodTree.values()].map(n => n.generation));
-  const curveHalfArc = (Math.PI * config.curveRadius) / 2;
-  const topArcDist = curveHalfArc + (maxGen + 1) * U_ROW_HEIGHT;
-  const topSpine = spinePoint(topArcDist, "left", config);
-  const armTipY = topSpine.y;
-
-  // Bottom: curve bottom (root couple area)
-  const curveBottomY = config.foundersY + config.curveRadius;
-
-  // Width: outermost positions
-  let minX = Infinity, maxX = -Infinity;
-  for (const pos of positions.values()) {
-    if (pos.x < minX) minX = pos.x;
-    if (pos.x > maxX) maxX = pos.x;
-  }
-
-  const labelExtra = 30;
-  const probandExtra = PROBAND_TAIL + 4;
 
   return {
-    offsetX: padding + nodeHalf + probandExtra - minX,
-    offsetY: padding + nodeHalf - armTipY,
-    width: Math.ceil(maxX - minX + 2 * (padding + nodeHalf) + probandExtra),
-    height: Math.ceil(curveBottomY - armTipY + 2 * (padding + nodeHalf) + labelExtra),
+    nodes,
+    rootMale,
+    rootFemale,
+    rootPartnership: rootPid,
+    consang: !!rootP.consanguineous,
   };
 }
 
-// ── Rendering helpers ────────────────────────────────────────────────────────
+// ── Weight + angular allocation ───────────────────────────────────────────────
+
+function computeWeights(tree: BloodTree, rootMale: string): number {
+  const node = tree.nodes.get(rootMale);
+  if (!node) return 1;
+  if (node.children.length === 0) {
+    node.weight = 1;
+    return 1;
+  }
+  let w = 0;
+  for (const c of node.children) w += computeWeights(tree, c);
+  node.weight = w;
+  return w;
+}
+
+function allocateAngles(tree: BloodTree, id: string, lo: number, hi: number): void {
+  const node = tree.nodes.get(id);
+  if (!node) return;
+  node.angle = (lo + hi) / 2;
+  if (node.children.length === 0) return;
+  const total = node.weight || 1;
+  let a = lo;
+  for (const c of node.children) {
+    const cw = tree.nodes.get(c)!.weight;
+    const span = (cw / total) * (hi - lo);
+    allocateAngles(tree, c, a, a + span);
+    a += span;
+  }
+}
+
+/** Choose a radial gap so the narrowest node slice still clears MIN_NODE_ARC. */
+function computeRingGap(tree: BloodTree, rootWeight: number): number {
+  let gap = BASE_RING_GAP;
+  const fullSpan = 2 * HALF_SPAN;
+  for (const node of tree.nodes.values()) {
+    if (node.depth < 1) continue;
+    const sliceAngle = (node.weight / rootWeight) * fullSpan;
+    if (sliceAngle <= 0) continue;
+    // width at this ring = depth * gap * sliceAngle  ≥  MIN_NODE_ARC
+    const need = MIN_NODE_ARC / (node.depth * sliceAngle);
+    if (need > gap) gap = need;
+  }
+  return gap;
+}
+
+// ── Position assignment ───────────────────────────────────────────────────────
+
+function assignPositions(tree: BloodTree, ringGap: number): Map<string, Pos> {
+  const pos = new Map<string, Pos>();
+  // Founder couple at the bottom centre.
+  pos.set(tree.rootMale, { x: -COUPLE_GAP / 2, y: 0 });
+  if (tree.rootFemale && tree.rootFemale !== tree.rootMale) {
+    pos.set(tree.rootFemale, { x: COUPLE_GAP / 2, y: 0 });
+  }
+  for (const node of tree.nodes.values()) {
+    if (node.depth === 0) continue;
+    const R = node.depth * ringGap;
+    pos.set(node.id, { x: R * Math.sin(node.angle), y: R * Math.cos(node.angle) });
+  }
+  return pos;
+}
+
+// ── Rendering helpers ─────────────────────────────────────────────────────────
 
 function r(n: number): number { return Math.round(n * 10) / 10; }
 
 function seg(x1: number, y1: number, x2: number, y2: number): string {
   return `<line x1="${r(x1)}" y1="${r(y1)}" x2="${r(x2)}" y2="${r(y2)}" stroke="black" stroke-width="${STROKE}"/>`;
+}
+
+function point(angle: number, R: number): Pos {
+  // angle 0 = straight down; positive sweeps toward the right.
+  return { x: R * Math.sin(angle), y: R * Math.cos(angle) };
+}
+
+/** Circular arc (centred on the origin) from angle a1 to a2 at radius R. */
+function arcPath(a1: number, a2: number, R: number): string {
+  const p1 = point(a1, R);
+  const p2 = point(a2, R);
+  const large = Math.abs(a2 - a1) > Math.PI ? 1 : 0;
+  const sweep = a2 >= a1 ? 0 : 1; // increasing angle = counter-clockwise on screen
+  return `<path d="M ${r(p1.x)} ${r(p1.y)} A ${r(R)} ${r(R)} 0 ${large} ${sweep} ${r(p2.x)} ${r(p2.y)}" fill="none" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
 function svgDefs(): string {
@@ -489,8 +316,8 @@ function renderShape(ind: Individual): string {
   }
   let overlay = "";
   if (ind.carrier && !ind.affected) {
-    const r = NODE_SIZE * 0.15;
-    overlay = `<circle cx="0" cy="0" r="${r}" fill="black"/>`;
+    const dot = NODE_SIZE * 0.15;
+    overlay = `<circle cx="0" cy="0" r="${dot}" fill="black"/>`;
   }
   return shape + overlay;
 }
@@ -503,197 +330,60 @@ function renderDeceasedSlash(): string {
 
 function renderProbandArrow(): string {
   const half = NODE_SIZE / 2;
-  // Standard rotated 90° CW: arrow at top-left pointing down-right toward symbol
   const tipX = -half, tipY = -half;
   const tailX = tipX - PROBAND_TAIL, tailY = tipY - PROBAND_TAIL;
   return `<line x1="${tailX}" y1="${tailY}" x2="${tipX}" y2="${tipY}" stroke="black" stroke-width="${STROKE}" marker-end="url(#proband-arrowhead)"/>`;
 }
 
-// ── Debug spine ──────────────────────────────────────────────────────────────
+// ── Connectors ────────────────────────────────────────────────────────────────
 
-function renderDebugSpine(config: SpineConfig, maxGen: number, show: boolean): string {
-  if (!show) return "";
-  const curveHalfArc = (Math.PI * config.curveRadius) / 2;
-  const maxArc = curveHalfArc + (maxGen + 1) * U_ROW_HEIGHT;
-  const steps = 60;
+function renderConnectors(tree: BloodTree, pos: Map<string, Pos>, ringGap: number): string[] {
   const lines: string[] = [];
 
-  for (const arm of ["left", "right"] as const) {
-    const points: string[] = [];
-    for (let i = 0; i <= steps; i++) {
-      const arc = (i / steps) * maxArc;
-      const sp = spinePoint(arc, arm, config);
-      points.push(`${sp.x.toFixed(1)},${sp.y.toFixed(1)}`);
-    }
-    lines.push(
-      `<polyline points="${points.join(" ")}" fill="none" stroke="red" stroke-width="1" stroke-dasharray="4 2"/>`,
-    );
-
-    for (let gen = 0; gen <= maxGen + 1; gen++) {
-      const arc = gen === 0 ? 0 : curveHalfArc + gen * U_ROW_HEIGHT;
-      if (arc > maxArc) break;
-      const sp = spinePoint(arc, arm, config);
-      const tickLen = 15;
-      lines.push(
-        `<line x1="${sp.x}" y1="${sp.y}" x2="${sp.x + sp.nx * tickLen}" y2="${sp.y + sp.ny * tickLen}" stroke="blue" stroke-width="0.5"/>`,
-      );
-    }
-  }
-  return lines.join("\n");
-}
-
-// ── Backbone rendering ──────────────────────────────────────────────────────
-
-function renderUBackbone(
-  positions: Map<string, NodePosition>,
-  bloodTree: BloodTree,
-  config: SpineConfig,
-): string[] {
-  const lines: string[] = [];
-  const { leftStemX, rightStemX, foundersY, curveRadius } = config;
-
-  const hasArmNodes = [...bloodTree.values()].some(n => n.arm === "left" || n.arm === "right");
-  if (!hasArmNodes) return lines;
-
-  // Semicircular curve at the bottom connecting the two arm bases
-  // sweep=0 (CCW on screen) = curve dips DOWN
-  lines.push(
-    `<path d="M ${leftStemX} ${foundersY} A ${curveRadius} ${curveRadius} 0 0 0 ${rightStemX} ${foundersY}" ` +
-    `fill="none" stroke="black" stroke-width="${STROKE}"/>`,
-  );
-
-  // Vertical connector from root couple midpoint down to curve bottom
-  const centreX = (leftStemX + rightStemX) / 2;
-  const curveBottomY = foundersY + curveRadius;
-  lines.push(seg(centreX, foundersY, centreX, curveBottomY));
-
-  // Vertical arm segments going UP (negative y)
-  for (const arm of ["left", "right"] as const) {
-    const armNodes = [...bloodTree.values()]
-      .filter(n => n.arm === arm)
-      .sort((a, b) => a.generation - b.generation);
-
-    const stemX = arm === "left" ? leftStemX : rightStemX;
-    let prevY = foundersY;
-
-    for (const node of armNodes) {
-      const pos = positions.get(node.id);
-      if (!pos) continue;
-      if (Math.abs(pos.y - prevY) > 1) {
-        lines.push(seg(stemX, prevY, stemX, pos.y));
-      }
-      prevY = pos.y;
-    }
-
-    // No backbone extension needed: child connectors handle
-    // the vertical drop from spine to children's y level
-  }
-
-  return lines;
-}
-
-// ── Root couple line ─────────────────────────────────────────────────────────
-
-function renderRootCoupleLine(
-  positions: Map<string, NodePosition>,
-  rootMale: string,
-  rootFemale: string,
-): string[] {
-  if (rootMale === rootFemale) return [];
-  const mPos = positions.get(rootMale);
-  const fPos = positions.get(rootFemale);
-  if (!mPos || !fPos) return [];
-  if (Math.hypot(mPos.x - fPos.x, mPos.y - fPos.y) < 1) return [];
-  return [seg(mPos.x, mPos.y, fPos.x, fPos.y)];
-}
-
-// ── Child connector lines ───────────────────────────────────────────────────
-
-function renderChildConnectors(
-  positions: Map<string, NodePosition>,
-  bloodTree: BloodTree,
-  bloodSet: Set<string>,
-  config: SpineConfig,
-): string[] {
-  const lines: string[] = [];
-  const renderedChildren = new Set<string>();
-
-  for (const [id, node] of bloodTree) {
-    if (node.arm === "root") continue;
-    if (node.spouseChildren.length === 0) continue;
-    const parentPos = positions.get(id);
-    if (!parentPos) continue;
-
-    const childrenKey = node.spouseChildren.join(",");
-    if (renderedChildren.has(childrenKey)) continue;
-    renderedChildren.add(childrenKey);
-
-    const stemX = node.arm === "left" ? config.leftStemX : config.rightStemX;
-
-    const placedChildren = node.spouseChildren
-      .filter(cid => bloodSet.has(cid) && !bloodTree.has(cid) && positions.has(cid))
-      .map(cid => positions.get(cid)!);
-
-    if (placedChildren.length === 0) continue;
-
-    // Children are centered vertically on parent's y, at a fixed outward x
-    const barX = placedChildren[0].x; // all at same x
-    const ys = placedChildren.map(p => p.y);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-
-    // Horizontal stem from parent on spine outward to the bar
-    lines.push(seg(stemX, parentPos.y, barX, parentPos.y));
-
-    // Vertical sibship bar connecting children
-    if (placedChildren.length > 1) {
-      lines.push(seg(barX, minY, barX, maxY));
+  // Founder couple line (double if consanguineous).
+  const mPos = pos.get(tree.rootMale);
+  const fPos = pos.get(tree.rootFemale);
+  if (mPos && fPos && tree.rootMale !== tree.rootFemale) {
+    if (tree.consang) {
+      lines.push(seg(mPos.x, mPos.y - CONSANG_OFFSET / 2, fPos.x, fPos.y - CONSANG_OFFSET / 2));
+      lines.push(seg(mPos.x, mPos.y + CONSANG_OFFSET / 2, fPos.x, fPos.y + CONSANG_OFFSET / 2));
+    } else {
+      lines.push(seg(mPos.x, mPos.y, fPos.x, fPos.y));
     }
   }
 
-  // Root couple's non-spine children connectors
-  const rootNode = [...bloodTree.values()].find(n => n.arm === "root");
-  if (rootNode) {
-    for (const arm of ["left", "right"] as const) {
-      const stemX = arm === "left" ? config.leftStemX : config.rightStemX;
-      const armChildren = rootNode.spouseChildren
-        .filter(cid => bloodSet.has(cid) && !bloodTree.has(cid) && positions.has(cid))
-        .map(cid => positions.get(cid)!)
-        .filter(p => arm === "left" ? p.x < stemX : p.x > stemX);
+  for (const node of tree.nodes.values()) {
+    if (node.children.length === 0) continue;
 
-      if (armChildren.length === 0) continue;
+    const childRadius = (node.depth + 1) * ringGap;
+    const childAngles = node.children.map(c => tree.nodes.get(c)!.angle);
+    const aMin = Math.min(...childAngles);
+    const aMax = Math.max(...childAngles);
 
-      const barX = armChildren[0].x;
-      const ys = armChildren.map(p => p.y);
-      const midY = (Math.min(...ys) + Math.max(...ys)) / 2;
+    // Radial spur from the parent (or founder couple midpoint) out to the
+    // children's ring, at the parent's angle.
+    const start = node.depth === 0 ? { x: 0, y: 0 } : pos.get(node.id)!;
+    const spurEnd = point(node.angle, childRadius);
+    lines.push(seg(start.x, start.y, spurEnd.x, spurEnd.y));
 
-      // Horizontal stem from arm base outward to bar
-      lines.push(seg(stemX, midY, barX, midY));
-
-      // Vertical sibship bar
-      if (armChildren.length > 1) {
-        lines.push(seg(barX, Math.min(...ys), barX, Math.max(...ys)));
-      }
+    // Sibship arc joining the children along their ring.
+    if (node.children.length > 1) {
+      lines.push(arcPath(aMin, aMax, childRadius));
     }
   }
 
   return lines;
 }
 
-// ── Symbol rendering (blood only) ────────────────────────────────────────────
+// ── Symbols + labels ──────────────────────────────────────────────────────────
 
-function renderUSymbols(
-  pedigree: Pedigree,
-  positions: Map<string, NodePosition>,
-  bloodSet: Set<string>,
-  config: SpineConfig,
-): string[] {
+function renderSymbols(pedigree: Pedigree, pos: Map<string, Pos>, ids: Set<string>): string[] {
   const elems: string[] = [];
   for (const ind of pedigree.individuals) {
-    if (!bloodSet.has(ind.id)) continue;
-    const pos = positions.get(ind.id);
-    if (!pos) continue;
-    elems.push(`<g transform="translate(${r(pos.x)} ${r(pos.y)})">`);
+    if (!ids.has(ind.id)) continue;
+    const p = pos.get(ind.id);
+    if (!p) continue;
+    elems.push(`<g transform="translate(${r(p.x)} ${r(p.y)})">`);
     elems.push(renderShape(ind));
     if (ind.deceased) elems.push(renderDeceasedSlash());
     if (ind.proband) elems.push(renderProbandArrow());
@@ -702,35 +392,72 @@ function renderUSymbols(
   return elems;
 }
 
-// ── Label rendering (blood only) ─────────────────────────────────────────────
-
-function renderULabels(
-  pedigree: Pedigree,
-  positions: Map<string, NodePosition>,
-  bloodSet: Set<string>,
-): string[] {
+function renderLabels(pedigree: Pedigree, pos: Map<string, Pos>, ids: Set<string>): string[] {
   const elems: string[] = [];
   for (const ind of pedigree.individuals) {
-    if (!bloodSet.has(ind.id)) continue;
-    const pos = positions.get(ind.id);
-    if (!pos) continue;
-    const labelBaseY = r(pos.y + LABEL_OFFSET_Y);
+    if (!ids.has(ind.id)) continue;
+    const p = pos.get(ind.id);
+    if (!p) continue;
+    const baseY = r(p.y + LABEL_OFFSET_Y);
     if (ind.name) {
       elems.push(
-        `<text x="${r(pos.x)}" y="${labelBaseY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.name)}</text>`,
+        `<text x="${r(p.x)}" y="${baseY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.name)}</text>`,
       );
     }
     if (ind.dob) {
-      const dobY = r(labelBaseY + (ind.name ? LABEL_LINE_HEIGHT : 0));
+      const dobY = r(baseY + (ind.name ? LABEL_LINE_HEIGHT : 0));
       elems.push(
-        `<text x="${r(pos.x)}" y="${dobY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.dob)}</text>`,
+        `<text x="${r(p.x)}" y="${dobY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.dob)}</text>`,
       );
     }
   }
   return elems;
 }
 
-// ── Main export function ─────────────────────────────────────────────────────
+// ── Debug rings (the invisible spine made visible) ────────────────────────────
+
+function renderDebugRings(maxDepth: number, ringGap: number): string {
+  const lines: string[] = [];
+  for (let g = 1; g <= maxDepth; g++) {
+    const R = g * ringGap;
+    const p1 = point(-HALF_SPAN, R);
+    const p2 = point(HALF_SPAN, R);
+    const large = 2 * HALF_SPAN > Math.PI ? 1 : 0;
+    lines.push(
+      `<path d="M ${r(p1.x)} ${r(p1.y)} A ${r(R)} ${r(R)} 0 ${large} 0 ${r(p2.x)} ${r(p2.y)}" fill="none" stroke="red" stroke-width="0.75" stroke-dasharray="4 3"/>`,
+    );
+  }
+  return lines.join("\n");
+}
+
+// ── Bounds ────────────────────────────────────────────────────────────────────
+
+interface Bounds { offsetX: number; offsetY: number; width: number; height: number; }
+
+function computeBounds(pos: Map<string, Pos>, ids: Set<string>): Bounds {
+  const half = NODE_SIZE / 2;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const id of ids) {
+    const p = pos.get(id);
+    if (!p) continue;
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y);
+  }
+  if (minX === Infinity) { minX = maxX = minY = maxY = 0; }
+
+  const labelPad = 28; // room for name/DOB under bottom row
+  const probandPad = PROBAND_TAIL + 6;
+  return {
+    offsetX: PADDING + half + probandPad - minX,
+    offsetY: PADDING + half + probandPad - minY,
+    width: Math.ceil(maxX - minX + 2 * (PADDING + half) + 2 * probandPad),
+    height: Math.ceil(maxY - minY + 2 * (PADDING + half) + probandPad + labelPad),
+  };
+}
+
+// ── Main export ───────────────────────────────────────────────────────────────
 
 export function exportUShapeSvg(
   pedigree: Pedigree,
@@ -744,22 +471,23 @@ export function exportUShapeSvg(
 
   const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
 
-  const { bloodTree, rootMale, rootFemale } = buildBloodTree(working);
-  const bloodSet = computeBloodSet(working, rootMale, rootFemale);
+  const tree = buildBloodTree(working);
 
-  const config: SpineConfig = {
-    leftStemX: U_PADDING + 200,
-    rightStemX: U_PADDING + 200 + U_ARM_GAP,
-    foundersY: 0,
-    curveRadius: U_ARM_GAP / 2,
-  };
+  // Set of individuals we actually draw: founder couple + all blood descendants.
+  const drawn = new Set<string>(tree.nodes.keys());
+  drawn.add(tree.rootMale);
+  if (tree.rootFemale) drawn.add(tree.rootFemale);
 
-  const positions = assignCoordinates(working, bloodTree, bloodSet, rootMale, rootFemale, config);
-  const maxGen = Math.max(0, ...[...bloodTree.values()].map(n => n.generation));
-  const bounds = computeUBounds(positions, bloodTree, config);
+  const rootWeight = computeWeights(tree, tree.rootMale);
+  allocateAngles(tree, tree.rootMale, -HALF_SPAN, HALF_SPAN);
+  const ringGap = computeRingGap(tree, rootWeight);
+  const pos = assignPositions(tree, ringGap);
+
+  const maxDepth = Math.max(0, ...[...tree.nodes.values()].map(n => n.depth));
+  const bounds = computeBounds(pos, drawn);
   const { offsetX, offsetY, width, height } = bounds;
 
-  const lines: string[] = [
+  const out: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
     `     viewBox="0 0 ${width} ${height}">`,
     svgDefs(),
@@ -767,28 +495,22 @@ export function exportUShapeSvg(
   ];
 
   if (options.title) {
-    lines.push(
-      `<text x="${width / 2}" y="${U_PADDING + 16}" text-anchor="middle" ` +
+    out.push(
+      `<text x="${width / 2}" y="${PADDING - 8}" text-anchor="middle" ` +
       `font-family="sans-serif" font-size="14" font-weight="bold" ` +
       `fill="black">${escapeXml(options.title)}</text>`,
     );
   }
 
-  lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
-
-  const hasArmNodes = [...bloodTree.values()].some(n => n.arm === "left" || n.arm === "right");
-  if (hasArmNodes) {
-    lines.push(renderDebugSpine(config, maxGen, !!options.debugSpine));
+  out.push(`<g transform="translate(${r(offsetX)} ${r(offsetY)})">`);
+  if (options.debugSpine && maxDepth > 0) {
+    out.push(renderDebugRings(maxDepth, ringGap));
   }
+  out.push(...renderConnectors(tree, pos, ringGap));
+  out.push(...renderSymbols(working, pos, drawn));
+  out.push(...renderLabels(working, pos, drawn));
+  out.push(`</g>`);
+  out.push(`</svg>`);
 
-  lines.push(...renderUBackbone(positions, bloodTree, config));
-  lines.push(...renderChildConnectors(positions, bloodTree, bloodSet, config));
-  lines.push(...renderRootCoupleLine(positions, rootMale, rootFemale));
-  lines.push(...renderUSymbols(working, positions, bloodSet, config));
-  lines.push(...renderULabels(working, positions, bloodSet));
-
-  lines.push(`</g>`);
-  lines.push(`</svg>`);
-
-  return lines.join("\n");
+  return out.join("\n");
 }

@@ -57,29 +57,26 @@ describe("U-shape SVG visual snapshots", () => {
     expect(svg).toContain("<svg");
   });
 
-  it("PED file 80237", () => {
+  it("PED file kinship2 sample", () => {
     const text = readFileSync(
-      join(__dirname, "../../../../../test-data/ped/80237.ped"),
+      join(__dirname, "../../../../../test-data/ped/large/kinship2_sample.ped"),
       "utf-8",
     );
     const { rows } = parsePed(text);
-    const pedigree = convertFamily(rows);
+    // The sample holds two families; render the first.
+    const family1 = rows.filter((r: any) => r.familyId === "1");
+    const pedigree = convertFamily(family1);
     const svg = exportUShapeSvg(pedigree, { debugSpine: true });
-    writeSvg("u-80237", svg);
+    writeSvg("u-kinship2", svg);
     expect(svg).toContain("<svg");
-    // Root couple I1+I2 have 5 children (84, 82, 78, 81, 53)
-    // All 5 should appear as symbols in the SVG
-    for (const id of ["84", "82", "78", "81", "53"]) {
-      const ind = pedigree.individuals.find((i: any) => i.id === id)!;
-      expect(ind).toBeDefined();
-    }
-    // Verify males render as squares, females as circles
-    // 78 is male (sex=1 in PED) -> should have <rect
-    const ind78 = pedigree.individuals.find((i: any) => i.id === "78")!;
-    expect(ind78.sex).toBe("male");
-    // 84 is female (sex=2 in PED) -> should have <circle
-    const ind84 = pedigree.individuals.find((i: any) => i.id === "84")!;
-    expect(ind84.sex).toBe("female");
+    // Founder couple 135 (male) + 136 (female) and their descendants render.
+    const ind135 = pedigree.individuals.find((i: any) => i.id === "135")!;
+    expect(ind135.sex).toBe("male");
+    const ind136 = pedigree.individuals.find((i: any) => i.id === "136")!;
+    expect(ind136.sex).toBe("female");
+    // Symbols for both square (male) and circle (female) appear.
+    expect(svg).toContain("<rect");
+    expect(svg).toContain("<circle");
   });
 });
 
@@ -90,25 +87,38 @@ describe("U-shape structural", () => {
     expect(svg).toMatch(/A \d/); // SVG arc command
   });
 
-  it("root couple at bottom of U (highest y among symbols)", () => {
-    const svg = exportUShapeSvg(simpleFamily);
-    const positions = extractPositions(svg);
-    const symbolPositions = positions.slice(1);
-    const maxY = Math.max(...symbolPositions.map(p => p.y));
-    // Root couple should be at the bottom (highest y)
-    const rootPositions = symbolPositions.filter(p => p.y === maxY);
-    expect(rootPositions.length).toBe(2); // male and female
+  // The founder couple are the only two symbols sharing a y value and separated
+  // horizontally by the couple gap; their raw midpoint is the layout origin.
+  function findCoupleY(positions: Array<{ x: number; y: number }>): number | null {
+    for (let i = 0; i < positions.length; i++) {
+      for (let j = i + 1; j < positions.length; j++) {
+        const a = positions[i], b = positions[j];
+        if (Math.abs(a.y - b.y) < 1 && Math.abs(Math.abs(a.x - b.x) - 46) < 2) {
+          return a.y;
+        }
+      }
+    }
+    return null;
+  }
+
+  it("founder couple sits in the interior, descent line pointing down", () => {
+    const svg = exportUShapeSvg(largerFamily);
+    const symbolPositions = extractPositions(svg).slice(1);
+    const founderY = findCoupleY(symbolPositions);
+    expect(founderY).not.toBeNull();
+    // The family wraps around the founder: descendants appear both below the
+    // founder (descent points down) and above it (the arms curl back up).
+    expect(symbolPositions.some(p => p.y > founderY! + 20)).toBe(true);
+    expect(symbolPositions.some(p => p.y < founderY! - 20)).toBe(true);
   });
 
-  it("generations increase upward on arms", () => {
+  it("generations radiate outward from the founder", () => {
     const svg = exportUShapeSvg(largerFamily);
-    const positions = extractPositions(svg);
-    const symbolPositions = positions.slice(1);
-    // Root couple at bottom (highest y), later generations have smaller y values
-    const ys = [...new Set(symbolPositions.map(p => p.y))].sort((a, b) => b - a);
-    expect(ys.length).toBeGreaterThan(2);
-    expect(ys[0]).toBeGreaterThan(ys[1]);
-    expect(ys[1]).toBeGreaterThan(ys[2]);
+    const symbolPositions = extractPositions(svg).slice(1);
+    // Raw coordinates are centred on the founder, so distance from the origin
+    // grows with generation. A 4-generation family yields several radial bands.
+    const bands = new Set(symbolPositions.map(p => Math.round(Math.hypot(p.x, p.y) / 20)));
+    expect(bands.size).toBeGreaterThanOrEqual(3);
   });
 
   it("empty pedigree produces valid SVG", () => {
