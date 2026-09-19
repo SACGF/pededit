@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf } from "../io/svg/index";
@@ -28,16 +28,27 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
   const [uShape, setUShape]         = useState(false);
   const [busy, setBusy]             = useState(false);
 
-  const omittedCount = uShape ? layoutUShape(pedigree)?.omitted.length ?? 0 : 0;
+  const [uPartners, setUPartners]   = useState(true);
+
+  // The U shape is a descendant chart of one founder couple. With nobody to
+  // descend from there is nothing to bend, so the option is switched off.
+  const uLayout = useMemo(
+    () => (open ? layoutUShape(pedigree, { partners: uPartners }) : null),
+    [open, pedigree, uPartners],
+  );
+  const uAvailable = !!uLayout && uLayout.maxDepth > 0;
+  const useU = uShape && uAvailable;
+  const omittedCount = uLayout?.omitted.length ?? 0;
 
   async function handleDownload() {
     setBusy(true);
     try {
-      const exportFn = uShape ? exportUShapeSvg : exportSvg;
+      const exportFn = useU ? exportUShapeSvg : exportSvg;
       const svgString = exportFn(pedigree, {
         deidentify: deident,
         ageBuckets: deident && ageBuckets,
         title: deident ? undefined : title,
+        uShapePartners: uPartners,
       });
 
       if (format === "svg") {
@@ -129,20 +140,39 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
 
           {/* U-shape layout */}
           <div className="space-y-1.5">
-            <label className="flex items-center gap-2 text-xs cursor-pointer">
+            <label className={`flex items-center gap-2 text-xs ${uAvailable ? "cursor-pointer" : "text-muted-foreground"}`}>
               <input
                 type="checkbox"
-                checked={uShape}
+                checked={useU}
+                disabled={!uAvailable}
                 onChange={e => setUShape(e.target.checked)}
               />
               <span className="font-medium">Render in U shape (for very wide pedigrees)</span>
             </label>
 
-            {uShape && (
+            {!uAvailable && (
               <p className="text-xs text-muted-foreground ml-5">
-                Draws the founding couple and their blood descendants only.
-                {omittedCount > 0 && ` ${omittedCount} married-in or unrelated individual${omittedCount === 1 ? "" : "s"} will be left out.`}
+                Needs a couple with descendants. This pedigree has none to bend around a U.
               </p>
+            )}
+
+            {useU && (
+              <>
+                <label className="flex items-center gap-2 text-xs cursor-pointer ml-5">
+                  <input
+                    type="checkbox"
+                    checked={uPartners}
+                    onChange={e => setUPartners(e.target.checked)}
+                  />
+                  <span>Include married-in partners</span>
+                </label>
+                <p className="text-xs text-muted-foreground ml-5">
+                  Draws one founding couple and their descendants
+                  {uPartners ? ", each with their partners." : " by blood only."}
+                  {omittedCount > 0 &&
+                    ` ${omittedCount} of ${pedigree.individuals.length} individuals ${omittedCount === 1 ? "is" : "are"} outside that line and will be left out.`}
+                </p>
+              </>
             )}
           </div>
         </div>

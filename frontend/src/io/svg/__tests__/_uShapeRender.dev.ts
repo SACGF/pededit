@@ -48,7 +48,6 @@ const threeGen = EXAMPLES.find(e => e.label === "Three generations");
 if (threeGen) write("dev-threegen", threeGen.data);
 const large = EXAMPLES.find(e => e.label === "Large family");
 if (large) write("dev-largeexample", large.data);
-write("dev-fame", loadPed("test-data/ped/public_data/FAME_80237.ped"));
 write("dev-kinship2", loadPed("test-data/ped/large/kinship2_sample.ped"));
 
 write("dev-synth-wide", makeSyntheticFamily({ seed: 8, generations: 5, minChildren: 2, maxChildren: 5, partnerRate: 0.65 }));

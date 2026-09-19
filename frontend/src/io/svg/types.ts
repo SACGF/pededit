@@ -21,6 +21,12 @@ export interface SvgExportOptions {
   /** Render as U-shape (horseshoe) layout instead of standard top-down. */
   uShape?: boolean;
 
+  /**
+   * U-shape only: draw married-in partners beside their blood partner.
+   * Default: true. When false only blood descendants of the founders are drawn.
+   */
+  uShapePartners?: boolean;
+
   /** Show the parametric spine as a red dashed overlay (development aid). */
   debugSpine?: boolean;
 }
