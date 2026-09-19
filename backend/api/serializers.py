@@ -24,6 +24,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 # ── Pedigree data shape (mirrors types.ts) ────────────────────────────────────
+#
+# Every field of the Pedigree interface in layout-engine/src/types.ts must be
+# declared here. DRF drops undeclared keys from validated_data, so a missing
+# field is silently lost on save.
 
 class IndividualSerializer(serializers.Serializer):
     id = serializers.CharField()
@@ -32,6 +36,11 @@ class IndividualSerializer(serializers.Serializer):
     deceased = serializers.BooleanField(required=False, default=False)
     carrier = serializers.BooleanField(required=False, default=False)
     proband = serializers.BooleanField(required=False, default=False)
+    sibOrder = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
+    dob = serializers.CharField(required=False, allow_blank=True)
+    notes = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
+    hpoTerms = serializers.ListField(child=serializers.CharField(), required=False)
 
 
 class PartnershipSerializer(serializers.Serializer):
@@ -41,11 +50,33 @@ class PartnershipSerializer(serializers.Serializer):
     consanguineous = serializers.BooleanField(required=False, default=False)
 
 
+class SiblingOrderSettingsSerializer(serializers.Serializer):
+    mode = serializers.ChoiceField(choices=["insertion", "manual", "birthDate"])
+    affectedFirst = serializers.BooleanField()
+
+
+class CanvasSettingsSerializer(serializers.Serializer):
+    nodesMoveable = serializers.BooleanField()
+    snapToGrid = serializers.BooleanField()
+    snapGridSize = serializers.FloatField(min_value=0)
+
+
+class PositionSerializer(serializers.Serializer):
+    x = serializers.FloatField()
+    y = serializers.FloatField()
+
+
 class PedigreeDataSerializer(serializers.Serializer):
     individuals = IndividualSerializer(many=True)
     partnerships = PartnershipSerializer(many=True)
     parentOf = serializers.DictField(
         child=serializers.ListField(child=serializers.CharField())
+    )
+    siblingOrder = SiblingOrderSettingsSerializer(required=False)
+    pinnedPositions = serializers.DictField(child=PositionSerializer(), required=False)
+    canvasSettings = CanvasSettingsSerializer(required=False)
+    unlockedIndividuals = serializers.ListField(
+        child=serializers.CharField(), required=False
     )
 
 
