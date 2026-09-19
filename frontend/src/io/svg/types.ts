@@ -17,4 +17,10 @@ export interface SvgExportOptions {
 
   /** Optional title line rendered above the pedigree. Default: none. */
   title?: string;
+
+  /** Render as U-shape (horseshoe) layout instead of standard top-down. */
+  uShape?: boolean;
+
+  /** Show the parametric spine as a red dashed overlay (development aid). */
+  debugSpine?: boolean;
 }

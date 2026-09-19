@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { exportSvg, exportPng, exportPdf } from "../io/svg/index";
+import { exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 interface ExportDialogProps {
@@ -25,12 +25,16 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
   const [pngScale, setPngScale]     = useState<1 | 2 | 3>(2);
+  const [uShape, setUShape]         = useState(false);
   const [busy, setBusy]             = useState(false);
+
+  const omittedCount = uShape ? layoutUShape(pedigree)?.omitted.length ?? 0 : 0;
 
   async function handleDownload() {
     setBusy(true);
     try {
-      const svgString = exportSvg(pedigree, {
+      const exportFn = uShape ? exportUShapeSvg : exportSvg;
+      const svgString = exportFn(pedigree, {
         deidentify: deident,
         ageBuckets: deident && ageBuckets,
         title: deident ? undefined : title,
@@ -120,6 +124,25 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
                 />
                 <span>Include age range (infant / child / 30s …)</span>
               </label>
+            )}
+          </div>
+
+          {/* U-shape layout */}
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 text-xs cursor-pointer">
+              <input
+                type="checkbox"
+                checked={uShape}
+                onChange={e => setUShape(e.target.checked)}
+              />
+              <span className="font-medium">Render in U shape (for very wide pedigrees)</span>
+            </label>
+
+            {uShape && (
+              <p className="text-xs text-muted-foreground ml-5">
+                Draws the founding couple and their blood descendants only.
+                {omittedCount > 0 && ` ${omittedCount} married-in or unrelated individual${omittedCount === 1 ? "" : "s"} will be left out.`}
+              </p>
             )}
           </div>
         </div>
