@@ -3,6 +3,10 @@ import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout
 import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE } from "../../pedigree/constants";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
+import {
+  renderSectorsSvg, renderAnnotationRowSvg, renderTagLegendSvg,
+  hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
+} from "../../pedigree/tags";
 
 const STROKE = 2;
 const CONSANG_GAP = 4;       // px gap between consanguineous double lines
@@ -11,6 +15,8 @@ const PROBAND_TAIL = 18;     // matches ProbandArrow in symbols.tsx
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
 const LABEL_OFFSET_Y = NODE_SIZE / 2 + 4; // below symbol centre
+// Extra drop for the name when a tag annotation row sits between it and the symbol.
+const ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
 
 // ── Slot positions ────────────────────────────────────────────────────────────
 
@@ -66,7 +72,9 @@ function computeBounds(
   const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
 
   const hasDob = pedigree.individuals.some(i => i.dob);
-  const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0);
+  const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
+  const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
+    + (hasAnnotations ? ANNOTATION_SHIFT : 0);
 
   const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
   const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
@@ -74,11 +82,15 @@ function computeBounds(
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra;
 
+  // The tag key sits under the pedigree, bottom-left, inside the padding.
+  const legend = renderTagLegendSvg(pedigree, 0, 0);
+  const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
+
   return {
     offsetX,
     offsetY,
-    width:  Math.ceil(contentW + 2 * padding),
-    height: Math.ceil(contentH + 2 * padding + titleHeight),
+    width:  Math.ceil(Math.max(contentW, legend.width) + 2 * padding),
+    height: Math.ceil(contentH + 2 * padding + titleHeight + legendExtra),
   };
 }
 
@@ -167,18 +179,28 @@ function renderSibshipLines(result: LayoutResult, slotPos: SlotPos): string[] {
 
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
-function renderShape(ind: Individual): string {
+function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
   const half = NODE_SIZE / 2;
   const fill = ind.affected ? "black" : "white";
 
-  let shape: string;
+  // Geometry without paint, reused for the clipPath, the filled base and the
+  // re-stroked outline that keeps the border crisp over tag sectors.
+  let geom: string;
   if (ind.sex === "male") {
-    shape = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
   } else if (ind.sex === "female") {
-    shape = `<circle cx="0" cy="0" r="${half - 1}" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<circle cx="0" cy="0" r="${half - 1}"`;
   } else {
     const pts = `0,${-(half - 1)} ${half - 1},0 0,${half - 1} ${-(half - 1)},0`;
-    shape = `<polygon points="${pts}" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<polygon points="${pts}"`;
+  }
+  const stroke = `stroke="black" stroke-width="${STROKE}"`;
+
+  let shape = `${geom} ${stroke} fill="${fill}"/>`;
+  if (sectorsFor(ind, pedigree).length > 0) {
+    shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
+      + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + `${geom} ${stroke} fill="none"/>`;
   }
 
   let overlay = "";
@@ -186,7 +208,7 @@ function renderShape(ind: Individual): string {
     const r = NODE_SIZE * 0.15;
     overlay = `<circle cx="0" cy="0" r="${r}" fill="black"/>`;
   }
-  return shape + overlay;
+  return shape + overlay + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE);
 }
 
 function renderDeceasedSlash(): string {
@@ -220,7 +242,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       seen.add(nid);
 
       elems.push(`<g transform="translate(${cx} ${cy})">`);
-      elems.push(renderShape(ind));
+      elems.push(renderShape(ind, pedigree, `symbol-clip-${level}-${slot}`));
       if (ind.deceased) elems.push(renderDeceasedSlash());
       if (ind.proband)  elems.push(renderProbandArrow());
       if (isDuplicate)  elems.push(renderDuplicateMark());
@@ -253,7 +275,7 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
 
       const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
-      const labelBaseY = cy + LABEL_OFFSET_Y;
+      const labelBaseY = cy + LABEL_OFFSET_Y + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
 
       if (ind.name) {
         elems.push(`<text x="${cx}" y="${labelBaseY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.name)}</text>`);
@@ -302,6 +324,14 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(...renderSymbols(working, result, slotPos));
   lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);
+
+  const padding = options.padding ?? 40;
+  const legend = renderTagLegendSvg(working, padding, 0);
+  if (legend.height > 0) {
+    lines.push(`<g transform="translate(0 ${height - padding - legend.height})">`);
+    lines.push(...legend.markup);
+    lines.push(`</g>`);
+  }
   lines.push(`</svg>`);
 
   return lines.join("\n");

@@ -1,12 +1,16 @@
 import type { Individual } from "@pedigree-editor/layout-engine";
+import {
+  sectorPath, tagCanvasText,
+  ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
+} from "../tags";
+import type { Sector, AnnotationItem } from "../tags";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
 type FillDescriptor =
   | { type: "solid" }
   | { type: "empty" }
-  | { type: "carrier-dot" }
-  | { type: "half-fill"; side: "left" | "right" }; // TODO Phase 7: multi-trait display
+  | { type: "carrier-dot" };
 
 function symbolFill(individual: Individual): FillDescriptor {
   if (individual.affected) return { type: "solid" };
@@ -19,20 +23,44 @@ function symbolFill(individual: Individual): FillDescriptor {
 interface ShapeProps {
   individual: Individual;
   size: number;
+  /** Quadrant-tag sectors to paint over the base fill. */
+  sectors?: Sector[];
+  /** Unique id for this symbol's clipPath. Required when sectors are given. */
+  clipId?: string;
+}
+
+/**
+ * Tag sectors, clipped to the symbol outline. The radius is the full symbol
+ * size so the clip, not the arc, defines the edge: a quarter of a square comes
+ * out square-cornered.
+ */
+function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; clipId: string }) {
+  if (sectors.length === 0) return null;
+  const c = size / 2;
+  return (
+    <g clipPath={`url(#${clipId})`}>
+      {sectors.map(s => (
+        <path key={s.tag.id} d={sectorPath(c, c, size, s.start, s.end)} fill={s.tag.color} />
+      ))}
+    </g>
+  );
 }
 
 // ── Male (square) ──────────────────────────────────────────────────────────────
 
-function MaleSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
+function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
   const padding = 1;
+  const outline = { x: padding, y: padding, width: size - 2 * padding, height: size - 2 * padding };
   return (
     <g>
+      <clipPath id={clipId}><rect {...outline} /></clipPath>
       <rect
-        x={padding} y={padding}
-        width={size - 2 * padding} height={size - 2 * padding}
+        {...outline}
         stroke="black" strokeWidth={2}
         fill={fill.type === "solid" ? "black" : "white"}
       />
+      <Sectors sectors={sectors} size={size} clipId={clipId} />
+      {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={2} fill="none" />}
       {fill.type === "carrier-dot" && (
         <circle cx={size / 2} cy={size / 2} r={size * 0.15} fill="black" />
       )}
@@ -42,15 +70,18 @@ function MaleSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
 
 // ── Female (circle) ────────────────────────────────────────────────────────────
 
-function FemaleSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
+function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 1;
   return (
     <g>
+      <clipPath id={clipId}><circle cx={cx} cy={cy} r={r} /></clipPath>
       <circle
         cx={cx} cy={cy} r={r}
         stroke="black" strokeWidth={2}
         fill={fill.type === "solid" ? "black" : "white"}
       />
+      <Sectors sectors={sectors} size={size} clipId={clipId} />
+      {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="none" />}
       {fill.type === "carrier-dot" && (
         <circle cx={cx} cy={cy} r={size * 0.15} fill="black" />
       )}
@@ -60,7 +91,7 @@ function FemaleSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
 
 // ── Unknown sex (diamond) ──────────────────────────────────────────────────────
 
-function UnknownSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
+function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
   const cx = size / 2, cy = size / 2;
   const points = [
     `${cx},1`,
@@ -70,11 +101,14 @@ function UnknownSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
   ].join(" ");
   return (
     <g>
+      <clipPath id={clipId}><polygon points={points} /></clipPath>
       <polygon
         points={points}
         stroke="black" strokeWidth={2}
         fill={fill.type === "solid" ? "black" : "white"}
       />
+      <Sectors sectors={sectors} size={size} clipId={clipId} />
+      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
       {fill.type === "carrier-dot" && (
         <circle cx={cx} cy={cy} r={size * 0.15} fill="black" />
       )}
@@ -84,13 +118,40 @@ function UnknownSymbol({ size, fill }: { size: number; fill: FillDescriptor }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size }: ShapeProps) {
+export function SymbolShape({ individual, size, sectors = [], clipId }: ShapeProps) {
   const fill = symbolFill(individual);
+  const id = clipId ?? `symbol-clip-${individual.id}`;
   switch (individual.sex) {
-    case "male":    return <MaleSymbol    size={size} fill={fill} />;
-    case "female":  return <FemaleSymbol  size={size} fill={fill} />;
-    case "unknown": return <UnknownSymbol size={size} fill={fill} />;
+    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={id} />;
+    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={id} />;
+    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} clipId={id} />;
   }
+}
+
+/** Dot and text tags in a centred row just below the symbol. */
+export function AnnotationRow({ items, size }: { items: AnnotationItem[]; size: number }) {
+  if (items.length === 0) return null;
+  const cx = size / 2;
+  const cy = size + ANNOTATION_Y;
+  return (
+    <g>
+      {items.map(({ tag, x }) =>
+        tag.style === "dot" ? (
+          <circle key={tag.id} cx={cx + x} cy={cy} r={ANNOTATION_DOT_RADIUS} fill={tag.color} />
+        ) : (
+          <text
+            key={tag.id}
+            x={cx + x} y={cy + ANNOTATION_FONT_SIZE / 2 - 1}
+            textAnchor="middle"
+            fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold"
+            fill={tag.color}
+          >
+            {tagCanvasText(tag)}
+          </text>
+        ),
+      )}
+    </g>
+  );
 }
 
 // ── Overlays ───────────────────────────────────────────────────────────────────

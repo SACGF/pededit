@@ -134,3 +134,23 @@ export const pedigreeApi = {
 
   delete: (id: string) => apiClient.delete(`/pedigrees/${id}/`),
 };
+
+// ── Tag presets (the signed-in user's personal tag library) ──────────────────
+
+export interface TagPresetPayload {
+  id: string;
+  label: string;
+  color: string;
+  style: "quadrant" | "dot" | "text";
+  abbrev: string;
+  created: string;
+}
+
+export const tagPresetApi = {
+  list: () => apiClient.get<TagPresetPayload[]>("/tag-presets/"),
+
+  create: (preset: Omit<TagPresetPayload, "id" | "created">) =>
+    apiClient.post<TagPresetPayload>("/tag-presets/", preset),
+
+  delete: (id: string) => apiClient.delete(`/tag-presets/${id}/`),
+};

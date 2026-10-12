@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import RegisterView, MeView, PedigreeViewSet
+from .views import RegisterView, MeView, PedigreeViewSet, TagPresetViewSet
 from .social_auth import GoogleLoginView, GitHubLoginView
 
 router = DefaultRouter()
 router.register(r"pedigrees", PedigreeViewSet, basename="pedigree")
+router.register(r"tag-presets", TagPresetViewSet, basename="tag-preset")
 
 urlpatterns = [
     path("auth/register/", RegisterView.as_view(), name="register"),

@@ -1,10 +1,16 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { pedigreeTags, tagCanvasText } from "../pedigree/tags";
 
-export function EditPanel() {
-  const { pedigree, selectedId, updateIndividual } = usePedigreeStore();
+interface EditPanelProps {
+  onManageTags?: () => void;
+}
+
+export function EditPanel({ onManageTags }: EditPanelProps) {
+  const { pedigree, selectedId, updateIndividual, setIndividualTag } = usePedigreeStore();
   const individual = pedigree.individuals.find(i => i.id === selectedId);
+  const tags = pedigreeTags(pedigree);
 
   if (!individual) {
     return (
@@ -46,6 +52,51 @@ export function EditPanel() {
           placeholder="Clinical notes"
         />
       </Field>
+
+      <div className="border-t pt-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+            Tags
+          </div>
+          {onManageTags && (
+            <button
+              type="button"
+              onClick={onManageTags}
+              className="text-[10px] text-gray-500 hover:text-black hover:underline"
+            >
+              Manage…
+            </button>
+          )}
+        </div>
+        {tags.length === 0 ? (
+          <p className="text-[10px] text-gray-400">
+            No tags defined for this pedigree yet.
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {tags.map(tag => {
+              const on = individual.tags?.includes(tag.id) ?? false;
+              return (
+                <label key={tag.id} className="flex items-center gap-2 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={on}
+                    onChange={e => setIndividualTag(individual.id, tag.id, e.target.checked)}
+                  />
+                  <span
+                    className="inline-block w-2.5 h-2.5 shrink-0 border border-black/20"
+                    style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
+                  />
+                  <span className="truncate">{tag.label}</span>
+                  {tag.style === "text" && (
+                    <span className="text-[10px] font-bold" style={{ color: tag.color }}>{tagCanvasText(tag)}</span>
+                  )}
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <div className="border-t pt-3 space-y-2">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">

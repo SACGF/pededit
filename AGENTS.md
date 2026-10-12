@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-**Phases 1-5c complete. Phase 6 partially complete (manual repositioning done). Phase 8 partially complete (infrastructure done). Phase 9 partially complete (social login done).** See `claude/overall_plan.md` for the full phase plan.
+**Phases 1-5c complete. Phase 6 partially complete (manual repositioning done). Phase 7 partially complete (tags and colouring done). Phase 8 partially complete (infrastructure done). Phase 9 partially complete (social login done).** See `claude/overall_plan.md` for the full phase plan.
 
 - **Phase 1:** `layout-engine/` — TypeScript package, 16 tests, kinship2 layout algorithm
 - **Phase 2:** Django + React scaffold — auth, CRUD, empty canvas
@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`.
 - **Phase 5c:** Small features — kindepth force fallback, autohint spouse hints, QP bundling, auto-detect consanguinity on edit, CSV export, PDF export, `hpoTerms` data model slot.
 - **Phase 6 (partial):** Manual repositioning — pin/unpin, visual indicator, reset layout, drag persistence, canvas settings (nodesMoveable, snapToGrid). Remaining: compact mode, fit-to-page, large family handling, full auto_hint, batch SVG API.
+- **Phase 7 (partial):** Tags and colouring (issue #3) — `Pedigree.tags` definitions with quadrant / dot / text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, `TagsDialog`, auto legend in app and in SVG/PNG/PDF export, per-user tag library (`/api/tag-presets/`). See `claude/phase_7_2_plan.md`. Remaining: pattern fills for print, HPO/MONDO phenotype annotation, twins, assisted reproduction symbols.
 - **Phase 8 (partial):** Deploy infrastructure — Gunicorn + Nginx + systemd on VPS, deploy scripts, INSTALL.md, domain (pededit.com). Remaining: Django security settings, rate limiting, health check, Sentry, automated backups.
 - **Phase 9 (partial):** Social login — Google and GitHub OAuth via direct OAuth flow (not Clerk as originally planned). Remaining: remove legacy username/password auth endpoints.
 
