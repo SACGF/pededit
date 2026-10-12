@@ -1,7 +1,7 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, RotateCw, Settings, Download, Image, List } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Image, List, Tags } from "lucide-react";
 import { exportPed } from "../io/ped/index.js";
 import { exportCsv } from "../io/csv/exporter";
 import { exportJson } from "../io/json/index.js";
@@ -33,9 +33,10 @@ interface ToolbarProps {
   onSettingsClick: () => void;
   onExportSvgClick: () => void;
   onLegendClick: () => void;
+  onTagsClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: ToolbarProps) {
+export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTagsClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
   const { activePedigreeId, pedigrees } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
@@ -140,6 +141,18 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: To
         onClick={redo}
       >
         <RotateCw size={14} />
+      </Button>
+
+      {/* Tags */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Define tags and colours for this pedigree"
+        disabled={!hasPedigree}
+        onClick={onTagsClick}
+      >
+        <Tags size={12} />
+        Tags
       </Button>
 
       <div className="flex-1" />

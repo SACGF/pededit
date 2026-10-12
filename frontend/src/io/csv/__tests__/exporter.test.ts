@@ -129,6 +129,22 @@ describe("exportCsv", () => {
     expect(rows[0]!.hpo_terms).toBe("");
   });
 
+  it("tags column holds tag labels, semicolon-joined", () => {
+    const ped = makePedigree({
+      individuals: [
+        { id: "i1", sex: "male", affected: false, sibOrder: 0, tags: ["t1", "t2"] },
+        { id: "i2", sex: "female", affected: false, sibOrder: 1 },
+      ],
+      tags: [
+        { id: "t1", label: "Tremor", color: "#000", style: "quadrant" },
+        { id: "t2", label: "Sequenced", color: "#2ca02c", style: "dot" },
+      ],
+    });
+    const rows = parseRows(exportCsv(ped));
+    expect(rows[0]!.tags).toBe("Tremor;Sequenced");
+    expect(rows[1]!.tags).toBe("");
+  });
+
   it("uses custom familyId when provided", () => {
     const ped = makePedigree({
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],

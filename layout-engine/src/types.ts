@@ -14,6 +14,32 @@ export interface Individual {
   dob?: string;          // ISO date string "YYYY-MM-DD"
   notes?: string;        // free text clinical notes
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
+  tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
+}
+
+/**
+ * How a tag is drawn on the symbols of the individuals that carry it.
+ *
+ *  - "quadrant": fills one sector of the symbol with the tag colour. The sector
+ *    is assigned by the tag's position among the pedigree's quadrant tags
+ *    (NSGC multi-condition convention: up to four quarters, more become equal
+ *    pie slices). Use for conditions / phenotypes.
+ *  - "dot": a small coloured dot in the annotation row below the symbol. Use
+ *    for sample / workflow status such as "DNA available" or "sequenced".
+ *  - "text": short coloured text in the annotation row below the symbol
+ *    (abbrev, falling back to label). Use for genotypes such as "exp/+".
+ */
+export type TagStyle = "quadrant" | "dot" | "text";
+
+export interface Tag {
+  id: string;
+  /** Full name shown in the legend and tag manager. */
+  label: string;
+  /** CSS colour, normally "#rrggbb". */
+  color: string;
+  style: TagStyle;
+  /** Short canvas text for "text" style tags. Defaults to label. */
+  abbrev?: string;
 }
 
 /** A partnership (union) between two individuals. Children attach here, not to parents. */
@@ -50,6 +76,11 @@ export interface Pedigree {
   canvasSettings?: CanvasSettings;
   /** Individual IDs unlocked for dragging when canvasSettings.nodesMoveable is false. */
   unlockedIndividuals?: string[];
+  /**
+   * Tag definitions for this pedigree, in display order. Quadrant tags take
+   * their sector from their order here. Individuals reference tags by id.
+   */
+  tags?: Tag[];
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

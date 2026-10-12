@@ -29,8 +29,19 @@ For convenience the importer also accepts a bare `Pedigree` object (no envelope)
 | `pinnedPositions` | `{ [individualId]: { x: number, y: number } }` | no | Manual drag overrides in canvas pixels. Individuals not listed here use the automatic layout. |
 | `canvasSettings` | `CanvasSettings` | no | Drag and snap settings. Absent means all defaults (nodes locked, no snapping). |
 | `unlockedIndividuals` | `string[]` | no | Ids of individuals unlocked for dragging when `canvasSettings.nodesMoveable` is `false`. |
+| `tags` | `Tag[]` | no | Tag definitions (conditions, sample status, genotypes) in display order. Individuals reference them by id. |
 
 Any other property on the pedigree object is preserved as-is through import and export.
+
+### `Tag`
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | Unique among the pedigree's tags. |
+| `label` | string | yes | Full name shown in the legend and tag manager. |
+| `color` | string | yes | CSS colour, normally `#rrggbb`. |
+| `style` | `"quadrant"`, `"dot"` or `"text"` | yes | `quadrant` fills a sector of the symbol (NSGC multi-condition shading, sector taken from the tag's position among quadrant tags). `dot` draws a small coloured dot below the symbol. `text` draws short coloured text below the symbol. |
+| `abbrev` | string | no | Short canvas text for `text` tags. Defaults to `label`. |
 
 ### `SiblingOrderSettings`
 
@@ -62,6 +73,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
 | `notes` | string | no | Free-text clinical notes. |
 | `hpoTerms` | string[] | no | HPO term codes, e.g. `["HP:0001250"]`. |
+| `tags` | string[] | no | Ids of tags from `Pedigree.tags` applied to this individual. |
 
 Optional fields may be omitted or set to `null`; both are treated as absent. Any other property on an individual is preserved as-is, so a newer PedEdit (or another tool) can add fields without older versions discarding them.
 
@@ -87,7 +99,7 @@ Errors block the import:
 - the text is not valid JSON, or the root is not an object
 - `format` is present but not `"pededit-pedigree"`
 - a required field is missing or has the wrong type (including `sibOrder` not being a number)
-- duplicate individual or partnership ids
+- duplicate individual, partnership or tag ids
 - a partnership refers to an individual that does not exist, or pairs an individual with itself
 - a `parentOf` key is not a partnership id, or a listed child does not exist
 - an individual is a child of two partnerships, is listed twice under one partnership, or is a child of their own partnership
@@ -98,6 +110,7 @@ Warnings allow the import and are shown to the user:
 - `siblingOrder` was missing and the default was applied
 - the document `version` is newer than the editor's
 - `pinnedPositions` or `unlockedIndividuals` name an individual that does not exist
+- an individual's `tags` names a tag that is not in `Pedigree.tags`
 
 ## Worked example
 

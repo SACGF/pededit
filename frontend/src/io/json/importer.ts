@@ -3,6 +3,7 @@ import { JSON_FORMAT, JSON_VERSION, JsonIssueCode } from "./types.js";
 import type { JsonImportResult, JsonValidationIssue } from "./types.js";
 
 const SEX_VALUES = ["male", "female", "unknown"];
+const TAG_STYLES = ["quadrant", "dot", "text"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
 
 type Obj = Record<string, unknown>;
@@ -154,6 +155,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
 
   // ---- Individuals ----
   const individualIds = new Set<string>();
+  const tagRefs: { tagId: string; path: string }[] = [];
   (ped.individuals as unknown[]).forEach((raw, i) => {
     const ip = p(`individuals[${i}]`);
     if (!isObject(raw)) {
@@ -178,6 +180,10 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "dob", ip, "a string", v => typeof v === "string");
     c.optional(raw, "notes", ip, "a string", v => typeof v === "string");
     c.optional(raw, "hpoTerms", ip, "an array of strings", isStringArray);
+    c.optional(raw, "tags", ip, "an array of tag ids", isStringArray);
+    if (isStringArray(raw.tags)) {
+      for (const tagId of raw.tags) tagRefs.push({ tagId, path: `${ip}.tags` });
+    }
     // Any other property is an extension or a newer field: preserved untouched.
   });
 
@@ -299,6 +305,37 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
           c.warning(JsonIssueCode.DANGLING_REFERENCE, `${up} refers to unknown individual '${id}'`, up, [id]);
         }
       }
+    }
+  }
+
+  const tagIds = new Set<string>();
+  if (ped.tags !== undefined && ped.tags !== null) {
+    const tp = p("tags");
+    if (!Array.isArray(ped.tags)) {
+      c.error(JsonIssueCode.WRONG_TYPE, `${tp} must be an array`, tp);
+    } else {
+      ped.tags.forEach((raw: unknown, i: number) => {
+        const tip = `${tp}[${i}]`;
+        if (!isObject(raw)) {
+          c.error(JsonIssueCode.WRONG_TYPE, `${tip} must be an object`, tip);
+          return;
+        }
+        if (c.required(raw, "id", tip, "a non-empty string", v => typeof v === "string" && v.length > 0)) {
+          const id = raw.id as string;
+          if (tagIds.has(id)) c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate tag id '${id}'`, tip, [id]);
+          tagIds.add(id);
+        }
+        c.required(raw, "label", tip, "a string", v => typeof v === "string");
+        c.required(raw, "color", tip, "a string", v => typeof v === "string");
+        c.required(raw, "style", tip, TAG_STYLES.map(s => `"${s}"`).join(" | "),
+          v => typeof v === "string" && TAG_STYLES.includes(v));
+        c.optional(raw, "abbrev", tip, "a string", v => typeof v === "string");
+      });
+    }
+  }
+  for (const { tagId, path: refPath } of tagRefs) {
+    if (!tagIds.has(tagId)) {
+      c.warning(JsonIssueCode.DANGLING_REFERENCE, `${refPath} refers to unknown tag '${tagId}'`, refPath, [tagId]);
     }
   }
 

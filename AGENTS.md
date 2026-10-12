@@ -10,6 +10,7 @@ What exists:
 - `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup). Connected-component ordering is still open (#39).
 - Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51).
 - React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu, edit panel (name/DOB/notes), settings panel (sibling order, snap to grid), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
+- Tags and colouring (#3): `Pedigree.tags` definitions with quadrant, dot and text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, `TagsDialog`, auto legend in the app and in SVG/PNG/PDF export, per-user tag library (`/api/tag-presets/`). See `claude/phase_7_2_plan.md`.
 - Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification, U-shape SVG export, CSV. `hpoTerms` exists on the data model with no UI (#46).
 - Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Hardening, backups, error reporting and a health check are open (#47 to #50).
 
@@ -19,7 +20,7 @@ The research phase is complete: `claude/search_report.md` contains a comprehensi
 
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
 - `claude/search_report.md` — domain research and feature gap analysis
-- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2)
+- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2), `claude/phase_7_2_plan.md` (how tags and colouring work, #3)
 
 ## What This Project Is
 

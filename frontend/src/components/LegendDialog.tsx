@@ -1,5 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Tag } from "@pedigree-editor/layout-engine";
+import {
+  tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText,
+  ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
+} from "../pedigree/tags";
 
 interface LegendDialogProps {
   open: boolean;
@@ -90,6 +94,39 @@ function ProbandSvg({ sex }: { sex: Sex }) {
   );
 }
 
+/** How a tag looks on a symbol: a quarter of a square, a dot, or coloured text. */
+function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
+  const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
+  if (tag.style === "quadrant") {
+    const all = quadrantTags(pedigree);
+    const idx = Math.max(0, all.findIndex(t => t.id === tag.id));
+    const [start, end] = sectorAngles(idx, Math.max(all.length, 1));
+    const clipId = `legend-dialog-clip-${tag.id}`;
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28">
+        <clipPath id={clipId}><rect x={x} y={y} width={s} height={s} /></clipPath>
+        <rect x={x} y={y} width={s} height={s} fill="white" stroke="black" strokeWidth={1.5} />
+        <path d={sectorPath(cx, cy, s, start, end)} fill={tag.color} clipPath={`url(#${clipId})`} />
+        <rect x={x} y={y} width={s} height={s} fill="none" stroke="black" strokeWidth={1.5} />
+      </svg>
+    );
+  }
+  if (tag.style === "dot") {
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28">
+        <circle cx={14} cy={14} r={ANNOTATION_DOT_RADIUS} fill={tag.color} />
+      </svg>
+    );
+  }
+  return (
+    <svg width="40" height="28" viewBox="0 0 40 28">
+      <text x={20} y={14 + ANNOTATION_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold" fill={tag.color}>
+        {tagCanvasText(tag)}
+      </text>
+    </svg>
+  );
+}
+
 function CoupleSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -158,7 +195,12 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });
   if (hasConsanguineous) relRows.push({ icon: <ConsanguineousSvg />, label: "Consanguineous couple" });
 
-  const isEmpty = indRows.length === 0 && relRows.length === 0;
+  const tagRows = tagsInUse(pedigree).map(tag => ({
+    icon: <TagSwatchSvg tag={tag} pedigree={pedigree} />,
+    label: tag.label,
+  }));
+
+  const isEmpty = indRows.length === 0 && relRows.length === 0 && tagRows.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -184,6 +226,14 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
                 <SectionHeader>Relationships</SectionHeader>
                 <div>
                   {relRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+                </div>
+              </>
+            )}
+            {tagRows.length > 0 && (
+              <>
+                <SectionHeader>Tags</SectionHeader>
+                <div>
+                  {tagRows.map((r, i) => <LegendRow key={i} icon={r.icon} label={r.label} />)}
                 </div>
               </>
             )}
