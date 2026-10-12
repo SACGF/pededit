@@ -20,6 +20,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
     deleteIndividual,
     setSelectedId,
     unpinIndividual,
+    setIndividualTag,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -88,6 +89,30 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
             {individual.proband ? "Unmark proband" : "Mark as proband"}
           </MenuItem>
         </MenuSection>
+
+        {(pedigree.tags?.length ?? 0) > 0 && (
+          <MenuSection label="Tags">
+            {pedigree.tags!.map(tag => {
+              const on = individual.tags?.includes(tag.id) ?? false;
+              return (
+                <MenuItem
+                  key={tag.id}
+                  onClick={() => action(() => setIndividualTag(individualId, tag.id, !on))}
+                  active={on}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <span
+                      className="inline-block w-2 h-2 border border-black/20"
+                      style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
+                    />
+                    {tag.label}
+                    {on && <span className="text-gray-400">✓</span>}
+                  </span>
+                </MenuItem>
+              );
+            })}
+          </MenuSection>
+        )}
 
         <MenuSection label="Sex">
           {(["male", "female", "unknown"] as const).map(sex => (

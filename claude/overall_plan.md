@@ -233,9 +233,10 @@ These are the features that exist nowhere in open-source and partially in commer
 - Click to expand
 - De-identification mode: collapse leaf branches, strip names/dates, preserve genetic structure for publication
 
-**Multi-trait display:**
+**Multi-trait display:** ✅ DONE (Phase 7.2, issue #3, see `phase_7_2_plan.md`)
 - Multiple conditions shown with distinct quadrant shading within a single symbol (e.g. top-left = breast cancer, bottom-right = colon cancer)
 - Legend auto-updates to show only conditions present in current pedigree
+- Also dot and text styles for sample status and genotype annotations, and a per-user tag library
 
 **Complex structure improvements:**
 - Cross-generational matings with correct alignment

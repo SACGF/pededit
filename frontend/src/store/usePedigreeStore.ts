@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 
@@ -143,6 +143,13 @@ interface PedigreeState {
 
   // Canvas settings
   updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
+
+  // Tags (definitions live on the pedigree; individuals reference them by id)
+  addTag: (tag: Omit<Tag, "id"> & { id?: string }) => string;
+  updateTag: (id: string, updates: Partial<Omit<Tag, "id">>) => void;
+  deleteTag: (id: string) => void;
+  moveTag: (id: string, direction: -1 | 1) => void;
+  setIndividualTag: (individualId: string, tagId: string, on: boolean) => void;
 }
 
 // ── Store implementation ───────────────────────────────────────────────────────
@@ -537,6 +544,68 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (draft.pinnedPositions) {
           delete draft.pinnedPositions[individualId];
           if (Object.keys(draft.pinnedPositions).length === 0) delete draft.pinnedPositions;
+        }
+      });
+    },
+
+    // ── Tags ──────────────────────────────────────────────────────────────────
+
+    addTag: (tag) => {
+      const id = tag.id ?? newId();
+      mutate(draft => {
+        if (!draft.tags) draft.tags = [];
+        draft.tags.push({ ...tag, id });
+      });
+      return id;
+    },
+
+    updateTag: (id, updates) => {
+      mutate(draft => {
+        const tag = draft.tags?.find(t => t.id === id);
+        if (tag) Object.assign(tag, updates);
+      });
+    },
+
+    /** Remove a tag definition and every reference to it. */
+    deleteTag: (id) => {
+      mutate(draft => {
+        if (!draft.tags) return;
+        draft.tags = draft.tags.filter(t => t.id !== id);
+        if (draft.tags.length === 0) delete draft.tags;
+        for (const ind of draft.individuals) {
+          if (!ind.tags?.includes(id)) continue;
+          ind.tags = ind.tags.filter(t => t !== id);
+          if (ind.tags.length === 0) delete ind.tags;
+        }
+      });
+    },
+
+    /** Swap a tag with its neighbour. Order decides which quadrant a quadrant tag gets. */
+    moveTag: (id, direction) => {
+      mutate(draft => {
+        const tags = draft.tags;
+        if (!tags) return;
+        const idx = tags.findIndex(t => t.id === id);
+        const target = idx + direction;
+        if (idx < 0 || target < 0 || target >= tags.length) return;
+        [tags[idx], tags[target]] = [tags[target]!, tags[idx]!];
+      });
+    },
+
+    setIndividualTag: (individualId, tagId, on) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === individualId);
+        if (!ind) return;
+        const has = ind.tags?.includes(tagId) ?? false;
+        if (on && !has) {
+          // Keep the individual's list in pedigree tag order so rendering is stable.
+          const order = new Map((draft.tags ?? []).map((t, i) => [t.id, i]));
+          ind.tags = [...(ind.tags ?? []), tagId].sort(
+            (a, b) => (order.get(a) ?? Infinity) - (order.get(b) ?? Infinity),
+          );
+        } else if (!on && has) {
+          ind.tags = ind.tags!.filter(t => t !== tagId);
+          if (ind.tags.length === 0) delete ind.tags;
         }
       });
     },
