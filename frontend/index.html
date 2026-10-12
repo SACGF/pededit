@@ -3,25 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PedEdit: Open-Source Pedigree Editor</title>
-    <meta name="description" content="A web-based pedigree editor for drawing, editing, and managing genetic family trees. Built for genetic counselors, clinical genetics teams, and researchers." />
+    <title>PedEdit: Free Online Pedigree Chart Maker, No Sign-up</title>
+    <meta name="description" content="Free online pedigree chart maker with no sign-up. Standard NSGC symbols, automatic layout from kinship2 that handles consanguinity and multiple partners, drag-and-drop repositioning, PED import, SVG/PNG/PDF export. Open source." />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="PedEdit — Open-Source Pedigree Editor" />
-    <meta property="og:description" content="A web-based pedigree editor for drawing, editing, and managing genetic family trees. Built for genetic counselors, clinical genetics teams, and researchers." />
+    <meta property="og:title" content="PedEdit: Free Online Pedigree Chart Maker, No Sign-up" />
+    <meta property="og:description" content="Free online pedigree chart maker with no sign-up. Standard NSGC symbols, automatic layout from kinship2 that handles consanguinity and multiple partners, drag-and-drop repositioning, PED import, SVG/PNG/PDF export. Open source." />
     <meta property="og:image" content="https://pededit.com/og-image.png" />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PedEdit — Open-Source Pedigree Editor" />
-    <meta name="twitter:description" content="A web-based pedigree editor for drawing, editing, and managing genetic family trees. Built for genetic counselors, clinical genetics teams, and researchers." />
+    <meta name="twitter:title" content="PedEdit: Free Online Pedigree Chart Maker, No Sign-up" />
+    <meta name="twitter:description" content="Free online pedigree chart maker with no sign-up. Standard NSGC symbols, automatic layout from kinship2 that handles consanguinity and multiple partners, drag-and-drop repositioning, PED import, SVG/PNG/PDF export. Open source." />
     <meta name="twitter:image" content="https://pededit.com/og-image.png" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://pededit.com/" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static fallback so crawlers and users without JavaScript see what the app is. Replaced on mount. -->
+      <noscript>
+        <h1>PedEdit</h1>
+        <p>A free, open-source pedigree editor for clinical genetics, genetic counselling and research. No account required: each pedigree is saved at its own private URL that you bookmark or share.</p>
+        <p>Automatic layout ported from the kinship2 R package handles consanguinity, multiple partners and complex families. Drag-and-drop repositioning, standard NSGC symbols, PED import, and SVG, PNG, PDF and CSV export.</p>
+        <p>PedEdit needs JavaScript to run. Source code: <a href="https://github.com/SACGF/pededit">github.com/SACGF/pededit</a></p>
+      </noscript>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

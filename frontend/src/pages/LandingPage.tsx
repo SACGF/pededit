@@ -101,7 +101,8 @@ export default function LandingPage() {
           </p>
           {!isAuthenticated && (
             <p className="text-sm text-gray-500 mb-8">
-              No account required. Each pedigree gets a unique URL you can bookmark or share. Just keep track of your links.{" "}
+              <span className="text-black font-medium">No account required.</span>{" "}
+              Click a button below to start drawing. Each pedigree is saved at its own private URL, so bookmark the link to come back to it or share it with a colleague.{" "}
               <span
                 className="text-black underline underline-offset-2 cursor-pointer"
                 onClick={() => navigate("/login")}
