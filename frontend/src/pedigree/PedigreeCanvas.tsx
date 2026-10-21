@@ -10,7 +10,7 @@ import {
   type Edge,
   type Node,
   type NodeChange,
-  type NodeMouseHandler,
+  type OnNodeDrag,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore } from "../store/usePedigreeStore";
@@ -186,7 +186,7 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
     setSelectedId(null);
   }, [setSelectedId]);
 
-  const handleNodeDragStop: NodeMouseHandler<Node<RFNodeData>> = useCallback(
+  const handleNodeDragStop: OnNodeDrag<Node<RFNodeData>> = useCallback(
     (_event, node) => {
       pinIndividual(node.data.individual.id, node.position);
     },
