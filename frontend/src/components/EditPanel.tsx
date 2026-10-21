@@ -42,7 +42,7 @@ export function EditPanel() {
         <textarea
           value={individual.notes ?? ""}
           onChange={e => updateIndividual(individual.id, { notes: e.target.value })}
-          className="w-full border rounded px-2 py-1 text-sm resize-none h-20 focus:outline-none focus:ring-1 focus:ring-black"
+          className="w-full border rounded px-2 py-1 text-sm resize-none h-20 focus:outline-hidden focus:ring-1 focus:ring-black"
           placeholder="Clinical notes"
         />
       </Field>

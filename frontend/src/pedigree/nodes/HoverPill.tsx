@@ -25,7 +25,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
       offset={6}
     >
       <div
-        className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-sm text-xs"
+        className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-xs text-xs"
         onMouseEnter={onPillEnter}
         onMouseLeave={onPillLeave}
       >
