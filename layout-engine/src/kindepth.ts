@@ -54,7 +54,7 @@ export function kindepth(input: LayoutInput, align = false): Int32Array {
     let anyChild = false;
     const nextParents: number[] = [];
     for (let i = 1; i <= n; i++) {
-      if (child[i] > 0) {
+      if (child[i]! > 0) {
         anyChild = true;
         depth[i] = iter;
         nextParents.push(i);

@@ -90,7 +90,7 @@ export function alignped3(x1: AlignState, x2: AlignState, packed: boolean, space
           }
         }
       }
-      n[i] -= 1;
+      n[i] = n[i]! - 1;
     }
 
     // Packed slide: position of right tree starts right after x1's rightmost
