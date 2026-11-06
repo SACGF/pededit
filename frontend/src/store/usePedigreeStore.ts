@@ -4,6 +4,7 @@ import type {
   Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
+import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -620,7 +621,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     pinIndividual: (individualId, pos) => {
       mutate(draft => {
         if (!draft.pinnedPositions) draft.pinnedPositions = {};
-        draft.pinnedPositions[individualId] = pos;
+        // Store on the grid in normal spacing. A compact drag lands on the
+        // compact grid and unscales off it; rounding here comes back to the
+        // same compact grid point because the compact scales are below 1.
+        draft.pinnedPositions[individualId] = snapPoint(pos, activeSnapGrid(draft as Pedigree));
       });
     },
 
@@ -745,7 +749,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         }
         // Turning snap on, or changing the grid size while snap is on, snaps every
         // pinned (manually moved) node so existing nodes line up with the grid.
-        // Auto-laid-out nodes have no stored position and are unaffected.
+        // Auto-laid-out nodes have no stored position; layoutToFlow rounds
+        // them to the grid when it draws them (pedigree/snap.ts).
         const { snapToGrid, snapGridSize } = draft.canvasSettings;
         const sizeChanged = settings.snapGridSize !== undefined;
         if (snapToGrid && snapGridSize > 0 && (!wasSnapping || sizeChanged) && draft.pinnedPositions) {

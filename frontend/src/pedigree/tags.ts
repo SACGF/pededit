@@ -430,7 +430,8 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
       });
     }
   }
-  const carrier = inds.find(i => i.carrier && !i.affected && !i.lifeStatus);
+  // The dot is drawn on every unaffected carrier, pregnancies and losses included (#14).
+  const carrier = inds.find(i => i.carrier && !i.affected);
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
   const deceased = inds.find(i => i.deceased);
   if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });

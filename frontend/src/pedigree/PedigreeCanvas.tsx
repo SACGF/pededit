@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
+import { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -11,6 +11,7 @@ import {
   type Node,
   type NodeChange,
   type OnNodeDrag,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
@@ -21,7 +22,9 @@ import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
+import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
+import { activeSnapGrid, backgroundDotGap } from "./snap";
 
 const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
 
@@ -87,14 +90,11 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
         {sibshipEdges.map(edge => {
           const data = edge.data as SibshipEdgeData;
           if (!data?.childXs?.length) return null;
-          const sibLeftX  = Math.min(data.coupleX, ...data.childXs);
-          const sibRightX = Math.max(data.coupleX, ...data.childXs);
-          const childTopY = data.childY - half;
-          const d = [
-            `M ${mx(data.coupleX)} ${my(data.coupleY)} L ${mx(data.coupleX)} ${my(data.sibBarY)}`,
-            `M ${mx(sibLeftX)} ${my(data.sibBarY)} L ${mx(sibRightX)} ${my(data.sibBarY)}`,
-            ...data.childXs.map(cx => `M ${mx(cx)} ${my(data.sibBarY)} L ${mx(cx)} ${my(childTopY)}`),
-          ].join(" ");
+          const kids = data.childXs.map((x, i) => ({ x, y: data.childYs?.[i] ?? data.childY }));
+          const d = segmentsPathD(
+            sibshipSegments(data.coupleX, data.coupleY, 0, kids),
+            (x, y) => [mx(x), my(y)],
+          );
           return <path key={edge.id} d={d} stroke="black" strokeWidth={1} fill="none" />;
         })}
 
@@ -148,6 +148,19 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
   );
 }
 
+/** Refits the view when compact mode is toggled, once the new layout has rendered. */
+function FitOnCompactChange({ compact }: { compact: boolean }) {
+  const { fitView } = useReactFlow();
+  const prev = useRef(compact);
+  useEffect(() => {
+    if (prev.current === compact) return; // the initial fit comes from the fitView prop
+    prev.current = compact;
+    const id = requestAnimationFrame(() => { void fitView(); });
+    return () => cancelAnimationFrame(id);
+  }, [compact, fitView]);
+  return null;
+}
+
 // ── Canvas ─────────────────────────────────────────────────────────────────────
 
 interface PedigreeCanvasProps {
@@ -184,6 +197,13 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   );
 
   const edges = [...coupleEdges, ...sibshipEdges];
+
+  // Background dots follow the snap grid when snap is on (React Flow's
+  // default of 20 otherwise). React Flow centres a dot in each pattern tile,
+  // so shift by half a tile to put the dots on grid points.
+  const grid = activeSnapGrid(pedigree);
+  const dotGap = grid > 0 ? backgroundDotGap(grid) : 20;
+  const DOT_SIZE = 1;
 
   const handlePaneClick = useCallback(() => {
     setSelectedId(null);
@@ -264,7 +284,8 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
             </button>
           </Panel>
         )}
-        <Background />
+        <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
+        <FitOnCompactChange compact={compact} />
         <Controls />
         {showMinimap && (
           <PedigreeMinimap

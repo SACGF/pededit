@@ -4,6 +4,7 @@ import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-e
 import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "./constants";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import type { LayoutSpacing } from "./spacing";
+import { activeSnapGrid, snapSlotPositions } from "./snap";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -61,7 +62,9 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   sibBarY: number;
   /** x (canvas px) of each child's slot centre, in slot order. */
   childXs: number[];
-  /** y (canvas px) of the child generation centre = level * ROW_HEIGHT. */
+  /** y (canvas px) of each child's centre, in slot order (differs when a child is pinned off the row). */
+  childYs: number[];
+  /** y (canvas px) of the highest child row; the sibship bar sits halfway up to the couple. */
   childY: number;
 }
 
@@ -256,6 +259,15 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
     adjustOrphanPositions(result, redirectSlot, nodes, slotPos);
   }
 
+  // With snap on, every node is drawn on the grid (see snap.ts).
+  const grid = activeSnapGrid(pedigree);
+  if (grid > 0) {
+    const pinned = new Set(nodes.filter(n => n.data.isPinned).map(n => n.id));
+    const snapped = snapSlotPositions(slotPos, pinned, grid);
+    for (const node of nodes) node.position = snapped.get(node.id) ?? node.position;
+    for (const [id, p] of snapped) slotPos.set(id, p);
+  }
+
   const partners = buildPartnerSetFromPedigree(pedigree);
 
   return {
@@ -415,9 +427,10 @@ function buildSibshipEdges(
       // Use canonical child positions for geometry.
       const firstChildPos = slotPos.get(resolvedChildIds[0]!);
       if (!firstChildPos) continue; // canonical child not found
-      const childY   = firstChildPos.y;
-      const sibBarY  = (coupleY + childY) / 2;
       const childXs  = resolvedChildIds.map(id => slotPos.get(id)?.x ?? 0);
+      const childYs  = resolvedChildIds.map(id => slotPos.get(id)?.y ?? firstChildPos.y);
+      const childY   = Math.min(...childYs);
+      const sibBarY  = (coupleY + childY) / 2;
       const hopHeight = hopHeightAt(result, partners, level - 1, leftParentSlot);
 
       // Source = left parent node; target = leftmost resolved child node.
@@ -432,7 +445,7 @@ function buildSibshipEdges(
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
-          coupleX, coupleY, hopHeight, sibBarY, childXs, childY,
+          coupleX, coupleY, hopHeight, sibBarY, childXs, childYs, childY,
         },
       });
     }

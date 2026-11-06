@@ -84,7 +84,7 @@ describe("lintFlow", () => {
     expect(found).toContain("missing-node");
   });
 
-  it("reports a slanted couple line and a child off its siblings' row", () => {
+  it("reports a slanted couple line but not a child off its siblings' row", () => {
     const sibs: Pedigree = {
       ...base,
       individuals: [...base.individuals, { id: "d", sex: "male", affected: false, sibOrder: 1 }],
@@ -97,7 +97,8 @@ describe("lintFlow", () => {
     d.position = { ...d.position, y: d.position.y + 40 };
     const found = lintFlow(sibs, flow).map(f => f.code);
     expect(found).toContain("couple-line-slanted");
-    expect(found).toContain("child-off-row");
+    // Each child has its own drop (sibshipPath.ts), so an off-row child is still reached.
+    expect(found).not.toContain("child-off-row");
   });
 
   it("reports overlapping symbols", () => {
