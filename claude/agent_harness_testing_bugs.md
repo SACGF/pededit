@@ -383,8 +383,8 @@ kinship2 1.9.6.2: the difference is a kinship2 fallback bug, not a port bug
 (see `layout-engine/AGENTS.md`, `tests/partner_chain.test.ts`).
 
 Still open from these notes, as issues: hatched fills and monochrome export
-(#67), label overlap (#68), SVG snapshot tests (#69), and the harness items
-below (#70). Fixed afterwards in e203ad4: the SVG title clears the top row,
+(#67), label overlap (#68), SVG snapshot tests (#69), and the harness friction items
+above (#70). Fixed afterwards in e203ad4: the SVG title clears the top row,
 a proband's tag row clears the arrow, the carrier dot has a white rim over
 tag colours, the Legend and export key show consanguinity by the drawing
 rule, and the SVG export numbers both copies of a duplicated person.
