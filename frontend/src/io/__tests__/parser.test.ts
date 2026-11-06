@@ -136,3 +136,113 @@ describe("parsePed", () => {
     expect(issues.some(i => i.code === ValidationIssueCode.EMPTY_FILE)).toBe(false);
   });
 });
+
+// ── 4/5-column "id fid mid sex [aff]" dialect ──────────────────────────────────
+
+describe("parsePed: id fid mid sex dialect", () => {
+  it("never imports a header line as an individual (famid id fid mid sex aff)", () => {
+    const text = "famid\tid\tfid\tmid\tsex\taff\nF1\t1\t0\t0\t1\t1\nF1\t2\t0\t0\t2\t1\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows).toHaveLength(2);
+    expect(rows.map(r => r.individualId)).toEqual(["1", "2"]);
+    expect(rows.some(r => r.familyId === "famid" || r.individualId === "id")).toBe(false);
+    expect(rows[0]).toMatchObject({ familyId: "F1", fatherId: "0", motherId: "0", sex: "1", affection: "1", lineNumber: 2 });
+  });
+
+  it("maps a 4-column header with no family or affection column", () => {
+    const text = "id\tfid\tmid\tsex\n1\t0\t0\t1\n2\t0\t0\t2\n3\t1\t2\t1\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows).toHaveLength(3);
+    expect(rows[2]).toMatchObject({
+      familyId: "1", individualId: "3", fatherId: "1", motherId: "2", sex: "1", affection: "0",
+    });
+  });
+
+  it("maps a 5-column header with aff", () => {
+    const text = "id fid mid sex aff\n1 0 0 1 1\n2 0 0 2 2\n";
+    const { rows } = parsePed(text);
+    expect(rows.map(r => r.affection)).toEqual(["1", "2"]);
+  });
+
+  it("header detection is case-insensitive", () => {
+    const text = "ID\tFID\tMID\tSEX\tAFF\n1\t0\t0\t1\t2\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ individualId: "1", affection: "2" });
+  });
+
+  it("reads fid as the family column in a PLINK header and as father in the R dialect", () => {
+    const plink = parsePed("FID\tIID\tPAT\tMAT\tSEX\tPHENO\nF9\t1\t0\t0\t1\t1\n").rows[0]!;
+    expect(plink).toMatchObject({ familyId: "F9", individualId: "1", fatherId: "0" });
+    const r = parsePed("id\tfid\tmid\tsex\n3\t1\t2\t1\n").rows[0]!;
+    expect(r).toMatchObject({ familyId: "1", individualId: "3", fatherId: "1", motherId: "2" });
+  });
+
+  it("maps a # header line by name", () => {
+    const text = "#famid id fid mid sex\nF2 1 0 0 1\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows[0]).toMatchObject({ familyId: "F2", individualId: "1", sex: "1", affection: "0" });
+  });
+
+  it("treats a # line that mentions id and sex but is not a header as a comment", () => {
+    const text = "# id and sex of each person\n1 1 0 0 1 1\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ familyId: "1", individualId: "1" });
+  });
+
+  it("splits on tabs only when the first line is tab-delimited", () => {
+    const text = "id\tfid\tmid\tsex\nBob Baker\t0\t0\t1\nCarol Able Baker\tBob Baker\t0\t2\n";
+    const { rows, issues } = parsePed(text);
+    expect(issues).toHaveLength(0);
+    expect(rows.map(r => r.individualId)).toEqual(["Bob Baker", "Carol Able Baker"]);
+    expect(rows[1]!.fatherId).toBe("Bob Baker");
+  });
+
+  it("without a header, 4 columns is id fid mid sex", () => {
+    const { rows, issues } = parsePed("1 0 0 1\n2 0 0 2\n3 1 2 1\n");
+    expect(issues).toHaveLength(0);
+    expect(rows[2]).toMatchObject({ familyId: "1", individualId: "3", fatherId: "1", motherId: "2", sex: "1", affection: "0" });
+  });
+
+  it("without a header, 5 columns is id fid mid sex aff when the first column varies", () => {
+    const { rows } = parsePed("1 0 0 1 1\n2 0 0 2 2\n3 1 2 1 2\n");
+    expect(rows[2]).toMatchObject({ familyId: "1", individualId: "3", fatherId: "1", motherId: "2", sex: "1", affection: "2" });
+  });
+
+  it("without a header, 5 columns is famid id fid mid sex when the first column repeats", () => {
+    const { rows } = parsePed("FAM1 1 0 0 1\nFAM1 2 0 0 2\nFAM1 3 1 2 1\n");
+    expect(rows[2]).toMatchObject({ familyId: "FAM1", individualId: "3", fatherId: "1", motherId: "2", sex: "1", affection: "0" });
+  });
+
+  it("reports a short line in a whitespace file as TOO_FEW_COLUMNS", () => {
+    const { rows, issues } = parsePed("1 0 0 1\n2 0 0\n3 1 2 1\n");
+    expect(rows.map(r => r.individualId)).toEqual(["1", "3"]);
+    const err = issues.find(i => i.code === ValidationIssueCode.TOO_FEW_COLUMNS);
+    expect(err).toBeDefined();
+    expect(err!.lineNumbers).toEqual([2]);
+  });
+
+  it("reports a short line under a header as TOO_FEW_COLUMNS", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\taff\n1\t0\t0\t1\n");
+    expect(rows).toHaveLength(0);
+    expect(issues.some(i => i.code === ValidationIssueCode.TOO_FEW_COLUMNS)).toBe(true);
+  });
+
+  it("rejects a header without parent columns", () => {
+    const { rows, issues } = parsePed("id\tsex\n1\t1\n");
+    expect(rows).toHaveLength(0);
+    expect(issues.some(i => i.code === ValidationIssueCode.TOO_FEW_COLUMNS && i.severity === "error")).toBe(true);
+  });
+
+  it("records unmapped header columns as extraColumns", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\tnotes\n1\t0\t0\t1\thello\n");
+    expect(rows[0]!.extraColumns).toEqual(["hello"]);
+    expect(issues.some(i => i.code === ValidationIssueCode.EXTRA_COLUMNS_IGNORED)).toBe(true);
+  });
+});
