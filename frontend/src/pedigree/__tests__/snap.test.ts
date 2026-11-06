@@ -4,6 +4,7 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { snapValue, snapSlotPositions, backgroundDotGap, activeSnapGrid } from "../snap";
 import { sibshipSegments } from "../sibshipPath";
+import { layoutSpacing, scalePinnedPosition, unscalePinnedPosition } from "../spacing";
 import { NODE_SIZE } from "../constants";
 import { EXAMPLES } from "../../data/examples";
 import { simpleFamily } from "../../fixtures/simpleFamily";
@@ -100,6 +101,20 @@ describe("layoutToFlow with snap on", () => {
     const p = withSnap(simpleFamily, 5, { pinnedPositions: { i6: { x: 255, y: 130 } } });
     const n6 = layoutToFlow(p, { compact: true }).nodes.find(n => n.data.individual.id === "i6")!;
     expect(n6.position).toEqual({ x: 215, y: 90 });
+  });
+
+  it("a compact drag stored on the normal grid redraws exactly where it was dropped", () => {
+    const spacing = layoutSpacing(true);
+    for (const grid of [4, 5, 7, 10, 45, 80]) {
+      for (let i = -20; i <= 20; i++) {
+        const dropped = { x: i * grid, y: (i + 3) * grid };
+        const stored = unscalePinnedPosition(dropped, spacing);
+        const storedOnGrid = { x: snapValue(stored.x, grid), y: snapValue(stored.y, grid) };
+        const shown = scalePinnedPosition(storedOnGrid, spacing);
+        expect({ grid, i, x: snapValue(shown.x, grid), y: snapValue(shown.y, grid) })
+          .toEqual({ grid, i, ...dropped });
+      }
+    }
   });
 });
 

@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
+import { useMemo, useCallback, useState, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -11,6 +11,7 @@ import {
   type Node,
   type NodeChange,
   type OnNodeDrag,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
@@ -147,6 +148,19 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
   );
 }
 
+/** Refits the view when compact mode is toggled, once the new layout has rendered. */
+function FitOnCompactChange({ compact }: { compact: boolean }) {
+  const { fitView } = useReactFlow();
+  const prev = useRef(compact);
+  useEffect(() => {
+    if (prev.current === compact) return; // the initial fit comes from the fitView prop
+    prev.current = compact;
+    const id = requestAnimationFrame(() => { void fitView(); });
+    return () => cancelAnimationFrame(id);
+  }, [compact, fitView]);
+  return null;
+}
+
 // ── Canvas ─────────────────────────────────────────────────────────────────────
 
 interface PedigreeCanvasProps {
@@ -271,6 +285,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
           </Panel>
         )}
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
+        <FitOnCompactChange compact={compact} />
         <Controls />
         {showMinimap && (
           <PedigreeMinimap
