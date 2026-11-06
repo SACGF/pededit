@@ -288,3 +288,23 @@ export function renderTagLegendSvg(pedigree: Pedigree, x: number, y: number): Ta
   );
   return { markup, width: tagLegendWidth(tags), height: tags.length * LEGEND_ROW_HEIGHT };
 }
+
+// ── Built-in suggestions ──────────────────────────────────────────────────────
+
+/**
+ * Tags offered in the tag manager to everyone, signed in or not. Gene test
+ * results are written under the symbol as text, in the common "+/-" shorthand
+ * (+ for the familial variant): "+/-" heterozygous, "+/+" homozygous, "-/-"
+ * tested negative. They complement the carrier dot (#14).
+ */
+export const BUILTIN_TAG_SUGGESTIONS: readonly Omit<Tag, "id">[] = [
+  { label: "Gene result +/-", abbrev: "+/-", color: "#000000", style: "text" },
+  { label: "Gene result +/+", abbrev: "+/+", color: "#000000", style: "text" },
+  { label: "Gene result -/-", abbrev: "-/-", color: "#000000", style: "text" },
+];
+
+/** Built-in suggestions not already in the pedigree (same label and style). */
+export function unusedTagSuggestions(pedigree: Pedigree): Omit<Tag, "id">[] {
+  const tags = pedigreeTags(pedigree);
+  return BUILTIN_TAG_SUGGESTIONS.filter(s => !tags.some(t => t.label === s.label && t.style === s.style));
+}

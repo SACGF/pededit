@@ -133,6 +133,11 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
             />
             <span>Carrier</span>
           </label>
+          {individual.carrier && individual.affected && (
+            <p className="text-[10px] text-gray-500 pl-5">
+              Not drawn: the affected fill replaces the carrier dot. Use a gene result tag to show it.
+            </p>
+          )}
           {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
