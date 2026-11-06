@@ -84,6 +84,22 @@ describe("lintFlow", () => {
     expect(found).toContain("missing-node");
   });
 
+  it("reports a slanted couple line and a child off its siblings' row", () => {
+    const sibs: Pedigree = {
+      ...base,
+      individuals: [...base.individuals, { id: "d", sex: "male", affected: false, sibOrder: 1 }],
+      parentOf: { p: ["c", "d"] },
+    } as Pedigree;
+    const flow = layoutToFlow(sibs);
+    const mother = flow.nodes.find(n => n.data.individual.id === "m")!;
+    mother.position = { ...mother.position, y: mother.position.y + 30 };
+    const d = flow.nodes.find(n => n.data.individual.id === "d")!;
+    d.position = { ...d.position, y: d.position.y + 40 };
+    const found = lintFlow(sibs, flow).map(f => f.code);
+    expect(found).toContain("couple-line-slanted");
+    expect(found).toContain("child-off-row");
+  });
+
   it("reports overlapping symbols", () => {
     const flow = layoutToFlow(base);
     flow.nodes[1]!.position = { ...flow.nodes[0]!.position };

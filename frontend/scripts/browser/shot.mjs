@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Render a page (or several fixtures) to PNG, measure elements, and report
 // the same JS findings as console.mjs. Read the PNG back to see the result.
-import { mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
   COMMON_HELP, FRONTEND_DIR, REPO_ROOT, closeBrowser, main, parseArgs, parseViewport, launchBrowser, newContext,
@@ -10,6 +10,10 @@ import {
 } from "./harness.mjs";
 
 const HELP = `usage: node frontend/scripts/browser/shot.mjs [URL] [options]
+       node frontend/scripts/browser/shot.mjs FILE.svg [--out PNG] [--scale N]
+
+  FILE.svg            Render a local SVG (an export saved with --download) on
+                      white at its own size, in chromium, and write a PNG.
 
   --out FILE          PNG path (single target only). Default
                       frontend/test-output/browser/<name>.png
@@ -42,33 +46,33 @@ function slug(s) {
 }
 
 async function measure(page, selector) {
-  return page.evaluate(sel => {
+  return page.locator(selector).evaluateAll(els => {
     const r1 = n => Math.round(n * 10) / 10;
-    return [...document.querySelectorAll(sel)].map(el => {
+    return els.map(el => {
       const b = el.getBoundingClientRect();
       const label = el.getAttribute("data-individual-id") ?? el.getAttribute("data-id") ?? el.id ??
         el.getAttribute("aria-label") ?? "";
       const text = (el.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 40);
       return { label: label || text, x: r1(b.x), y: r1(b.y), width: r1(b.width), height: r1(b.height) };
     });
-  }, selector);
+  });
 }
 
 /** Centre and size in React Flow canvas coordinates, undoing the viewport pan and zoom. */
 async function measureFlow(page, selector) {
-  return page.evaluate(sel => {
+  return page.locator(selector).evaluateAll(els => {
     const r1 = n => Math.round(n * 10) / 10;
     const vp = document.querySelector(".react-flow__viewport");
     if (!vp) return null;
     const m = new DOMMatrixReadOnly(getComputedStyle(vp).transform);
     const origin = vp.parentElement.getBoundingClientRect();
-    return [...document.querySelectorAll(sel)].map(el => {
+    return els.map(el => {
       const b = el.getBoundingClientRect();
       const label = el.getAttribute("data-individual-id") ?? el.getAttribute("data-id") ?? el.id ?? "";
       const cx = (b.x + b.width / 2 - origin.x - m.e) / m.a, cy = (b.y + b.height / 2 - origin.y - m.f) / m.d;
       return { label, cx: r1(cx), cy: r1(cy), width: r1(b.width / m.a), height: r1(b.height / m.d), zoom: r1(m.a * 1000) / 1000 };
     });
-  }, selector);
+  });
 }
 
 /** Lay several PNGs out in one labelled grid, rendered by chromium itself. */
@@ -78,7 +82,7 @@ async function contactSheet(browser, reports, file, cols) {
   const cells = reports.map(r => {
     const img = readFileSync(path.resolve(REPO_ROOT, r.png)).toString("base64");
     const lint = r.render ? (r.render.length ? `${r.render.length} render lint` : "lint clean") : "";
-    return `<figure><img src="data:image/png;base64,${img}"><figcaption>${esc(r.fixture ?? r.url)}` +
+    return `<figure><img src="data:image/png;base64,${img}"><figcaption>${esc((r.fixture ?? r.url).replace(/^.*[\\/]/, ""))}` +
       `${lint ? ` <b class="${r.render?.length ? "bad" : ""}">${lint}</b>` : ""}</figcaption></figure>`;
   }).join("");
   await page.setContent(`<!doctype html><style>
@@ -94,9 +98,32 @@ async function contactSheet(browser, reports, file, cols) {
   await page.close();
 }
 
+/** Render a saved SVG file to PNG, so exports can be looked at like the canvas. */
+async function renderSvgFile(file, flags) {
+  const svg = readFileSync(file, "utf8");
+  const out = path.resolve(flags.out ?? path.join(flags["out-dir"] ?? path.dirname(file), `${path.basename(file, path.extname(file))}.svg.png`));
+  const browser = await launchBrowser();
+  try {
+    const page = await browser.newPage({ viewport: { width: 800, height: 600 }, deviceScaleFactor: flags.scale ?? 1 });
+    await page.setContent(`<!doctype html><style>html,body{margin:0;background:#fff}svg{display:block}</style>${svg}`);
+    const el = page.locator("svg").first();
+    const box = await el.boundingBox();
+    if (!box) throw new UsageError(`${file} has no drawable <svg>`);
+    mkdirSync(path.dirname(out), { recursive: true });
+    await el.screenshot({ path: out });
+    console.log(`shot: ${displayPath(out)}  (${displayPath(path.resolve(file))}, ${Math.round(box.width)}x${Math.round(box.height)})`);
+  } finally {
+    await closeBrowser(browser);
+  }
+  return 0;
+}
+
 await main(async () => {
   const { positional, flags, steps } = parseArgs(process.argv.slice(2), SHOT_FLAGS);
   if (flags.help) { console.log(HELP); return 0; }
+  if (positional.length === 1 && /\.svg$/i.test(positional[0]) && existsSync(positional[0])) {
+    return renderSvgFile(positional[0], flags);
+  }
   if (positional.length > 1) throw new UsageError("usage: one URL at most (use --fixture several times for several pedigrees)");
   const targets = targetsFrom(positional[0], flags);
   if (flags.out && targets.length > 1) throw new UsageError("--out takes one target; use --out-dir for several fixtures");

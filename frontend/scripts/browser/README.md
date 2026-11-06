@@ -94,6 +94,8 @@ Screenshot first, measure second.
   in a labelled grid with its render lint count, so one image read covers a
   batch (`--fixture example:8 --fixture example:9 ... --tile`).
 - Paths are printed relative to the repo root (absolute when outside it).
+- `shot.mjs FILE.svg` renders a saved SVG export to `FILE.svg.png` in
+  chromium, so exports can be read back like the canvas.
 
 ### eval.mjs: what is in the stores?
 
@@ -111,12 +113,12 @@ goes to stdout; the `served:` line and the findings summary go to stderr, so
 `2>&1` interleaves them with the JSON (pipe stdout alone into `jq`).
 
 In the dev build `window.__pededit` holds `usePedigreeStore`, `useAppStore`,
-`layoutToFlow`, `lintFlow`, `importPed`, `importJson`, `EXAMPLES`, `commit`
+`layoutToFlow`, `lintFlow`, `importPed`, `exportPed`, `importJson`, `exportJson`, `EXAMPLES`, `commit`
 and the shortcuts (see `frontend/src/devHooks.ts`; production builds do not
 include it):
 
 - `pedigree()`: the pedigree in the editor.
-- `layout(pedigree?, options?)`: React Flow nodes and edges as the canvas
+- `layout(pedigree?, options?)`: `{ nodes, coupleEdges, sibshipEdges }` as the canvas
   computes them, compact mode included (read from `localStorage`, the way
   the canvas reads it).
 - `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`.
@@ -135,7 +137,8 @@ node frontend/scripts/browser/lint.mjs /p/<id> --click ... # the editor's pedigr
 Structural checks on what the canvas draws (`layoutToFlow`'s output, in
 `frontend/src/pedigree/renderLint.ts`): someone with no symbol, a line to a
 node that is not drawn, a couple line between non-partners or through
-another symbol, two couple lines overlapping on one row, a partnership with
+another symbol, two couple lines overlapping on one row, a slanted couple
+line, a child off their siblings' row (the drop line misses), a partnership with
 no couple line, a child with no line from their parents or hanging from the
 wrong couple, overlapping symbols. The kinship2 oracle tests check slots
 against R; this checks what is drawn from them. `console.mjs` and `shot.mjs`
@@ -202,7 +205,7 @@ Steps run in the order given, each followed by `--step-wait` ms (default 300):
 | `--select 'SEL=>VALUE'` | pick a native `<select>` option by value or label (lists the options when none matches) |
 | `--drag 'SEL=>DX,DY'` | press on the element's centre and drag by DX,DY screen pixels |
 | `--upload 'SEL=>FILE'` | set a file input, or click SEL and answer the file chooser |
-| `--download 'SEL[=>PATH]'` | click SEL and save the download (default `frontend/test-output/browser/downloads/<name>`); the report prints where |
+| `--download 'SEL[=>PATH]'` | click SEL and save the download (default `--out-dir`, else `frontend/test-output/browser/downloads/`, with the suggested name); the report prints where. Scope a common label to a dialog: `'role=dialog >> button:text-is("Download")'` |
 | `--reload` | wait for auto-save (the store's `isDirty` clears), then reload |
 | `--sleep MS` | wait |
 | `--mouse-away` | move the mouse to the corner so hover toolbars close |

@@ -34,7 +34,8 @@ stub so the app still builds without Google login.
   "Your pedigrees" list and the per-user tag library.
 - Pedigree symbols encode biological sex, not gender (see root AGENTS.md).
 - Structures that competitors refuse but we handle: partnerships with no
-  children (`addPartner`), a single known parent (`addParent` inserts an
+  children (`addPartner`; currently drawn without a couple line, see
+  `claude/agent_harness_testing_bugs.md`), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
   disconnected individuals, cross-generation and consanguineous matings.
   Not yet: twins, adoption, pregnancy loss, assisted reproduction symbols.

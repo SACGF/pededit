@@ -17,8 +17,8 @@ import { layoutToFlow } from "./pedigree/layoutToFlow";
 import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
 import { lintFlow } from "./pedigree/renderLint";
 import { alignPedigree } from "@pedigree-editor/layout-engine";
-import { importPed } from "./io/ped";
-import { importJson } from "./io/json";
+import { importPed, exportPed } from "./io/ped";
+import { importJson, exportJson } from "./io/json";
 import { EXAMPLES } from "./data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -32,7 +32,9 @@ const hooks = {
   useAppStore,
   layoutToFlow,
   importPed,
+  exportPed,
   importJson,
+  exportJson,
   lintFlow,
   EXAMPLES,
   /** Commit the dev server was serving when this page loaded (see vite.config.ts). */

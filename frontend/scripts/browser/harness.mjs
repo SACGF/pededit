@@ -47,6 +47,7 @@ const COMMON_FLAGS = {
   "no-persist-check": "bool",
   "local-storage": "multi",
   first: "bool",
+  "out-dir": "string",
   "as-agent": "bool",
   "allow-remote": "bool",
   viewport: "string",
@@ -121,13 +122,14 @@ disabled, or matches several visible elements is reported, not skipped):
   --drag 'SEL=>DX,DY' Drag an element by DX,DY screen pixels.
   --upload 'SEL=>FILE' Set a file input, or click SEL and answer the file chooser.
   --download 'SEL[=>PATH]' Click SEL and save the download (default
-                      frontend/test-output/browser/downloads/<suggested name>).
+                      <--out-dir or frontend/test-output/browser/downloads>/<name>).
   --reload            Wait for auto-save to finish, then reload the page.
   --sleep MS          Wait MS milliseconds.
   --mouse-away        Move the mouse to the page corner (hides hover toolbars).
   --first             Let a step selector match several visible elements and
                       use the first, instead of failing the step.
 Timing and output:
+  --out-dir DIR       Where downloads (and shot.mjs PNGs) go.
   --wait MS           Extra wait after network idle (default 1500).
   --step-wait MS      Wait after each step (default 300).
   --timeout MS        How long a step waits for its element (default 5000).
@@ -476,7 +478,7 @@ export async function waitForSaved(page, timeout = 8000) {
   ).then(() => true, () => false);
 }
 
-export async function runSteps(page, steps, findings, { timeout = 5000, stepWait = 300, first = false, wait = 1500 } = {}) {
+export async function runSteps(page, steps, findings, { timeout = 5000, stepWait = 300, first = false, wait = 1500, downloadDir = null } = {}) {
   const opts = { timeout, first };
   for (const step of steps) {
     const record = { ...step, ok: true };
@@ -548,7 +550,8 @@ export async function runSteps(page, steps, findings, { timeout = 5000, stepWait
           const [sel, out] = splitArrow(step, { allowMissing: true });
           const el = await target(page, sel, opts);
           const [dl] = await Promise.all([page.waitForEvent("download", { timeout }), el.click({ timeout })]);
-          const file = path.resolve(out ?? path.join(FRONTEND_DIR, "test-output", "browser", "downloads", dl.suggestedFilename()));
+          const dir = downloadDir ?? path.join(FRONTEND_DIR, "test-output", "browser", "downloads");
+          const file = path.resolve(out ?? path.join(dir, dl.suggestedFilename()));
           mkdirSync(path.dirname(file), { recursive: true });
           await dl.saveAs(file);
           record.saved = displayPath(file);
@@ -583,8 +586,11 @@ export function diffJson(a, b, at = "") {
     const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
     for (const k of keys) {
       const p = Array.isArray(a) ? `${at}[${k}]` : at ? `${at}.${k}` : k;
-      if (!(k in b)) out.push({ path: p, kind: "dropped", before: a[k] });
-      else if (!(k in a)) out.push({ path: p, kind: "added", after: b[k] });
+      // A key holding undefined is absent once it goes through JSON.
+      const inA = k in a && a[k] !== undefined, inB = k in b && b[k] !== undefined;
+      if (!inA && !inB) continue;
+      if (!inB) out.push({ path: p, kind: "dropped", before: a[k] });
+      else if (!inA) out.push({ path: p, kind: "added", after: b[k] });
       else out.push(...diffJson(a[k], b[k], p));
     }
     return out;
@@ -911,6 +917,7 @@ export async function openPage(context, { url, fixture, steps = [], flags = {} }
   }
   await runSteps(page, steps, findings, {
     timeout: flags.timeout ?? 5000, stepWait: flags["step-wait"] ?? 300, first: !!flags.first, wait: flags.wait ?? 1500,
+    downloadDir: flags["out-dir"] ? path.resolve(flags["out-dir"]) : null,
   });
   return { page, findings, status: response?.status() ?? null, url, fixture, sent, ms: Date.now() - started };
 }
