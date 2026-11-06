@@ -470,3 +470,29 @@ describe("exportSvg: compact option", () => {
     expect(c.dy).toBeCloseTo(250 * 0.7);
   });
 });
+
+describe("exportSvg: someone drawn twice", () => {
+  // Double first cousins: kinship2 draws a1 once with his parents and once
+  // beside his wife b2.
+  const ind = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+  const dfc: Pedigree = {
+    individuals: [ind("A1", "male"), ind("A2", "female"), ind("B1", "male"), ind("B2", "female"),
+                  ind("a1", "male"), ind("a2", "female"), ind("b1", "male"), ind("b2", "female"),
+                  ind("Y", "female"), ind("X", "male")],
+    partnerships: [
+      { id: "pA", individual1: "A1", individual2: "A2" },
+      { id: "pB", individual1: "B1", individual2: "B2" },
+      { id: "p1", individual1: "b1", individual2: "a2" },
+      { id: "p2", individual1: "a1", individual2: "b2" },
+    ],
+    parentOf: { pA: ["a1", "a2"], pB: ["b1", "b2"], p1: ["Y"], p2: ["X"] },
+    siblingOrder: { mode: "insertion", affectedFirst: false },
+  };
+
+  it("draws both copies joined by one dashed arc, as on the canvas", () => {
+    const svg = exportSvg(dfc);
+    const shapes = svg.match(/<g transform="translate\([^)]+\)">\n<(?:rect|circle|polygon)/g) ?? [];
+    expect(shapes).toHaveLength(11);
+    expect(svg.match(/stroke-dasharray/g)).toHaveLength(1);
+  });
+});

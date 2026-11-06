@@ -10,22 +10,10 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
  * when a fix makes one draw cleanly this test fails until it is removed here,
  * and any new problem in any example fails straight away.
  */
-const KNOWN_BROKEN: Record<string, string[]> = {
-  // duplicate individuals dropped or moved by layoutToFlow (P1 in the bug list)
-  "Spanish Habsburgs": ["couple-lines-overlap", "couple-through-symbol"],
-  "3/4 siblings": ["child-without-parents", "missing-node", "partnership-not-drawn"],
-  "Double first cousins": ["couple-lines-overlap", "couple-through-symbol"],
-  "Double second cousins (A)": ["couple-lines-overlap", "couple-through-symbol"],
-  "Double second cousins (B)": ["couple-lines-overlap", "couple-through-symbol"],
-  "Quadruple half first cousins": ["child-without-parents", "missing-node", "partnership-not-drawn"],
-  "Two lineages joined twice": ["couple-through-symbol"],
-};
+const KNOWN_BROKEN: Record<string, string[]> = {};
 
-/** Extra findings in compact mode: the duplicate fixup puts these symbols on top of each other. */
-const KNOWN_BROKEN_COMPACT_EXTRA: Record<string, string[]> = {
-  "Double first cousins": ["symbols-overlap"],
-  "Double second cousins (B)": ["symbols-overlap"],
-};
+/** Extra findings in compact mode only, by label, as for KNOWN_BROKEN. */
+const KNOWN_BROKEN_COMPACT_EXTRA: Record<string, string[]> = {};
 
 const codes = (p: Pedigree, compact = false) =>
   [...new Set(lintFlow(p, layoutToFlow(p, { compact })).map(f => f.code))].sort();

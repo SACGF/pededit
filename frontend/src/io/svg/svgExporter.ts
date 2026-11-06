@@ -1,11 +1,10 @@
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants";
-import { layoutSpacing, scalePinnedPosition } from "../../pedigree/spacing";
-import type { LayoutSpacing } from "../../pedigree/spacing";
-import { couplePathD, consanguineousPathsD } from "../../pedigree/couplePath";
+import { couplePathD, consanguineousPathsD, duplicateArcD } from "../../pedigree/couplePath";
 import { sibshipSegments } from "../../pedigree/sibshipPath";
-import { activeSnapGrid, snapSlotPositions } from "../../pedigree/snap";
+import { layoutToFlow } from "../../pedigree/layoutToFlow";
+import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 import {
@@ -38,28 +37,23 @@ const CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
 type SlotPos = Map<string, { x: number; y: number }>;
 
 /**
- * Build a map from "level-slot" → canvas pixel position.
- * Pinned individuals use their stored position (scaled to the spacing in use);
- * others use the algorithm result. Snapped to the grid when snap is on.
+ * Map from "level-slot" to canvas pixel position, taken from the canvas's own
+ * layoutToFlow so the export matches it: pins applied (to the nearest copy of
+ * someone drawn twice), and copies with no line left out. A slot missing from
+ * the map is not drawn.
  */
-function buildSlotPositions(pedigree: Pedigree, result: LayoutResult, spacing: LayoutSpacing): SlotPos {
-  const map: SlotPos = new Map();
-  const pinnedSlots = new Set<string>();
-  const { slotWidth, rowHeight } = spacing;
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const nid = Math.floor(result.nid[level][slot]);
-      const ind = pedigree.individuals[nid - 1];
-      const pinned = pedigree.pinnedPositions?.[ind.id];
-      if (pinned) pinnedSlots.add(`${level}-${slot}`);
-      map.set(`${level}-${slot}`, pinned ? scalePinnedPosition(pinned, spacing) : {
-        x: result.pos[level][slot] * slotWidth,
-        y: level * rowHeight,
-      });
-    }
-  }
-  // Match the canvas: with snap on every node is drawn on the grid.
-  return snapSlotPositions(map, pinnedSlots, activeSnapGrid(pedigree));
+function buildSlotPositions(flow: FlowData): SlotPos {
+  return new Map(flow.nodes.map(n => [n.id, n.position]));
+}
+
+/** Dashed arcs joining the copies of anyone drawn more than once. */
+function renderDuplicateArcs(flow: FlowData, slotPos: SlotPos): string[] {
+  const half = NODE_SIZE / 2;
+  return flow.duplicateEdges.map(e => {
+    const a = slotPos.get(e.source)!, b = slotPos.get(e.target)!;
+    const d = duplicateArcD(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half);
+    return `<path d="${d}" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>`;
+  });
 }
 
 // ── Bounds ────────────────────────────────────────────────────────────────────
@@ -338,9 +332,11 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
+      const pos = slotPos.get(`${level}-${slot}`);
+      if (!pos) continue; // a copy with no line, not drawn
       const nid = Math.floor(result.nid[level][slot]);
       const ind = pedigree.individuals[nid - 1];
-      const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
+      const { x: cx, y: cy } = pos;
       const isDuplicate = seen.has(nid);
       seen.add(nid);
 
@@ -372,12 +368,13 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
+      const pos = slotPos.get(`${level}-${slot}`);
       const nid = Math.floor(result.nid[level][slot]);
-      if (seen.has(nid)) continue;
+      if (!pos || seen.has(nid)) continue;
       seen.add(nid);
 
       const ind = pedigree.individuals[nid - 1];
-      const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
+      const { x: cx, y: cy } = pos;
       // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
       const caption = lifeStatusCaption(ind.lifeStatus);
       if (caption) elems.push(renderLifeStatusCaption(caption, cx, cy + LABEL_OFFSET_Y));
@@ -407,7 +404,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 
   const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
   const result  = alignPedigree(working);
-  const slotPos = buildSlotPositions(working, result, layoutSpacing(options.compact));
+  const flow    = layoutToFlow(working, { compact: options.compact });
+  const slotPos = buildSlotPositions(flow);
   const bounds  = computeBounds(working, slotPos, options);
   const { offsetX, offsetY, width, height } = bounds;
 
@@ -429,6 +427,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const partners = buildPartnerSetFromPedigree(working);
   lines.push(...renderCoupleLines(result, partners, slotPos));
   lines.push(...renderSibshipLines(working, result, partners, slotPos));
+  lines.push(...renderDuplicateArcs(flow, slotPos));
   lines.push(...renderSymbols(working, result, slotPos));
   lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);

@@ -85,9 +85,9 @@ describe("layoutToFlow with snap on", () => {
   it("puts example 2's i2a on the grid so a drag can line up under it", () => {
     const ex = EXAMPLES[2]!.data;
     const plain = layoutToFlow(ex).nodes.find(n => n.data.individual.id === "i2a")!;
-    expect(onGrid(plain.position.x, 5)).toBe(false); // 93.333 without snap
+    expect(onGrid(plain.position.x, 5)).toBe(false); // 129.6 without snap
     const snapped = layoutToFlow(withSnap(ex, 5)).nodes.find(n => n.data.individual.id === "i2a")!;
-    expect(snapped.position.x).toBe(95);
+    expect(snapped.position.x).toBe(130);
   });
 
   it("puts compact rows on the grid, so a horizontal drag stays on its row", () => {

@@ -20,6 +20,7 @@ import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
+import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
@@ -32,6 +33,7 @@ const edgeTypes: EdgeTypes = {
   coupleEdge:         CoupleEdge,
   consanguineousEdge: ConsanguineousEdge,
   sibshipEdge:        SibshipEdge,
+  duplicateEdge:      DuplicateEdge,
 };
 
 // ── Custom minimap ─────────────────────────────────────────────────────────────
@@ -174,10 +176,10 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
 
-  const { nodes: computedNodes, coupleEdges, sibshipEdges } = useMemo(
+  const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges } = useMemo(
     () => pedigree.individuals.length > 0
       ? layoutToFlow(pedigree, { compact })
-      : { nodes: [], coupleEdges: [], sibshipEdges: [] },
+      : { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] },
     [pedigree, compact],
   );
 
@@ -196,7 +198,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     [],
   );
 
-  const edges = [...coupleEdges, ...sibshipEdges];
+  const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges];
 
   // Background dots follow the snap grid when snap is on (React Flow's
   // default of 20 otherwise). React Flow centres a dot in each pattern tile,

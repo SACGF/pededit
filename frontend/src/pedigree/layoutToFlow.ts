@@ -1,7 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "./constants";
+import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP, DUPLICATE_ARC_BULGE } from "./constants";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
@@ -11,19 +11,22 @@ import { activeSnapGrid, snapSlotPositions } from "./snap";
 export interface RFNodeData extends Record<string, unknown> {
   individual: Individual;
   /**
-   * True when the same individual appears in two different slots (e.g. a
-   * parent who has children with two different partners). Both occurrences
-   * render — add a small superscript to both.
+   * True when the same individual is drawn in more than one slot (kinship2
+   * could not place them both with their siblings and beside every partner).
+   * Every copy renders with a superscript, joined by a dashed duplicateEdge.
    */
   isDuplicate: boolean;
   /**
-   * 1 = first occurrence of a duplicate, 2 = second. Used to pick the
-   * superscript glyph. Undefined when isDuplicate = false.
+   * 1 = first drawn copy of a duplicate, 2 = second, and so on, in reading
+   * order. Shown as a superscript. Undefined when isDuplicate = false.
    */
-  duplicateIndex?: 1 | 2;
+  duplicateIndex?: number;
   /** True if individual has a parent partnership in the pedigree. */
   hasParents: boolean;
-  /** True if this individual has a manually dragged (pinned) position. */
+  /**
+   * True if this node sits at the individual's pinned (dragged) position. For
+   * someone drawn more than once only the copy nearest the pin is moved.
+   */
   isPinned: boolean;
 }
 
@@ -68,10 +71,18 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   childY: number;
 }
 
+/** Dashed arc joining two copies of the same person. */
+export interface DuplicateEdgeData extends Record<string, unknown> {
+  /** How far (px) the arc rises above the higher of the two symbol tops. */
+  bulge: number;
+}
+
 export interface FlowData {
   nodes: Node<RFNodeData>[];
   coupleEdges: Edge<CoupleEdgeData>[];
   sibshipEdges: Edge<SibshipEdgeData>[];
+  /** One per pair of consecutive copies of someone drawn more than once. */
+  duplicateEdges: Edge<DuplicateEdgeData>[];
 }
 
 export interface LayoutToFlowOptions {
@@ -83,180 +94,71 @@ export interface LayoutToFlowOptions {
   compact?: boolean;
 }
 
-// ── Orphan duplicate detection ────────────────────────────────────────────────
+// ── Duplicate copies ──────────────────────────────────────────────────────────
 
 /**
- * When both spouses have parents, alignped1 processes one family first and
- * "claims" the other spouse — consuming the couple row. The second family then
- * has that spouse appear as a childless, partnerless orphan.
+ * kinship2 draws someone in more than one slot when one copy cannot sit both
+ * with their parents' other children and beside every partner (cousin
+ * marriages, people with partners on both sides of the tree). Every copy that
+ * carries a line is drawn, as R's plot.pedigree does, and the copies are
+ * joined by a dashed arc (see duplicateEdges).
  *
- * This function finds same-level duplicate slots where one copy has no couple
- * edge (the orphan). Returns:
- *   orphanSlotIds  — slot IDs to suppress in node output
- *   redirectSlot   — maps orphan slot ID → canonical (couple-connected) slot ID,
- *                    so sibship edges can be redirected to the correct position
+ * A copy with no line at all (no parents above it, no spouse marker beside
+ * it) carries no information once its other copies are drawn, so it is left
+ * out. kinship2 leaves these behind in the founder row when someone has
+ * partners on both sides of a chain (e.g. "Quadruple half first cousins").
  */
-function findOrphanDuplicates(result: LayoutResult): {
-  orphanSlotIds: Set<string>;
-  redirectSlot:  Map<string, string>;
-} {
-  const orphanSlotIds = new Set<string>();
-  const redirectSlot  = new Map<string, string>();
-
-  // Group slots by (baseNid, level) to find same-level duplicates.
-  const nidLevelSlots = new Map<string, number[]>(); // "${nid}-${lev}" → [slot, ...]
+function findLinelessCopies(result: LayoutResult): Set<string> {
+  const copies = new Map<number, number>(); // nid → slot count
   for (let lev = 0; lev < result.n.length; lev++) {
     for (let sl = 0; sl < result.n[lev]; sl++) {
-      const baseNid = Math.floor(result.nid[lev][sl]);
-      const key = `${baseNid}-${lev}`;
-      if (!nidLevelSlots.has(key)) nidLevelSlots.set(key, []);
-      nidLevelSlots.get(key)!.push(sl);
+      const nid = result.nid[lev][sl];
+      copies.set(nid, (copies.get(nid) ?? 0) + 1);
     }
   }
 
-  for (const [key, slots] of nidLevelSlots) {
-    if (slots.length < 2) continue;
-
-    const lev = parseInt(key.split("-").at(-1)!);
-    const spouseRow = result.spouse[lev] ?? [];
-
-    // Canonical = the slot that participates in a couple edge.
-    // A slot is the left partner if spouse[lev][sl] > 0.
-    // A slot is the right partner if spouse[lev][sl-1] > 0.
-    let canonical: number | null = null;
-    for (const sl of slots) {
-      const isLeft  = sl < result.n[lev] - 1 && (spouseRow[sl]     ?? 0) > 0;
-      const isRight = sl > 0                  && (spouseRow[sl - 1] ?? 0) > 0;
-      if (isLeft || isRight) {
-        canonical = sl;
-        break;
-      }
-    }
-    if (canonical === null) continue;
-
-    for (const sl of slots) {
-      if (sl === canonical) continue;
-      orphanSlotIds.add(`${lev}-${sl}`);
-      redirectSlot.set(`${lev}-${sl}`, `${lev}-${canonical}`);
+  // Slots a family hangs from (always a marked couple, but be safe).
+  const parentSlots = new Set<string>();
+  for (let lev = 1; lev < result.n.length; lev++) {
+    for (let sl = 0; sl < result.n[lev]; sl++) {
+      const f = result.fam[lev][sl];
+      if (f > 0) { parentSlots.add(`${lev - 1}-${f - 1}`); parentSlots.add(`${lev - 1}-${f}`); }
     }
   }
 
-  return { orphanSlotIds, redirectSlot };
-}
-
-// ── Orphan position adjustment ────────────────────────────────────────────────
-
-/**
- * When both partners have parents the orphan-redirect produces a layout where
- * one parent-pair sits on the wrong side of its child (because alignped1 placed
- * the child as a spouse copy next to the other partner first, then the second
- * family placed it again further right as a child).
- *
- * This function post-processes node positions so that:
- *   - Each redirected child (canonical) is centred under its own parents.
- *   - Its couple-partner is centred under the partner's own parents.
- *
- * Both slotPos and the nodes array are mutated in-place (positions only).
- * Pinned nodes are left untouched.
- */
-function adjustOrphanPositions(
-  result: LayoutResult,
-  redirectSlot: Map<string, string>,
-  nodes: Node<RFNodeData>[],
-  slotPos: Map<string, { x: number; y: number }>,
-): void {
-  for (const [orphanSlotId, canonicalSlotId] of redirectSlot) {
-    const parts = orphanSlotId.split("-");
-    const orphanLevel = parseInt(parts[0]!);
-    const orphanSlot  = parseInt(parts[1]!);
-
-    if (orphanLevel < 1) continue;
-
-    // Orphan's parents via fam (1-based left-parent slot in level above).
-    const orphanFam = result.fam[orphanLevel]?.[orphanSlot] ?? 0;
-    if (!orphanFam) continue;
-
-    const parentLevel      = orphanLevel - 1;
-    const leftParentSlot   = orphanFam - 1;  // 0-based
-    const rightParentSlot  = orphanFam;       // 0-based
-
-    const leftParentPos  = slotPos.get(`${parentLevel}-${leftParentSlot}`);
-    const rightParentPos = slotPos.get(`${parentLevel}-${rightParentSlot}`);
-    if (!leftParentPos || !rightParentPos) continue;
-
-    const newCanonicalX = (leftParentPos.x + rightParentPos.x) / 2;
-
-    // Update canonical child position (the spouse-copy that was already placed).
-    const canonicalPos = slotPos.get(canonicalSlotId);
-    if (!canonicalPos) continue;
-
-    const setPos = (slotId: string, x: number) => {
-      const pos = slotPos.get(slotId);
-      if (!pos) return;
-      slotPos.set(slotId, { ...pos, x });
-      const node = nodes.find(n => n.id === slotId);
-      if (node && !node.data.isPinned) {
-        node.position = { ...node.position, x };
-      }
-    };
-
-    setPos(canonicalSlotId, newCanonicalX);
-
-    // Also centre the couple-partner under its own parents.
-    const cParts        = canonicalSlotId.split("-");
-    const canonicalLevel = parseInt(cParts[0]!);
-    const canonicalSlot  = parseInt(cParts[1]!);
-
-    const spouseRow = result.spouse[canonicalLevel] ?? [];
-    let partnerSlot: number | null = null;
-    if (canonicalSlot < result.n[canonicalLevel] - 1 && (spouseRow[canonicalSlot] ?? 0) > 0) {
-      partnerSlot = canonicalSlot + 1;
-    } else if (canonicalSlot > 0 && (spouseRow[canonicalSlot - 1] ?? 0) > 0) {
-      partnerSlot = canonicalSlot - 1;
+  const out = new Set<string>();
+  const remaining = new Map(copies);
+  for (let lev = 0; lev < result.n.length; lev++) {
+    const sp = result.spouse[lev] ?? [];
+    for (let sl = 0; sl < result.n[lev]; sl++) {
+      const nid = result.nid[lev][sl];
+      if ((remaining.get(nid) ?? 1) < 2) continue; // keep the last copy standing
+      const id = `${lev}-${sl}`;
+      const married = (sp[sl] ?? 0) > 0 || (sl > 0 && (sp[sl - 1] ?? 0) > 0);
+      if (married || result.fam[lev][sl] > 0 || parentSlots.has(id)) continue;
+      out.add(id);
+      remaining.set(nid, remaining.get(nid)! - 1);
     }
-    if (partnerSlot === null) continue;
-
-    const partnerFam = result.fam[canonicalLevel]?.[partnerSlot] ?? 0;
-    if (!partnerFam) continue;
-
-    const pLeftParentPos  = slotPos.get(`${parentLevel}-${partnerFam - 1}`);
-    const pRightParentPos = slotPos.get(`${parentLevel}-${partnerFam}`);
-    if (!pLeftParentPos || !pRightParentPos) continue;
-
-    setPos(
-      `${canonicalLevel}-${partnerSlot}`,
-      (pLeftParentPos.x + pRightParentPos.x) / 2,
-    );
   }
+  return out;
 }
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
   if (pedigree.individuals.length === 0) {
-    return { nodes: [], coupleEdges: [], sibshipEdges: [] };
+    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] };
   }
   const result: LayoutResult = alignPedigree(pedigree);
   const spacing = layoutSpacing(options.compact);
 
-  // Detect orphan duplicates (both-spouses-have-parents case) and build
-  // a redirect map so their parents' sibship edges point to the right node.
-  const { orphanSlotIds, redirectSlot } = findOrphanDuplicates(result);
-
-  const nodes = buildNodes(pedigree, result, orphanSlotIds, spacing);
+  const hidden = findLinelessCopies(result);
+  const nodes = buildNodes(pedigree, result, hidden, spacing);
 
   // Map from slot id ("level-slot") → final pixel position (reflects pin overrides).
   const slotPos = new Map<string, { x: number; y: number }>();
   for (const node of nodes) {
     slotPos.set(node.id, node.position);
-  }
-
-  // When both partners have parents the orphan-redirect can leave a partner
-  // visually offset from its parents.  Centre each redirected child under its
-  // own parents, and centre the couple-partner under their parents too, so
-  // both sibship lines drop vertically rather than diagonally.
-  if (redirectSlot.size > 0) {
-    adjustOrphanPositions(result, redirectSlot, nodes, slotPos);
   }
 
   // With snap on, every node is drawn on the grid (see snap.ts).
@@ -272,8 +174,9 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
 
   return {
     nodes,
-    coupleEdges:  buildCoupleEdges(result, partners),
-    sibshipEdges: buildSibshipEdges(result, partners, slotPos, redirectSlot),
+    coupleEdges:    buildCoupleEdges(result, partners),
+    sibshipEdges:   buildSibshipEdges(result, partners, slotPos),
+    duplicateEdges: buildDuplicateEdges(nodes, spacing),
   };
 }
 
@@ -293,68 +196,111 @@ function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, 
 function buildNodes(
   pedigree: Pedigree,
   result: LayoutResult,
-  orphanSlotIds: Set<string>,
+  hidden: Set<string>,
   spacing: LayoutSpacing,
 ): Node<RFNodeData>[] {
   const { slotWidth, rowHeight } = spacing;
-  // First pass: count non-orphan slots per baseNid to compute isDuplicate correctly.
-  const nidSlotCount = new Map<number, number>();
+
+  // Drawn slots per individual, in reading order.
+  const slotsOf = new Map<number, string[]>();
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
-      if (orphanSlotIds.has(`${level}-${slot}`)) continue;
-      const baseNid = Math.floor(result.nid[level][slot]);
-      nidSlotCount.set(baseNid, (nidSlotCount.get(baseNid) ?? 0) + 1);
+      const id = `${level}-${slot}`;
+      if (hidden.has(id)) continue;
+      const nid = result.nid[level][slot];
+      if (!slotsOf.has(nid)) slotsOf.set(nid, []);
+      slotsOf.get(nid)!.push(id);
     }
+  }
+
+  const autoPos = (level: number, slot: number) => ({
+    x: result.pos[level][slot] * slotWidth,
+    y: level * rowHeight,
+  });
+
+  // A pin is stored per individual. When someone is drawn more than once it
+  // moves only the copy laid out nearest to it (normally the one that was
+  // dragged); the other copies keep their automatic places instead of all
+  // landing on the same spot.
+  const pinnedSlot = new Map<number, string>();
+  for (const [nid, ids] of slotsOf) {
+    const pin = pedigree.pinnedPositions?.[pedigree.individuals[nid - 1]!.id];
+    if (!pin) continue;
+    const p = scalePinnedPosition(pin, spacing);
+    let best = ids[0]!, bestD = Infinity;
+    for (const id of ids) {
+      const [lv, sl] = id.split("-").map(Number) as [number, number];
+      const a = autoPos(lv, sl);
+      const d = (a.x - p.x) ** 2 + (a.y - p.y) ** 2;
+      if (d < bestD) { bestD = d; best = id; }
+    }
+    pinnedSlot.set(nid, best);
   }
 
   // Determine which individuals are draggable.
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
+  const childIds = new Set(Object.values(pedigree.parentOf).flat());
 
-  // Second pass: emit one React Flow node per (level, slot), skipping orphans.
-  const nidOccurrence = new Map<number, number>();
   const nodes: Node<RFNodeData>[] = [];
-
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
-      if (orphanSlotIds.has(`${level}-${slot}`)) continue;
+      const id = `${level}-${slot}`;
+      if (hidden.has(id)) continue;
 
-      const baseNid = Math.floor(result.nid[level][slot]);
-      const individual = pedigree.individuals[baseNid - 1]; // 1-based → 0-based
-
-      const occurrence = (nidOccurrence.get(baseNid) ?? 0) + 1;
-      nidOccurrence.set(baseNid, occurrence);
-      const isDuplicate = (nidSlotCount.get(baseNid) ?? 1) > 1;
-
-      const hasParents = Object.values(pedigree.parentOf).some(
-        children => children.includes(individual.id)
-      );
-
+      const nid = result.nid[level][slot];
+      const individual = pedigree.individuals[nid - 1]; // 1-based → 0-based
+      const copies = slotsOf.get(nid)!;
+      const isDuplicate = copies.length > 1;
+      const isPinned = pinnedSlot.get(nid) === id;
       const pinnedPos = pedigree.pinnedPositions?.[individual.id];
-      const isMoveable = nodesMoveable || unlockedSet.has(individual.id);
 
       nodes.push({
-        id:       `${level}-${slot}`,
+        id,
         type:     "pedigreeSymbol",
-        position: pinnedPos ? scalePinnedPosition(pinnedPos, spacing) : {
-          x: result.pos[level][slot] * slotWidth,
-          y: level * rowHeight,
-        },
-        draggable: isMoveable,
+        position: isPinned && pinnedPos ? scalePinnedPosition(pinnedPos, spacing) : autoPos(level, slot),
+        draggable: nodesMoveable || unlockedSet.has(individual.id),
         width:  NODE_SIZE,
         height: NODE_SIZE,
         data: {
           individual,
           isDuplicate,
-          duplicateIndex: isDuplicate ? (occurrence as 1 | 2) : undefined,
-          hasParents,
-          isPinned: !!pinnedPos,
+          duplicateIndex: isDuplicate ? copies.indexOf(id) + 1 : undefined,
+          hasParents: childIds.has(individual.id),
+          isPinned,
         },
       });
     }
   }
 
   return nodes;
+}
+
+// ── Duplicate connectors ──────────────────────────────────────────────────────
+
+/** Joins consecutive drawn copies of one person, left to right (R: arcconnect). */
+function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing): Edge<DuplicateEdgeData>[] {
+  const byPerson = new Map<string, Node<RFNodeData>[]>();
+  for (const n of nodes) {
+    if (!n.data.isDuplicate) continue;
+    const pid = n.data.individual.id;
+    if (!byPerson.has(pid)) byPerson.set(pid, []);
+    byPerson.get(pid)!.push(n);
+  }
+  const edges: Edge<DuplicateEdgeData>[] = [];
+  for (const [pid, copies] of byPerson) {
+    const sorted = [...copies].sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y);
+    for (let i = 0; i + 1 < sorted.length; i++) {
+      edges.push({
+        id:     `duplicate-${pid}-${i}`,
+        source: sorted[i]!.id,
+        target: sorted[i + 1]!.id,
+        type:   "duplicateEdge",
+        data:   { bulge: DUPLICATE_ARC_BULGE * (spacing.rowHeight / 2 - NODE_SIZE / 2) },
+      });
+    }
+  }
+  return edges;
 }
 
 // ── Couple edges ──────────────────────────────────────────────────────────────
@@ -393,7 +339,6 @@ function buildSibshipEdges(
   result: LayoutResult,
   partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
-  redirectSlot: Map<string, string>,
 ): Edge<SibshipEdgeData>[] {
   const edges: Edge<SibshipEdgeData>[] = [];
 
@@ -411,11 +356,7 @@ function buildSibshipEdges(
       const leftParentSlot  = f - 1;  // 0-based
       const rightParentSlot = f;       // 0-based
 
-      // Resolve any orphan-duplicate children to their canonical slot.
-      const resolvedChildIds = slots.map(s => {
-        const slotId = `${level}-${s}`;
-        return redirectSlot.get(slotId) ?? slotId;
-      });
+      const resolvedChildIds = slots.map(s => `${level}-${s}`);
 
       const leftPos  = slotPos.get(`${level - 1}-${leftParentSlot}`)!;
       const rightPos = slotPos.get(`${level - 1}-${rightParentSlot}`)!;
@@ -424,9 +365,8 @@ function buildSibshipEdges(
       const coupleX  = (leftPos.x + rightPos.x) / 2;
       const coupleY  = (leftPos.y + rightPos.y) / 2;
 
-      // Use canonical child positions for geometry.
       const firstChildPos = slotPos.get(resolvedChildIds[0]!);
-      if (!firstChildPos) continue; // canonical child not found
+      if (!firstChildPos) continue;
       const childXs  = resolvedChildIds.map(id => slotPos.get(id)?.x ?? 0);
       const childYs  = resolvedChildIds.map(id => slotPos.get(id)?.y ?? firstChildPos.y);
       const childY   = Math.min(...childYs);

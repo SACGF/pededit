@@ -153,7 +153,7 @@ for (let level = 0; level < result.n.length; level++) {
 }
 ```
 
-**Handling duplicate slots:** If the same `nid` value appears at two different slots (same or different levels), render both. Add a visual indicator that they are the same person — the standard convention is a small superscript number (e.g. `¹`) on both occurrences. Do NOT deduplicate: the position information is load-bearing for edge drawing.
+**Handling duplicate slots:** If the same `nid` value appears at two different slots (same or different levels), render both. Add a visual indicator that they are the same person — the standard convention is a small superscript number (e.g. `¹`) on both occurrences. Do NOT deduplicate: the position information is load-bearing for edge drawing. Join the copies with a dashed arc, as R's `plot.pedigree` does (`arcconnect`). A copy with no line at all (no `fam`, no spouse marker on either side) may be left out once another copy is drawn; kinship2 leaves these at the end of a founder row when someone has partners on both sides of a chain. `layoutToFlow` and the SVG exporter do both, and apply a pin only to the copy nearest it.
 
 ### Rule 2: Couple lines
 

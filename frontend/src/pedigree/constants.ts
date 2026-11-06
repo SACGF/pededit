@@ -24,3 +24,11 @@ export const COUPLE_HOP_STEP = 10;
 
 /** Distance (px) from a node edge at which a hopping couple line turns upward. */
 export const COUPLE_HOP_INSET = 10;
+
+/**
+ * Rise of the dashed arc joining two copies of one person above the symbol
+ * tops, as a fraction of the gap between a symbol top and the sibship bar
+ * above its row. R's plot.pedigree rises half a row, into the bar; staying
+ * below it keeps the arc from reading as part of the bar.
+ */
+export const DUPLICATE_ARC_BULGE = 0.7;
