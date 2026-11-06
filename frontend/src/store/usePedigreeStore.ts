@@ -126,6 +126,7 @@ interface PedigreeState {
   updateIndividual: (id: string, updates: Partial<Individual>) => void;
   setAffected: (id: string, affected: boolean) => void;
   setDeceased: (id: string, deceased: boolean) => void;
+  setCarrier: (id: string, carrier: boolean) => void;
   setProband: (id: string) => void;
   setSex: (id: string, sex: Sex) => void;
 
@@ -458,6 +459,13 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
         if (ind) ind.deceased = deceased;
+      });
+    },
+
+    setCarrier: (id, carrier) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (ind) ind.carrier = carrier;
       });
     },
 
