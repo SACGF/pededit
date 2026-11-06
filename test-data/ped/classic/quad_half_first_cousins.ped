@@ -1,0 +1,15 @@
+# Quadruple half first cousins: two men (A, C) and two women (B, D) have four
+# children in a cycle of partnerships A-B, C-D, A-D, C-B. Each parent of X is a half
+# sibling of each parent of Y. Kinship(X, Y) = 1/8, the same as half siblings, but
+# the identity coefficients differ. Every founder has two partners, so the top row
+# cannot be drawn without duplicating someone.
+CLAS	A	0	0	1	1
+CLAS	B	0	0	2	1
+CLAS	C	0	0	1	1
+CLAS	D	0	0	2	1
+CLAS	F1	A	B	1	1
+CLAS	M1	C	D	2	1
+CLAS	F2	A	D	1	1
+CLAS	M2	C	B	2	1
+CLAS	X	F1	M1	1	2
+CLAS	Y	F2	M2	2	2

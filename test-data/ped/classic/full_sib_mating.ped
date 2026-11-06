@@ -1,0 +1,6 @@
+# Full-sib mating: brother S and sister D have a child C. Inbreeding(C) = 1/4.
+CLAS	GF	0	0	1	1
+CLAS	GM	0	0	2	1
+CLAS	S	GF	GM	1	1
+CLAS	D	GF	GM	2	1
+CLAS	C	S	D	1	2

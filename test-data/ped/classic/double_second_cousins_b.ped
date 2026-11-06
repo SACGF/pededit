@@ -1,0 +1,18 @@
+# Double second cousins, variant B: the fathers P1 and P2 of X and Y are double
+# first cousins (a brother and sister from lineage G married a sister and brother
+# from lineage H), and the mothers are unrelated. Kinship(X, Y) = 1/32, the same
+# as variant A, but the condensed identity coefficients differ.
+CLAS	G1	0	0	1	1
+CLAS	G2	0	0	2	1
+CLAS	H1	0	0	1	1
+CLAS	H2	0	0	2	1
+CLAS	g1	G1	G2	1	1
+CLAS	g2	G1	G2	2	1
+CLAS	h1	H1	H2	1	1
+CLAS	h2	H1	H2	2	1
+CLAS	P1	g1	h2	1	1
+CLAS	P2	h1	g2	1	1
+CLAS	s1	0	0	2	1
+CLAS	s2	0	0	2	1
+CLAS	X	P1	s1	1	2
+CLAS	Y	P2	s2	2	2

@@ -1,0 +1,13 @@
+# Double first cousins: a brother and sister from family A marry a sister and brother
+# from family B. Their children X and Y are first cousins through both parents.
+# Kinship(X, Y) = 1/8, the same as half siblings.
+CLAS	A1	0	0	1	1
+CLAS	A2	0	0	2	1
+CLAS	B1	0	0	1	1
+CLAS	B2	0	0	2	1
+CLAS	a1	A1	A2	1	1
+CLAS	a2	A1	A2	2	1
+CLAS	b1	B1	B2	1	1
+CLAS	b2	B1	B2	2	1
+CLAS	X	a1	b2	1	2
+CLAS	Y	b1	a2	2	2

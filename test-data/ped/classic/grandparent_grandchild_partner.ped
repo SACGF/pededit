@@ -1,0 +1,11 @@
+# Cross-generational mating: grandfather GF has a child W with Z, who is also the
+# partner of his grandson GC. W is both an uncle of GC and a half sibling of GC's
+# child GGC. The GF-Z couple spans two generations, which kindepth must reconcile.
+CLAS	GF	0	0	1	1
+CLAS	GM	0	0	2	1
+CLAS	P	GF	GM	2	1
+CLAS	S	0	0	1	1
+CLAS	GC	S	P	1	1
+CLAS	Z	0	0	2	1
+CLAS	GGC	GC	Z	2	1
+CLAS	W	GF	Z	1	2

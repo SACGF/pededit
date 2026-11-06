@@ -1,8 +1,12 @@
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Individual, Partnership, Sex } from "@pedigree-editor/layout-engine";
 
 export interface ExamplePedigree {
   label: string;
   description: string;
+  /** Heading in the example picker. Entries without a group come first, under no heading. */
+  group?: "Historic" | "Classic";
+  /** Primary source, shown under the description. */
+  citation?: string;
   data: Pedigree;
 }
 
@@ -427,4 +431,276 @@ export const EXAMPLES: ExamplePedigree[] = [
       },
     },
   },
+  ...historicAndClassicExamples(),
 ];
+
+/** Example picker headings in display order. "" is the ungrouped set above. */
+export const EXAMPLE_GROUPS: string[] = [...new Set(EXAMPLES.map(e => e.group ?? ""))];
+
+// ── Historic and classic examples ─────────────────────────────────────────────
+//
+// These are the same pedigrees as test-data/ped/historic and test-data/ped/classic
+// (sources and notes in test-data/ped/README.md), written as parent-pointer rows
+// so the entries stay readable. A row is [id, sex, father, mother, extras].
+
+type Row = [
+  id: string,
+  sex: Sex,
+  father: string | null,
+  mother: string | null,
+  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes">>,
+];
+
+function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree {
+  const individuals: Individual[] = rows.map(([id, sex, , , extras]) => ({
+    id,
+    sex,
+    affected: extras?.affected ?? false,
+    deceased: extras?.deceased ?? defaults.deceased ?? false,
+    carrier: extras?.carrier ?? false,
+    proband: extras?.proband ?? false,
+    sibOrder: 0,
+    ...(extras?.name ? { name: extras.name } : {}),
+    ...(extras?.notes ? { notes: extras.notes } : {}),
+  }));
+
+  const parentsOf = new Map<string, [string, string]>();
+  const partnerships: Partnership[] = [];
+  const parentOf: Record<string, string[]> = {};
+  for (const [id, , father, mother] of rows) {
+    if (!father || !mother) continue;
+    parentsOf.set(id, [father, mother]);
+    const pid = `${father}+${mother}`;
+    if (!parentOf[pid]) {
+      partnerships.push({ id: pid, individual1: father, individual2: mother });
+      parentOf[pid] = [];
+    }
+    parentOf[pid].push(id);
+  }
+
+  const ancestors = (id: string): Set<string> => {
+    const out = new Set<string>();
+    const stack = [id];
+    while (stack.length) {
+      const p = parentsOf.get(stack.pop()!);
+      if (!p) continue;
+      for (const a of p) {
+        if (!out.has(a)) { out.add(a); stack.push(a); }
+      }
+    }
+    return out;
+  };
+  for (const p of partnerships) {
+    const a1 = ancestors(p.individual1);
+    const a2 = ancestors(p.individual2);
+    if (a1.has(p.individual2) || a2.has(p.individual1) || [...a1].some(a => a2.has(a))) {
+      p.consanguineous = true;
+    }
+  }
+
+  const byId = new Map(individuals.map(i => [i.id, i]));
+  for (const children of Object.values(parentOf)) {
+    children.forEach((c, i) => { byId.get(c)!.sibOrder = i; });
+  }
+
+  return { siblingOrder, individuals, partnerships, parentOf };
+}
+
+function historicAndClassicExamples(): ExamplePedigree[] {
+  const M: Sex = "male";
+  const F: Sex = "female";
+
+  const habsburg: Row[] = [
+    ["Ferdinand_of_Aragon",   M, null, null, { name: "Ferdinand of Aragon" }],
+    ["Elizabeth_of_Castile",  F, null, null, { name: "Elizabeth of Castile" }],
+    ["Maximilian_I",          M, null, null, { name: "Maximilian I" }],
+    ["Mary_of_Burgundy",      F, null, null, { name: "Mary of Burgundy" }],
+    ["Manuel_I",              M, null, null, { name: "Manuel I of Portugal" }],
+    ["Mary_of_Aragon",        F, "Ferdinand_of_Aragon", "Elizabeth_of_Castile", { name: "Mary of Aragon" }],
+    ["Joanna_I",              F, "Ferdinand_of_Aragon", "Elizabeth_of_Castile", { name: "Joanna I" }],
+    ["Philip_I",              M, "Maximilian_I", "Mary_of_Burgundy", { name: "Philip I", notes: "F = 0.025 (Alvarez et al. 2009)" }],
+    ["John_III",              M, "Manuel_I", "Mary_of_Aragon", { name: "John III of Portugal" }],
+    ["Isabella_of_Portugal",  F, "Manuel_I", "Mary_of_Aragon", { name: "Isabella of Portugal" }],
+    ["Catherine",             F, "Philip_I", "Joanna_I", { name: "Catherine" }],
+    ["Charles_I",             M, "Philip_I", "Joanna_I", { name: "Charles I (Charles V)", notes: "F = 0.037 (Alvarez et al. 2009)" }],
+    ["Ferdinand_I",           M, "Philip_I", "Joanna_I", { name: "Ferdinand I" }],
+    ["Anna_of_Hungary",       F, null, null, { name: "Anna of Hungary" }],
+    ["Mary_of_Portugal",      F, "John_III", "Catherine", { name: "Mary of Portugal" }],
+    ["Philip_II",             M, "Charles_I", "Isabella_of_Portugal", { name: "Philip II", notes: "F = 0.123 (Alvarez et al. 2009)" }],
+    ["Maria",                 F, "Charles_I", "Isabella_of_Portugal", { name: "Maria" }],
+    ["Maximilian_II",         M, "Ferdinand_I", "Anna_of_Hungary", { name: "Maximilian II" }],
+    ["Charles_II_of_Austria", M, "Ferdinand_I", "Anna_of_Hungary", { name: "Archduke Charles II" }],
+    ["Anna",                  F, "Ferdinand_I", "Anna_of_Hungary", { name: "Anna" }],
+    ["Albert_V_of_Bavaria",   M, null, null, { name: "Albert V of Bavaria", notes: "Not in the paper's figure; added as Mary's father" }],
+    ["Don_Carlos",            M, "Philip_II", "Mary_of_Portugal", { name: "Charles (Don Carlos)", notes: "F = 0.211 (Alvarez et al. 2009)" }],
+    ["Anna_of_Austria",       F, "Maximilian_II", "Maria", { name: "Anna of Austria" }],
+    ["Mary",                  F, "Albert_V_of_Bavaria", "Anna", { name: "Mary" }],
+    ["Philip_III",            M, "Philip_II", "Anna_of_Austria", { name: "Philip III", notes: "F = 0.218 (Alvarez et al. 2009)" }],
+    ["Margaret_of_Austria",   F, "Charles_II_of_Austria", "Mary", { name: "Margaret of Austria" }],
+    ["Ferdinand_II",          M, "Charles_II_of_Austria", "Mary", { name: "Ferdinand II" }],
+    ["Maria_Anna_of_Bavaria", F, null, null, { name: "Maria Anna of Bavaria", notes: "Not in the paper's figure; added as Ferdinand III's mother" }],
+    ["Philip_IV",             M, "Philip_III", "Margaret_of_Austria", { name: "Philip IV", notes: "F = 0.115 (Alvarez et al. 2009)" }],
+    ["Maria_Anna_of_Austria", F, "Philip_III", "Margaret_of_Austria", { name: "Maria Anna of Austria" }],
+    ["Ferdinand_III",         M, "Ferdinand_II", "Maria_Anna_of_Bavaria", { name: "Ferdinand III" }],
+    ["Mariana_of_Austria",    F, "Ferdinand_III", "Maria_Anna_of_Austria", { name: "Mariana of Austria" }],
+    ["Charles_II",            M, "Philip_IV", "Mariana_of_Austria", { name: "Charles II", affected: true, proband: true, notes: "F = 0.254 on the paper's full pedigree, 0.217 on this one" }],
+  ];
+
+  const carrier = { carrier: true };
+  const haem = { affected: true };
+  const victoria: Row[] = [
+    ["Queen_Victoria",          F, null, null, { name: "Queen Victoria", carrier: true, notes: "Obligate carrier of the F9 mutation" }],
+    ["Prince_Albert",           M, null, null, { name: "Prince Albert" }],
+    ["Victoria_Princess_Royal", F, "Prince_Albert", "Queen_Victoria", { name: "Victoria, Princess Royal" }],
+    ["Edward_VII",              M, "Prince_Albert", "Queen_Victoria", { name: "Edward VII" }],
+    ["Alice",                   F, "Prince_Albert", "Queen_Victoria", { name: "Alice", ...carrier }],
+    ["Alfred",                  M, "Prince_Albert", "Queen_Victoria", { name: "Alfred" }],
+    ["Helena",                  F, "Prince_Albert", "Queen_Victoria", { name: "Helena" }],
+    ["Louise",                  F, "Prince_Albert", "Queen_Victoria", { name: "Louise" }],
+    ["Arthur",                  M, "Prince_Albert", "Queen_Victoria", { name: "Arthur" }],
+    ["Leopold",                 M, "Prince_Albert", "Queen_Victoria", { name: "Leopold", ...haem }],
+    ["Beatrice",                F, "Prince_Albert", "Queen_Victoria", { name: "Beatrice", ...carrier }],
+    ["Frederick_III",           M, null, null, { name: "Frederick III" }],
+    ["Louis_IV_of_Hesse",       M, null, null, { name: "Louis IV of Hesse" }],
+    ["Helen_of_Waldeck",        F, null, null, { name: "Helen of Waldeck" }],
+    ["Henry_of_Battenberg",     M, null, null, { name: "Henry of Battenberg" }],
+    ["Henry_of_Prussia",        M, "Frederick_III", "Victoria_Princess_Royal", { name: "Henry of Prussia" }],
+    ["Victoria_of_Hesse",       F, "Louis_IV_of_Hesse", "Alice", { name: "Victoria of Hesse" }],
+    ["Elisabeth_of_Hesse",      F, "Louis_IV_of_Hesse", "Alice", { name: "Elisabeth of Hesse" }],
+    ["Irene_of_Hesse",          F, "Louis_IV_of_Hesse", "Alice", { name: "Irene of Hesse", ...carrier }],
+    ["Ernest_Louis_of_Hesse",   M, "Louis_IV_of_Hesse", "Alice", { name: "Ernest Louis" }],
+    ["Friedrich_of_Hesse",      M, "Louis_IV_of_Hesse", "Alice", { name: "Friedrich", ...haem, notes: "Died aged 2 after a fall" }],
+    ["Alix_of_Hesse",           F, "Louis_IV_of_Hesse", "Alice", { name: "Alix (Empress Alexandra)", ...carrier, notes: "Heterozygous for F9 IVS3-3A>G by DNA (Rogaev et al. 2009)" }],
+    ["Marie_of_Hesse",          F, "Louis_IV_of_Hesse", "Alice", { name: "Marie of Hesse" }],
+    ["Alice_of_Albany",         F, "Leopold", "Helen_of_Waldeck", { name: "Alice of Albany", ...carrier }],
+    ["Charles_Edward",          M, "Leopold", "Helen_of_Waldeck", { name: "Charles Edward" }],
+    ["Alexander_of_Battenberg", M, "Henry_of_Battenberg", "Beatrice", { name: "Alexander of Battenberg" }],
+    ["Victoria_Eugenie",        F, "Henry_of_Battenberg", "Beatrice", { name: "Victoria Eugenie", ...carrier }],
+    ["Leopold_of_Battenberg",   M, "Henry_of_Battenberg", "Beatrice", { name: "Leopold of Battenberg", ...haem }],
+    ["Maurice_of_Battenberg",   M, "Henry_of_Battenberg", "Beatrice", { name: "Maurice of Battenberg", notes: "Haemophilia status disputed; killed in action 1914" }],
+    ["Nicholas_II",             M, null, null, { name: "Nicholas II" }],
+    ["Alexander_of_Teck",       M, null, null, { name: "Alexander of Teck" }],
+    ["Alfonso_XIII",            M, null, null, { name: "Alfonso XIII" }],
+    ["Waldemar_of_Prussia",     M, "Henry_of_Prussia", "Irene_of_Hesse", { name: "Waldemar of Prussia", ...haem }],
+    ["Sigismund_of_Prussia",    M, "Henry_of_Prussia", "Irene_of_Hesse", { name: "Sigismund of Prussia" }],
+    ["Heinrich_of_Prussia",     M, "Henry_of_Prussia", "Irene_of_Hesse", { name: "Heinrich of Prussia", ...haem, notes: "Died aged 4" }],
+    ["Olga",                    F, "Nicholas_II", "Alix_of_Hesse", { name: "Olga" }],
+    ["Tatiana",                 F, "Nicholas_II", "Alix_of_Hesse", { name: "Tatiana" }],
+    ["Maria",                   F, "Nicholas_II", "Alix_of_Hesse", { name: "Maria" }],
+    ["Anastasia",               F, "Nicholas_II", "Alix_of_Hesse", { name: "Anastasia", ...carrier, notes: "Heterozygous carrier by DNA; identification as Anastasia is putative (Rogaev et al. 2009)" }],
+    ["Alexei",                  M, "Nicholas_II", "Alix_of_Hesse", { name: "Alexei", ...haem, proband: true, notes: "Hemizygous for F9 IVS3-3A>G (Rogaev et al. 2009)" }],
+    ["May_of_Teck",             F, "Alexander_of_Teck", "Alice_of_Albany", { name: "May of Teck" }],
+    ["Rupert_of_Teck",          M, "Alexander_of_Teck", "Alice_of_Albany", { name: "Rupert of Teck", ...haem }],
+    ["Maurice_of_Teck",         M, "Alexander_of_Teck", "Alice_of_Albany", { name: "Maurice of Teck", notes: "Died in infancy; status unknown" }],
+    ["Alfonso_of_Asturias",     M, "Alfonso_XIII", "Victoria_Eugenie", { name: "Alfonso, Prince of Asturias", ...haem }],
+    ["Jaime",                   M, "Alfonso_XIII", "Victoria_Eugenie", { name: "Jaime" }],
+    ["Beatriz",                 F, "Alfonso_XIII", "Victoria_Eugenie", { name: "Beatriz" }],
+    ["Maria_Cristina",          F, "Alfonso_XIII", "Victoria_Eugenie", { name: "Maria Cristina" }],
+    ["Juan",                    M, "Alfonso_XIII", "Victoria_Eugenie", { name: "Juan" }],
+    ["Gonzalo",                 M, "Alfonso_XIII", "Victoria_Eugenie", { name: "Gonzalo", ...haem }],
+  ];
+
+  const tutankhamun: Row[] = [
+    ["Yuya",          M, null, null, { name: "Yuya" }],
+    ["Thuya",         F, null, null, { name: "Thuya" }],
+    ["Amenhotep_III", M, null, null, { name: "Amenhotep III" }],
+    ["Tiye",          F, "Yuya", "Thuya", { name: "Tiye (KV35EL)" }],
+    ["KV55",          M, "Amenhotep_III", "Tiye", { name: "KV55", notes: "Most probably Akhenaten" }],
+    ["KV35YL",        F, "Amenhotep_III", "Tiye", { name: "KV35YL", notes: "The Younger Lady, full sister of KV55" }],
+    ["Tutankhamun",   M, "KV55", "KV35YL", { name: "Tutankhamun", proband: true }],
+    ["KV21A",         F, null, null, { name: "KV21A", notes: "Tentatively the mother of the two fetuses" }],
+    ["Fetus_1",       F, "Tutankhamun", "KV21A", { name: "Fetus 1" }],
+    ["Fetus_2",       F, "Tutankhamun", "KV21A", { name: "Fetus 2" }],
+  ];
+
+  const focal = { affected: true };
+  const classic: Array<[string, string, Row[]]> = [
+    ["3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
+      ["GF", M, null, null], ["GM", F, null, null],
+      ["F1", M, "GF", "GM"], ["F2", M, "GF", "GM"], ["M", F, null, null],
+      ["A", M, "F1", "M", focal], ["B", F, "F2", "M", focal],
+    ]],
+    ["5/8 siblings", "share a mother; fathers are half brothers. Kinship 5/32", [
+      ["GF", M, null, null], ["GM1", F, null, null], ["GM2", F, null, null],
+      ["F1", M, "GF", "GM1"], ["F2", M, "GF", "GM2"], ["M", F, null, null],
+      ["A", M, "F1", "M", focal], ["B", F, "F2", "M", focal],
+    ]],
+    ["Full-sib mating", "brother and sister have a child. F = 1/4", [
+      ["GF", M, null, null], ["GM", F, null, null],
+      ["S", M, "GF", "GM"], ["D", F, "GF", "GM"],
+      ["C", M, "S", "D", focal],
+    ]],
+    ["Half-sib triangle", "every pair of parents are half siblings", [
+      ["P1", M, null, null], ["P2", F, null, null], ["P3", M, null, null], ["P4", F, null, null],
+      ["C12", M, "P1", "P2"], ["C23", F, "P3", "P2"], ["C34", M, "P3", "P4"],
+      ["D1", M, "C12", "C23"], ["D2", F, "C34", "C23"],
+      ["E", M, "D1", "D2", focal],
+    ]],
+    ["Double first cousins", "two sibling pairs intermarry. Kinship 1/8", [
+      ["A1", M, null, null], ["A2", F, null, null], ["B1", M, null, null], ["B2", F, null, null],
+      ["a1", M, "A1", "A2"], ["a2", F, "A1", "A2"], ["b1", M, "B1", "B2"], ["b2", F, "B1", "B2"],
+      ["X", M, "a1", "b2", focal], ["Y", F, "b1", "a2", focal],
+    ]],
+    ["Double second cousins (A)", "fathers first cousins, mothers first cousins. Kinship 1/32", [
+      ["G1", M, null, null], ["G2", F, null, null], ["H1", M, null, null], ["H2", F, null, null],
+      ["g1", M, "G1", "G2"], ["g2", M, "G1", "G2"], ["s1", F, null, null], ["s2", F, null, null],
+      ["h1", F, "H1", "H2"], ["h2", F, "H1", "H2"], ["t1", M, null, null], ["t2", M, null, null],
+      ["P1", M, "g1", "s1"], ["P2", M, "g2", "s2"], ["Q1", F, "t1", "h1"], ["Q2", F, "t2", "h2"],
+      ["X", M, "P1", "Q1", focal], ["Y", F, "P2", "Q2", focal],
+    ]],
+    ["Double second cousins (B)", "fathers are double first cousins. Kinship 1/32", [
+      ["G1", M, null, null], ["G2", F, null, null], ["H1", M, null, null], ["H2", F, null, null],
+      ["g1", M, "G1", "G2"], ["g2", F, "G1", "G2"], ["h1", M, "H1", "H2"], ["h2", F, "H1", "H2"],
+      ["P1", M, "g1", "h2"], ["P2", M, "h1", "g2"], ["s1", F, null, null], ["s2", F, null, null],
+      ["X", M, "P1", "s1", focal], ["Y", F, "P2", "s2", focal],
+    ]],
+    ["Quadruple half first cousins", "each parent of X is a half sibling of each parent of Y. Kinship 1/8", [
+      ["A", M, null, null], ["B", F, null, null], ["C", M, null, null], ["D", F, null, null],
+      ["F1", M, "A", "B"], ["M1", F, "C", "D"], ["F2", M, "A", "D"], ["M2", F, "C", "B"],
+      ["X", M, "F1", "M1", focal], ["Y", F, "F2", "M2", focal],
+    ]],
+    ["Grandparent and grandchild's partner", "a couple spanning two generations", [
+      ["GF", M, null, null], ["GM", F, null, null],
+      ["P", F, "GF", "GM"], ["S", M, null, null],
+      ["GC", M, "S", "P"], ["Z", F, null, null],
+      ["GGC", F, "GC", "Z"], ["W", M, "GF", "Z", focal],
+    ]],
+    ["Two lineages joined twice", "marriages between two families in successive generations", [
+      ["A1", M, null, null], ["A2", F, null, null], ["B1", M, null, null], ["B2", F, null, null],
+      ["a1", M, "A1", "A2"], ["a2", F, "A1", "A2"], ["b1", F, "B1", "B2"], ["b2", M, "B1", "B2"],
+      ["X", M, null, null], ["Y", F, null, null],
+      ["c1", M, "a1", "b1", focal], ["a3", M, "X", "a2"], ["b3", F, "b2", "Y"],
+      ["c2", F, "a3", "b3", focal],
+    ]],
+  ];
+
+  return [
+    {
+      label: "Spanish Habsburgs",
+      description: "9 generations · 33 individuals · nested uncle-niece and cousin marriages",
+      group: "Historic",
+      citation: "Alvarez, Ceballos & Quinteiro (2009) PLoS ONE 4(4): e5174, Fig. 1",
+      data: fromRows(habsburg, { deceased: true }),
+    },
+    {
+      label: "Queen Victoria · haemophilia B",
+      description: "4 generations · 49 individuals · X-linked recessive with carriers",
+      group: "Historic",
+      citation: "Rogaev et al. (2009) Science 326: 817, Fig. S1",
+      data: fromRows(victoria, { deceased: true }),
+    },
+    {
+      label: "Tutankhamun's family",
+      description: "5 generations · 10 individuals · brother-sister parents",
+      group: "Historic",
+      citation: "Hawass et al. (2010) JAMA 303(7): 638, Fig. 2",
+      data: fromRows(tutankhamun, { deceased: true }),
+    },
+    ...classic.map(([label, description, rows]): ExamplePedigree => ({
+      label,
+      description: `${rows.length} individuals · ${description}`,
+      group: "Classic",
+      data: fromRows(rows),
+    })),
+  ];
+}

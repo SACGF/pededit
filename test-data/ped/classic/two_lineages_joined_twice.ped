@@ -1,0 +1,17 @@
+# Two founder lineages joined twice, in different generations: a1 (lineage A)
+# marries b1 (lineage B); one generation later a3 (grandchild of A) marries b3
+# (grandchild of B). c1 and c2 are double first cousins once removed.
+CLAS	A1	0	0	1	1
+CLAS	A2	0	0	2	1
+CLAS	B1	0	0	1	1
+CLAS	B2	0	0	2	1
+CLAS	a1	A1	A2	1	1
+CLAS	a2	A1	A2	2	1
+CLAS	b1	B1	B2	2	1
+CLAS	b2	B1	B2	1	1
+CLAS	X	0	0	1	1
+CLAS	Y	0	0	2	1
+CLAS	c1	a1	b1	1	2
+CLAS	a3	X	a2	1	1
+CLAS	b3	b2	Y	2	1
+CLAS	c2	a3	b3	2	2
