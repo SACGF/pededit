@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import {
-  tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText,
+  tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
 import { SymbolShape } from "../pedigree/nodes/symbols";
@@ -100,9 +100,8 @@ function ProbandSvg({ sex }: { sex: Sex }) {
 function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
   if (tag.style === "quadrant") {
-    const all = quadrantTags(pedigree);
-    const idx = Math.max(0, all.findIndex(t => t.id === tag.id));
-    const [start, end] = sectorAngles(idx, Math.max(all.length, 1));
+    const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
+    const [start, end] = sectorAngles(idx);
     const clipId = `legend-dialog-clip-${tag.id}`;
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">
@@ -125,6 +124,21 @@ function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
       <text x={20} y={14 + ANNOTATION_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold" fill={tag.color}>
         {tagCanvasText(tag)}
       </text>
+    </svg>
+  );
+}
+
+/** A tagged affected person: light grey standing for any tag colours, round the black centre. */
+function AffectedCoreSvg({ sex }: { sex: Sex }) {
+  const sample: Tag = { id: "legend-sample", label: "", color: "#bdbdbd", style: "quadrant" };
+  return (
+    <svg width="28" height="28" viewBox="-2 -2 28 28">
+      <SymbolShape
+        individual={{ id: "", sex, affected: true, sibOrder: 0 }}
+        size={SZ}
+        sectors={[{ tag: sample, start: 0, end: 360 }]}
+        clipId="legend-affected-core"
+      />
     </svg>
   );
 }
@@ -199,6 +213,10 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   if (hasFemale)  indRows.push({ icon: <SymbolSvg sex="female" />,  label: "Female" });
   if (hasUnknown) indRows.push({ icon: <SymbolSvg sex="unknown" />, label: "Unknown sex" });
   if (affectedInd) indRows.push({ icon: <SymbolSvg sex={affectedInd.sex} affected />, label: "Affected" });
+  const coreInd = individuals.find(i => needsAffectedCore(i, sectorsFor(i, pedigree)));
+  if (coreInd) {
+    indRows.push({ icon: <AffectedCoreSvg sex={coreInd.sex} />, label: "Affected, with tags (black centre)" });
+  }
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
   if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} />,          label: "Proband (index case)" });
@@ -220,7 +238,9 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xs" aria-describedby={undefined}>
+      {/* Capped to the viewport with the body scrolling, so the title and the
+          close button stay on screen with many tags (1280x720 laptops). */}
+      <DialogContent className="max-w-xs flex flex-col max-h-[calc(100dvh-2rem)]" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Figure legend</DialogTitle>
         </DialogHeader>
@@ -228,7 +248,7 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
         {isEmpty ? (
           <p className="text-xs text-gray-400">No symbols in this pedigree yet.</p>
         ) : (
-          <div>
+          <div className="min-h-0 overflow-y-auto -mr-4 pr-4" data-testid="legend-body">
             {indRows.length > 0 && (
               <>
                 <SectionHeader>Individuals</SectionHeader>

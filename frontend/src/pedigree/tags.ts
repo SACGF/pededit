@@ -13,10 +13,11 @@ import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layou
 /**
  * Default swatches offered in the tag manager. Chosen to stay distinguishable
  * for the common forms of colour-vision deficiency and to print acceptably in
- * greyscale when combined with the quadrant position.
+ * greyscale when combined with the quadrant position. Black is last: a new
+ * tag takes the first unused colour, and a black quarter is invisible on an
+ * affected person and reads as affected shading on anyone else.
  */
 export const TAG_PALETTE: readonly string[] = [
-  "#000000", // black
   "#d62728", // red
   "#1f77b4", // blue
   "#f2c80f", // yellow
@@ -26,6 +27,7 @@ export const TAG_PALETTE: readonly string[] = [
   "#17becf", // cyan
   "#8c564b", // brown
   "#7f7f7f", // grey
+  "#000000", // black
 ];
 
 /** First palette colour not already used by an existing tag. */
@@ -85,14 +87,18 @@ export interface Sector {
 }
 
 /**
- * Fixed quarter positions for up to four quadrant tags. Each tag owns a
+ * Fixed quarter positions for the first four quadrant tags. Each tag owns a
  * quarter in every symbol (the "slot" model used by kinship2, Madeline and
  * Progeny), so position alone identifies the condition and a quarter stays
  * put when other tags are added. The NSGC standard requires a key but fixes
  * no order, so we read like a page: upper left first, then clockwise. This is
  * Madeline's convention and the one in most published multi-condition
- * pedigrees. With more than four quadrant tags the symbol is split into equal
- * pie slices instead, starting at 12 o'clock.
+ * pedigrees.
+ *
+ * A fifth or later quadrant tag has no quarter of its own. Someone who carries
+ * one gets equal pie slices for the quadrant tags they carry, from 12
+ * o'clock, identified by colour. Everyone else keeps the fixed quarters, so
+ * adding a fifth tag never splits the symbols of people who do not have it.
  */
 const QUADRANT_ANGLES: readonly [number, number][] = [
   [270, 360], // upper left
@@ -103,11 +109,16 @@ const QUADRANT_ANGLES: readonly [number, number][] = [
 
 export const QUADRANT_NAMES = ["upper left", "upper right", "lower right", "lower left"] as const;
 
-/** Angle range for the quadrant tag at `index` when the pedigree has `count` quadrant tags. */
-export function sectorAngles(index: number, count: number): [number, number] {
-  if (count <= QUADRANT_ANGLES.length) return QUADRANT_ANGLES[index]!;
-  const span = 360 / count;
-  return [index * span, (index + 1) * span];
+/** Number of quadrant tags that have a fixed quarter. */
+export const FIXED_QUADRANTS = QUADRANT_ANGLES.length;
+
+/**
+ * Angle range of the fixed quarter for the quadrant tag at `index` in the
+ * pedigree's quadrant tags, or the whole symbol for a fifth or later tag
+ * (which has no fixed position; legends show it as a full swatch).
+ */
+export function sectorAngles(index: number): [number, number] {
+  return QUADRANT_ANGLES[index] ?? [0, 360];
 }
 
 /** Sectors to paint on an individual's symbol, in pedigree tag order. */
@@ -115,13 +126,47 @@ export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[]
   const all = quadrantTags(pedigree);
   if (all.length === 0) return [];
   const mine = new Set(individual.tags ?? []);
-  const out: Sector[] = [];
-  all.forEach((tag, i) => {
-    if (!mine.has(tag.id)) return;
-    const [start, end] = sectorAngles(i, all.length);
-    out.push({ tag, start, end });
-  });
-  return out;
+  const carried = all
+    .map((tag, index) => ({ tag, index }))
+    .filter(({ tag }) => mine.has(tag.id));
+  if (carried.length === 0) return [];
+  if (carried.every(c => c.index < FIXED_QUADRANTS)) {
+    return carried.map(({ tag, index }) => {
+      const [start, end] = QUADRANT_ANGLES[index]!;
+      return { tag, start, end };
+    });
+  }
+  const span = 360 / carried.length;
+  return carried.map(({ tag }, i) => ({ tag, start: i * span, end: (i + 1) * span }));
+}
+
+// ── Affected core ─────────────────────────────────────────────────────────────
+
+/**
+ * An affected person whose symbol carries quadrant tags keeps a solid black
+ * centre: the symbol's own outline scaled by this factor, drawn over the
+ * sectors with a white rim. Without it, four tagged quarters (or a pie of
+ * tags) would cover the black fill and the person would read as unaffected.
+ * An affected person with no quadrant tags is filled black as usual.
+ */
+export const AFFECTED_CORE_SCALE = 0.55;
+/** White rim around the core, in symbol pixels (after scaling). */
+export const AFFECTED_CORE_RIM = 1.5;
+
+/** True when the symbol needs the black centre described above. */
+export function needsAffectedCore(individual: Individual, sectors: readonly Sector[]): boolean {
+  return !!individual.affected && sectors.length > 0;
+}
+
+/**
+ * The core as SVG markup for a symbol centred on (0, 0). `geom` is the
+ * unpainted, unclosed outline element the exporters build (for example
+ * `<rect x=".." y=".." width=".." height=".."`).
+ */
+export function renderAffectedCoreSvg(geom: string): string {
+  const k = AFFECTED_CORE_SCALE;
+  return `<g transform="scale(${k})">${geom} fill="black" stroke="white" stroke-width="${fmt((AFFECTED_CORE_RIM * 2) / k)}"/></g>`
+    + `<g transform="scale(${k})">${geom} fill="black" stroke="none"/></g>`;
 }
 
 function polar(cx: number, cy: number, r: number, deg: number): [number, number] {
@@ -235,19 +280,35 @@ export const LEGEND_SWATCH = 16;
 export const LEGEND_ROW_HEIGHT = 20;
 export const LEGEND_FONT_SIZE = 10;
 
+/** Rough width of a text tag drawn at ANNOTATION_FONT_SIZE bold. */
+export function tagTextWidth(tag: Tag): number {
+  return tagCanvasText(tag).length * ANNOTATION_BOLD_CHAR_WIDTH;
+}
+const ANNOTATION_BOLD_CHAR_WIDTH = 6;
+const LEGEND_LABEL_GAP = 8;
+const LEGEND_CHAR_WIDTH = 6;
+
+/** Width of the swatch column: a square, or wider for long text tags. */
+function swatchColumnWidth(tags: readonly Tag[]): number {
+  return Math.max(LEGEND_SWATCH, ...tags.filter(t => t.style === "text").map(tagTextWidth));
+}
+
 /**
- * A legend entry for a tag: a small square swatch showing how the tag is
- * drawn (quarter fill, dot, or coloured text) followed by the label. Drawn
- * with the swatch's top-left at (x, y).
+ * A legend entry for a tag: a swatch showing how the tag is drawn (quarter
+ * fill, dot, or coloured text) followed by the label. Drawn with the swatch's
+ * top-left at (x, y); the label starts `labelOffset` to the right, past the
+ * widest swatch in the key, so text tags never run into their label.
  */
-export function renderTagLegendRowSvg(tag: Tag, pedigree: Pedigree, x: number, y: number): string {
+export function renderTagLegendRowSvg(
+  tag: Tag, pedigree: Pedigree, x: number, y: number,
+  labelOffset = swatchColumnWidth([tag]) + LEGEND_LABEL_GAP,
+): string {
   const s = LEGEND_SWATCH;
   const cx = x + s / 2, cy = y + s / 2;
   const parts: string[] = [];
   if (tag.style === "quadrant") {
-    const all = quadrantTags(pedigree);
-    const idx = all.findIndex(t => t.id === tag.id);
-    const [start, end] = sectorAngles(Math.max(idx, 0), Math.max(all.length, 1));
+    const idx = quadrantTags(pedigree).findIndex(t => t.id === tag.id);
+    const [start, end] = sectorAngles(Math.max(idx, 0));
     const clipId = `legend-clip-${tag.id}`;
     parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);
@@ -256,16 +317,20 @@ export function renderTagLegendRowSvg(tag: Tag, pedigree: Pedigree, x: number, y
   } else if (tag.style === "dot") {
     parts.push(`<circle cx="${cx}" cy="${cy}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(tag.color)}"/>`);
   } else {
-    parts.push(`<text x="${cx}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" text-anchor="middle" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(tag.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
+    parts.push(`<text x="${x}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(tag.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
   }
-  parts.push(`<text x="${x + s + 8}" y="${cy + LEGEND_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${escapeXml(tag.label)}</text>`);
+  parts.push(legendLabelSvg(tag.label, x + labelOffset, cy));
   return parts.join("");
+}
+
+function legendLabelSvg(label: string, x: number, cy: number): string {
+  return `<text x="${fmt(x)}" y="${cy + LEGEND_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${escapeXml(label)}</text>`;
 }
 
 /** Width needed by the widest legend row, for sizing the export canvas. */
 export function tagLegendWidth(tags: readonly Tag[]): number {
   const longest = Math.max(0, ...tags.map(t => t.label.length));
-  return LEGEND_SWATCH + 8 + longest * 6;
+  return swatchColumnWidth(tags) + LEGEND_LABEL_GAP + longest * LEGEND_CHAR_WIDTH;
 }
 
 export interface TagLegendBlock {
@@ -277,14 +342,15 @@ export interface TagLegendBlock {
 
 /**
  * The key for every tag applied to at least one individual, one row per tag,
- * with its top-left corner at (x, y). Exporters reserve `height` below the
- * pedigree and at least `width` across.
+ * with its top-left corner at (x, y). Exporters use renderExportKeySvg, which
+ * adds status rows above these.
  */
 export function renderTagLegendSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
   const tags = tagsInUse(pedigree);
   if (tags.length === 0) return { markup: [], width: 0, height: 0 };
+  const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
   const markup = tags.map((tag, i) =>
-    renderTagLegendRowSvg(tag, pedigree, x, y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2),
+    renderTagLegendRowSvg(tag, pedigree, x, y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2, labelOffset),
   );
   return { markup, width: tagLegendWidth(tags), height: tags.length * LEGEND_ROW_HEIGHT };
 }
@@ -307,4 +373,82 @@ export const BUILTIN_TAG_SUGGESTIONS: readonly Omit<Tag, "id">[] = [
 export function unusedTagSuggestions(pedigree: Pedigree): Omit<Tag, "id">[] {
   const tags = pedigreeTags(pedigree);
   return BUILTIN_TAG_SUGGESTIONS.filter(s => !tags.some(t => t.label === s.label && t.style === s.style));
+}
+
+// ── Export key: status rows plus tags ─────────────────────────────────────────
+
+type KeyStatus = "affected" | "carrier" | "deceased";
+
+/** Unpainted, unclosed outline of a legend swatch symbol with top-left (x, y). */
+function swatchGeom(sex: Individual["sex"], x: number, y: number, s: number): string {
+  const c = s / 2;
+  if (sex === "female") return `<circle cx="${fmt(x + c)}" cy="${fmt(y + c)}" r="${fmt(c)}"`;
+  if (sex === "unknown") {
+    return `<polygon points="${fmt(x + c)},${fmt(y)} ${fmt(x + s)},${fmt(y + c)} ${fmt(x + c)},${fmt(y + s)} ${fmt(x)},${fmt(y + c)}"`;
+  }
+  return `<rect x="${fmt(x)}" y="${fmt(y)}" width="${s}" height="${s}"`;
+}
+
+function renderStatusSwatchSvg(status: KeyStatus, sex: Individual["sex"], withCore: boolean, x: number, y: number): string {
+  const s = LEGEND_SWATCH;
+  const geom = swatchGeom(sex, x, y, s);
+  const stroke = `stroke="black" stroke-width="1.5"`;
+  const cx = x + s / 2, cy = y + s / 2;
+  if (status === "affected") {
+    if (!withCore) return `${geom} fill="black" ${stroke}/>`;
+    // A tagged affected person: light grey stands for any tag colours, round the black centre.
+    const k = AFFECTED_CORE_SCALE;
+    const scaled = `translate(${fmt(cx)} ${fmt(cy)}) scale(${k}) translate(${fmt(-cx)} ${fmt(-cy)})`;
+    return `${geom} fill="#bdbdbd" ${stroke}/>`
+      + `<g transform="${scaled}">${geom} fill="black" stroke="white" stroke-width="${fmt((AFFECTED_CORE_RIM * 2) / k)}"/>${geom} fill="black" stroke="none"/></g>`;
+  }
+  if (status === "carrier") {
+    return `${geom} fill="white" ${stroke}/><circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(s * 0.15)}" fill="black"/>`;
+  }
+  const o = 3;
+  return `${geom} fill="white" ${stroke}/><line x1="${x - o}" y1="${y - o}" x2="${x + s + o}" y2="${y + s + o}" stroke="black" stroke-width="1.5"/>`;
+}
+
+/**
+ * The full export key: Affected, Carrier and Deceased rows when anyone in the
+ * pedigree has that status, then one row per tag in use. Same contract as
+ * renderTagLegendSvg (top-left at (x, y), empty when there is nothing to
+ * explain); exporters reserve `height` below the pedigree and at least
+ * `width` across. Each swatch uses the sex of the first person with the
+ * status, as the in-app legend does.
+ */
+export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
+  const rows: { label: string; swatch: (sy: number) => string }[] = [];
+  const inds = pedigree.individuals;
+  const affected = inds.find(i => i.affected);
+  if (affected) {
+    rows.push({ label: "Affected", swatch: sy => renderStatusSwatchSvg("affected", affected.sex, false, x, sy) });
+    if (inds.some(i => needsAffectedCore(i, sectorsFor(i, pedigree)))) {
+      rows.push({
+        label: "Affected, with tags (black centre)",
+        swatch: sy => renderStatusSwatchSvg("affected", affected.sex, true, x, sy),
+      });
+    }
+  }
+  const carrier = inds.find(i => i.carrier && !i.affected && !i.lifeStatus);
+  if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
+  const deceased = inds.find(i => i.deceased);
+  if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
+
+  const tags = tagsInUse(pedigree);
+  if (rows.length === 0 && tags.length === 0) return { markup: [], width: 0, height: 0 };
+
+  const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
+  const rowY = (i: number) => y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2;
+  const markup = rows.map((r, i) =>
+    r.swatch(rowY(i)) + legendLabelSvg(r.label, x + labelOffset, rowY(i) + LEGEND_SWATCH / 2),
+  );
+  tags.forEach((tag, j) => markup.push(renderTagLegendRowSvg(tag, pedigree, x, rowY(rows.length + j), labelOffset)));
+
+  const longest = Math.max(0, ...rows.map(r => r.label.length), ...tags.map(t => t.label.length));
+  return {
+    markup,
+    width: labelOffset + longest * LEGEND_CHAR_WIDTH,
+    height: (rows.length + tags.length) * LEGEND_ROW_HEIGHT,
+  };
 }

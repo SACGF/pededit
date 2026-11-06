@@ -10,6 +10,12 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function shortDevId(id: string): string {
+  return UUID_RE.test(id) ? id.slice(0, 6) : id;
+}
+
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
@@ -59,6 +65,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         boxShadow: isSelected ? "0 0 0 2px #ef4444" : undefined,
       }}
       onMouseEnter={handleMouseEnter}
+      onMouseMove={() => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(); }}
       onMouseLeave={handleMouseLeave}
       onClick={() => setSelectedId(individual.id)}
     >
@@ -95,8 +102,11 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         </div>
       )}
 
-      {/* Dev-mode ID label, always visible so you can screenshot the canvas for bug reports.
-          Not for the invented partners of single parents in a PED import: their IDs are internal. */}
+      {/* Dev-mode ID label, so a screenshot of the canvas names each node for bug
+          reports. Generated ids are UUIDs, which are wider than a slot and
+          overlap their neighbours, so those show only their first 6
+          characters (data-individual-id has the full id). Not for the invented
+          partners of single parents in a PED import: their IDs are internal. */}
       {import.meta.env.DEV && !isPhantomId(individual.id) && (
         <div
           style={{
@@ -112,7 +122,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
             pointerEvents: "none",
           }}
         >
-          {individual.id}
+          {shortDevId(individual.id)}
         </div>
       )}
 
@@ -152,6 +162,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         hasParents={hasParents}
         onPillEnter={cancelHide}
         onPillLeave={scheduleHide}
+        onMenuClose={scheduleHide}
       />
     </div>
   );

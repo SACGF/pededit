@@ -10,9 +10,10 @@ interface HoverPillProps {
   hasParents: boolean;     // disable +parents if already has both parents filled
   onPillEnter: () => void; // called when mouse enters pill (cancel hide timer)
   onPillLeave: () => void; // called when mouse leaves pill (schedule hide)
+  onMenuClose?: () => void; // more menu closed (it gives no mouseleave, see MoreMenu)
 }
 
-export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillEnter, onPillLeave }: HoverPillProps) {
+export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
   const { addParent, addChild, addSibling, pedigree, unlockIndividual, lockIndividual } = usePedigreeStore();
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const isUnlocked = nodesMoveable || (pedigree.unlockedIndividuals ?? []).includes(individualId);
@@ -29,6 +30,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
       <div
         className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-xs text-xs"
         onMouseEnter={onPillEnter}
+        onMouseMove={onPillEnter}
         onMouseLeave={onPillLeave}
       >
         {/* +parents */}
@@ -94,7 +96,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
         <div className="w-px h-3 bg-gray-300 mx-0.5" />
 
         {/* More menu */}
-        <MoreMenu individualId={individualId} />
+        <MoreMenu individualId={individualId} onClose={onMenuClose} />
       </div>
     </NodeToolbar>
   );

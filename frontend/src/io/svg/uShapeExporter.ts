@@ -1,7 +1,8 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
 import {
-  renderSectorsSvg, renderAnnotationRowSvg, renderTagLegendSvg,
+  renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
+  needsAffectedCore, renderAffectedCoreSvg,
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
@@ -996,9 +997,11 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   }
   const stroke = `stroke="black" stroke-width="${STROKE}"`;
   let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  if (sectorsFor(ind, pedigree).length > 0) {
+  const sectors = sectorsFor(ind, pedigree);
+  if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + (needsAffectedCore(ind, sectors) ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
   shape += renderCarrierDot(ind);
@@ -1106,7 +1109,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
     minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
-  const legend = renderTagLegendSvg(working, padding, 0);
+  const legend = renderExportKeySvg(working, padding, 0);
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
   const width = Math.ceil(Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding));
   const height = Math.ceil(maxY - minY + 2 * margin + titleH + legendExtra);
@@ -1133,7 +1136,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   out.push(...renderSymbols(working, b));
   out.push(`</g>`);
   if (legend.height > 0) {
-    out.push(`<g transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);
+    out.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);
   }
   out.push(`</svg>`);
   return out.join("\n");

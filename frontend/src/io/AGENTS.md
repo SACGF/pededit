@@ -61,8 +61,11 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 
 ## svg/ — figure export
 
-- `svgExporter.ts` — standard layout as an SVG string, including legend for
-  tags. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
+- `svgExporter.ts` — standard layout as an SVG string, including the key
+  (`renderExportKeySvg` in `pedigree/tags.ts`: Affected, Carrier, Deceased
+  rows when present, then tags in use), in a `<g class="pedigree-key">`.
+  Tests find symbols by `<g transform="translate(..)">` followed by a shape,
+  so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.
 - `uShapeExporter.ts` — `layoutUShape` and `exportUShapeSvg`: horseshoe layout
   for large families (partners, consanguinity, flat bottom, fan for small

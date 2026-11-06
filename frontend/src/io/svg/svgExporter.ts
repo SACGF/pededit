@@ -7,7 +7,8 @@ import { couplePathD, consanguineousPathsD } from "../../pedigree/couplePath";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 import {
-  renderSectorsSvg, renderAnnotationRowSvg, renderTagLegendSvg,
+  renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
+  needsAffectedCore, renderAffectedCoreSvg,
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import {
@@ -98,7 +99,7 @@ function computeBounds(
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
-  const legend = renderTagLegendSvg(pedigree, 0, 0);
+  const legend = renderExportKeySvg(pedigree, 0, 0);
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
 
   return {
@@ -229,9 +230,11 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   const stroke = `stroke="black" stroke-width="${STROKE}"`;
 
   let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  if (sectorsFor(ind, pedigree).length > 0) {
+  const sectors = sectorsFor(ind, pedigree);
+  if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + (needsAffectedCore(ind, sectors) ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
 
@@ -438,9 +441,9 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;
-  const legend = renderTagLegendSvg(working, padding, 0);
+  const legend = renderExportKeySvg(working, padding, 0);
   if (legend.height > 0) {
-    lines.push(`<g transform="translate(0 ${height - padding - legend.height})">`);
+    lines.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`);
     lines.push(...legend.markup);
     lines.push(`</g>`);
   }

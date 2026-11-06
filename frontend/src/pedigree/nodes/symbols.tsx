@@ -1,6 +1,7 @@
+import { cloneElement } from "react";
 import type { Individual } from "@pedigree-editor/layout-engine";
 import {
-  sectorPath, tagCanvasText,
+  sectorPath, tagCanvasText, AFFECTED_CORE_SCALE, AFFECTED_CORE_RIM,
   ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../tags";
 import type { Sector, AnnotationItem } from "../tags";
@@ -51,6 +52,24 @@ function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; c
   );
 }
 
+/**
+ * Black centre for an affected person whose symbol carries quadrant tags, so
+ * affected status stays visible when tags cover every quarter. `outline` is
+ * the symbol's own outline element; it is drawn scaled about the centre.
+ * Mirrors renderAffectedCoreSvg in tags.ts.
+ */
+function AffectedCore({ size, show, outline }: { size: number; show: boolean; outline: React.ReactElement<React.SVGProps<SVGElement>> }) {
+  if (!show) return null;
+  const c = size / 2, k = AFFECTED_CORE_SCALE;
+  const transform = `translate(${c} ${c}) scale(${k}) translate(${-c} ${-c})`;
+  return (
+    <g transform={transform}>
+      {cloneElement(outline, { fill: "black", stroke: "white", strokeWidth: (AFFECTED_CORE_RIM * 2) / k })}
+      {cloneElement(outline, { fill: "black", stroke: "none" })}
+    </g>
+  );
+}
+
 // ── Male (square) ──────────────────────────────────────────────────────────────
 
 function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
@@ -65,6 +84,7 @@ function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillD
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
+      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<rect {...outline} />} />
       {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -83,6 +103,7 @@ function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fil
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
+      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<circle cx={cx} cy={cy} r={r} />} />
       {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -107,6 +128,7 @@ function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fi
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
+      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<polygon points={points} />} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -129,6 +151,7 @@ function LossTriangle({ size, fill, slash, sectors, clipId }: {
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
+      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<polygon points={points} />} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
       {slash && <SlashOverFill {...s} fill={fill} clipId={clipId} />}
     </g>

@@ -22,13 +22,29 @@ draws NSGC symbols.
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
 - `nodes/MoreMenu.tsx` — affected, deceased, proband, sex, lock/unlock,
-  move sib left/right, delete.
+  move sib left/right, delete, and "Add children..." (count stepper, plus a
+  partner choice when the person has several partnerships). The menu is
+  about 600px tall, so it is capped at Radix's
+  `--radix-popover-content-available-height` and scrolls; check it at
+  1280x720 after adding items. It is portalled: when an item closes it, the
+  element under the cursor vanishes and the pill gets no mouseleave, so the
+  menu calls `onClose` and the pill schedules its own hide.
+- The grey id under each symbol is dev-only; UUIDs are cut to 6 characters
+  there so a batch of new children does not overlap. Unnamed people have no
+  label in production.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
-  within the pedigree's quadrant-style tags.
+  within the pedigree's quadrant-style tags. Only the first four have a
+  fixed quarter; someone carrying a fifth or later quadrant tag gets equal
+  slices of just the quadrant tags they carry, so other people's symbols
+  never gain empty wedges. An affected person with any quadrant sector keeps
+  a black centre (the outline scaled by `AFFECTED_CORE_SCALE`, white rim),
+  otherwise four tagged quarters hide the affected fill. `symbols.tsx`
+  (`AffectedCore`) and `renderAffectedCoreSvg` draw it; keep them in step.
+  Black is last in `TAG_PALETTE` so a new tag never defaults to it.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
   symbol with a small triangle; quadrant tags are clipped to that triangle.

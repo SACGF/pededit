@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { Sex } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
@@ -10,12 +11,17 @@ function clampCount(n: number): number {
 
 interface MoreMenuProps {
   individualId: string;
+  /**
+   * Called whenever the menu closes. The menu is portalled, so after an item
+   * removes it from under the cursor the hover pill gets no mouseleave; the
+   * pill uses this to hide itself.
+   */
+  onClose?: () => void;
 }
 
-export function MoreMenu({ individualId }: MoreMenuProps) {
+export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
   const [open, setOpen] = useState(false);
   const [showAddChildren, setShowAddChildren] = useState(false);
-  const [childCount, setChildCount] = useState(2);
   const {
     pedigree,
     addPartner,
@@ -54,13 +60,19 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
     }
   }
 
+  function close() {
+    setOpen(false);
+    setShowAddChildren(false);
+    onClose?.();
+  }
+
   function action(fn: () => void) {
     fn();
-    setOpen(false);
+    close();
   }
 
   return (
-    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setShowAddChildren(false); }}>
+    <Popover open={open} onOpenChange={(o) => { if (o) setOpen(true); else close(); }}>
       <PopoverTrigger asChild>
         <button
           title="More options"
@@ -70,10 +82,13 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
           ···
         </button>
       </PopoverTrigger>
+      {/* Never taller than the room Radix finds on the chosen side: the menu
+          is about 600px and must stay usable on a 1280x720 laptop. */}
       <PopoverContent
-        className="w-44 p-1"
+        className="w-44 p-1 overflow-y-auto max-h-(--radix-popover-content-available-height)"
         side="bottom"
         align="end"
+        collisionPadding={8}
         onClick={(e) => e.stopPropagation()}
       >
         <MenuSection label="Add">
@@ -93,53 +108,22 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
             Add children...
           </MenuItem>
           {showAddChildren && !individual.lifeStatus && (
-            <div className="pl-2">
-              <div className="flex items-center gap-1 px-2 py-1">
-                <span className="text-[10px] text-gray-400">Count</span>
-                <button
-                  title="Fewer"
-                  onClick={() => setChildCount(c => clampCount(c - 1))}
-                  className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  aria-label="Number of children"
-                  min={1}
-                  max={MAX_ADD_CHILDREN}
-                  value={childCount}
-                  onChange={e => setChildCount(clampCount(Number(e.target.value)))}
-                  className="w-9 h-5 border rounded text-xs text-center"
-                />
-                <button
-                  title="More"
-                  onClick={() => setChildCount(c => clampCount(c + 1))}
-                  className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
-                >
-                  +
-                </button>
-              </div>
-              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "male"))}>
-                Add {childCount} {childCount === 1 ? "son" : "sons"}
-              </MenuItem>
-              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "female"))}>
-                Add {childCount} {childCount === 1 ? "daughter" : "daughters"}
-              </MenuItem>
-              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "unknown"))}>
-                Add {childCount} of unknown sex
-              </MenuItem>
-            </div>
+            <AddChildrenPanel
+              individualId={individualId}
+              onAdd={(sex, count, partnershipId) => action(() => addChildren(individualId, count, sex, partnershipId))}
+            />
           )}
         </MenuSection>
 
         <MenuSection label="Sibling order">
-          <MenuItem onClick={() => action(() => moveSibLeft(individualId))}>
-            Move left
-          </MenuItem>
-          <MenuItem onClick={() => action(() => moveSibRight(individualId))}>
-            Move right
-          </MenuItem>
+          <div className="flex">
+            <MenuItem onClick={() => action(() => moveSibLeft(individualId))}>
+              Move left
+            </MenuItem>
+            <MenuItem onClick={() => action(() => moveSibRight(individualId))}>
+              Move right
+            </MenuItem>
+          </div>
         </MenuSection>
 
         <MenuSection label="Status">
@@ -182,6 +166,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
         )}
 
         <MenuSection label="Sex">
+          <div className="flex">
           {(["male", "female", "unknown"] as const).map(sex => (
             <MenuItem
               key={sex}
@@ -192,6 +177,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </MenuItem>
           ))}
+          </div>
         </MenuSection>
 
         <MenuSection label="Pregnancy / loss">
@@ -232,6 +218,112 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
         )}
       </PopoverContent>
     </Popover>
+  );
+}
+
+/** Partners of individualId, one per partnership, in partnership order. */
+function partnerChoices(pedigree: ReturnType<typeof usePedigreeStore.getState>["pedigree"], individualId: string) {
+  return pedigree.partnerships
+    .filter(p => p.individual1 === individualId || p.individual2 === individualId)
+    .map((p, i) => {
+      const otherId = p.individual1 === individualId ? p.individual2 : p.individual1;
+      const other = pedigree.individuals.find(ind => ind.id === otherId);
+      const name = other?.name?.trim();
+      const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
+      return { partnershipId: p.id, label: name || `Partner ${i + 1} (${sexLabel})` };
+    });
+}
+
+/**
+ * Count stepper, partner choice (when there are several) and the three add
+ * buttons. The count is typed as text and clamped on blur or Enter, so typing
+ * "4" after clearing the box gives 4, not 1 then 10.
+ */
+function AddChildrenPanel({ individualId, onAdd }: {
+  individualId: string;
+  onAdd: (sex: Sex, count: number, partnershipId: string | undefined) => void;
+}) {
+  const pedigree = usePedigreeStore(s => s.pedigree);
+  const [count, setCount] = useState(2);
+  const [draft, setDraft] = useState("2");
+  const partners = partnerChoices(pedigree, individualId);
+  const [partnershipId, setPartnershipId] = useState<string | undefined>(partners[0]?.partnershipId);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { ref.current?.scrollIntoView?.({ block: "nearest" }); }, []);
+
+  function commit(raw: string): number {
+    const n = raw.trim() === "" ? count : clampCount(Number(raw));
+    setCount(n);
+    setDraft(String(n));
+    return n;
+  }
+  function step(delta: number) {
+    const n = clampCount(commit(draft) + delta);
+    setCount(n);
+    setDraft(String(n));
+  }
+  function add(sex: Sex) {
+    onAdd(sex, commit(draft), partnershipId);
+  }
+
+  // What the buttons will add, read from the box as typed so they never lie.
+  const shown = draft.trim() === "" ? count : clampCount(Number(draft));
+
+  return (
+    <div className="pl-2" ref={ref}>
+      <div className="flex items-center gap-1 px-2 py-1">
+        <span className="text-[10px] text-gray-400">Count</span>
+        <button
+          title="Fewer"
+          onClick={() => step(-1)}
+          className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
+        >
+          -
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          aria-label="Number of children"
+          value={draft}
+          onChange={e => setDraft(e.target.value.replace(/[^0-9]/g, ""))}
+          onBlur={e => commit(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") commit(draft); }}
+          className="w-9 h-5 border rounded text-xs text-center"
+        />
+        <button
+          title="More"
+          onClick={() => step(1)}
+          className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
+        >
+          +
+        </button>
+      </div>
+      {partners.length > 1 && (
+        <label className="flex items-center gap-1 px-2 py-1">
+          <span className="text-[10px] text-gray-400">With</span>
+          <select
+            aria-label="Other parent"
+            value={partnershipId}
+            onChange={e => setPartnershipId(e.target.value)}
+            className="min-w-0 flex-1 h-5 border rounded text-xs bg-white"
+          >
+            {partners.map(p => (
+              <option key={p.partnershipId} value={p.partnershipId}>{p.label}</option>
+            ))}
+          </select>
+        </label>
+      )}
+      <MenuItem onClick={() => add("male")}>
+        Add {shown} {shown === 1 ? "son" : "sons"}
+      </MenuItem>
+      <MenuItem onClick={() => add("female")}>
+        Add {shown} {shown === 1 ? "daughter" : "daughters"}
+      </MenuItem>
+      <MenuItem onClick={() => add("unknown")}>
+        Add {shown} of unknown sex
+      </MenuItem>
+    </div>
   );
 }
 
