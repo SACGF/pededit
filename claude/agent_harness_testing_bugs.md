@@ -382,7 +382,9 @@ The H1/H2/H3 W1/W2 partner chain (#5) was checked against R 4.5.3 /
 kinship2 1.9.6.2: the difference is a kinship2 fallback bug, not a port bug
 (see `layout-engine/AGENTS.md`, `tests/partner_chain.test.ts`).
 
-Still open from these notes: hatched fills and monochrome export (#67), label
-overlap at standard spacing, the tag annotation row against the proband
-arrow, the carrier dot drawn over tag sectors, the SVG title overlapping the
-top-left symbol, and the harness items listed above.
+Still open from these notes, as issues: hatched fills and monochrome export
+(#67), label overlap (#68), SVG snapshot tests (#69), and the harness items
+below (#70). Fixed afterwards in e203ad4: the SVG title clears the top row,
+a proband's tag row clears the arrow, the carrier dot has a white rim over
+tag colours, the Legend and export key show consanguinity by the drawing
+rule, and the SVG export numbers both copies of a duplicated person.
