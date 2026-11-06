@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, RotateCw, Settings, Download, Image, List } from "lucide-react";
 import { exportPed } from "../io/ped/index.js";
 import { exportCsv } from "../io/csv/exporter";
+import { exportJson } from "../io/json/index.js";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -59,6 +60,17 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: To
     const a = document.createElement("a");
     a.href = url;
     a.download = `${activeTitle ?? "pedigree"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleExportJson() {
+    const text = exportJson(pedigree, { title: activeTitle ?? "pedigree" });
+    const blob = new Blob([text], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${activeTitle ?? "pedigree"}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -166,6 +178,18 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick }: To
       >
         <Download size={12} />
         Export CSV
+      </Button>
+
+      {/* Download JSON (lossless, see docs/pedigree-json-format.md) */}
+      <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Download as JSON (lossless, re-importable)"
+        disabled={!hasPedigree}
+        onClick={handleExportJson}
+      >
+        <Download size={12} />
+        Download JSON
       </Button>
 
       {/* Export SVG/PNG */}

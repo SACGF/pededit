@@ -2,8 +2,16 @@ import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { importPed, ValidationIssueCode } from "../io/ped/index.js";
-import type { ImportResult } from "../io/ped/index.js";
+import type { IssueSeverity } from "../io/ped/index.js";
+import { importJson } from "../io/json/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+
+/** Common shape of a PED or JSON import result, as rendered by this dialog. */
+interface DialogResult {
+  pedigrees: Array<{ familyId: string; pedigree: Pedigree }>;
+  issues: Array<{ severity: IssueSeverity; code: string; message: string }>;
+  hasErrors: boolean;
+}
 
 interface PendingImport {
   familyId: string;
@@ -18,7 +26,7 @@ interface ImportPedDialogProps {
 }
 
 export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProps) {
-  const [result, setResult] = useState<ImportResult | null>(null);
+  const [result, setResult] = useState<DialogResult | null>(null);
   const [selectedFids, setSelectedFids] = useState<Set<string>>(new Set());
   const [baseTitle, setBaseTitle] = useState("Imported pedigree");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -28,13 +36,25 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
     if (!file) return;
 
     // Derive default title from filename (strip extension)
-    const name = file.name.replace(/\.(ped|fam)$/i, "");
+    const name = file.name.replace(/\.(ped|fam|json)$/i, "");
     setBaseTitle(name);
+    const isJson = /\.json$/i.test(file.name);
 
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result as string;
-      const imported = importPed(text);
+      let imported: DialogResult;
+      if (isJson) {
+        const json = importJson(text);
+        if (json.title) setBaseTitle(json.title);
+        imported = {
+          pedigrees: json.pedigree ? [{ familyId: "1", pedigree: json.pedigree }] : [],
+          issues: json.issues,
+          hasErrors: json.hasErrors,
+        };
+      } else {
+        imported = importPed(text);
+      }
       setResult(imported);
       // Default: select all families
       setSelectedFids(new Set(imported.pedigrees.map(p => p.familyId)));
@@ -83,14 +103,14 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Import PED file</DialogTitle>
+          <DialogTitle>Import PED or JSON file</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <input
             ref={fileRef}
             type="file"
-            accept=".ped,.fam"
+            accept=".ped,.fam,.json"
             onChange={handleFileChange}
             className="block w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:text-xs file:border file:border-gray-300 file:rounded file:bg-white hover:file:bg-gray-50"
           />

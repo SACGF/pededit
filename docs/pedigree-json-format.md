@@ -1,0 +1,140 @@
+# PedEdit pedigree JSON format
+
+PedEdit can download any pedigree as a JSON file and import it again without loss. Unlike PED export (which drops names, notes, HPO terms and node positions by design), the JSON file contains every field of the data model, so it is the format to use when you want to keep a complete copy of a pedigree yourself or move it between PedEdit instances.
+
+A machine-readable JSON Schema (draft 2020-12) for this format is in [`pedigree-json-schema.json`](pedigree-json-schema.json). The canonical TypeScript definition is the `Pedigree` interface in `layout-engine/src/types.ts`; the Django `JSONField` and the editor's in-memory store mirror it exactly.
+
+## Envelope
+
+A downloaded file is a single JSON object with five top-level keys.
+
+| Key | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `format` | `"pededit-pedigree"` | yes | Identifies the file type. Any other value is rejected. |
+| `version` | integer | yes | Envelope version. Currently `1`. Files with a newer version are imported with a warning; unknown fields are kept but not interpreted. |
+| `exportedAt` | string | no | ISO 8601 timestamp of the export, e.g. `"2026-11-06T09:30:00.000Z"`. Informational only. |
+| `title` | string | no | The pedigree's title at export time. Used as the default title on import. |
+| `pedigree` | `Pedigree` | yes | The pedigree data, described below. |
+
+For convenience the importer also accepts a bare `Pedigree` object (no envelope). It reports an informational issue in that case, and the title defaults to the file name.
+
+## `Pedigree`
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `individuals` | `Individual[]` | yes | All people in the pedigree, in any order. Ids must be unique. |
+| `partnerships` | `Partnership[]` | yes | All unions. Ids must be unique among partnerships. |
+| `parentOf` | `{ [partnershipId]: string[] }` | yes | Children of each partnership. Every key must be a partnership id and every value an array of individual ids. An individual may be a child of at most one partnership. Use `{}` when there are no children. |
+| `siblingOrder` | `SiblingOrderSettings` | yes (defaulted) | How siblings are ordered on the canvas. If absent the importer applies `{ "mode": "insertion", "affectedFirst": false }` and reports a warning. |
+| `pinnedPositions` | `{ [individualId]: { x: number, y: number } }` | no | Manual drag overrides in canvas pixels. Individuals not listed here use the automatic layout. |
+| `canvasSettings` | `CanvasSettings` | no | Drag and snap settings. Absent means all defaults (nodes locked, no snapping). |
+| `unlockedIndividuals` | `string[]` | no | Ids of individuals unlocked for dragging when `canvasSettings.nodesMoveable` is `false`. |
+
+Any other property on the pedigree object is preserved as-is through import and export.
+
+### `SiblingOrderSettings`
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `mode` | `"insertion"`, `"manual"` or `"birthDate"` | Which ordering rule applies within each sibship. |
+| `affectedFirst` | boolean | When `true`, affected siblings are drawn before unaffected ones. |
+
+### `CanvasSettings`
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `nodesMoveable` | boolean | When `true` every node is draggable without an individual unlock. |
+| `snapToGrid` | boolean | Snap dragged nodes to a grid. |
+| `snapGridSize` | number | Grid spacing in canvas pixels. |
+
+## `Individual`
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | Unique within the pedigree. Any non-empty string; the editor generates UUIDs. |
+| `sex` | `"male"`, `"female"` or `"unknown"` | yes | Biological sex, drawn as square, circle or diamond. |
+| `affected` | boolean | yes | Filled symbol when `true`. |
+| `sibOrder` | number | yes | 0-indexed position within the sibling group (or among founders). |
+| `deceased` | boolean | no | Diagonal slash through the symbol. |
+| `carrier` | boolean | no | Carrier dot in the symbol. |
+| `proband` | boolean | no | Proband arrow. Normally exactly one individual. |
+| `name` | string | no | Display name shown under the symbol. |
+| `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
+| `notes` | string | no | Free-text clinical notes. |
+| `hpoTerms` | string[] | no | HPO term codes, e.g. `["HP:0001250"]`. |
+
+Optional fields may be omitted or set to `null`; both are treated as absent. Any other property on an individual is preserved as-is, so a newer PedEdit (or another tool) can add fields without older versions discarding them.
+
+## `Partnership`
+
+Children attach to a partnership, not to a parent. A single parent is modelled by partnering them with an `unknown`-sex individual.
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `id` | string | yes | Unique within the pedigree. |
+| `individual1` | string | yes | Id of one partner. Must exist in `individuals`. |
+| `individual2` | string | yes | Id of the other partner. Must exist and differ from `individual1`. |
+| `consanguineous` | boolean | no | Draw a double line between the partners. |
+
+Any other property on a partnership is preserved as-is.
+
+## Validation on import
+
+The importer never throws. It returns the pedigree together with a list of issues, each with a severity, a code, a message and a dotted path into the document (for example `pedigree.individuals[2].sex`).
+
+Errors block the import:
+
+- the text is not valid JSON, or the root is not an object
+- `format` is present but not `"pededit-pedigree"`
+- a required field is missing or has the wrong type (including `sibOrder` not being a number)
+- duplicate individual or partnership ids
+- a partnership refers to an individual that does not exist, or pairs an individual with itself
+- a `parentOf` key is not a partnership id, or a listed child does not exist
+- an individual is a child of two partnerships, is listed twice under one partnership, or is a child of their own partnership
+- circular ancestry (an individual is their own ancestor)
+
+Warnings allow the import and are shown to the user:
+
+- `siblingOrder` was missing and the default was applied
+- the document `version` is newer than the editor's
+- `pinnedPositions` or `unlockedIndividuals` name an individual that does not exist
+
+## Worked example
+
+A three-generation family: grandparents `i1` and `i2`, their affected daughter `i3` (the proband, with one HPO term and a pinned position) and their son `i4`, who died in infancy.
+
+```json
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "exportedAt": "2026-11-06T09:30:00.000Z",
+  "title": "Example family",
+  "pedigree": {
+    "individuals": [
+      { "id": "i1", "sex": "male", "affected": false, "sibOrder": 0, "name": "John" },
+      { "id": "i2", "sex": "female", "affected": false, "sibOrder": 0, "name": "Mary", "dob": "1952-03-14" },
+      { "id": "i3", "sex": "female", "affected": true, "proband": true, "sibOrder": 0, "hpoTerms": ["HP:0001250"] },
+      { "id": "i4", "sex": "male", "affected": false, "deceased": true, "sibOrder": 1, "notes": "Died in infancy" }
+    ],
+    "partnerships": [
+      { "id": "p1", "individual1": "i1", "individual2": "i2" }
+    ],
+    "parentOf": {
+      "p1": ["i3", "i4"]
+    },
+    "siblingOrder": { "mode": "insertion", "affectedFirst": false },
+    "pinnedPositions": { "i3": { "x": 180, "y": 240 } },
+    "canvasSettings": { "nodesMoveable": false, "snapToGrid": true, "snapGridSize": 20 },
+    "unlockedIndividuals": ["i3"]
+  }
+}
+```
+
+The same family as a bare pedigree is just the value of `"pedigree"` on its own.
+
+## Where the code lives
+
+- Exporter: `frontend/src/io/json/exporter.ts` (`exportJson`)
+- Importer and validator: `frontend/src/io/json/importer.ts` (`importJson`)
+- Issue codes and envelope type: `frontend/src/io/json/types.ts`
+- Tests: `frontend/src/io/json/__tests__/json.test.ts`

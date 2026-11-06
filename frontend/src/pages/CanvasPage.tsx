@@ -135,7 +135,7 @@ export default function CanvasPage() {
                 className="w-full mb-2 h-7 text-xs"
                 onClick={() => setImportOpen(true)}
               >
-                Import PED…
+                Import PED/JSON…
               </Button>
               <ul className="space-y-0.5">
                 {pedigrees.map((p) => (

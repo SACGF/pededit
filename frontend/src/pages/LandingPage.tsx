@@ -125,7 +125,7 @@ export default function LandingPage() {
               onClick={() => setImportOpen(true)}
               disabled={loading !== null}
             >
-              Import from PED file…
+              Import from PED or JSON file…
             </Button>
           </div>
 
