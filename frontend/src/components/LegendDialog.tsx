@@ -1,9 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Pedigree, Tag } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import {
   tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
+import { SymbolShape } from "../pedigree/nodes/symbols";
+import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 
 interface LegendDialogProps {
   open: boolean;
@@ -127,6 +129,16 @@ function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
   );
 }
 
+/** Pregnancy / loss symbols reuse the canvas renderer so the legend matches exactly. */
+function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }) {
+  // Extra room below for the "SB" / "ECT" caption and the stillbirth slash overhang.
+  return (
+    <svg width="36" height="40" viewBox="-6 -6 36 40">
+      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, lifeStatus }} size={SZ} clipId={`legend-life-${lifeStatus}`} />
+    </svg>
+  );
+}
+
 function CoupleSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -190,6 +202,10 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
   if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} />,          label: "Proband (index case)" });
+  for (const o of LIFE_STATUS_OPTIONS) {
+    const ind = individuals.find(i => i.lifeStatus === o.value);
+    if (ind) indRows.push({ icon: <LifeStatusSvg sex={ind.sex} lifeStatus={o.value} />, label: o.label });
+  }
 
   const relRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });

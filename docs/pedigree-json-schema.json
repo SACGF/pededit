@@ -54,6 +54,10 @@
         "deceased": { "type": "boolean" },
         "carrier": { "type": "boolean" },
         "proband": { "type": "boolean" },
+        "lifeStatus": {
+          "enum": ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"],
+          "description": "Pregnancy or pregnancy loss. Absent means born. Such an individual has no partners or children."
+        },
         "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },

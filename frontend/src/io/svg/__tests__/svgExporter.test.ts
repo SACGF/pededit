@@ -4,6 +4,7 @@ import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, ROW_HEIGHT, SLOT_WIDTH } from "../../../pedigree/constants";
+import { lossTrianglePoints } from "../../../pedigree/lifeStatus";
 
 function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
   return {
@@ -155,6 +156,83 @@ describe("exportSvg — overlays", () => {
     const svg = exportSvg(p);
     expect(svg).toContain("marker-end");
     expect(svg).toContain("proband-arrowhead");
+  });
+});
+
+// ── Pregnancy / loss symbols (NSGC 2008) ─────────────────────────────────────
+
+describe("exportSvg, pregnancy and pregnancy loss", () => {
+  const half = NODE_SIZE / 2;
+  const TRIANGLE = `points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
+  const one = (ind: Partial<Pedigree["individuals"][number]>) => exportSvg(makePedigree({
+    individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, ...ind }],
+  }));
+
+  it("pregnancy → sex symbol with a P inside", () => {
+    const svg = one({ sex: "male", lifeStatus: "pregnancy" });
+    expect(svg).toContain("<rect");
+    expect(svg).toMatch(/<text[^>]*>P<\/text>/);
+    expect(svg).not.toContain(TRIANGLE);
+  });
+
+  it("miscarriage → small triangle instead of the sex symbol", () => {
+    const svg = one({ sex: "female", lifeStatus: "miscarriage" });
+    expect(svg).toContain(TRIANGLE);
+    expect(svg).not.toContain("<circle cx=\"0\" cy=\"0\" r=\"19\"");
+    expect(svg).not.toContain("<text");
+  });
+
+  it("termination → triangle plus a slash line through it", () => {
+    const svg = one({ lifeStatus: "termination" });
+    expect(svg).toContain(TRIANGLE);
+    expect(svg).toMatch(new RegExp(`${TRIANGLE.replace(/[.*+?^$()|[\]\\]/g, "\\$&")}[^]*?<line`));
+  });
+
+  it("stillbirth → sex symbol, slash and an SB caption above the name", () => {
+    const svg = one({ sex: "male", lifeStatus: "stillbirth", name: "Baby" });
+    expect(svg).toContain("<rect");
+    expect(svg).toMatch(/<line[^>]*x1="-\d/);           // deceased-style slash
+    expect(svg).toMatch(/<text[^>]*>SB<\/text>/);
+    expect(svg.indexOf(">SB<")).toBeLessThan(svg.indexOf("Baby"));
+  });
+
+  it("ectopic → triangle with an ECT caption", () => {
+    const svg = one({ lifeStatus: "ectopic" });
+    expect(svg).toContain(TRIANGLE);
+    expect(svg).toMatch(/<text[^>]*>ECT<\/text>/);
+  });
+
+  it("a caption adds a label line to the canvas height", () => {
+    const plain = one({ sex: "male" });
+    const sb    = one({ sex: "male", lifeStatus: "stillbirth" });
+    const h = (s: string) => parseInt(s.match(/height="(\d+)"/)![1]);
+    expect(h(sb)).toBeGreaterThan(h(plain));
+  });
+
+  it("quadrant tags on a loss triangle are clipped to the triangle", () => {
+    const svg = exportSvg(makePedigree({
+      individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "miscarriage", tags: ["q"] }],
+      tags: [{ id: "q", label: "Anomaly", color: "#d62728", style: "quadrant" }],
+    }));
+    const clip = svg.match(/<clipPath id="[^"]+">(.*?)<\/clipPath>/)!;
+    expect(clip[1]).toContain(TRIANGLE);
+    expect(svg).toContain('fill="#d62728"');
+  });
+
+  it("stacks the caption, then the tag row, then the name below the symbol", () => {
+    const svg = exportSvg(makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "stillbirth", name: "Baby", tags: ["d"] }],
+      tags: [{ id: "d", label: "Sequenced", color: "#2ca02c", style: "dot" }],
+    }));
+    const caption = svg.match(/<text x="([\d.-]+)" y="([\d.-]+)"[^>]*>SB<\/text>/)!;
+    const captionY = Number(caption[2]);
+    const dotY = Number(svg.match(/<circle cx="[^"]*" cy="([\d.-]+)" r="3.5" fill="#2ca02c"/)![1]);
+    const nameY = Number(svg.match(/<text[^>]*y="([\d.]+)"[^>]*>Baby<\/text>/)![1]);
+    // The dot is drawn in the symbol's local frame (centre at 0,0); the
+    // caption and name are absolute. Compare via the symbol centre.
+    const centreY = Number(svg.match(new RegExp(`<g transform="translate\\(${caption[1]} ([\\d.-]+)\\)">`))![1]);
+    expect(centreY + dotY - 3.5).toBeGreaterThan(captionY);
+    expect(nameY - 10).toBeGreaterThan(centreY + dotY + 3.5);
   });
 });
 

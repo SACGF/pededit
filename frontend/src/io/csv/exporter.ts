@@ -1,7 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags";
+  const header = "family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status";
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
   const parents = new Map<string, { f: string; m: string }>();
@@ -34,6 +34,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       (ind.notes ?? "").replace(/,/g, ";"), // escape commas in notes
       (ind.hpoTerms ?? []).join(";"),
       (ind.tags ?? []).map(id => tagLabels.get(id) ?? id).join(";"),
+      ind.lifeStatus ?? "",
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

@@ -212,11 +212,14 @@ export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, siz
     .join("");
 }
 
-/** Annotation row for a symbol centred on (0, 0), as SVG markup. */
-export function renderAnnotationRowSvg(individual: Individual, pedigree: Pedigree, size: number): string {
+/**
+ * Annotation row for a symbol centred on (0, 0), as SVG markup. `offsetY`
+ * moves the row down, e.g. past an "SB" / "ECT" caption.
+ */
+export function renderAnnotationRowSvg(individual: Individual, pedigree: Pedigree, size: number, offsetY = 0): string {
   const items = annotationRow(individual, pedigree);
   if (items.length === 0) return "";
-  const cy = size / 2 + ANNOTATION_Y;
+  const cy = size / 2 + ANNOTATION_Y + offsetY;
   return items
     .map(({ tag, x }) =>
       tag.style === "dot"

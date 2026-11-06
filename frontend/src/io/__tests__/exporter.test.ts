@@ -178,6 +178,23 @@ describe("exportPed", () => {
     });
     expect(exportPed(ped).endsWith("\n")).toBe(true);
   });
+
+  it("drops pregnancy / loss status silently (PED cannot carry it)", () => {
+    const ped = makePedigree({
+      individuals: [
+        { id: "1", sex: "male",    affected: false, sibOrder: 0 },
+        { id: "2", sex: "female",  affected: false, sibOrder: 1 },
+        { id: "3", sex: "unknown", affected: true,  sibOrder: 0, lifeStatus: "miscarriage" },
+      ],
+      partnerships: [{ id: "p", individual1: "1", individual2: "2" }],
+      parentOf: { p: ["3"] },
+    });
+    const text = exportPed(ped);
+    const line = text.trim().split("\n").find(l => l.includes("\t3\t"))!;
+    expect(line.split("\t")).toEqual(["1", "3", "1", "2", "0", "2"]);
+    expect(text).not.toContain("miscarriage");
+    expect(importPed(text).hasErrors).toBe(false);
+  });
 });
 
 describe("exportPed: r dialect", () => {

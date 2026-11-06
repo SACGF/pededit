@@ -4,6 +4,10 @@ import {
   ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../tags";
 import type { Sector, AnnotationItem } from "../tags";
+import {
+  usesLossTriangle, lifeStatusCaption, captionBaselineY, CAPTION_FONT_SIZE,
+  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
+} from "../lifeStatus";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
@@ -116,11 +120,90 @@ function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fi
   );
 }
 
+// ── Pregnancy and pregnancy loss (NSGC 2008) ───────────────────────────────────
+
+/** Small triangle for miscarriage, termination (with slash) and ectopic pregnancy. */
+function LossTriangle({ size, fill, slash, sectors, clipId }: {
+  size: number; fill: FillDescriptor; slash: boolean; sectors: Sector[]; clipId: string;
+}) {
+  const s = lossSlashEnds(size);
+  const points = lossTrianglePoints(size);
+  return (
+    <g>
+      <clipPath id={clipId}><polygon points={points} /></clipPath>
+      <polygon
+        points={points}
+        stroke="black" strokeWidth={2}
+        fill={fill.type === "solid" ? "black" : "white"}
+      />
+      <Sectors sectors={sectors} size={size} clipId={clipId} />
+      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
+      {slash && (
+        <line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke="black" strokeWidth={2} />
+      )}
+    </g>
+  );
+}
+
+/** "P" inside the sex symbol of a current pregnancy. */
+function PregnancyMark({ size, fill }: { size: number; fill: FillDescriptor }) {
+  return (
+    <text
+      x={size / 2} y={pregnancyBaselineY(size)}
+      textAnchor="middle"
+      fontFamily="sans-serif" fontSize={pregnancyFontSize(size)} fontWeight="bold"
+      fill={fill.type === "solid" ? "white" : "black"}
+      style={{ pointerEvents: "none", userSelect: "none" }}
+    >
+      P
+    </text>
+  );
+}
+
+/** "SB" or "ECT" caption drawn under the symbol. */
+function LifeStatusCaption({ size, text }: { size: number; text: string }) {
+  return (
+    <text
+      x={size / 2} y={captionBaselineY(size)}
+      textAnchor="middle"
+      fontFamily="sans-serif" fontSize={CAPTION_FONT_SIZE}
+      fill="black"
+      style={{ pointerEvents: "none", userSelect: "none" }}
+    >
+      {text}
+    </text>
+  );
+}
+
+function SexSymbol({ individual, size, fill, sectors, clipId }: {
+  individual: Individual; size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string;
+}) {
+  switch (individual.sex) {
+    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={clipId} />;
+    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={clipId} />;
+    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} clipId={clipId} />;
+  }
+}
+
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
 export function SymbolShape({ individual, size, sectors = [], clipId }: ShapeProps) {
   const fill = symbolFill(individual);
   const id = clipId ?? `symbol-clip-${individual.id}`;
+  const status = individual.lifeStatus;
+  if (status) {
+    const caption = lifeStatusCaption(status);
+    return (
+      <g>
+        {usesLossTriangle(status)
+          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
+          : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
+        {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
+        {status === "stillbirth" && <DeceasedSlash size={size} />}
+        {caption && <LifeStatusCaption size={size} text={caption} />}
+      </g>
+    );
+  }
   switch (individual.sex) {
     case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={id} />;
     case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={id} />;
@@ -128,11 +211,14 @@ export function SymbolShape({ individual, size, sectors = [], clipId }: ShapePro
   }
 }
 
-/** Dot and text tags in a centred row just below the symbol. */
-export function AnnotationRow({ items, size }: { items: AnnotationItem[]; size: number }) {
+/**
+ * Dot and text tags in a centred row just below the symbol. `offsetY` moves
+ * the row down, e.g. past an "SB" / "ECT" caption.
+ */
+export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationItem[]; size: number; offsetY?: number }) {
   if (items.length === 0) return null;
   const cx = size / 2;
-  const cy = size + ANNOTATION_Y;
+  const cy = size + ANNOTATION_Y + offsetY;
   return (
     <g>
       {items.map(({ tag, x }) =>

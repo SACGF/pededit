@@ -145,6 +145,20 @@ describe("exportCsv", () => {
     expect(rows[1]!.tags).toBe("");
   });
 
+  it("life_status column carries the pregnancy / loss status, empty when born", () => {
+    const ped = makePedigree({
+      individuals: [
+        { id: "i1", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "stillbirth" },
+        { id: "i2", sex: "male",    affected: false, sibOrder: 1 },
+      ],
+    });
+    const csv = exportCsv(ped);
+    expect(csv.split("\n")[0]!.endsWith(",life_status")).toBe(true);
+    const rows = parseRows(csv);
+    expect(rows[0]!.life_status).toBe("stillbirth");
+    expect(rows[1]!.life_status).toBe("");
+  });
+
   it("uses custom familyId when provided", () => {
     const ped = makePedigree({
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],

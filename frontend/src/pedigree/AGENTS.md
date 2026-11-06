@@ -29,5 +29,15 @@ draws NSGC symbols.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
   within the pedigree's quadrant-style tags.
+- `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
+  with the exporters. Miscarriage, termination and ectopic replace the sex
+  symbol with a small triangle; quadrant tags are clipped to that triangle.
+  A pregnancy or loss can have no partner or children, enforced in the store
+  actions and greyed out in the menus.
 
-Tests: `__tests__/layoutToFlow.test.ts` and `__tests__/tags.test.ts`.
+Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name,
+DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter`
+each offset these by hand, so change all three together.
+
+Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
+`__tests__/symbols.test.tsx`.

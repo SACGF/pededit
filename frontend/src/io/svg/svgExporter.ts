@@ -10,6 +10,10 @@ import {
   renderSectorsSvg, renderAnnotationRowSvg, renderTagLegendSvg,
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
+import {
+  usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
+  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
+} from "../../pedigree/lifeStatus";
 
 const STROKE = 2;
 const CONSANG_GAP = 4;       // px gap between consanguineous double lines
@@ -78,8 +82,9 @@ function computeBounds(
 
   const hasDob = pedigree.individuals.some(i => i.dob);
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
+  const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
   const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
-    + (hasAnnotations ? ANNOTATION_SHIFT : 0);
+    + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? LABEL_LINE_HEIGHT : 0);
 
   const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
   const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
@@ -202,8 +207,11 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
 
   // Geometry without paint, reused for the clipPath, the filled base and the
   // re-stroked outline that keeps the border crisp over tag sectors.
+  const triangle = lossTriangleGeom(ind);
   let geom: string;
-  if (ind.sex === "male") {
+  if (triangle) {
+    geom = triangle;
+  } else if (ind.sex === "male") {
     geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
   } else if (ind.sex === "female") {
     geom = `<circle cx="0" cy="0" r="${half - 1}"`;
@@ -221,11 +229,57 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   }
 
   let overlay = "";
-  if (ind.carrier && !ind.affected) {
+  if (ind.carrier && !ind.affected && !triangle) {
     const r = NODE_SIZE * 0.15;
     overlay = `<circle cx="0" cy="0" r="${r}" fill="black"/>`;
   }
-  return shape + overlay + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE);
+  return shape + overlay + renderLifeStatusMarks(ind)
+    + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
+}
+
+/** Drop for everything under the symbol when it has an "SB" / "ECT" caption line. */
+function captionShift(ind: Individual): number {
+  return lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
+}
+
+/*
+ * Pregnancy / pregnancy-loss symbols (NSGC 2008), centred on the origin.
+ * Mirror SymbolShape in symbols.tsx and are shared with the U-shape exporter.
+ * The "SB" / "ECT" caption is a label line, see lifeStatusCaption.
+ */
+
+/**
+ * Unpainted outline of the small loss triangle (miscarriage, termination,
+ * ectopic), in the same open-tag form as the sex symbol geometry so callers
+ * can reuse it for the clipPath and the outline. Null when the individual is
+ * drawn with their sex symbol.
+ */
+export function lossTriangleGeom(ind: Individual): string | null {
+  if (!usesLossTriangle(ind.lifeStatus)) return null;
+  const half = NODE_SIZE / 2;
+  return `<polygon points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
+}
+
+/** "P", the termination slash or the stillbirth slash drawn over the symbol. Empty when born. */
+export function renderLifeStatusMarks(ind: Individual): string {
+  const status = ind.lifeStatus;
+  if (!status) return "";
+  const half = NODE_SIZE / 2;
+  if (status === "termination") {
+    const s = lossSlashEnds(NODE_SIZE, -half, -half);
+    return `<line x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke="black" stroke-width="${STROKE}"/>`;
+  }
+  if (status === "pregnancy") {
+    const textFill = ind.affected ? "white" : "black";
+    return `<text x="0" y="${pregnancyBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${pregnancyFontSize(NODE_SIZE)}" font-weight="bold" fill="${textFill}">P</text>`;
+  }
+  if (status === "stillbirth") return renderDeceasedSlash();
+  return "";
+}
+
+/** "SB" / "ECT" caption as a label line at the given baseline, centred on cx. */
+export function renderLifeStatusCaption(caption: string, cx: number, y: number): string {
+  return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${CAPTION_FONT_SIZE}" fill="black">${caption}</text>`;
 }
 
 function renderDeceasedSlash(): string {
@@ -292,7 +346,11 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
 
       const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = slotPos.get(`${level}-${slot}`)!;
-      const labelBaseY = cy + LABEL_OFFSET_Y + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
+      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
+      const caption = lifeStatusCaption(ind.lifeStatus);
+      if (caption) elems.push(renderLifeStatusCaption(caption, cx, cy + LABEL_OFFSET_Y));
+      const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
+        + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
 
       if (ind.name) {
         elems.push(`<text x="${cx}" y="${labelBaseY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.name)}</text>`);

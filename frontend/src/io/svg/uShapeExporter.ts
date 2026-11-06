@@ -5,6 +5,8 @@ import {
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
+import { lossTriangleGeom, renderLifeStatusMarks } from "./svgExporter";
+import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // U-shape (horseshoe) pedigree export. Issue #2.
@@ -784,7 +786,8 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
     for (const { id } of n.members) {
       const ind = byId.get(id);
       if (!ind) continue;
-      labelLines = Math.max(labelLines, (ind.name ? 1 : 0) + (ind.dob ? 1 : 0) + (hasAnnotationRow(ind, pedigree) ? 1 : 0));
+      labelLines = Math.max(labelLines, (ind.name ? 1 : 0) + (ind.dob ? 1 : 0)
+        + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
       labelChars = Math.max(labelChars, ind.name?.length ?? 0, ind.dob?.length ?? 0);
     }
   });
@@ -977,8 +980,11 @@ function renderConnectors(b: Built, layout: UShapeLayout): string[] {
 
 function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
   const fill = ind.affected ? "black" : "white";
+  const triangle = lossTriangleGeom(ind);
   let geom: string;
-  if (ind.sex === "male") {
+  if (triangle) {
+    geom = triangle;
+  } else if (ind.sex === "male") {
     geom = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
   } else if (ind.sex === "female") {
     geom = `<circle cx="0" cy="0" r="${HALF - 1}"`;
@@ -993,8 +999,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
       + `${geom} ${stroke} fill="none"/>`;
   }
-  if (ind.carrier && !ind.affected) shape += `<circle cx="0" cy="0" r="${NODE_SIZE * 0.15}" fill="black"/>`;
-  return shape + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE);
+  if (ind.carrier && !ind.affected && !triangle) shape += `<circle cx="0" cy="0" r="${NODE_SIZE * 0.15}" fill="black"/>`;
+  const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
+  return shape + renderLifeStatusMarks(ind) + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
 }
 
 function renderDeceasedSlash(): string {
@@ -1013,18 +1020,25 @@ function renderProbandArrow(): string {
  * white backing to stay readable.
  */
 function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): string {
-  const lines = [ind.name, ind.dob].filter((s): s is string => !!s);
+  // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
+  // by renderShape, over the white backing), name, DOB.
+  const caption = lifeStatusCaption(ind.lifeStatus);
+  const below = [ind.name, ind.dob].filter((s): s is string => !!s);
+  const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];
-  const top = HALF + 3 + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_ROW_HEIGHT : 0);
+  const top = HALF + 3;
+  const annotationGap = hasAnnotationRow(ind, pedigree) ? ANNOTATION_ROW_HEIGHT : 0;
+  const lineY = (i: number) =>
+    top + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT + (caption && i === 0 ? 0 : annotationGap);
   if (hasDescent) {
     const w = Math.max(...lines.map(l => l.length)) * LABEL_CHAR_WIDTH + 4;
-    const h = lines.length * LABEL_LINE_HEIGHT;
-    out.push(`<rect x="${r(-w / 2)}" y="${top}" width="${r(w)}" height="${h}" fill="white"/>`);
+    const h = lines.length * LABEL_LINE_HEIGHT + (below.length > 0 ? annotationGap : 0);
+    const y = caption ? top : top + annotationGap;
+    out.push(`<rect x="${r(-w / 2)}" y="${y}" width="${r(w)}" height="${h}" fill="white"/>`);
   }
   lines.forEach((text, i) => {
-    const y = top + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT;
-    out.push(`<text x="0" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(text)}</text>`);
+    out.push(`<text x="0" y="${lineY(i)}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(text)}</text>`);
   });
   return out.join("");
 }
