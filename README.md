@@ -100,6 +100,10 @@ npm run test:layout
 npm -w @pedigree-editor/frontend run typecheck
 ```
 
+## File formats
+
+Pedigrees can be downloaded as a lossless JSON document and imported again. The format, including every field of the data model and a worked example, is documented in [docs/pedigree-json-format.md](docs/pedigree-json-format.md), with a JSON Schema in [docs/pedigree-json-schema.json](docs/pedigree-json-schema.json). PED (lossy), CSV, SVG, PNG and PDF export are also available from the toolbar.
+
 ## Production deployment
 
 See [INSTALL.md](INSTALL.md) for step-by-step instructions to deploy on Ubuntu 24.04 with Nginx, Gunicorn, and PostgreSQL.

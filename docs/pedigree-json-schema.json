@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pededit.com/schema/pedigree-json-v1.json",
+  "title": "PedEdit pedigree JSON document",
+  "description": "Lossless JSON export of a PedEdit pedigree. The document root is the envelope; the importer also accepts a bare Pedigree object. See docs/pedigree-json-format.md.",
+  "type": "object",
+  "required": ["format", "version", "pedigree"],
+  "properties": {
+    "format": { "const": "pededit-pedigree" },
+    "version": { "type": "integer", "minimum": 1 },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "title": { "type": "string" },
+    "pedigree": { "$ref": "#/$defs/Pedigree" }
+  },
+  "$defs": {
+    "Pedigree": {
+      "type": "object",
+      "required": ["individuals", "partnerships", "parentOf"],
+      "properties": {
+        "individuals": { "type": "array", "items": { "$ref": "#/$defs/Individual" } },
+        "partnerships": { "type": "array", "items": { "$ref": "#/$defs/Partnership" } },
+        "parentOf": {
+          "type": "object",
+          "description": "Keys are partnership ids, values are the ids of that partnership's children.",
+          "additionalProperties": { "type": "array", "items": { "type": "string" } }
+        },
+        "siblingOrder": { "$ref": "#/$defs/SiblingOrderSettings" },
+        "pinnedPositions": {
+          "type": "object",
+          "description": "Manual drag overrides keyed by individual id, in canvas pixels.",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["x", "y"],
+            "properties": { "x": { "type": "number" }, "y": { "type": "number" } }
+          }
+        },
+        "canvasSettings": { "$ref": "#/$defs/CanvasSettings" },
+        "unlockedIndividuals": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "Individual": {
+      "type": "object",
+      "required": ["id", "sex", "affected", "sibOrder"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "sex": { "enum": ["male", "female", "unknown"] },
+        "affected": { "type": "boolean" },
+        "deceased": { "type": "boolean" },
+        "carrier": { "type": "boolean" },
+        "proband": { "type": "boolean" },
+        "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
+        "name": { "type": "string" },
+        "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },
+        "notes": { "type": "string" },
+        "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } }
+      },
+      "additionalProperties": true
+    },
+    "Partnership": {
+      "type": "object",
+      "required": ["id", "individual1", "individual2"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "individual1": { "type": "string" },
+        "individual2": { "type": "string" },
+        "consanguineous": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "SiblingOrderSettings": {
+      "type": "object",
+      "required": ["mode", "affectedFirst"],
+      "properties": {
+        "mode": { "enum": ["insertion", "manual", "birthDate"] },
+        "affectedFirst": { "type": "boolean" }
+      }
+    },
+    "CanvasSettings": {
+      "type": "object",
+      "required": ["nodesMoveable", "snapToGrid", "snapGridSize"],
+      "properties": {
+        "nodesMoveable": { "type": "boolean" },
+        "snapToGrid": { "type": "boolean" },
+        "snapGridSize": { "type": "number" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "format": "pededit-pedigree",
+      "version": 1,
+      "exportedAt": "2026-11-06T09:30:00.000Z",
+      "title": "Example family",
+      "pedigree": {
+        "individuals": [
+          { "id": "i1", "sex": "male", "affected": false, "sibOrder": 0, "name": "John" },
+          { "id": "i2", "sex": "female", "affected": false, "sibOrder": 0, "name": "Mary", "dob": "1952-03-14" },
+          { "id": "i3", "sex": "female", "affected": true, "proband": true, "sibOrder": 0, "hpoTerms": ["HP:0001250"] },
+          { "id": "i4", "sex": "male", "affected": false, "deceased": true, "sibOrder": 1, "notes": "Died in infancy" }
+        ],
+        "partnerships": [
+          { "id": "p1", "individual1": "i1", "individual2": "i2" }
+        ],
+        "parentOf": {
+          "p1": ["i3", "i4"]
+        },
+        "siblingOrder": { "mode": "insertion", "affectedFirst": false },
+        "pinnedPositions": { "i3": { "x": 180, "y": 240 } },
+        "canvasSettings": { "nodesMoveable": false, "snapToGrid": true, "snapGridSize": 20 },
+        "unlockedIndividuals": ["i3"]
+      }
+    }
+  ]
+}
