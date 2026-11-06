@@ -117,3 +117,38 @@ describe("SymbolShape, tags on pregnancy and pregnancy loss", () => {
     expect(html).toMatch(/>P<\/text>/);
   });
 });
+
+describe("SymbolShape, carrier dot and slashes over fill (#13, #14)", () => {
+  const dot = (html: string) => {
+    const m = html.match(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="black"/);
+    return m ? { cx: +m[1], cy: +m[2], r: +m[3] } : null;
+  };
+
+  it("born carrier: dot at the centre", () => {
+    expect(dot(render({ carrier: true }))).toEqual({ cx: 20, cy: 20, r: 6 });
+  });
+
+  it("pregnancy carrier: dot below a smaller, raised P, not overlapping it", () => {
+    const html = render({ carrier: true, lifeStatus: "pregnancy" });
+    const d = dot(html)!;
+    const t = html.match(/<text x="[\d.]+" y="([\d.]+)"[^>]*font-size="([\d.]+)"/)!;
+    const baseline = +t[1];
+    expect(d.cy - d.r).toBeGreaterThan(baseline);
+    expect(d.cy + d.r).toBeLessThan(SIZE);
+  });
+
+  it("loss triangle carrier: dot drawn inside the triangle, clear of the slash", () => {
+    const d = dot(render({ carrier: true, lifeStatus: "termination" }))!;
+    expect(d).not.toBeNull();
+    // Slash runs along y = x; keep the dot off it.
+    expect(Math.abs(d.cy - d.cx) / Math.SQRT2).toBeGreaterThan(d.r + 1);
+  });
+
+  it("affected termination and stillbirth: the slash is redrawn in white inside the fill", () => {
+    for (const lifeStatus of ["termination", "stillbirth"] as const) {
+      const html = render({ affected: true, lifeStatus });
+      expect(html).toMatch(/<line[^>]*stroke="white"[^>]*clip-path="url\(#symbol-clip-i1\)"/);
+    }
+    expect(render({ lifeStatus: "stillbirth" })).not.toContain('stroke="white"');
+  });
+});

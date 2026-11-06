@@ -13,6 +13,7 @@ import {
 import {
   usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
+  carrierDot, symbolTopInset, CAPTION_ROW_HEIGHT,
 } from "../../pedigree/lifeStatus";
 
 const STROKE = 2;
@@ -21,9 +22,13 @@ const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
 const PROBAND_TAIL = 18;     // matches ProbandArrow in symbols.tsx
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
-const LABEL_OFFSET_Y = NODE_SIZE / 2 + 4; // below symbol centre
+// Baseline of the first line under the symbol, below its centre. Leaves a gap
+// between the symbol edge and the cap height of a 10px label.
+const LABEL_OFFSET_Y = NODE_SIZE / 2 + 12;
 // Extra drop for the name when a tag annotation row sits between it and the symbol.
 const ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
+// Extra drop for everything under a symbol with an "SB" / "ECT" caption.
+const CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
 
 // ── Slot positions ────────────────────────────────────────────────────────────
 
@@ -84,7 +89,7 @@ function computeBounds(
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
   const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
   const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
-    + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? LABEL_LINE_HEIGHT : 0);
+    + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
   const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
   const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
@@ -159,7 +164,7 @@ function seg(x1: number, y1: number, x2: number, y2: number): string {
   return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function renderSibshipLines(result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
+function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
 
   for (let level = 1; level < result.n.length; level++) {
@@ -191,8 +196,10 @@ function renderSibshipLines(result: LayoutResult, partners: PartnerSet, slotPos:
       // 2. Horizontal sibship bar
       lines.push(seg(sibLeftX, sibBarY, sibRightX, sibBarY));
       // 3. Vertical drops from bar to top of each child symbol
-      for (const cx of childXs) {
-        lines.push(seg(cx, sibBarY, cx, childY - NODE_SIZE / 2));
+      for (const s of slots) {
+        const cx = slotPos.get(`${level}-${s}`)!.x;
+        const child = pedigree.individuals[Math.floor(result.nid[level][s]) - 1];
+        lines.push(seg(cx, sibBarY, cx, childY + childDropEndOffset(child)));
       }
     }
   }
@@ -228,18 +235,32 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  let overlay = "";
-  if (ind.carrier && !ind.affected && !triangle) {
-    const r = NODE_SIZE * 0.15;
-    overlay = `<circle cx="0" cy="0" r="${r}" fill="black"/>`;
-  }
-  return shape + overlay + renderLifeStatusMarks(ind)
+  return shape + renderCarrierDot(ind) + renderLifeStatusMarks(ind, geom, clipId)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 
 /** Drop for everything under the symbol when it has an "SB" / "ECT" caption line. */
 function captionShift(ind: Individual): number {
-  return lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
+  return lifeStatusCaption(ind.lifeStatus) ? CAPTION_SHIFT : 0;
+}
+
+/**
+ * Carrier dot, centred on the origin's symbol. Not drawn on an affected
+ * (filled) symbol. Shared with the U-shape exporter.
+ */
+export function renderCarrierDot(ind: Individual): string {
+  if (!ind.carrier || ind.affected) return "";
+  const half = NODE_SIZE / 2;
+  const d = carrierDot(ind.lifeStatus, NODE_SIZE, -half, -half);
+  return `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="black"/>`;
+}
+
+/**
+ * Where a sibship drop meets the child: the top of the symbol box, lowered to
+ * the apex for a loss triangle. Relative to the symbol centre.
+ */
+export function childDropEndOffset(ind: Individual | undefined): number {
+  return -NODE_SIZE / 2 + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
 }
 
 /*
@@ -260,20 +281,35 @@ export function lossTriangleGeom(ind: Individual): string | null {
   return `<polygon points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
 }
 
-/** "P", the termination slash or the stillbirth slash drawn over the symbol. Empty when born. */
-export function renderLifeStatusMarks(ind: Individual): string {
+/**
+ * "P", the termination slash or the stillbirth slash drawn over the symbol.
+ * Empty when born. `geom` is the unpainted symbol outline (see renderShape):
+ * on an affected symbol the part of a slash inside it is redrawn in white,
+ * clipped to that outline, so the slash does not vanish into the fill.
+ */
+export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: string): string {
   const status = ind.lifeStatus;
   if (!status) return "";
   const half = NODE_SIZE / 2;
-  if (status === "termination") {
-    const s = lossSlashEnds(NODE_SIZE, -half, -half);
-    return `<line x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke="black" stroke-width="${STROKE}"/>`;
-  }
+  const slash = (s: { x1: number; y1: number; x2: number; y2: number }) => {
+    const attrs = `x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke-width="${STROKE}"`;
+    let out = `<line ${attrs} stroke="black"/>`;
+    if (ind.affected) {
+      const id = `${clipId}-slash`;
+      out += `<clipPath id="${id}">${geom}/></clipPath><line ${attrs} stroke="white" clip-path="url(#${id})"/>`;
+    }
+    return out;
+  };
+  if (status === "termination") return slash(lossSlashEnds(NODE_SIZE, -half, -half));
   if (status === "pregnancy") {
     const textFill = ind.affected ? "white" : "black";
-    return `<text x="0" y="${pregnancyBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${pregnancyFontSize(NODE_SIZE)}" font-weight="bold" fill="${textFill}">P</text>`;
+    const carrier = !!ind.carrier && !ind.affected;
+    return `<text x="0" y="${pregnancyBaselineY(NODE_SIZE, -half, carrier)}" text-anchor="middle" font-family="sans-serif" font-size="${pregnancyFontSize(NODE_SIZE, carrier)}" font-weight="bold" fill="${textFill}">P</text>`;
   }
-  if (status === "stillbirth") return renderDeceasedSlash();
+  if (status === "stillbirth") {
+    const o = half + DECEASED_OVERHANG;
+    return slash({ x1: -o, y1: -o, x2: o, y2: o });
+  }
   return "";
 }
 
@@ -396,7 +432,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
   const partners = buildPartnerSetFromPedigree(working);
   lines.push(...renderCoupleLines(result, partners, slotPos));
-  lines.push(...renderSibshipLines(result, partners, slotPos));
+  lines.push(...renderSibshipLines(working, result, partners, slotPos));
   lines.push(...renderSymbols(working, result, slotPos));
   lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);
