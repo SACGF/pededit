@@ -1,0 +1,60 @@
+# Haemophilia B (the "royal disease") among the descendants of Queen Victoria.
+# Rogaev EI et al. (2009) Science 326(5954): 817. doi:10.1126/science.1180660
+# The lines carrying the F9 mutation plus Victoria's other children. The Prussian line
+# through Victoria, Princess Royal is included only as far as Henry of Prussia, whose
+# marriage to his first cousin Irene of Hesse closes a loop.
+# PHENO 2 = haemophiliac. PHENO 0 = status unknown or disputed. Carriers are
+# phenotypically unaffected in PED; the in-app example carries the carrier flags.
+# Generation 0
+VICT	Queen_Victoria	0	0	2	1
+VICT	Prince_Albert	0	0	1	1
+# Generation 1: children of Victoria and Albert in birth order, then married-in spouses
+VICT	Victoria_Princess_Royal	Prince_Albert	Queen_Victoria	2	1
+VICT	Edward_VII	Prince_Albert	Queen_Victoria	1	1
+VICT	Alice	Prince_Albert	Queen_Victoria	2	1
+VICT	Alfred	Prince_Albert	Queen_Victoria	1	1
+VICT	Helena	Prince_Albert	Queen_Victoria	2	1
+VICT	Louise	Prince_Albert	Queen_Victoria	2	1
+VICT	Arthur	Prince_Albert	Queen_Victoria	1	1
+VICT	Leopold	Prince_Albert	Queen_Victoria	1	2
+VICT	Beatrice	Prince_Albert	Queen_Victoria	2	1
+VICT	Frederick_III	0	0	1	1
+VICT	Louis_IV_of_Hesse	0	0	1	1
+VICT	Helen_of_Waldeck	0	0	2	1
+VICT	Henry_of_Battenberg	0	0	1	1
+# Generation 2
+VICT	Henry_of_Prussia	Frederick_III	Victoria_Princess_Royal	1	1
+VICT	Victoria_of_Hesse	Louis_IV_of_Hesse	Alice	2	1
+VICT	Elisabeth_of_Hesse	Louis_IV_of_Hesse	Alice	2	1
+VICT	Irene_of_Hesse	Louis_IV_of_Hesse	Alice	2	1
+VICT	Ernest_Louis_of_Hesse	Louis_IV_of_Hesse	Alice	1	1
+VICT	Friedrich_of_Hesse	Louis_IV_of_Hesse	Alice	1	2
+VICT	Alix_of_Hesse	Louis_IV_of_Hesse	Alice	2	1
+VICT	Marie_of_Hesse	Louis_IV_of_Hesse	Alice	2	1
+VICT	Alice_of_Albany	Leopold	Helen_of_Waldeck	2	1
+VICT	Charles_Edward	Leopold	Helen_of_Waldeck	1	1
+VICT	Alexander_of_Battenberg	Henry_of_Battenberg	Beatrice	1	1
+VICT	Victoria_Eugenie	Henry_of_Battenberg	Beatrice	2	1
+VICT	Leopold_of_Battenberg	Henry_of_Battenberg	Beatrice	1	2
+VICT	Maurice_of_Battenberg	Henry_of_Battenberg	Beatrice	1	0
+VICT	Nicholas_II	0	0	1	1
+VICT	Alexander_of_Teck	0	0	1	1
+VICT	Alfonso_XIII	0	0	1	1
+# Generation 3
+VICT	Waldemar_of_Prussia	Henry_of_Prussia	Irene_of_Hesse	1	2
+VICT	Sigismund_of_Prussia	Henry_of_Prussia	Irene_of_Hesse	1	1
+VICT	Heinrich_of_Prussia	Henry_of_Prussia	Irene_of_Hesse	1	2
+VICT	Olga	Nicholas_II	Alix_of_Hesse	2	1
+VICT	Tatiana	Nicholas_II	Alix_of_Hesse	2	1
+VICT	Maria	Nicholas_II	Alix_of_Hesse	2	1
+VICT	Anastasia	Nicholas_II	Alix_of_Hesse	2	1
+VICT	Alexei	Nicholas_II	Alix_of_Hesse	1	2
+VICT	May_of_Teck	Alexander_of_Teck	Alice_of_Albany	2	1
+VICT	Rupert_of_Teck	Alexander_of_Teck	Alice_of_Albany	1	2
+VICT	Maurice_of_Teck	Alexander_of_Teck	Alice_of_Albany	1	0
+VICT	Alfonso_of_Asturias	Alfonso_XIII	Victoria_Eugenie	1	2
+VICT	Jaime	Alfonso_XIII	Victoria_Eugenie	1	1
+VICT	Beatriz	Alfonso_XIII	Victoria_Eugenie	2	1
+VICT	Maria_Cristina	Alfonso_XIII	Victoria_Eugenie	2	1
+VICT	Juan	Alfonso_XIII	Victoria_Eugenie	1	1
+VICT	Gonzalo	Alfonso_XIII	Victoria_Eugenie	1	2

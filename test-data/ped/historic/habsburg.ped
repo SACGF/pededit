@@ -1,0 +1,48 @@
+# Spanish Habsburg kings, as drawn in Figure 1 of Alvarez, Ceballos & Quinteiro (2009)
+# PLoS ONE 4(4): e5174. doi:10.1371/journal.pone.0005174
+# The figure is a chain-of-descent diagram. Two parents it omits are added here so that
+# every non-founder has both parents: Albert_V_of_Bavaria (husband of Anna, father of
+# Mary) and Maria_Anna_of_Bavaria (wife of Ferdinand II, mother of Ferdinand III).
+# PHENO 2 marks Charles II, the last king, whose disabilities motivated the study.
+# Generation 0
+HABS	Ferdinand_of_Aragon	0	0	1	1
+HABS	Elizabeth_of_Castile	0	0	2	1
+HABS	Maximilian_I	0	0	1	1
+HABS	Mary_of_Burgundy	0	0	2	1
+# Generation 1
+HABS	Manuel_I	0	0	1	1
+HABS	Mary_of_Aragon	Ferdinand_of_Aragon	Elizabeth_of_Castile	2	1
+HABS	Joanna_I	Ferdinand_of_Aragon	Elizabeth_of_Castile	2	1
+HABS	Philip_I	Maximilian_I	Mary_of_Burgundy	1	1
+# Generation 2
+HABS	John_III	Manuel_I	Mary_of_Aragon	1	1
+HABS	Isabella_of_Portugal	Manuel_I	Mary_of_Aragon	2	1
+HABS	Catherine	Philip_I	Joanna_I	2	1
+HABS	Charles_I	Philip_I	Joanna_I	1	1
+HABS	Ferdinand_I	Philip_I	Joanna_I	1	1
+HABS	Anna_of_Hungary	0	0	2	1
+# Generation 3
+HABS	Mary_of_Portugal	John_III	Catherine	2	1
+HABS	Philip_II	Charles_I	Isabella_of_Portugal	1	1
+HABS	Maria	Charles_I	Isabella_of_Portugal	2	1
+HABS	Maximilian_II	Ferdinand_I	Anna_of_Hungary	1	1
+HABS	Charles_II_of_Austria	Ferdinand_I	Anna_of_Hungary	1	1
+HABS	Anna	Ferdinand_I	Anna_of_Hungary	2	1
+HABS	Albert_V_of_Bavaria	0	0	1	1
+# Generation 4
+HABS	Don_Carlos	Philip_II	Mary_of_Portugal	1	1
+HABS	Anna_of_Austria	Maximilian_II	Maria	2	1
+HABS	Mary	Albert_V_of_Bavaria	Anna	2	1
+# Generation 5 (Philip II and Charles II of Austria married a generation below their own)
+HABS	Philip_III	Philip_II	Anna_of_Austria	1	1
+HABS	Margaret_of_Austria	Charles_II_of_Austria	Mary	2	1
+HABS	Ferdinand_II	Charles_II_of_Austria	Mary	1	1
+HABS	Maria_Anna_of_Bavaria	0	0	2	1
+# Generation 6
+HABS	Philip_IV	Philip_III	Margaret_of_Austria	1	1
+HABS	Maria_Anna_of_Austria	Philip_III	Margaret_of_Austria	2	1
+HABS	Ferdinand_III	Ferdinand_II	Maria_Anna_of_Bavaria	1	1
+# Generation 7
+HABS	Mariana_of_Austria	Ferdinand_III	Maria_Anna_of_Austria	2	1
+# Generation 8
+HABS	Charles_II	Philip_IV	Mariana_of_Austria	1	2

@@ -1,0 +1,11 @@
+# 5/8 siblings: A and B share their mother M, and their fathers F1 and F2 are
+# paternal half brothers (GF with two partners). Kinship(A, B) = 5/32, five eighths
+# of the full-sibling value. Two people (GF and M) each have two partners.
+CLAS	GF	0	0	1	1
+CLAS	GM1	0	0	2	1
+CLAS	GM2	0	0	2	1
+CLAS	F1	GF	GM1	1	1
+CLAS	F2	GF	GM2	1	1
+CLAS	M	0	0	2	1
+CLAS	A	F1	M	1	2
+CLAS	B	F2	M	2	2

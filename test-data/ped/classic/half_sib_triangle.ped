@@ -1,0 +1,14 @@
+# Half-sib triangle, three generations of matings: every pair of parents are half
+# siblings. Four founders in a row (P1 P2 P3 P4) with adjacent pairs having a child,
+# so C12 and C23 share P2, C23 and C34 share P3; then C12 x C23 and C23 x C34, whose
+# children D1 and D2 share C23; then D1 x D2. P2, P3 and C23 each have two partners.
+CLAS	P1	0	0	1	1
+CLAS	P2	0	0	2	1
+CLAS	P3	0	0	1	1
+CLAS	P4	0	0	2	1
+CLAS	C12	P1	P2	1	1
+CLAS	C23	P3	P2	2	1
+CLAS	C34	P3	P4	1	1
+CLAS	D1	C12	C23	1	1
+CLAS	D2	C34	C23	2	1
+CLAS	E	D1	D2	1	2

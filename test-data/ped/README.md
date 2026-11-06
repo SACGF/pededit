@@ -23,6 +23,53 @@ Exported from the **kinship2** R package `sample.ped` dataset.
 - Conversion: R `affected` column (0/1/NA) mapped to PHENO (1/2/0) per standard
   PED spec.
 
+### `historic/habsburg.ped`
+Reconstructed by hand from **Figure 1** of Alvarez G, Ceballos FC, Quinteiro C (2009).
+The Role of Inbreeding in the Extinction of a European Royal Dynasty. PLoS ONE 4(4):
+e5174. doi:10.1371/journal.pone.0005174 (CC BY).
+- 33 individuals, 9 generation rows: the 31 people in the figure plus two parents the
+  chain-of-descent figure omits (Albert V of Bavaria, Maria Anna of Bavaria) so that
+  every non-founder has both parents.
+- Exercises: nested uncle-niece (Philip II + Anna of Austria, Philip IV + Mariana),
+  double first cousin (Philip II + Mary of Portugal), first cousin and first cousin
+  once removed marriages; couples that span generations (Philip II and Philip IV
+  are each drawn twice, once beside each wife's row).
+- Inbreeding of Charles II on this partial pedigree is F = 0.217 (kinship2); the
+  paper reports 0.254 on its full 16-generation tree of 3,000+ individuals.
+
+### `historic/queen_victoria.ped`
+Haemophilia B among Queen Victoria's descendants. Primary source: Rogaev EI et al.
+(2009). Genotype Analysis Identifies the Cause of the "Royal Disease". Science
+326(5954): 817. doi:10.1126/science.1180660, Figure S1. The supplement is behind
+the publisher's paywall; the structure and affection status here were cross-checked
+against the main-text Figure 1 and the Wikipedia article "Haemophilia in European
+royalty", which follows Stevens RF (1999) Br J Haematol 105: 25, Rogaev's reference 1.
+- 49 individuals, 4 generations. Victoria's nine children, the Hesse, Albany and
+  Battenberg lines with their Prussian, Russian, Teck and Spanish descendants, and
+  Henry of Prussia (son of Victoria, Princess Royal), whose marriage to his first
+  cousin Irene of Hesse closes a loop.
+- PHENO 2 = haemophiliac (9). PHENO 0 for Maurice of Battenberg (disputed) and
+  Maurice of Teck (died in infancy). Obligate carriers are unaffected in PED;
+  the in-app example carries the carrier flags.
+- Exercises: wide sibships (9 and 7), many married-in founders, a consanguineous
+  loop, X-linked pattern.
+
+### `historic/tutankhamun.ped`
+Hawass Z et al. (2010). Ancestry and Pathology in King Tutankhamun's Family. JAMA
+303(7): 638. doi:10.1001/jama.2010.121, Figure 2.
+- 10 individuals, 5 generations. KV55 (most probably Akhenaten) and KV35YL are full
+  siblings, both children of Amenhotep III and Tiye, and the parents of Tutankhamun.
+  KV21A as mother of the two KV62 fetuses is the paper's tentative assignment.
+- PHENO is missing (0) throughout; this is a full-sib consanguinity example.
+
+### Jicaque pedigree (not included)
+Chapman AM, Jacquard A (1971), Un isolat d'Amérique Centrale: les Indiens Jicaques
+du Honduras, is a French book chapter that is not available online, and the only
+reproductions found are datasets inside GPL-licensed R packages (ribd, 22
+individuals; GENLIB, a "modified" 29-individual version). Since the structure could
+not be verified against a readable primary source without copying from those
+packages, it is left out.
+
 ### All other files
 Hand-authored for this test suite. No external attribution required.
 
@@ -49,6 +96,38 @@ Hand-authored for this test suite. No external attribution required.
 | `double_first_cousin.ped` | 11 | 1 | Two pairs of founders (1+2 and 3+4) each have one son and one daughter. The sons marry the other family's daughters: son (5) + daughter (8) → son (9); son (7) + daughter (6) → daughter (10). Double first cousins (9+10) → affected son (11). |
 | `uncle_niece.ped` | 7 | 1 | Grandparents (1+2) have son-uncle (3) and daughter (4). Unrelated man (5) + daughter (4) → niece (6). Uncle (3) + niece (6) → affected son (7). |
 | `half_sibling_mating.ped` | 6 | 1 | Individual (1) has children (4) with partner (2) and children (5) with different partner (3). Half-siblings (4+5) have an affected child (6). |
+
+### `historic/`: published pedigrees, reconstructed from primary sources
+
+Attribution for each file is in the section above. IIDs are names, not numbers.
+Each has a kinship2 oracle in `layout-engine/tests/oracle/` (see
+`layout-engine/scripts/kinship2-oracle.R`) compared by
+`frontend/src/io/__tests__/kinship2Oracle.test.ts`.
+
+| File | Individuals | Families | Description |
+|------|-------------|----------|-------------|
+| `habsburg.ped` | 33 | 1 | Spanish Habsburgs from Ferdinand and Isabella to Charles II (Alvarez et al. 2009, Fig. 1). Nested uncle-niece, double first cousin and first cousin marriages; nine generation rows. |
+| `queen_victoria.ped` | 49 | 1 | Haemophilia B in Queen Victoria's descendants (Rogaev et al. 2009). Four generations, wide sibships, nine affected males, one cousin marriage. |
+| `tutankhamun.ped` | 10 | 1 | Tutankhamun's family (Hawass et al. 2010, Fig. 2). Brother-sister parents, five generations. |
+
+### `classic/`: textbook relationships with known kinship coefficients
+
+Hand-authored. The pair (or child) the relationship is named for has PHENO 2 so it
+stands out when drawn. Each has a kinship2 oracle like `historic/`. Kinship
+coefficients are for issue #32.
+
+| File | Individuals | Families | Description |
+|------|-------------|----------|-------------|
+| `three_quarter_siblings.ped` | 7 | 1 | A and B share a mother; their fathers are brothers. Kinship 3/16. Mother has two partners. |
+| `five_eighths_siblings.ped` | 8 | 1 | A and B share a mother; their fathers are paternal half brothers. Kinship 5/32. Two people with two partners each. |
+| `full_sib_mating.ped` | 5 | 1 | Brother and sister have a child. F(C) = 1/4. |
+| `half_sib_triangle.ped` | 10 | 1 | Four founders in a row, every adjacent pair with a child, then every adjacent pair of half siblings with a child, down to one person. Every parent pair are half siblings. |
+| `double_first_cousins.ped` | 10 | 1 | Brother and sister from family A marry sister and brother from family B. Kinship(X, Y) = 1/8. |
+| `double_second_cousins_a.ped` | 18 | 1 | Fathers are first cousins through one lineage, mothers first cousins through another. Kinship 1/32. |
+| `double_second_cousins_b.ped` | 14 | 1 | Fathers are double first cousins, mothers unrelated. Kinship 1/32, different identity coefficients from variant A. |
+| `quad_half_first_cousins.ped` | 10 | 1 | Two men and two women with four children in a cycle of partnerships; each parent of X is a half sibling of each parent of Y. Kinship 1/8. Every founder has two partners, so the top row needs duplicates. |
+| `grandparent_grandchild_partner.ped` | 8 | 1 | A grandfather has a child with his grandson's partner. One couple spans two generations. |
+| `two_lineages_joined_twice.ped` | 14 | 1 | Two founder families linked by a marriage in one generation and another a generation later. c1 and c2 are double first cousins once removed. |
 
 ### `large/` — Multi-individual, multi-family files
 

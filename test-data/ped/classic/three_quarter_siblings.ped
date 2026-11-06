@@ -1,0 +1,10 @@
+# 3/4 siblings: A and B share their mother M, and their fathers F1 and F2 are full
+# brothers. Kinship(A, B) = 3/16, three quarters of the full-sibling value.
+# M has children by two brothers, so she is drawn between them.
+CLAS	GF	0	0	1	1
+CLAS	GM	0	0	2	1
+CLAS	F1	GF	GM	1	1
+CLAS	F2	GF	GM	1	1
+CLAS	M	0	0	2	1
+CLAS	A	F1	M	1	2
+CLAS	B	F2	M	2	2
