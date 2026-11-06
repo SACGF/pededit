@@ -179,3 +179,39 @@ describe("exportPed", () => {
     expect(exportPed(ped).endsWith("\n")).toBe(true);
   });
 });
+
+describe("exportPed: r dialect", () => {
+  const ped: Pedigree = makePedigree({
+    individuals: [
+      { id: "dad", sex: "male",   affected: false, sibOrder: 0 },
+      { id: "mum", sex: "female", affected: false, sibOrder: 1 },
+      { id: "kid", sex: "female", affected: true,  sibOrder: 0 },
+    ],
+    partnerships: [{ id: "p", individual1: "dad", individual2: "mum" }],
+    parentOf: { p: ["kid"] },
+  });
+
+  it("writes an id fid mid sex aff header by default", () => {
+    const lines = exportPed(ped, { dialect: "r" }).trim().split("\n");
+    expect(lines[0]).toBe("id\tfid\tmid\tsex\taff");
+    expect(lines).toContain("kid\tdad\tmum\t2\t2");
+    expect(lines).toHaveLength(4);
+  });
+
+  it("can prepend famid and drop aff", () => {
+    const lines = exportPed(ped, {
+      dialect: "r", familyId: "F1", includeFamilyId: true, includeAffection: false,
+    }).trim().split("\n");
+    expect(lines[0]).toBe("famid\tid\tfid\tmid\tsex");
+    expect(lines).toContain("F1\tkid\tdad\tmum\t2");
+  });
+
+  it("round-trips through importPed", () => {
+    const result = importPed(exportPed(ped, { dialect: "r" }));
+    expect(result.hasErrors).toBe(false);
+    const ped2 = result.pedigrees[0]!.pedigree;
+    expect(ped2.individuals.map(i => i.id)).toEqual(["dad", "mum", "kid"]);
+    expect(ped2.individuals.find(i => i.id === "kid")!.affected).toBe(true);
+    expect(ped2.partnerships).toHaveLength(1);
+  });
+});

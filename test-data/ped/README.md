@@ -162,8 +162,12 @@ and by hand. Differences from the 6-column PLINK layout: a header line naming th
 columns, no family ID column (or an optional leading `famid`), no phenotype column
 (or an optional trailing `aff`), tab separation with spaces allowed inside IDs, and
 founders that may be omitted when only referenced as parents. All hand-authored.
-**The current parser does not accept these files** (GitHub issue #31); they
-document the target behaviour.
+The parser accepts both layouts (GitHub issue #31): it splits on tabs only when the
+first line contains a tab, maps columns by name when the first line is a header
+(an `id` column plus a `sex` column), and otherwise reads 4 columns as
+`id fid mid sex`, 5 as `id fid mid sex aff` (or `famid id fid mid sex` when the
+first column repeats in every row), and 6+ as PLINK. Files without a family
+column import as family `1`; without an affection column everyone is "missing".
 
 | File | Individuals | Expected behaviour |
 |------|-------------|--------------------|
@@ -183,7 +187,7 @@ document the target behaviour.
 |------|-------------|----------------|
 | `empty.ped` | 0 | `EMPTY_FILE` |
 | `only_comments.ped` | 0 | `EMPTY_FILE` |
-| `missing_columns.ped` | 0 | `TOO_FEW_COLUMNS` (all 3 rows fail; no valid rows) |
+| `missing_columns.ped` | 0 | `TOO_FEW_COLUMNS` (rows 2 and 3 fail, so the import is blocked; row 1 alone has 5 columns and would parse as `famid id fid mid sex`) |
 | `invalid_sex_code.ped` | 3 | No hard error; `UNKNOWN_SEX_CODE` warnings only (these parse but have bad SEX) |
 | `invalid_pheno_code.ped` | 3 | No hard error; `UNKNOWN_PHENO_CODE` warnings only |
 | `self_as_parent.ped` | 4 | `SELF_AS_PARENT` errors for IID=3 and IID=4 |

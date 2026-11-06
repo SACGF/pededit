@@ -219,6 +219,120 @@ describe("roundtrip: edge_cases/", () => {
   });
 });
 
+// ── variants/ (id fid mid sex [aff] dialect) ───────────────────────────────────
+
+describe("roundtrip: variants/", () => {
+  function ids(result: ReturnType<typeof importPed>): string[] {
+    return result.pedigrees.flatMap(f => f.pedigree.individuals.map(i => i.id));
+  }
+  function affectedIds(result: ReturnType<typeof importPed>): string[] {
+    return result.pedigrees.flatMap(f => f.pedigree.individuals.filter(i => i.affected).map(i => i.id));
+  }
+
+  it("four_col_header_tab.ped: 7 individuals, one family, nobody affected", () => {
+    const result = importPed(readPed("variants/four_col_header_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(ids(result)).toEqual(["1", "2", "3", "4", "5", "6", "7"]);
+    expect(affectedIds(result)).toEqual([]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(2);
+  });
+
+  it("five_col_aff_header_tab.ped: 7 individuals, 2, 4 and 6 affected", () => {
+    const result = importPed(readPed("variants/five_col_aff_header_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(ids(result)).toHaveLength(7);
+    expect(affectedIds(result)).toEqual(["2", "4", "6"]);
+  });
+
+  it("four_col_no_header_space.ped: 6 individuals, space separated, no header", () => {
+    const result = importPed(readPed("variants/four_col_no_header_space.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(ids(result)).toEqual(["1", "2", "3", "4", "5", "6"]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(2);
+  });
+
+  it("famid_header_tab.ped: header is not read as a data row", () => {
+    const result = importPed(readPed("variants/famid_header_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(result.pedigrees[0]!.familyId).toBe("F1");
+    expect(ids(result)).toEqual(["1", "2", "3", "4"]);
+    expect(ids(result)).not.toContain("id");
+    expect(affectedIds(result)).toEqual(["3"]);
+  });
+
+  it("uppercase_header_tab.ped: header detection is case-insensitive", () => {
+    const result = importPed(readPed("variants/uppercase_header_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(ids(result)).toEqual(["1", "2", "3", "4"]);
+    expect(affectedIds(result)).toEqual(["3"]);
+  });
+
+  it("names_with_spaces_tab.ped: IDs with spaces survive tab splitting", () => {
+    const result = importPed(readPed("variants/names_with_spaces_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(ids(result)).toEqual([
+      "Alice Able", "Bob Baker", "Carol Able Baker", "Dan Able Baker", "Erin Ferris", "Fay Baker Ferris",
+    ]);
+    expect(affectedIds(result)).toEqual(["Carol Able Baker", "Fay Baker Ferris"]);
+    const ped = result.pedigrees[0]!.pedigree;
+    expect(ped.partnerships).toHaveLength(2);
+    const parents = ped.partnerships.find(p => (ped.parentOf[p.id] ?? []).includes("Carol Able Baker"))!;
+    expect([parents.individual1, parents.individual2]).toEqual(["Bob Baker", "Alice Able"]);
+  });
+
+  it("missing_founders_four_col.ped: omitted founders 1, 2 and 5 become phantom parents", () => {
+    const result = importPed(readPed("variants/missing_founders_four_col.ped"));
+    expect(result.hasErrors).toBe(false);
+    const phantoms = result.issues.filter(i => i.code === ValidationIssueCode.PHANTOM_PARENT);
+    expect(phantoms.length).toBeGreaterThan(0);
+    expect(new Set(phantoms.flatMap(i => i.affectedIds ?? []))).toEqual(new Set(["1:1", "1:2", "1:5"]));
+    expect(ids(result).sort()).toEqual(["1", "2", "3", "4", "5", "6"]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(2);
+  });
+
+  it("famid_no_header_repeat.ped: repeated first column is a family ID", () => {
+    const result = importPed(readPed("variants/famid_no_header_repeat.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(result.pedigrees[0]!.familyId).toBe("FAM1");
+    expect(ids(result)).toEqual(["1", "2", "3", "4"]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(1);
+  });
+
+  it("two_families_no_famid.ped: one pedigree with two components", () => {
+    const result = importPed(readPed("variants/two_families_no_famid.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    expect(result.pedigrees).toHaveLength(1);
+    expect(ids(result)).toEqual(["1", "2", "3", "4", "X1", "X2", "X3"]);
+    expect(affectedIds(result)).toEqual(["X2"]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(2);
+  });
+
+  it("variants round-trip through the r-dialect exporter", () => {
+    for (const file of ["variants/names_with_spaces_tab.ped", "variants/five_col_aff_header_tab.ped"]) {
+      const first = importPed(readPed(file));
+      const ped = first.pedigrees[0]!.pedigree;
+      const second = importPed(exportPed(ped, { dialect: "r" }));
+      expect(second.hasErrors).toBe(false);
+      const ped2 = second.pedigrees[0]!.pedigree;
+      expect(ped2.individuals.map(i => [i.id, i.sex, i.affected])).toEqual(ped.individuals.map(i => [i.id, i.sex, i.affected]));
+      expect(ped2.partnerships).toHaveLength(ped.partnerships.length);
+    }
+  });
+});
+
 // ── malformed/ ─────────────────────────────────────────────────────────────────
 
 describe("roundtrip: malformed/", () => {

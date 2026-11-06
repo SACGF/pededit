@@ -2,14 +2,30 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
-  includeHeader?: boolean;   // default false (PLINK-compatible)
+  includeHeader?: boolean;   // default false (PLINK-compatible); always on for "r"
+  /**
+   * "plink" (default): FID IID PAT MAT SEX PHENO, no header.
+   * "r": id fid mid sex [aff] with a header line, as read by pedtools and
+   * kinship2. Tab separated; the family ID column is optional.
+   */
+  dialect?: "plink" | "r";
+  includeFamilyId?: boolean;   // "r" only, default false
+  includeAffection?: boolean;  // "r" only, default true
 }
 
 export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): string {
   const fid = options.familyId ?? "1";
-  const header = options.includeHeader
-    ? "#FID\tIID\tPAT\tMAT\tSEX\tPHENO\n"
-    : "";
+  const rDialect = options.dialect === "r";
+  const withFamily = !rDialect || (options.includeFamilyId ?? false);
+  const withAffection = !rDialect || (options.includeAffection ?? true);
+
+  let header = "";
+  if (rDialect) {
+    const names = [...(withFamily ? ["famid"] : []), "id", "fid", "mid", "sex", ...(withAffection ? ["aff"] : [])];
+    header = names.join("\t") + "\n";
+  } else if (options.includeHeader) {
+    header = "#FID\tIID\tPAT\tMAT\tSEX\tPHENO\n";
+  }
 
   const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
 
@@ -36,7 +52,8 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
     const mat = parents?.mother ?? "0";
     const sex = ind.sex === "male" ? "1" : ind.sex === "female" ? "2" : "0";
     const pheno = ind.affected ? "2" : "1";
-    lines.push([fid, ind.id, pat, mat, sex, pheno].join("\t"));
+    const cells = [...(withFamily ? [fid] : []), ind.id, pat, mat, sex, ...(withAffection ? [pheno] : [])];
+    lines.push(cells.join("\t"));
   }
 
   return header + lines.join("\n") + "\n";
