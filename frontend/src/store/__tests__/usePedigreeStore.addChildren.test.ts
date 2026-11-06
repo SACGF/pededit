@@ -84,6 +84,21 @@ describe("addChildren", () => {
     expect(added.map(c => c.sibOrder)).toEqual([5, 6]);
   });
 
+  it("adds to the chosen partnership when the individual has several", () => {
+    const ped = coupleWithTwoKids();
+    ped.individuals.push({ id: "p3", sex: "female", affected: false, sibOrder: 0, name: "", notes: "" });
+    ped.partnerships.push({ id: "pq", individual1: "p1", individual2: "p3" });
+    ped.parentOf["pq"] = [];
+    store().initialize(ped);
+    store().addChildren("p1", 2, "male", "pq");
+    expect(store().pedigree.parentOf["pq"]).toHaveLength(2);
+    expect(store().pedigree.parentOf["pp"]).toHaveLength(2);
+
+    // A partnership that is not the individual's falls back to the first.
+    store().addChildren("p3", 1, "male", "pp");
+    expect(store().pedigree.parentOf["pq"]).toHaveLength(3);
+  });
+
   it("clamps count to 1..MAX_ADD_CHILDREN", () => {
     store().initialize(coupleWithTwoKids());
     store().addChildren("p1", 0, "male");

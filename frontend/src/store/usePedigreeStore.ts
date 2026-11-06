@@ -103,8 +103,9 @@ function makeIndividual(sex: Sex, sibOrder: number): Individual {
  * (with an opposite-sex placeholder partner) if the individual has none.
  * Mirrors the partnership choice made by addChild.
  */
-function ensureChildPartnershipId(draft: Pedigree, individualId: string): string {
+function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferred?: string): string {
   const ownPs = findOwnPartnerships(draft, individualId);
+  if (preferred && ownPs.includes(preferred)) return preferred;
   if (ownPs.length > 0) return ownPs[0]!;
 
   const ind = draft.individuals.find(i => i.id === individualId)!;
@@ -156,7 +157,7 @@ interface PedigreeState {
   addIndividual: (sex: Sex) => void;
   addParent: (individualId: string, sex: Sex) => void;
   addChild: (individualId: string, sex: Sex) => void;
-  addChildren: (individualId: string, count: number, sex: Sex) => void;
+  addChildren: (individualId: string, count: number, sex: Sex, partnershipId?: string) => void;
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
   deleteIndividual: (individualId: string) => void;
@@ -374,8 +375,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
      * Uses the same partnership addChild would (first existing partnership, or a
      * new one with a placeholder partner). Children get consecutive sibOrder
      * values after the existing siblings. count is clamped to 1..MAX_ADD_CHILDREN.
+     * `partnershipId` picks one of the individual's partnerships (the more
+     * menu offers a partner choice when there are several); an id that is not
+     * one of theirs falls back to the first.
      */
-    addChildren: (individualId, count, sex) => {
+    addChildren: (individualId, count, sex, partnershipId) => {
       const n = Math.min(MAX_ADD_CHILDREN, Math.max(1, Math.floor(count)));
       if (!Number.isFinite(n)) return;
       if (get().pedigree.individuals.find(i => i.id === individualId)?.lifeStatus) {
@@ -384,12 +388,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       }
       mutate(draft => {
         if (!draft.individuals.some(i => i.id === individualId)) return;
-        const partnershipId = ensureChildPartnershipId(draft, individualId);
-        let sibOrder = nextSibOrderInFamily(draft, partnershipId);
+        const pid = ensureChildPartnershipId(draft, individualId, partnershipId);
+        let sibOrder = nextSibOrderInFamily(draft, pid);
         for (let k = 0; k < n; k++) {
           const child = makeIndividual(sex, sibOrder++);
           draft.individuals.push(child);
-          draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
+          draft.parentOf[pid] = [...(draft.parentOf[pid] ?? []), child.id];
         }
       });
     },

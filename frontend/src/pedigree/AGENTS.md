@@ -22,7 +22,16 @@ draws NSGC symbols.
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
 - `nodes/MoreMenu.tsx` — affected, deceased, proband, sex, lock/unlock,
-  move sib left/right, delete.
+  move sib left/right, delete, and "Add children..." (count stepper, plus a
+  partner choice when the person has several partnerships). The menu is
+  about 600px tall, so it is capped at Radix's
+  `--radix-popover-content-available-height` and scrolls; check it at
+  1280x720 after adding items. It is portalled: when an item closes it, the
+  element under the cursor vanishes and the pill gets no mouseleave, so the
+  menu calls `onClose` and the pill schedules its own hide.
+- The grey id under each symbol is dev-only; UUIDs are cut to 6 characters
+  there so a batch of new children does not overlap. Unnamed people have no
+  label in production.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners.
