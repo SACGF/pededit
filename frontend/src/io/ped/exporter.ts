@@ -58,3 +58,12 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
 
   return header + lines.join("\n") + "\n";
 }
+
+/**
+ * Individuals PED cannot represent: pregnancies and pregnancy losses
+ * (`lifeStatus`). exportPed writes them as ordinary children, so the UI warns
+ * before exporting and points at JSON, which keeps them.
+ */
+export function pedLostLifeStatus(pedigree: Pedigree): Pedigree["individuals"] {
+  return pedigree.individuals.filter(i => !!i.lifeStatus);
+}
