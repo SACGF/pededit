@@ -42,7 +42,7 @@ Each major directory has its own `AGENTS.md` with the non-obvious facts about th
 
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
 - `claude/search_report.md` — domain research and feature gap analysis
-- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2), `claude/phase_7_2_plan.md` (how tags and colouring work, #3)
+- `claude/export_u_plan.md`: how the U-shape export works (open items on #2). `claude/phase_7_2_plan.md`: how tags and colouring work (#3). Design notes for other open issues are linked from the issues themselves.
 
 ## What This Project Is
 
