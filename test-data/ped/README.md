@@ -152,7 +152,7 @@ coefficients are for issue #32.
 | `windows_crlf.ped` | 3 | Clean. CRLF line endings normalised. |
 | `bom.ped` | 3 | Clean. UTF-8 BOM stripped. |
 | `mixed_whitespace.ped` | 3 | Clean. Spaces and tabs both work as delimiters. |
-| `non_numeric_sex.ped` | 4 | `UNKNOWN_SEX_CODE` warnings for M/F/U; converter treats M→male, F→female, U→unknown. |
+| `non_numeric_sex.ped` | 4 | Clean. M/F/U (and male/female/unknown, any case) read as male, female, unknown with no warning. |
 | `leading_trailing_spaces.ped` | 3 | Clean. Trimmed before splitting. |
 
 ### `variants/` — The 4/5-column `id fid mid sex [aff]` dialect
@@ -166,7 +166,9 @@ The parser accepts both layouts (GitHub issue #31): it splits on tabs only when 
 first line contains a tab, maps columns by name when the first line is a header
 (an `id` column plus a `sex` column), and otherwise reads 4 columns as
 `id fid mid sex`, 5 as `id fid mid sex aff` (or `famid id fid mid sex` when the
-first column repeats in every row), and 6+ as PLINK. Files without a family
+first column repeats in every row of a file with two or more rows), and 6+ as PLINK.
+Every row must split into as many cells as the header (or, without a header, the
+widest row), or the import is blocked. A parent of `NA` means missing. Files without a family
 column import as family `1`; without an affection column everyone is "missing".
 
 | File | Individuals | Expected behaviour |
@@ -179,6 +181,8 @@ column import as family `1`; without an affection column everyone is "missing".
 | `names_with_spaces_tab.ped` | 6 | Tab-separated with spaces inside IDs (`Carol Able Baker`). Must split on tabs only when the file is tab-delimited. |
 | `missing_founders_four_col.ped` | 3 (+3 phantom) | Parents 1, 2 and 5 referenced but not listed. `PHANTOM_PARENT` warnings, phantoms created as founders. |
 | `famid_no_header_repeat.ped` | 4 | Five columns, no header, first column identical in every row (`FAM1`). Ambiguous between `famid id fid mid sex` and `id fid mid sex aff`; a repeated first column should be read as a family ID. |
+| `na_parents_tab.ped` | 4 (+1 phantom) | Missing parents written as `NA` (pedtools, kinship2). Read as missing: no "NA" individual, no NA = NA couple. One `SINGLE_PARENT` warning (4 has father 1 only). |
+| `kinship2_names.ped` | 5 | kinship2's own header `id dadid momid sex affected`, space-separated. `affected` is kinship2-coded (0 = unaffected, 1 = affected, NA = missing) and is recoded with an `AFFECTION_RECODED` info; 2 and 3 affected. |
 | `two_families_no_famid.ped` | 7 | Five columns with header, no family ID, two disconnected components (1-4 and X1-X3). Should import as two families, or one pedigree with two components. |
 
 ### `malformed/` — Input that should fail with errors
@@ -193,6 +197,9 @@ column import as family `1`; without an affection column everyone is "missing".
 | `self_as_parent.ped` | 4 | `SELF_AS_PARENT` errors for IID=3 and IID=4 |
 | `circular_ancestry.ped` | 2 | `CIRCULAR_ANCESTRY` error: 1→2→1 |
 | `duplicate_iid.ped` | 3 unique | `DUPLICATE_INDIVIDUAL` error: IID=1 appears twice |
+| `mixed_delimiters.ped` | 0 | `COLUMN_COUNT_MISMATCH` on every row: the header is space-separated, the rows are tab-separated with spaces inside IDs |
+| `spaces_in_ids_no_tabs.ped` | 0 | `COLUMN_COUNT_MISMATCH` on every row: spaces inside IDs in a space-separated file |
+| `parent_both_sexes.ped` | 5 | `PARENT_BOTH_SEXES` error: 3 is both father and mother of 5 |
 
 **Note:** `invalid_sex_code.ped` and `invalid_pheno_code.ped` do not hard-block import
 (warnings only). They are in `malformed/` because the data is technically invalid per the

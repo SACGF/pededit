@@ -8,6 +8,7 @@ import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
+import { isPhantomId } from "../../io/ped/converter";
 
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
@@ -94,8 +95,9 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         </div>
       )}
 
-      {/* Dev-mode ID label — always visible so you can screenshot the canvas for bug reports */}
-      {import.meta.env.DEV && (
+      {/* Dev-mode ID label, always visible so you can screenshot the canvas for bug reports.
+          Not for the invented partners of single parents in a PED import: their IDs are internal. */}
+      {import.meta.env.DEV && !isPhantomId(individual.id) && (
         <div
           style={{
             position: "absolute",

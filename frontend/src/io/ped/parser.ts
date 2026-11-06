@@ -20,7 +20,17 @@ export interface ParseOutput {
  * a sex column, or matches "FID IID PAT MAT SEX PHENO". Columns are then mapped
  * by name. Without a header the column count decides: 6+ is PLINK, 4 is
  * "id fid mid sex", 5 is "id fid mid sex aff" unless the first column holds the
- * same value in every row, in which case it is "famid id fid mid sex".
+ * same value in every row (and there are at least two rows), in which case it
+ * is "famid id fid mid sex".
+ *
+ * Every row must have the same number of cells as the header (or, without a
+ * header, as the widest row). A row that splits into a different number of
+ * cells is an error, not a warning: it means an ID contained a space in a
+ * space-separated file, or the file mixes tab and space delimiters, and reading
+ * it anyway would import nonsense.
+ *
+ * A parent ID of "NA" (written by pedtools and kinship2) or an empty cell in a
+ * tab-separated file means "no parent" and is read as "0".
  */
 
 /** Family ID used when the file has no family column. Matches the exporter's default. */
@@ -28,6 +38,12 @@ export const DEFAULT_FAMILY_ID = "1";
 
 /** Affection value used when the file has no affection column (PED "missing"). */
 const MISSING_AFFECTION = "0";
+
+/**
+ * Parent IDs that mean "no parent". "0" is the PED convention; R writes "NA".
+ * Deliberately short: other tokens ("-", ".", "?") could be real IDs.
+ */
+const MISSING_PARENT_TOKENS = new Set(["0", "NA", ""]);
 
 /** Fewest columns any layout can have (id fid mid sex). */
 const MIN_COLUMNS = 4;
@@ -37,8 +53,10 @@ const PLINK_HEADER_PATTERN = /^#?\s*FID\s+IID\s+PAT\s+MAT\s+SEX\s+PHENO/i;
 
 const ID_NAMES = new Set(["id", "iid", "ind", "individual"]);
 const FAMILY_NAMES = new Set(["famid", "fam", "family"]);
-const FATHER_NAMES = new Set(["pat", "father", "dad"]);
-const MOTHER_NAMES = new Set(["mid", "mat", "mother", "mum", "mom"]);
+const FATHER_NAMES = new Set(["pat", "father", "dad", "dadid", "fatherid", "patid"]);
+const MOTHER_NAMES = new Set(["mid", "mat", "mother", "mum", "mom", "momid", "mumid", "motherid", "matid"]);
+/** kinship2's own column names; its "affected" column is coded 0 = unaffected, 1 = affected. */
+const KINSHIP2_PARENT_NAMES = new Set(["dadid", "momid"]);
 const SEX_NAMES = new Set(["sex"]);
 const AFFECTION_NAMES = new Set(["aff", "affected", "affection", "pheno", "phenotype"]);
 
@@ -56,10 +74,18 @@ interface ColumnMap {
   width: number;
   /** Column indices below `width` that carry no known field. */
   extra: number[];
+  /**
+   * Number of cells every row must have, or null when rows may carry any
+   * number of trailing genotype columns (PLINK) as long as they agree.
+   */
+  exact: number | null;
+  /** Affection is kinship2-coded (0 = unaffected, 1 = affected) if its values allow it. */
+  kinship2Affection: boolean;
 }
 
 interface Line {
   lineNumber: number;
+  text: string;
   cells: string[];
 }
 
@@ -98,9 +124,10 @@ export function parsePed(text: string): ParseOutput {
   const firstText = headerText ?? dataLines[0]?.text ?? "";
   const splitCells = chooseSplitter(firstText);
   const header = headerText === null ? null : splitCells(headerText);
-  const lines: Line[] = dataLines.map(l => ({ lineNumber: l.lineNumber, cells: splitCells(l.text) }));
+  const lines: Line[] = dataLines.map(l => ({ lineNumber: l.lineNumber, text: l.text, cells: splitCells(l.text) }));
 
   const columns = header ? mapHeaderColumns(header) : mapPositionalColumns(lines);
+  const tabSplit = splitCells === splitOnTabs;
 
   if (columns === null) {
     // Header present but it does not name the columns we need.
@@ -114,18 +141,32 @@ export function parsePed(text: string): ParseOutput {
   }
 
   let dataLineCount = 0;
+  // Without an exact count (PLINK with genotypes), rows must agree with the widest row.
+  const expected = columns.exact ?? lines.reduce((w, l) => Math.max(w, l.cells.length), 0);
+  const against = header ? "the header" : "the widest row";
 
   for (const line of lines) {
-    const { cells, lineNumber } = line;
+    const { cells, lineNumber, text } = line;
+    const hint = delimiterHint(text, tabSplit, header !== null);
 
     if (cells.length < columns.required) {
       issues.push({
         severity: "error",
         code: ValidationIssueCode.TOO_FEW_COLUMNS,
-        message: `Line ${lineNumber}: expected ≥${columns.required} columns, got ${cells.length}`,
+        message: `Line ${lineNumber}: expected ${expected} columns, got ${cells.length}${hint}`,
         lineNumbers: [lineNumber],
       });
       continue;  // skip row but keep parsing
+    }
+
+    if (cells.length !== expected) {
+      issues.push({
+        severity: "error",
+        code: ValidationIssueCode.COLUMN_COUNT_MISMATCH,
+        message: `Line ${lineNumber}: splits into ${cells.length} columns but ${against} has ${expected}${hint || spaceHint(tabSplit)}`,
+        lineNumbers: [lineNumber],
+      });
+      continue;
     }
 
     dataLineCount++;
@@ -147,14 +188,16 @@ export function parsePed(text: string): ParseOutput {
     rows.push({
       familyId: columns.family >= 0 ? cells[columns.family]! : DEFAULT_FAMILY_ID,
       individualId: cells[columns.id]!,
-      fatherId: cells[columns.father]!,
-      motherId: cells[columns.mother]!,
+      fatherId: normaliseParent(cells[columns.father]!),
+      motherId: normaliseParent(cells[columns.mother]!),
       sex: cells[columns.sex]!,
       affection: columns.affection >= 0 ? cells[columns.affection]! : MISSING_AFFECTION,
       lineNumber,
       extraColumns,
     });
   }
+
+  if (columns.kinship2Affection) recodeKinship2Affection(rows, issues);
 
   if (rows.length === 0 && issues.filter(i => i.severity === "error").length === 0) {
     issues.push({
@@ -165,6 +208,26 @@ export function parsePed(text: string): ParseOutput {
   }
 
   return { rows, issues };
+}
+
+function normaliseParent(cell: string): string {
+  return MISSING_PARENT_TOKENS.has(cell) ? "0" : cell;
+}
+
+/**
+ * kinship2 codes "affected" as 0 = unaffected, 1 = affected, NA = missing. When
+ * the header uses kinship2's names (dadid, momid) and every value fits that
+ * coding, translate to PED (1, 2, 0). A file with any 2 is already PED-coded.
+ */
+function recodeKinship2Affection(rows: PedRow[], issues: ValidationIssue[]): void {
+  const kinship2 = new Map([["0", "1"], ["1", "2"], ["NA", "0"]]);
+  if (rows.length === 0 || !rows.every(r => kinship2.has(r.affection))) return;
+  for (const row of rows) row.affection = kinship2.get(row.affection)!;
+  issues.push({
+    severity: "info",
+    code: ValidationIssueCode.AFFECTION_RECODED,
+    message: "kinship2 column names (dadid, momid): \"affected\" read as 0 = unaffected, 1 = affected",
+  });
 }
 
 // ── Delimiter ──────────────────────────────────────────────────────────────────
@@ -180,6 +243,28 @@ function chooseSplitter(firstLine: string): (line: string) => string[] {
     if (cells.length >= MIN_COLUMNS) return splitOnTabs;
   }
   return splitOnWhitespace;
+}
+
+/** Explains a bad row whose delimiters disagree with the first line, or "". */
+function delimiterHint(text: string, tabSplit: boolean, hasHeader: boolean): string {
+  const first = hasHeader ? "the header" : "the first line";
+  if (tabSplit && !text.includes("\t")) {
+    return `. ${capitalise(first)} is tab-separated but this row has no tabs; use the same delimiter on every line`;
+  }
+  if (!tabSplit && text.includes("\t")) {
+    return `. This row contains tabs but ${first} is separated by spaces, so IDs containing spaces are split apart; use tabs on every line, including the header`;
+  }
+  return "";
+}
+
+function spaceHint(tabSplit: boolean): string {
+  return tabSplit
+    ? ". Check for a missing or extra tab"
+    : ". In a space-separated file IDs cannot contain spaces; separate columns with tabs to allow them";
+}
+
+function capitalise(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function splitOnTabs(line: string): string[] {
@@ -235,8 +320,16 @@ function mapHeaderColumns(header: string[]): ColumnMap | null {
   const extra = names.map((_, i) => i).filter(i => !used.has(i));
   const required = Math.max(...[...used]) + 1;
 
-  return { family, id, father, mother, sex, affection, required, width: names.length, extra };
+  const plink = PLINK_HEADER_PATTERN.test(header.join(" "));
+  const kinship2Affection = affection >= 0 && names[affection] === "affected"
+    && names.some(n => KINSHIP2_PARENT_NAMES.has(n));
+  return {
+    family, id, father, mother, sex, affection, required, width: names.length, extra,
+    exact: plink ? null : names.length, kinship2Affection,
+  };
 }
+
+const POSITIONAL = { extra: [] as number[], exact: null as number | null, kinship2Affection: false };
 
 /** Map columns by count when there is no header. */
 function mapPositionalColumns(lines: Line[]): ColumnMap {
@@ -244,17 +337,18 @@ function mapPositionalColumns(lines: Line[]): ColumnMap {
 
   if (width >= 6) {
     // PLINK: FID IID PAT MAT SEX PHENO [genotypes...]
-    return { family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: 5, required: 6, width: 6, extra: [] };
+    return { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: 5, required: 6, width: 6 };
   }
 
   if (width === 5) {
+    // A single row says nothing about whether the first column repeats.
     const firstCells = lines.filter(l => l.cells.length >= 5).map(l => l.cells[0]!);
-    const sameFamily = firstCells.every(c => c === firstCells[0]);
+    const sameFamily = firstCells.length >= 2 && firstCells.every(c => c === firstCells[0]);
     return sameFamily
-      ? { family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: -1, required: 5, width: 5, extra: [] }
-      : { family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: 4, required: 5, width: 5, extra: [] };
+      ? { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: -1, required: 5, width: 5, exact: 5 }
+      : { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: 4, required: 5, width: 5, exact: 5 };
   }
 
   // id fid mid sex (lines narrower than this are reported as TOO_FEW_COLUMNS)
-  return { family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: -1, required: MIN_COLUMNS, width: MIN_COLUMNS, extra: [] };
+  return { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: -1, required: MIN_COLUMNS, width: MIN_COLUMNS, exact: MIN_COLUMNS };
 }

@@ -1,6 +1,16 @@
 import type { Pedigree, Individual, Partnership } from "@pedigree-editor/layout-engine";
 import type { PedRow } from "./types.js";
 
+/**
+ * Prefix of the IDs the importer invents for the missing partner of a single
+ * parent. They are internal and never shown as a label.
+ */
+export const PHANTOM_ID_PREFIX = "__phantom_";
+
+export function isPhantomId(id: string): boolean {
+  return id.startsWith(PHANTOM_ID_PREFIX);
+}
+
 export function convertFamily(rows: PedRow[]): Pedigree {
   // Step 1: Normalise — build complete set of individuals including phantoms
   const knownIds = new Set(rows.map(r => r.individualId));
@@ -28,7 +38,7 @@ export function convertFamily(rows: PedRow[]): Pedigree {
   const phantomRegistry = new Map<string, string>(); // pKey → generated_iid
 
   function getOrCreatePhantom(role: "father" | "mother"): string {
-    const phantomId = `__phantom_${role}_${crypto.randomUUID().slice(0, 8)}`;
+    const phantomId = `${PHANTOM_ID_PREFIX}${role}_${crypto.randomUUID().slice(0, 8)}`;
     allIndividuals.push({
       id: phantomId,
       sex: role === "father" ? "male" : "female",
@@ -155,7 +165,7 @@ export function convertFamily(rows: PedRow[]): Pedigree {
   const childIds = new Set(Object.values(parentOf).flat());
   let rootOrder = 0;
   for (const ind of allIndividuals) {
-    if (!childIds.has(ind.id) && !ind.id.startsWith("__phantom_")) {
+    if (!childIds.has(ind.id) && !isPhantomId(ind.id)) {
       ind.sibOrder = rootOrder++;
     }
   }
@@ -170,12 +180,22 @@ export function convertFamily(rows: PedRow[]): Pedigree {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function parseSex(raw: string): "male" | "female" | "unknown" {
+/**
+ * Sex codes the importer understands: PED 1/2/0, and the letters and words R
+ * and spreadsheets write. Returns null for anything else (read as unknown, with
+ * a validator warning). The validator uses this too, so the two always agree.
+ */
+export function recogniseSex(raw: string): "male" | "female" | "unknown" | null {
   switch (raw.trim().toLowerCase()) {
-    case "1": case "m": case "male":   return "male";
-    case "2": case "f": case "female": return "female";
-    default:                           return "unknown";
+    case "1": case "m": case "male":                  return "male";
+    case "2": case "f": case "female":                return "female";
+    case "0": case "u": case "unknown": case "na":    return "unknown";
+    default:                                          return null;
   }
+}
+
+function parseSex(raw: string): "male" | "female" | "unknown" {
+  return recogniseSex(raw) ?? "unknown";
 }
 
 function parseAffection(raw: string): boolean {

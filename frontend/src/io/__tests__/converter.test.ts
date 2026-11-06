@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { convertFamily } from "../ped/converter.js";
+import { convertFamily, isPhantomId } from "../ped/converter.js";
 import type { PedRow } from "../ped/types.js";
 
 function makeRow(overrides: Partial<PedRow> & { individualId: string }): PedRow {
@@ -198,5 +198,16 @@ describe("convertFamily", () => {
     for (const p of ped.partnerships) {
       expect(p.consanguineous).toBeUndefined();
     }
+  });
+});
+
+describe("convertFamily: phantom IDs", () => {
+  it("marks invented single-parent partners with the phantom prefix", () => {
+    const ped = convertFamily([
+      { familyId: "1", individualId: "1", fatherId: "0", motherId: "0", sex: "1", affection: "1", lineNumber: 1, extraColumns: [] },
+      { familyId: "1", individualId: "2", fatherId: "1", motherId: "0", sex: "1", affection: "1", lineNumber: 2, extraColumns: [] },
+    ]);
+    expect(ped.individuals.filter(i => isPhantomId(i.id))).toHaveLength(1);
+    expect(isPhantomId("1")).toBe(false);
   });
 });

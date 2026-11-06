@@ -1,0 +1,4 @@
+id fid mid sex
+Alice Able	0	0	2
+Bob Baker	0	0	1
+Carol B	Bob Baker	Alice Able	2
