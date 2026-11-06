@@ -89,6 +89,34 @@ function makeIndividual(sex: Sex, sibOrder: number): Individual {
   };
 }
 
+/**
+ * Partnership to which a child of individualId should be added, creating one
+ * (with an opposite-sex placeholder partner) if the individual has none.
+ * Mirrors the partnership choice made by addChild.
+ */
+function ensureChildPartnershipId(draft: Pedigree, individualId: string): string {
+  const ownPs = findOwnPartnerships(draft, individualId);
+  if (ownPs.length > 0) return ownPs[0]!;
+
+  const ind = draft.individuals.find(i => i.id === individualId)!;
+  const partnerSex: Sex =
+    ind.sex === "male" ? "female" :
+    ind.sex === "female" ? "male" : "unknown";
+  const placeholder = makeIndividual(partnerSex, 0);
+  const partnership: Partnership = {
+    id: newId(),
+    individual1: individualId,
+    individual2: placeholder.id,
+  };
+  draft.individuals.push(placeholder);
+  draft.partnerships.push(partnership);
+  draft.parentOf[partnership.id] = [];
+  return partnership.id;
+}
+
+/** Clamp the batch size accepted by addChildren. */
+export const MAX_ADD_CHILDREN = 10;
+
 // ── Store interface ────────────────────────────────────────────────────────────
 
 interface PedigreeState {
@@ -119,6 +147,7 @@ interface PedigreeState {
   addIndividual: (sex: Sex) => void;
   addParent: (individualId: string, sex: Sex) => void;
   addChild: (individualId: string, sex: Sex) => void;
+  addChildren: (individualId: string, count: number, sex: Sex) => void;
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
   deleteIndividual: (individualId: string) => void;
@@ -314,6 +343,28 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const child = makeIndividual(sex, nextSibOrderInFamily(draft, partnershipId));
         draft.individuals.push(child);
         draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
+      });
+    },
+
+    /**
+     * Add `count` children of the given sex to individualId in one undo step.
+     *
+     * Uses the same partnership addChild would (first existing partnership, or a
+     * new one with a placeholder partner). Children get consecutive sibOrder
+     * values after the existing siblings. count is clamped to 1..MAX_ADD_CHILDREN.
+     */
+    addChildren: (individualId, count, sex) => {
+      const n = Math.min(MAX_ADD_CHILDREN, Math.max(1, Math.floor(count)));
+      if (!Number.isFinite(n)) return;
+      mutate(draft => {
+        if (!draft.individuals.some(i => i.id === individualId)) return;
+        const partnershipId = ensureChildPartnershipId(draft, individualId);
+        let sibOrder = nextSibOrderInFamily(draft, partnershipId);
+        for (let k = 0; k < n; k++) {
+          const child = makeIndividual(sex, sibOrder++);
+          draft.individuals.push(child);
+          draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
+        }
       });
     },
 
