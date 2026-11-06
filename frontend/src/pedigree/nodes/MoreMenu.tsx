@@ -13,6 +13,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
     addPartner,
     setAffected,
     setDeceased,
+    setCarrier,
     setProband,
     setSex,
     moveSibLeft,
@@ -83,6 +84,9 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
           </MenuItem>
           <MenuItem onClick={() => action(() => setDeceased(individualId, !individual.deceased))}>
             {individual.deceased ? "Mark living" : "Mark deceased"}
+          </MenuItem>
+          <MenuItem onClick={() => action(() => setCarrier(individualId, !individual.carrier))}>
+            {individual.carrier ? "Unmark carrier" : "Mark carrier"}
           </MenuItem>
           <MenuItem onClick={() => action(() => setProband(individualId))}>
             {individual.proband ? "Unmark proband" : "Mark as proband"}

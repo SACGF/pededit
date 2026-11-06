@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function EditPanel() {
-  const { pedigree, selectedId, updateIndividual } = usePedigreeStore();
+  const { pedigree, selectedId, updateIndividual, setCarrier } = usePedigreeStore();
   const individual = pedigree.individuals.find(i => i.id === selectedId);
 
   if (!individual) {
@@ -54,6 +54,15 @@ export function EditPanel() {
         <div className="text-xs text-gray-600 space-y-1">
           <div>Sex: <span className="font-medium">{individual.sex}</span></div>
           <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={!!individual.carrier}
+              onChange={e => setCarrier(individual.id, e.target.checked)}
+              className="accent-black"
+            />
+            <span>Carrier</span>
+          </label>
           {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
         </div>
