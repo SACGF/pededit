@@ -3,22 +3,25 @@
 // function body) in it and print the result as JSON. In the dev build the
 // stores and helpers are on window.__pededit (see frontend/src/devHooks.ts).
 import {
-  COMMON_HELP, closeBrowser, main, parseArgs, parseViewport, launchBrowser, newContext, targetsFrom,
-  assertServerUp, loadFixture, openPage, resolveFindings, SourceMapper,
-  summaryLine, findingLines, writesLine, UsageError,
+  COMMON_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
+  assertServerUp, loadFixture, openPage, finishPage, contextOptions, resolveFindings, SourceMapper,
+  summaryLine, findingLines, writesLine, servedInfo, servedLines, UsageError,
 } from "./harness.mjs";
 
 const HELP = `usage: node frontend/scripts/browser/eval.mjs [URL] 'JS' [options]
 
 JS is an expression (await is allowed) or, if it does not parse as one, a
-function body that returns a value. The result is printed as JSON on stdout;
-the JS findings summary goes to stderr. Exits 1 if the expression threw.
+function body that returns a value. Only the result goes to stdout, as JSON,
+so it can be piped; the served commit and findings summary go to stderr
+(they interleave when the streams are merged). Exits 1 if the expression threw.
 
 Examples:
   eval.mjs --fixture example:0 '__pededit.pedigree().individuals.length'
   eval.mjs --fixture example:0 --click '[data-individual-id="c1"]' \\
       '__pededit.usePedigreeStore.getState().selectedId'
   eval.mjs --fixture example:0 'const l = __pededit.layout(); return l.nodes.map(n => [n.data.individual.id, n.position])'
+  eval.mjs --fixture example:18 '__pededit.check()'          # render lint findings
+  eval.mjs --fixture example:5 '__pededit.align().pos'       # raw kinship2 layout
 ${COMMON_HELP}`;
 
 await main(async () => {
@@ -32,11 +35,12 @@ await main(async () => {
   if (targets.length > 1) throw new UsageError("eval takes one --fixture");
   const [t] = targets;
   await assertServerUp(t.url);
+  const served = await servedInfo(t.url);
 
   const browser = await launchBrowser();
   let result, threw = null, run;
   try {
-    const context = await newContext(browser, { asAgent: flags["as-agent"], viewport: parseViewport(flags.viewport) });
+    const context = await newContext(browser, contextOptions(flags));
     const fixture = t.spec ? await loadFixture(t.spec, context, t.url) : null;
     run = await openPage(context, { url: t.url, fixture, steps, flags });
     try {
@@ -59,16 +63,18 @@ await main(async () => {
     } catch (e) {
       threw = String(e.message).replace(/^page\.evaluate: /, "").split("\n")[0];
     }
+    await finishPage(run, flags);
     await resolveFindings(run.findings, new SourceMapper());
   } finally {
     await closeBrowser(browser);
   }
 
   if (flags.json) {
-    console.log(JSON.stringify({ url: t.url, fixture: t.spec, result: threw ? null : result, error: threw, ...run.findings }, null, 2));
+    console.log(JSON.stringify({ served, url: run.url, fixture: t.spec, result: threw ? null : result, error: threw, ...run.findings }, null, 2));
   } else {
     if (threw) console.log(`error: ${threw}`);
     else console.log(JSON.stringify(result, null, 2));
+    for (const line of servedLines(served)) console.error(line);
     console.error(summaryLine(run.findings));
     for (const line of findingLines(run.findings, { verbose: flags.verbose })) console.error(line);
     const writes = writesLine(run.findings);

@@ -29,10 +29,21 @@ node frontend/scripts/browser/servers.mjs down                 # stops only what
 ```
 
 Servers already running are reused. Logs go to `node_modules/.cache/pededit-browser/`.
+`status` also says which checkout and commit Vite serves.
+
+## What code is being served
+
+Every tool prints a `served:` line first: the commit, branch and uncommitted
+file count of the checkout Vite runs from (read live from a dev-only
+`/__pededit/commit` endpoint in `vite.config.ts`), plus `origin/main`. It
+warns when that checkout is behind `origin/main` (as of its last fetch) or is
+not the checkout the harness runs from. Feature PRs merge on GitHub, so a
+local `main` can lag: `git fetch` and check this line before testing a fix.
+In the page, `__pededit.commit` holds the same as of server start.
 
 ## The tools
 
-All three take a URL (a path like `/p/<id>` is resolved against
+All four take a URL (a path like `/p/<id>` is resolved against
 `http://localhost:5173`) or `--fixture`, plus ordered interaction steps.
 `--help` on any of them lists every option.
 
@@ -54,10 +65,11 @@ js: 1 uncaught error(s), 8 console error/warning(s), 0 failed request(s), 0 step
 One summary line, then one line per finding with a `path:line` mapped
 through Vite's source maps to the original `.tsx`. Reported: uncaught
 exceptions, `console.error`/`console.warn`, failed requests and responses
-with status 400 or more, and steps whose element never appeared ("its JS
-never ran": a clean report after a failed click would mean nothing). Exit
-code 0 clean, 1 findings, 2 usage error. `--verbose` prints full stacks,
-`--json` everything.
+with status 400 or more, steps that could not run (see below: a clean report
+after a failed click would mean nothing), import warnings from a `.ped` or
+`.json` fixture, render lint findings on editor pages, and with
+`--fixture-via-api` anything that did not persist. Exit code 0 clean, 1
+findings, 2 usage error. `--verbose` prints full stacks, `--json` everything.
 
 ### shot.mjs: what does it look like?
 
@@ -72,6 +84,17 @@ and prints the same JS summary plus the bounding box of every `--measure`
 match. Read the PNG back; a lot of layout questions are answered by looking.
 Screenshot first, measure second.
 
+- `--measure` boxes are screen pixels after React Flow's fitView zoom.
+  `--measure-flow SEL` gives centres and sizes in canvas units instead, the
+  same units as `__pededit.layout()` positions (120px rows, 80px slots; 84
+  and 68 in compact mode), so they compare across viewports.
+- `--clip SEL` cuts off menus and dialogs that open outside the clipped box.
+  Take a full shot when a popover is open.
+- `--tile` with several fixtures also writes `contact-sheet.png`: every shot
+  in a labelled grid with its render lint count, so one image read covers a
+  batch (`--fixture example:8 --fixture example:9 ... --tile`).
+- Paths are printed relative to the repo root (absolute when outside it).
+
 ### eval.mjs: what is in the stores?
 
 ```bash
@@ -83,11 +106,44 @@ node frontend/scripts/browser/eval.mjs --fixture example:0 \
 ```
 
 Evaluates an expression (or a function body, if it does not parse as an
-expression) after the steps and prints the result as JSON. In the dev build
-`window.__pededit` holds `usePedigreeStore`, `useAppStore`, `layoutToFlow`,
-`importPed`, `EXAMPLES` and the shortcuts `pedigree()`, `layout()` and
-`load(pedigree)` (see `frontend/src/devHooks.ts`; production builds do not
-include it).
+expression) after the steps and prints the result as JSON. Only the result
+goes to stdout; the `served:` line and the findings summary go to stderr, so
+`2>&1` interleaves them with the JSON (pipe stdout alone into `jq`).
+
+In the dev build `window.__pededit` holds `usePedigreeStore`, `useAppStore`,
+`layoutToFlow`, `lintFlow`, `importPed`, `importJson`, `EXAMPLES`, `commit`
+and the shortcuts (see `frontend/src/devHooks.ts`; production builds do not
+include it):
+
+- `pedigree()`: the pedigree in the editor.
+- `layout(pedigree?, options?)`: React Flow nodes and edges as the canvas
+  computes them, compact mode included (read from `localStorage`, the way
+  the canvas reads it).
+- `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`.
+- `check(pedigree?, options?)`: the render lint, `[]` when clean.
+- `load(pedigree)`: replace the editor's pedigree (clears undo history).
+
+### lint.mjs: does the drawing make sense?
+
+```bash
+node frontend/scripts/browser/lint.mjs --all-examples
+node frontend/scripts/browser/lint.mjs --all-examples --compact
+node frontend/scripts/browser/lint.mjs --fixture test-data/ped/historic/habsburg.ped
+node frontend/scripts/browser/lint.mjs /p/<id> --click ... # the editor's pedigree after steps
+```
+
+Structural checks on what the canvas draws (`layoutToFlow`'s output, in
+`frontend/src/pedigree/renderLint.ts`): someone with no symbol, a line to a
+node that is not drawn, a couple line between non-partners or through
+another symbol, two couple lines overlapping on one row, a partnership with
+no couple line, a child with no line from their parents or hanging from the
+wrong couple, overlapping symbols. The kinship2 oracle tests check slots
+against R; this checks what is drawn from them. `console.mjs` and `shot.mjs`
+run it on every editor page (`render lint clean` in the summary). The same
+checks run in vitest over every example
+(`src/pedigree/__tests__/renderLint.test.ts`), which lists the examples known
+to draw wrong: fixing one makes that test fail until it is removed from the
+list.
 
 ## Fixtures
 
@@ -97,22 +153,76 @@ PATCHes go to the in-memory copy. SPEC is one of:
 
 - `example:N` or `example:LABEL` from `frontend/src/data/examples.ts`
 - a `.ped` file, optionally `FILE.ped#FAMID` (imported with the app's own `importPed`)
-- a `.json` Pedigree, or a `{ "title", "data": Pedigree }` payload
+- a `.json` file: the app's own Download JSON envelope (`{format, version,
+  pedigree}`) or a bare Pedigree, both read with the app's `importJson`, or
+  an API payload `{ "title", "data": Pedigree }`
 
-`shot.mjs` and `console.mjs` accept `--fixture` several times and handle each in turn.
+Import warnings (an unrecognised sex value, a founder created for a missing
+parent) are reported as findings, so an import that only worked by guessing
+does not look clean. Import errors stop the run.
 
-Fixtures never reach Django: the route stores whatever the page sends. A
-field the backend serializer drops (this happened with `lifeStatus`) looks
-fine in fixture mode. Anything that must survive a save needs a run against
-`/p/<id>` on the real backend, with a reload.
+`shot.mjs`, `console.mjs` and `lint.mjs` accept `--fixture` several times and
+handle each in turn.
+
+### Fixtures through the real backend
+
+Plain fixtures never reach Django: the route stores whatever the page sends,
+so a field the backend serializer drops (this happened with `lifeStatus`)
+looks fine. `--fixture-via-api` instead POSTs the fixture to
+`/api/pedigrees/` (anonymously, or as the agent with `--as-agent`) and opens
+`/p/<id>`. It then checks persistence twice and reports any difference as a
+`persist` finding:
+
+1. right after load, the POSTed pedigree against what the editor loaded;
+2. after the steps (and after `shot.mjs` has taken its picture), it waits
+   for auto-save, reloads, and compares the editor's pedigree before and
+   after.
+
+Fields the backend added with an empty default (`deceased: false` where it
+was absent) are listed in one `note` line, not as findings. Use it for
+anything that must survive a save; `--no-persist-check` skips the reload.
+Each run leaves a pedigree in the local database.
+
+```bash
+node frontend/scripts/browser/console.mjs --fixture example:0 --fixture-via-api \
+    --click '[data-individual-id="c1"]' --select 'select=>Miscarriage' --mouse-away
+#  persist  save then reload: individuals[2].lifeStatus dropped (was "miscarriage")
+```
 
 ## Steps and selectors
 
-`--click`, `--dblclick`, `--hover`, `--wait-for` take a
-[playwright selector](https://playwright.dev/docs/locators) (CSS,
-`text=Export PED`, `role=button[name="Undo"]`); `--press` takes a key
-(`Delete`, `Control+z`); `--fill 'SELECTOR=>TEXT'` types into an input. They
-run in the order given, each followed by `--step-wait` ms (default 300).
+Steps run in the order given, each followed by `--step-wait` ms (default 300):
+
+| Step | Does |
+| --- | --- |
+| `--click SEL`, `--dblclick SEL`, `--hover SEL` | act on the element |
+| `--wait-for SEL` | wait until one is visible |
+| `--press KEY` | a key or chord: `Delete`, `Control+z` |
+| `--fill 'SEL=>TEXT'` | replace an input's value |
+| `--select 'SEL=>VALUE'` | pick a native `<select>` option by value or label (lists the options when none matches) |
+| `--drag 'SEL=>DX,DY'` | press on the element's centre and drag by DX,DY screen pixels |
+| `--upload 'SEL=>FILE'` | set a file input, or click SEL and answer the file chooser |
+| `--download 'SEL[=>PATH]'` | click SEL and save the download (default `frontend/test-output/browser/downloads/<name>`); the report prints where |
+| `--reload` | wait for auto-save (the store's `isDirty` clears), then reload |
+| `--sleep MS` | wait |
+| `--mouse-away` | move the mouse to the corner so hover toolbars close |
+
+`--local-storage KEY=VALUE` (repeatable, not a step) seeds `localStorage`
+before the first load, for settings kept there such as `compactLayout=true`.
+It seeds once per tab, so `--reload` keeps what the app wrote.
+
+Selectors are [playwright selectors](https://playwright.dev/docs/locators):
+CSS, `text=Export PED`, `role=button[name="Undo"]`. Prefer
+`button:has-text("Add")` over `:text()`, which matches the smallest element
+containing the text.
+
+A step acts on exactly one visible element. It fails, with the reason in the
+report, when nothing visible appears ("never found ... its JS never ran", or
+"found 2 element(s) but none visible"), when the element is disabled ("found
+but disabled"), or when several visible elements match: hover toolbars and
+menus can linger on another node, and acting on the first match silently
+edited the wrong person in the first testing run. Make the selector
+specific, or pass `--first` to accept the first match.
 
 Every individual on the canvas carries `data-individual-id`, so
 `[data-individual-id="c1"]` selects or measures one person. React Flow's own
@@ -126,13 +236,25 @@ with no usable password (if it does not exist) and mints a simplejwt pair,
 and seeds it into `localStorage` the way `useAppStore` keeps tokens. Needs
 Django running and `backend/.venv` (or `PEDEDIT_PYTHON`).
 
+## Base URL
+
+Paths resolve against `http://localhost:5173`; set `PEDEDIT_BASE` to use
+another local port (for a second checkout's Vite, for example).
+
 ## Safety
 
 - URLs must be on localhost; anything else is refused unless
   `--allow-remote` is given. Never point these at pededit.com.
-- Without `--fixture`, the page talks to the local backend and nothing is
-  rolled back. Any POST/PATCH/PUT/DELETE that reached `/api/` is listed at the
+- Without `--fixture`, or with `--fixture-via-api`, the page talks to the
+  local backend and nothing is rolled back. Any POST/PATCH/PUT/DELETE that reached `/api/` is listed at the
   end of the report ("not rolled back"). Local dev data is disposable.
+
+## Writing your own script
+
+For anything the steps cannot express, import from `harness.mjs`
+(`launchBrowser`, `newContext(browser, contextOptions(flags))`, `loadFixture`,
+`openPage`, `finishPage`, `runSteps`, `resolveFindings`, `findingLines`) so
+fixtures, viewport, login and reporting match the CLI.
 
 ## Gotchas
 

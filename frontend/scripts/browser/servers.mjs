@@ -108,6 +108,18 @@ async function status() {
     const ours = state[name] && alive(state[name].pid) ? ` (started by servers.mjs, pid ${state[name].pid})` : "";
     console.log(`${name}: ${(await answering(s.url)) ? "answering" : "not answering"} at ${s.url}${ours}`);
   }
+  // Which checkout and commit Vite serves (vite.config.ts /__pededit/commit).
+  try {
+    const res = await fetch("http://localhost:5173/__pededit/commit", { signal: AbortSignal.timeout(2000) });
+    const info = res.ok && /json/.test(res.headers.get("content-type") ?? "") ? await res.json() : null;
+    if (!info) console.log("vite serves: unknown (restart Vite to get the /__pededit/commit endpoint)");
+    else {
+      console.log(`vite serves: ${info.root} at ${info.commit.slice(0, 7)} (${info.branch})` +
+        `${info.dirty ? `, ${info.dirty} uncommitted file(s)` : ""}` +
+        (info.behindOriginMain ? `, ${info.behindOriginMain} commit(s) BEHIND origin/main` : info.originMain ? ", level with origin/main" : ""));
+      if (path.resolve(info.root) !== REPO_ROOT) console.log(`  not this checkout (${REPO_ROOT})`);
+    }
+  } catch { /* Vite not up */ }
   return 0;
 }
 

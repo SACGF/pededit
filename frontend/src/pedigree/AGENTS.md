@@ -41,3 +41,13 @@ each offset these by hand, so change all three together.
 
 Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.
+
+## Render lint
+
+`renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would
+misread (lines through symbols, lines to dropped nodes, children with no line
+from their parents, couple lines between non-partners, overlapping symbols).
+The kinship2 oracle tests compare slots with R, so a bug in the duplicate
+handling here passes them and is only caught by this lint. Its vitest keeps a
+`KNOWN_BROKEN` list of examples; remove an entry when a fix makes it draw
+cleanly. Also run by `__pededit.check()` and `scripts/browser/lint.mjs`.

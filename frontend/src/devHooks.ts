@@ -8,29 +8,60 @@
  *   __pededit.pedigree().individuals.length
  *   __pededit.usePedigreeStore.getState().past.length
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
+ *   __pededit.check()          // render lint: [] when the canvas draws cleanly
+ *   __pededit.align().pos      // raw kinship2 LayoutResult
  */
 import { usePedigreeStore } from "./store/usePedigreeStore";
 import { useAppStore } from "./store/useAppStore";
 import { layoutToFlow } from "./pedigree/layoutToFlow";
+import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
+import { lintFlow } from "./pedigree/renderLint";
+import { alignPedigree } from "@pedigree-editor/layout-engine";
 import { importPed } from "./io/ped";
+import { importJson } from "./io/json";
 import { EXAMPLES } from "./data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+
+/** The canvas reads compact mode from localStorage at mount and writes it on toggle. */
+function canvasOptions(): LayoutToFlowOptions {
+  try { return { compact: localStorage.getItem("compactLayout") === "true" }; } catch { return {}; }
+}
 
 const hooks = {
   usePedigreeStore,
   useAppStore,
   layoutToFlow,
   importPed,
+  importJson,
+  lintFlow,
   EXAMPLES,
+  /** Commit the dev server was serving when this page loaded (see vite.config.ts). */
+  commit: __PEDEDIT_COMMIT__,
   /** The pedigree currently in the editor. */
   pedigree: (): Pedigree => usePedigreeStore.getState().getPedigree(),
-  /** React Flow nodes and edges for the current pedigree, as the canvas computes them. */
-  layout: () => layoutToFlow(usePedigreeStore.getState().getPedigree()),
+  /**
+   * React Flow nodes and edges for a pedigree (default: the current one), as
+   * the canvas computes them, including compact mode. Override with options.
+   */
+  layout: (pedigree?: Pedigree, options?: LayoutToFlowOptions) =>
+    layoutToFlow(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
+  /** The raw kinship2 LayoutResult (alignPedigree) for a pedigree, default the current one. */
+  align: (pedigree?: Pedigree) => alignPedigree(pedigree ?? usePedigreeStore.getState().getPedigree()),
+  /**
+   * Render lint (pedigree/renderLint.ts): lines through symbols, lines to
+   * missing nodes, children with no parent line, and so on. [] means clean.
+   */
+  check: (pedigree?: Pedigree, options?: LayoutToFlowOptions) => {
+    const p = pedigree ?? usePedigreeStore.getState().getPedigree();
+    return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }));
+  },
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),
 };
 
 declare global {
+  /** Set by the pededit-served-commit plugin in vite.config.ts at server start. */
+  const __PEDEDIT_COMMIT__: { commit: string; branch: string; dirty: number; root: string } | null;
   interface Window {
     __pededit?: typeof hooks;
   }

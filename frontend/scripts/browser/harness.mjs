@@ -4,7 +4,7 @@
 // See README.md in this directory.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,7 +29,12 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 // ── Arguments ────────────────────────────────────────────────────────────────
 
 /** Flags that become ordered interaction steps, run after the page settles. */
-const STEP_FLAGS = new Set(["click", "dblclick", "hover", "press", "fill", "wait-for"]);
+const STEP_FLAGS = new Set([
+  "click", "dblclick", "hover", "press", "fill", "wait-for",
+  "drag", "reload", "upload", "download", "sleep", "mouse-away", "select",
+]);
+/** Steps that take no value. */
+const BARE_STEPS = new Set(["reload", "mouse-away"]);
 
 /** Flags shared by every tool: name -> kind ("bool" | "string" | "number" | "multi"). */
 const COMMON_FLAGS = {
@@ -38,6 +43,10 @@ const COMMON_FLAGS = {
   timeout: "number",
   "step-wait": "number",
   fixture: "multi",
+  "fixture-via-api": "bool",
+  "no-persist-check": "bool",
+  "local-storage": "multi",
+  first: "bool",
   "as-agent": "bool",
   "allow-remote": "bool",
   viewport: "string",
@@ -71,7 +80,7 @@ export function parseArgs(argv, extraFlags = {}) {
       return argv[++i];
     };
     if (STEP_FLAGS.has(name)) {
-      steps.push({ kind: name, arg: takeValue() });
+      steps.push({ kind: name, arg: BARE_STEPS.has(name) ? null : takeValue() });
       continue;
     }
     const kind = kinds[name];
@@ -92,16 +101,33 @@ export class UsageError extends Error {}
 export const COMMON_HELP = `
 Common options:
   --fixture SPEC      Serve a pedigree at /p/fixture without the backend. SPEC is
-                      a .json Pedigree, a .ped file (optionally FILE.ped#FAMID),
-                      or example:N / example:LABEL from src/data/examples.ts.
-                      The URL defaults to /p/fixture when this is given.
+                      a .json Pedigree or Download JSON file, a .ped file
+                      (optionally FILE.ped#FAMID), or example:N / example:LABEL
+                      from src/data/examples.ts. The URL defaults to /p/fixture.
+  --fixture-via-api   POST each fixture through the real API (Django running)
+                      and open /p/<id> instead. Afterwards the harness checks
+                      persistence: what was POSTed against what loaded, and the
+                      editor's pedigree before and after a reload. Turn the
+                      reload check off with --no-persist-check.
+  --local-storage K=V Seed localStorage before the first load (repeatable),
+                      e.g. compactLayout=true. Reloads keep the app's own writes.
   --as-agent          Sign in as the claude_agent user (needs Django running).
-  --click SEL         Steps, run in order after load: --click, --dblclick,
-  --dblclick SEL      --hover take a playwright selector, --press a key
-  --hover SEL         (e.g. Control+z), --fill 'SEL=>TEXT' types into an input,
-  --press KEY         --wait-for SEL waits for an element to appear. A step
-  --fill 'SEL=>TEXT'  whose element never appears is reported, not skipped.
-  --wait-for SEL
+Steps, run in order after load (a step whose element never appears, is
+disabled, or matches several visible elements is reported, not skipped):
+  --click SEL  --dblclick SEL  --hover SEL  --wait-for SEL
+  --press KEY         A key or chord, e.g. Delete, Control+z.
+  --fill 'SEL=>TEXT'  Type into an input (replaces its value).
+  --select 'SEL=>V'   Choose an option of a native <select> by value or label.
+  --drag 'SEL=>DX,DY' Drag an element by DX,DY screen pixels.
+  --upload 'SEL=>FILE' Set a file input, or click SEL and answer the file chooser.
+  --download 'SEL[=>PATH]' Click SEL and save the download (default
+                      frontend/test-output/browser/downloads/<suggested name>).
+  --reload            Wait for auto-save to finish, then reload the page.
+  --sleep MS          Wait MS milliseconds.
+  --mouse-away        Move the mouse to the page corner (hides hover toolbars).
+  --first             Let a step selector match several visible elements and
+                      use the first, instead of failing the step.
+Timing and output:
   --wait MS           Extra wait after network idle (default 1500).
   --step-wait MS      Wait after each step (default 300).
   --timeout MS        How long a step waits for its element (default 5000).
@@ -157,10 +183,25 @@ export async function launchBrowser() {
 }
 
 /** A fresh context; with asAgent, localStorage carries a JWT pair for claude_agent. */
-export async function newContext(browser, { asAgent = false, viewport, deviceScaleFactor = 1 } = {}) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor });
+export async function newContext(browser, { asAgent = false, viewport, deviceScaleFactor = 1, localStorage: seed = [] } = {}) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor, acceptDownloads: true });
+  if (seed.length) {
+    const pairs = seed.map(kv => {
+      const eq = kv.indexOf("=");
+      if (eq < 1) throw new UsageError(`--local-storage wants KEY=VALUE, got ${kv}`);
+      return [kv.slice(0, eq), kv.slice(eq + 1)];
+    });
+    // Once per tab (sessionStorage survives reloads), so a value the app
+    // writes during the run is not put back by a --reload.
+    await context.addInitScript(pairs => {
+      if (sessionStorage.getItem("__pededit_seeded")) return;
+      for (const [k, v] of pairs) localStorage.setItem(k, v);
+      sessionStorage.setItem("__pededit_seeded", "1");
+    }, pairs);
+  }
   if (asAgent) {
     const tokens = mintAgentTokens();
+    context.agentTokens = tokens;
     // Only seed when absent so a token the app refreshes mid-run survives reloads.
     await context.addInitScript(({ access, refresh }) => {
       if (!localStorage.getItem("access_token")) {
@@ -209,7 +250,7 @@ export async function loadFixture(spec, context, base) {
     if (!ex) {
       throw new UsageError(`no example matches "${key}". Examples: ${examples.map((e, i) => `${i}:${e.label}`).join(", ")}`);
     }
-    return { label: spec, title: ex.label, pedigree: ex.data };
+    return { label: spec, title: ex.label, pedigree: ex.data, warnings: [] };
   }
 
   const [file, famId] = spec.split("#");
@@ -231,17 +272,34 @@ export async function loadFixture(spec, context, base) {
     if (!fam) {
       throw new UsageError(`${file} has no family ${famId}. Families: ${result.pedigrees.map(p => p.familyId).join(", ")}`);
     }
-    return { label: spec, title, pedigree: fam.pedigree };
+    // Warnings do not stop an import in the app either; report them so a
+    // nonsense import does not look clean.
+    const warnings = result.issues.filter(i => i.severity === "warning").map(i => i.message);
+    return { label: spec, title, pedigree: fam.pedigree, warnings };
   }
 
-  const json = JSON.parse(text);
-  const pedigree = json.individuals ? json : json.data;
-  if (!pedigree?.individuals) throw new UsageError(`${file} is neither a Pedigree nor a {data: Pedigree} payload`);
-  return { label: spec, title: json.title ?? title, pedigree };
+  // JSON: a bare Pedigree, the app's Download JSON envelope ({format, pedigree}),
+  // or an API payload ({title, data}). The first two go through the app's importJson.
+  let json;
+  try { json = JSON.parse(text); } catch (e) { throw new UsageError(`${file} is not JSON: ${e.message}`); }
+  if (json && typeof json === "object" && json.data?.individuals && !json.individuals) {
+    return { label: spec, title: json.title ?? title, pedigree: json.data, warnings: [] };
+  }
+  const result = await inApp(context, base, async ({ text }) => {
+    const { importJson } = await import("/src/io/json/index.ts");
+    return importJson(text);
+  }, { text });
+  if (result.hasErrors || !result.pedigree) {
+    const issues = result.issues.filter(i => i.severity === "error").map(i => `${i.path}: ${i.message}`).slice(0, 5);
+    throw new UsageError(`${file} did not import as pedigree JSON: ${issues.join("; ")}`);
+  }
+  const warnings = result.issues.filter(i => i.severity === "warning")
+    .map(i => (i.path && !i.message.startsWith(i.path) ? `${i.path}: ${i.message}` : i.message));
+  return { label: spec, title: result.title ?? title, pedigree: result.pedigree, warnings };
 }
 
 /** Run fn inside a blank same-origin page so it can import app modules from Vite. */
-async function inApp(context, base, fn, arg) {
+export async function inApp(context, base, fn, arg) {
   const page = await context.newPage();
   try {
     const blank = new URL("/__pededit_fixture_loader__", base).toString();
@@ -271,6 +329,27 @@ export async function routeFixture(page, fixture) {
   return record;
 }
 
+/**
+ * POST a fixture through the real API (via Vite's /api proxy) and return the
+ * record, so the editor loads it from Django at /p/<id>. Anonymous unless
+ * tokens are given.
+ */
+export async function postFixture(fixture, base, tokens = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (tokens) headers.Authorization = `Bearer ${tokens.access}`;
+  let res;
+  try {
+    res = await fetch(new URL("/api/pedigrees/", base), {
+      method: "POST", headers, body: JSON.stringify({ title: fixture.title, data: fixture.pedigree }),
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch (e) {
+    throw new UsageError(`--fixture-via-api: POST /api/pedigrees/ failed (${e.message}); is Django up? \`servers.mjs up\``);
+  }
+  if (!res.ok) throw new UsageError(`--fixture-via-api: POST /api/pedigrees/ -> ${res.status} ${(await res.text()).slice(0, 200)}`);
+  return res.json();
+}
+
 // ── Collecting what the page complained about ────────────────────────────────
 
 const IGNORED_REQUEST = /\/favicon\.ico(\?|$)/;
@@ -285,7 +364,10 @@ const KNOWN_NOISE = [
 ];
 
 export function collect(page) {
-  const findings = { pageErrors: [], console: [], requests: [], steps: [], writes: [], ignored: 0 };
+  const findings = {
+    pageErrors: [], console: [], requests: [], steps: [], writes: [], ignored: 0,
+    fixtureWarnings: [], render: [], persist: [], persistDefaults: [],
+  };
   page.on("request", req => {
     const u = new URL(req.url());
     if (req.method() === "GET" || req.method() === "HEAD" || req.method() === "OPTIONS") return;
@@ -343,33 +425,198 @@ export async function gotoAndSettle(page, url, waitMs) {
   return response;
 }
 
-export async function runSteps(page, steps, findings, { timeout = 5000, stepWait = 300 } = {}) {
+/** Split 'SEL=>VALUE'; the value is optional when allowMissing. */
+function splitArrow(step, { allowMissing = false } = {}) {
+  const sep = step.arg.lastIndexOf("=>");
+  if (sep < 0) {
+    if (allowMissing) return [step.arg, null];
+    throw new UsageError(`--${step.kind} wants 'SELECTOR=>VALUE', got ${step.arg}`);
+  }
+  return [step.arg.slice(0, sep), step.arg.slice(sep + 2)];
+}
+
+class StepError extends Error {}
+
+/**
+ * The one visible element a step acts on. Fails the step, instead of acting
+ * on a hidden or stale copy, when nothing visible appears, when several
+ * visible elements match (unless --first), or when the element is disabled.
+ */
+async function target(page, selector, { timeout, first, mayBeHidden = false }) {
+  const all = page.locator(selector);
+  if (mayBeHidden) {
+    await all.first().waitFor({ state: "attached", timeout }).catch(() => {
+      throw new StepError(`never found within ${timeout} ms, so its JS never ran`);
+    });
+    return all.first();
+  }
+  const visible = all.filter({ visible: true });
+  try {
+    await visible.first().waitFor({ timeout });
+  } catch {
+    const hidden = await all.count();
+    throw new StepError(hidden
+      ? `found ${hidden} element(s) but none visible within ${timeout} ms, so its JS never ran`
+      : `never found within ${timeout} ms, so its JS never ran`);
+  }
+  const n = await visible.count();
+  if (n > 1 && !first) {
+    throw new StepError(`matched ${n} visible elements; make the selector specific (or pass --first to take the first)`);
+  }
+  const el = visible.first();
+  if (await el.isDisabled().catch(() => false)) throw new StepError("found but disabled");
+  return el;
+}
+
+/** Auto-save is a 2 s debounce; wait for the editor to report a clean store. */
+export async function waitForSaved(page, timeout = 8000) {
+  return page.waitForFunction(
+    () => !window.__pededit || !window.__pededit.usePedigreeStore.getState().isDirty,
+    null, { timeout },
+  ).then(() => true, () => false);
+}
+
+export async function runSteps(page, steps, findings, { timeout = 5000, stepWait = 300, first = false, wait = 1500 } = {}) {
+  const opts = { timeout, first };
   for (const step of steps) {
     const record = { ...step, ok: true };
     try {
       switch (step.kind) {
-        case "click": await page.locator(step.arg).first().click({ timeout }); break;
-        case "dblclick": await page.locator(step.arg).first().dblclick({ timeout }); break;
-        case "hover": await page.locator(step.arg).first().hover({ timeout }); break;
-        case "wait-for": await page.locator(step.arg).first().waitFor({ timeout }); break;
+        case "click": await (await target(page, step.arg, opts)).click({ timeout }); break;
+        case "dblclick": await (await target(page, step.arg, opts)).dblclick({ timeout }); break;
+        case "hover": await (await target(page, step.arg, opts)).hover({ timeout }); break;
+        case "wait-for": await target(page, step.arg, { ...opts, first: true }); break;
         case "press": await page.keyboard.press(step.arg); break;
+        case "sleep": {
+          const ms = Number(step.arg);
+          if (!Number.isFinite(ms)) throw new UsageError(`--sleep wants milliseconds, got ${step.arg}`);
+          await page.waitForTimeout(ms);
+          break;
+        }
+        case "mouse-away": await page.mouse.move(1, 1); break;
+        case "reload": {
+          if (!(await waitForSaved(page))) record.note = "auto-save had not finished after 8 s; reloaded anyway";
+          await page.reload({ waitUntil: "networkidle" }).catch(() => page.reload({ waitUntil: "load" }));
+          await page.waitForTimeout(wait);
+          break;
+        }
         case "fill": {
-          const sep = step.arg.indexOf("=>");
-          if (sep < 0) throw new UsageError(`--fill wants 'SELECTOR=>TEXT', got ${step.arg}`);
-          await page.locator(step.arg.slice(0, sep)).first().fill(step.arg.slice(sep + 2), { timeout });
+          const [sel, text] = splitArrow(step);
+          await (await target(page, sel, opts)).fill(text, { timeout });
+          break;
+        }
+        case "select": {
+          const [sel, value] = splitArrow(step);
+          const el = await target(page, sel, opts);
+          const options = await el.evaluate(e => [...(e.options ?? [])].map(o => [o.value, o.label]), null, { timeout }).catch(() => null);
+          if (!options) throw new StepError("is not a native <select>; open it with --click and click the option instead");
+          const hit = options.find(([v, l]) => v === value || l === value);
+          if (!hit) throw new StepError(`has no option ${JSON.stringify(value)}; options: ${options.map(([v, l]) => (v === l ? v : `${v} (${l})`)).join(", ")}`);
+          await el.selectOption(hit[0], { timeout });
+          break;
+        }
+        case "drag": {
+          const [sel, delta] = splitArrow(step);
+          const m = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(delta.replace(/\s/g, ""));
+          if (!m) throw new UsageError(`--drag wants 'SELECTOR=>DX,DY', got ${step.arg}`);
+          const box = await (await target(page, sel, opts)).boundingBox();
+          if (!box) throw new StepError("has no bounding box");
+          const x = box.x + box.width / 2, y = box.y + box.height / 2;
+          await page.mouse.move(x, y);
+          await page.mouse.down();
+          await page.mouse.move(x + Number(m[1]), y + Number(m[2]), { steps: 12 });
+          await page.mouse.up();
+          record.from = { x, y };
+          break;
+        }
+        case "upload": {
+          const [sel, file] = splitArrow(step);
+          const abs = path.resolve(process.cwd(), file);
+          if (!existsSync(abs)) throw new UsageError(`--upload: ${file} does not exist`);
+          const isInput = await page.locator(sel).first()
+            .evaluate(el => el instanceof HTMLInputElement && el.type === "file", null, { timeout }).catch(() => false);
+          if (isInput) {
+            await (await target(page, sel, { ...opts, mayBeHidden: true })).setInputFiles(abs);
+          } else {
+            const el = await target(page, sel, opts);
+            const [chooser] = await Promise.all([page.waitForEvent("filechooser", { timeout }), el.click({ timeout })]);
+            await chooser.setFiles(abs);
+          }
+          break;
+        }
+        case "download": {
+          const [sel, out] = splitArrow(step, { allowMissing: true });
+          const el = await target(page, sel, opts);
+          const [dl] = await Promise.all([page.waitForEvent("download", { timeout }), el.click({ timeout })]);
+          const file = path.resolve(out ?? path.join(FRONTEND_DIR, "test-output", "browser", "downloads", dl.suggestedFilename()));
+          mkdirSync(path.dirname(file), { recursive: true });
+          await dl.saveAs(file);
+          record.saved = displayPath(file);
           break;
         }
       }
     } catch (e) {
       if (e instanceof UsageError) throw e;
       record.ok = false;
-      record.error = /Timeout/.test(e.message)
-        ? `never found within ${timeout} ms, so its JS never ran`
+      record.error = e instanceof StepError ? e.message
+        : /Timeout/.test(e.message) ? `timed out after ${timeout} ms: ${String(e.message).split("\n")[0]}`
         : String(e.message).split("\n")[0];
     }
     findings.steps.push(record);
     await settle(page, stepWait);
   }
+}
+
+// ── Render lint and persistence ──────────────────────────────────────────────
+
+/** Run __pededit.check() (src/pedigree/renderLint.ts) on the editor's pedigree, if this is an editor page. */
+export async function renderLint(page) {
+  return page.evaluate(() => (window.__pededit && window.__pededit.pedigree().individuals.length
+    ? window.__pededit.check() : null)).catch(() => null);
+}
+
+/** Paths where b differs from a: dropped (in a, not b), added, changed. */
+export function diffJson(a, b, at = "") {
+  const out = [];
+  const isObj = v => v && typeof v === "object";
+  if (isObj(a) && isObj(b) && Array.isArray(a) === Array.isArray(b)) {
+    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    for (const k of keys) {
+      const p = Array.isArray(a) ? `${at}[${k}]` : at ? `${at}.${k}` : k;
+      if (!(k in b)) out.push({ path: p, kind: "dropped", before: a[k] });
+      else if (!(k in a)) out.push({ path: p, kind: "added", after: b[k] });
+      else out.push(...diffJson(a[k], b[k], p));
+    }
+    return out;
+  }
+  if (JSON.stringify(a) !== JSON.stringify(b)) out.push({ path: at, kind: "changed", before: a, after: b });
+  return out;
+}
+
+const isEmptyDefault = v => v === false || v === null || v === 0 || v === "" || (Array.isArray(v) && v.length === 0);
+
+/** Sort diffs into findings, and fields a save only added with an empty default (a note, not a finding). */
+function recordDiff(findings, stage, diffs) {
+  for (const d of diffs) {
+    if (d.kind === "added" && isEmptyDefault(d.after)) findings.persistDefaults.push({ stage, ...d });
+    else findings.persist.push({ stage, ...d });
+  }
+}
+
+/**
+ * For --fixture-via-api, after the steps: wait for auto-save, reload, and
+ * compare the editor's pedigree before and after. (openPage already compared
+ * the POSTed pedigree with what loaded.)
+ * Run it last: the reload resets menus and selection.
+ */
+export async function persistCheck(page, findings, { reload = true, wait = 1500 }) {
+  if (!reload || !(await page.evaluate(() => !!window.__pededit))) return;
+  if (!(await waitForSaved(page))) findings.persist.push({ stage: "save", kind: "changed", path: "", before: "dirty", after: "auto-save had not finished after 8 s" });
+  const before = await page.evaluate(() => window.__pededit.pedigree());
+  await page.reload({ waitUntil: "networkidle" }).catch(() => page.reload({ waitUntil: "load" }));
+  await page.waitForTimeout(wait);
+  const after = await page.evaluate(() => window.__pededit?.pedigree() ?? null);
+  recordDiff(findings, "save then reload", diffJson(before, after ?? {}));
 }
 
 // ── Mapping frames back to source ────────────────────────────────────────────
@@ -510,14 +757,25 @@ function shortUrl(url) {
   return LOCAL_HOSTS.has(u.hostname) ? u.pathname + u.search : url;
 }
 
+const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
 export function summaryLine(f) {
   const consoleCount = f.console.reduce((n, c) => n + c.count, 0);
   const stepFailures = f.steps.filter(s => !s.ok).length;
   const errorCount = f.pageErrors.reduce((n, e) => n + e.count, 0);
-  return `js: ${errorCount} uncaught error(s), ${consoleCount} console error/warning(s), ` +
-    `${f.requests.length} failed request(s)` + (f.steps.length ? `, ${stepFailures} step failure(s)` : "") +
-    (f.ignored ? ` [${f.ignored} known warning(s) ignored]` : "");
+  const parts = [
+    plural(errorCount, "uncaught error"),
+    plural(consoleCount, "console error/warning", "console errors/warnings"),
+    plural(f.requests.length, "failed request"),
+  ];
+  if (f.steps.length) parts.push(plural(stepFailures, "step failure"));
+  if (f.fixtureWarnings?.length) parts.push(plural(f.fixtureWarnings.length, "import warning"));
+  if (f.render) parts.push(f.render.length ? plural(f.render.length, "render lint finding") : "render lint clean");
+  if (f.persistChecked) parts.push(f.persist.length ? plural(f.persist.length, "persistence difference") : "persists");
+  return `js: ${parts.join(", ")}` + (f.ignored ? ` [${plural(f.ignored, "known warning")} ignored]` : "");
 }
+
+const short = v => { const s = JSON.stringify(v); return s === undefined ? "(missing)" : s.length > 60 ? s.slice(0, 57) + "..." : s; };
 
 export function findingLines(f, { verbose = false } = {}) {
   const lines = [];
@@ -532,8 +790,21 @@ export function findingLines(f, { verbose = false } = {}) {
   for (const r of f.requests) {
     lines.push(`  request  ${r.method} ${shortUrl(r.url)} -> ${r.status ?? r.error}`);
   }
-  for (const s of f.steps.filter(s => !s.ok)) {
-    lines.push(`  step  --${s.kind} ${JSON.stringify(s.arg)} ${s.error}`);
+  for (const s of f.steps) {
+    const shown = s.arg === null ? `--${s.kind}` : `--${s.kind} ${JSON.stringify(s.arg)}`;
+    if (!s.ok) lines.push(`  step  ${shown} ${s.error}`);
+    else if (s.note) lines.push(`  step  ${shown} ${s.note}`);
+    else if (s.saved) lines.push(`  saved  ${s.saved}  (${shown})`);
+  }
+  for (const w of f.fixtureWarnings ?? []) lines.push(`  import warning  ${w}`);
+  for (const r of f.render ?? []) lines.push(`  render  ${r.code}  ${r.message}`);
+  for (const d of f.persist ?? []) {
+    lines.push(`  persist  ${d.stage}: ${d.path || "(root)"} ${d.kind}` +
+      (d.kind === "dropped" ? ` (was ${short(d.before)})` : d.kind === "added" ? ` ${short(d.after)}` : ` ${short(d.before)} -> ${short(d.after)}`));
+  }
+  if (f.persistDefaults?.length) {
+    const paths = [...new Set(f.persistDefaults.map(d => d.path.replace(/\[\d+\]/g, "[]")))];
+    lines.push(`  note  the backend added ${plural(f.persistDefaults.length, "empty default")} that were absent: ${paths.slice(0, 6).join(", ")}${paths.length > 6 ? ", ..." : ""}`);
   }
   return lines;
 }
@@ -545,8 +816,43 @@ export function writesLine(f) {
   return `note: ${f.writes.length} write(s) reached the local backend and were not rolled back: ${uniq.slice(0, 5).join(", ")}${uniq.length > 5 ? ", ..." : ""}`;
 }
 
+/** Repo-relative when inside the repo, absolute otherwise. */
+export function displayPath(file) {
+  const rel = path.relative(REPO_ROOT, file);
+  return rel.startsWith("..") || path.isAbsolute(rel) ? file : rel;
+}
+
 export function hasFindings(f) {
-  return f.pageErrors.length > 0 || f.console.length > 0 || f.requests.length > 0 || f.steps.some(s => !s.ok);
+  return f.pageErrors.length > 0 || f.console.length > 0 || f.requests.length > 0 || f.steps.some(s => !s.ok) ||
+    (f.fixtureWarnings?.length ?? 0) > 0 || (f.render?.length ?? 0) > 0 || (f.persist?.length ?? 0) > 0;
+}
+
+// ── What is being served ─────────────────────────────────────────────────────
+
+/** Ask the dev server (vite.config.ts) which checkout and commit it serves. */
+export async function servedInfo(base) {
+  try {
+    const res = await fetch(new URL("/__pededit/commit", base), { signal: AbortSignal.timeout(3000) });
+    if (!res.ok || !/json/.test(res.headers.get("content-type") ?? "")) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** One line (plus warnings) saying what code the page ran. */
+export function servedLines(info) {
+  if (!info) return ["served: unknown (this Vite predates the /__pededit/commit endpoint; restart it with servers.mjs)"];
+  const lines = [];
+  const where = path.resolve(info.root) === REPO_ROOT ? "" : ` from ${info.root}`;
+  lines.push(`served: ${info.commit.slice(0, 7)} ${info.branch}${info.dirty ? ` +${plural(info.dirty, "uncommitted file")}` : ""}${where}` +
+    (info.originMain ? `, origin/main ${info.originMain.slice(0, 7)}` : ""));
+  if (info.behindOriginMain) {
+    lines.push(`WARNING: the served checkout is ${plural(info.behindOriginMain, "commit")} behind origin/main (as of its last fetch); ` +
+      "`git pull` there, or you are testing old code");
+  }
+  if (where) lines.push(`WARNING: Vite serves ${info.root}, not this checkout (${REPO_ROOT})`);
+  return lines;
 }
 
 /** Close the browser, but never let a stuck chromium hang the caller's shell. */
@@ -579,22 +885,59 @@ export async function main(fn, help) {
 
 /**
  * Open url (or /p/fixture) in a new page of context, with an optional fixture
- * routed in, then run the steps. Returns { page, findings, status, url, fixture }.
+ * routed in (or POSTed, with --fixture-via-api), then run the steps.
+ * Returns { page, findings, status, url, fixture, sent, ms }.
  */
 export async function openPage(context, { url, fixture, steps = [], flags = {} }) {
   const page = await context.newPage();
   const findings = collect(page);
-  let record = null;
-  if (fixture) record = await routeFixture(page, fixture);
+  let sent = null;
+  if (fixture) {
+    findings.fixtureWarnings.push(...(fixture.warnings ?? []));
+    if (flags["fixture-via-api"]) {
+      const created = await postFixture(fixture, url, context.agentTokens ?? null);
+      url = new URL(`/p/${created.id}`, url).toString();
+      sent = fixture.pedigree;
+    } else {
+      await routeFixture(page, fixture);
+    }
+  }
   const started = Date.now();
   const response = await gotoAndSettle(page, url, flags.wait ?? 1500);
-  await runSteps(page, steps, findings, { timeout: flags.timeout ?? 5000, stepWait: flags["step-wait"] ?? 300 });
-  return { page, findings, status: response?.status() ?? null, url, fixture, record, ms: Date.now() - started };
+  if (sent) {
+    // What the backend kept of the POST, before any step edits the pedigree.
+    const loaded = await page.evaluate(() => window.__pededit?.pedigree() ?? null);
+    if (loaded) recordDiff(findings, "POST then load", diffJson(sent, loaded));
+  }
+  await runSteps(page, steps, findings, {
+    timeout: flags.timeout ?? 5000, stepWait: flags["step-wait"] ?? 300, first: !!flags.first, wait: flags.wait ?? 1500,
+  });
+  return { page, findings, status: response?.status() ?? null, url, fixture, sent, ms: Date.now() - started };
+}
+
+/**
+ * The checks every tool runs after its own capture: render lint on editor
+ * pages, then (with --fixture-via-api) the persistence check, which reloads.
+ */
+export async function finishPage(run, flags) {
+  run.findings.render = await renderLint(run.page);
+  if (flags["fixture-via-api"] && run.fixture) {
+    run.findings.persistChecked = true;
+    await persistCheck(run.page, run.findings, { reload: !flags["no-persist-check"], wait: flags.wait ?? 1500 });
+  }
+}
+
+/** Shared context options from the common flags. */
+export function contextOptions(flags, extra = {}) {
+  return {
+    asAgent: flags["as-agent"], viewport: parseViewport(flags.viewport), localStorage: flags["local-storage"] ?? [], ...extra,
+  };
 }
 
 /** Work out the list of { url, fixtureSpec } targets from positional args and --fixture. */
 export function targetsFrom(positionalUrl, flags) {
   const fixtures = flags.fixture ?? [];
+  if (flags["fixture-via-api"] && !fixtures.length) throw new UsageError("--fixture-via-api needs --fixture SPEC");
   const url = resolveTarget(positionalUrl ?? (fixtures.length ? `/p/${FIXTURE_ID}` : "/"), { allowRemote: flags["allow-remote"] });
   if (fixtures.length && !new URL(url).pathname.startsWith(`/p/${FIXTURE_ID}`)) {
     throw new UsageError(`--fixture serves /p/${FIXTURE_ID}; drop the URL or point it there`);
