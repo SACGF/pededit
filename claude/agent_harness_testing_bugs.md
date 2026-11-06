@@ -351,3 +351,32 @@ Still open:
 - No `--oracle` to compare a fixture's `align()` with R kinship2.
 - `--clip` on `.react-flow__viewport` is offset (it carries the transform).
 - Pretty-printed eval output is long; a compact JSON flag would help.
+
+# Fixes after the second run
+
+On 2026-11-06 the ten Rework issues were fixed on main and closed: #3, #5,
+#7, #13, #14, #17, #19, #31, #33, #37. Each issue's closing comment lists
+what was done and how it was checked. In short:
+
+- Serializer keeps `lifeStatus` and unknown fields and adds no defaults
+  (#17, #13). Django tests and `schemaDrift.test.ts` guard the schema.
+- Childless partnerships go to kinship2 as `childlessCouples` (#5). Every
+  copy of a duplicated person is drawn and joined by a dashed arc (#33), so
+  `KNOWN_BROKEN` in `renderLint.test.ts` is empty, in compact mode too (#37).
+- With snap on every node is drawn on the grid, so compact rows and
+  auto-placed nodes line up (#7, #37). Each child gets its own sibship drop,
+  so the `child-off-row` lint was retired.
+- Menus and the Legend fit the viewport (#19, #3); affected people with tags
+  keep a black centre (#3); P and carrier dot no longer collide (#14).
+- PED import blocks mis-split rows and same-ID parents, reads `NA` as
+  missing (#31); export offers PLINK or R and warns about losses (#13).
+
+Also fixed from Audald's reports, labelled Needs Testing: families are laid
+out separately with a gap (#64, `alignPedigreeByFamily`), PED export uses
+names (#66). #65 was already fixed by e938281 but not deployed.
+
+Still open from these notes: hatched fills and monochrome export (#67), label
+overlap at standard spacing, the H1/H2/H3 W1/W2 partner chain against R (not
+rechecked; R was not installed), the tag annotation row against the proband
+arrow, the carrier dot drawn over tag sectors, the SVG title overlapping the
+top-left symbol, and the harness items listed above.
