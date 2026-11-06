@@ -141,8 +141,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                 const qIndex = quads.findIndex(q => q.id === tag.id);
                 const position =
                   tag.style !== "quadrant" ? null
-                  : quads.length <= 4 ? QUADRANT_NAMES[qIndex]
-                  : `slice ${qIndex + 1} of ${quads.length}`;
+                  : qIndex < QUADRANT_NAMES.length ? QUADRANT_NAMES[qIndex]
+                  : "shared slice";
                 return (
                   <div key={tag.id} className="flex items-center gap-1.5 px-2 py-1.5 min-w-0">
                     <ColorPicker tag={tag} onChange={color => updateTag(tag.id, { color })} />
@@ -207,7 +207,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
 
           {quads.length > 4 && (
             <p className="text-[10px] text-gray-500">
-              More than four quadrant tags: symbols are split into {quads.length} equal slices, clockwise from the top.
+              More than four quadrant tags: the first four keep their quarter. Anyone with a fifth or later
+              quadrant tag has their quadrant tags drawn as equal slices, clockwise from the top.
             </p>
           )}
 

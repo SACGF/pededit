@@ -37,7 +37,14 @@ draws NSGC symbols.
   `ConsanguineousEdge` (double line) connect partners.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
-  within the pedigree's quadrant-style tags.
+  within the pedigree's quadrant-style tags. Only the first four have a
+  fixed quarter; someone carrying a fifth or later quadrant tag gets equal
+  slices of just the quadrant tags they carry, so other people's symbols
+  never gain empty wedges. An affected person with any quadrant sector keeps
+  a black centre (the outline scaled by `AFFECTED_CORE_SCALE`, white rim),
+  otherwise four tagged quarters hide the affected fill. `symbols.tsx`
+  (`AffectedCore`) and `renderAffectedCoreSvg` draw it; keep them in step.
+  Black is last in `TAG_PALETTE` so a new tag never defaults to it.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
   symbol with a small triangle; quadrant tags are clipped to that triangle.
