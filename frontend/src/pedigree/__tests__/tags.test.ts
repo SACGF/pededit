@@ -167,6 +167,16 @@ describe("string SVG rendering", () => {
     expect(key.height).toBe(5 * 20);
   });
 
+  it("export key lists pregnancies and losses present, labelled as in the legend (#13)", () => {
+    const p = makePedigree([tremor]);
+    p.individuals[0]!.lifeStatus = "miscarriage";
+    p.individuals[1]!.lifeStatus = "stillbirth";
+    const key = renderExportKeySvg(p, 0, 0);
+    const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
+    expect(labels).toEqual(["Miscarriage", "Stillbirth (SB)"]);
+    expect(key.markup[0]).toContain("<polygon");
+  });
+
   it("export key is empty with no status and no tags", () => {
     expect(renderExportKeySvg(makePedigree([tremor]), 0, 0).markup).toEqual([]);
   });

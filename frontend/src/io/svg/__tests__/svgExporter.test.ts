@@ -165,9 +165,11 @@ describe("exportSvg — overlays", () => {
 describe("exportSvg, pregnancy and pregnancy loss", () => {
   const half = NODE_SIZE / 2;
   const TRIANGLE = `points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
+  // The symbol only: the export key, which now lists pregnancies and losses
+  // too, is a separate <g class="pedigree-key"> at the end.
   const one = (ind: Partial<Pedigree["individuals"][number]>) => exportSvg(makePedigree({
     individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, ...ind }],
-  }));
+  })).replace(/<g class="pedigree-key"[^]*$/, "");
 
   it("pregnancy → sex symbol with a P inside", () => {
     const svg = one({ sex: "male", lifeStatus: "pregnancy" });

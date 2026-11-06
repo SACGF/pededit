@@ -1,5 +1,6 @@
 import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "./consanguinity";
+import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -415,6 +416,25 @@ function renderStatusSwatchSvg(status: KeyStatus, sex: Individual["sex"], withCo
   return `${geom} fill="white" ${stroke}/><line x1="${x - o}" y1="${y - o}" x2="${x + s + o}" y2="${y + s + o}" stroke="black" stroke-width="1.5"/>`;
 }
 
+/** Key swatch for a pregnancy or loss, drawn like the symbol (NSGC). */
+function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>, sex: Individual["sex"], x: number, y: number): string {
+  const s = LEGEND_SWATCH;
+  const stroke = `stroke="black" stroke-width="1.5"`;
+  if (usesLossTriangle(status)) {
+    const tri = `<polygon points="${lossTrianglePoints(s, x, y)}" fill="white" ${stroke}/>`;
+    if (status !== "termination") return tri;
+    const e = lossSlashEnds(s, x, y);
+    return tri + `<line x1="${fmt(e.x1)}" y1="${fmt(e.y1)}" x2="${fmt(e.x2)}" y2="${fmt(e.y2)}" ${stroke}/>`;
+  }
+  const geom = swatchGeom(sex, x, y, s);
+  if (status === "pregnancy") {
+    return `${geom} fill="white" ${stroke}/><text x="${fmt(x + s / 2)}" y="${fmt(y + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>`;
+  }
+  // Stillbirth: the symbol with a slash, as for deceased.
+  const o = 3;
+  return `${geom} fill="white" ${stroke}/><line x1="${x - o}" y1="${y - o}" x2="${x + s + o}" y2="${y + s + o}" ${stroke}/>`;
+}
+
 /**
  * The full export key: Affected, Carrier and Deceased rows when anyone in the
  * pedigree has that status, then one row per tag in use. Same contract as
@@ -441,6 +461,13 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
   const deceased = inds.find(i => i.deceased);
   if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
+  // Pregnancies and losses, in the in-app legend's order and wording.
+  for (const o of LIFE_STATUS_OPTIONS) {
+    const ind = inds.find(i => i.lifeStatus === o.value);
+    if (!ind) continue;
+    const label = o.value === "stillbirth" ? "Stillbirth (SB)" : o.value === "ectopic" ? "Ectopic pregnancy (ECT)" : o.label;
+    rows.push({ label, swatch: sy => renderLifeStatusSwatchSvg(o.value, ind.sex, x, sy) });
+  }
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(pedigree);
   if (pedigree.partnerships.some(p => related(p.individual1, p.individual2))) {
