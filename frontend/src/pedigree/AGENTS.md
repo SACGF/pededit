@@ -6,9 +6,16 @@ draws NSGC symbols.
 - `layoutToFlow.ts` — the bridge from `alignPedigree()` output to React Flow.
   Produces `pedigreeSymbol` nodes, `coupleEdge` / `consanguineousEdge` edges
   between partners, and one `sibshipEdge` per partnership with children.
-  Applies `pinnedPositions` overrides. Marks duplicates (same person in two
-  slots) so both get a superscript. Read `claude/layout_engine_guide.md`
+  Applies `pinnedPositions` overrides. Read `claude/layout_engine_guide.md`
   first; the three rendering rules there are implemented here.
+- Someone kinship2 places in several slots (cousin marriages, partners on
+  both sides of the tree) is drawn once per slot that carries a line, each
+  copy numbered, joined by a dashed `duplicateEdge` arc (R's `arcconnect`).
+  Copies with no line at all are left out. Never merge or move copies to
+  "tidy" them: an earlier version did, and drew 7 of the 13 historic and
+  classic examples wrong while the R oracle tests still passed. A pin is
+  stored per individual, so it moves only the copy laid out nearest to it.
+  `svgExporter` takes its positions from `layoutToFlow` so it matches.
 - `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40. The layout
   engine's `pedigreeToGeometry` and the SVG exporters use the same numbers;
   change them together.
@@ -37,7 +44,9 @@ draws NSGC symbols.
   `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits
   halfway to the highest child and every child gets its own drop, so a child
   pinned off its siblings' row is still reached. `CoupleEdge` and
-  `ConsanguineousEdge` (double line) connect partners.
+  `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
+  the dashed arc between copies; its path is `duplicateArcD` in
+  `couplePath.ts`, shared with the SVG exporter.
 - `snap.ts` — snap to grid. With snap on, `layoutToFlow` and `svgExporter`
   round every node to the grid, auto-placed ones included, so a dragged node
   can line up with them. Whole rows round together (couple lines stay flat)

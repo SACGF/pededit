@@ -153,7 +153,7 @@ for (let level = 0; level < result.n.length; level++) {
 }
 ```
 
-**Handling duplicate slots:** If the same `nid` value appears at two different slots (same or different levels), render both. Add a visual indicator that they are the same person — the standard convention is a small superscript number (e.g. `¹`) on both occurrences. Do NOT deduplicate: the position information is load-bearing for edge drawing.
+**Handling duplicate slots:** If the same `nid` value appears at two different slots (same or different levels), render both. Add a visual indicator that they are the same person — the standard convention is a small superscript number (e.g. `¹`) on both occurrences. Do NOT deduplicate: the position information is load-bearing for edge drawing. Join the copies with a dashed arc, as R's `plot.pedigree` does (`arcconnect`). A copy with no line at all (no `fam`, no spouse marker on either side) may be left out once another copy is drawn; kinship2 leaves these at the end of a founder row when someone has partners on both sides of a chain. `layoutToFlow` and the SVG exporter do both, and apply a pin only to the copy nearest it.
 
 ### Rule 2: Couple lines
 
@@ -227,10 +227,11 @@ for (let level = 1; level < result.n.length; level++) {
 
 `autohint` is a full port of the kinship2 routine. It runs the alignment once with no spouse hints, finds anyone drawn in more than one slot (someone with children by several partners), moves each such person to the edge of their sibship nearest their other copy, records a spouse hint saying which partner is drawn on the left and which family the marriage is anchored to, and re-runs the alignment level by level. The chain `F-M-F-M` (woman with two husbands, one of whom has another wife) therefore comes out as four slots with nobody duplicated, matching R. Twin handling is not ported because the data model has no twin relation yet.
 
-Three deliberate departures from R:
+Four deliberate departures from R:
 
 - Spouse hint rows and the parent-pair rows are oriented by the father/mother *role* each person holds in `findex`/`mindex`, not by sex, so couples where neither partner is male (both unknown, or same sex) are still drawn once.
 - `kindepth`'s alignment pass marks only the couple it just handled as done. R marks every couple involving the shifted person, so the second partner of someone who married into a lower generation stayed in the founder row and their children floated free.
+- Childless partnerships are laid out as couples. R only learns about a couple from a shared child, so a partner with no children landed in the founder row with no couple line. `LayoutInput.childlessCouples` carries them into kindepth's spouse alignment and the spouselist.
 - Isolated individuals (no partner, no children) are appended to the right of their generation *after* the QP pass. R drops them entirely; appending them before the QP would make the top row the widest and leave no room to centre parents over children.
 
 ---

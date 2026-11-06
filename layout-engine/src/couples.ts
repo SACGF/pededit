@@ -29,6 +29,8 @@ export function buildPartnerSet(input: LayoutInput): PartnerSet {
     const d = input.findex[i]!, m = input.mindex[i]!;
     if (d > 0 && m > 0) set.add(pairKey(d, m));
   }
+  const cc = input.childlessCouples;
+  if (cc) for (let k = 0; k + 1 < cc.length; k += 2) set.add(pairKey(cc[k]!, cc[k + 1]!));
   return set;
 }
 

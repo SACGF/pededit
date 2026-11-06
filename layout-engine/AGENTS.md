@@ -38,6 +38,11 @@ indexing convention inherited from R, and the three rendering rules.
 - Spouse copies appear as `index + 0.5` in `nid`. A person can appear in two
   slots when they have children with two partners.
 - Keep the algorithm deterministic. Tests compare exact positions.
+- Childless partnerships are a departure from R: kinship2 only learns about a
+  couple from a child's findex/mindex, so `pedigreeToLayoutInput` puts them in
+  `LayoutInput.childlessCouples`, and kindepth's spouse alignment, the
+  spouselist and `buildPartnerSet` read them from there. PED input never has
+  any, so the oracle comparisons are unaffected.
 
 ## Testing
 

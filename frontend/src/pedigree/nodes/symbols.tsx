@@ -308,7 +308,7 @@ export function ProbandArrow({ size }: { size: number }) {
   );
 }
 
-export function DuplicateSuperscript({ index }: { index: 1 | 2 }) {
+export function DuplicateSuperscript({ index }: { index: number }) {
   return (
     <span
       style={{

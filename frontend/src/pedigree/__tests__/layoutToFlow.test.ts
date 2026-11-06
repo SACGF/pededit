@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { layoutToFlow } from "../layoutToFlow";
+import { lintFlow } from "../renderLint";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../fixtures/consanguineous";
 import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR, COUPLE_HOP } from "../constants";
@@ -298,13 +299,118 @@ describe("layoutToFlow — edge cases", () => {
     expect(sibshipEdges).toHaveLength(0);
   });
 
-  it.todo(
-    // TODO Phase 6: autohint stub does not yet produce duplicate slots for multi-partner individuals.
-    // When full autohint is implemented, an individual with two partnerships should appear in two
-    // adjacent slots (one per partner). buildNodes must mark both with isDuplicate=true and
-    // assign duplicateIndex 1 and 2 respectively. Re-enable this test in Phase 6.
-    "isDuplicate detection: individual in two slots gets isDuplicate=true on both",
-  );
+});
+
+// ── Someone drawn more than once ──────────────────────────────────────────────
+
+describe("layoutToFlow: duplicated individuals", () => {
+  const ind = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+  const so = { mode: "insertion" as const, affectedFirst: false };
+
+  // Double first cousins: a1 is a child of A1 = A2 and the partner of b2,
+  // while his sister a2 marries b2's sister b1. kinship2 draws a1 twice.
+  const dfc: Pedigree = {
+    individuals: [ind("A1", "male"), ind("A2", "female"), ind("B1", "male"), ind("B2", "female"),
+                  ind("a1", "male"), ind("a2", "female"), ind("b1", "male"), ind("b2", "female"),
+                  ind("Y", "female"), ind("X", "male")],
+    partnerships: [
+      { id: "pA", individual1: "A1", individual2: "A2" },
+      { id: "pB", individual1: "B1", individual2: "B2" },
+      { id: "p1", individual1: "b1", individual2: "a2" },
+      { id: "p2", individual1: "a1", individual2: "b2" },
+    ],
+    parentOf: { pA: ["a1", "a2"], pB: ["b1", "b2"], p1: ["Y"], p2: ["X"] },
+    siblingOrder: so,
+  };
+
+  it("draws every copy that carries a line, numbered in reading order", () => {
+    const { nodes } = layoutToFlow(dfc);
+    const a1 = nodes.filter(n => n.data.individual.id === "a1");
+    expect(a1).toHaveLength(2);
+    expect(a1.map(n => n.data.isDuplicate)).toEqual([true, true]);
+    expect(a1.map(n => n.data.duplicateIndex)).toEqual([1, 2]);
+  });
+
+  it("joins the copies with one dashed duplicate edge", () => {
+    const { nodes, duplicateEdges } = layoutToFlow(dfc);
+    const a1 = nodes.filter(n => n.data.individual.id === "a1").map(n => n.id);
+    expect(duplicateEdges).toHaveLength(1);
+    expect([duplicateEdges[0]!.source, duplicateEdges[0]!.target]).toEqual(a1);
+    expect(duplicateEdges[0]!.type).toBe("duplicateEdge");
+  });
+
+  it("the child copy hangs from its parents and the other copy has the couple line", () => {
+    const { nodes, coupleEdges, sibshipEdges } = layoutToFlow(dfc);
+    const idOf = (id: string) => nodes.find(n => n.id === id)!.data.individual.id;
+    const [first, second] = nodes.filter(n => n.data.individual.id === "a1").map(n => n.id);
+    const pA = sibshipEdges.find(e => idOf(e.data!.leftParentId) === "A1")!;
+    expect(pA.data!.childIds).toContain(first);
+    expect(coupleEdges.some(e => e.source === second || e.target === second)).toBe(true);
+  });
+
+  it("a pin moves only the copy laid out nearest to it", () => {
+    const auto = layoutToFlow(dfc).nodes.filter(n => n.data.individual.id === "a1");
+    const pin = { x: auto[1]!.position.x + 10, y: auto[1]!.position.y + 5 };
+    const { nodes } = layoutToFlow({ ...dfc, pinnedPositions: { a1: pin } });
+    const a1 = nodes.filter(n => n.data.individual.id === "a1");
+    expect(a1[0]!.position).toEqual(auto[0]!.position);
+    expect(a1[0]!.data.isPinned).toBe(false);
+    expect(a1[1]!.position).toEqual(pin);
+    expect(a1[1]!.data.isPinned).toBe(true);
+  });
+
+  it("leaves out a copy with no line at all", () => {
+    // Quadruple half first cousins: A-B, C-D, A-D, C-B. kinship2 leaves a
+    // spare copy of D at the end of the founder row with nothing attached.
+    const q: Pedigree = {
+      individuals: [ind("A", "male"), ind("B", "female"), ind("C", "male"), ind("D", "female"),
+                    ind("F1", "male"), ind("M1", "female"), ind("F2", "male"), ind("M2", "female"),
+                    ind("X", "male"), ind("Y", "female")],
+      partnerships: [
+        { id: "ab", individual1: "A", individual2: "B" },
+        { id: "cd", individual1: "C", individual2: "D" },
+        { id: "ad", individual1: "A", individual2: "D" },
+        { id: "cb", individual1: "C", individual2: "B" },
+        { id: "x", individual1: "F1", individual2: "M1" },
+        { id: "y", individual1: "F2", individual2: "M2" },
+      ],
+      parentOf: { ab: ["F1"], cd: ["M1"], ad: ["F2"], cb: ["M2"], x: ["X"], y: ["Y"] },
+      siblingOrder: so,
+    };
+    const { nodes, coupleEdges } = layoutToFlow(q);
+    const count = (id: string) => nodes.filter(n => n.data.individual.id === id).length;
+    expect(count("D")).toBe(2);
+    const ids = new Set(nodes.map(n => n.id));
+    for (const e of coupleEdges) {
+      expect(ids.has(e.source) && ids.has(e.target)).toBe(true);
+    }
+  });
+
+  it("man with three wives where two remarry: every marriage and child is drawn", () => {
+    const ped: Pedigree = {
+      individuals: [ind("m", "male"), ind("w1", "female"), ind("w2", "female"), ind("w3", "female"),
+                    ind("h2", "male"), ind("h3", "male"),
+                    ind("c1", "male"), ind("c2", "female"), ind("c3", "male"), ind("d2", "female"), ind("d3", "male")],
+      partnerships: [
+        { id: "p1", individual1: "m", individual2: "w1" },
+        { id: "p2", individual1: "m", individual2: "w2" },
+        { id: "p3", individual1: "m", individual2: "w3" },
+        { id: "q2", individual1: "h2", individual2: "w2" },
+        { id: "q3", individual1: "h3", individual2: "w3" },
+      ],
+      parentOf: { p1: ["c1"], p2: ["c2"], p3: ["c3"], q2: ["d2"], q3: ["d3"] },
+      siblingOrder: so,
+    };
+    const flow = layoutToFlow(ped);
+    const ids = new Set(flow.nodes.map(n => n.id));
+    const idOf = (id: string) => flow.nodes.find(n => n.id === id)!.data.individual.id;
+    for (const e of flow.coupleEdges) expect(ids.has(e.source) && ids.has(e.target)).toBe(true);
+    const pairs = new Set(flow.coupleEdges.map(e => [idOf(e.source), idOf(e.target)].sort().join("=")));
+    expect([...pairs].sort()).toEqual(["h2=w2", "h3=w3", "m=w1", "m=w2", "m=w3"]);
+    const kids = new Set(flow.sibshipEdges.flatMap(e => e.data!.childIds.map(idOf)));
+    expect([...kids].sort()).toEqual(["c1", "c2", "c3", "d2", "d3"]);
+    expect(lintFlow(ped, flow)).toEqual([]);
+  });
 });
 
 // ── Someone with three partners ───────────────────────────────────────────────
@@ -342,6 +448,40 @@ describe("layoutToFlow — man with three wives", () => {
   it("never draws a couple edge between two wives", () => {
     for (const e of coupleEdges) {
       expect([idOf(e.source), idOf(e.target)]).toContain("m");
+    }
+  });
+
+  it("line style comes from the real partners, not the slots a hop passes over", () => {
+    // Flag the far marriage only: its hopping line is double, the near ones single.
+    const flagged: Pedigree = {
+      ...ped,
+      partnerships: ped.partnerships.map(p => p.id === "p3" ? { ...p, consanguineous: true } : p),
+    };
+    const flow = layoutToFlow(flagged);
+    const idOfF = (nodeId: string) => flow.nodes.find(n => n.id === nodeId)!.data.individual.id;
+    const types = Object.fromEntries(flow.coupleEdges.map(e =>
+      [[idOfF(e.source), idOfF(e.target)].sort().join("-"), e.type]));
+    expect(types).toEqual({ "m-w1": "coupleEdge", "m-w2": "coupleEdge", "m-w3": "consanguineousEdge" });
+  });
+
+  it("with five wives, two hops from the man on one side rise at different x", () => {
+    const five: Pedigree = {
+      individuals: [ind("m", "male"), ...[1, 2, 3, 4, 5].map(i => ind(`w${i}`, "female")),
+                    ...[1, 2, 3, 4, 5].map(i => ind(`k${i}`, "male"))],
+      partnerships: [1, 2, 3, 4, 5].map(i => ({ id: `p${i}`, individual1: "m", individual2: `w${i}` })),
+      parentOf: Object.fromEntries([1, 2, 3, 4, 5].map(i => [`p${i}`, [`k${i}`]])),
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    const flow = layoutToFlow(five);
+    const man = flow.nodes.find(n => n.data.individual.id === "m")!.id;
+    // Hops that leave the man on the same side.
+    const right = flow.coupleEdges.filter(e => e.source === man && e.data!.hopHeight > 0);
+    const left  = flow.coupleEdges.filter(e => e.target === man && e.data!.hopHeight > 0);
+    const sides = [right, left].filter(s => s.length > 1);
+    expect(sides.length).toBeGreaterThan(0);
+    for (const side of sides) {
+      const insets = side.map(e => e.data!.hopInset);
+      expect(new Set(insets).size).toBe(insets.length);
     }
   });
 
