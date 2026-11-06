@@ -1,5 +1,9 @@
 import type { PedRow, ValidationIssue } from "./types.js";
 import { ValidationIssueCode } from "./types.js";
+import { recogniseSex } from "./converter.js";
+
+/** PED affection codes; "NA" is how R writes missing. */
+const PHENO_CODES = new Set(["0", "1", "2", "-9", "NA"]);
 
 export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
@@ -24,7 +28,7 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
 
   // Check sex codes
   for (const row of rows) {
-    if (!["0", "1", "2"].includes(row.sex)) {
+    if (recogniseSex(row.sex) === null) {
       issues.push({
         severity: "warning",
         code: ValidationIssueCode.UNKNOWN_SEX_CODE,
@@ -37,7 +41,7 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
 
   // Check pheno codes
   for (const row of rows) {
-    if (!["0", "1", "2", "-9"].includes(row.affection)) {
+    if (!PHENO_CODES.has(row.affection)) {
       issues.push({
         severity: "warning",
         code: ValidationIssueCode.UNKNOWN_PHENO_CODE,
@@ -62,6 +66,30 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
         lineNumbers: [row.lineNumber],
       });
     }
+  }
+
+  // One ID used as a father and as a mother (in one row or across rows) would
+  // become a partnership of that person with themselves.
+  const fathers = new Map<string, PedRow>();
+  const mothers = new Map<string, PedRow>();
+  for (const row of rows) {
+    if (row.fatherId !== "0" && !fathers.has(`${row.familyId}:${row.fatherId}`)) fathers.set(`${row.familyId}:${row.fatherId}`, row);
+    if (row.motherId !== "0" && !mothers.has(`${row.familyId}:${row.motherId}`)) mothers.set(`${row.familyId}:${row.motherId}`, row);
+  }
+  for (const [key, asFather] of fathers) {
+    const asMother = mothers.get(key);
+    if (!asMother) continue;
+    const parentId = key.slice(key.indexOf(":") + 1);
+    const where = asFather === asMother
+      ? `as both father and mother of '${asFather.individualId}'`
+      : `as father of '${asFather.individualId}' and as mother of '${asMother.individualId}'`;
+    issues.push({
+      severity: "error",
+      code: ValidationIssueCode.PARENT_BOTH_SEXES,
+      message: `'${parentId}' is listed ${where}; one person cannot be both parents`,
+      affectedIds: [key],
+      lineNumbers: [...new Set([asFather.lineNumber, asMother.lineNumber])],
+    });
   }
 
   // Zero IID warning
@@ -125,11 +153,11 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
   for (const row of rows) {
     if (row.fatherId !== "0") {
       const fatherRow = rowIndex.get(`${row.familyId}:${row.fatherId}`);
-      if (fatherRow && fatherRow.sex === "2") {
+      if (fatherRow && recogniseSex(fatherRow.sex) === "female") {
         issues.push({
           severity: "warning",
           code: ValidationIssueCode.SEX_MISMATCH,
-          message: `Individual '${row.individualId}': PAT '${row.fatherId}' has SEX=2 (female)`,
+          message: `Individual '${row.individualId}': PAT '${row.fatherId}' has SEX='${fatherRow.sex}' (female)`,
           affectedIds: [`${row.familyId}:${row.fatherId}`],
           lineNumbers: [row.lineNumber],
         });
@@ -137,11 +165,11 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
     }
     if (row.motherId !== "0") {
       const motherRow = rowIndex.get(`${row.familyId}:${row.motherId}`);
-      if (motherRow && motherRow.sex === "1") {
+      if (motherRow && recogniseSex(motherRow.sex) === "male") {
         issues.push({
           severity: "warning",
           code: ValidationIssueCode.SEX_MISMATCH,
-          message: `Individual '${row.individualId}': MAT '${row.motherId}' has SEX=1 (male)`,
+          message: `Individual '${row.individualId}': MAT '${row.motherId}' has SEX='${motherRow.sex}' (male)`,
           affectedIds: [`${row.familyId}:${row.motherId}`],
           lineNumbers: [row.lineNumber],
         });

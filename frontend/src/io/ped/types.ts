@@ -29,6 +29,8 @@ export enum ValidationIssueCode {
   DUPLICATE_INDIVIDUAL    = "DUPLICATE_INDIVIDUAL",
   SELF_AS_PARENT          = "SELF_AS_PARENT",
   CIRCULAR_ANCESTRY       = "CIRCULAR_ANCESTRY",
+  COLUMN_COUNT_MISMATCH   = "COLUMN_COUNT_MISMATCH", // row splits into a different number of cells than the header
+  PARENT_BOTH_SEXES       = "PARENT_BOTH_SEXES",     // one ID used as a father and as a mother
 
   // Warnings (allow import with notice)
   PHANTOM_PARENT          = "PHANTOM_PARENT",
@@ -42,6 +44,7 @@ export enum ValidationIssueCode {
   MULTIPLE_FAMILIES       = "MULTIPLE_FAMILIES",
   EXTRA_COLUMNS_IGNORED   = "EXTRA_COLUMNS_IGNORED",
   CONSANGUINITY_DETECTED  = "CONSANGUINITY_DETECTED",
+  AFFECTION_RECODED       = "AFFECTION_RECODED",     // kinship2 0/1 affected read as PED 1/2
 }
 
 /** Result of parse+validate+convert pipeline. */

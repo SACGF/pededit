@@ -246,3 +246,86 @@ describe("parsePed: id fid mid sex dialect", () => {
     expect(issues.some(i => i.code === ValidationIssueCode.EXTRA_COLUMNS_IGNORED)).toBe(true);
   });
 });
+
+describe("parsePed: issue #31 rework", () => {
+  it("reads NA parents as missing (pedtools and kinship2 write NA)", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\n1\tNA\tNA\t1\n2\tNA\tNA\t2\n3\t1\t2\t1\n");
+    expect(issues).toHaveLength(0);
+    expect(rows.map(r => [r.fatherId, r.motherId])).toEqual([["0", "0"], ["0", "0"], ["1", "2"]]);
+  });
+
+  it("reads an empty parent cell in a tab-separated file as missing", () => {
+    const { rows } = parsePed("id\tfid\tmid\tsex\n1\t\t\t1\n");
+    expect(rows[0]).toMatchObject({ fatherId: "0", motherId: "0" });
+  });
+
+  it("keeps other tokens as real parent IDs", () => {
+    const { rows } = parsePed("id fid mid sex\n3 na - 1\n");
+    expect(rows[0]).toMatchObject({ fatherId: "na", motherId: "-" });
+  });
+
+  it("errors on a space-separated header with tab-separated rows containing spaces", () => {
+    const text = "id fid mid sex\nAlice Able\t0\t0\t2\nBob Baker\t0\t0\t1\nCarol B\tBob Baker\tAlice Able\t2\n";
+    const { rows, issues } = parsePed(text);
+    expect(rows).toHaveLength(0);
+    const errs = issues.filter(i => i.code === ValidationIssueCode.COLUMN_COUNT_MISMATCH);
+    expect(errs).toHaveLength(3);
+    expect(errs.every(e => e.severity === "error")).toBe(true);
+    expect(errs[0]!.message).toMatch(/Line 2: splits into 5 columns but the header has 4/);
+  });
+
+  it("errors on a row with more cells than the header", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\n1\t0\t0\t1\n2\t0\t0\t2\tx\n");
+    expect(rows.map(r => r.individualId)).toEqual(["1"]);
+    expect(issues.find(i => i.code === ValidationIssueCode.COLUMN_COUNT_MISMATCH)?.lineNumbers).toEqual([3]);
+  });
+
+  it("explains a row without tabs in a tab-separated file", () => {
+    const { issues } = parsePed("id\tfid\tmid\tsex\n1 0 0 1\n");
+    expect(issues[0]!.message).toContain("tab-separated but this row has no tabs");
+  });
+
+  it("still accepts mixed tabs and spaces between columns when every row splits evenly", () => {
+    const { rows, issues } = parsePed("1 1 0 0 1 1\n1\t2\t0\t0\t2\t1\n1   3   1   2   1   2\n");
+    expect(rows).toHaveLength(3);
+    expect(issues).toHaveLength(0);
+  });
+
+  it("errors on a headerless PLINK row with a different number of genotype cells", () => {
+    const { issues } = parsePed("1 1 0 0 1 1 A B\n1 2 0 0 2 1 C\n");
+    expect(issues.find(i => i.code === ValidationIssueCode.COLUMN_COUNT_MISMATCH)?.lineNumbers).toEqual([2]);
+  });
+
+  it("allows genotype columns after a PLINK header", () => {
+    const { rows, issues } = parsePed("#FID IID PAT MAT SEX PHENO\n1 1 0 0 1 1 A B\n1 2 0 0 2 1 C D\n");
+    expect(rows).toHaveLength(2);
+    expect(issues.every(i => i.severity !== "error")).toBe(true);
+  });
+
+  it("accepts kinship2 column names (dadid, momid) and father/mother", () => {
+    for (const header of ["id dadid momid sex", "id father mother sex", "ID DADID MOMID SEX"]) {
+      const { rows, issues } = parsePed(`${header}\n1 0 0 1\n2 0 0 2\n3 1 2 1\n`);
+      expect(issues, header).toHaveLength(0);
+      expect(rows[2], header).toMatchObject({ individualId: "3", fatherId: "1", motherId: "2" });
+    }
+  });
+
+  it("recodes kinship2 affected (0/1/NA) only when the header uses kinship2 names", () => {
+    const k2 = parsePed("id dadid momid sex affected\n1 0 0 1 0\n2 0 0 2 1\n3 1 2 1 NA\n");
+    expect(k2.rows.map(r => r.affection)).toEqual(["1", "2", "0"]);
+    expect(k2.issues.map(i => i.code)).toEqual([ValidationIssueCode.AFFECTION_RECODED]);
+
+    // Already PED-coded (has a 2): left alone.
+    const ped = parsePed("id dadid momid sex affected\n1 0 0 1 1\n2 0 0 2 2\n");
+    expect(ped.rows.map(r => r.affection)).toEqual(["1", "2"]);
+
+    // pedtools-style names: PED coding.
+    const pt = parsePed("id fid mid sex affected\n1 0 0 1 1\n2 0 0 2 0\n");
+    expect(pt.rows.map(r => r.affection)).toEqual(["1", "0"]);
+  });
+
+  it("does not read a single 5-column row as famid id fid mid sex", () => {
+    const { rows } = parsePed("X 1 0 0 1\n");
+    expect(rows[0]).toMatchObject({ familyId: "1", individualId: "X", fatherId: "1", motherId: "0", sex: "0", affection: "1" });
+  });
+});

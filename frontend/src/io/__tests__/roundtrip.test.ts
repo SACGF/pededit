@@ -207,10 +207,11 @@ describe("roundtrip: edge_cases/", () => {
     expect(result.hasErrors).toBe(false);
   });
 
-  it("non_numeric_sex.ped: imports with UNKNOWN_SEX_CODE warnings", () => {
+  it("non_numeric_sex.ped: M/F/U read as male/female/unknown without warnings", () => {
     const result = importPed(readPed("edge_cases/non_numeric_sex.ped"));
     expect(result.hasErrors).toBe(false);
-    expect(result.issues.some(i => i.code === ValidationIssueCode.UNKNOWN_SEX_CODE)).toBe(true);
+    expect(result.issues.some(i => i.code === ValidationIssueCode.UNKNOWN_SEX_CODE)).toBe(false);
+    expect(result.pedigrees[0]!.pedigree.individuals.map(i => i.sex)).toEqual(["male", "female", "male", "unknown"]);
   });
 
   it("leading_trailing_spaces.ped: imports cleanly", () => {
@@ -228,6 +229,30 @@ describe("roundtrip: variants/", () => {
   function affectedIds(result: ReturnType<typeof importPed>): string[] {
     return result.pedigrees.flatMap(f => f.pedigree.individuals.filter(i => i.affected).map(i => i.id));
   }
+
+  it("na_parents_tab.ped: NA parents are missing, no NA individual or NA = NA couple", () => {
+    const result = importPed(readPed("variants/na_parents_tab.ped"));
+    expect(result.hasErrors).toBe(false);
+    const ped = result.pedigrees[0]!.pedigree;
+    expect(ped.individuals.some(i => i.id === "NA")).toBe(false);
+    // 1, 2, 3, 4 plus the phantom mother of 4 (father 1 only)
+    expect(ped.individuals.filter(i => !i.id.startsWith("__phantom_")).map(i => i.id)).toEqual(["1", "2", "3", "4"]);
+    expect(ped.partnerships.some(p => p.individual1 === p.individual2)).toBe(false);
+    const couple = ped.partnerships.find(p => p.individual1 === "1" && p.individual2 === "2")!;
+    expect(ped.parentOf[couple.id]).toEqual(["3"]);
+    expect(couple.consanguineous).toBeUndefined();
+    expect(result.issues.filter(i => i.severity === "warning").map(i => i.code)).toEqual([ValidationIssueCode.SINGLE_PARENT]);
+  });
+
+  it("kinship2_names.ped: id dadid momid sex affected, kinship2 0/1 affection coding", () => {
+    const result = importPed(readPed("variants/kinship2_names.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues.filter(i => i.severity !== "info")).toHaveLength(0);
+    expect(result.issues.some(i => i.code === ValidationIssueCode.AFFECTION_RECODED)).toBe(true);
+    expect(ids(result)).toEqual(["1", "2", "3", "4", "5"]);
+    expect(affectedIds(result)).toEqual(["2", "3"]);
+    expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(1);
+  });
 
   it("four_col_header_tab.ped: 7 individuals, one family, nobody affected", () => {
     const result = importPed(readPed("variants/four_col_header_tab.ped"));
@@ -382,5 +407,29 @@ describe("roundtrip: malformed/", () => {
     const result = importPed(readPed("malformed/duplicate_iid.ped"));
     expect(result.hasErrors).toBe(true);
     expect(result.issues.some(i => i.code === ValidationIssueCode.DUPLICATE_INDIVIDUAL)).toBe(true);
+  });
+
+  it("mixed_delimiters.ped (space header, tab rows with spaces in IDs) → COLUMN_COUNT_MISMATCH, nothing imported", () => {
+    const result = importPed(readPed("malformed/mixed_delimiters.ped"));
+    expect(result.hasErrors).toBe(true);
+    expect(result.pedigrees).toHaveLength(0);
+    const errs = result.issues.filter(i => i.code === ValidationIssueCode.COLUMN_COUNT_MISMATCH);
+    expect(errs.map(e => e.lineNumbers![0])).toEqual([2, 3, 4]);
+    expect(errs[0]!.message).toContain("contains tabs but the header is separated by spaces");
+  });
+
+  it("spaces_in_ids_no_tabs.ped → COLUMN_COUNT_MISMATCH, nothing imported", () => {
+    const result = importPed(readPed("malformed/spaces_in_ids_no_tabs.ped"));
+    expect(result.hasErrors).toBe(true);
+    expect(result.pedigrees).toHaveLength(0);
+    const errs = result.issues.filter(i => i.code === ValidationIssueCode.COLUMN_COUNT_MISMATCH);
+    expect(errs).toHaveLength(3);
+    expect(errs[0]!.message).toContain("IDs cannot contain spaces");
+  });
+
+  it("parent_both_sexes.ped → hasErrors: true, PARENT_BOTH_SEXES", () => {
+    const result = importPed(readPed("malformed/parent_both_sexes.ped"));
+    expect(result.hasErrors).toBe(true);
+    expect(result.issues.some(i => i.code === ValidationIssueCode.PARENT_BOTH_SEXES)).toBe(true);
   });
 });

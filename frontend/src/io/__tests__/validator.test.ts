@@ -135,10 +135,20 @@ describe("validatePedRows", () => {
     expect(issues.some(i => i.code === ValidationIssueCode.SEX_MISMATCH)).toBe(true);
   });
 
-  it("emits UNKNOWN_SEX_CODE for 'M'", () => {
-    const rows = [makeRow({ individualId: "1", sex: "M" })];
-    const issues = validatePedRows(rows);
-    expect(issues.some(i => i.code === ValidationIssueCode.UNKNOWN_SEX_CODE)).toBe(true);
+  it("accepts the sex codes the converter understands (M, F, male, female, U)", () => {
+    for (const sex of ["M", "F", "m", "f", "male", "Female", "U", "unknown"]) {
+      const issues = validatePedRows([makeRow({ individualId: "1", sex })]);
+      expect(issues.filter(i => i.code === ValidationIssueCode.UNKNOWN_SEX_CODE), sex).toHaveLength(0);
+    }
+  });
+
+  it("emits SEX_MISMATCH for a letter-coded female father", () => {
+    const rows = [
+      makeRow({ individualId: "1", sex: "F" }),
+      makeRow({ individualId: "2", sex: "F" }),
+      makeRow({ individualId: "3", fatherId: "1", motherId: "2" }),
+    ];
+    expect(validatePedRows(rows).some(i => i.code === ValidationIssueCode.SEX_MISMATCH)).toBe(true);
   });
 
   it("emits UNKNOWN_SEX_CODE for '5'", () => {
@@ -214,5 +224,38 @@ describe("validatePedRows", () => {
     ];
     const issues = validatePedRows(rows);
     expect(issues.some(i => i.code === ValidationIssueCode.MULTIPLE_FAMILIES)).toBe(false);
+  });
+});
+
+describe("validatePedRows: one person as both parents", () => {
+  it("errors when the same ID is father and mother of one child", () => {
+    const rows = [
+      makeRow({ individualId: "1", sex: "1" }),
+      makeRow({ individualId: "2", fatherId: "1", motherId: "1", lineNumber: 2 }),
+    ];
+    const err = validatePedRows(rows).find(i => i.code === ValidationIssueCode.PARENT_BOTH_SEXES);
+    expect(err?.severity).toBe("error");
+    expect(err?.message).toContain("both father and mother of '2'");
+  });
+
+  it("errors when an ID is a father in one row and a mother in another", () => {
+    const rows = [
+      makeRow({ individualId: "1", sex: "1" }),
+      makeRow({ individualId: "2", sex: "2" }),
+      makeRow({ individualId: "3", sex: "2" }),
+      makeRow({ individualId: "4", fatherId: "1", motherId: "2", lineNumber: 4 }),
+      makeRow({ individualId: "5", fatherId: "3", motherId: "1", lineNumber: 5 }),
+    ];
+    const err = validatePedRows(rows).find(i => i.code === ValidationIssueCode.PARENT_BOTH_SEXES);
+    expect(err?.severity).toBe("error");
+    expect(err?.lineNumbers).toEqual([4, 5]);
+  });
+
+  it("does not confuse the same ID in different families", () => {
+    const rows = [
+      makeRow({ individualId: "c", fatherId: "x", motherId: "y" }),
+      { ...makeRow({ individualId: "c", fatherId: "z", motherId: "x" }), familyId: "2" },
+    ];
+    expect(validatePedRows(rows).some(i => i.code === ValidationIssueCode.PARENT_BOTH_SEXES)).toBe(false);
   });
 });
