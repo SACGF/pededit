@@ -470,6 +470,17 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         // Remove the individual
         draft.individuals = draft.individuals.filter(i => i.id !== individualId);
+
+        // Drop their pin and unlock entries, which would otherwise dangle
+        // (the JSON importer warns about them on every later load).
+        if (draft.pinnedPositions) {
+          delete draft.pinnedPositions[individualId];
+          if (Object.keys(draft.pinnedPositions).length === 0) delete draft.pinnedPositions;
+        }
+        if (draft.unlockedIndividuals) {
+          draft.unlockedIndividuals = draft.unlockedIndividuals.filter(id => id !== individualId);
+          if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
+        }
       });
     },
 
