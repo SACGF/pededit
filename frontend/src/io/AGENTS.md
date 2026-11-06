@@ -21,6 +21,12 @@ phenotype 1/2/0/-9.
 so newer files survive a round trip through an older editor. The format is
 documented in `docs/pedigree-json-format.md` and `docs/pedigree-json-schema.json`;
 update both when adding a field to `Individual`, `Partnership` or `Pedigree`.
+The schema is hand-written, not generated. `json/__tests__/schemaDrift.test.ts`
+parses `types.ts` with the TypeScript compiler API and fails when a property,
+its optionality or a string-literal enum differs from the schema, and
+`backend/api/tests.py` checks the Django validating serializers against the same
+schema. So a new field fails both test suites until types.ts, the schema and
+the serializer agree.
 Test corpus: `test-data/ped/` (simple, edge_cases, malformed, consanguineous,
 large). `large/kinship2_sample.ped` is the kinship2 reference family. Tests are
 in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
