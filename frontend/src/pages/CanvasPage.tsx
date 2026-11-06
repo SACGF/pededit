@@ -37,6 +37,9 @@ export default function CanvasPage() {
   const { isDirty, pedigree } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") === "true");
+  const [compact, setCompact] = useState(() => {
+    try { return localStorage.getItem("compactLayout") === "true"; } catch { return false; }
+  });
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
@@ -212,7 +215,7 @@ export default function CanvasPage() {
 
         <div className="flex flex-1 overflow-hidden">
           <div className="flex-1">
-            <PedigreeCanvas showMinimap={showMinimap} />
+            <PedigreeCanvas showMinimap={showMinimap} compact={compact} />
           </div>
 
           <div className="w-52 border-l bg-white shrink-0 overflow-y-auto">
@@ -226,6 +229,11 @@ export default function CanvasPage() {
         onClose={() => setSettingsOpen(false)}
         showMinimap={showMinimap}
         onToggleMinimap={v => { setShowMinimap(v); localStorage.setItem("showMinimap", String(v)); }}
+        compact={compact}
+        onToggleCompact={v => {
+          setCompact(v);
+          try { localStorage.setItem("compactLayout", String(v)); } catch { /* storage unavailable */ }
+        }}
       />
 
       <ImportPedDialog
@@ -247,6 +255,7 @@ export default function CanvasPage() {
           onOpenChange={setExportDialogOpen}
           pedigree={pedigree}
           title={activeTitle ?? "pedigree"}
+          defaultCompact={compact}
         />
       )}
 

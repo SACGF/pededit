@@ -21,6 +21,7 @@ import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
+import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 
 const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
 
@@ -151,18 +152,20 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
 
 interface PedigreeCanvasProps {
   showMinimap?: boolean;
+  /** Tighter row and slot spacing so larger pedigrees fit on screen. */
+  compact?: boolean;
 }
 
-export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
+export function PedigreeCanvas({ showMinimap = false, compact = false }: PedigreeCanvasProps) {
   const { pedigree, setSelectedId, pinIndividual, resetLayout } = usePedigreeStore();
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
 
   const { nodes: computedNodes, coupleEdges, sibshipEdges } = useMemo(
     () => pedigree.individuals.length > 0
-      ? layoutToFlow(pedigree)
+      ? layoutToFlow(pedigree, { compact })
       : { nodes: [], coupleEdges: [], sibshipEdges: [] },
-    [pedigree],
+    [pedigree, compact],
   );
 
   // Local node state so React Flow can track positions during drag.
@@ -188,9 +191,13 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
 
   const handleNodeDragStop: OnNodeDrag<Node<RFNodeData>> = useCallback(
     (_event, node) => {
-      pinIndividual(node.data.individual.id, node.position);
+      // Pins are stored at normal spacing; map the dragged position back.
+      pinIndividual(
+        node.data.individual.id,
+        unscalePinnedPosition(node.position, layoutSpacing(compact)),
+      );
     },
-    [pinIndividual],
+    [pinIndividual, compact],
   );
 
   return (

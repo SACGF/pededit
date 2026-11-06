@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf } from "../io/svg/index";
@@ -9,6 +9,8 @@ interface ExportDialogProps {
   onOpenChange: (open: boolean) => void;
   pedigree: Pedigree;
   title: string;
+  /** Initial state of the compact toggle, normally the canvas setting. */
+  defaultCompact?: boolean;
 }
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -20,7 +22,7 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDialogProps) {
+export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompact = false }: ExportDialogProps) {
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
@@ -29,6 +31,12 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
   const [busy, setBusy]             = useState(false);
 
   const [uPartners, setUPartners]   = useState(true);
+  const [compact, setCompact]       = useState(defaultCompact);
+
+  // Follow the canvas setting each time the dialog opens.
+  useEffect(() => {
+    if (open) setCompact(defaultCompact);
+  }, [open, defaultCompact]);
 
   // The U shape is a descendant chart of one founder couple. With nobody to
   // descend from there is nothing to bend, so the option is switched off.
@@ -49,6 +57,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
         ageBuckets: deident && ageBuckets,
         title: deident ? undefined : title,
         uShapePartners: uPartners,
+        compact,
       });
 
       if (format === "svg") {
@@ -137,6 +146,20 @@ export function ExportDialog({ open, onOpenChange, pedigree, title }: ExportDial
               </label>
             )}
           </div>
+
+          {/* Compact spacing (standard layout only; the U shape has its own geometry) */}
+          {!useU && (
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={compact}
+                  onChange={e => setCompact(e.target.checked)}
+                />
+                <span className="font-medium">Compact layout (tighter spacing between generations)</span>
+              </label>
+            </div>
+          )}
 
           {/* U-shape layout */}
           <div className="space-y-1.5">

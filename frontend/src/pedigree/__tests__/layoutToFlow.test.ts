@@ -352,3 +352,68 @@ describe("layoutToFlow — man with three wives", () => {
     expect(sibshipEdges.filter(e => e.data!.hopHeight === 0)).toHaveLength(2);
   });
 });
+
+// ── compact mode ──────────────────────────────────────────────────────────────
+
+describe("layoutToFlow: compact option", () => {
+  const ROW_SCALE  = 0.7;
+  const SLOT_SCALE = 0.85;
+
+  it("default (no options) keeps the normal spacing", () => {
+    const { nodes } = layoutToFlow(simpleFamily);
+    const n20 = nodes.find((n) => n.id === "2-0")!;
+    const n21 = nodes.find((n) => n.id === "2-1")!;
+    expect(n21.position.x - n20.position.x).toBeCloseTo(SLOT_WIDTH);
+    expect(n20.position.y).toBeCloseTo(2 * ROW_HEIGHT);
+  });
+
+  it("compact=true places rows at 70% of ROW_HEIGHT", () => {
+    const { nodes } = layoutToFlow(simpleFamily, { compact: true });
+    for (const level of [0, 1, 2]) {
+      const node = nodes.find((n) => n.id === `${level}-0`)!;
+      expect(node.position.y).toBeCloseTo(level * ROW_HEIGHT * ROW_SCALE);
+    }
+  });
+
+  it("compact=true places slots at 85% of SLOT_WIDTH", () => {
+    const { nodes } = layoutToFlow(simpleFamily, { compact: true });
+    // gen-2 children sit at pos 0, 1, 2 (one slot apart).
+    const n20 = nodes.find((n) => n.id === "2-0")!;
+    const n21 = nodes.find((n) => n.id === "2-1")!;
+    const n22 = nodes.find((n) => n.id === "2-2")!;
+    expect(n21.position.x - n20.position.x).toBeCloseTo(SLOT_WIDTH * SLOT_SCALE);
+    expect(n22.position.x - n21.position.x).toBeCloseTo(SLOT_WIDTH * SLOT_SCALE);
+    // Every position is the normal position scaled by the same factors.
+    const normal = layoutToFlow(simpleFamily).nodes;
+    for (const node of nodes) {
+      const ref = normal.find((n) => n.id === node.id)!;
+      expect(node.position.x).toBeCloseTo(ref.position.x * SLOT_SCALE);
+      expect(node.position.y).toBeCloseTo(ref.position.y * ROW_SCALE);
+    }
+  });
+
+  it("compact=true derives sibship geometry from the compact positions", () => {
+    const { sibshipEdges } = layoutToFlow(simpleFamily, { compact: true });
+    const gen1 = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
+    const data = gen1.data!;
+    expect(data.coupleY).toBeCloseTo(0);
+    expect(data.childY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE);
+    expect(data.sibBarY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE * SIB_BAR_FACTOR);
+  });
+
+  it("compact=true scales pinned positions by the same factors", () => {
+    const pinned: Pedigree = {
+      ...simpleFamily,
+      pinnedPositions: { i6: { x: 300, y: 240 } },
+    };
+    const { nodes } = layoutToFlow(pinned, { compact: true });
+    const n6 = nodes.find((n) => n.data.individual.id === "i6")!;
+    expect(n6.data.isPinned).toBe(true);
+    expect(n6.position.x).toBeCloseTo(300 * SLOT_SCALE);
+    expect(n6.position.y).toBeCloseTo(240 * ROW_SCALE);
+
+    // Without compact the pin is used as stored.
+    const n6normal = layoutToFlow(pinned).nodes.find((n) => n.data.individual.id === "i6")!;
+    expect(n6normal.position).toEqual({ x: 300, y: 240 });
+  });
+});
