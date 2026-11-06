@@ -1,4 +1,17 @@
-import { COUPLE_HOP_INSET } from "./constants";
+import { COUPLE_HOP, COUPLE_HOP_STEP, COUPLE_HOP_INSET, COUPLE_HOP_INSET_STEP, COUPLE_HOP_INSET_MIN } from "./constants";
+
+/**
+ * Rise and inset of a couple line whose partners are `span` slots apart
+ * (1 = adjacent, no hop). Wider hops rise higher and turn up closer to the
+ * symbols (see COUPLE_HOP_INSET_STEP), so nested hops never share a riser.
+ */
+export function hopGeometry(span: number): { hopHeight: number; hopInset: number } {
+  if (span <= 1) return { hopHeight: 0, hopInset: COUPLE_HOP_INSET };
+  return {
+    hopHeight: COUPLE_HOP + (span - 2) * COUPLE_HOP_STEP,
+    hopInset:  Math.max(COUPLE_HOP_INSET_MIN, COUPLE_HOP_INSET - (span - 2) * COUPLE_HOP_INSET_STEP),
+  };
+}
 
 /**
  * SVG path for a couple line from the right edge of the left partner (x1, y1)

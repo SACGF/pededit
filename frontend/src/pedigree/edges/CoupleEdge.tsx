@@ -21,7 +21,7 @@ export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) 
   return (
     <g>
       <path
-        d={couplePathD(sx, sy, tx, ty, data?.hopHeight ?? 0)}
+        d={couplePathD(sx, sy, tx, ty, data?.hopHeight ?? 0, data?.hopInset)}
         stroke="black"
         strokeWidth={2}
         fill="none"

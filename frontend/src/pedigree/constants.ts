@@ -26,6 +26,18 @@ export const COUPLE_HOP_STEP = 10;
 export const COUPLE_HOP_INSET = 10;
 
 /**
+ * Inset (px) taken off for each additional slot a hop passes over, so two
+ * hops from the same person on the same side (five or more partners) rise at
+ * different x instead of sharing one riser. Wider hops turn up closer to the
+ * symbol: they rise higher, so they nest outside the narrower hop instead of
+ * crossing it, and stay clear of the sibship drop at the slot midpoint.
+ */
+export const COUPLE_HOP_INSET_STEP = 4;
+
+/** Smallest inset (px) a hop gets, however wide. */
+export const COUPLE_HOP_INSET_MIN = 3;
+
+/**
  * Rise of the dashed arc joining two copies of one person above the symbol
  * tops, as a fraction of the gap between a symbol top and the sibship bar
  * above its row. R's plot.pedigree rises half a row, into the bar; staying

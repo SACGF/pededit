@@ -451,6 +451,40 @@ describe("layoutToFlow — man with three wives", () => {
     }
   });
 
+  it("line style comes from the real partners, not the slots a hop passes over", () => {
+    // Flag the far marriage only: its hopping line is double, the near ones single.
+    const flagged: Pedigree = {
+      ...ped,
+      partnerships: ped.partnerships.map(p => p.id === "p3" ? { ...p, consanguineous: true } : p),
+    };
+    const flow = layoutToFlow(flagged);
+    const idOfF = (nodeId: string) => flow.nodes.find(n => n.id === nodeId)!.data.individual.id;
+    const types = Object.fromEntries(flow.coupleEdges.map(e =>
+      [[idOfF(e.source), idOfF(e.target)].sort().join("-"), e.type]));
+    expect(types).toEqual({ "m-w1": "coupleEdge", "m-w2": "coupleEdge", "m-w3": "consanguineousEdge" });
+  });
+
+  it("with five wives, two hops from the man on one side rise at different x", () => {
+    const five: Pedigree = {
+      individuals: [ind("m", "male"), ...[1, 2, 3, 4, 5].map(i => ind(`w${i}`, "female")),
+                    ...[1, 2, 3, 4, 5].map(i => ind(`k${i}`, "male"))],
+      partnerships: [1, 2, 3, 4, 5].map(i => ({ id: `p${i}`, individual1: "m", individual2: `w${i}` })),
+      parentOf: Object.fromEntries([1, 2, 3, 4, 5].map(i => [`p${i}`, [`k${i}`]])),
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    const flow = layoutToFlow(five);
+    const man = flow.nodes.find(n => n.data.individual.id === "m")!.id;
+    // Hops that leave the man on the same side.
+    const right = flow.coupleEdges.filter(e => e.source === man && e.data!.hopHeight > 0);
+    const left  = flow.coupleEdges.filter(e => e.target === man && e.data!.hopHeight > 0);
+    const sides = [right, left].filter(s => s.length > 1);
+    expect(sides.length).toBeGreaterThan(0);
+    for (const side of sides) {
+      const insets = side.map(e => e.data!.hopInset);
+      expect(new Set(insets).size).toBe(insets.length);
+    }
+  });
+
   it("the far wife's child drops from the raised line", () => {
     const raised = sibshipEdges.filter(e => e.data!.hopHeight > 0);
     expect(raised).toHaveLength(1);

@@ -1,8 +1,10 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP, DUPLICATE_ARC_BULGE } from "./constants";
+import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
+import { hopGeometry } from "./couplePath";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
+import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 
@@ -38,6 +40,8 @@ export interface RFNodeData extends Record<string, unknown> {
  */
 export interface CoupleEdgeData extends Record<string, unknown> {
   hopHeight: number;
+  /** Distance (px) from each symbol edge at which a hopping line turns up. */
+  hopInset: number;
 }
 
 /**
@@ -174,7 +178,7 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
 
   return {
     nodes,
-    coupleEdges:    buildCoupleEdges(result, partners),
+    coupleEdges:    buildCoupleEdges(pedigree, result, partners),
     sibshipEdges:   buildSibshipEdges(result, partners, slotPos),
     duplicateEdges: buildDuplicateEdges(nodes, spacing),
   };
@@ -186,9 +190,12 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
  * real partners.
  */
 function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
+  return hopAt(result, partners, level, slot).hopHeight;
+}
+
+function hopAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number) {
   const rc = resolveCouple(result, partners, level, slot);
-  if (!rc.hop) return 0;
-  return COUPLE_HOP + (rc.rightSlot - rc.leftSlot - 2) * COUPLE_HOP_STEP;
+  return hopGeometry(rc.hop ? rc.rightSlot - rc.leftSlot : 1);
 }
 
 // ── Nodes ─────────────────────────────────────────────────────────────────────
@@ -305,8 +312,10 @@ function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing):
 
 // ── Couple edges ──────────────────────────────────────────────────────────────
 
-function buildCoupleEdges(result: LayoutResult, partners: PartnerSet): Edge<CoupleEdgeData>[] {
+function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet): Edge<CoupleEdgeData>[] {
   const edges: Edge<CoupleEdgeData>[] = [];
+  const related = consanguinityTest(pedigree);
+  const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -324,8 +333,11 @@ function buildCoupleEdges(result: LayoutResult, partners: PartnerSet): Edge<Coup
         target:       `${level}-${rc.rightSlot}`,
         sourceHandle: "couple-out",  // right edge of left partner
         targetHandle: "couple-in",   // left edge of right partner
-        type:         sp === 1 ? "coupleEdge" : "consanguineousEdge",
-        data:         { hopHeight: hopHeightAt(result, partners, level, slot) },
+        // Line style from the real partners, not the slots the marker sits
+        // between (see consanguinityTest).
+        type:         related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))
+          ? "consanguineousEdge" : "coupleEdge",
+        data:         hopAt(result, partners, level, slot),
       });
     }
   }

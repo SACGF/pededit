@@ -20,7 +20,7 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
   const tx = targetNode.position.x - half;
   const ty = targetNode.position.y;
 
-  const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, data?.hopHeight ?? 0, GAP);
+  const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, data?.hopHeight ?? 0, GAP, data?.hopInset);
 
   return (
     <g>

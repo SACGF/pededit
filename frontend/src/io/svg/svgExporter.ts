@@ -1,9 +1,10 @@
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants";
-import { couplePathD, consanguineousPathsD, duplicateArcD } from "../../pedigree/couplePath";
+import { NODE_SIZE } from "../../pedigree/constants";
+import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
 import { sibshipSegments } from "../../pedigree/sibshipPath";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
+import { consanguinityTest } from "../../pedigree/consanguinity";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
@@ -127,14 +128,19 @@ function svgDefs(): string {
  * adjacent slots are partners, otherwise enough to clear the slots between the
  * real partners (someone with three or more partners).
  */
-function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
+function hopAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number) {
   const rc = resolveCouple(result, partners, level, slot);
-  if (!rc.hop) return 0;
-  return COUPLE_HOP + (rc.rightSlot - rc.leftSlot - 2) * COUPLE_HOP_STEP;
+  return hopGeometry(rc.hop ? rc.rightSlot - rc.leftSlot : 1);
 }
 
-function renderCoupleLines(result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
+function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
+  return hopAt(result, partners, level, slot).hopHeight;
+}
+
+function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
+  const related = consanguinityTest(pedigree);
+  const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const path = (d: string) => `<path d="${d}" stroke="black" stroke-width="${STROKE}" fill="none"/>`;
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -146,12 +152,12 @@ function renderCoupleLines(result: LayoutResult, partners: PartnerSet, slotPos: 
       const rc    = resolveCouple(result, partners, level, slot);
       const left  = slotPos.get(`${level}-${rc.leftSlot}`)!;
       const right = slotPos.get(`${level}-${rc.rightSlot}`)!;
-      const hop   = hopHeightAt(result, partners, level, slot);
+      const { hopHeight: hop, hopInset } = hopAt(result, partners, level, slot);
 
-      if (sp === 1) {
-        lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop)));
+      if (!related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))) {
+        lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop, hopInset)));
       } else {
-        for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP)) lines.push(path(d));
+        for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP, hopInset)) lines.push(path(d));
       }
     }
   }
@@ -425,7 +431,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
   const partners = buildPartnerSetFromPedigree(working);
-  lines.push(...renderCoupleLines(result, partners, slotPos));
+  lines.push(...renderCoupleLines(working, result, partners, slotPos));
   lines.push(...renderSibshipLines(working, result, partners, slotPos));
   lines.push(...renderDuplicateArcs(flow, slotPos));
   lines.push(...renderSymbols(working, result, slotPos));
