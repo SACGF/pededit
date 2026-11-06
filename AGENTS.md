@@ -12,6 +12,7 @@ What exists:
 - React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu, edit panel (name/DOB/notes), settings panel (sibling order, snap to grid), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
 - Tags and colouring (#3): `Pedigree.tags` definitions with quadrant, dot and text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, `TagsDialog`, auto legend in the app and in SVG/PNG/PDF export, per-user tag library (`/api/tag-presets/`). See `claude/phase_7_2_plan.md`.
 - Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification, U-shape SVG export, CSV. `hpoTerms` exists on the data model with no UI (#46).
+- Agent page checks: `frontend/scripts/browser/` runs a page in headless chromium and reports JS errors with `frontend/src/...:line`, screenshots and measures, or evaluates against the dev-only `window.__pededit` stores. See its `README.md`.
 - Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Hardening, backups, error reporting and a health check are open (#47 to #50).
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
@@ -88,6 +89,18 @@ Pedigree symbols (square/circle/diamond) represent **biological sex**, not gende
 ## Tooling Preferences
 
 **Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
+
+## Checking frontend changes
+
+A change under `frontend/src/` is not done until it has been run in the browser on a page whose data reaches the changed code:
+
+```bash
+node frontend/scripts/browser/servers.mjs up --frontend-only      # once per session (plain `up` adds Django)
+node frontend/scripts/browser/console.mjs --fixture example:2 [--click SEL ...]   # JS errors, mapped to source lines
+node frontend/scripts/browser/shot.mjs --fixture example:2                        # then read the PNG
+```
+
+`--fixture` takes `example:N`, a `.ped` file or a Pedigree `.json` and needs no backend, so it cannot catch serializer bugs; check anything that must survive a save against `/p/<id>` with Django running. Use `--as-agent` for signed-in pages. These tools only drive localhost. Details in `frontend/scripts/browser/README.md`. Node 20+ is required.
 
 ## Writing Style
 

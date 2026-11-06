@@ -50,6 +50,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
 
   return (
     <div
+      data-individual-id={individual.id}
       style={{
         width: NODE_SIZE,
         height: NODE_SIZE,

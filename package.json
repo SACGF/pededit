@@ -8,6 +8,11 @@
   "scripts": {
     "test:layout": "npm -w layout-engine run test",
     "test:frontend": "npm -w frontend run test",
-    "dev:frontend": "npm -w frontend run dev"
+    "dev:frontend": "npm -w frontend run dev",
+    "browser:up": "node frontend/scripts/browser/servers.mjs up",
+    "browser:down": "node frontend/scripts/browser/servers.mjs down",
+    "browser:console": "node frontend/scripts/browser/console.mjs",
+    "browser:shot": "node frontend/scripts/browser/shot.mjs",
+    "browser:eval": "node frontend/scripts/browser/eval.mjs"
   }
 }

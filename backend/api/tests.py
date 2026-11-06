@@ -100,3 +100,36 @@ class TagPresetTests(APITestCase):
             "/api/tag-presets/", {"label": "x", "color": "#000", "style": "stripe"}, format="json"
         )
         self.assertEqual(resp.status_code, 400)
+
+
+class AgentTokenCommandTests(APITestCase):
+    def _mint(self):
+        import json
+        from io import StringIO
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("agent_token", stdout=out)
+        return json.loads(out.getvalue())
+
+    def test_creates_passwordless_agent_and_tokens_work(self):
+        from django.contrib.auth import get_user_model
+
+        tokens = self._mint()
+        user = get_user_model().objects.get(username="claude_agent")
+        self.assertFalse(user.has_usable_password())
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        me = self.client.get("/api/auth/me/")
+        self.assertEqual(me.status_code, 200)
+        self.assertEqual(me.json()["username"], "claude_agent")
+        # Second call reuses the same account.
+        self._mint()
+        self.assertEqual(get_user_model().objects.filter(username="claude_agent").count(), 1)
+
+    def test_refuses_an_account_with_a_password(self):
+        from django.contrib.auth import get_user_model
+        from django.core.management.base import CommandError
+
+        get_user_model().objects.create_user("claude_agent", password="hunter22")
+        with self.assertRaises(CommandError):
+            self._mint()

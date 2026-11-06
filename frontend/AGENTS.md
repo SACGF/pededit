@@ -13,6 +13,13 @@ npm -w frontend run test   # vitest
 npm -w frontend run typecheck
 ```
 
+Check a change in the real page before calling it done: `node
+frontend/scripts/browser/console.mjs --fixture example:2` reports JS errors as
+`frontend/src/...:line`, `shot.mjs` writes a PNG to read back, `eval.mjs` reads
+the stores via the dev-only `window.__pededit` (`src/devHooks.ts`). Every canvas
+symbol carries `data-individual-id` for selectors. See
+`scripts/browser/README.md`.
+
 `src/config.ts` reads `VITE_GOOGLE_CLIENT_ID` and `VITE_GITHUB_CLIENT_ID`. If
 `@react-oauth/google` is not installed, `vite.config.ts` aliases it to a no-op
 stub so the app still builds without Google login.
