@@ -380,7 +380,6 @@ kinship2 1.9.6.2: the difference is a kinship2 fallback bug, not a port bug
 (see `layout-engine/AGENTS.md`, `tests/partner_chain.test.ts`).
 
 Still open from these notes: hatched fills and monochrome export (#67), label
-overlap at standard spacing, the H1/H2/H3 W1/W2 partner chain against R (not
-rechecked; R was not installed), the tag annotation row against the proband
+overlap at standard spacing, the tag annotation row against the proband
 arrow, the carrier dot drawn over tag sectors, the SVG title overlapping the
 top-left symbol, and the harness items listed above.
