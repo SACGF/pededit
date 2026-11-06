@@ -38,10 +38,10 @@ interface ToolbarProps {
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTagsClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
-  const { activePedigreeId, pedigrees } = useAppStore();
+  const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
-  const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+  const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
 
   function handleExportPed() {
     const text = exportPed(pedigree, { familyId: "1" });

@@ -13,6 +13,8 @@ interface AppState {
 
   // ── Active pedigree ────────────────────────────────────────────────────────
   activePedigreeId: string | null;
+  /** Server title of the active pedigree. Set on open for anonymous pedigrees too. */
+  activeTitle: string | null;
 
   // ── Actions ────────────────────────────────────────────────────────────────
   login: (username: string, password: string) => Promise<void>;
@@ -34,6 +36,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   isAuthenticated: !!localStorage.getItem("access_token"),
   pedigrees: [],
   activePedigreeId: null,
+  activeTitle: null,
 
   login: async (username, password) => {
     const { data } = await authApi.login(username, password);
@@ -67,7 +70,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();
-    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null });
+    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null });
   },
 
   fetchMe: async () => {
@@ -97,7 +100,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       if (ind.sibOrder === undefined) ind.sibOrder = i;
     });
     usePedigreeStore.getState().initialize(pedigree);
-    set({ activePedigreeId: id });
+    set({ activePedigreeId: id, activeTitle: data.title ?? null });
   },
 
   createPedigree: async (title) => {
@@ -121,6 +124,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((state) => ({
       pedigrees: state.pedigrees.filter((p) => p.id !== id),
       activePedigreeId: state.activePedigreeId === id ? null : state.activePedigreeId,
+      activeTitle: state.activePedigreeId === id ? null : state.activeTitle,
     }));
   },
 
@@ -135,6 +139,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   renamePedigree: async (id, title) => {
     const { data } = await pedigreeApi.update(id, { title });
     set(state => ({
+      activeTitle: state.activePedigreeId === id ? data.title : state.activeTitle,
       pedigrees: state.pedigrees.map(p =>
         p.id === id
           ? { id: data.id, title: data.title, created: data.created, updated: data.updated }

@@ -82,7 +82,7 @@ export default function CanvasPage() {
   }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Page title
-  const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+  const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
   useEffect(() => {
     document.title = activeTitle ? `PedEdit: ${activeTitle}` : "PedEdit: Pedigree Editor";
   }, [activeTitle]);
