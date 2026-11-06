@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image, List, Tags } from "lucide-react";
-import { exportPed } from "../io/ped/index.js";
+import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { exportCsv } from "../io/csv/exporter";
 import { exportJson } from "../io/json/index.js";
 
@@ -42,9 +44,11 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
   const hasPedigree = activePedigreeId !== null;
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+  const [pedMenuOpen, setPedMenuOpen] = useState(false);
 
-  function handleExportPed() {
-    const text = exportPed(pedigree, { familyId: "1" });
+  function handleExportPed(dialect: NonNullable<ExportOptions["dialect"]>) {
+    setPedMenuOpen(false);
+    const text = exportPed(pedigree, { familyId: "1", dialect });
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -169,17 +173,32 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
         </Button>
       )}
 
-      {/* Export PED */}
-      <Button
-        variant="ghost" size="sm"
-        className="h-7 px-2 gap-1 text-xs"
-        title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
-        disabled={!hasPedigree}
-        onClick={handleExportPed}
-      >
-        <Download size={12} />
-        Export PED
-      </Button>
+      {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}
+      <Popover open={pedMenuOpen} onOpenChange={setPedMenuOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost" size="sm"
+            className="h-7 px-2 gap-1 text-xs"
+            title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
+            disabled={!hasPedigree}
+          >
+            <Download size={12} />
+            Export PED
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-1" side="bottom" align="end">
+          <PedFormatItem
+            label="PLINK"
+            detail="FID IID PAT MAT SEX PHENO, no header"
+            onClick={() => handleExportPed("plink")}
+          />
+          <PedFormatItem
+            label="R (pedtools, kinship2)"
+            detail="id fid mid sex aff, tabs, header"
+            onClick={() => handleExportPed("r")}
+          />
+        </PopoverContent>
+      </Popover>
 
       {/* Export CSV */}
       <Button
@@ -242,5 +261,17 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
         <Settings size={14} />
       </Button>
     </div>
+  );
+}
+
+function PedFormatItem({ label, detail, onClick }: { label: string; detail: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left px-2 py-1 rounded-sm hover:bg-gray-100"
+    >
+      <div className="text-xs">{label}</div>
+      <div className="text-[10px] text-gray-400 font-mono">{detail}</div>
+    </button>
   );
 }
