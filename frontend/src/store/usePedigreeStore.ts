@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 
@@ -44,6 +44,15 @@ function findOwnPartnerships(
   return pedigree.partnerships
     .filter(p => p.individual1 === individualId || p.individual2 === individualId)
     .map(p => p.id);
+}
+
+/**
+ * True when the individual has a partner or children. Children only exist
+ * through a partnership, so one check covers both. A pregnancy or pregnancy
+ * loss can have neither, see setLifeStatus.
+ */
+export function hasPartnerOrChild(pedigree: Pedigree, individualId: string): boolean {
+  return findOwnPartnerships(pedigree, individualId).length > 0;
 }
 
 /** Next sibOrder value within a sibling group (children of partnershipId). */
@@ -161,6 +170,8 @@ interface PedigreeState {
   setCarrier: (id: string, carrier: boolean) => void;
   setProband: (id: string) => void;
   setSex: (id: string, sex: Sex) => void;
+  /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
+  setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -323,6 +334,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
      * - If individual has no partnership → create an opposite-sex partner + partnership
      */
     addChild: (individualId, sex) => {
+      if (get().pedigree.individuals.find(i => i.id === individualId)?.lifeStatus) {
+        console.warn("Cannot add a child to a pregnancy or pregnancy loss");
+        return;
+      }
       mutate(draft => {
         let partnershipId: string;
         const ownPs = findOwnPartnerships(draft, individualId);
@@ -363,6 +378,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     addChildren: (individualId, count, sex) => {
       const n = Math.min(MAX_ADD_CHILDREN, Math.max(1, Math.floor(count)));
       if (!Number.isFinite(n)) return;
+      if (get().pedigree.individuals.find(i => i.id === individualId)?.lifeStatus) {
+        console.warn("Cannot add a child to a pregnancy or pregnancy loss");
+        return;
+      }
       mutate(draft => {
         if (!draft.individuals.some(i => i.id === individualId)) return;
         const partnershipId = ensureChildPartnershipId(draft, individualId);
@@ -400,6 +419,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
      * (multiple partnerships are valid — e.g. second marriage).
      */
     addPartner: (individualId) => {
+      if (get().pedigree.individuals.find(i => i.id === individualId)?.lifeStatus) {
+        console.warn("Cannot add a partner to a pregnancy or pregnancy loss");
+        return;
+      }
       mutate(draft => {
         const partner = makeIndividual("unknown", 0);
         const partnership: Partnership = {
@@ -548,6 +571,24 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
         if (ind) ind.sex = sex;
+      });
+    },
+
+    /**
+     * Set or clear the pregnancy / loss status. Clearing is always allowed.
+     * Setting is refused when the individual has a partner or children, since
+     * a pregnancy or pregnancy loss can have neither.
+     */
+    setLifeStatus: (id, status) => {
+      if (status !== undefined && hasPartnerOrChild(get().pedigree, id)) {
+        console.warn("Cannot mark an individual with a partner or children as a pregnancy or pregnancy loss");
+        return;
+      }
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (status === undefined) delete ind.lifeStatus;
+        else ind.lifeStatus = status;
       });
     },
 

@@ -16,6 +16,8 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
   const { addParent, addChild, addSibling, pedigree, unlockIndividual, lockIndividual } = usePedigreeStore();
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const isUnlocked = nodesMoveable || (pedigree.unlockedIndividuals ?? []).includes(individualId);
+  // A pregnancy or pregnancy loss cannot have children.
+  const noChildren = !!pedigree.individuals.find(i => i.id === individualId)?.lifeStatus;
 
   return (
     <NodeToolbar
@@ -41,6 +43,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
         {/* +son */}
         <PillButton
           title="Add son"
+          disabled={noChildren}
           onClick={() => addChild(individualId, "male")}
         >
           □↓
@@ -49,6 +52,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
         {/* +daughter */}
         <PillButton
           title="Add daughter"
+          disabled={noChildren}
           onClick={() => addChild(individualId, "female")}
         >
           ○↓

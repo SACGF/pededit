@@ -5,6 +5,7 @@ import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
+import { captionRowHeight } from "../lifeStatus";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 
@@ -19,7 +20,9 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
   const isSelected = individual.id === selectedId;
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
-  const labelTop = NODE_SIZE + 2 + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
+  // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
+  const captionOffset = captionRowHeight(individual.lifeStatus);
+  const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
 
   function scheduleHide() {
     hideTimeout.current = setTimeout(() => {
@@ -68,7 +71,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <SymbolShape individual={individual} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {individual.proband  && <ProbandArrow  size={NODE_SIZE} />}
-        <AnnotationRow items={annotations} size={NODE_SIZE} />
+        <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
       {/* Name label below symbol */}

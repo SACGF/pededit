@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { usePedigreeStore, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
+import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
+import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -24,6 +25,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
     setCarrier,
     setProband,
     setSex,
+    setLifeStatus,
     moveSibLeft,
     moveSibRight,
     deleteIndividual,
@@ -36,6 +38,8 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
   if (!individual) return null;
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
+  // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
+  const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
 
   // Collect sexes that would create a same-sex pairing (grey them out)
   const disabledSexes = new Set<string>();
@@ -73,13 +77,22 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <MenuSection label="Add">
-          <MenuItem onClick={() => action(() => addPartner(individualId))}>
+          <MenuItem
+            onClick={() => action(() => addPartner(individualId))}
+            disabled={!!individual.lifeStatus}
+            title={individual.lifeStatus ? "A pregnancy or pregnancy loss cannot have a partner" : undefined}
+          >
             Add partner
           </MenuItem>
-          <MenuItem onClick={() => setShowAddChildren(v => !v)} active={showAddChildren}>
+          <MenuItem
+            onClick={() => setShowAddChildren(v => !v)}
+            active={showAddChildren}
+            disabled={!!individual.lifeStatus}
+            title={individual.lifeStatus ? "A pregnancy or pregnancy loss cannot have children" : undefined}
+          >
             Add children...
           </MenuItem>
-          {showAddChildren && (
+          {showAddChildren && !individual.lifeStatus && (
             <div className="pl-2">
               <div className="flex items-center gap-1 px-2 py-1">
                 <span className="text-[10px] text-gray-400">Count</span>
@@ -181,6 +194,26 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
           ))}
         </MenuSection>
 
+        <MenuSection label="Pregnancy / loss">
+          <MenuItem
+            onClick={() => action(() => setLifeStatus(individualId, undefined))}
+            active={!individual.lifeStatus}
+          >
+            None
+          </MenuItem>
+          {LIFE_STATUS_OPTIONS.map(o => (
+            <MenuItem
+              key={o.value}
+              onClick={() => action(() => setLifeStatus(individualId, o.value))}
+              active={individual.lifeStatus === o.value}
+              disabled={isLifeStatusLocked}
+              title={isLifeStatusLocked ? "Not available: this individual has a partner or children" : undefined}
+            >
+              {o.label}
+            </MenuItem>
+          ))}
+        </MenuSection>
+
         <div className="border-t mt-1 pt-1">
           <MenuItem
             onClick={() => action(() => { deleteIndividual(individualId); setSelectedId(null); })}
@@ -217,13 +250,15 @@ interface MenuItemProps {
   active?: boolean;
   destructive?: boolean;
   disabled?: boolean;
+  title?: string;
 }
 
-function MenuItem({ onClick, children, active, destructive, disabled }: MenuItemProps) {
+function MenuItem({ onClick, children, active, destructive, disabled, title }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`
         w-full text-left px-2 py-1 rounded text-xs
         hover:bg-gray-100 transition-colors

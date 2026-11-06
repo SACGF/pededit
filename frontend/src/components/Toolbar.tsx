@@ -173,7 +173,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
       <Button
         variant="ghost" size="sm"
         className="h-7 px-2 gap-1 text-xs"
-        title="Export as PED file"
+        title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
         disabled={!hasPedigree}
         onClick={handleExportPed}
       >

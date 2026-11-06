@@ -2,6 +2,13 @@
 
 export type Sex = "male" | "female" | "unknown";
 
+/**
+ * Pregnancy and pregnancy-loss status (NSGC 2008, Bennett et al.). Absent means
+ * a born individual, living or deceased. Layout treats these as ordinary sibs;
+ * only the symbol changes.
+ */
+export type LifeStatus = "pregnancy" | "miscarriage" | "termination" | "stillbirth" | "ectopic";
+
 export interface Individual {
   id: string;
   sex: Sex;
@@ -14,6 +21,7 @@ export interface Individual {
   dob?: string;          // ISO date string "YYYY-MM-DD"
   notes?: string;        // free text clinical notes
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
+  lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
 }
 

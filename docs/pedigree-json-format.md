@@ -69,6 +69,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `deceased` | boolean | no | Diagonal slash through the symbol. |
 | `carrier` | boolean | no | Carrier dot in the symbol. |
 | `proband` | boolean | no | Proband arrow. Normally exactly one individual. |
+| `lifeStatus` | `"pregnancy"`, `"miscarriage"`, `"termination"`, `"stillbirth"` or `"ectopic"` | no | Pregnancy or pregnancy loss, drawn with the NSGC symbols (P inside the symbol, a small triangle for miscarriage, termination and ectopic, SB for stillbirth). Absent means born. Such an individual cannot have partners or children. |
 | `name` | string | no | Display name shown under the symbol. |
 | `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
 | `notes` | string | no | Free-text clinical notes. |

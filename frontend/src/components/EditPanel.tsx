@@ -1,16 +1,20 @@
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { pedigreeTags, tagCanvasText } from "../pedigree/tags";
+import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
+import type { LifeStatus } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
   onManageTags?: () => void;
 }
 
 export function EditPanel({ onManageTags }: EditPanelProps) {
-  const { pedigree, selectedId, updateIndividual, setCarrier, setIndividualTag } = usePedigreeStore();
+  const { pedigree, selectedId, updateIndividual, setCarrier, setIndividualTag, setLifeStatus } = usePedigreeStore();
   const individual = pedigree.individuals.find(i => i.id === selectedId);
   const tags = pedigreeTags(pedigree);
+  // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
+  const isLifeStatusLocked = !!individual && !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
   if (!individual) {
     return (
@@ -51,6 +55,21 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
           className="w-full border rounded px-2 py-1 text-sm resize-none h-20 focus:outline-hidden focus:ring-1 focus:ring-black"
           placeholder="Clinical notes"
         />
+      </Field>
+
+      <Field label="Pregnancy / loss">
+        <select
+          value={individual.lifeStatus ?? ""}
+          disabled={isLifeStatusLocked}
+          title={isLifeStatusLocked ? "Not available: this individual has a partner or children" : undefined}
+          onChange={e => setLifeStatus(individual.id, (e.target.value || undefined) as LifeStatus | undefined)}
+          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black disabled:opacity-50"
+        >
+          <option value="">None</option>
+          {LIFE_STATUS_OPTIONS.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </Field>
 
       <div className="border-t pt-3 space-y-2">
@@ -116,6 +135,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
           </label>
           {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
+          {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
         </div>
       </div>
     </div>
