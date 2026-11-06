@@ -149,32 +149,40 @@ export function validatePedRows(rows: PedRow[]): ValidationIssue[] {
     }
   }
 
-  // Sex mismatch: PAT points to female, MAT points to male
+  // Sex mismatch: PAT points to female, MAT points to male. One warning per
+  // parent pair, not per child: a swapped couple with five children is one
+  // problem. The converter draws defined people from their SEX column, so this
+  // only affects other PED readers.
+  const mismatches = new Map<string, {
+    row: PedRow; badFather: PedRow | null; badMother: PedRow | null; childLines: number[];
+  }>();
   for (const row of rows) {
-    if (row.fatherId !== "0") {
-      const fatherRow = rowIndex.get(`${row.familyId}:${row.fatherId}`);
-      if (fatherRow && recogniseSex(fatherRow.sex) === "female") {
-        issues.push({
-          severity: "warning",
-          code: ValidationIssueCode.SEX_MISMATCH,
-          message: `Individual '${row.individualId}': PAT '${row.fatherId}' has SEX='${fatherRow.sex}' (female)`,
-          affectedIds: [`${row.familyId}:${row.fatherId}`],
-          lineNumbers: [row.lineNumber],
-        });
-      }
-    }
-    if (row.motherId !== "0") {
-      const motherRow = rowIndex.get(`${row.familyId}:${row.motherId}`);
-      if (motherRow && recogniseSex(motherRow.sex) === "male") {
-        issues.push({
-          severity: "warning",
-          code: ValidationIssueCode.SEX_MISMATCH,
-          message: `Individual '${row.individualId}': MAT '${row.motherId}' has SEX='${motherRow.sex}' (male)`,
-          affectedIds: [`${row.familyId}:${row.motherId}`],
-          lineNumbers: [row.lineNumber],
-        });
-      }
-    }
+    const fatherRow = row.fatherId !== "0" ? rowIndex.get(`${row.familyId}:${row.fatherId}`) : undefined;
+    const motherRow = row.motherId !== "0" ? rowIndex.get(`${row.familyId}:${row.motherId}`) : undefined;
+    const badFather = fatherRow && recogniseSex(fatherRow.sex) === "female" ? fatherRow : null;
+    const badMother = motherRow && recogniseSex(motherRow.sex) === "male" ? motherRow : null;
+    if (!badFather && !badMother) continue;
+    const key = `${row.familyId}\t${row.fatherId}\t${row.motherId}`;
+    const entry = mismatches.get(key) ?? { row, badFather, badMother, childLines: [] };
+    entry.childLines.push(row.lineNumber);
+    mismatches.set(key, entry);
+  }
+  for (const { row, badFather, badMother, childLines } of mismatches.values()) {
+    const n = childLines.length;
+    const children = `${n} ${n === 1 ? "child" : "children"}`;
+    const what = badFather && badMother
+      ? `Parents '${row.fatherId}' (SEX=${badFather.sex}, female) and '${row.motherId}' (SEX=${badMother.sex}, male) are in swapped PAT/MAT columns`
+      : badFather
+        ? `Father (PAT) '${row.fatherId}' has SEX=${badFather.sex} (female)`
+        : `Mother (MAT) '${row.motherId}' has SEX=${badMother!.sex} (male)`;
+    const affected = [badFather, badMother].filter((r): r is PedRow => r !== null);
+    issues.push({
+      severity: "warning",
+      code: ValidationIssueCode.SEX_MISMATCH,
+      message: `${what} for ${children}. Drawn using the SEX column; other PED tools may reject this.`,
+      affectedIds: affected.map(r => `${r.familyId}:${r.individualId}`),
+      lineNumbers: [...affected.map(r => r.lineNumber), ...childLines],
+    });
   }
 
   // Circular ancestry detection (DFS cycle check)

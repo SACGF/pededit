@@ -32,6 +32,10 @@ Rules that keep a bad file from importing as nonsense (#31):
 - kinship2 codes `affected` 0/1 (1 = affected), unlike PED 1/2. It is recoded
   only when the header uses kinship2's `dadid`/`momid` and no value is 2;
   pedtools-style headers keep PED coding.
+- `SEX_MISMATCH` (female in PAT, male in MAT) is one warning per parent pair,
+  not per child. It is cosmetic for us: defined people are drawn from their
+  SEX column. It matters only for other PED readers, and our exporter always
+  writes the male partner in PAT.
 - The famid-or-aff guess for headerless 5-column files needs at least two
   rows; one row is always `id fid mid sex aff`.
 - IDs in the file are not internal IDs (#66). `exportIds` in `exporter.ts`

@@ -135,6 +135,20 @@ describe("validatePedRows", () => {
     expect(issues.some(i => i.code === ValidationIssueCode.SEX_MISMATCH)).toBe(true);
   });
 
+  it("emits one SEX_MISMATCH per swapped couple, not per child or per parent", () => {
+    const rows = [
+      makeRow({ individualId: "1", sex: "2" }),  // female listed as father
+      makeRow({ individualId: "2", sex: "1" }),  // male listed as mother
+      makeRow({ individualId: "3", fatherId: "1", motherId: "2" }),
+      makeRow({ individualId: "4", fatherId: "1", motherId: "2" }),
+      makeRow({ individualId: "5", fatherId: "1", motherId: "2" }),
+    ];
+    const mismatches = validatePedRows(rows).filter(i => i.code === ValidationIssueCode.SEX_MISMATCH);
+    expect(mismatches).toHaveLength(1);
+    expect(mismatches[0].message).toMatch(/swapped PAT\/MAT.*3 children/);
+    expect(mismatches[0].affectedIds).toEqual(["1:1", "1:2"]);
+  });
+
   it("accepts the sex codes the converter understands (M, F, male, female, U)", () => {
     for (const sex of ["M", "F", "m", "f", "male", "Female", "U", "unknown"]) {
       const issues = validatePedRows([makeRow({ individualId: "1", sex })]);
