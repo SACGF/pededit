@@ -1,0 +1,35 @@
+{
+  "source": "queen_victoria.ped",
+  "kinship2": "1.9.6.2",
+  "families": {
+    "VICT": {
+      "ids": ["Queen_Victoria", "Prince_Albert", "Victoria_Princess_Royal", "Edward_VII", "Alice", "Alfred", "Helena", "Louise", "Arthur", "Leopold", "Beatrice", "Frederick_III", "Louis_IV_of_Hesse", "Helen_of_Waldeck", "Henry_of_Battenberg", "Henry_of_Prussia", "Victoria_of_Hesse", "Elisabeth_of_Hesse", "Irene_of_Hesse", "Ernest_Louis_of_Hesse", "Friedrich_of_Hesse", "Alix_of_Hesse", "Marie_of_Hesse", "Alice_of_Albany", "Charles_Edward", "Alexander_of_Battenberg", "Victoria_Eugenie", "Leopold_of_Battenberg", "Maurice_of_Battenberg", "Nicholas_II", "Alexander_of_Teck", "Alfonso_XIII", "Waldemar_of_Prussia", "Sigismund_of_Prussia", "Heinrich_of_Prussia", "Olga", "Tatiana", "Maria", "Anastasia", "Alexei", "May_of_Teck", "Rupert_of_Teck", "Maurice_of_Teck", "Alfonso_of_Asturias", "Jaime", "Beatriz", "Maria_Cristina", "Juan", "Gonzalo"],
+      "n": [2, 13, 17, 17],
+      "nid": [
+        [2, 1],
+        [12, 3, 4, 13, 5, 6, 7, 8, 9, 10, 14, 15, 11],
+        [16, 19, 17, 18, 20, 21, 30, 22, 23, 31, 24, 25, 26, 32, 27, 28, 29],
+        [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+      ],
+      "pos": [
+        [6.4982366597, 7.4982366597],
+        [8.8829959711e-08, 1.0000000888, 2.9669626433, 3.9669626433, 4.9669626433, 5.9669626433, 6.9669626433, 7.9669626433, 8.9669626433, 9.9669626433, 10.9669626433, 13.2153951245, 14.2153951245],
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+        [-6.4923985752e-17, 1, 2, 3.01, 4.01, 5.01, 6.01, 7.01, 8.01, 9.01, 10.01, 11.01, 12.01, 13.01, 14.01, 15.01, 16.01]
+      ],
+      "fam": [
+        [0, 0],
+        [0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1],
+        [1, 4, 4, 4, 4, 4, 0, 4, 4, 0, 10, 10, 12, 0, 12, 12, 12],
+        [1, 1, 1, 7, 7, 7, 7, 7, 10, 10, 10, 14, 14, 14, 14, 14, 14]
+      ],
+      "spouse": [
+        [1, 0],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [2, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      "inbreeding": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0625, 0.0625, 0.0625, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  }
+}
