@@ -49,6 +49,15 @@ indexing convention inherited from R, and the three rendering rules.
   `LayoutInput.childlessCouples`, and kindepth's spouse alignment, the
   spouselist and `buildPartnerSet` read them from there. PED input never has
   any, so the oracle comparisons are unaffected.
+- kinship2 bug: when `autohint()` fails ("autohint bug 3"), `align.pedigree`
+  falls back to `order = seq_len(max(1, dim(ped)))`, and `dim()` of a pedigree
+  is NULL, so every rank but the first is NA. Our `autohint` falls back to the
+  plain order R meant, and `scripts/kinship2-oracle.R` passes that order too
+  (flagging `autohint_failed`), so the oracle compares like with like. Calling
+  R's `align.pedigree` directly on such a pedigree gives a different, NA-driven
+  layout. Example: `tests/partner_chain.test.ts`.
+- R for the oracle without sudo: micromamba from micro.mamba.pm, then
+  `micromamba create -p <dir> -c conda-forge r-base r-kinship2 r-jsonlite`.
 
 ## Testing
 

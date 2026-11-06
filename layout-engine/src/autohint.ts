@@ -24,9 +24,12 @@ import { buildPartnerSet, isPartnerPair } from "./couples.js";
 export function autohint(input: LayoutInput, pedigree: Pedigree): Hints {
   const horder = initialOrder(input, pedigree);
   try {
-    return fixupDuplicates(pedigree, input, horder);
+    // fixupDuplicates shifts sibling ranks in place, so give it a copy.
+    return fixupDuplicates(pedigree, input, horder.slice());
   } catch {
-    // R wraps autohint in try() and punts to a plain ordering on failure.
+    // R wraps autohint in try() and, when it fails, lays out with a plain
+    // ordering and no spouse hints. Discard any ranks the fixup had already
+    // shifted before failing, as R does: its changes were local to autohint.
     return { order: horder, spouse: null };
   }
 }

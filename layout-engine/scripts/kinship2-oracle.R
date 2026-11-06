@@ -52,10 +52,21 @@ for (fid in unique(ped$fid)) {
                   sex = sex_code[ped$fid == fid], affected = fam_aff,
                   missid = "0")
   }
-  a <- align.pedigree(p)
+  # When autohint() fails, align.pedigree() falls back to
+  # list(order = seq_len(max(1, dim(ped)))), but dim() of a pedigree is NULL,
+  # so that order has length 1 and every rank but the first is NA. Pass the
+  # fallback it meant (file order, no spouse hints) and say so in the output.
+  hints <- try(autohint(p), silent = TRUE)
+  autohint_failed <- inherits(hints, "try-error")
+  a <- if (autohint_failed) {
+    align.pedigree(p, hints = list(order = seq_along(p$id)))
+  } else {
+    align.pedigree(p)
+  }
   kin <- kinship(p)
   families[[fid]] <- list(
     ids = I(rows$iid),
+    autohint_failed = autohint_failed,
     n = I(as.integer(a$n)),
     nid = trim_rows(a$nid, a$n),
     pos = trim_rows(a$pos, a$n),
