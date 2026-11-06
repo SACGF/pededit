@@ -54,6 +54,14 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
           ○↓
         </PillButton>
 
+        {/* +child of unknown sex */}
+        <PillButton
+          title="Add child (unknown sex)"
+          onClick={() => addChild(individualId, "unknown")}
+        >
+          ◇↓
+        </PillButton>
+
         {/* +sib */}
         <PillButton
           title="Add sibling"

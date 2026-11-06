@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { usePedigreeStore, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
+
+function clampCount(n: number): number {
+  if (!Number.isFinite(n)) return 1;
+  return Math.min(MAX_ADD_CHILDREN, Math.max(1, Math.floor(n)));
+}
 
 interface MoreMenuProps {
   individualId: string;
@@ -8,9 +13,12 @@ interface MoreMenuProps {
 
 export function MoreMenu({ individualId }: MoreMenuProps) {
   const [open, setOpen] = useState(false);
+  const [showAddChildren, setShowAddChildren] = useState(false);
+  const [childCount, setChildCount] = useState(2);
   const {
     pedigree,
     addPartner,
+    addChildren,
     setAffected,
     setDeceased,
     setProband,
@@ -46,7 +54,7 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setShowAddChildren(false); }}>
       <PopoverTrigger asChild>
         <button
           title="More options"
@@ -66,6 +74,48 @@ export function MoreMenu({ individualId }: MoreMenuProps) {
           <MenuItem onClick={() => action(() => addPartner(individualId))}>
             Add partner
           </MenuItem>
+          <MenuItem onClick={() => setShowAddChildren(v => !v)} active={showAddChildren}>
+            Add children...
+          </MenuItem>
+          {showAddChildren && (
+            <div className="pl-2">
+              <div className="flex items-center gap-1 px-2 py-1">
+                <span className="text-[10px] text-gray-400">Count</span>
+                <button
+                  title="Fewer"
+                  onClick={() => setChildCount(c => clampCount(c - 1))}
+                  className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  aria-label="Number of children"
+                  min={1}
+                  max={MAX_ADD_CHILDREN}
+                  value={childCount}
+                  onChange={e => setChildCount(clampCount(Number(e.target.value)))}
+                  className="w-9 h-5 border rounded text-xs text-center"
+                />
+                <button
+                  title="More"
+                  onClick={() => setChildCount(c => clampCount(c + 1))}
+                  className="w-5 h-5 border rounded text-xs leading-none hover:bg-gray-100"
+                >
+                  +
+                </button>
+              </div>
+              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "male"))}>
+                Add {childCount} {childCount === 1 ? "son" : "sons"}
+              </MenuItem>
+              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "female"))}>
+                Add {childCount} {childCount === 1 ? "daughter" : "daughters"}
+              </MenuItem>
+              <MenuItem onClick={() => action(() => addChildren(individualId, childCount, "unknown"))}>
+                Add {childCount} of unknown sex
+              </MenuItem>
+            </div>
+          )}
         </MenuSection>
 
         <MenuSection label="Sibling order">
