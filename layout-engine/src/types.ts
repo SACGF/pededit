@@ -100,6 +100,13 @@ export interface LayoutInput {
   findex: Int32Array;
   mindex: Int32Array;
   sex: Uint8Array; // 1=male, 2=female, 3=unknown
+  /**
+   * Partnerships with no children, as flat [fatherRole, motherRole] pairs
+   * (1-based). kinship2 only learns about couples from findex/mindex, so these
+   * are fed to kindepth's spouse alignment and to the spouselist separately.
+   * Absent or empty for input read from a PED file.
+   */
+  childlessCouples?: Int32Array;
 }
 
 /** Hints produced by autohint and consumed by alignPedigree. */

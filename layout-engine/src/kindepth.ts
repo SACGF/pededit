@@ -79,6 +79,14 @@ export function kindepth(input: LayoutInput, align = false): Int32Array {
       if (!pairSet.has(key)) pairSet.set(key, [d, m]);
     }
   }
+  // Childless partnerships must sit on one row as well (not in R, which only
+  // knows couples through their children).
+  const cc = input.childlessCouples;
+  if (cc) for (let k = 0; k + 1 < cc.length; k += 2) {
+    const d = cc[k]!, m = cc[k + 1]!;
+    const key = d * (n + 1) + m;
+    if (!pairSet.has(key)) pairSet.set(key, [d, m]);
+  }
   let dads = Array.from(pairSet.values()).map(p => p[0]!);
   let moms = Array.from(pairSet.values()).map(p => p[1]!);
   const npair = dads.length;

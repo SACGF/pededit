@@ -11,8 +11,6 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
  * and any new problem in any example fails straight away.
  */
 const KNOWN_BROKEN: Record<string, string[]> = {
-  // childless partnership pp5 (i3c = i3f) has no couple line
-  "Multi-branch family": ["partnership-not-drawn"],
   // duplicate individuals dropped or moved by layoutToFlow (P1 in the bug list)
   "Spanish Habsburgs": ["couple-lines-overlap", "couple-through-symbol"],
   "3/4 siblings": ["child-without-parents", "missing-node", "partnership-not-drawn"],

@@ -388,17 +388,37 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
     resolved.push({ p, dad, mom });
   }
 
+  const childless: number[] = [];
+  const seenCouple = new Set<number>();
   for (const { p, dad, mom } of resolved) {
+    let anyChild = false;
     for (const childId of parentOf[p.id] ?? []) {
       const childIdx = idToIdx.get(childId) ?? 0;
       if (childIdx > 0) {
         findex[childIdx] = dad;
         mindex[childIdx] = mom;
+        anyChild = true;
       }
     }
+    if (!anyChild && dad !== mom) {
+      const key = Math.min(dad, mom) * (n + 1) + Math.max(dad, mom);
+      if (!seenCouple.has(key)) { seenCouple.add(key); childless.push(dad, mom); }
+    }
+  }
+  // A childless partnership is only a couple to kinship2 if no child links the
+  // same two people (a second partnership record between them, say).
+  const withKids = new Set<number>();
+  for (let i = 1; i <= n; i++) {
+    const d = findex[i]!, m = mindex[i]!;
+    if (d > 0 && m > 0) withKids.add(Math.min(d, m) * (n + 1) + Math.max(d, m));
+  }
+  const childlessCouples: number[] = [];
+  for (let k = 0; k < childless.length; k += 2) {
+    const d = childless[k]!, m = childless[k + 1]!;
+    if (!withKids.has(Math.min(d, m) * (n + 1) + Math.max(d, m))) childlessCouples.push(d, m);
   }
 
-  return { n, findex, mindex, sex };
+  return { n, findex, mindex, sex, childlessCouples: Int32Array.from(childlessCouples) };
 }
 
 /**
@@ -423,6 +443,8 @@ function buildSpouseList(
     const d = input.findex[i]!, m = input.mindex[i]!;
     if (d > 0 && m > 0) fatherMother.add(d * (n + 1) + m);
   }
+  const cc = input.childlessCouples;
+  if (cc) for (let k = 0; k + 1 < cc.length; k += 2) fatherMother.add(cc[k]! * (n + 1) + cc[k + 1]!);
 
   // Start with spouse hints: [left, right, anchor] → [father, mother, leftIsFather ? 1 : 2, anchor]
   // (R: tsex = sex of the left member; col3 = 1 if male, else 2.)
@@ -450,6 +472,11 @@ function buildSpouseList(
       rows.push([d, m, 0, 0]);
     }
   }
+
+  // Childless partnerships (not part of R kinship2, which has no way to say
+  // two people are partners without a child). alignped1 places the partners
+  // of whoever it is processing from this list, children or not.
+  if (cc) for (let k = 0; k + 1 < cc.length; k += 2) rows.push([cc[k]!, cc[k + 1]!, 0, 0]);
 
   // Deduplicate by hash(husband * n + wife)
   const seen = new Set<number>();

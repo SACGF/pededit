@@ -340,7 +340,10 @@ const SCENARIOS: Array<{ label: string; ped: Pedigree; count: number; centred: b
   // UI examples — all four are simple enough that centering holds
   { label: "ui/simple-family",        ped: SIMPLE_FAMILY,        count: 4,  centred: true  },
   { label: "ui/three-generations",    ped: THREE_GENERATIONS,     count: 9,  centred: true  },
-  { label: "ui/large-family",         ped: LARGE_FAMILY,          count: 16, centred: true  },
+  // large-family: since the childless couple i3c = i3f is drawn side by side
+  // (generation III is one slot wider), the QP trades exact centring of
+  // i3a/i3b/i3c under i2a = i2b (off by 0.45 units) for a narrower layout.
+  { label: "ui/large-family",         ped: LARGE_FAMILY,          count: 16, centred: false },
   // NOTE: high-complexity has TWO known misalignments (see NOTE A + high_complexity_check.test.ts)
   { label: "ui/high-complexity",      ped: HIGH_COMPLEXITY,       count: 13, centred: false },
 
