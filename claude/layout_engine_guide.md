@@ -227,9 +227,10 @@ for (let level = 1; level < result.n.length; level++) {
 
 `autohint` is a full port of the kinship2 routine. It runs the alignment once with no spouse hints, finds anyone drawn in more than one slot (someone with children by several partners), moves each such person to the edge of their sibship nearest their other copy, records a spouse hint saying which partner is drawn on the left and which family the marriage is anchored to, and re-runs the alignment level by level. The chain `F-M-F-M` (woman with two husbands, one of whom has another wife) therefore comes out as four slots with nobody duplicated, matching R. Twin handling is not ported because the data model has no twin relation yet.
 
-Two deliberate departures from R:
+Three deliberate departures from R:
 
 - Spouse hint rows and the parent-pair rows are oriented by the father/mother *role* each person holds in `findex`/`mindex`, not by sex, so couples where neither partner is male (both unknown, or same sex) are still drawn once.
+- `kindepth`'s alignment pass marks only the couple it just handled as done. R marks every couple involving the shifted person, so the second partner of someone who married into a lower generation stayed in the founder row and their children floated free.
 - Isolated individuals (no partner, no children) are appended to the right of their generation *after* the QP pass. R drops them entirely; appending them before the QP would make the top row the widest and leave no room to centre parents over children.
 
 ---

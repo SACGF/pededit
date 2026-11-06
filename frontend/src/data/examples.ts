@@ -343,6 +343,50 @@ export const EXAMPLES: ExamplePedigree[] = [
     },
   },
   {
+    label: "Multiple partners",
+    description: "3 generations · one person with three partners · partner chain",
+    data: {
+      siblingOrder,
+      individuals: [
+        // Gen I: one man with three partners
+        { id: "mp_dad",  sex: "male",   affected: true,  deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "mp_w1",   sex: "female", affected: false, deceased: true,  carrier: false, proband: false, sibOrder: 1 },
+        { id: "mp_w2",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 2 },
+        { id: "mp_w3",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 3 },
+        // Gen II: children of each marriage, plus the married-in partners of mp_c4
+        { id: "mp_c1",   sex: "male",   affected: true,  deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "mp_c2",   sex: "female", affected: false, deceased: false, carrier: true,  proband: false, sibOrder: 0 },
+        { id: "mp_c3",   sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 1 },
+        { id: "mp_c4",   sex: "female", affected: false, deceased: false, carrier: true,  proband: false, sibOrder: 0 },
+        { id: "mp_h1",   sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 4 },
+        { id: "mp_h2",   sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 5 },
+        { id: "mp_w4",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 6 },
+        // Gen III: mp_c4 has children by two husbands; mp_h2 also has a child with mp_w4
+        { id: "mp_g1",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 0 },
+        { id: "mp_g2",   sex: "male",   affected: true,  deceased: false, carrier: false, proband: true,  sibOrder: 0 },
+        { id: "mp_g3",   sex: "female", affected: false, deceased: false, carrier: false, proband: false, sibOrder: 1 },
+        { id: "mp_g4",   sex: "male",   affected: false, deceased: false, carrier: false, proband: false, sibOrder: 0 },
+      ],
+      partnerships: [
+        { id: "mp_pp1", individual1: "mp_dad", individual2: "mp_w1", consanguineous: false },
+        { id: "mp_pp2", individual1: "mp_dad", individual2: "mp_w2", consanguineous: false },
+        { id: "mp_pp3", individual1: "mp_dad", individual2: "mp_w3", consanguineous: false },
+        // Partner chain in Gen II: mp_h1 - mp_c4 - mp_h2 - mp_w4
+        { id: "mp_pp4", individual1: "mp_h1", individual2: "mp_c4", consanguineous: false },
+        { id: "mp_pp5", individual1: "mp_h2", individual2: "mp_c4", consanguineous: false },
+        { id: "mp_pp6", individual1: "mp_h2", individual2: "mp_w4", consanguineous: false },
+      ],
+      parentOf: {
+        mp_pp1: ["mp_c1"],
+        mp_pp2: ["mp_c2", "mp_c3"],
+        mp_pp3: ["mp_c4"],
+        mp_pp4: ["mp_g1"],
+        mp_pp5: ["mp_g2", "mp_g3"],
+        mp_pp6: ["mp_g4"],
+      },
+    },
+  },
+  {
     label: "High complexity",
     description: "4 generations · consanguinity · multiple traits",
     data: {

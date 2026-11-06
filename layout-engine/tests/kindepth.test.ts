@@ -94,3 +94,21 @@ describe("kindepth force fallback", () => {
     }).not.toThrow();
   });
 });
+
+describe("kindepth — chain of married-in partners", () => {
+  it("second partner of a married-in spouse follows them down a generation", () => {
+    // 1+2 → 3 (gen II). 4 marries 3 (married in). 4 also has a child with 5, a founder.
+    // 5 must sit beside 4 in gen II, and 6 in gen III, not with the founders.
+    const input = buildLayoutInput([
+      { id: 1, father: 0, mother: 0, sex: 1 },
+      { id: 2, father: 0, mother: 0, sex: 2 },
+      { id: 3, father: 1, mother: 2, sex: 2 },
+      { id: 4, father: 0, mother: 0, sex: 1 },
+      { id: 5, father: 0, mother: 0, sex: 2 },
+      { id: 6, father: 4, mother: 3, sex: 1 },
+      { id: 7, father: 4, mother: 5, sex: 1 },
+    ]);
+    const depth = kindepth(input, true);
+    expect(Array.from(depth).slice(1)).toEqual([0, 0, 1, 1, 1, 2, 2]);
+  });
+});

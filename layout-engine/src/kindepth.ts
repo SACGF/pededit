@@ -186,10 +186,13 @@ export function kindepth(input: LayoutInput, align = false): Int32Array {
       }
     }
 
-    // Mark bad as done (all pairs involving bad)
-    for (let i = 0; i < npair; i++) {
-      if (dads[i] === bad || moms[i] === bad) done[i] = 1;
-    }
+    // Mark this pair as done. R marks every pair involving `bad` as done,
+    // which leaves the other partners of a married-in person at their old
+    // depth (e.g. the second wife of a man who married into generation II
+    // would stay in generation I, and their children would float free).
+    // Handling those pairs in later iterations lets the shift propagate
+    // along a chain of partners; each pair is still visited at most once.
+    done[who] = 1;
   }
 
   // Sanity check: at least one individual must be at depth 0
