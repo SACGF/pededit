@@ -34,6 +34,10 @@ Rules that keep a bad file from importing as nonsense (#31):
   pedtools-style headers keep PED coding.
 - The famid-or-aff guess for headerless 5-column files needs at least two
   rows; one row is always `id fid mid sex aff`.
+- IDs in the file are not internal IDs (#66). `exportIds` in `exporter.ts`
+  writes each person's canvas name (unique, never `0`/`NA`, spaces to `_`
+  in PLINK), falls back to a non-UUID internal ID, then `ind1, ind2...`.
+  Import sets `name` to the file's ID so the round trip keeps the labels.
 - The converter invents `__phantom_*` IDs for the missing partner of a single
   parent (`isPhantomId`). They are never shown, not even as the dev-mode ID
   label.
