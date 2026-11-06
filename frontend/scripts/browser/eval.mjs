@@ -22,10 +22,13 @@ Examples:
   eval.mjs --fixture example:0 'const l = __pededit.layout(); return l.nodes.map(n => [n.data.individual.id, n.position])'
   eval.mjs --fixture example:18 '__pededit.check()'          # render lint findings
   eval.mjs --fixture example:5 '__pededit.align().pos'       # raw kinship2 layout
+
+  --one-line          Print the result as single-line JSON instead of indented.
 ${COMMON_HELP}`;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2));
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "one-line": "bool" });
+  const indent = flags["one-line"] ? undefined : 2;
   if (flags.help) { console.log(HELP); return 0; }
   let urlArg, js;
   if (positional.length === 2) [urlArg, js] = positional;
@@ -70,10 +73,10 @@ await main(async () => {
   }
 
   if (flags.json) {
-    console.log(JSON.stringify({ served, url: run.url, fixture: t.spec, result: threw ? null : result, error: threw, ...run.findings }, null, 2));
+    console.log(JSON.stringify({ served, url: run.url, fixture: t.spec, result: threw ? null : result, error: threw, ...run.findings }, null, indent));
   } else {
     if (threw) console.log(`error: ${threw}`);
-    else console.log(JSON.stringify(result, null, 2));
+    else console.log(JSON.stringify(result, null, indent));
     for (const line of servedLines(served)) console.error(line);
     console.error(summaryLine(run.findings));
     for (const line of findingLines(run.findings, { verbose: flags.verbose })) console.error(line);

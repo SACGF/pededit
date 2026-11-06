@@ -89,7 +89,9 @@ Screenshot first, measure second.
   same units as `__pededit.layout()` positions (120px rows, 80px slots; 84
   and 68 in compact mode), so they compare across viewports.
 - `--clip SEL` cuts off menus and dialogs that open outside the clipped box.
-  Take a full shot when a popover is open.
+  Take a full shot when a popover is open. `--clip .react-flow__viewport`
+  frames the whole drawn pedigree: a transformed element is clipped to its
+  visible shapes and labels, not its own (pan-and-zoom) box.
 - `--tile` with several fixtures also writes `contact-sheet.png`: every shot
   in a labelled grid with its render lint count, so one image read covers a
   batch (`--fixture example:8 --fixture example:9 ... --tile`).
@@ -111,6 +113,7 @@ Evaluates an expression (or a function body, if it does not parse as an
 expression) after the steps and prints the result as JSON. Only the result
 goes to stdout; the `served:` line and the findings summary go to stderr, so
 `2>&1` interleaves them with the JSON (pipe stdout alone into `jq`).
+`--one-line` prints the result as single-line JSON.
 
 In the dev build `window.__pededit` holds `usePedigreeStore`, `useAppStore`,
 `layoutToFlow`, `lintFlow`, `importPed`, `exportPed`, `importJson`, `exportJson`, `EXAMPLES`, `commit`
@@ -121,7 +124,10 @@ include it):
 - `layout(pedigree?, options?)`: `{ nodes, coupleEdges, sibshipEdges }` as the canvas
   computes them, compact mode included (read from `localStorage`, the way
   the canvas reads it).
-- `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`.
+- `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`,
+  for comparing with R. The canvas lays out each family separately
+  (`alignPedigreeByFamily`, #64), so for a file with several families this
+  differs from `layout()` positions.
 - `check(pedigree?, options?)`: the render lint, `[]` when clean.
 - `load(pedigree)`: replace the editor's pedigree (clears undo history).
 

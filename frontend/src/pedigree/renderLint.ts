@@ -18,7 +18,8 @@
  * Used by `__pededit.check()` (devHooks.ts), `scripts/browser/lint.mjs` and the
  * vitest over every example. Framework-free so all three share it.
  */
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 
@@ -52,6 +53,16 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
     return ind?.name ? `${ind.name} (${id})` : id;
   };
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  // A node id is a layout slot ("level-slot"). When one is not drawn, name the
+  // person kinship2 put in that slot, from the same layout layoutToFlow uses.
+  let layout: LayoutResult | undefined;
+  const slotLabel = (nodeId: string) => {
+    layout ??= alignPedigreeByFamily(pedigree);
+    const [lev, slot] = nodeId.split("-").map(Number);
+    const idx = layout.nid[lev!]?.[slot!];
+    const id = idx ? pedigree.individuals[Math.floor(idx) - 1]?.id : undefined;
+    return id ? `slot ${nodeId}, ${label(id)}` : `slot ${nodeId}`;
+  };
 
   // Partnerships, by unordered pair and by id.
   const partnerPairs = new Map<string, string>();
@@ -74,7 +85,7 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
       const present = [s, t].filter(Boolean).map(n => n!.data.individual.id);
       out.push({
         code: "missing-node",
-        message: `couple line ${e.id} ends at a node that is not drawn (${!s ? e.source : e.target})`,
+        message: `couple line ${e.id} ends at a node that is not drawn (${slotLabel(!s ? e.source : e.target)})`,
         individuals: present,
       });
       continue;
@@ -152,7 +163,7 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
     if (missing.length) {
       out.push({
         code: "missing-node",
-        message: `sibship line ${e.id} refers to node(s) that are not drawn: ${missing.join(", ")}`,
+        message: `sibship line ${e.id} refers to node(s) that are not drawn: ${missing.map(slotLabel).join("; ")}`,
         individuals: ids.map(indOf).filter((x): x is string => !!x),
       });
     }

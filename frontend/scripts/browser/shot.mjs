@@ -25,6 +25,8 @@ const HELP = `usage: node frontend/scripts/browser/shot.mjs [URL] [options]
                       centre and size before React Flow's fitView zoom, the
                       same units as __pededit.layout() positions.
   --clip SEL          Screenshot only the region around the first match of SEL.
+                      A transformed element (.react-flow__viewport) is clipped
+                      to its visible contents, so it frames the whole pedigree.
                       Popovers outside that box are cut off; take a full shot
                       (no --clip) when a menu or dialog is open.
   --pad PX            Margin around --clip (default 16).
@@ -146,8 +148,26 @@ await main(async () => {
       mkdirSync(path.dirname(file), { recursive: true });
       let clip;
       if (flags.clip) {
-        const box = await page.locator(flags.clip).first().boundingBox({ timeout: flags.timeout ?? 5000 }).catch(() => null);
+        const target = page.locator(flags.clip).first();
+        let box = await target.boundingBox({ timeout: flags.timeout ?? 5000 }).catch(() => null);
         if (!box) throw new UsageError(`--clip ${flags.clip} matched nothing visible`);
+        // An element carrying a CSS transform (.react-flow__viewport holds the
+        // pan and zoom) reports a box that does not match where its children
+        // are drawn, so clip to the union of its visible leaf elements instead.
+        box = (await target.evaluate(el => {
+          if (getComputedStyle(el).transform === "none") return null;
+          let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+          for (const d of el.querySelectorAll("*")) {
+            // Layers (<svg>s, the nodes and edge-label <div>s) report the full
+            // pane; only leaf elements (shapes, labels) report what is drawn.
+            if (d.childElementCount > 0) continue;
+            if (!(d instanceof SVGElement) && !d.textContent?.trim()) continue; // empty layer div
+            const r = d.getBoundingClientRect();
+            if (r.width === 0 || r.height === 0) continue;
+            x1 = Math.min(x1, r.left); y1 = Math.min(y1, r.top); x2 = Math.max(x2, r.right); y2 = Math.max(y2, r.bottom);
+          }
+          return x1 < x2 ? { x: x1, y: y1, width: x2 - x1, height: y2 - y1 } : null;
+        })) ?? box;
         const pad = flags.pad ?? 16;
         const x = Math.max(0, box.x - pad), y = Math.max(0, box.y - pad);
         clip = { x, y, width: box.width + pad * 2, height: box.height + pad * 2 };

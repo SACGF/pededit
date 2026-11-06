@@ -68,6 +68,8 @@ describe("lintFlow", () => {
     const found = lintFlow(base, flow).map(f => f.code);
     expect(found).toContain("missing-individual");
     expect(found).toContain("missing-node");
+    const msg = lintFlow(base, flow).find(f => f.code === "missing-node")!.message;
+    expect(msg).toContain(`slot ${mother.id}, m`);
   });
 
   it("reports a slanted couple line but not a child off its siblings' row", () => {

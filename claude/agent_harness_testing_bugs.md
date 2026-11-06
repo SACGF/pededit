@@ -347,10 +347,13 @@ Still open:
 - The lint misses overlapping hop risers, line style versus the
   consanguineous flag, a child that looks as if it hangs from the wrong parent
   (example 20's c2), and label overlap.
-- `missing-node` names a slot id (`1-3`), not the person who is missing.
+- ~~`missing-node` names a slot id (`1-3`), not the person who is missing.~~
+  Fixed: it now names the person kinship2 put in that slot.
 - No `--oracle` to compare a fixture's `align()` with R kinship2.
-- `--clip` on `.react-flow__viewport` is offset (it carries the transform).
-- Pretty-printed eval output is long; a compact JSON flag would help.
+- ~~`--clip` on `.react-flow__viewport` is offset (it carries the transform).~~
+  Fixed: it frames the drawn shapes and labels.
+- ~~Pretty-printed eval output is long; a compact JSON flag would help.~~
+  Fixed: `eval.mjs --one-line`.
 
 # Fixes after the second run
 
