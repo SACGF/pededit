@@ -13,7 +13,7 @@ import {
   type OnNodeDrag,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CoupleEdge }         from "./edges/CoupleEdge";
@@ -214,8 +214,8 @@ export function PedigreeCanvas({ showMinimap = false }: PedigreeCanvasProps) {
         nodesConnectable={false}
         snapToGrid={pedigree.canvasSettings?.snapToGrid ?? false}
         snapGrid={[
-          pedigree.canvasSettings?.snapGridSize ?? 10,
-          pedigree.canvasSettings?.snapGridSize ?? 10,
+          pedigree.canvasSettings?.snapGridSize ?? DEFAULT_SNAP_GRID_SIZE,
+          pedigree.canvasSettings?.snapGridSize ?? DEFAULT_SNAP_GRID_SIZE,
         ]}
         onNodesChange={onNodesChange}
         fitView

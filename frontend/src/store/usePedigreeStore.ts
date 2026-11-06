@@ -16,6 +16,9 @@ const EMPTY_PEDIGREE: Pedigree = {
   siblingOrder: { mode: "insertion", affectedFirst: false },
 };
 
+/** Default snap grid size in canvas pixels. Used when a pedigree has no canvasSettings. */
+export const DEFAULT_SNAP_GRID_SIZE = 5;
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function newId(): string {
@@ -553,15 +556,27 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     updateCanvasSettings: (settings) => {
       mutate(draft => {
+        const wasSnapping = draft.canvasSettings?.snapToGrid ?? false;
         if (!draft.canvasSettings) {
           draft.canvasSettings = {
             nodesMoveable: false,
             snapToGrid: false,
-            snapGridSize: 10,
+            snapGridSize: DEFAULT_SNAP_GRID_SIZE,
             ...settings,
           };
         } else {
           Object.assign(draft.canvasSettings, settings);
+        }
+        // Turning snap on, or changing the grid size while snap is on, snaps every
+        // pinned (manually moved) node so existing nodes line up with the grid.
+        // Auto-laid-out nodes have no stored position and are unaffected.
+        const { snapToGrid, snapGridSize } = draft.canvasSettings;
+        const sizeChanged = settings.snapGridSize !== undefined;
+        if (snapToGrid && snapGridSize > 0 && (!wasSnapping || sizeChanged) && draft.pinnedPositions) {
+          for (const pos of Object.values(draft.pinnedPositions)) {
+            pos.x = Math.round(pos.x / snapGridSize) * snapGridSize;
+            pos.y = Math.round(pos.y / snapGridSize) * snapGridSize;
+          }
         }
       });
     },

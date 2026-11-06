@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import type { SiblingOrderMode } from "@pedigree-editor/layout-engine";
 
@@ -15,7 +15,7 @@ interface SettingsPanelProps {
 export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: SettingsPanelProps) {
   const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeStore();
   const { mode, affectedFirst } = pedigree.siblingOrder;
-  const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: 10 };
+  const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: DEFAULT_SNAP_GRID_SIZE };
   const { activePedigreeId, pedigrees, deletePedigree } = useAppStore();
   const navigate = useNavigate();
   const [deleteExpanded, setDeleteExpanded] = useState(false);
@@ -106,7 +106,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
                 <div>
                   <div className="text-sm">Snap to grid</div>
                   <div className="text-xs text-gray-400">
-                    Dragged nodes snap to a fixed grid
+                    Dragged nodes snap to a fixed grid. Turning this on also snaps nodes you have already moved.
                   </div>
                 </div>
               </label>
