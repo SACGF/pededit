@@ -375,6 +375,10 @@ Also fixed from Audald's reports, labelled Needs Testing: families are laid
 out separately with a gap (#64, `alignPedigreeByFamily`), PED export uses
 names (#66). #65 was already fixed by e938281 but not deployed.
 
+The H1/H2/H3 W1/W2 partner chain (#5) was checked against R 4.5.3 /
+kinship2 1.9.6.2: the difference is a kinship2 fallback bug, not a port bug
+(see `layout-engine/AGENTS.md`, `tests/partner_chain.test.ts`).
+
 Still open from these notes: hatched fills and monochrome export (#67), label
 overlap at standard spacing, the H1/H2/H3 W1/W2 partner chain against R (not
 rechecked; R was not installed), the tag annotation row against the proband
