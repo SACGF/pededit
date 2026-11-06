@@ -7,7 +7,7 @@ import {
 import type { Sector, AnnotationItem } from "../tags";
 import {
   usesLossTriangle, lifeStatusCaption, captionBaselineY, CAPTION_FONT_SIZE,
-  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY, carrierDot,
+  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY, carrierDot, CARRIER_RIM,
 } from "../lifeStatus";
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
 
@@ -175,10 +175,15 @@ function SlashOverFill({ x1, y1, x2, y2, fill, clipId }: {
   );
 }
 
-/** Carrier dot, placed so it clears the pregnancy "P" and the loss triangle's slash. */
-function CarrierDot({ size, status }: { size: number; status: LifeStatus | undefined }) {
+/**
+ * Carrier dot, placed so it clears the pregnancy "P" and the loss triangle's
+ * slash. Over tag colours it gets a white rim so it stays readable.
+ */
+function CarrierDot({ size, status, rim }: { size: number; status: LifeStatus | undefined; rim: boolean }) {
   const d = carrierDot(status, size);
-  return <circle cx={d.cx} cy={d.cy} r={d.r} fill="black" />;
+  return rim
+    ? <circle cx={d.cx} cy={d.cy} r={d.r + CARRIER_RIM / 2} fill="black" stroke="white" strokeWidth={CARRIER_RIM} />
+    : <circle cx={d.cx} cy={d.cy} r={d.r} fill="black" />;
 }
 
 /** "P" inside the sex symbol of a current pregnancy. */
@@ -235,7 +240,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId }: ShapePro
         {usesLossTriangle(status)
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
           : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
-        {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} />}
+        {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
         {status === "stillbirth" && (
           <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
@@ -247,7 +252,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId }: ShapePro
   return (
     <g>
       <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />
-      {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} />}
+      {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
     </g>
   );
 }

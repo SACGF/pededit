@@ -16,7 +16,7 @@ import {
 import {
   usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
-  carrierDot, symbolTopInset, CAPTION_ROW_HEIGHT,
+  carrierDot, symbolTopInset, CAPTION_ROW_HEIGHT, CARRIER_RIM,
 } from "../../pedigree/lifeStatus";
 
 const STROKE = 2;
@@ -72,7 +72,9 @@ function computeBounds(
   options: SvgExportOptions,
 ): CanvasBounds {
   const padding = options.padding ?? 40;
-  const titleHeight = options.title ? 24 : 0;
+  // The title's baseline is at padding + 16; the band below it must clear a
+  // deceased slash, which reaches DECEASED_OVERHANG above the top row.
+  const titleHeight = options.title ? 24 + DECEASED_OVERHANG + 8 : 0;
 
   let rawMinX = Infinity, rawMaxX = -Infinity;
   let rawMinY = Infinity, rawMaxY = -Infinity;
@@ -231,7 +233,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return shape + renderCarrierDot(ind) + renderLifeStatusMarks(ind, geom, clipId)
+  return shape + renderCarrierDot(ind, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 
@@ -244,11 +246,14 @@ function captionShift(ind: Individual): number {
  * Carrier dot, centred on the origin's symbol. Not drawn on an affected
  * (filled) symbol. Shared with the U-shape exporter.
  */
-export function renderCarrierDot(ind: Individual): string {
+/** Carrier dot; with `rim` (tag colours behind it) it gets a white rim, as on the canvas. */
+export function renderCarrierDot(ind: Individual, rim = false): string {
   if (!ind.carrier || ind.affected) return "";
   const half = NODE_SIZE / 2;
   const d = carrierDot(ind.lifeStatus, NODE_SIZE, -half, -half);
-  return `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="black"/>`;
+  return rim
+    ? `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r + CARRIER_RIM / 2}" fill="black" stroke="white" stroke-width="${CARRIER_RIM}"/>`
+    : `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="black"/>`;
 }
 
 /**
@@ -327,14 +332,16 @@ function renderProbandArrow(): string {
   return `<line x1="${tailX}" y1="${tailY}" x2="${tipX}" y2="${tipY}" stroke="black" stroke-width="${STROKE}" marker-end="url(#proband-arrowhead)"/>`;
 }
 
-function renderDuplicateMark(): string {
+/** Copy number of someone drawn more than once, top right, as DuplicateSuperscript on the canvas. */
+function renderDuplicateMark(index: number): string {
   const half = NODE_SIZE / 2;
-  return `<text x="${half + 2}" y="${-half + 8}" font-family="sans-serif" font-size="9" fill="black">¹</text>`;
+  return `<text x="${half + 2}" y="${-half + 2}" font-family="sans-serif" font-size="10" fill="black">${index}</text>`;
 }
 
-function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos): string[] {
+function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
-  const seen = new Set<number>();
+  // Every drawn copy is numbered 1, 2, ... in the same order as on the canvas.
+  const copyIndex = new Map(flow.nodes.map(n => [n.id, n.data.isDuplicate ? n.data.duplicateIndex : undefined]));
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
@@ -343,14 +350,13 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       const nid = Math.floor(result.nid[level][slot]);
       const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = pos;
-      const isDuplicate = seen.has(nid);
-      seen.add(nid);
+      const dupIndex = copyIndex.get(`${level}-${slot}`);
 
       elems.push(`<g transform="translate(${cx} ${cy})">`);
       elems.push(renderShape(ind, pedigree, `symbol-clip-${level}-${slot}`));
       if (ind.deceased) elems.push(renderDeceasedSlash());
       if (ind.proband)  elems.push(renderProbandArrow());
-      if (isDuplicate)  elems.push(renderDuplicateMark());
+      if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
       elems.push(`</g>`);
     }
   }
@@ -434,7 +440,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(...renderCoupleLines(working, result, partners, slotPos));
   lines.push(...renderSibshipLines(working, result, partners, slotPos));
   lines.push(...renderDuplicateArcs(flow, slotPos));
-  lines.push(...renderSymbols(working, result, slotPos));
+  lines.push(...renderSymbols(working, result, slotPos, flow));
   lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);
 

@@ -6,6 +6,7 @@ import {
 } from "../pedigree/tags";
 import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
+import { consanguinityTest } from "@/pedigree/consanguinity";
 
 interface LegendDialogProps {
   open: boolean;
@@ -205,7 +206,9 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   const probandInd  = individuals.find(i => i.proband);
 
   const hasCouples        = partnerships.length > 0;
-  const hasConsanguineous = partnerships.some(p => p.consanguineous);
+  // Same rule the canvas uses for the double line: flagged, or related by blood.
+  const related = consanguinityTest(pedigree);
+  const hasConsanguineous = partnerships.some(p => related(p.individual1, p.individual2));
 
   // Build legend rows
   const indRows: { icon: React.ReactNode; label: string }[] = [];

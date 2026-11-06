@@ -98,6 +98,13 @@ describe("annotationRow", () => {
     expect(hasAnnotationRow(p.individuals[0]!, p)).toBe(true);
     expect(hasAnnotationRow(p.individuals[1]!, p)).toBe(false);
   });
+
+  it("starts a proband's row at the symbol's left edge, clear of the arrow", () => {
+    const p = makePedigree([genotype, tremor, sequenced], { a: ["s1", "g1", "t1"] });
+    p.individuals[0]!.proband = true;
+    const row = annotationRow(p.individuals[0]!, p, 40);
+    expect(row[0]!.x - row[0]!.width / 2).toBeGreaterThanOrEqual(-18);
+  });
 });
 
 describe("tagsInUse", () => {

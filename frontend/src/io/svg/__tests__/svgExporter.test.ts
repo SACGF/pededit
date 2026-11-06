@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { EXAMPLES } from "../../../data/examples";
 import { exportSvg } from "../svgExporter";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
@@ -494,5 +495,13 @@ describe("exportSvg: someone drawn twice", () => {
     const shapes = svg.match(/<g transform="translate\([^)]+\)">\n<(?:rect|circle|polygon)/g) ?? [];
     expect(shapes).toHaveLength(11);
     expect(svg.match(/stroke-dasharray/g)).toHaveLength(1);
+  });
+});
+
+describe("exportSvg — duplicate copies", () => {
+  it("numbers every copy of someone drawn twice, as the canvas does", () => {
+    const uncleNiece = EXAMPLES.find(e => e.label === "Uncle-niece")!.data;
+    const marks = [...exportSvg(uncleNiece).matchAll(/font-size="10" fill="black">(\d+)<\/text>/g)].map(m => m[1]);
+    expect(marks.sort()).toEqual(["1", "2"]);
   });
 });

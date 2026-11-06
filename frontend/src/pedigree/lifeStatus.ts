@@ -70,6 +70,9 @@ export function symbolTopInset(status: LifeStatus | undefined, size: number): nu
   return usesLossTriangle(status) ? triangleInset(size) : 0;
 }
 
+/** Width of the white rim round a carrier dot drawn over tag colours. */
+export const CARRIER_RIM = 1.5;
+
 /**
  * Carrier dot, relative to the top-left of the symbol box. Centred in a sex
  * symbol; below the "P" of a pregnancy (which then shrinks and moves up, see

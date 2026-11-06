@@ -1,4 +1,5 @@
 import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layout-engine";
+import { consanguinityTest } from "./consanguinity";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -211,15 +212,20 @@ export interface AnnotationItem {
   width: number;
 }
 
-/** Dot and text tags of an individual laid out as a centred row. */
-export function annotationRow(individual: Individual, pedigree: Pedigree): AnnotationItem[] {
+/**
+ * Dot and text tags of an individual laid out as a centred row. The proband
+ * arrow comes in from below-left to the symbol's bottom-left corner, so for a
+ * proband the row starts no further left than the symbol's left edge.
+ * `size` is the symbol size (NODE_SIZE on the canvas and in the exporters).
+ */
+export function annotationRow(individual: Individual, pedigree: Pedigree, size = 40): AnnotationItem[] {
   const tags = tagsOf(individual, pedigree).filter(t => t.style !== "quadrant");
   if (tags.length === 0) return [];
   const widths = tags.map(t =>
     t.style === "dot" ? ANNOTATION_DOT_RADIUS * 2 : tagCanvasText(t).length * ANNOTATION_CHAR_WIDTH,
   );
   const total = widths.reduce((a, b) => a + b, 0) + ANNOTATION_GAP * (tags.length - 1);
-  let x = -total / 2;
+  let x = individual.proband ? Math.max(-total / 2, -size / 2 + 2) : -total / 2;
   return tags.map((tag, i) => {
     const width = widths[i]!;
     const item = { tag, x: x + width / 2, width };
@@ -435,6 +441,18 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
   const deceased = inds.find(i => i.deceased);
   if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
+  // Double couple line, by the same rule the canvas and exporter draw it with.
+  const related = consanguinityTest(pedigree);
+  if (pedigree.partnerships.some(p => related(p.individual1, p.individual2))) {
+    rows.push({
+      label: "Consanguineous couple",
+      swatch: sy => {
+        const cy = sy + LEGEND_SWATCH / 2;
+        const line = (y: number) => `<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(x + LEGEND_SWATCH)}" y2="${fmt(y)}" stroke="black" stroke-width="1.5"/>`;
+        return line(cy - 2) + line(cy + 2);
+      },
+    });
+  }
 
   const tags = tagsInUse(pedigree);
   if (rows.length === 0 && tags.length === 0) return { markup: [], width: 0, height: 0 };

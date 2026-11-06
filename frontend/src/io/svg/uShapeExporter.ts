@@ -1004,7 +1004,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + (needsAffectedCore(ind, sectors) ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
-  shape += renderCarrierDot(ind);
+  shape += renderCarrierDot(ind, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   return shape + renderLifeStatusMarks(ind, geom, clipId) + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
 }
