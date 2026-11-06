@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { ImportPedDialog } from "../components/ImportPedDialog";
-import { EXAMPLES } from "../data/examples";
+import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export default function LandingPage() {
@@ -134,22 +134,32 @@ export default function LandingPage() {
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
               Start from an example
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              {EXAMPLES.map((ex, i) => (
-                <button
-                  key={i}
-                  className="text-left border rounded p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                  onClick={() => handleExample(i)}
-                  disabled={loading !== null}
-                >
-                  <span className="block text-xs font-medium mb-0.5">{ex.label}</span>
-                  <span className="block text-[10px] text-gray-400">{ex.description}</span>
-                  {loading === `example-${i}` && (
-                    <span className="block text-[10px] text-gray-400 mt-1">Loading…</span>
-                  )}
-                </button>
-              ))}
-            </div>
+            {EXAMPLE_GROUPS.map(group => (
+              <div key={group} className="mb-4">
+                {group && (
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">{group}</p>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  {EXAMPLES.map((ex, i) => (ex.group ?? "") === group && (
+                    <button
+                      key={i}
+                      className="text-left border rounded p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                      onClick={() => handleExample(i)}
+                      disabled={loading !== null}
+                    >
+                      <span className="block text-xs font-medium mb-0.5">{ex.label}</span>
+                      <span className="block text-[10px] text-gray-400">{ex.description}</span>
+                      {ex.citation && (
+                        <span className="block text-[10px] text-gray-400 mt-0.5">{ex.citation}</span>
+                      )}
+                      {loading === `example-${i}` && (
+                        <span className="block text-[10px] text-gray-400 mt-1">Loading…</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* My pedigrees (authenticated) */}
