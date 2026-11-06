@@ -24,8 +24,12 @@ supplied.
 
 - `Pedigree` — UUID primary key, nullable `owner`, `title`, `data` JSONField
   that mirrors `layout-engine/src/types.ts` exactly. `PedigreeDataSerializer`
-  validates the shape; keep it in sync with `types.ts` or saves will drop
-  fields (this has bitten us before, see commit d7c71b5).
+  only validates the known fields; `PedigreeDataField` then stores the
+  submitted JSON untouched, so unknown fields survive and absent optional
+  fields stay absent (the JSON format promises this). Never switch back to
+  storing `validated_data`: DRF drops undeclared keys and fills defaults,
+  which lost `lifeStatus` on every save. Still add new `types.ts` fields to
+  the serializer so they get validated.
 - `TagPreset` — a signed-in user's reusable tag library. Pedigrees always
   carry their own copy of tags, so presets are a convenience only.
 

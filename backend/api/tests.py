@@ -67,6 +67,61 @@ class PedigreeRoundTripTests(APITestCase):
         self.assertNotIn("name", saved["individuals"][0])
 
 
+    def test_life_status_and_unknown_fields_preserved_exactly(self):
+        data = {
+            "individuals": [
+                {"id": "a", "sex": "unknown", "affected": False, "sibOrder": 0,
+                 "lifeStatus": "miscarriage", "futureField": {"nested": [1, 2]}},
+                {"id": "b", "sex": "male", "affected": False, "sibOrder": 0,
+                 "deceased": None, "x-ext": "kept"},
+                {"id": "c", "sex": "female", "affected": True, "sibOrder": 1,
+                 "lifeStatus": "pregnancy", "carrier": True},
+            ],
+            "partnerships": [
+                {"id": "p1", "individual1": "b", "individual2": "c", "since": "2001"},
+            ],
+            "parentOf": {},
+            "siblingOrder": {"mode": "insertion", "affectedFirst": False},
+            "newTopLevel": {"anything": True},
+        }
+        resp = self.client.post("/api/pedigrees/", {"title": "x", "data": data}, format="json")
+        self.assertEqual(resp.status_code, 201, resp.data)
+        pk = resp.data["id"]
+        self.assertEqual(resp.json()["data"], data)
+        self.assertEqual(Pedigree.objects.get(pk=pk).data, data)
+
+        resp = self.client.put(f"/api/pedigrees/{pk}/", {"title": "x", "data": data}, format="json")
+        self.assertEqual(resp.status_code, 200, resp.data)
+        self.assertEqual(self.client.get(f"/api/pedigrees/{pk}/").json()["data"], data)
+
+    def test_no_defaults_injected(self):
+        data = {
+            "individuals": [{"id": "a", "sex": "male", "affected": False, "sibOrder": 0}],
+            "partnerships": [],
+            "parentOf": {},
+        }
+        resp = self.client.post("/api/pedigrees/", {"data": data}, format="json")
+        self.assertEqual(resp.status_code, 201, resp.data)
+        saved = Pedigree.objects.get(pk=resp.data["id"]).data
+        self.assertEqual(saved, data)
+
+    def test_known_fields_still_validated(self):
+        base = {"individuals": [], "partnerships": [], "parentOf": {}}
+        bad_cases = [
+            {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
+                                      "lifeStatus": "reborn"}]},
+            {**base, "individuals": [{"id": "a", "sex": "robot", "affected": False}]},
+            {**base, "individuals": [{"id": "a", "sex": "male"}]},
+            {**base, "partnerships": [{"id": "p", "individual1": "a"}]},
+            {"individuals": [], "partnerships": []},
+            {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "stripe"}]},
+            [],
+        ]
+        for data in bad_cases:
+            resp = self.client.post("/api/pedigrees/", {"data": data}, format="json")
+            self.assertEqual(resp.status_code, 400, data)
+
+
 class TagPresetTests(APITestCase):
     def setUp(self):
         self.alice = User.objects.create_user("alice", password="pw12345678")
