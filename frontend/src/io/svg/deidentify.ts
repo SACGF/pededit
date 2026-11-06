@@ -1,4 +1,4 @@
-import { alignPedigree } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import type { SvgExportOptions } from "./types";
 
@@ -41,7 +41,7 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
 }
 
 export function deidentify(pedigree: Pedigree, options: SvgExportOptions = {}): Pedigree {
-  const result = alignPedigree(pedigree);
+  const result = alignPedigreeByFamily(pedigree);
   const notations = buildNotationMap(pedigree, result);
 
   return {

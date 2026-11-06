@@ -150,18 +150,26 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
   );
 }
 
-/** Refits the view when compact mode is toggled, once the new layout has rendered. */
-function FitOnCompactChange({ compact }: { compact: boolean }) {
+/**
+ * Refits the view, once the new layout has rendered, when compact mode is
+ * toggled or Auto arrange / Reset layout clears the pins (#64: an auto
+ * layout of several families is often wider than the hand-placed one).
+ */
+function FitOnLayoutChange({ compact }: { compact: boolean }) {
   const { fitView } = useReactFlow();
-  const prev = useRef(compact);
+  const resetCount = usePedigreeStore(s => s.layoutResetCount);
+  const key = `${compact}-${resetCount}`;
+  const prev = useRef(key);
   useEffect(() => {
-    if (prev.current === compact) return; // the initial fit comes from the fitView prop
-    prev.current = compact;
+    if (prev.current === key) return; // the initial fit comes from the fitView prop
+    prev.current = key;
     const id = requestAnimationFrame(() => { void fitView(); });
     return () => cancelAnimationFrame(id);
-  }, [compact, fitView]);
+  }, [key, fitView]);
   return null;
 }
+
+const MIN_ZOOM = 0.1;
 
 // ── Canvas ─────────────────────────────────────────────────────────────────────
 
@@ -248,6 +256,9 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         ]}
         onNodesChange={onNodesChange}
         fitView
+        // React Flow's default (0.5) cannot fit a wide pedigree, such as
+        // a dozen families side by side (#64), so fit view would clip it.
+        minZoom={MIN_ZOOM}
         onPaneClick={handlePaneClick}
         onNodeDragStop={handleNodeDragStop}
         proOptions={{ hideAttribution: true }}
@@ -287,7 +298,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
           </Panel>
         )}
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
-        <FitOnCompactChange compact={compact} />
+        <FitOnLayoutChange compact={compact} />
         <Controls />
         {showMinimap && (
           <PedigreeMinimap

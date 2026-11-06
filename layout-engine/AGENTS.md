@@ -23,6 +23,12 @@ indexing convention inherited from R, and the three rendering rules.
 - `alignped1.ts` to `alignped4.ts`, `alignPedigree.ts` — the kinship2 placement
   pipeline. alignped4 runs a quadratic program via the `quadprog` npm package.
   Vite needs `optimizeDeps.include: ["quadprog"]` for that package to load.
+- `families.ts` — `alignPedigreeByFamily`, which the canvas, SVG export and
+  de-identification call instead of `alignPedigree` (#64). R's `align.pedigree`
+  packs disconnected families into shared rows at ordinary spacing, so they
+  read as one family; this lays out each family alone and joins them with
+  `FAMILY_GAP`, with unconnected people last. With one family it returns
+  `alignPedigree` unchanged, so keep `alignPedigree` R-faithful for the oracle.
 - `pedigreeToGeometry.ts` — turns a Pedigree into pixel coordinates using the
   same constants as the frontend (slot 80, row 120, node 40). Useful for tests
   and headless export; the U-shape exporter and SVG exporter build on this.

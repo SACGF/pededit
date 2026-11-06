@@ -1,5 +1,5 @@
 import type { Node, Edge } from "@xyflow/react";
-import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { hopGeometry } from "./couplePath";
@@ -153,7 +153,7 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] };
   }
-  const result: LayoutResult = alignPedigree(pedigree);
+  const result: LayoutResult = alignPedigreeByFamily(pedigree);
   const spacing = layoutSpacing(options.compact);
 
   const hidden = findLinelessCopies(result);

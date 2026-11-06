@@ -1,4 +1,5 @@
 export { alignPedigree } from "./alignPedigree.js";
+export { alignPedigreeByFamily, splitFamilies, FAMILY_GAP } from "./families.js";
 export { kindepth } from "./kindepth.js";
 export { autohint } from "./autohint.js";
 export type { LayoutResult, Pedigree, Individual, Partnership, Sex, LifeStatus, Hints, LayoutInput, SiblingOrderMode, SiblingOrderSettings, CanvasSettings, Tag, TagStyle } from "./types.js";

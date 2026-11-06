@@ -139,6 +139,8 @@ interface PedigreeState {
   selectedId: string | null;
   hoveredId: string | null;
   isDirty: boolean;
+  /** Bumped by resetLayout so the canvas can refit the view (#64). Not undoable. */
+  layoutResetCount: number;
 
   // Lifecycle
   initialize: (p: Pedigree) => void;
@@ -222,6 +224,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     selectedId: null,
     hoveredId: null,
     isDirty: false,
+    layoutResetCount: 0,
 
     initialize: (p) => set({
       pedigree: p,
@@ -643,6 +646,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         delete draft.pinnedPositions;
       });
+      set(s => ({ layoutResetCount: s.layoutResetCount + 1 }));
     },
 
     // ── Lock / unlock per-node ────────────────────────────────────────────────

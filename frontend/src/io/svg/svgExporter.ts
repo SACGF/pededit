@@ -1,4 +1,4 @@
-import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
@@ -409,7 +409,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   }
 
   const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
-  const result  = alignPedigree(working);
+  const result  = alignPedigreeByFamily(working);
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
   const bounds  = computeBounds(working, slotPos, options);
