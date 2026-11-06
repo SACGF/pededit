@@ -21,6 +21,9 @@ export function convertFamily(rows: PedRow[]): Pedigree {
   for (const row of rows) {
     allIndividuals.push({
       id: row.individualId,
+      // The PED ID is the only label the file carries; show it (#66), so a
+      // PED round trip keeps what the user sees and exports.
+      name: row.individualId,
       sex: parseSex(row.sex),
       affected: parseAffection(row.affection),
       sibOrder: sibOrderCounter++,
@@ -59,6 +62,7 @@ export function convertFamily(rows: PedRow[]): Pedigree {
         phantomRegistry.set(pKey, fatherId); // keep original ID as the phantom's ID
         allIndividuals.push({
           id: fatherId,
+          name: fatherId,
           sex: "male",   // PAT column implies male; validator warned about mismatches
           affected: false,
           sibOrder: sibOrderCounter++,
@@ -71,6 +75,7 @@ export function convertFamily(rows: PedRow[]): Pedigree {
         phantomRegistry.set(pKey, motherId);
         allIndividuals.push({
           id: motherId,
+          name: motherId,
           sex: "female",
           affected: false,
           sibOrder: sibOrderCounter++,

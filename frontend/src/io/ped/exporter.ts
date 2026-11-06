@@ -28,6 +28,7 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
   }
 
   const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
+  const pedId = exportIds(pedigree, rDialect);
 
   // Build child→(father,mother) lookup from partnerships + parentOf.
   // Partnership members are unordered, so put the male partner in PAT: a
@@ -48,13 +49,56 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
   const lines: string[] = [];
   for (const ind of pedigree.individuals) {
     const parents = parentLookup.get(ind.id);
-    const pat = parents?.father ?? "0";
-    const mat = parents?.mother ?? "0";
+    const pat = parents ? pedId.get(parents.father)! : "0";
+    const mat = parents ? pedId.get(parents.mother)! : "0";
     const sex = ind.sex === "male" ? "1" : ind.sex === "female" ? "2" : "0";
     const pheno = ind.affected ? "2" : "1";
-    const cells = [...(withFamily ? [fid] : []), ind.id, pat, mat, sex, ...(withAffection ? [pheno] : [])];
+    const cells = [...(withFamily ? [fid] : []), pedId.get(ind.id)!, pat, mat, sex, ...(withAffection ? [pheno] : [])];
     lines.push(cells.join("\t"));
   }
 
   return header + lines.join("\n") + "\n";
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** IDs a PED reader takes to mean "no parent", so no individual may use them. */
+const RESERVED_IDS = new Set(["0", "NA"]);
+
+/**
+ * The ID each individual gets in the file (#66). People are identified by the
+ * name shown on the canvas when they have one; otherwise by their internal ID,
+ * unless that is a generated UUID, which means nothing outside PedEdit and is
+ * replaced by a short sequential one. IDs are unique within the file: a
+ * repeated name gets a "_2", "_3" suffix. The R dialect is tab separated, so
+ * spaces inside names are kept; PLINK readers split on any whitespace, so
+ * there spaces become underscores.
+ */
+export function exportIds(pedigree: Pedigree, rDialect = false): Map<string, string> {
+  const clean = (s: string) => {
+    const t = s.trim().replace(rDialect ? /[\t\r\n]+/g : /\s+/g, rDialect ? " " : "_");
+    return RESERVED_IDS.has(t) ? "" : t;
+  };
+  const wanted = pedigree.individuals.map(ind => {
+    const fromName = clean(ind.name ?? "");
+    if (fromName) return fromName;
+    return UUID_PATTERN.test(ind.id) ? "" : clean(ind.id);
+  });
+
+  const used = new Set(wanted.filter(Boolean));
+  const taken = new Set<string>();
+  const result = new Map<string, string>();
+  let next = 1;
+  pedigree.individuals.forEach((ind, i) => {
+    let id = wanted[i]!;
+    if (!id) {
+      do id = `ind${next++}`; while (used.has(id) || taken.has(id));
+    } else if (taken.has(id)) {
+      let n = 2;
+      while (used.has(`${id}_${n}`) || taken.has(`${id}_${n}`)) n++;
+      id = `${id}_${n}`;
+    }
+    taken.add(id);
+    result.set(ind.id, id);
+  });
+  return result;
 }

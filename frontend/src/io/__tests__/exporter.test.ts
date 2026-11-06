@@ -231,4 +231,68 @@ describe("exportPed: r dialect", () => {
     expect(ped2.individuals.find(i => i.id === "kid")!.affected).toBe(true);
     expect(ped2.partnerships).toHaveLength(1);
   });
+
+  describe("IDs come from names (#66)", () => {
+    const U1 = "7f48c99b-5fd5-4a4d-8839-749c0022547a";
+    const U2 = "e52ca3b0-9513-4089-a945-db2c2b51ea9f";
+    const U3 = "f952755d-2644-441b-9b24-ddfe0c6fa02c";
+    const U4 = "0cc4daef-f6ca-46f7-8f82-7a3ab3db16ca";
+    const family = (names: (string | undefined)[]) => makePedigree({
+      individuals: [
+        { id: U1, sex: "male",   affected: false, sibOrder: 0, name: names[0] },
+        { id: U2, sex: "female", affected: true,  sibOrder: 0, name: names[1] },
+        { id: U3, sex: "male",   affected: false, sibOrder: 0, name: names[2] },
+        { id: U4, sex: "female", affected: false, sibOrder: 1, name: names[3] },
+      ],
+      partnerships: [{ id: "p", individual1: U1, individual2: U2 }],
+      parentOf: { p: [U3, U4] },
+    });
+    const rows = (text: string) => text.trim().split("\n").map(l => l.split("\t"));
+
+    it("writes names in IID, PAT and MAT instead of UUIDs", () => {
+      const text = exportPed(family(["35", "40", "1125", "Echo_F60"]));
+      expect(text).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}/);
+      expect(rows(text).map(r => r.slice(1, 4))).toEqual([
+        ["35", "0", "0"], ["40", "0", "0"], ["1125", "35", "40"], ["Echo_F60", "35", "40"],
+      ]);
+    });
+
+    it("gives unnamed people short sequential IDs, not UUIDs", () => {
+      const ids = rows(exportPed(family(["35", undefined, "", "  "]))).map(r => r[1]);
+      expect(ids).toEqual(["35", "ind1", "ind2", "ind3"]);
+    });
+
+    it("keeps non-UUID internal IDs of unnamed people (PED imports round-trip)", () => {
+      const ped = makePedigree({
+        individuals: [{ id: "A12", sex: "male", affected: false, sibOrder: 0 }],
+      });
+      expect(rows(exportPed(ped))[0]![1]).toBe("A12");
+    });
+
+    it("makes repeated names unique", () => {
+      const ids = rows(exportPed(family(["x", "x", "x_2", "x"]))).map(r => r[1]);
+      expect(ids).toEqual(["x", "x_3", "x_2", "x_4"]);
+    });
+
+    it("never uses an ID that means no parent", () => {
+      const ids = rows(exportPed(family(["0", "NA", "a", "b"]))).map(r => r[1]);
+      expect(ids).toEqual(["ind1", "ind2", "a", "b"]);
+    });
+
+    it("replaces spaces in PLINK but keeps them in the tab-only R dialect", () => {
+      const names = ["Charles V", "Isabella of Portugal", "Philip II", "Maria"];
+      expect(rows(exportPed(family(names)))[2]!.slice(1, 4)).toEqual(["Philip_II", "Charles_V", "Isabella_of_Portugal"]);
+      const r = rows(exportPed(family(names), { dialect: "r" }));
+      expect(r[3]!.slice(0, 3)).toEqual(["Philip II", "Charles V", "Isabella of Portugal"]);
+    });
+
+    it("re-imports with the names as IDs and the same structure", () => {
+      for (const dialect of ["plink", "r"] as const) {
+        const pedigree = importPed(exportPed(family(["35", "40", "Carol Ann", "d"]), { dialect })).pedigrees[0]?.pedigree;
+        expect(pedigree!.individuals.map(i => i.id).sort()).toEqual(
+          (dialect === "r" ? ["35", "40", "Carol Ann", "d"] : ["35", "40", "Carol_Ann", "d"]).sort());
+        expect(pedigree!.partnerships).toHaveLength(1);
+      }
+    });
+  });
 });
