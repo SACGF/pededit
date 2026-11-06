@@ -34,6 +34,15 @@ draws NSGC symbols.
   symbol with a small triangle; quadrant tags are clipped to that triangle.
   A pregnancy or loss can have no partner or children, enforced in the store
   actions and greyed out in the menus.
+  Positions that depend on the status live here too, so canvas and exports
+  agree: `carrierDot` (centred; below a shrunk, raised "P" on a pregnancy;
+  low left in a triangle to clear the termination slash) and
+  `symbolTopInset` (sibship drops end at a triangle's apex, not the box top).
+  On an affected symbol the termination / stillbirth slash is redrawn in
+  white clipped to the symbol outline, so it stays visible over the fill.
+  The carrier dot is never drawn on an affected symbol (the edit panel says
+  so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
+  way to show it.
 
 Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name,
 DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter`

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { exportPed } from "../ped/exporter.js";
+import { exportPed, pedLostLifeStatus } from "../ped/exporter.js";
 import { importPed } from "../ped/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -294,5 +294,21 @@ describe("exportPed: r dialect", () => {
         expect(pedigree!.partnerships).toHaveLength(1);
       }
     });
+  });
+});
+
+describe("pedLostLifeStatus", () => {
+  it("lists pregnancies and losses, which PED writes as ordinary children", () => {
+    const ped: Pedigree = {
+      individuals: [
+        { id: "a", sex: "male", affected: false, sibOrder: 0 },
+        { id: "b", sex: "unknown", affected: false, sibOrder: 1, lifeStatus: "miscarriage" },
+        { id: "c", sex: "female", affected: false, sibOrder: 2, lifeStatus: "pregnancy" },
+      ],
+      partnerships: [],
+      parentOf: {},
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    expect(pedLostLifeStatus(ped).map(i => i.id)).toEqual(["b", "c"]);
   });
 });

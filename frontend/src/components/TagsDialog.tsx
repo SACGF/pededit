@@ -9,7 +9,7 @@ import { useAppStore } from "../store/useAppStore";
 import { tagPresetApi, type TagPresetPayload } from "../api/client";
 import {
   TAG_PALETTE, TAG_STYLE_LABELS, QUADRANT_NAMES,
-  pedigreeTags, quadrantTags, nextTagColor,
+  pedigreeTags, quadrantTags, nextTagColor, unusedTagSuggestions,
 } from "../pedigree/tags";
 
 interface TagsDialogProps {
@@ -211,9 +211,22 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
             </p>
           )}
 
-          <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={handleAdd}>
-            <Plus size={12} /> Add tag
-          </Button>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={handleAdd}>
+              <Plus size={12} /> Add tag
+            </Button>
+            {unusedTagSuggestions(pedigree).map(s => (
+              <button
+                key={s.label}
+                type="button"
+                title={`Add a text tag "${s.label}"`}
+                onClick={() => addTag({ ...s })}
+                className="h-7 px-2 text-[11px] font-mono border rounded hover:bg-gray-100"
+              >
+                + {s.abbrev}
+              </button>
+            ))}
+          </div>
 
           {isAuthenticated && (
             <div className="border-t pt-3">

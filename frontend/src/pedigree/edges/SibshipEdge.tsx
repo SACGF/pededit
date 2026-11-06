@@ -1,7 +1,8 @@
 import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps, Node } from "@xyflow/react";
-import type { SibshipEdgeData } from "../layoutToFlow";
+import type { SibshipEdgeData, RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
+import { symbolTopInset } from "../lifeStatus";
 
 export type SibshipEdgeType = Edge<SibshipEdgeData, "sibshipEdge">;
 
@@ -31,8 +32,10 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   const sibLeftX  = Math.min(coupleX, ...childXs);
   const sibRightX = Math.max(coupleX, ...childXs);
 
-  // Child drops end at the top edge of the child symbol.
-  const childTopY = childY - NODE_SIZE / 2;
+  // Child drops end at the top edge of the child symbol, or at the apex of a
+  // loss triangle, which sits lower in the symbol box.
+  const childTopY = (c: Node) =>
+    childY - NODE_SIZE / 2 + symbolTopInset((c.data as RFNodeData | undefined)?.individual?.lifeStatus, NODE_SIZE);
 
   // When the parents' couple line hops over an intermediate partner the drop
   // starts from the raised line rather than the row centre.
@@ -44,7 +47,7 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
     // 2. Horizontal sibship bar: spans from couple-drop to outermost child
     `M ${sibLeftX} ${sibBarY} L ${sibRightX} ${sibBarY}`,
     // 3. Vertical drops: sibship bar → top of each child symbol
-    ...childXs.map((cx: number) => `M ${cx} ${sibBarY} L ${cx} ${childTopY}`),
+    ...children.map(c => `M ${c.position.x} ${sibBarY} L ${c.position.x} ${childTopY(c)}`),
   ];
 
   return (

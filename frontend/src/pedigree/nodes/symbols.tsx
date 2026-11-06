@@ -6,8 +6,9 @@ import {
 import type { Sector, AnnotationItem } from "../tags";
 import {
   usesLossTriangle, lifeStatusCaption, captionBaselineY, CAPTION_FONT_SIZE,
-  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
+  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY, carrierDot,
 } from "../lifeStatus";
+import type { LifeStatus } from "@pedigree-editor/layout-engine";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
@@ -65,9 +66,6 @@ function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillD
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={2} fill="none" />}
-      {fill.type === "carrier-dot" && (
-        <circle cx={size / 2} cy={size / 2} r={size * 0.15} fill="black" />
-      )}
     </g>
   );
 }
@@ -86,9 +84,6 @@ function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fil
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="none" />}
-      {fill.type === "carrier-dot" && (
-        <circle cx={cx} cy={cy} r={size * 0.15} fill="black" />
-      )}
     </g>
   );
 }
@@ -113,9 +108,6 @@ function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fi
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
-      {fill.type === "carrier-dot" && (
-        <circle cx={cx} cy={cy} r={size * 0.15} fill="black" />
-      )}
     </g>
   );
 }
@@ -138,20 +130,42 @@ function LossTriangle({ size, fill, slash, sectors, clipId }: {
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
-      {slash && (
-        <line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke="black" strokeWidth={2} />
+      {slash && <SlashOverFill {...s} fill={fill} clipId={clipId} />}
+    </g>
+  );
+}
+
+/**
+ * A slash through a symbol. Black, and on an affected (black) fill the part
+ * inside the symbol is drawn again in white so the slash stays visible.
+ */
+function SlashOverFill({ x1, y1, x2, y2, fill, clipId }: {
+  x1: number; y1: number; x2: number; y2: number; fill: FillDescriptor; clipId: string;
+}) {
+  return (
+    <g>
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2} />
+      {fill.type === "solid" && (
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={2} clipPath={`url(#${clipId})`} />
       )}
     </g>
   );
 }
 
+/** Carrier dot, placed so it clears the pregnancy "P" and the loss triangle's slash. */
+function CarrierDot({ size, status }: { size: number; status: LifeStatus | undefined }) {
+  const d = carrierDot(status, size);
+  return <circle cx={d.cx} cy={d.cy} r={d.r} fill="black" />;
+}
+
 /** "P" inside the sex symbol of a current pregnancy. */
 function PregnancyMark({ size, fill }: { size: number; fill: FillDescriptor }) {
+  const carrier = fill.type === "carrier-dot";
   return (
     <text
-      x={size / 2} y={pregnancyBaselineY(size)}
+      x={size / 2} y={pregnancyBaselineY(size, 0, carrier)}
       textAnchor="middle"
-      fontFamily="sans-serif" fontSize={pregnancyFontSize(size)} fontWeight="bold"
+      fontFamily="sans-serif" fontSize={pregnancyFontSize(size, carrier)} fontWeight="bold"
       fill={fill.type === "solid" ? "white" : "black"}
       style={{ pointerEvents: "none", userSelect: "none" }}
     >
@@ -198,17 +212,21 @@ export function SymbolShape({ individual, size, sectors = [], clipId }: ShapePro
         {usesLossTriangle(status)
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
           : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
+        {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
-        {status === "stillbirth" && <DeceasedSlash size={size} />}
+        {status === "stillbirth" && (
+          <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
+        )}
         {caption && <LifeStatusCaption size={size} text={caption} />}
       </g>
     );
   }
-  switch (individual.sex) {
-    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={id} />;
-    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={id} />;
-    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} clipId={id} />;
-  }
+  return (
+    <g>
+      <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />
+      {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} />}
+    </g>
+  );
 }
 
 /**
@@ -242,15 +260,13 @@ export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationI
 
 // ── Overlays ───────────────────────────────────────────────────────────────────
 
-export function DeceasedSlash({ size }: { size: number }) {
+function deceasedSlashEnds(size: number) {
   const overhang = 4;
-  return (
-    <line
-      x1={-overhang}       y1={-overhang}
-      x2={size + overhang} y2={size + overhang}
-      stroke="black" strokeWidth={2}
-    />
-  );
+  return { x1: -overhang, y1: -overhang, x2: size + overhang, y2: size + overhang };
+}
+
+export function DeceasedSlash({ size }: { size: number }) {
+  return <line {...deceasedSlashEnds(size)} stroke="black" strokeWidth={2} />;
 }
 
 /** NSGC proband arrow: solid arrowhead pointing up-right toward the symbol's bottom-left corner. */

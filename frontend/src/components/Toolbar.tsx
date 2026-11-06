@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image, List, Tags } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
+import { pedLostLifeStatus } from "../io/ped/exporter.js";
+import { lifeStatusLabel } from "../pedigree/lifeStatus";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
 import { exportJson } from "../io/json/index.js";
 
@@ -40,14 +43,26 @@ interface ToolbarProps {
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTagsClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
-  const { activePedigreeId, pedigrees } = useAppStore();
+  const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
-  const activeTitle = pedigrees.find(p => p.id === activePedigreeId)?.title;
+  const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
   const [pedMenuOpen, setPedMenuOpen] = useState(false);
 
-  function handleExportPed(dialect: NonNullable<ExportOptions["dialect"]>) {
+  type PedDialect = NonNullable<ExportOptions["dialect"]>;
+  // PED has no column for pregnancy / loss status, so warn before writing
+  // those individuals as ordinary children. Holds the chosen dialect too.
+  const [pedWarning, setPedWarning] = useState<{ lines: string[]; dialect: PedDialect } | null>(null);
+
+  function handleExportPedClick(dialect: PedDialect) {
     setPedMenuOpen(false);
+    const lost = pedLostLifeStatus(pedigree);
+    if (lost.length === 0) { handleExportPed(dialect); return; }
+    setPedWarning({ dialect, lines: lost.map(i => `${i.name || i.id}: ${lifeStatusLabel(i.lifeStatus!)}`) });
+  }
+
+  function handleExportPed(dialect: PedDialect) {
+    setPedWarning(null);
     const text = exportPed(pedigree, { familyId: "1", dialect });
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -82,6 +97,28 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
 
   return (
     <div className="flex items-center gap-1 px-2 py-1 border-b bg-white">
+      <Dialog open={pedWarning !== null} onOpenChange={open => { if (!open) setPedWarning(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>PED drops pregnancies and losses</DialogTitle>
+            <DialogDescription>
+              PED has no column for pregnancy or pregnancy loss, so{" "}
+              {pedWarning?.lines.length === 1 ? "this individual is" : `these ${pedWarning?.lines.length} individuals are`}{" "}
+              written as ordinary children. Download JSON keeps them.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="text-xs text-gray-700 max-h-40 overflow-y-auto list-disc pl-5">
+            {(pedWarning?.lines ?? []).map((line, k) => <li key={k}>{line}</li>)}
+          </ul>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setPedWarning(null)}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={() => { setPedWarning(null); handleExportJson(); }}>
+              Download JSON
+            </Button>
+            <Button size="sm" onClick={() => pedWarning && handleExportPed(pedWarning.dialect)}>Export PED anyway</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Select mode */}
       <Button
         variant={activeTool === "select" ? "secondary" : "ghost"}
@@ -190,12 +227,12 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onLegendClick, onTa
           <PedFormatItem
             label="PLINK"
             detail="FID IID PAT MAT SEX PHENO, no header"
-            onClick={() => handleExportPed("plink")}
+            onClick={() => handleExportPedClick("plink")}
           />
           <PedFormatItem
             label="R (pedtools, kinship2)"
             detail="id fid mid sex aff, tabs, header"
-            onClick={() => handleExportPed("r")}
+            onClick={() => handleExportPedClick("r")}
           />
         </PopoverContent>
       </Popover>

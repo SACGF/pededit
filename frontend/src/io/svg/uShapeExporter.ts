@@ -5,7 +5,7 @@ import {
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
-import { lossTriangleGeom, renderLifeStatusMarks } from "./svgExporter";
+import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset } from "./svgExporter";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -932,8 +932,9 @@ function normalSeg(u: number, o1: number, o2: number, g: Geom): string {
 
 const DUP_ATTRS = `fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"`;
 
-function renderConnectors(b: Built, layout: UShapeLayout): string[] {
+function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): string[] {
   const g = b.geom;
+  const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const out: string[] = [];
 
   walk(b.root, n => {
@@ -956,7 +957,8 @@ function renderConnectors(b: Built, layout: UShapeLayout): string[] {
       out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
       const lo = Math.min(uP, ...us), hi = Math.max(uP, ...us);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
-      for (const u of us) out.push(normalSeg(u, bar, childEdge, g));
+      // A loss triangle's apex sits below the top of the symbol box.
+      w.kids.forEach(c => out.push(normalSeg(c.u, bar, childEdge + HALF + childDropEndOffset(byId.get(c.blood)), g)));
     }
   });
 
@@ -999,9 +1001,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
       + `${geom} ${stroke} fill="none"/>`;
   }
-  if (ind.carrier && !ind.affected && !triangle) shape += `<circle cx="0" cy="0" r="${NODE_SIZE * 0.15}" fill="black"/>`;
+  shape += renderCarrierDot(ind);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
-  return shape + renderLifeStatusMarks(ind) + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
+  return shape + renderLifeStatusMarks(ind, geom, clipId) + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
 }
 
 function renderDeceasedSlash(): string {
@@ -1127,7 +1129,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   }
   out.push(`<g transform="translate(${r(margin - minX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
-  out.push(...renderConnectors(b, layout));
+  out.push(...renderConnectors(b, layout, working));
   out.push(...renderSymbols(working, b));
   out.push(`</g>`);
   if (legend.height > 0) {

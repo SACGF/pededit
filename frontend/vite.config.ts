@@ -81,7 +81,8 @@ export default defineConfig({
     proxy: {
       // Proxy /api calls to Django during development
       "/api": {
-        target: "http://localhost:8000",
+        // PEDEDIT_API_TARGET lets a second checkout run its own Django.
+        target: process.env.PEDEDIT_API_TARGET ?? "http://localhost:8000",
         changeOrigin: true,
       },
     },

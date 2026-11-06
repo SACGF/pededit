@@ -62,6 +62,26 @@ function triangleInset(size: number): number {
   return size * 0.2;
 }
 
+/**
+ * Distance from the top of the symbol box down to the top of the drawn
+ * symbol. Sibship drops end here so they meet a loss triangle's apex.
+ */
+export function symbolTopInset(status: LifeStatus | undefined, size: number): number {
+  return usesLossTriangle(status) ? triangleInset(size) : 0;
+}
+
+/**
+ * Carrier dot, relative to the top-left of the symbol box. Centred in a sex
+ * symbol; below the "P" of a pregnancy (which then shrinks and moves up, see
+ * pregnancyFontSize); in a loss triangle low and left of centre so it stays
+ * clear of the termination slash.
+ */
+export function carrierDot(status: LifeStatus | undefined, size: number, ox = 0, oy = 0): { cx: number; cy: number; r: number } {
+  if (usesLossTriangle(status)) return { cx: ox + size * 0.42, cy: oy + size * 0.65, r: size * 0.08 };
+  if (status === "pregnancy")   return { cx: ox + size / 2,    cy: oy + size * 0.74, r: size * 0.09 };
+  return { cx: ox + size / 2, cy: oy + size / 2, r: size * 0.15 };
+}
+
 /** Points attribute for the loss triangle (apex up). */
 export function lossTrianglePoints(size: number, ox = 0, oy = 0): string {
   const inset = triangleInset(size);
@@ -80,12 +100,17 @@ export function lossSlashEnds(size: number, ox = 0, oy = 0): { x1: number; y1: n
   };
 }
 
-/** Font size (px) of the "P" drawn inside a pregnancy symbol. */
-export function pregnancyFontSize(size: number): number {
-  return size * 0.5;
+/**
+ * Font size (px) of the "P" drawn inside a pregnancy symbol. Smaller when a
+ * carrier dot has to fit under it.
+ */
+export function pregnancyFontSize(size: number, carrier = false): number {
+  return size * (carrier ? 0.36 : 0.5);
 }
 
-/** Baseline of the "P" so it sits centred inside the symbol. */
-export function pregnancyBaselineY(size: number, oy = 0): number {
-  return oy + size / 2 + pregnancyFontSize(size) * 0.35;
+/** Baseline of the "P": centred, or raised above the carrier dot. */
+export function pregnancyBaselineY(size: number, oy = 0, carrier = false): number {
+  return carrier
+    ? oy + size * 0.56
+    : oy + size / 2 + pregnancyFontSize(size) * 0.35;
 }

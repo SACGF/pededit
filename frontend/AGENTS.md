@@ -38,7 +38,9 @@ stub so the app still builds without Google login.
   `claude/agent_harness_testing_bugs.md`), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
   disconnected individuals, cross-generation and consanguineous matings.
-  Not yet: twins, adoption, pregnancy loss, assisted reproduction symbols.
+  Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`); PED cannot
+  carry them, so Export PED warns first. Not yet: twins, adoption, assisted
+  reproduction symbols.
 - Visual style is black and white, minimal chrome. No colour except tags.
 
 ## Layout of src/
