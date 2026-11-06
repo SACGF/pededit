@@ -11,15 +11,21 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
     ? "#FID\tIID\tPAT\tMAT\tSEX\tPHENO\n"
     : "";
 
-  // Build child→(father,mother) lookup from partnerships + parentOf
+  const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
+
+  // Build child→(father,mother) lookup from partnerships + parentOf.
+  // Partnership members are unordered, so put the male partner in PAT: a
+  // female in PAT makes every other PED reader warn or reject the file.
+  // When neither partner is male the original order is kept.
   const parentLookup = new Map<string, { father: string; mother: string }>();
   for (const partnership of pedigree.partnerships) {
+    const { individual1, individual2 } = partnership;
+    const swap = sexOf.get(individual1) !== "male" && sexOf.get(individual2) === "male";
+    const father = swap ? individual2 : individual1;
+    const mother = swap ? individual1 : individual2;
     const children = pedigree.parentOf[partnership.id] ?? [];
     for (const childId of children) {
-      parentLookup.set(childId, {
-        father: partnership.individual1,
-        mother: partnership.individual2,
-      });
+      parentLookup.set(childId, { father, mother });
     }
   }
 

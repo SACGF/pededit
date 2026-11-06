@@ -1,7 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
-import { alignPedigree } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE } from "./constants";
+import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
+import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "./constants";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -24,8 +24,15 @@ export interface RFNodeData extends Record<string, unknown> {
   isPinned: boolean;
 }
 
-/** No extra data needed — geometry is derived from source/target handle positions. */
-export type CoupleEdgeData = Record<string, unknown>;
+/**
+ * Geometry is derived from the source/target node positions. hopHeight is 0
+ * for an ordinary line; otherwise the partners are not adjacent (someone with
+ * three or more partners) and the line rises by that many px to pass over the
+ * slot(s) between them.
+ */
+export interface CoupleEdgeData extends Record<string, unknown> {
+  hopHeight: number;
+}
 
 /**
  * All geometry for a sibship connection. The SibshipEdge renderer uses
@@ -46,6 +53,8 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   coupleX: number;
   /** y (canvas px) of the parent generation centre = (level-1) * ROW_HEIGHT. */
   coupleY: number;
+  /** Rise (px) of the parents' couple line when it hops over an intermediate partner; 0 otherwise. */
+  hopHeight: number;
   /** y (canvas px) of the sibship bar = (level - SIB_BAR_FACTOR) * ROW_HEIGHT. */
   sibBarY: number;
   /** x (canvas px) of each child's slot centre, in slot order. */
@@ -235,11 +244,24 @@ export function layoutToFlow(pedigree: Pedigree): FlowData {
     adjustOrphanPositions(result, redirectSlot, nodes, slotPos);
   }
 
+  const partners = buildPartnerSetFromPedigree(pedigree);
+
   return {
     nodes,
-    coupleEdges:  buildCoupleEdges(result),
-    sibshipEdges: buildSibshipEdges(result, slotPos, redirectSlot),
+    coupleEdges:  buildCoupleEdges(result, partners),
+    sibshipEdges: buildSibshipEdges(result, partners, slotPos, redirectSlot),
   };
+}
+
+/**
+ * Rise of the couple line for the spouse marker at (level, slot): 0 when the
+ * adjacent slots are partners, otherwise enough to clear the slots between the
+ * real partners.
+ */
+function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
+  const rc = resolveCouple(result, partners, level, slot);
+  if (!rc.hop) return 0;
+  return COUPLE_HOP + (rc.rightSlot - rc.leftSlot - 2) * COUPLE_HOP_STEP;
 }
 
 // ── Nodes ─────────────────────────────────────────────────────────────────────
@@ -311,7 +333,7 @@ function buildNodes(
 
 // ── Couple edges ──────────────────────────────────────────────────────────────
 
-function buildCoupleEdges(result: LayoutResult): Edge<CoupleEdgeData>[] {
+function buildCoupleEdges(result: LayoutResult, partners: PartnerSet): Edge<CoupleEdgeData>[] {
   const edges: Edge<CoupleEdgeData>[] = [];
 
   for (let level = 0; level < result.n.length; level++) {
@@ -319,14 +341,19 @@ function buildCoupleEdges(result: LayoutResult): Edge<CoupleEdgeData>[] {
       const sp = result.spouse[level][slot];
       if (sp === 0) continue;
 
+      // A marker between two people who are not partners is a marriage line
+      // passing through to a further partner: connect the real partners and
+      // hop over whatever sits between them.
+      const rc = resolveCouple(result, partners, level, slot);
+
       edges.push({
         id:           `couple-${level}-${slot}`,
-        source:       `${level}-${slot}`,
-        target:       `${level}-${slot + 1}`,
+        source:       `${level}-${rc.leftSlot}`,
+        target:       `${level}-${rc.rightSlot}`,
         sourceHandle: "couple-out",  // right edge of left partner
         targetHandle: "couple-in",   // left edge of right partner
         type:         sp === 1 ? "coupleEdge" : "consanguineousEdge",
-        data:         {},
+        data:         { hopHeight: hopHeightAt(result, partners, level, slot) },
       });
     }
   }
@@ -338,6 +365,7 @@ function buildCoupleEdges(result: LayoutResult): Edge<CoupleEdgeData>[] {
 
 function buildSibshipEdges(
   result: LayoutResult,
+  partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
   redirectSlot: Map<string, string>,
 ): Edge<SibshipEdgeData>[] {
@@ -376,6 +404,7 @@ function buildSibshipEdges(
       const childY   = firstChildPos.y;
       const sibBarY  = (coupleY + childY) / 2;
       const childXs  = resolvedChildIds.map(id => slotPos.get(id)?.x ?? 0);
+      const hopHeight = hopHeightAt(result, partners, level - 1, leftParentSlot);
 
       // Source = left parent node; target = leftmost resolved child node.
       edges.push({
@@ -389,7 +418,7 @@ function buildSibshipEdges(
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
-          coupleX, coupleY, sibBarY, childXs, childY,
+          coupleX, coupleY, hopHeight, sibBarY, childXs, childY,
         },
       });
     }

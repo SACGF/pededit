@@ -115,8 +115,8 @@ describe("exportSvg — relationship lines", () => {
     const svg = exportSvg(consanguineousFamily);
     // consanguineousFamily: i3+i4 couple is at level 1 (raw y = ROW_HEIGHT = 120)
     // Double couple lines at y ± CONSANG_GAP/2 = 120 ± 2 = 118 and 122
-    expect(svg).toContain('y1="118"');
-    expect(svg).toContain('y1="122"');
+    expect(svg).toMatch(/<path d="M [\d.]+ 118 L [\d.]+ 118"/);
+    expect(svg).toMatch(/<path d="M [\d.]+ 122 L [\d.]+ 122"/);
   });
 
   it("nuclear family → contains sibship bar and vertical drops", () => {

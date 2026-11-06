@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Phase 5a:** PED file import/export — `frontend/src/io/ped/` (parser, validator, converter, exporter), `ImportPedDialog`, toolbar Import/Export buttons. 129 tests.
 - **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`.
 - **Phase 5c:** Small features — kindepth force fallback, autohint spouse hints, QP bundling, auto-detect consanguinity on edit, CSV export, PDF export, `hpoTerms` data model slot.
-- **Phase 6 (partial):** Manual repositioning — pin/unpin, visual indicator, reset layout, drag persistence, canvas settings (nodesMoveable, snapToGrid). Remaining: compact mode, fit-to-page, large family handling, full auto_hint, batch SVG API.
+- **Phase 6 (partial):** Manual repositioning — pin/unpin, visual indicator, reset layout, drag persistence, canvas settings (nodesMoveable, snapToGrid). Full `autohint` (kinship2 duplicate fixup) ported, so people with several partners are drawn once and three-plus partners get a raised line to the far partner. Remaining: compact mode, fit-to-page, large family handling, connected-component founder ordering, batch SVG API.
 - **Phase 8 (partial):** Deploy infrastructure — Gunicorn + Nginx + systemd on VPS, deploy scripts, INSTALL.md, domain (pededit.com). Remaining: Django security settings, rate limiting, health check, Sentry, automated backups.
 - **Phase 9 (partial):** Social login — Google and GitHub OAuth via direct OAuth flow (not Clerk as originally planned). Remaining: remove legacy username/password auth endpoints.
 
@@ -93,4 +93,4 @@ This is the established aesthetic for clinical and publication pedigrees. Mainta
 
 **Data model:** Graph-based — `Individual` nodes, `Partnership` edges, `parentOf` map. JSON serialization is the native format; PED/BOADICEA/GA4GH FHIR are import targets. The `Pedigree` interface in `layout-engine/src/types.ts` is canonical — the Django `JSONField` and the Zustand store both mirror it exactly.
 
-**Layout algorithm:** Ported from kinship2 (R). The hard parts are done: `kindepth` assigns generations, `alignped1–4` place individuals and optimise positions. `autohint` is currently a stub (sequential ordering); full duplicate-detection reordering is Phase 6. See `claude/layout_engine_guide.md` for how to consume `LayoutResult` in the renderer.
+**Layout algorithm:** Ported from kinship2 (R). The hard parts are done: `kindepth` assigns generations, `alignped1–4` place individuals and optimise positions. `autohint` is a full port of the kinship2 duplicate fixup (sibling shift plus spouse hints). See `claude/layout_engine_guide.md` for how to consume `LayoutResult` in the renderer, including pass-through spouse markers for people with three or more partners.

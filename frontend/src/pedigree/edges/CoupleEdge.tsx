@@ -2,10 +2,11 @@ import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
+import { couplePathD } from "../couplePath";
 
 export type CoupleEdgeType = Edge<CoupleEdgeData, "coupleEdge">;
 
-export function CoupleEdge({ source, target }: EdgeProps<CoupleEdgeType>) {
+export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) {
   const nodes = useNodes();
   const sourceNode = nodes.find(n => n.id === source);
   const targetNode = nodes.find(n => n.id === target);
@@ -20,7 +21,7 @@ export function CoupleEdge({ source, target }: EdgeProps<CoupleEdgeType>) {
   return (
     <g>
       <path
-        d={`M ${sx} ${sy} L ${tx} ${ty}`}
+        d={couplePathD(sx, sy, tx, ty, data?.hopHeight ?? 0)}
         stroke="black"
         strokeWidth={2}
         fill="none"

@@ -38,13 +38,23 @@ describe("alignPedigree — simple cases", () => {
 });
 
 describe("alignPedigree — sample.ped family 1", () => {
-  it("produces 4 generations with non-trivial counts (R ground truth: n = c(8, 19, 22, 8))", () => {
-    // Full autohint (not yet implemented) is required for the exact R ground truth.
-    // Verify structural invariants that hold regardless of hint ordering.
+  it("matches kinship2 1.9.6.2 align.pedigree() slot for slot", () => {
+    // R output (data(sample.ped), ped==1). R omits individual 113, who has no
+    // relatives in the file; we append such people to the end of their row.
     const ped = buildPedigreeFromFlat(SAMPLE_PED_1);
     const result = alignPedigree(ped);
-    expect(result.n).toHaveLength(4);
-    expect(result.n.every(c => c > 0)).toBe(true);
+    const rows = result.nid.map((row, lev) =>
+      row.map((nid, s) => {
+        const id = ped.individuals[nid - 1]!.id;
+        return `${id}${result.spouse[lev]![s] ? "~" : ""}/f${result.fam[lev]![s]}`;
+      }).join(" "),
+    );
+    expect(rows).toEqual([
+      "105~/f0 106/f0 107~/f0 108/f0 135~/f0 136/f0 113/f0",
+      "101~/f0 102/f0 115/f1 117~/f0 116/f1 118/f1 119~/f1 120/f3 103~/f5 104/f0 137~/f0 138/f5",
+      "109~/f1 110/f0 129/f4 130/f7 131/f7 132/f7 133/f7 134/f7 110/f9 111/f9 112~/f9 118/f0 114~/f9 115/f0 139/f11 140/f11 141/f11",
+      "121/f1 122/f1 123/f1 124/f1 125/f11 126/f11 127/f13 128/f13",
+    ]);
   });
 
   it("all 41 individuals appear at least once", () => {

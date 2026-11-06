@@ -21,10 +21,10 @@ Each phase produces something testable and, from Phase 4 onward, something demon
 - `kindepth` — generation depth assignment with couple-alignment pass
 - `alignped1` / `alignped2` / `alignped3` / `alignped4` — all four kinship2 sub-routines ported
 - `alignPedigree` — orchestrator: converts `Pedigree` → layout, runs algorithm, returns `LayoutResult`
-- `autohint` — stub (sequential ordering); produces valid layouts but not visually optimised for large families with cross-generational couples
+- `autohint` — full port: duplicate detection, sibling shift, spouse hints (multi-partner chains draw each person once, matching R)
 - `utils` — `buildLayoutInput` / `buildPedigreeFromFlat` for tests
 
-**Known limitation:** Full `autohint` (duplicate detection → sibling reordering → spouse hints) is not yet implemented. This affects visual quality for complex pedigrees (e.g. kinship2's SAMPLE_PED_1 produces `n = [8,19,22,8]` in R; the stub produces different but structurally valid counts). Layout correctness — monotonically increasing positions, valid fam pointers, all individuals placed — is verified. Autohint can be completed as part of Phase 6 layout improvements if needed, or earlier if visual quality becomes a blocker.
+**Multi-partner layouts:** `autohint` now ports the kinship2 duplicate fixup, and renderers resolve pass-through spouse markers (someone with three or more partners) into a raised line to the far partner via `resolveCouple`. Twin handling in autohint is still missing because the data model has no twin relation.
 
 **Defer:** No UI, no Django, no React. Just types and algorithms.
 
@@ -206,7 +206,7 @@ Small self-contained improvements. Suggested order: auto-consang → CSV → PDF
 - Compact mode: tighten inter-generation spacing for presentation
 - Fit-to-page: reorganise layout to fit a target aspect ratio (not just scale, actually reorganise)
 - Large family handling: pagination / viewport clipping for pedigrees > ~80 individuals
-- Full `auto_hint` graph-based optimisation (founder ordering using connected-component traversal, replacing current stub)
+- ~~Full `auto_hint`~~ ✅ duplicate fixup ported; connected-component founder ordering still open (see `claude/phase_6_5_plan.md`)
 
 *Batch SVG API:*
 - `POST /api/pedigrees/render-svg/` Django endpoint: accepts a PED file body, returns SVG

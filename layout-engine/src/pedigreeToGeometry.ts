@@ -10,6 +10,7 @@
  */
 
 import { alignPedigree } from "./alignPedigree.js";
+import { buildPartnerSetFromPedigree, resolveCouple } from "./couples.js";
 import type { Pedigree, Individual, LayoutResult } from "./types.js";
 
 // ── Rendering constants (match frontend/src/pedigree/constants.ts) ────────────
@@ -26,6 +27,13 @@ export interface RenderingConstants {
    * bar sits. sibBarY = (level - sibBarFactor) × rowHeight. Default: 0.4.
    */
   sibBarFactor: number;
+  /**
+   * Height (px) a couple line rises to pass over an intermediate partner when
+   * someone has three or more partners. Must clear nodeSize / 2. Default: 28.
+   */
+  coupleHop: number;
+  /** Extra rise (px) for each additional slot a hop passes over. Default: 10. */
+  coupleHopStep: number;
 }
 
 const DEFAULT_CONSTANTS: RenderingConstants = {
@@ -33,6 +41,8 @@ const DEFAULT_CONSTANTS: RenderingConstants = {
   rowHeight: 120,
   nodeSize:  40,
   sibBarFactor: 0.4,
+  coupleHop: 28,
+  coupleHopStep: 10,
 };
 
 // ── Output types ──────────────────────────────────────────────────────────────
@@ -77,6 +87,12 @@ export interface CoupleGeometry {
   x2: number;
   /** y of the line (centre of both nodes — they share the same y). */
   y: number;
+  /**
+   * 0 for an ordinary line. Otherwise the partners are not adjacent (someone
+   * with three or more partners) and the line rises by this many px to pass
+   * over the slot(s) between them.
+   */
+  hopHeight: number;
 }
 
 /**
@@ -90,6 +106,11 @@ export interface SibshipGeometry {
   coupleX: number;
   /** y of the parent generation centre. */
   coupleY: number;
+  /**
+   * When the parents' couple line hops over an intermediate partner the drop
+   * starts from the raised line, at coupleY - hopHeight. 0 otherwise.
+   */
+  hopHeight: number;
   /** y of the horizontal sibling bar. */
   sibBarY: number;
   /** x centre of each child, in slot order. */
@@ -176,13 +197,21 @@ export function pedigreeToGeometry(
   const nodeAt = new Map<string, NodeGeometry>();
   for (const n of nodes) nodeAt.set(`${n.level}-${n.slot}`, n);
 
+  const partners = buildPartnerSetFromPedigree(pedigree);
+  const hopHeightAt = (lev: number, slot: number): number => {
+    const rc = resolveCouple(result, partners, lev, slot);
+    if (!rc.hop) return 0;
+    return c.coupleHop + (rc.rightSlot - rc.leftSlot - 2) * c.coupleHopStep;
+  };
+
   const couples: CoupleGeometry[] = [];
   for (let lev = 0; lev < result.n.length; lev++) {
     for (let slot = 0; slot < result.n[lev]! - 1; slot++) {
       const sp = result.spouse[lev]![slot]!;
       if (sp === 0) continue;
-      const left  = nodeAt.get(`${lev}-${slot}`)!;
-      const right = nodeAt.get(`${lev}-${slot + 1}`)!;
+      const rc    = resolveCouple(result, partners, lev, slot);
+      const left  = nodeAt.get(`${lev}-${rc.leftSlot}`)!;
+      const right = nodeAt.get(`${lev}-${rc.rightSlot}`)!;
       couples.push({
         leftId:  left.id,
         rightId: right.id,
@@ -190,6 +219,7 @@ export function pedigreeToGeometry(
         x1:      left.cx + half,
         x2:      right.cx - half,
         y:       left.cy,
+        hopHeight: hopHeightAt(lev, slot),
       });
     }
   }
@@ -219,8 +249,9 @@ export function pedigreeToGeometry(
       const sibBarY = (lev - c.sibBarFactor) * c.rowHeight;
       const childY  = lev * c.rowHeight;
       const childXs = slots.map(s => result.pos[lev]![s]! * c.slotWidth);
+      const hopHeight = hopHeightAt(lev - 1, leftParentSlot);
 
-      sibships.push({ coupleX, coupleY, sibBarY, childXs, childY });
+      sibships.push({ coupleX, coupleY, hopHeight, sibBarY, childXs, childY });
     }
   }
 

@@ -14,6 +14,34 @@ function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
 }
 
 describe("exportPed", () => {
+  it("writes the male partner in PAT even when the partnership lists the female first", () => {
+    const ped: Pedigree = makePedigree({
+      individuals: [
+        { id: "mum", sex: "female", affected: false, sibOrder: 0 },
+        { id: "dad", sex: "male",   affected: false, sibOrder: 1 },
+        { id: "kid", sex: "male",   affected: false, sibOrder: 0 },
+      ],
+      partnerships: [{ id: "p", individual1: "mum", individual2: "dad" }],
+      parentOf: { p: ["kid"] },
+    });
+    const line = exportPed(ped).trim().split("\n").find(l => l.includes("\tkid\t"))!;
+    expect(line.split("\t").slice(2, 4)).toEqual(["dad", "mum"]);
+  });
+
+  it("keeps partnership order when neither partner is male", () => {
+    const ped: Pedigree = makePedigree({
+      individuals: [
+        { id: "a", sex: "unknown", affected: false, sibOrder: 0 },
+        { id: "b", sex: "unknown", affected: false, sibOrder: 1 },
+        { id: "kid", sex: "female", affected: false, sibOrder: 0 },
+      ],
+      partnerships: [{ id: "p", individual1: "a", individual2: "b" }],
+      parentOf: { p: ["kid"] },
+    });
+    const line = exportPed(ped).trim().split("\n").find(l => l.includes("\tkid\t"))!;
+    expect(line.split("\t").slice(2, 4)).toEqual(["a", "b"]);
+  });
+
   it("exports nuclear family with correct columns", () => {
     const ped: Pedigree = makePedigree({
       individuals: [

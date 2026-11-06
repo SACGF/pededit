@@ -12,3 +12,15 @@ export const NODE_SIZE = 40;
  * generations. 0.5 = exactly midway (= sibBarY = (level - 0.5) * ROW_HEIGHT).
  */
 export const SIB_BAR_FACTOR = 0.5;
+
+/**
+ * Height (px) a couple line rises to pass over an intermediate partner when
+ * someone has three or more partners. Must clear NODE_SIZE / 2.
+ */
+export const COUPLE_HOP = 28;
+
+/** Extra rise (px) for each additional slot a hop passes over. */
+export const COUPLE_HOP_STEP = 10;
+
+/** Distance (px) from a node edge at which a hopping couple line turns upward. */
+export const COUPLE_HOP_INSET = 10;

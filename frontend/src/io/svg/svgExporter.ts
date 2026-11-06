@@ -1,6 +1,7 @@
-import { alignPedigree } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE } from "../../pedigree/constants";
+import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
+import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants";
+import { couplePathD, consanguineousPathsD } from "../../pedigree/couplePath";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 
@@ -95,27 +96,36 @@ function svgDefs(): string {
 
 // ── Couple lines ──────────────────────────────────────────────────────────────
 
-function renderCoupleLines(result: LayoutResult, slotPos: SlotPos): string[] {
+/**
+ * Rise of the couple line for the spouse marker at (level, slot): 0 when the
+ * adjacent slots are partners, otherwise enough to clear the slots between the
+ * real partners (someone with three or more partners).
+ */
+function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
+  const rc = resolveCouple(result, partners, level, slot);
+  if (!rc.hop) return 0;
+  return COUPLE_HOP + (rc.rightSlot - rc.leftSlot - 2) * COUPLE_HOP_STEP;
+}
+
+function renderCoupleLines(result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
+  const path = (d: string) => `<path d="${d}" stroke="black" stroke-width="${STROKE}" fill="none"/>`;
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
       const sp = result.spouse[level][slot];
       if (sp === 0) continue;
 
-      const left  = slotPos.get(`${level}-${slot}`)!;
-      const right = slotPos.get(`${level}-${slot + 1}`)!;
+      // Join the real partners; a marker between two non-partners is a line
+      // passing through to a further partner and hops over the slots between.
+      const rc    = resolveCouple(result, partners, level, slot);
+      const left  = slotPos.get(`${level}-${rc.leftSlot}`)!;
+      const right = slotPos.get(`${level}-${rc.rightSlot}`)!;
+      const hop   = hopHeightAt(result, partners, level, slot);
 
       if (sp === 1) {
-        lines.push(`<line x1="${left.x}" y1="${left.y}" x2="${right.x}" y2="${right.y}" stroke="black" stroke-width="${STROKE}"/>`);
+        lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop)));
       } else {
-        // Consanguineous: two parallel lines offset perpendicular to the connecting vector
-        const dx = right.x - left.x;
-        const dy = right.y - left.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const nx = -dy / len * (CONSANG_GAP / 2); // normal vector, scaled to half-gap
-        const ny =  dx / len * (CONSANG_GAP / 2);
-        lines.push(`<line x1="${left.x + nx}" y1="${left.y + ny}" x2="${right.x + nx}" y2="${right.y + ny}" stroke="black" stroke-width="${STROKE}"/>`);
-        lines.push(`<line x1="${left.x - nx}" y1="${left.y - ny}" x2="${right.x - nx}" y2="${right.y - ny}" stroke="black" stroke-width="${STROKE}"/>`);
+        for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP)) lines.push(path(d));
       }
     }
   }
@@ -128,7 +138,7 @@ function seg(x1: number, y1: number, x2: number, y2: number): string {
   return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function renderSibshipLines(result: LayoutResult, slotPos: SlotPos): string[] {
+function renderSibshipLines(result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
 
   for (let level = 1; level < result.n.length; level++) {
@@ -149,11 +159,14 @@ function renderSibshipLines(result: LayoutResult, slotPos: SlotPos): string[] {
       const sibBarY  = (coupleY + childY) / 2;
 
       const childXs = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
-      const sibLeftX  = Math.min(...childXs);
-      const sibRightX = Math.max(...childXs);
+      // The bar spans from the couple drop to the outermost child so the drop
+      // always meets it, even when a child cannot be centred under its parents.
+      const sibLeftX  = Math.min(coupleX, ...childXs);
+      const sibRightX = Math.max(coupleX, ...childXs);
 
-      // 1. Vertical drop from couple midpoint to sibship bar
-      lines.push(seg(coupleX, coupleY, coupleX, sibBarY));
+      // 1. Vertical drop from the couple line (raised if it hops) to the sibship bar
+      const dropTopY = coupleY - hopHeightAt(result, partners, level - 1, f - 1);
+      lines.push(seg(coupleX, dropTopY, coupleX, sibBarY));
       // 2. Horizontal sibship bar
       lines.push(seg(sibLeftX, sibBarY, sibRightX, sibBarY));
       // 3. Vertical drops from bar to top of each child symbol
@@ -297,8 +310,9 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   }
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
-  lines.push(...renderCoupleLines(result, slotPos));
-  lines.push(...renderSibshipLines(result, slotPos));
+  const partners = buildPartnerSetFromPedigree(working);
+  lines.push(...renderCoupleLines(result, partners, slotPos));
+  lines.push(...renderSibshipLines(result, partners, slotPos));
   lines.push(...renderSymbols(working, result, slotPos));
   lines.push(...renderLabels(working, result, slotPos));
   lines.push(`</g>`);

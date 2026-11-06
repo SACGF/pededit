@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import { layoutToFlow } from "../layoutToFlow";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../fixtures/consanguineous";
-import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR } from "../constants";
+import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR, COUPLE_HOP } from "../constants";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 // Concrete layout engine output for these fixtures (verified by running alignPedigree):
 //
@@ -304,4 +305,50 @@ describe("layoutToFlow — edge cases", () => {
     // assign duplicateIndex 1 and 2 respectively. Re-enable this test in Phase 6.
     "isDuplicate detection: individual in two slots gets isDuplicate=true on both",
   );
+});
+
+// ── Someone with three partners ───────────────────────────────────────────────
+
+describe("layoutToFlow — man with three wives", () => {
+  // Layout (kinship2): wife2 ~ man ~ wife3 ~ wife4. The marker between wife3
+  // and wife4 is the man's line passing through to wife4.
+  const ind = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+  const ped: Pedigree = {
+    individuals: [ind("m", "male"), ind("w1", "female"), ind("w2", "female"), ind("w3", "female"),
+                  ind("c1", "male"), ind("c2", "female"), ind("c3", "male")],
+    partnerships: [
+      { id: "p1", individual1: "m", individual2: "w1" },
+      { id: "p2", individual1: "m", individual2: "w2" },
+      { id: "p3", individual1: "m", individual2: "w3" },
+    ],
+    parentOf: { p1: ["c1"], p2: ["c2"], p3: ["c3"] },
+    siblingOrder: { mode: "insertion", affectedFirst: false },
+  };
+  const { nodes, coupleEdges, sibshipEdges } = layoutToFlow(ped);
+  const idOf = (nodeId: string) => nodes.find(n => n.id === nodeId)!.data.individual.id;
+
+  it("draws each person once", () => {
+    expect(nodes).toHaveLength(7);
+  });
+
+  it("joins the man to each wife; the far wife's edge hops over the near one", () => {
+    const pairs = coupleEdges.map(e => ({ pair: [idOf(e.source), idOf(e.target)].sort().join("-"), hop: e.data!.hopHeight }));
+    expect(pairs.filter(p => p.hop === 0).map(p => p.pair).sort()).toEqual(["m-w1", "m-w2"]);
+    const far = pairs.find(p => p.hop > 0)!;
+    expect(far.pair).toBe("m-w3");
+    expect(far.hop).toBe(COUPLE_HOP);
+  });
+
+  it("never draws a couple edge between two wives", () => {
+    for (const e of coupleEdges) {
+      expect([idOf(e.source), idOf(e.target)]).toContain("m");
+    }
+  });
+
+  it("the far wife's child drops from the raised line", () => {
+    const raised = sibshipEdges.filter(e => e.data!.hopHeight > 0);
+    expect(raised).toHaveLength(1);
+    expect(raised[0]!.data!.childIds.map(idOf)).toEqual(["c3"]);
+    expect(sibshipEdges.filter(e => e.data!.hopHeight === 0)).toHaveLength(2);
+  });
 });

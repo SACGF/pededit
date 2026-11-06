@@ -2,12 +2,13 @@ import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
+import { consanguineousPathsD } from "../couplePath";
 
 export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
 
 const GAP = 4; // px between the two lines
 
-export function ConsanguineousEdge({ source, target }: EdgeProps<ConsanguineousEdgeType>) {
+export function ConsanguineousEdge({ source, target, data }: EdgeProps<ConsanguineousEdgeType>) {
   const nodes = useNodes();
   const sourceNode = nodes.find(n => n.id === source);
   const targetNode = nodes.find(n => n.id === target);
@@ -19,16 +20,12 @@ export function ConsanguineousEdge({ source, target }: EdgeProps<ConsanguineousE
   const tx = targetNode.position.x - half;
   const ty = targetNode.position.y;
 
+  const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, data?.hopHeight ?? 0, GAP);
+
   return (
     <g>
-      <path
-        d={`M ${sx} ${sy - GAP / 2} L ${tx} ${ty - GAP / 2}`}
-        stroke="black" strokeWidth={2} fill="none"
-      />
-      <path
-        d={`M ${sx} ${sy + GAP / 2} L ${tx} ${ty + GAP / 2}`}
-        stroke="black" strokeWidth={2} fill="none"
-      />
+      <path d={outer} stroke="black" strokeWidth={2} fill="none" />
+      <path d={inner} stroke="black" strokeWidth={2} fill="none" />
     </g>
   );
 }

@@ -1,4 +1,4 @@
-import type { Pedigree, LayoutInput, Hints, LayoutResult, AlignState } from "./types.js";
+import type { Pedigree, Partnership, LayoutInput, Hints, LayoutResult, AlignState } from "./types.js";
 import { kindepth } from "./kindepth.js";
 import { autohint } from "./autohint.js";
 import { alignped1 } from "./alignped1.js";
@@ -77,40 +77,6 @@ export function alignPedigree(
     }
   }
 
-  // 5.5. Insert isolated individuals not reached by the main traversal
-  // (e.g. founders with no spouse and no children who never appear in any spouselist row)
-  {
-    const _maxlev = rval.n.length - 1;
-    const placed = new Set<number>();
-    for (let lev = 1; lev <= _maxlev; lev++) {
-      const ni = rval.n[lev] ?? 0;
-      for (let c = 1; c <= ni; c++) placed.add(Math.floor(rval.nid[lev]![c]!));
-    }
-    for (let i = 1; i <= input.n; i++) {
-      if (placed.has(i)) continue;
-      const lev = level[i]!;
-      if (!lev || lev > _maxlev) continue;
-      const ni = rval.n[lev] ?? 0;
-      const newCol = ni + 1;
-      const newNid = new Float64Array(newCol + 1);
-      const newPos = new Float64Array(newCol + 1);
-      const newFam = new Int32Array(newCol + 1);
-      for (let c = 1; c <= ni; c++) {
-        newNid[c] = rval.nid[lev]![c]!;
-        newPos[c] = rval.pos[lev]![c]!;
-        newFam[c] = rval.fam[lev]![c]!;
-      }
-      newNid[newCol] = i;
-      newPos[newCol] = ni > 0 ? newPos[ni]! + 1 : 0;
-      newFam[newCol] = 0;
-      rval.nid[lev] = newNid;
-      rval.pos[lev] = newPos;
-      rval.fam[lev] = newFam;
-      rval.n[lev] = newCol;
-      placed.add(i);
-    }
-  }
-
   // 6. Separate nid (integer) from spouse marker (fractional .5 → 1)
   const maxlev = rval.n.length - 1;
   const nidInt: Int32Array[] = rval.nid.map(row => {
@@ -181,8 +147,64 @@ export function alignPedigree(
   // 8.5. Post-QP centering: shift each sibship toward its parent midpoint where spacing allows
   pos = postQPCenter(rval, pos);
 
+  // 8.7. Append isolated individuals (no partner, no children, never reached by
+  // the traversal) to the right end of their generation. This runs after the
+  // QP on purpose: the QP bounds every row by the widest row, so counting the
+  // isolated people in the top row would leave the connected families no room
+  // to centre parents over children.
+  appendIsolated(input, level, rval, nidInt, spouseMatrix, pos);
+
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
   return toLayoutResult(rval, nidInt, pos, spouseMatrix, maxlev);
+}
+
+/**
+ * Add every individual not yet placed to the end of their generation row,
+ * one slot to the right of the current rightmost position. Extends all
+ * per-row arrays in place.
+ */
+function appendIsolated(
+  input: LayoutInput,
+  level: Int32Array,
+  rval: AlignState,
+  nidInt: Int32Array[],
+  spouseMatrix: number[][],
+  pos: Float64Array[],
+): void {
+  const maxlev = rval.n.length - 1;
+  const placed = new Set<number>();
+  for (let lev = 1; lev <= maxlev; lev++) {
+    const ni = rval.n[lev] ?? 0;
+    for (let c = 1; c <= ni; c++) placed.add(nidInt[lev]![c]!);
+  }
+  const grow = <T extends Int32Array | Float64Array>(arr: T, len: number): T => {
+    if (arr.length >= len) return arr;
+    const out = new (arr.constructor as new (n: number) => T)(len);
+    out.set(arr);
+    return out;
+  };
+  for (let i = 1; i <= input.n; i++) {
+    if (placed.has(i)) continue;
+    const lev = level[i]!;
+    if (!lev || lev > maxlev) continue;
+    const ni = rval.n[lev] ?? 0;
+    const col = ni + 1;
+    rval.nid[lev] = grow(rval.nid[lev]!, col + 1);
+    rval.fam[lev] = grow(rval.fam[lev]!, col + 1);
+    rval.pos[lev] = grow(rval.pos[lev]!, col + 1);
+    nidInt[lev]   = grow(nidInt[lev]!, col + 1);
+    pos[lev]      = grow(pos[lev]!, col + 1);
+    while (spouseMatrix[lev]!.length < col + 1) spouseMatrix[lev]!.push(0);
+    rval.nid[lev]![col] = i;
+    nidInt[lev]![col] = i;
+    rval.fam[lev]![col] = 0;
+    spouseMatrix[lev]![col] = 0;
+    const x = ni > 0 ? pos[lev]![ni]! + 1 : 0;
+    pos[lev]![col] = x;
+    rval.pos[lev]![col] = x;
+    rval.n[lev] = col;
+    placed.add(i);
+  }
 }
 
 /**
@@ -332,27 +354,46 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
     sex[idx] = ind.sex === "male" ? 1 : ind.sex === "female" ? 2 : 3;
   }
 
-  // Fill in parent indices from partnerships
+  // Fill in parent indices from partnerships.
+  //
+  // The algorithm works in terms of a "father" and a "mother" role per couple
+  // (findex/mindex) and treats someone as the father-role member whenever they
+  // appear in findex. A male partner always takes the father role. When neither
+  // partner is male (both female, or sex unknown) the roles are arbitrary, but
+  // they must be consistent: a person who is the father-role member of one
+  // couple must not be the mother-role member of another, or alignped1 will
+  // only see half their marriages. Couples with a male are assigned first so
+  // the ambiguous ones can follow whatever role their members already hold.
+  const role = new Map<number, 1 | 2>(); // 1 = father role, 2 = mother role
+  const resolved: Array<{ p: Partnership; dad: number; mom: number }> = [];
+  const ambiguous: Partnership[] = [];
   for (const p of partnerships) {
-    const children = parentOf[p.id] ?? [];
     const p1idx = idToIdx.get(p.individual1) ?? 0;
     const p2idx = idToIdx.get(p.individual2) ?? 0;
+    if (p1idx === 0 || p2idx === 0) continue;
+    const s1 = sex[p1idx]!, s2 = sex[p2idx]!;
+    if (s1 === 1 && s2 !== 1)      resolved.push({ p, dad: p1idx, mom: p2idx });
+    else if (s2 === 1 && s1 !== 1) resolved.push({ p, dad: p2idx, mom: p1idx });
+    else ambiguous.push(p);
+  }
+  for (const r of resolved) { role.set(r.dad, 1); role.set(r.mom, 2); }
+  for (const p of ambiguous) {
+    const p1idx = idToIdx.get(p.individual1)!;
+    const p2idx = idToIdx.get(p.individual2)!;
+    const swap = role.get(p1idx) === 2 || role.get(p2idx) === 1;
+    const dad = swap ? p2idx : p1idx;
+    const mom = swap ? p1idx : p2idx;
+    if (!role.has(dad)) role.set(dad, 1);
+    if (!role.has(mom)) role.set(mom, 2);
+    resolved.push({ p, dad, mom });
+  }
 
-    // Determine which is father (male) and which is mother (female)
-    let dadIdx = 0, momIdx = 0;
-    if (p1idx > 0 && p2idx > 0) {
-      const s1 = sex[p1idx]!;
-      const s2 = sex[p2idx]!;
-      if (s1 === 1) { dadIdx = p1idx; momIdx = p2idx; }
-      else if (s2 === 1) { dadIdx = p2idx; momIdx = p1idx; }
-      else { dadIdx = p1idx; momIdx = p2idx; } // both unknown/female: arbitrary
-    }
-
-    for (const childId of children) {
+  for (const { p, dad, mom } of resolved) {
+    for (const childId of parentOf[p.id] ?? []) {
       const childIdx = idToIdx.get(childId) ?? 0;
       if (childIdx > 0) {
-        findex[childIdx] = dadIdx;
-        mindex[childIdx] = momIdx;
+        findex[childIdx] = dad;
+        mindex[childIdx] = mom;
       }
     }
   }
@@ -374,7 +415,17 @@ function buildSpouseList(
   const n = input.n;
   const rows: [number, number, number, number][] = [];
 
-  // Start with spouse hints
+  // Father-role/mother-role orientation of every parent couple, so hint rows
+  // can be written [father, mother] regardless of sex and still deduplicate
+  // against the parent-pair rows below.
+  const fatherMother = new Set<number>();
+  for (let i = 1; i <= n; i++) {
+    const d = input.findex[i]!, m = input.mindex[i]!;
+    if (d > 0 && m > 0) fatherMother.add(d * (n + 1) + m);
+  }
+
+  // Start with spouse hints: [left, right, anchor] → [father, mother, leftIsFather ? 1 : 2, anchor]
+  // (R: tsex = sex of the left member; col3 = 1 if male, else 2.)
   if (hints.spouse !== null) {
     const hsp = hints.spouse;
     const hRows = hsp.length / 3;
@@ -382,13 +433,12 @@ function buildSpouseList(
       const left = hsp[r * 3]!;
       const right = hsp[r * 3 + 1]!;
       const anchor = hsp[r * 3 + 2]!;
-      // tsex = sex of left member; if male → col1=left, col2=right; else swap
-      const tsex = input.sex[left] ?? 3;
-      if (tsex === 1) {
-        rows.push([left, right, 1 + (tsex !== 1 ? 1 : 0), anchor]);
-      } else {
-        rows.push([right, left, 1 + (tsex !== 1 ? 1 : 0), anchor]);
-      }
+      let leftIsFather: boolean;
+      if (fatherMother.has(left * (n + 1) + right))      leftIsFather = true;
+      else if (fatherMother.has(right * (n + 1) + left)) leftIsFather = false;
+      else leftIsFather = (input.sex[left] ?? 3) === 1;
+      if (leftIsFather) rows.push([left, right, 1, anchor]);
+      else              rows.push([right, left, 2, anchor]);
     }
   }
 

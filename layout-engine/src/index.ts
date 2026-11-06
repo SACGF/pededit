@@ -5,3 +5,5 @@ export type { LayoutResult, Pedigree, Individual, Partnership, Sex, Hints, Layou
 export { buildLayoutInput, buildPedigreeFromFlat } from "./utils.js";
 export { pedigreeToGeometry } from "./pedigreeToGeometry.js";
 export type { PedigreeGeometry, NodeGeometry, CoupleGeometry, SibshipGeometry, RenderingConstants } from "./pedigreeToGeometry.js";
+export { buildPartnerSet, buildPartnerSetFromPedigree, isPartnerPair, resolveCouple } from "./couples.js";
+export type { PartnerSet, ResolvedCouple } from "./couples.js";

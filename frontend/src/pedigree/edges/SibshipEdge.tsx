@@ -34,9 +34,13 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   // Child drops end at the top edge of the child symbol.
   const childTopY = childY - NODE_SIZE / 2;
 
+  // When the parents' couple line hops over an intermediate partner the drop
+  // starts from the raised line rather than the row centre.
+  const dropTopY = coupleY - (data.hopHeight ?? 0);
+
   const pathSegments: string[] = [
-    // 1. Vertical drop: couple midpoint → sibship bar
-    `M ${coupleX} ${coupleY} L ${coupleX} ${sibBarY}`,
+    // 1. Vertical drop: couple line → sibship bar
+    `M ${coupleX} ${dropTopY} L ${coupleX} ${sibBarY}`,
     // 2. Horizontal sibship bar: spans from couple-drop to outermost child
     `M ${sibLeftX} ${sibBarY} L ${sibRightX} ${sibBarY}`,
     // 3. Vertical drops: sibship bar → top of each child symbol

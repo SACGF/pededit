@@ -159,6 +159,8 @@ for (let level = 0; level < result.n.length; level++) {
 
 Iterate over all slots. Where `spouse[level][slot] > 0`, draw a horizontal line from the node at `slot` to the node at `slot + 1`:
 
+**Three or more partners (pass-through markers).** Someone with several partners is laid out as one run of marriage-linked slots, e.g. a man with three wives becomes `wife2 ~ man ~ wife1 ~ wife3` with a marker on every slot but the last. The marker between `wife1` and `wife3` does not mean they are a couple: it is the man's marriage line continuing through `wife1` to reach `wife3` (kinship2 draws it straight through the symbol). Use `resolveCouple(result, partners, level, slot)` from the layout engine to get the real partner slots; when `hop` is true, draw the line from the far partner raised above the row so it clears the slot(s) in between, and start that family's sibship drop (Rule 3) from the raised line. `pedigreeToGeometry` reports this as `hopHeight` on both `CoupleGeometry` and `SibshipGeometry`; the React canvas and the SVG exporter share the path helper in `frontend/src/pedigree/couplePath.ts`.
+
 ```typescript
 for (let level = 0; level < result.n.length; level++) {
   for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -221,11 +223,14 @@ for (let level = 1; level < result.n.length; level++) {
 
 ---
 
-## Known limitations (as of Phase 1)
+## autohint
 
-**autohint is a stub.** The full `autohint` detects when an individual appears in two slots and moves them to the edge of their sibling group nearest to their spouse, minimising crossing lines. The current implementation returns a simple sequential ordering. For simple families this produces correct layouts; for families with cross-generational couples or individuals with multiple partners, the stub layout is structurally valid but may have unnecessary line crossings.
+`autohint` is a full port of the kinship2 routine. It runs the alignment once with no spouse hints, finds anyone drawn in more than one slot (someone with children by several partners), moves each such person to the edge of their sibship nearest their other copy, records a spouse hint saying which partner is drawn on the left and which family the marriage is anchored to, and re-runs the alignment level by level. The chain `F-M-F-M` (woman with two husbands, one of whom has another wife) therefore comes out as four slots with nobody duplicated, matching R. Twin handling is not ported because the data model has no twin relation yet.
 
-R ground truth for SAMPLE_PED_1: `n = [8, 19, 22, 8]`. The stub produces different counts (still structurally valid). Full `autohint` is targeted for Phase 6.
+Two deliberate departures from R:
+
+- Spouse hint rows and the parent-pair rows are oriented by the father/mother *role* each person holds in `findex`/`mindex`, not by sex, so couples where neither partner is male (both unknown, or same sex) are still drawn once.
+- Isolated individuals (no partner, no children) are appended to the right of their generation *after* the QP pass. R drops them entirely; appending them before the QP would make the top row the widest and leave no room to centre parents over children.
 
 ---
 

@@ -116,7 +116,8 @@ export function alignped1(
     const nleft = Math.max(0, Math.floor((filteredSprows.length + (sex === 2 ? 1 : 0)) / 2) - lspouseArr.length);
     const take = Math.min(nleft, undecidedSpouse.length);
     for (let i = 0; i < take; i++) lspouseArr.push(undecidedSpouse[i]!);
-    for (let i = take; i < undecidedSpouse.length; i++) rspouseArr.unshift(undecidedSpouse[i]!);
+    // R: rspouse <- c(spouse[indx[-(1:nleft)]], rspouse) — the undecided ones keep their order
+    rspouseArr.unshift(...undecidedSpouse.slice(take));
   }
 
   // Layout order: [lspouse..., x, rspouse...]
