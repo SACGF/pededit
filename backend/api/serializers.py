@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Pedigree
+from .models import Pedigree, TagPreset
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
@@ -41,6 +41,15 @@ class IndividualSerializer(serializers.Serializer):
     dob = serializers.CharField(required=False, allow_blank=True)
     notes = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
     hpoTerms = serializers.ListField(child=serializers.CharField(), required=False)
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+
+
+class TagSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    label = serializers.CharField(allow_blank=True, trim_whitespace=False)
+    color = serializers.CharField()
+    style = serializers.ChoiceField(choices=["quadrant", "dot", "text"])
+    abbrev = serializers.CharField(required=False, allow_blank=True, trim_whitespace=False)
 
 
 class PartnershipSerializer(serializers.Serializer):
@@ -78,6 +87,7 @@ class PedigreeDataSerializer(serializers.Serializer):
     unlockedIndividuals = serializers.ListField(
         child=serializers.CharField(), required=False
     )
+    tags = TagSerializer(many=True, required=False)
 
 
 # ── Pedigree model serializer ─────────────────────────────────────────────────
@@ -103,3 +113,15 @@ class PedigreeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedigree
         fields = ["id", "title", "created", "updated"]
+
+
+class TagPresetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TagPreset
+        fields = ["id", "label", "color", "style", "abbrev", "created"]
+        read_only_fields = ["id", "created"]
+
+    def validate_style(self, value):
+        if value not in ("quadrant", "dot", "text"):
+            raise serializers.ValidationError("style must be quadrant, dot or text")
+        return value

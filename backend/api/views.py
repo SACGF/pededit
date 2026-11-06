@@ -2,12 +2,13 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
-from .models import Pedigree
+from .models import Pedigree, TagPreset
 from .serializers import (
     RegisterSerializer,
     UserSerializer,
     PedigreeSerializer,
     PedigreeListSerializer,
+    TagPresetSerializer,
 )
 
 
@@ -51,3 +52,23 @@ class PedigreeViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return PedigreeListSerializer
         return PedigreeSerializer
+
+
+class TagPresetViewSet(viewsets.ModelViewSet):
+    """
+    The signed-in user's personal tag library.
+
+    list:    GET    /api/tag-presets/
+    create:  POST   /api/tag-presets/
+    update:  PATCH  /api/tag-presets/{id}/
+    destroy: DELETE /api/tag-presets/{id}/
+    """
+
+    serializer_class = TagPresetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return TagPreset.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

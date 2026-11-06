@@ -3,9 +3,10 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
@@ -14,8 +15,11 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, selectedId } = usePedigreeStore();
+  const { setHoveredId, setSelectedId, selectedId, pedigree } = usePedigreeStore();
   const isSelected = individual.id === selectedId;
+  const sectors = sectorsFor(individual, pedigree);
+  const annotations = annotationRow(individual, pedigree);
+  const labelTop = NODE_SIZE + 2 + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
 
   function scheduleHide() {
     hideTimeout.current = setTimeout(() => {
@@ -61,9 +65,10 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`}
         overflow="visible"
       >
-        <SymbolShape individual={individual} size={NODE_SIZE} />
+        <SymbolShape individual={individual} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {individual.proband  && <ProbandArrow  size={NODE_SIZE} />}
+        <AnnotationRow items={annotations} size={NODE_SIZE} />
       </svg>
 
       {/* Name label below symbol */}
@@ -71,7 +76,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <div
           style={{
             position: "absolute",
-            top: NODE_SIZE + 2,
+            top: labelTop,
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",
@@ -90,7 +95,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <div
           style={{
             position: "absolute",
-            top: NODE_SIZE + (individual.name ? 14 : 2),
+            top: labelTop + (individual.name ? 12 : 0),
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",

@@ -1,5 +1,9 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
+import {
+  renderSectorsSvg, renderAnnotationRowSvg, renderTagLegendSvg,
+  hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
+} from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -780,7 +784,7 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
     for (const { id } of n.members) {
       const ind = byId.get(id);
       if (!ind) continue;
-      labelLines = Math.max(labelLines, (ind.name ? 1 : 0) + (ind.dob ? 1 : 0));
+      labelLines = Math.max(labelLines, (ind.name ? 1 : 0) + (ind.dob ? 1 : 0) + (hasAnnotationRow(ind, pedigree) ? 1 : 0));
       labelChars = Math.max(labelChars, ind.name?.length ?? 0, ind.dob?.length ?? 0);
     }
   });
@@ -971,19 +975,26 @@ function renderConnectors(b: Built, layout: UShapeLayout): string[] {
   return out;
 }
 
-function renderShape(ind: Individual): string {
+function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
   const fill = ind.affected ? "black" : "white";
-  let shape: string;
+  let geom: string;
   if (ind.sex === "male") {
-    shape = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
   } else if (ind.sex === "female") {
-    shape = `<circle cx="0" cy="0" r="${HALF - 1}" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<circle cx="0" cy="0" r="${HALF - 1}"`;
   } else {
     const h = HALF - 1;
-    shape = `<polygon points="0,${-h} ${h},0 0,${h} ${-h},0" stroke="black" stroke-width="${STROKE}" fill="${fill}"/>`;
+    geom = `<polygon points="0,${-h} ${h},0 0,${h} ${-h},0"`;
+  }
+  const stroke = `stroke="black" stroke-width="${STROKE}"`;
+  let shape = `${geom} ${stroke} fill="${fill}"/>`;
+  if (sectorsFor(ind, pedigree).length > 0) {
+    shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
+      + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + `${geom} ${stroke} fill="none"/>`;
   }
   if (ind.carrier && !ind.affected) shape += `<circle cx="0" cy="0" r="${NODE_SIZE * 0.15}" fill="black"/>`;
-  return shape;
+  return shape + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE);
 }
 
 function renderDeceasedSlash(): string {
@@ -1001,17 +1012,18 @@ function renderProbandArrow(): string {
  * with children the descent line runs through that spot, so the text gets a
  * white backing to stay readable.
  */
-function renderLabel(ind: Individual, hasDescent: boolean): string {
+function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): string {
   const lines = [ind.name, ind.dob].filter((s): s is string => !!s);
   if (lines.length === 0) return "";
   const out: string[] = [];
+  const top = HALF + 3 + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_ROW_HEIGHT : 0);
   if (hasDescent) {
     const w = Math.max(...lines.map(l => l.length)) * LABEL_CHAR_WIDTH + 4;
     const h = lines.length * LABEL_LINE_HEIGHT;
-    out.push(`<rect x="${r(-w / 2)}" y="${HALF + 3}" width="${r(w)}" height="${h}" fill="white"/>`);
+    out.push(`<rect x="${r(-w / 2)}" y="${top}" width="${r(w)}" height="${h}" fill="white"/>`);
   }
   lines.forEach((text, i) => {
-    const y = HALF + 3 + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT;
+    const y = top + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT;
     out.push(`<text x="0" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(text)}</text>`);
   });
   return out.join("");
@@ -1020,6 +1032,7 @@ function renderLabel(ind: Individual, hasDescent: boolean): string {
 function renderSymbols(pedigree: Pedigree, b: Built): string[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const out: string[] = [];
+  let seq = 0;
   walk(b.root, n => {
     // A sibship by partners who are not drawn descends from the symbol itself,
     // straight through the label.
@@ -1028,10 +1041,11 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       const ind = byId.get(m.id);
       if (!ind) return;
       const pos = nodeAt(n, i, b.geom);
+      const clipId = `symbol-clip-${seq++}`;
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
-        renderLabel(ind, solo && m.id === n.blood) +
-        renderShape(ind) +
+        renderLabel(ind, pedigree, solo && m.id === n.blood) +
+        renderShape(ind, pedigree, clipId) +
         (ind.deceased ? renderDeceasedSlash() : "") +
         (ind.proband ? renderProbandArrow() : "") +
         `</g>`,
@@ -1076,8 +1090,10 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
     minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
-  const width = Math.ceil(maxX - minX + 2 * margin);
-  const height = Math.ceil(maxY - minY + 2 * margin + titleH);
+  const legend = renderTagLegendSvg(working, padding, 0);
+  const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
+  const width = Math.ceil(Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding));
+  const height = Math.ceil(maxY - minY + 2 * margin + titleH + legendExtra);
 
   const out: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
@@ -1099,6 +1115,10 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout));
   out.push(...renderSymbols(working, b));
-  out.push(`</g>`, `</svg>`);
+  out.push(`</g>`);
+  if (legend.height > 0) {
+    out.push(`<g transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);
+  }
+  out.push(`</svg>`);
   return out.join("\n");
 }

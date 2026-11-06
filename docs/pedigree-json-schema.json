@@ -35,7 +35,12 @@
           }
         },
         "canvasSettings": { "$ref": "#/$defs/CanvasSettings" },
-        "unlockedIndividuals": { "type": "array", "items": { "type": "string" } }
+        "unlockedIndividuals": { "type": "array", "items": { "type": "string" } },
+        "tags": {
+          "type": "array",
+          "description": "Tag definitions in display order. Quadrant tags take their sector from this order.",
+          "items": { "$ref": "#/$defs/Tag" }
+        }
       },
       "additionalProperties": true
     },
@@ -53,7 +58,8 @@
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },
         "notes": { "type": "string" },
-        "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } }
+        "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." }
       },
       "additionalProperties": true
     },
@@ -65,6 +71,18 @@
         "individual1": { "type": "string" },
         "individual2": { "type": "string" },
         "consanguineous": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "Tag": {
+      "type": "object",
+      "required": ["id", "label", "color", "style"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "description": "Full name shown in the legend." },
+        "color": { "type": "string", "description": "CSS colour, normally #rrggbb." },
+        "style": { "enum": ["quadrant", "dot", "text"] },
+        "abbrev": { "type": "string", "description": "Short canvas text for text-style tags. Defaults to label." }
       },
       "additionalProperties": true
     },

@@ -16,7 +16,7 @@ const DOCS = join(__dirname, "../../../../../docs");
 const fullFeatured: Pedigree = {
   individuals: [
     { id: "a", sex: "male", affected: false, sibOrder: 0, name: "Arthur", dob: "1950-01-02", notes: "founder" },
-    { id: "b", sex: "female", affected: true, deceased: true, sibOrder: 0, hpoTerms: ["HP:0001250"] },
+    { id: "b", sex: "female", affected: true, deceased: true, sibOrder: 0, hpoTerms: ["HP:0001250"], tags: ["t1", "t2"] },
     { id: "c", sex: "unknown", affected: false, carrier: true, proband: true, sibOrder: 0, name: "Child" },
   ],
   partnerships: [{ id: "p", individual1: "a", individual2: "b", consanguineous: false }],
@@ -25,6 +25,10 @@ const fullFeatured: Pedigree = {
   pinnedPositions: { c: { x: 120.5, y: 240 } },
   canvasSettings: { nodesMoveable: true, snapToGrid: true, snapGridSize: 20 },
   unlockedIndividuals: ["a"],
+  tags: [
+    { id: "t1", label: "Breast cancer", color: "#c0392b", style: "quadrant" },
+    { id: "t2", label: "BRCA1 c.68_69del", color: "#2c3e50", style: "text", abbrev: "B1+" },
+  ],
 };
 
 function roundtrip(ped: Pedigree) {
@@ -77,6 +81,8 @@ describe("JSON roundtrip", () => {
     expect(ped.unlockedIndividuals).toEqual(["a"]);
     expect(ped.individuals[1]!.hpoTerms).toEqual(["HP:0001250"]);
     expect(ped.siblingOrder).toEqual({ mode: "birthDate", affectedFirst: true });
+    expect(ped.individuals[1]!.tags).toEqual(["t1", "t2"]);
+    expect(ped.tags).toEqual(fullFeatured.tags);
   });
 
   it("unknown fields on individuals, partnerships and the pedigree survive the roundtrip", () => {
@@ -120,6 +126,18 @@ describe("JSON import: accepted inputs", () => {
     expect(result.hasErrors).toBe(false);
     const dangling = result.issues.filter(i => i.code === JsonIssueCode.DANGLING_REFERENCE);
     expect(dangling).toHaveLength(2);
+  });
+
+  it("warns when an individual names a tag that is not defined", () => {
+    const ped: Pedigree = {
+      ...simpleFamily,
+      individuals: simpleFamily.individuals.map((ind, i) => (i === 0 ? { ...ind, tags: ["missing"] } : ind)),
+    };
+    const result = importJson(exportJson(ped));
+    expect(result.hasErrors).toBe(false);
+    const dangling = result.issues.filter(i => i.code === JsonIssueCode.DANGLING_REFERENCE);
+    expect(dangling).toHaveLength(1);
+    expect(dangling[0]!.affectedIds).toEqual(["missing"]);
   });
 
   it("the worked example in the JSON Schema file imports cleanly", () => {
@@ -189,6 +207,19 @@ describe("JSON import: rejected inputs", () => {
     expect(errorsOf(withPedigree(p => { p.individuals[0].deceased = 1; }))).toContain(JsonIssueCode.WRONG_TYPE);
     expect(errorsOf(withPedigree(p => { p.individuals[0].hpoTerms = "HP:0001250"; }))).toContain(JsonIssueCode.WRONG_TYPE);
     expect(errorsOf(withPedigree(p => { p.individuals[0].name = 5; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.individuals[0].tags = "t1"; }))).toContain(JsonIssueCode.WRONG_TYPE);
+  });
+
+  it("rejects malformed tag definitions", () => {
+    expect(errorsOf(withPedigree(p => { p.tags = {}; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.tags = [{ id: "t", label: "x", color: "#000" }]; }))).toContain(JsonIssueCode.MISSING_FIELD);
+    expect(errorsOf(withPedigree(p => { p.tags = [{ id: "t", label: "x", color: "#000", style: "stripe" }]; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => {
+      p.tags = [
+        { id: "t", label: "x", color: "#000", style: "dot" },
+        { id: "t", label: "y", color: "#fff", style: "dot" },
+      ];
+    }))).toContain(JsonIssueCode.DUPLICATE_ID);
   });
 
   it("rejects duplicate individual and partnership ids", () => {

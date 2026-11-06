@@ -80,6 +80,62 @@ describe("exportSvg — symbol fills", () => {
   });
 });
 
+// ── Tag tests ─────────────────────────────────────────────────────────────────
+
+describe("exportSvg — tags", () => {
+  const tags = [
+    { id: "t1", label: "Tremor", color: "#000000", style: "quadrant" as const },
+    { id: "t2", label: "Seizures", color: "#d62728", style: "quadrant" as const },
+    { id: "s1", label: "Sequenced", color: "#2ca02c", style: "dot" as const },
+    { id: "g1", label: "Expansion", color: "#ff7f0e", style: "text" as const, abbrev: "exp/+" },
+  ];
+
+  it("quadrant tag → clipPath plus a coloured sector path, and a legend row", () => {
+    const p = makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, tags: ["t2"] }],
+      tags,
+    });
+    const svg = exportSvg(p);
+    expect(svg).toContain("<clipPath");
+    expect(svg).toContain('fill="#d62728"');
+    expect(svg).toContain(">Seizures</text>");
+    expect(svg).not.toContain(">Tremor</text>"); // defined but unused: not in the key
+  });
+
+  it("dot and text tags → annotation row under the symbol", () => {
+    const p = makePedigree({
+      individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, tags: ["s1", "g1"] }],
+      tags,
+    });
+    const svg = exportSvg(p);
+    expect(svg).toContain('fill="#2ca02c"');
+    expect(svg).toContain(">exp/+</text>");
+    expect(svg).not.toContain("<clipPath"); // no quadrant tag on anyone
+  });
+
+  it("tags grow the canvas to fit the legend", () => {
+    const base = makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],
+    });
+    const tagged = makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, tags: ["t1"] }],
+      tags,
+    });
+    const h = (svg: string) => Number(svg.match(/height="(\d+)"/)![1]);
+    expect(h(exportSvg(tagged))).toBeGreaterThan(h(exportSvg(base)));
+  });
+
+  it("de-identified export keeps tags", () => {
+    const p = makePedigree({
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, name: "Bob", tags: ["t1"] }],
+      tags,
+    });
+    const svg = exportSvg(p, { deidentify: true });
+    expect(svg).not.toContain("Bob");
+    expect(svg).toContain(">Tremor</text>");
+  });
+});
+
 // ── Overlay tests ─────────────────────────────────────────────────────────────
 
 describe("exportSvg — overlays", () => {

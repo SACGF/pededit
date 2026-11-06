@@ -10,16 +10,39 @@ What exists:
 - `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup). Connected-component ordering is still open (#39).
 - Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51).
 - React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu, edit panel (name/DOB/notes), settings panel (sibling order, snap to grid), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
+- Tags and colouring (#3): `Pedigree.tags` definitions with quadrant, dot and text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, `TagsDialog`, auto legend in the app and in SVG/PNG/PDF export, per-user tag library (`/api/tag-presets/`). See `claude/phase_7_2_plan.md`.
 - Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification, U-shape SVG export, CSV. `hpoTerms` exists on the data model with no UI (#46).
 - Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Hardening, backups, error reporting and a health check are open (#47 to #50).
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
 
+## Product Facts Every Agent Must Know
+
+- **No account is required.** Anonymous mode is the default: creating a pedigree while signed out stores it with `owner=None` and the UUID in the URL (`/p/<uuid>`) is the only key. Users bookmark or copy the link. Google/GitHub sign-in only adds the "Your pedigrees" list and the per-user tag library. Never describe PedEdit as requiring login.
+- The site is live at https://pededit.com and the code is public at https://github.com/SACGF/pededit.
+- Pedigree symbols encode biological sex, not gender (see below).
+
+## Directory Guides
+
+Each major directory has its own `AGENTS.md` with the non-obvious facts about that code. Read the one for any directory you work in:
+
+- `layout-engine/AGENTS.md` — kinship2 port, 1-based indexing, where tests live
+- `frontend/AGENTS.md` — app structure, stores, auth tokens, running and testing
+- `frontend/src/pedigree/AGENTS.md` — canvas renderer and symbol drawing
+- `frontend/src/io/AGENTS.md` — PED import, SVG/PNG/PDF/CSV export, U-shape
+- `backend/AGENTS.md` — Django config file, data model, anonymous access rules, auth
+- `deploy/AGENTS.md` — VPS deploy script and services
+- `claude/AGENTS.md` — index of plans and research
+- Strategy, user research and outreach notes are in the private repo `SACGF/pededit_private`, not here
+- `test-data/ped/README.md` — PED test corpus
+
+**Keep them current.** When you learn something about a directory that is not obvious from reading its code (a gotcha, a convention, why something is the way it is, a product fact), add it to that directory's `AGENTS.md` in the same change. Do not duplicate what the code or git history already says.
+
 ## Key Reference Documents
 
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
 - `claude/search_report.md` — domain research and feature gap analysis
-- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2)
+- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2), `claude/phase_7_2_plan.md` (how tags and colouring work, #3)
 
 ## What This Project Is
 
@@ -27,7 +50,7 @@ A new open-source pedigree editor — a web-based tool for drawing, editing, and
 
 **Target users:** Genetic counselors, clinical genetics teams, research geneticists.
 
-**North star:** Every open-source pedigree tool trades correct layout for simplicity, and none have drag-and-drop repositioning. The layout problem is solved in the [kinship2](https://cran.r-project.org/package=kinship2) R package — we ported it to TypeScript, giving us publication-quality automatic layout as a native npm package for the first time. Everything else is built on top of that foundation.
+**North star:** Every open-source pedigree tool trades correct layout for simplicity, and almost none have drag-and-drop repositioning (pedigreejs added SHIFT+drag in December 2024, without persistent pinning; see `user_research/github_issues.md` in the private repo `SACGF/pededit_private`). The layout problem is solved in the [kinship2](https://cran.r-project.org/package=kinship2) R package — we ported it to TypeScript, giving us publication-quality automatic layout as a native npm package for the first time. Everything else is built on top of that foundation.
 
 ## Key Research Findings (from `claude/search_report.md`)
 

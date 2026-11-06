@@ -10,6 +10,7 @@ import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
 import { LegendDialog } from "../components/LegendDialog";
+import { TagsDialog } from "../components/TagsDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -43,8 +44,20 @@ export default function CanvasPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable (e.g. insecure context); the URL bar still works.
+    }
+  };
   const [notFound, setNotFound] = useState(false);
 
   useKeyboardShortcuts();
@@ -176,8 +189,16 @@ export default function CanvasPage() {
           ) : (
             <div className="text-[10px] text-gray-400 leading-relaxed">
               <p className="mb-2">
-                This pedigree is anonymous. Bookmark the URL to return to it.
+                This pedigree is saved at this URL and nowhere else. Bookmark it or copy the link to come back to it.
               </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full mb-3 h-7 text-xs"
+                onClick={copyLink}
+              >
+                {linkCopied ? "Link copied" : "Copy link"}
+              </Button>
               <p>
                 <span
                   className="text-black underline underline-offset-1 cursor-pointer"
@@ -185,7 +206,7 @@ export default function CanvasPage() {
                 >
                   Sign in
                 </span>
-                {" "}to save and manage your pedigrees.
+                {" "}to see all your pedigrees in one place.
               </p>
             </div>
           )}
@@ -211,6 +232,7 @@ export default function CanvasPage() {
           onSettingsClick={() => setSettingsOpen(true)}
           onExportSvgClick={() => setExportDialogOpen(true)}
           onLegendClick={() => setLegendOpen(true)}
+          onTagsClick={() => setTagsOpen(true)}
         />
 
         <div className="flex flex-1 overflow-hidden">
@@ -219,7 +241,7 @@ export default function CanvasPage() {
           </div>
 
           <div className="w-52 border-l bg-white shrink-0 overflow-y-auto">
-            <EditPanel />
+            <EditPanel onManageTags={() => setTagsOpen(true)} />
           </div>
         </div>
       </div>
@@ -257,6 +279,10 @@ export default function CanvasPage() {
           title={activeTitle ?? "pedigree"}
           defaultCompact={compact}
         />
+      )}
+
+      {activePedigreeId && (
+        <TagsDialog open={tagsOpen} onOpenChange={setTagsOpen} />
       )}
 
       {activePedigreeId && (
