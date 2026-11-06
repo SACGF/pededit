@@ -4,26 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-**Phases 1-5c complete. Phase 6 partially complete (manual repositioning done). Phase 8 partially complete (infrastructure done). Phase 9 partially complete (social login done).** See `claude/overall_plan.md` for the full phase plan.
+Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issues), not in plan files. Check there before starting anything.
 
-- **Phase 1:** `layout-engine/` — TypeScript package, 16 tests, kinship2 layout algorithm
-- **Phase 2:** Django + React scaffold — auth, CRUD, empty canvas
-- **Phase 3:** Visual renderer — NSGC symbols, couple/sibship/consanguinity edges, read-only pan/zoom canvas. 32 tests in `frontend/src/pedigree/__tests__/`.
-- **Phase 4:** Core interaction — toolbar (add male/female/unknown), hover pill (add parents/children/siblings), more menu (mark affected/deceased/proband, set sex, delete, move sib), edit panel (name/DOB/notes), settings panel (sibling order), undo/redo, keyboard shortcuts, auto-save on pedigree switch.
-- **Phase 5a:** PED file import/export — `frontend/src/io/ped/` (parser, validator, converter, exporter), `ImportPedDialog`, toolbar Import/Export buttons. 129 tests.
-- **Phase 5b:** SVG/PNG export with de-identification mode — `frontend/src/io/svg/`, `ExportDialog`.
-- **Phase 5c:** Small features — kindepth force fallback, autohint spouse hints, QP bundling, auto-detect consanguinity on edit, CSV export, PDF export, `hpoTerms` data model slot.
-- **Phase 6 (partial):** Manual repositioning — pin/unpin, visual indicator, reset layout, drag persistence, canvas settings (nodesMoveable, snapToGrid). Full `autohint` (kinship2 duplicate fixup) ported, so people with several partners are drawn once and three-plus partners get a raised line to the far partner. Remaining: compact mode, fit-to-page, large family handling, connected-component founder ordering, batch SVG API.
-- **Phase 8 (partial):** Deploy infrastructure — Gunicorn + Nginx + systemd on VPS, deploy scripts, INSTALL.md, domain (pededit.com). Remaining: Django security settings, rate limiting, health check, Sentry, automated backups.
-- **Phase 9 (partial):** Social login — Google and GitHub OAuth via direct OAuth flow (not Clerk as originally planned). Remaining: remove legacy username/password auth endpoints.
+What exists:
+- `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup). Connected-component ordering is still open (#39).
+- Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51).
+- React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu, edit panel (name/DOB/notes), settings panel (sibling order, snap to grid), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
+- Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification, U-shape SVG export, CSV. `hpoTerms` exists on the data model with no UI (#46).
+- Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Hardening, backups, error reporting and a health check are open (#47 to #50).
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
 
 ## Key Reference Documents
 
-- `claude/overall_plan.md` — phase-by-phase build plan
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
 - `claude/search_report.md` — domain research and feature gap analysis
+- Design notes for open issues: `claude/phase_6_4_plan.md` (render API, #38), `claude/phase_6_5_plan.md` (autohint component ordering, #39), `claude/phase_7_1_plan.md` (URL sharing, #40), `claude/export_u_plan.md` (how the U-shape export works, #2)
 
 ## What This Project Is
 
@@ -78,7 +74,7 @@ No em-dashes. Use commas, periods, or rewrite the sentence instead.
 
 **Black and white minimalist.** The UI should look like a clinical pedigree chart — not a generic SaaS app. The pedigree symbols (squares, circles, filled/unfilled, slashes, connecting lines) are the visual language; the chrome around them should get out of the way.
 
-- Pedigree canvas: white background, black symbols and lines, no colour except where clinically meaningful (e.g. multi-trait shading in Phase 7)
+- Pedigree canvas: white background, black symbols and lines, no colour except where clinically meaningful (e.g. multi-trait shading, #3)
 - App UI: minimal, low-contrast chrome — the pedigree is the focus, not the toolbar
 - No gradients, drop shadows, rounded-corner cards, or decorative colour on pedigree elements
 - Typography: clean sans-serif, small, functional

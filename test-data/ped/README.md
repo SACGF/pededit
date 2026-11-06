@@ -76,6 +76,28 @@ Hand-authored for this test suite. No external attribution required.
 | `non_numeric_sex.ped` | 4 | `UNKNOWN_SEX_CODE` warnings for M/F/U; converter treats M→male, F→female, U→unknown. |
 | `leading_trailing_spaces.ped` | 3 | Clean. Trimmed before splitting. |
 
+### `variants/` — The 4/5-column `id fid mid sex [aff]` dialect
+
+Produced by R pedigree packages (pedtools `as.data.frame(ped)`, kinship2 data frames)
+and by hand. Differences from the 6-column PLINK layout: a header line naming the
+columns, no family ID column (or an optional leading `famid`), no phenotype column
+(or an optional trailing `aff`), tab separation with spaces allowed inside IDs, and
+founders that may be omitted when only referenced as parents. All hand-authored.
+**The current parser does not accept these files** (GitHub issue #31); they
+document the target behaviour.
+
+| File | Individuals | Expected behaviour |
+|------|-------------|--------------------|
+| `four_col_header_tab.ped` | 7 | Header `id fid mid sex`, tab-separated, no family ID, no phenotype. Clean. |
+| `five_col_aff_header_tab.ped` | 7 | As above plus `aff` column (1/2). Clean; 2, 4, 6 affected. |
+| `four_col_no_header_space.ped` | 6 | Four columns, no header, space-separated. Clean. |
+| `famid_header_tab.ped` | 4 | Header `famid id fid mid sex aff`. The header must not be read as a data row. Clean. |
+| `uppercase_header_tab.ped` | 4 | Header `ID FID MID SEX AFF`. Header detection is case-insensitive. Clean. |
+| `names_with_spaces_tab.ped` | 6 | Tab-separated with spaces inside IDs (`Carol Able Baker`). Must split on tabs only when the file is tab-delimited. |
+| `missing_founders_four_col.ped` | 3 (+3 phantom) | Parents 1, 2 and 5 referenced but not listed. `PHANTOM_PARENT` warnings, phantoms created as founders. |
+| `famid_no_header_repeat.ped` | 4 | Five columns, no header, first column identical in every row (`FAM1`). Ambiguous between `famid id fid mid sex` and `id fid mid sex aff`; a repeated first column should be read as a family ID. |
+| `two_families_no_famid.ped` | 7 | Five columns with header, no family ID, two disconnected components (1-4 and X1-X3). Should import as two families, or one pedigree with two components. |
+
 ### `malformed/` — Input that should fail with errors
 
 | File | Individuals | Expected error |

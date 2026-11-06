@@ -1,0 +1,7 @@
+id	fid	mid	sex	aff
+Alice Able	0	0	2	1
+Bob Baker	0	0	1	1
+Carol Able Baker	Bob Baker	Alice Able	2	2
+Dan Able Baker	Bob Baker	Alice Able	1	1
+Erin Ferris	0	0	2	1
+Fay Baker Ferris	Dan Able Baker	Erin Ferris	2	2

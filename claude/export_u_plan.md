@@ -176,21 +176,4 @@ children of the first couple.
 
 ## Not done
 
-- **Only one founder lineage.** When two founder lineages marry, the partner
-  is drawn but their parents and siblings are not. `double_first_cousin.ped`
-  shows both cousins joined but not the second pair of grandparents (3 and 4),
-  so the "double" is not visible. `kinship2_sample` family 1 still omits 17 of
-  41 and the in-app "Large family" 63 of 100. The U shape is a descendant
-  chart. Drawing several lineages needs either ancestors hung inward from a
-  married-in partner (the middle of the U is empty) or a user-chosen root.
-- More than two partners of one person: the rest are omitted with their
-  children.
-- With partners off, half-siblings are drawn as one sibship under their shared
-  blood parent. Ambiguous rather than wrong.
-- A dashed duplicate link across tracks is a straight line under the symbols.
-  It can pass behind an unrelated symbol or label.
-- A lopsided family drawn as a fan is a lopsided fan (most of it to one side
-  of the founders). That is the price of upright founders.
-- `single_parent.ped` has two unrelated single-parent lines and only one is
-  drawn. The dialog reports 3 of 6 left out.
-- The middle of the U is empty. It is a natural place for a legend.
+Open items are tracked on GitHub issue #2.
