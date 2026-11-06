@@ -6,7 +6,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
  * Examples the canvas currently draws wrong, by label, with the lint codes
- * they raise. Each is a known bug (see claude/agent_harness_testing_bugs.md):
+ * they raise. Each is a known bug, with a GitHub issue:
  * when a fix makes one draw cleanly this test fails until it is removed here,
  * and any new problem in any example fails straight away.
  */
