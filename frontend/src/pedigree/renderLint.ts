@@ -11,7 +11,6 @@
  *   couple-through-symbol  a straight couple line passes through another symbol
  *   couple-lines-overlap   two couple lines share a stretch of the same row
  *   couple-line-slanted    partners sit on different rows (usually a pin moved vertically)
- *   child-off-row          siblings sit on different rows, so a drop line misses a child
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
  *   symbols-overlap        two symbols sit on top of each other
@@ -31,7 +30,6 @@ export type LintCode =
   | "couple-through-symbol"
   | "couple-lines-overlap"
   | "couple-line-slanted"
-  | "child-off-row"
   | "child-without-parents"
   | "child-wrong-parents"
   | "symbols-overlap";
@@ -157,19 +155,6 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
         message: `sibship line ${e.id} refers to node(s) that are not drawn: ${missing.join(", ")}`,
         individuals: ids.map(indOf).filter((x): x is string => !!x),
       });
-    }
-    // SibshipEdge draws every drop to the first child's row.
-    const kids = d.childIds.map(id => nodeById.get(id)).filter(n => !!n);
-    const rowY = kids[0]?.position.y;
-    for (const k of kids.slice(1)) {
-      if (rowY !== undefined && Math.abs(k.position.y - rowY) >= EPS) {
-        const c = k.data.individual.id;
-        out.push({
-          code: "child-off-row",
-          message: `${label(c)} sits ${Math.round(k.position.y - rowY)}px off their siblings' row, so the drop line does not reach them`,
-          individuals: [c],
-        });
-      }
     }
     let lp = indOf(d.leftParentId), rp = indOf(d.rightParentId);
     if (!lp || !rp) continue;

@@ -4,6 +4,8 @@ import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants
 import { layoutSpacing, scalePinnedPosition } from "../../pedigree/spacing";
 import type { LayoutSpacing } from "../../pedigree/spacing";
 import { couplePathD, consanguineousPathsD } from "../../pedigree/couplePath";
+import { sibshipSegments } from "../../pedigree/sibshipPath";
+import { activeSnapGrid, snapSlotPositions } from "../../pedigree/snap";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
 import {
@@ -32,23 +34,26 @@ type SlotPos = Map<string, { x: number; y: number }>;
 /**
  * Build a map from "level-slot" → canvas pixel position.
  * Pinned individuals use their stored position (scaled to the spacing in use);
- * others use the algorithm result.
+ * others use the algorithm result. Snapped to the grid when snap is on.
  */
 function buildSlotPositions(pedigree: Pedigree, result: LayoutResult, spacing: LayoutSpacing): SlotPos {
   const map: SlotPos = new Map();
+  const pinnedSlots = new Set<string>();
   const { slotWidth, rowHeight } = spacing;
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
       const nid = Math.floor(result.nid[level][slot]);
       const ind = pedigree.individuals[nid - 1];
       const pinned = pedigree.pinnedPositions?.[ind.id];
+      if (pinned) pinnedSlots.add(`${level}-${slot}`);
       map.set(`${level}-${slot}`, pinned ? scalePinnedPosition(pinned, spacing) : {
         x: result.pos[level][slot] * slotWidth,
         y: level * rowHeight,
       });
     }
   }
-  return map;
+  // Match the canvas: with snap on every node is drawn on the grid.
+  return snapSlotPositions(map, pinnedSlots, activeSnapGrid(pedigree));
 }
 
 // ── Bounds ────────────────────────────────────────────────────────────────────
@@ -176,23 +181,10 @@ function renderSibshipLines(result: LayoutResult, partners: PartnerSet, slotPos:
       const rightPos = slotPos.get(`${level - 1}-${f}`)!;
       const coupleX  = (leftPos.x + rightPos.x) / 2;
       const coupleY  = (leftPos.y + rightPos.y) / 2;
-      const childY   = slotPos.get(`${level}-${slots[0]}`)!.y;
-      const sibBarY  = (coupleY + childY) / 2;
-
-      const childXs = slots.map(s => slotPos.get(`${level}-${s}`)!.x);
-      // The bar spans from the couple drop to the outermost child so the drop
-      // always meets it, even when a child cannot be centred under its parents.
-      const sibLeftX  = Math.min(coupleX, ...childXs);
-      const sibRightX = Math.max(coupleX, ...childXs);
-
-      // 1. Vertical drop from the couple line (raised if it hops) to the sibship bar
-      const dropTopY = coupleY - hopHeightAt(result, partners, level - 1, f - 1);
-      lines.push(seg(coupleX, dropTopY, coupleX, sibBarY));
-      // 2. Horizontal sibship bar
-      lines.push(seg(sibLeftX, sibBarY, sibRightX, sibBarY));
-      // 3. Vertical drops from bar to top of each child symbol
-      for (const cx of childXs) {
-        lines.push(seg(cx, sibBarY, cx, childY - NODE_SIZE / 2));
+      const hop      = hopHeightAt(result, partners, level - 1, f - 1);
+      const children = slots.map(s => slotPos.get(`${level}-${s}`)!);
+      for (const [x1, y1, x2, y2] of sibshipSegments(coupleX, coupleY, hop, children)) {
+        lines.push(seg(x1, y1, x2, y2));
       }
     }
   }

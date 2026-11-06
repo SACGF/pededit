@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
@@ -129,18 +129,9 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               {canvasSettings.snapToGrid && (
                 <label className="flex items-center gap-2 ml-6">
                   <span className="text-xs text-gray-500">Grid size</span>
-                  <input
-                    type="number"
-                    min={4}
-                    max={80}
+                  <GridSizeInput
                     value={canvasSettings.snapGridSize}
-                    onChange={e => {
-                      const v = parseInt(e.target.value, 10);
-                      if (!isNaN(v) && v >= 4 && v <= 80) {
-                        updateCanvasSettings({ snapGridSize: v });
-                      }
-                    }}
-                    className="w-16 text-xs border rounded px-1.5 py-0.5"
+                    onCommit={v => updateCanvasSettings({ snapGridSize: v })}
                   />
                   <span className="text-xs text-gray-400">px</span>
                 </label>
@@ -224,5 +215,54 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const MIN_GRID = 4;
+const MAX_GRID = 80;
+
+/**
+ * The grid size box. Typing only edits the text; the value is applied once,
+ * on blur or Enter, clamped to 4..80, so typing "45" is one undo entry and
+ * pins are rounded once. An empty or non-numeric box reverts. Closing the
+ * dialog (Escape) also applies it.
+ */
+function GridSizeInput({ value, onCommit }: { value: number; onCommit: (v: number) => void }) {
+  const [text, setText] = useState(String(value));
+  // Latest state for the unmount commit: Escape (and any other way of
+  // closing the dialog) unmounts the box without a blur. `sent` stops a blur
+  // and the unmount that follows it from committing twice.
+  const latest = useRef({ text, value, onCommit, sent: value });
+  latest.current = { ...latest.current, text, value, onCommit };
+  useEffect(() => { setText(String(value)); latest.current.sent = value; }, [value]);
+
+  function commit(raw: string) {
+    const cur = latest.current;
+    const v = parseInt(raw, 10);
+    if (isNaN(v)) { setText(String(cur.value)); return; }
+    const clamped = Math.min(MAX_GRID, Math.max(MIN_GRID, v));
+    setText(String(clamped));
+    if (clamped === cur.value || clamped === cur.sent) return;
+    cur.sent = clamped;
+    cur.onCommit(clamped);
+  }
+  const commitRef = useRef(commit);
+  commitRef.current = commit;
+  useEffect(() => () => commitRef.current(latest.current.text), []);
+
+  return (
+    <input
+      type="number"
+      min={MIN_GRID}
+      max={MAX_GRID}
+      value={text}
+      onChange={e => setText(e.target.value)}
+      onBlur={() => commit(text)}
+      onKeyDown={e => {
+        if (e.key === "Enter") { e.preventDefault(); commit(text); }
+      }}
+      aria-label="Grid size"
+      className="w-16 text-xs border rounded px-1.5 py-0.5"
+    />
   );
 }

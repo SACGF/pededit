@@ -24,8 +24,23 @@ draws NSGC symbols.
 - `nodes/MoreMenu.tsx` — affected, deceased, proband, sex, lock/unlock,
   move sib left/right, delete.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
-  the sibship bar follows dragged nodes. `CoupleEdge` and
+  the sibship bar follows dragged nodes. The lines come from
+  `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits
+  halfway to the highest child and every child gets its own drop, so a child
+  pinned off its siblings' row is still reached. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners.
+- `snap.ts` — snap to grid. With snap on, `layoutToFlow` and `svgExporter`
+  round every node to the grid, auto-placed ones included, so a dragged node
+  can line up with them. Whole rows round together (couple lines stay flat)
+  and auto-placed neighbours keep at least a symbol's width apart on coarse
+  grids. Compact rows (84px) are not grid multiples, which is why rounding
+  happens at render time rather than through grid-friendly spacing: the grid
+  size is user-set (4 to 80), so no fixed spacing fits every grid. Pins are
+  stored on the grid in normal spacing (`pinIndividual`); because the compact
+  scales are below 1, a compact drop unscaled, rounded and scaled back
+  rounds to the same compact grid point. Background dots follow the grid,
+  every nth point when the grid is under 10px; React Flow centres a dot in
+  its pattern tile, so `PedigreeCanvas` offsets it by half a tile.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
   within the pedigree's quadrant-style tags.

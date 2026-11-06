@@ -70,9 +70,19 @@ describe("updateCanvasSettings snap to grid", () => {
 
   it("does not re-snap when an unrelated setting changes while snap is on", () => {
     store().updateCanvasSettings({ snapToGrid: true });
-    store().pinIndividual("a", { x: 101, y: 201 });
+    store().updateCanvasSettings({ snapGridSize: 10 });
+    store().updateCanvasSettings({ snapToGrid: true, snapGridSize: 10 });
+    const before = store().pedigree.pinnedPositions;
     store().updateCanvasSettings({ nodesMoveable: true });
-    expect(store().pedigree.pinnedPositions?.a).toEqual({ x: 101, y: 201 });
+    expect(store().pedigree.pinnedPositions).toEqual(before);
+  });
+
+  it("applies a grid size change as one undo entry", () => {
+    store().updateCanvasSettings({ snapToGrid: true });
+    const n = store().past.length;
+    store().updateCanvasSettings({ snapGridSize: 45 });
+    expect(store().past).toHaveLength(n + 1);
+    expect(store().pedigree.pinnedPositions?.a).toEqual({ x: 90, y: 225 });
   });
 
   it("leaves auto-laid-out nodes alone (no pinnedPositions)", () => {
