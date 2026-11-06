@@ -3,7 +3,7 @@ import { exportSvg } from "../svgExporter";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE, ROW_HEIGHT } from "../../../pedigree/constants";
+import { NODE_SIZE, ROW_HEIGHT, SLOT_WIDTH } from "../../../pedigree/constants";
 
 function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
   return {
@@ -259,5 +259,80 @@ describe("exportSvg — title option", () => {
     });
     const svg = exportSvg(p);
     expect(svg).not.toContain('font-weight="bold"');
+  });
+});
+
+// ── Compact option ────────────────────────────────────────────────────────────
+
+describe("exportSvg: compact option", () => {
+  /** Centre of every rendered symbol, in slot order, from its translate(x y). */
+  function symbolCentres(svg: string): { x: number; y: number }[] {
+    return [...svg.matchAll(/<g transform="translate\(([-\d.]+) ([-\d.]+)\)">\n<(?:rect|circle|polygon)/g)]
+      .map((m) => ({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
+  }
+  function rowYs(svg: string): number[] {
+    return [...new Set(symbolCentres(svg).map((c) => c.y))].sort((a, b) => a - b);
+  }
+  function dims(svg: string): { w: number; h: number } {
+    const m = svg.match(/viewBox="0 0 (\d+) (\d+)"/)!;
+    return { w: parseInt(m[1], 10), h: parseInt(m[2], 10) };
+  }
+
+  it("default keeps generation rows ROW_HEIGHT apart", () => {
+    const rows = rowYs(exportSvg(simpleFamily));
+    expect(rows).toHaveLength(3);
+    expect(rows[1] - rows[0]).toBeCloseTo(ROW_HEIGHT);
+  });
+
+  it("compact=true places generation rows 70% of ROW_HEIGHT apart", () => {
+    const rows = rowYs(exportSvg(simpleFamily, { compact: true }));
+    expect(rows).toHaveLength(3);
+    expect(rows[1] - rows[0]).toBeCloseTo(ROW_HEIGHT * 0.7);
+    expect(rows[2] - rows[1]).toBeCloseTo(ROW_HEIGHT * 0.7);
+  });
+
+  it("compact=true narrows slot spacing to 85% of the default", () => {
+    const bottomRowXs = (svg: string) => {
+      const cs = symbolCentres(svg);
+      const bottom = Math.max(...cs.map((c) => c.y));
+      return cs.filter((c) => c.y === bottom).map((c) => c.x).sort((a, b) => a - b);
+    };
+    // Bottom row of simpleFamily: three children one slot apart.
+    const nx = bottomRowXs(exportSvg(simpleFamily));
+    const cx = bottomRowXs(exportSvg(simpleFamily, { compact: true }));
+    expect(nx).toHaveLength(3);
+    expect(cx).toHaveLength(3);
+    expect(nx[1] - nx[0]).toBeCloseTo(SLOT_WIDTH);
+    expect(cx[1] - cx[0]).toBeCloseTo(SLOT_WIDTH * 0.85);
+    expect(cx[2] - cx[1]).toBeCloseTo(SLOT_WIDTH * 0.85);
+  });
+
+  it("compact=true produces a smaller SVG than the default", () => {
+    const n = dims(exportSvg(simpleFamily));
+    const c = dims(exportSvg(simpleFamily, { compact: true }));
+    expect(c.w).toBeLessThan(n.w);
+    expect(c.h).toBeLessThan(n.h);
+  });
+
+  it("compact=true scales a pinned position by the same factors", () => {
+    // i1 (first symbol) is at pos 1 → x = SLOT_WIDTH, y = 0 at normal spacing.
+    // i6 is pinned below everyone else; measure it relative to i1 so the
+    // export offset cancels out.
+    const pinned: Pedigree = {
+      ...simpleFamily,
+      pinnedPositions: { i6: { x: 300, y: 250 } },
+    };
+    const rel = (svg: string) => {
+      const cs = symbolCentres(svg);
+      const founder = cs[0];
+      const pin = cs.reduce((a, b) => (b.y > a.y ? b : a));
+      return { dx: pin.x - founder.x, dy: pin.y - founder.y };
+    };
+    const n = rel(exportSvg(pinned));
+    const c = rel(exportSvg(pinned, { compact: true }));
+    expect(n.dx).toBeCloseTo(300 - SLOT_WIDTH);
+    expect(n.dy).toBeCloseTo(250);
+    expect(c.dx).toBeCloseTo((300 - SLOT_WIDTH) * 0.85);
+    expect(c.dy).toBeCloseTo(250 * 0.7);
   });
 });

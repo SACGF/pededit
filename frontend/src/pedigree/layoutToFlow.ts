@@ -1,7 +1,9 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "./constants";
+import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "./constants";
+import { layoutSpacing, scalePinnedPosition } from "./spacing";
+import type { LayoutSpacing } from "./spacing";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -67,6 +69,15 @@ export interface FlowData {
   nodes: Node<RFNodeData>[];
   coupleEdges: Edge<CoupleEdgeData>[];
   sibshipEdges: Edge<SibshipEdgeData>[];
+}
+
+export interface LayoutToFlowOptions {
+  /**
+   * Compact mode: rows are placed at 70% of ROW_HEIGHT and slots at 85% of
+   * SLOT_WIDTH so larger pedigrees fit on screen. Pinned positions (stored
+   * at normal spacing) are scaled by the same factors. Default: false.
+   */
+  compact?: boolean;
 }
 
 // ── Orphan duplicate detection ────────────────────────────────────────────────
@@ -218,17 +229,18 @@ function adjustOrphanPositions(
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
-export function layoutToFlow(pedigree: Pedigree): FlowData {
+export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [] };
   }
   const result: LayoutResult = alignPedigree(pedigree);
+  const spacing = layoutSpacing(options.compact);
 
   // Detect orphan duplicates (both-spouses-have-parents case) and build
   // a redirect map so their parents' sibship edges point to the right node.
   const { orphanSlotIds, redirectSlot } = findOrphanDuplicates(result);
 
-  const nodes = buildNodes(pedigree, result, orphanSlotIds);
+  const nodes = buildNodes(pedigree, result, orphanSlotIds, spacing);
 
   // Map from slot id ("level-slot") → final pixel position (reflects pin overrides).
   const slotPos = new Map<string, { x: number; y: number }>();
@@ -270,7 +282,9 @@ function buildNodes(
   pedigree: Pedigree,
   result: LayoutResult,
   orphanSlotIds: Set<string>,
+  spacing: LayoutSpacing,
 ): Node<RFNodeData>[] {
+  const { slotWidth, rowHeight } = spacing;
   // First pass: count non-orphan slots per baseNid to compute isDuplicate correctly.
   const nidSlotCount = new Map<number, number>();
   for (let level = 0; level < result.n.length; level++) {
@@ -310,9 +324,9 @@ function buildNodes(
       nodes.push({
         id:       `${level}-${slot}`,
         type:     "pedigreeSymbol",
-        position: pinnedPos ?? {
-          x: result.pos[level][slot] * SLOT_WIDTH,
-          y: level * ROW_HEIGHT,
+        position: pinnedPos ? scalePinnedPosition(pinnedPos, spacing) : {
+          x: result.pos[level][slot] * slotWidth,
+          y: level * rowHeight,
         },
         draggable: isMoveable,
         width:  NODE_SIZE,

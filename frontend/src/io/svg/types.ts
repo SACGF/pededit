@@ -18,6 +18,12 @@ export interface SvgExportOptions {
   /** Optional title line rendered above the pedigree. Default: none. */
   title?: string;
 
+  /**
+   * Compact layout: 70% row height and 85% slot width, matching the canvas
+   * compact mode. Standard top-down layout only. Default: false.
+   */
+  compact?: boolean;
+
   /** Render as U-shape (horseshoe) layout instead of standard top-down. */
   uShape?: boolean;
 

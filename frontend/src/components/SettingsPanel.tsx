@@ -10,9 +10,11 @@ interface SettingsPanelProps {
   onClose: () => void;
   showMinimap: boolean;
   onToggleMinimap: (v: boolean) => void;
+  compact: boolean;
+  onToggleCompact: (v: boolean) => void;
 }
 
-export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: SettingsPanelProps) {
+export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, compact, onToggleCompact }: SettingsPanelProps) {
   const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeStore();
   const { mode, affectedFirst } = pedigree.siblingOrder;
   const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: 10 };
@@ -73,6 +75,19 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap }: S
                 <div className="text-sm">Show minimap</div>
                 <div className="text-xs text-gray-400">
                   Overview of the full pedigree in the bottom-right corner
+                </div>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer mt-2">
+              <input
+                type="checkbox"
+                checked={compact}
+                onChange={e => onToggleCompact(e.target.checked)}
+              />
+              <div>
+                <div className="text-sm">Compact layout</div>
+                <div className="text-xs text-gray-400">
+                  Tighter spacing between generations so larger pedigrees fit on screen. Pinned positions are scaled to match.
                 </div>
               </div>
             </label>

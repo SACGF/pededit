@@ -1,6 +1,8 @@
 import { alignPedigree, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
-import { SLOT_WIDTH, ROW_HEIGHT, NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants";
+import { NODE_SIZE, COUPLE_HOP, COUPLE_HOP_STEP } from "../../pedigree/constants";
+import { layoutSpacing, scalePinnedPosition } from "../../pedigree/spacing";
+import type { LayoutSpacing } from "../../pedigree/spacing";
 import { couplePathD, consanguineousPathsD } from "../../pedigree/couplePath";
 import { deidentify } from "./deidentify";
 import type { SvgExportOptions } from "./types";
@@ -19,18 +21,20 @@ type SlotPos = Map<string, { x: number; y: number }>;
 
 /**
  * Build a map from "level-slot" → canvas pixel position.
- * Pinned individuals use their stored position; others use the algorithm result.
+ * Pinned individuals use their stored position (scaled to the spacing in use);
+ * others use the algorithm result.
  */
-function buildSlotPositions(pedigree: Pedigree, result: LayoutResult): SlotPos {
+function buildSlotPositions(pedigree: Pedigree, result: LayoutResult, spacing: LayoutSpacing): SlotPos {
   const map: SlotPos = new Map();
+  const { slotWidth, rowHeight } = spacing;
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
       const nid = Math.floor(result.nid[level][slot]);
       const ind = pedigree.individuals[nid - 1];
       const pinned = pedigree.pinnedPositions?.[ind.id];
-      map.set(`${level}-${slot}`, pinned ?? {
-        x: result.pos[level][slot] * SLOT_WIDTH,
-        y: level * ROW_HEIGHT,
+      map.set(`${level}-${slot}`, pinned ? scalePinnedPosition(pinned, spacing) : {
+        x: result.pos[level][slot] * slotWidth,
+        y: level * rowHeight,
       });
     }
   }
@@ -291,7 +295,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 
   const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
   const result  = alignPedigree(working);
-  const slotPos = buildSlotPositions(working, result);
+  const slotPos = buildSlotPositions(working, result, layoutSpacing(options.compact));
   const bounds  = computeBounds(working, slotPos, options);
   const { offsetX, offsetY, width, height } = bounds;
 
