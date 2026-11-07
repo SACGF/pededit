@@ -8,7 +8,11 @@ Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issue
 
 ### Issue and release workflow
 
-- Name the issue in every commit that works on it, as `(#N)` in the subject. The release process finds fixes by searching commit messages, so a fix without a number is invisible.
+- **Why issues exist.** They are for humans: so a bug reported twice can be found as already captured, and so changes that need manual testing get tested. Decide whether work needs one on that basis:
+  - **Major work** (a feature, a behaviour change, anything needing manual testing) gets an issue. Raise one if none exists.
+  - **A super quick fix that needs no manual testing** (a small bug found along the way, fully covered by unit tests or the browser page checks) can go in without an issue. Do not raise an issue just to have a number to cite.
+- **No other GitHub writes without being asked.** Beyond raising issues for major work and closing tested issues as described below, do not edit, comment on, label or reopen issues, PRs or milestones, and do not push, unless the user asked for that in this conversation.
+- When a commit works on an issue, name it as `(#N)` in the subject. The release process finds fixes by searching commit messages, so a fix without a number is invisible.
 - **Never use a closing keyword** (`closes`, `fixes`, `resolves` and their variants) in a commit message or PR description. GitHub would close the issue on merge with no testing decision made. Write `(#N)` and nothing more.
 - **Issues stay open by default.** Finishing the code is not the end of an issue. An agent may close one only as a deliberate decision, once it is sure the change works and the whole issue is covered: by unit tests, by agent testing with the browser page checks (`frontend/scripts/browser/`), or both. Coverage means every behaviour the issue asks for, including a save and reload where the data model changed. Close with a comment saying what was run. Anything that depends on interaction the harness cannot drive (drag, dialogs, menus, export files, signed-in flows) stays open with the `Needs Testing` label for the maintainer to test by hand. When in doubt, label rather than close.
 - An issue is **fixed** when code that solves it is on `main`. Its GitHub state says nothing about that, since fixed issues normally stay open until tested. When asked which issues are fixed, read the commits, not the open/closed flag.
