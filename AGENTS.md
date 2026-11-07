@@ -6,6 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issues), not in plan files. Check there before starting anything.
 
+### Issue and release workflow
+
+- Name the issue in every commit that works on it, as `(#N)` in the subject. The release process finds fixes by searching commit messages, so a fix without a number is invisible.
+- **Never use a closing keyword** (`closes`, `fixes`, `resolves` and their variants) in a commit message or PR description. GitHub would close the issue on merge with no testing decision made. Write `(#N)` and nothing more.
+- **Issues stay open by default.** Finishing the code is not the end of an issue. An agent may close one only as a deliberate decision, once it is sure the change works and the whole issue is covered: by unit tests, by agent testing with the browser page checks (`frontend/scripts/browser/`), or both. Coverage means every behaviour the issue asks for, including a save and reload where the data model changed. Close with a comment saying what was run. Anything that depends on interaction the harness cannot drive (drag, dialogs, menus, export files, signed-in flows) stays open with the `Needs Testing` label for the maintainer to test by hand. When in doubt, label rather than close.
+- An issue is **fixed** when code that solves it is on `main`. Its GitHub state says nothing about that, since fixed issues normally stay open until tested. When asked which issues are fixed, read the commits, not the open/closed flag.
+- Every fixed issue goes on the current release milestone (`gh api repos/SACGF/pededit/milestones`) as soon as its code lands, tested or not. Reopening an issue keeps its milestone.
+
 What exists:
 - `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup). Connected-component ordering is still open (#39).
 - Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51).
