@@ -873,7 +873,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   };
   const targaryenTags = [
     { id: "dragonrider", label: "Dragonrider", color: "#d62728", style: "quadrant" as const, members: Object.keys(dragons) },
-    { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "dot" as const,
+    { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "quadrant" as const,
       members: ["Viserys_I", "Helaena", "Daeron_Drunken", "Daenerys"] },
     { id: "throne", label: "Sat the Iron Throne", color: "#000000", style: "text" as const, abbrev: "Throne",
       members: ["Aegon_I", "Aenys_I", "Maegor_I", "Jaehaerys_I", "Viserys_I", "Aegon_II", "Rhaenyra", "Aegon_III",
