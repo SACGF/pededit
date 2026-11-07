@@ -1,0 +1,46 @@
+# The Buendía family of Macondo. Gabriel García Márquez, One Hundred Years of Solitude
+# (1967). Seven generations from José Arcadio Buendía and his cousin Úrsula Iguarán to
+# the last Aureliano, born with a pig's tail to an aunt and her nephew.
+# The novel says the founders are cousins, and that Úrsula's aunt and José Arcadio
+# Buendía's uncle had a son with a pig's tail, without saying how they are related.
+# The unnamed grandparents and parents here are our scaffold: two Buendía brothers marry
+# two Iguarán sisters, and Úrsula's father is their brother.
+# Bloodline only: Rebeca, Remedios Moscote, Petra Cotes, Gastón and the Colonel's 17
+# sons by 17 women are left out. PHENO 2 = born with a pig's tail.
+# The two founding families. The novel says only that the Buendías and Iguaráns had intermarried for centuries; this scaffold is ours
+BUEN	Buendia_grandfather	0	0	1	1
+BUEN	Buendia_grandmother	0	0	2	1
+BUEN	Iguaran_grandfather	0	0	1	1
+BUEN	Iguaran_grandmother	0	0	2	1
+BUEN	JAB_father	Buendia_grandfather	Buendia_grandmother	1	1
+BUEN	Pig_tail_uncle	Buendia_grandfather	Buendia_grandmother	1	1
+BUEN	JAB_mother	Iguaran_grandfather	Iguaran_grandmother	2	1
+BUEN	Ursula_father	Iguaran_grandfather	Iguaran_grandmother	1	1
+BUEN	Pig_tail_aunt	Iguaran_grandfather	Iguaran_grandmother	2	1
+BUEN	Ursula_mother	0	0	2	1
+BUEN	Pig_tail_cousin	Pig_tail_uncle	Pig_tail_aunt	1	2
+BUEN	Jose_Arcadio_Buendia	JAB_father	JAB_mother	1	1
+BUEN	Ursula_Iguaran	Ursula_father	Ursula_mother	2	1
+# Second generation
+BUEN	Jose_Arcadio	Jose_Arcadio_Buendia	Ursula_Iguaran	1	1
+BUEN	Colonel_Aureliano	Jose_Arcadio_Buendia	Ursula_Iguaran	1	1
+BUEN	Amaranta	Jose_Arcadio_Buendia	Ursula_Iguaran	2	1
+BUEN	Pilar_Ternera	0	0	2	1
+# Third generation: Pilar Ternera's sons by the two brothers
+BUEN	Arcadio	Jose_Arcadio	Pilar_Ternera	1	1
+BUEN	Aureliano_Jose	Colonel_Aureliano	Pilar_Ternera	1	1
+BUEN	Santa_Sofia	0	0	2	1
+# Fourth generation
+BUEN	Remedios_the_Beauty	Arcadio	Santa_Sofia	2	1
+BUEN	Jose_Arcadio_Segundo	Arcadio	Santa_Sofia	1	1
+BUEN	Aureliano_Segundo	Arcadio	Santa_Sofia	1	1
+BUEN	Fernanda	0	0	2	1
+# Fifth generation
+BUEN	Jose_Arcadio_V	Aureliano_Segundo	Fernanda	1	1
+BUEN	Meme	Aureliano_Segundo	Fernanda	2	1
+BUEN	Amaranta_Ursula	Aureliano_Segundo	Fernanda	2	1
+BUEN	Mauricio_Babilonia	0	0	1	1
+# Sixth generation: Meme's son falls in love with her sister, his aunt
+BUEN	Aureliano_Babilonia	Mauricio_Babilonia	Meme	1	1
+# Seventh generation
+BUEN	Aureliano_last	Aureliano_Babilonia	Amaranta_Ursula	1	2

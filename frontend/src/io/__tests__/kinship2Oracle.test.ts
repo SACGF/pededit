@@ -35,6 +35,8 @@ const FIXTURES: Record<string, string> = {
   queen_victoria: "historic/queen_victoria.ped",
   tutankhamun: "historic/tutankhamun.ped",
   targaryen: "fiction/targaryen.ped",
+  buendia: "fiction/buendia.ped",
+  atreides: "fiction/atreides.ped",
   three_quarter_siblings: "classic/three_quarter_siblings.ped",
   five_eighths_siblings: "classic/five_eighths_siblings.ped",
   full_sib_mating: "classic/full_sib_mating.ped",
@@ -77,6 +79,8 @@ const POSITION_DIVERGENCES: Record<string, string> = {
     "post-QP centering shifts the sibship 121 to 124 one unit left, centred under 109~110",
   "quad_half_first_cousins/CLAS":
     "post-QP centering moves M2 from 3.17 to 3.5 and Y from 2.67 to 2.83, centred under their parents",
+  "atreides/ATRE":
+    "post-QP centering moves Alia and Paul 0.74 units left under Leto~Jessica, Paul's children 1.21 left under Paul~Chani, and Farad'n 0.48 right under his parents",
   "targaryen/TARG":
     "post-QP centering moves Rhaenys and Aemma in row 6 (up to 0.35 units) and Daeron II's and Maekar's lines in rows 13 and 14 (0.05 units) under their parents",
 };
@@ -256,6 +260,8 @@ const EXAMPLE_FIXTURES: Record<string, string> = {
   "Queen Victoria · haemophilia B": "queen_victoria",
   "Tutankhamun's family": "tutankhamun",
   "House Targaryen": "targaryen",
+  "The Buendías": "buendia",
+  "House Atreides": "atreides",
   "3/4 siblings": "three_quarter_siblings",
   "5/8 siblings": "five_eighths_siblings",
   "Full-sib mating": "full_sib_mating",

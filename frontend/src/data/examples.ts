@@ -1,4 +1,4 @@
-import type { Pedigree, Individual, Partnership, Sex } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Individual, Partnership, Sex, Tag } from "@pedigree-editor/layout-engine";
 
 export interface ExamplePedigree {
   label: string;
@@ -448,10 +448,10 @@ type Row = [
   sex: Sex,
   father: string | null,
   mother: string | null,
-  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes">>,
+  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes" | "tags">>,
 ];
 
-function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree {
+function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}, tags?: Tag[]): Pedigree {
   const individuals: Individual[] = rows.map(([id, sex, , , extras]) => ({
     id,
     sex,
@@ -462,6 +462,7 @@ function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree 
     sibOrder: 0,
     ...(extras?.name ? { name: extras.name } : {}),
     ...(extras?.notes ? { notes: extras.notes } : {}),
+    ...(extras?.tags ? { tags: extras.tags } : {}),
   }));
 
   const parentsOf = new Map<string, [string, string]>();
@@ -499,16 +500,20 @@ function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree 
   }
 
   const byId = new Map(individuals.map(i => [i.id, i]));
+  // Founders are numbered in row order, as the PED importer does; the layout
+  // uses sibOrder to order them.
+  individuals.filter(i => !parentsOf.has(i.id)).forEach((ind, k) => { ind.sibOrder = k; });
   for (const children of Object.values(parentOf)) {
     children.forEach((c, i) => { byId.get(c)!.sibOrder = i; });
   }
 
-  return { siblingOrder, individuals, partnerships, parentOf };
+  return { siblingOrder, individuals, partnerships, parentOf, ...(tags ? { tags } : {}) };
 }
 
 function historicAndClassicExamples(): ExamplePedigree[] {
   const M: Sex = "male";
   const F: Sex = "female";
+  const U: Sex = "unknown";
 
   const habsburg: Row[] = [
     ["Ferdinand_of_Aragon",   M, null, null, { name: "Ferdinand of Aragon" }],
@@ -723,6 +728,91 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Jon_Snow",           M, "Rhaegar", "Lyanna_Stark", { name: "Jon Snow", proband: true, deceased: false, notes: "Born Aegon. Raised as Eddard Stark's bastard; Rhaegar's son by Lyanna" }],
   ];
 
+  // Fiction: test-data/ped/fiction/buendia.ped. Affected = born with a pig's tail.
+  const buendia: Row[] = [
+    // The two founding families. The novel says only that the Buendías and Iguaráns had intermarried for centuries; this scaffold is ours
+    ["Buendia_grandfather",  M, null, null, { name: "Buendía", notes: "Unnamed Buendía grandfather" }],
+    ["Buendia_grandmother",  F, null, null, { name: "Grandmother", notes: "Unnamed Buendía grandmother" }],
+    ["Iguaran_grandfather",  M, null, null, { name: "Iguarán", notes: "Unnamed Iguarán grandfather" }],
+    ["Iguaran_grandmother",  F, null, null, { name: "Grandmother", notes: "Unnamed Iguarán grandmother" }],
+    ["JAB_father",           M, "Buendia_grandfather", "Buendia_grandmother", { name: "Father", notes: "Unnamed; father of José Arcadio Buendía" }],
+    ["Pig_tail_uncle",       M, "Buendia_grandfather", "Buendia_grandmother", { name: "Uncle", notes: "Unnamed; José Arcadio Buendía's uncle" }],
+    ["JAB_mother",           F, "Iguaran_grandfather", "Iguaran_grandmother", { name: "Mother", notes: "Unnamed; her being an Iguarán is our assumption, to make the couple cousins" }],
+    ["Ursula_father",        M, "Iguaran_grandfather", "Iguaran_grandmother", { name: "Father", notes: "Unnamed; father of Úrsula" }],
+    ["Pig_tail_aunt",        F, "Iguaran_grandfather", "Iguaran_grandmother", { name: "Aunt", notes: "Unnamed; Úrsula's aunt" }],
+    ["Ursula_mother",        F, null, null, { name: "Mother", notes: "Unnamed; Úrsula's mother" }],
+    ["Pig_tail_cousin",      M, "Pig_tail_uncle", "Pig_tail_aunt", { name: "Cousin", affected: true, notes: "Son of the uncle and aunt, born with a pig's tail. Lived 42 years a virgin and bled to death when a butcher cut it off" }],
+    ["Jose_Arcadio_Buendia", M, "JAB_father", "JAB_mother", { name: "José Arcadio B.", notes: "José Arcadio Buendía, founder of Macondo" }],
+    ["Ursula_Iguaran",       F, "Ursula_father", "Ursula_mother", { name: "Úrsula", notes: "Úrsula Iguarán. Feared the cousin marriage would bring a child with a pig's tail" }],
+    // Second generation
+    ["Jose_Arcadio",         M, "Jose_Arcadio_Buendia", "Ursula_Iguaran", { name: "José Arcadio", notes: "Married his adopted sister Rebeca; no children with her" }],
+    ["Colonel_Aureliano",    M, "Jose_Arcadio_Buendia", "Ursula_Iguaran", { name: "Col. Aureliano", notes: "Colonel Aureliano Buendía. Also had 17 sons by 17 women, all named Aureliano, not shown" }],
+    ["Amaranta",             F, "Jose_Arcadio_Buendia", "Ursula_Iguaran", { name: "Amaranta", notes: "Never married" }],
+    ["Pilar_Ternera",        F, null, null, { name: "Pilar", notes: "Pilar Ternera" }],
+    // Third generation: Pilar Ternera's sons by the two brothers
+    ["Arcadio",              M, "Jose_Arcadio", "Pilar_Ternera", { name: "Arcadio" }],
+    ["Aureliano_Jose",       M, "Colonel_Aureliano", "Pilar_Ternera", { name: "Aureliano José", notes: "In love with his aunt Amaranta" }],
+    ["Santa_Sofia",          F, null, null, { name: "Santa Sofía", notes: "Santa Sofía de la Piedad" }],
+    // Fourth generation
+    ["Remedios_the_Beauty",  F, "Arcadio", "Santa_Sofia", { name: "Remedios", notes: "Remedios the Beauty; ascended to heaven while folding sheets" }],
+    ["Jose_Arcadio_Segundo", M, "Arcadio", "Santa_Sofia", { name: "J. A. Segundo", notes: "José Arcadio Segundo; twin of Aureliano Segundo" }],
+    ["Aureliano_Segundo",    M, "Arcadio", "Santa_Sofia", { name: "A. Segundo", notes: "Aureliano Segundo; twin of José Arcadio Segundo" }],
+    ["Fernanda",             F, null, null, { name: "Fernanda", notes: "Fernanda del Carpio" }],
+    // Fifth generation
+    ["Jose_Arcadio_V",       M, "Aureliano_Segundo", "Fernanda", { name: "José Arcadio", notes: "Sent to Rome to become Pope" }],
+    ["Meme",                 F, "Aureliano_Segundo", "Fernanda", { name: "Meme", notes: "Renata Remedios" }],
+    ["Amaranta_Ursula",      F, "Aureliano_Segundo", "Fernanda", { name: "Amaranta Ú.", notes: "Amaranta Úrsula" }],
+    ["Mauricio_Babilonia",   M, null, null, { name: "Mauricio", notes: "Mauricio Babilonia. Followed by yellow butterflies" }],
+    // Sixth generation: Meme's son falls in love with her sister, his aunt
+    ["Aureliano_Babilonia",  M, "Mauricio_Babilonia", "Meme", { name: "Aureliano B.", notes: "Aureliano Babilonia. Deciphered Melquíades's parchments as Macondo was wiped out" }],
+    // Seventh generation
+    ["Aureliano_last",       M, "Aureliano_Babilonia", "Amaranta_Ursula", { name: "Aureliano", affected: true, proband: true, notes: "Born with a pig's tail; the last of the line" }],
+  ];
+
+  // Fiction: test-data/ped/fiction/atreides.ped. Affected = Kwisatz Haderach.
+  const atreides: Row[] = [
+    // Grandparents
+    ["Paulus_Atreides",  M, null, null, { name: "Paulus Atreides", notes: "The Old Duke, killed by a bull" }],
+    ["Helena_Richese",   F, null, null, { name: "Helena Richese", notes: "Name from the Brian Herbert and Kevin J. Anderson prequels" }],
+    ["Dmitri_Harkonnen", M, null, null, { name: "Dmitri Harkonnen", notes: "Name from the Brian Herbert and Kevin J. Anderson prequels" }],
+    ["Baron_mother",     F, null, null, { name: "Baron's mother", notes: "Unnamed here; the Baron and Abulurd are half brothers" }],
+    ["Abulurd_mother",   F, null, null, { name: "Abulurd's mother", notes: "Unnamed here" }],
+    ["Pardot_Kynes",     M, null, null, { name: "Pardot Kynes", notes: "First planetologist of Arrakis" }],
+    ["Liet_mother",      F, null, null, { name: "Liet's mother", notes: "Fremen; unnamed here" }],
+    // Parents' generation
+    ["Leto_I",           M, "Paulus_Atreides", "Helena_Richese", { name: "Duke Leto" }],
+    ["Baron_Harkonnen",  M, "Dmitri_Harkonnen", "Baron_mother", { name: "Baron Harkonnen", notes: "Vladimir Harkonnen. Jessica's father, a secret kept by the Bene Gesserit" }],
+    ["Abulurd",          M, "Dmitri_Harkonnen", "Abulurd_mother", { name: "Abulurd" }],
+    ["Mohiam",           F, null, null, { name: "Mohiam", tags: ["bg"], notes: "Reverend Mother Gaius Helen Mohiam. Jessica's mother per the prequels" }],
+    ["Emmi_Rabban",      F, null, null, { name: "Emmi Rabban", notes: "Name from the Brian Herbert and Kevin J. Anderson prequels" }],
+    ["Liet_Kynes",       M, "Pardot_Kynes", "Liet_mother", { name: "Liet-Kynes", notes: "Imperial Planetologist and Fremen leader" }],
+    ["Chani_mother",     F, null, null, { name: "Chani's mother", notes: "Fremen; unnamed here" }],
+    ["Shaddam_IV",       M, null, null, { name: "Shaddam IV", notes: "Padishah Emperor" }],
+    ["Anirul",           F, null, null, { name: "Anirul", tags: ["bg"], notes: "Bene Gesserit of Hidden Rank. Name from the Brian Herbert and Kevin J. Anderson prequels" }],
+    // Paul's generation
+    ["Jessica",          F, "Baron_Harkonnen", "Mohiam", { name: "Jessica", tags: ["bg"], notes: "Ordered to bear Leto a daughter; bore a son" }],
+    ["Rabban",           M, "Abulurd", "Emmi_Rabban", { name: "Rabban", notes: "Glossu Rabban, the Beast" }],
+    ["Feyd_Rautha",      M, "Abulurd", "Emmi_Rabban", { name: "Feyd-Rautha", notes: "The Bene Gesserit's fallback: to be bred with Leto's daughter. Killed by Paul, his half cousin's son" }],
+    ["Chani",            F, "Liet_Kynes", "Chani_mother", { name: "Chani" }],
+    ["Irulan",           F, "Shaddam_IV", "Anirul", { name: "Irulan", tags: ["bg"], notes: "Married Paul for the throne; no children" }],
+    ["Chalice",          F, "Shaddam_IV", "Anirul", { name: "Chalice" }],
+    ["Wensicia",         F, "Shaddam_IV", "Anirul", { name: "Wensicia" }],
+    ["Josifa",           F, "Shaddam_IV", "Anirul", { name: "Josifa" }],
+    ["Rugi",             F, "Shaddam_IV", "Anirul", { name: "Rugi" }],
+    ["Farad_n_father",   M, null, null, { name: "Farad'n's father", notes: "Unnamed here" }],
+    // Children of Leto and Jessica
+    ["Paul",             M, "Leto_I", "Jessica", { name: "Paul", affected: true, proband: true, notes: "Muad'Dib. The Kwisatz Haderach, a generation early" }],
+    ["Alia",             F, "Leto_I", "Jessica", { name: "Alia", notes: "Pre-born: Jessica took the Water of Life while pregnant. Married Duncan Idaho's ghola; no children" }],
+    ["Farad_n",          M, "Farad_n_father", "Wensicia", { name: "Farad'n", notes: "Married Ghanima, uniting Corrino and Atreides" }],
+    // Children of Paul and Chani
+    ["Leto_first",       M, "Paul", "Chani", { name: "Leto", notes: "Killed as an infant in a Sardaukar raid" }],
+    ["Leto_II",          M, "Paul", "Chani", { name: "Leto II", affected: true, notes: "Twin of Ghanima. The God Emperor, who took over the breeding programme" }],
+    ["Ghanima",          F, "Paul", "Chani", { name: "Ghanima", notes: "Twin of Leto II; married Leto II in name only, then Farad'n" }],
+    // The line continues
+    ["Atreides_line",    U, "Farad_n", "Ghanima", { name: "Their descendants", notes: "The Atreides line of Ghanima and Farad'n, through Moneo to Siona (God Emperor of Dune), not shown individually" }],
+  ];
+  const beneGesserit: Tag[] = [{ id: "bg", label: "Bene Gesserit", color: "#000000", style: "text", abbrev: "BG" }];
+
   const focal = { affected: true };
   const classic: Array<[string, string, Row[]]> = [
     ["3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
@@ -818,6 +908,20 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       group: "Fiction",
       citation: "G. R. R. Martin, Fire & Blood (2018) and A Song of Ice and Fire",
       data: fromRows(targaryen, { deceased: true }),
+    },
+    {
+      label: "The Buendías",
+      description: "9 generations · 30 individuals · cousin and aunt-nephew marriages, the pig's tail",
+      group: "Fiction",
+      citation: "G. García Márquez, One Hundred Years of Solitude (1967)",
+      data: fromRows(buendia, { deceased: true }),
+    },
+    {
+      label: "House Atreides",
+      description: "5 generations · 33 individuals · the Bene Gesserit breeding programme",
+      group: "Fiction",
+      citation: "F. Herbert, Dune (1965), Dune Messiah (1969), Children of Dune (1976)",
+      data: fromRows(atreides, {}, beneGesserit),
     },
   ];
 }

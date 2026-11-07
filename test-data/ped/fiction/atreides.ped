@@ -1,0 +1,51 @@
+# House Atreides and the Bene Gesserit breeding programme. Frank Herbert, Dune (1965),
+# Dune Messiah (1969), Children of Dune (1976). Jessica, a Bene Gesserit, is the
+# daughter of Baron Harkonnen, so Paul and Feyd-Rautha are half first cousins once removed.
+# Names for Paulus's wife, the Baron's father, Feyd-Rautha's mother, Jessica's mother
+# (Gaius Helen Mohiam) and Shaddam's wife (Anirul) are from the Brian Herbert and
+# Kevin J. Anderson prequels. Other parents the books do not name are unnamed founders.
+# Childless marriages (Paul and Irulan, Alia and Duncan Idaho, Leto II and Ghanima) are
+# left out. Ghanima later married Farad'n; their descendants (Moneo, Siona) are one
+# unknown-sex node, which also joins the Corrinos to the rest of the pedigree.
+# PHENO 2 = Kwisatz Haderach (Paul, and Leto II who took his place).
+# Bene Gesserit (Mohiam, Jessica, Anirul, Irulan) carry a "BG" tag in the app; PED has
+# no column for it.
+# Grandparents
+ATRE	Paulus_Atreides	0	0	1	1
+ATRE	Helena_Richese	0	0	2	1
+ATRE	Dmitri_Harkonnen	0	0	1	1
+ATRE	Baron_mother	0	0	2	1
+ATRE	Abulurd_mother	0	0	2	1
+ATRE	Pardot_Kynes	0	0	1	1
+ATRE	Liet_mother	0	0	2	1
+# Parents' generation
+ATRE	Leto_I	Paulus_Atreides	Helena_Richese	1	1
+ATRE	Baron_Harkonnen	Dmitri_Harkonnen	Baron_mother	1	1
+ATRE	Abulurd	Dmitri_Harkonnen	Abulurd_mother	1	1
+ATRE	Mohiam	0	0	2	1
+ATRE	Emmi_Rabban	0	0	2	1
+ATRE	Liet_Kynes	Pardot_Kynes	Liet_mother	1	1
+ATRE	Chani_mother	0	0	2	1
+ATRE	Shaddam_IV	0	0	1	1
+ATRE	Anirul	0	0	2	1
+# Paul's generation
+ATRE	Jessica	Baron_Harkonnen	Mohiam	2	1
+ATRE	Rabban	Abulurd	Emmi_Rabban	1	1
+ATRE	Feyd_Rautha	Abulurd	Emmi_Rabban	1	1
+ATRE	Chani	Liet_Kynes	Chani_mother	2	1
+ATRE	Irulan	Shaddam_IV	Anirul	2	1
+ATRE	Chalice	Shaddam_IV	Anirul	2	1
+ATRE	Wensicia	Shaddam_IV	Anirul	2	1
+ATRE	Josifa	Shaddam_IV	Anirul	2	1
+ATRE	Rugi	Shaddam_IV	Anirul	2	1
+ATRE	Farad_n_father	0	0	1	1
+# Children of Leto and Jessica
+ATRE	Paul	Leto_I	Jessica	1	2
+ATRE	Alia	Leto_I	Jessica	2	1
+ATRE	Farad_n	Farad_n_father	Wensicia	1	1
+# Children of Paul and Chani
+ATRE	Leto_first	Paul	Chani	1	1
+ATRE	Leto_II	Paul	Chani	1	2
+ATRE	Ghanima	Paul	Chani	2	1
+# The line continues
+ATRE	Atreides_line	Farad_n	Ghanima	0	1

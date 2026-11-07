@@ -78,6 +78,31 @@ to Aerys II) and gives Harwin Strong as Jacaerys's father, so it was not used as
   Alysanne's 13 children), and a married-in spouse inside a sibship's span, which
   caught an overlap in the post-QP centering pass. kinship2 gives Daenerys F = 0.375.
 
+### `fiction/buendia.ped`
+The Buendía family of Macondo, Gabriel García Márquez, One Hundred Years of Solitude
+(1967).
+- 30 individuals, 9 generation rows: seven generations of Buendías plus two of founders.
+- The novel says José Arcadio Buendía and Úrsula Iguarán are cousins, and that her aunt
+  and his uncle had a son with a pig's tail, without giving the links. The unnamed
+  grandparents and parents are our scaffold: two Buendía brothers marry two Iguarán
+  sisters, and Úrsula's father is their brother. The header says so.
+- PHENO 2 = born with a pig's tail: that cousin, and the last Aureliano, son of
+  Amaranta Úrsula and her nephew Aureliano Babilonia (F = 0.125 in kinship2).
+- Exercises: first cousin and aunt-nephew marriages, a woman with children by two
+  brothers (Pilar Ternera), people drawn twice.
+
+### `fiction/atreides.ped`
+House Atreides, Frank Herbert, Dune (1965), Dune Messiah (1969), Children of Dune (1976).
+- 33 individuals, 5 generation rows. Atreides, Harkonnen, Kynes and Corrino lines.
+- A few names the novels do not give are from the Brian Herbert and Kevin J. Anderson
+  prequels (Helena Richese, Dmitri Harkonnen, Emmi Rabban, Mohiam as Jessica's mother,
+  Anirul); parents named in neither are unnamed founders.
+- Ghanima and Farad'n's descendants are one unknown-sex node. Without it the Corrinos
+  would be a separate component (component ordering is #39) joined only by Paul and
+  Irulan's childless marriage, which PED cannot express.
+- PHENO 2 = Kwisatz Haderach (Paul, Leto II). The in-app example tags the four Bene
+  Gesserit (Mohiam, Jessica, Anirul, Irulan) with a "BG" text tag.
+
 ### Jicaque pedigree (not included)
 Chapman AM, Jacquard A (1971), Un isolat d'Amérique Centrale: les Indiens Jicaques
 du Honduras, is a French book chapter that is not available online, and the only
@@ -133,6 +158,8 @@ Has a kinship2 oracle like `historic/`.
 | File | Individuals | Families | Description |
 |------|-------------|----------|-------------|
 | `targaryen.ped` | 96 | 1 | House Targaryen, 16 generations of sibling, uncle-niece and cousin marriages. |
+| `buendia.ped` | 30 | 1 | The Buendías, One Hundred Years of Solitude. Cousin and aunt-nephew marriages, two children with a pig's tail. |
+| `atreides.ped` | 33 | 1 | House Atreides, Dune. Jessica is Baron Harkonnen's daughter; one unknown-sex node for Ghanima's descendants. |
 
 ### `classic/`: textbook relationships with known kinship coefficients
 
