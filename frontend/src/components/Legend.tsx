@@ -6,6 +6,8 @@ import {
 import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { consanguinityTest } from "@/pedigree/consanguinity";
+import { Button } from "@/components/ui/button";
+import { Tags } from "lucide-react";
 
 /**
  * The figure legend, always visible in the edit panel (#75). With an
@@ -246,13 +248,15 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
   const used = new Set(tagsInUse(pedigree).map(t => t.id));
 
   const manage = onManageTags && (
-    <button
-      type="button"
+    <Button
+      variant="outline" size="sm"
+      className="h-6 px-1.5 gap-1 text-[11px]"
+      title="Define tags and colours for this pedigree"
       onClick={onManageTags}
-      className="text-[10px] text-gray-500 hover:text-black hover:underline"
     >
-      Manage…
-    </button>
+      <Tags size={11} />
+      Add / edit
+    </Button>
   );
 
   return (
@@ -260,14 +264,7 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
       <div className="space-y-1">
         <SectionHeader action={manage}>Tags</SectionHeader>
         {tags.length === 0 ? (
-          <p className="text-[10px] text-gray-400">
-            No tags yet.{" "}
-            {onManageTags && (
-              <button type="button" onClick={onManageTags} className="text-gray-500 hover:text-black underline underline-offset-1">
-                Add a tag…
-              </button>
-            )}
-          </p>
+          <p className="text-[10px] text-gray-400">No tags defined for this pedigree yet.</p>
         ) : (
           <div>
             {tags.map(tag => {
