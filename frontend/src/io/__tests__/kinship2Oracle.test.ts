@@ -157,10 +157,10 @@ function assertInvariants(result: LayoutResult, ped: Pedigree, label: string) {
     const count = result.n[lev]!;
     expect(result.nid[lev]!.length, `${label}: nid row ${lev} length`).toBe(count);
     for (let s = 0; s < count; s++) {
-      // Positions strictly increase along a row.
+      // Positions increase along a row, at least one slot apart (#73).
       if (s > 0) {
-        expect(result.pos[lev]![s]!, `${label}: lev ${lev} slot ${s} position order`)
-          .toBeGreaterThan(result.pos[lev]![s - 1]!);
+        expect(result.pos[lev]![s]! - result.pos[lev]![s - 1]!, `${label}: lev ${lev} slot ${s} spacing`)
+          .toBeGreaterThanOrEqual(1 - 1e-6);
       }
       // fam points at a valid couple in the row above, and both parents sit in
       // the run of marriage-linked slots around it. (With three or more

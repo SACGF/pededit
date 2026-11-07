@@ -217,7 +217,7 @@ function appendIsolated(
  * for cross-family couples the spouse-adjacency penalty dominates, leaving
  * children off-centre even though a simple shift would fix it.  This pass
  * corrects that by greedily shifting each sibship leftward or rightward,
- * clamped so no child is moved closer than 1 unit to its non-sibling neighbour.
+ * clamped so no child is moved closer than 1 unit to any non-sibling neighbour.
  *
  * Levels are processed top→bottom so that a corrected parent position is
  * visible when we compute grandchild shifts.  Within each level, families
@@ -261,23 +261,14 @@ function postQPCenter(rval: AlignState, pos: Float64Array[]): Float64Array[] {
       let shift = parentMid - childMid;
       if (Math.abs(shift) < 1e-6) continue;
 
-      const sortedSlots = [...slots].sort((a, b) => a - b);
-      const leftmostSlot  = sortedSlots[0]!;
-      const rightmostSlot = sortedSlots[sortedSlots.length - 1]!;
-
-      if (shift < 0) {
-        // Shifting left — check the immediate left neighbour
-        const leftNeighbor = leftmostSlot - 1;
-        if (leftNeighbor >= 1 && !slots.includes(leftNeighbor)) {
-          const gap = pos[lev]![leftmostSlot]! - pos[lev]![leftNeighbor]!;
-          shift = Math.max(shift, -(gap - 1));
-        }
-      } else {
-        // Shifting right — check the immediate right neighbour
-        const rightNeighbor = rightmostSlot + 1;
-        if (rightNeighbor <= ni && !slots.includes(rightNeighbor)) {
-          const gap = pos[lev]![rightNeighbor]! - pos[lev]![rightmostSlot]!;
-          shift = Math.min(shift, gap - 1);
+      // Clamp against every non-sibling slot beside a sibling, not just the two
+      // ends: a married-in spouse can sit inside the sibship's span.
+      const member = new Set(slots);
+      for (const c of slots) {
+        if (shift < 0 && c - 1 >= 1 && !member.has(c - 1)) {
+          shift = Math.max(shift, -(pos[lev]![c]! - pos[lev]![c - 1]! - 1));
+        } else if (shift > 0 && c + 1 <= ni && !member.has(c + 1)) {
+          shift = Math.min(shift, pos[lev]![c + 1]! - pos[lev]![c]! - 1);
         }
       }
 
