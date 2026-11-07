@@ -229,7 +229,6 @@ export default function CanvasPage() {
         <Toolbar
           onSettingsClick={() => setSettingsOpen(true)}
           onExportSvgClick={() => setExportDialogOpen(true)}
-          onTagsClick={() => setTagsOpen(true)}
         />
 
         <div className="flex flex-1 overflow-hidden">

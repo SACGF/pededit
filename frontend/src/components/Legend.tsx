@@ -260,7 +260,14 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
       <div className="space-y-1">
         <SectionHeader action={manage}>Tags</SectionHeader>
         {tags.length === 0 ? (
-          <p className="text-[10px] text-gray-400">No tags defined for this pedigree yet.</p>
+          <p className="text-[10px] text-gray-400">
+            No tags yet.{" "}
+            {onManageTags && (
+              <button type="button" onClick={onManageTags} className="text-gray-500 hover:text-black underline underline-offset-1">
+                Add a tag…
+              </button>
+            )}
+          </p>
         ) : (
           <div>
             {tags.map(tag => {

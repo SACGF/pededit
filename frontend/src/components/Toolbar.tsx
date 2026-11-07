@@ -3,7 +3,7 @@ import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { RotateCcw, RotateCw, Settings, Download, Image, Tags } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { pedLostLifeStatus } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
@@ -37,10 +37,9 @@ function UnknownIcon() {
 interface ToolbarProps {
   onSettingsClick: () => void;
   onExportSvgClick: () => void;
-  onTagsClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick, onExportSvgClick, onTagsClick }: ToolbarProps) {
+export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
   const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
   const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
@@ -181,18 +180,6 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onTagsClick }: Tool
         onClick={redo}
       >
         <RotateCw size={14} />
-      </Button>
-
-      {/* Tags */}
-      <Button
-        variant="ghost" size="sm"
-        className="h-7 px-2 gap-1 text-xs"
-        title="Define tags and colours for this pedigree"
-        disabled={!hasPedigree}
-        onClick={onTagsClick}
-      >
-        <Tags size={12} />
-        Tags
       </Button>
 
       <div className="flex-1" />
