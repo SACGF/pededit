@@ -10,9 +10,9 @@ interface EditPanelProps {
 }
 
 /**
- * The right-hand panel: the selected individual's fields on top (when there
- * is one), then the figure legend, always (#75). The legend's tag rows are
- * the tag checkboxes while someone is selected.
+ * The right-hand panel: the figure legend when nothing is selected, or the
+ * selected individual's fields followed by the legend's tag rows as that
+ * person's tag checkboxes (#75).
  */
 export function EditPanel({ onManageTags }: EditPanelProps) {
   const { pedigree, selectedId, setIndividualTag } = usePedigreeStore();

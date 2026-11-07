@@ -10,8 +10,9 @@ import { consanguinityTest } from "@/pedigree/consanguinity";
 /**
  * The figure legend, always visible in the edit panel (#75). With an
  * individual selected the tag rows become checkboxes for that person, so the
- * same rows serve as the key and as the tag editor. The exported key
- * (`renderExportKeySvg`) lists the same statuses in the same order.
+ * same rows serve as the key and as the tag editor, and the symbol and
+ * relationship sections are dropped to keep the editor short. The exported
+ * key (`renderExportKeySvg`) lists the same statuses in the same order.
  */
 
 type Sex = "male" | "female" | "unknown";
@@ -303,7 +304,7 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
         )}
       </div>
 
-      {indRows.length > 0 && (
+      {!individual && indRows.length > 0 && (
         <div className="space-y-1">
           <SectionHeader>Symbols</SectionHeader>
           <div>
@@ -312,7 +313,7 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
         </div>
       )}
 
-      {relRows.length > 0 && (
+      {!individual && relRows.length > 0 && (
         <div className="space-y-1">
           <SectionHeader>Relationships</SectionHeader>
           <div>
