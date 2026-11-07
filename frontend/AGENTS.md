@@ -58,7 +58,8 @@ stub so the app still builds without Google login.
   snapshot. Add new edits here, not in components.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
-- `components/` — Toolbar, EditPanel, SettingsPanel, TagsDialog, LegendDialog,
+- `components/` — Toolbar, EditPanel (individual form plus the always-visible
+  `Legend`, #75), SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
   redo, Delete/Backspace removes selection, Escape returns to select tool.

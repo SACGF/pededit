@@ -1,18 +1,18 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
+import type { Individual, Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import {
-  tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
+  pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
 import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 
-interface LegendDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  pedigree: Pedigree;
-}
+/**
+ * The figure legend, always visible in the edit panel (#75). With an
+ * individual selected the tag rows become checkboxes for that person, so the
+ * same rows serve as the key and as the tag editor. The exported key
+ * (`renderExportKeySvg`) lists the same statuses in the same order.
+ */
 
 type Sex = "male" | "female" | "unknown";
 
@@ -98,12 +98,12 @@ function ProbandSvg({ sex }: { sex: Sex }) {
 }
 
 /** How a tag looks on a symbol: a quarter of a square, a dot, or coloured text. */
-function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
+export function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
   if (tag.style === "quadrant") {
     const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
     const [start, end] = sectorAngles(idx);
-    const clipId = `legend-dialog-clip-${tag.id}`;
+    const clipId = `legend-clip-${tag.id}`;
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">
         <clipPath id={clipId}><rect x={x} y={y} width={s} height={s} /></clipPath>
@@ -173,18 +173,19 @@ function ConsanguineousSvg() {
 
 // ── Layout helpers ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ children }: { children: React.ReactNode }) {
+function SectionHeader({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1 mt-4 first:mt-0">
-      {children}
+    <div className="flex items-center justify-between">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">{children}</div>
+      {action}
     </div>
   );
 }
 
 function LegendRow({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-3 py-0.5">
-      <div className="flex items-center justify-center w-12 h-10 shrink-0">{icon}</div>
+    <div className="flex items-center gap-2 py-0.5">
+      <div className="flex items-center justify-center w-12 h-9 shrink-0">{icon}</div>
       <span className="text-xs text-gray-800">{label}</span>
     </div>
   );
@@ -192,10 +193,17 @@ function LegendRow({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps) {
+interface LegendProps {
+  pedigree: Pedigree;
+  /** When set, the tag rows are checkboxes that tag or untag this person. */
+  individual?: Individual;
+  onToggleTag?: (tagId: string, on: boolean) => void;
+  onManageTags?: () => void;
+}
+
+export function Legend({ pedigree, individual, onToggleTag, onManageTags }: LegendProps) {
   const { individuals, partnerships } = pedigree;
 
-  // Detect which symbol types are used
   const hasMale    = individuals.some(i => i.sex === "male");
   const hasFemale  = individuals.some(i => i.sex === "female");
   const hasUnknown = individuals.some(i => i.sex === "unknown");
@@ -210,7 +218,6 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   const related = consanguinityTest(pedigree);
   const hasConsanguineous = partnerships.some(p => related(p.individual1, p.individual2));
 
-  // Build legend rows
   const indRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasMale)    indRows.push({ icon: <SymbolSvg sex="male" />,    label: "Male" });
   if (hasFemale)  indRows.push({ icon: <SymbolSvg sex="female" />,  label: "Female" });
@@ -232,53 +239,87 @@ export function LegendDialog({ open, onOpenChange, pedigree }: LegendDialogProps
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });
   if (hasConsanguineous) relRows.push({ icon: <ConsanguineousSvg />, label: "Consanguineous couple" });
 
-  const tagRows = tagsInUse(pedigree).map(tag => ({
-    icon: <TagSwatchSvg tag={tag} pedigree={pedigree} />,
-    label: tag.label,
-  }));
+  // Every defined tag is listed so an unused one can still be ticked; the
+  // exported key lists only tags someone carries.
+  const tags = pedigreeTags(pedigree);
+  const used = new Set(tagsInUse(pedigree).map(t => t.id));
 
-  const isEmpty = indRows.length === 0 && relRows.length === 0 && tagRows.length === 0;
+  const manage = onManageTags && (
+    <button
+      type="button"
+      onClick={onManageTags}
+      className="text-[10px] text-gray-500 hover:text-black hover:underline"
+    >
+      Manage…
+    </button>
+  );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Capped to the viewport with the body scrolling, so the title and the
-          close button stay on screen with many tags (1280x720 laptops). */}
-      <DialogContent className="max-w-xs flex flex-col max-h-[calc(100dvh-2rem)]" aria-describedby={undefined}>
-        <DialogHeader>
-          <DialogTitle>Figure legend</DialogTitle>
-        </DialogHeader>
-
-        {isEmpty ? (
-          <p className="text-xs text-gray-400">No symbols in this pedigree yet.</p>
+    <div className="space-y-4" data-testid="legend">
+      <div className="space-y-1">
+        <SectionHeader action={manage}>Tags</SectionHeader>
+        {tags.length === 0 ? (
+          <p className="text-[10px] text-gray-400">No tags defined for this pedigree yet.</p>
         ) : (
-          <div className="min-h-0 overflow-y-auto -mr-4 pr-4" data-testid="legend-body">
-            {indRows.length > 0 && (
-              <>
-                <SectionHeader>Individuals</SectionHeader>
-                <div>
-                  {indRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+          <div>
+            {tags.map(tag => {
+              const inUse = used.has(tag.id);
+              const swatch = (
+                <div className="flex items-center justify-center w-10 h-7 shrink-0">
+                  <TagSwatchSvg tag={tag} pedigree={pedigree} />
                 </div>
-              </>
-            )}
-            {relRows.length > 0 && (
-              <>
-                <SectionHeader>Relationships</SectionHeader>
-                <div>
-                  {relRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+              );
+              const text = (
+                <span
+                  className={`text-xs truncate ${inUse || individual ? "text-gray-800" : "text-gray-400"}`}
+                  title={inUse ? undefined : "No one has this tag yet"}
+                >
+                  {tag.label}
+                </span>
+              );
+              if (individual && onToggleTag) {
+                const on = individual.tags?.includes(tag.id) ?? false;
+                return (
+                  <label key={tag.id} className="flex items-center gap-1.5 cursor-pointer min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={e => onToggleTag(tag.id, e.target.checked)}
+                      className="accent-black shrink-0"
+                    />
+                    {swatch}
+                    {text}
+                  </label>
+                );
+              }
+              return (
+                <div key={tag.id} className="flex items-center gap-1.5 min-w-0">
+                  {swatch}
+                  {text}
                 </div>
-              </>
-            )}
-            {tagRows.length > 0 && (
-              <>
-                <SectionHeader>Tags</SectionHeader>
-                <div>
-                  {tagRows.map((r, i) => <LegendRow key={i} icon={r.icon} label={r.label} />)}
-                </div>
-              </>
-            )}
+              );
+            })}
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+
+      {indRows.length > 0 && (
+        <div className="space-y-1">
+          <SectionHeader>Symbols</SectionHeader>
+          <div>
+            {indRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+          </div>
+        </div>
+      )}
+
+      {relRows.length > 0 && (
+        <div className="space-y-1">
+          <SectionHeader>Relationships</SectionHeader>
+          <div>
+            {relRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

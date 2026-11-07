@@ -1,31 +1,49 @@
 import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { pedigreeTags, tagCanvasText } from "../pedigree/tags";
+import { Legend } from "./Legend";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
-import type { LifeStatus } from "@pedigree-editor/layout-engine";
+import type { Individual, LifeStatus } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
   onManageTags?: () => void;
 }
 
+/**
+ * The right-hand panel: the selected individual's fields on top (when there
+ * is one), then the figure legend, always (#75). The legend's tag rows are
+ * the tag checkboxes while someone is selected.
+ */
 export function EditPanel({ onManageTags }: EditPanelProps) {
-  const { pedigree, selectedId, updateIndividual, setCarrier, setIndividualTag, setLifeStatus } = usePedigreeStore();
+  const { pedigree, selectedId, setIndividualTag } = usePedigreeStore();
   const individual = pedigree.individuals.find(i => i.id === selectedId);
-  const tags = pedigreeTags(pedigree);
-  // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
-  const isLifeStatusLocked = !!individual && !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
-
-  if (!individual) {
-    return (
-      <div className="p-4 text-xs text-gray-400">
-        Select an individual to edit
-      </div>
-    );
-  }
 
   return (
-    <div className="p-4 space-y-4 overflow-y-auto">
+    <div className="p-4 space-y-4">
+      {individual ? (
+        <IndividualForm individual={individual} />
+      ) : (
+        <p className="text-xs text-gray-400">Select an individual to edit</p>
+      )}
+      <div className="border-t pt-3">
+        <Legend
+          pedigree={pedigree}
+          individual={individual}
+          onToggleTag={individual ? (tagId, on) => setIndividualTag(individual.id, tagId, on) : undefined}
+          onManageTags={onManageTags}
+        />
+      </div>
+    </div>
+  );
+}
+
+function IndividualForm({ individual }: { individual: Individual }) {
+  const { pedigree, updateIndividual, setCarrier, setLifeStatus } = usePedigreeStore();
+  // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
+  const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
+
+  return (
+    <div className="space-y-4">
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
         Individual
       </div>
@@ -71,51 +89,6 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
           ))}
         </select>
       </Field>
-
-      <div className="border-t pt-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-            Tags
-          </div>
-          {onManageTags && (
-            <button
-              type="button"
-              onClick={onManageTags}
-              className="text-[10px] text-gray-500 hover:text-black hover:underline"
-            >
-              Manage…
-            </button>
-          )}
-        </div>
-        {tags.length === 0 ? (
-          <p className="text-[10px] text-gray-400">
-            No tags defined for this pedigree yet.
-          </p>
-        ) : (
-          <div className="space-y-1">
-            {tags.map(tag => {
-              const on = individual.tags?.includes(tag.id) ?? false;
-              return (
-                <label key={tag.id} className="flex items-center gap-2 text-xs cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={on}
-                    onChange={e => setIndividualTag(individual.id, tag.id, e.target.checked)}
-                  />
-                  <span
-                    className="inline-block w-2.5 h-2.5 shrink-0 border border-black/20"
-                    style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
-                  />
-                  <span className="truncate">{tag.label}</span>
-                  {tag.style === "text" && (
-                    <span className="text-[10px] font-bold" style={{ color: tag.color }}>{tagCanvasText(tag)}</span>
-                  )}
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </div>
 
       <div className="border-t pt-3 space-y-2">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">

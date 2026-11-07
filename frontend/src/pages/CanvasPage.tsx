@@ -9,7 +9,6 @@ import { EditPanel } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
-import { LegendDialog } from "../components/LegendDialog";
 import { TagsDialog } from "../components/TagsDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
@@ -43,7 +42,6 @@ export default function CanvasPage() {
   });
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [legendOpen, setLegendOpen] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
@@ -231,7 +229,6 @@ export default function CanvasPage() {
         <Toolbar
           onSettingsClick={() => setSettingsOpen(true)}
           onExportSvgClick={() => setExportDialogOpen(true)}
-          onLegendClick={() => setLegendOpen(true)}
           onTagsClick={() => setTagsOpen(true)}
         />
 
@@ -240,7 +237,7 @@ export default function CanvasPage() {
             <PedigreeCanvas showMinimap={showMinimap} compact={compact} />
           </div>
 
-          <div className="w-52 border-l bg-white shrink-0 overflow-y-auto">
+          <div className="w-60 border-l bg-white shrink-0 overflow-y-auto">
             <EditPanel onManageTags={() => setTagsOpen(true)} />
           </div>
         </div>
@@ -285,13 +282,6 @@ export default function CanvasPage() {
         <TagsDialog open={tagsOpen} onOpenChange={setTagsOpen} />
       )}
 
-      {activePedigreeId && (
-        <LegendDialog
-          open={legendOpen}
-          onOpenChange={setLegendOpen}
-          pedigree={pedigree}
-        />
-      )}
     </div>
   );
 }
