@@ -448,10 +448,10 @@ type Row = [
   sex: Sex,
   father: string | null,
   mother: string | null,
-  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes" | "tags">>,
+  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes">>,
 ];
 
-function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}, tags?: Tag[]): Pedigree {
+function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree {
   const individuals: Individual[] = rows.map(([id, sex, , , extras]) => ({
     id,
     sex,
@@ -462,7 +462,6 @@ function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}, tags?: Tag
     sibOrder: 0,
     ...(extras?.name ? { name: extras.name } : {}),
     ...(extras?.notes ? { notes: extras.notes } : {}),
-    ...(extras?.tags ? { tags: extras.tags } : {}),
   }));
 
   const parentsOf = new Map<string, [string, string]>();
@@ -507,7 +506,35 @@ function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}, tags?: Tag
     children.forEach((c, i) => { byId.get(c)!.sibOrder = i; });
   }
 
-  return { siblingOrder, individuals, partnerships, parentOf, ...(tags ? { tags } : {}) };
+  return { siblingOrder, individuals, partnerships, parentOf };
+}
+
+/**
+ * Add tag definitions and apply each to its members, and append extra notes.
+ * Throws on an unknown id so a typo fails the example tests.
+ */
+function withTags(
+  ped: Pedigree,
+  tags: Array<Tag & { members: string[] }>,
+  extraNotes: Record<string, string> = {},
+): Pedigree {
+  const byId = new Map(ped.individuals.map(i => [i.id, i]));
+  const get = (id: string) => {
+    const ind = byId.get(id);
+    if (!ind) throw new Error(`withTags: no individual ${id}`);
+    return ind;
+  };
+  for (const { members, ...tag } of tags) {
+    for (const id of members) {
+      const ind = get(id);
+      ind.tags = [...(ind.tags ?? []), tag.id];
+    }
+  }
+  for (const [id, note] of Object.entries(extraNotes)) {
+    const ind = get(id);
+    ind.notes = ind.notes ? `${ind.notes}. ${note}` : note;
+  }
+  return { ...ped, tags: tags.map(({ members: _members, ...tag }) => tag) };
 }
 
 function historicAndClassicExamples(): ExamplePedigree[] {
@@ -783,18 +810,18 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Leto_I",           M, "Paulus_Atreides", "Helena_Richese", { name: "Duke Leto" }],
     ["Baron_Harkonnen",  M, "Dmitri_Harkonnen", "Baron_mother", { name: "Baron Harkonnen", notes: "Vladimir Harkonnen. Jessica's father, a secret kept by the Bene Gesserit" }],
     ["Abulurd",          M, "Dmitri_Harkonnen", "Abulurd_mother", { name: "Abulurd" }],
-    ["Mohiam",           F, null, null, { name: "Mohiam", tags: ["bg"], notes: "Reverend Mother Gaius Helen Mohiam. Jessica's mother per the prequels" }],
+    ["Mohiam",           F, null, null, { name: "Mohiam", notes: "Reverend Mother Gaius Helen Mohiam. Jessica's mother per the prequels" }],
     ["Emmi_Rabban",      F, null, null, { name: "Emmi Rabban", notes: "Name from the Brian Herbert and Kevin J. Anderson prequels" }],
     ["Liet_Kynes",       M, "Pardot_Kynes", "Liet_mother", { name: "Liet-Kynes", notes: "Imperial Planetologist and Fremen leader" }],
     ["Chani_mother",     F, null, null, { name: "Chani's mother", notes: "Fremen; unnamed here" }],
     ["Shaddam_IV",       M, null, null, { name: "Shaddam IV", notes: "Padishah Emperor" }],
-    ["Anirul",           F, null, null, { name: "Anirul", tags: ["bg"], notes: "Bene Gesserit of Hidden Rank. Name from the Brian Herbert and Kevin J. Anderson prequels" }],
+    ["Anirul",           F, null, null, { name: "Anirul", notes: "Bene Gesserit of Hidden Rank. Name from the Brian Herbert and Kevin J. Anderson prequels" }],
     // Paul's generation
-    ["Jessica",          F, "Baron_Harkonnen", "Mohiam", { name: "Jessica", tags: ["bg"], notes: "Ordered to bear Leto a daughter; bore a son" }],
+    ["Jessica",          F, "Baron_Harkonnen", "Mohiam", { name: "Jessica", notes: "Ordered to bear Leto a daughter; bore a son" }],
     ["Rabban",           M, "Abulurd", "Emmi_Rabban", { name: "Rabban", notes: "Glossu Rabban, the Beast" }],
     ["Feyd_Rautha",      M, "Abulurd", "Emmi_Rabban", { name: "Feyd-Rautha", notes: "The Bene Gesserit's fallback: to be bred with Leto's daughter. Killed by Paul, his half cousin's son" }],
     ["Chani",            F, "Liet_Kynes", "Chani_mother", { name: "Chani" }],
-    ["Irulan",           F, "Shaddam_IV", "Anirul", { name: "Irulan", tags: ["bg"], notes: "Married Paul for the throne; no children" }],
+    ["Irulan",           F, "Shaddam_IV", "Anirul", { name: "Irulan", notes: "Married Paul for the throne; no children" }],
     ["Chalice",          F, "Shaddam_IV", "Anirul", { name: "Chalice" }],
     ["Wensicia",         F, "Shaddam_IV", "Anirul", { name: "Wensicia" }],
     ["Josifa",           F, "Shaddam_IV", "Anirul", { name: "Josifa" }],
@@ -811,7 +838,60 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     // The line continues
     ["Atreides_line",    U, "Farad_n", "Ghanima", { name: "Their descendants", notes: "The Atreides line of Ghanima and Farad'n, through Moneo to Siona (God Emperor of Dune), not shown individually" }],
   ];
-  const beneGesserit: Tag[] = [{ id: "bg", label: "Bene Gesserit", color: "#000000", style: "text", abbrev: "BG" }];
+  const atreidesTags = [
+    { id: "preborn", label: "Pre-born (ancestral memory before birth)", color: "#9467bd", style: "quadrant" as const,
+      members: ["Alia", "Leto_II", "Ghanima"] },
+    { id: "agony", label: "Survived the spice agony", color: "#1f77b4", style: "dot" as const,
+      members: ["Mohiam", "Anirul", "Jessica", "Paul"] },
+    { id: "bg", label: "Bene Gesserit", color: "#000000", style: "text" as const, abbrev: "BG",
+      members: ["Mohiam", "Anirul", "Jessica", "Irulan"] },
+    { id: "fremen", label: "Fremen, by birth or adoption", color: "#8c564b", style: "text" as const, abbrev: "Fremen",
+      members: ["Liet_mother", "Liet_Kynes", "Chani_mother", "Chani", "Jessica", "Paul", "Alia", "Leto_first", "Leto_II", "Ghanima"] },
+  ];
+
+  const buendiaTags = [
+    { id: "aureliano", label: "Aureliano temperament: withdrawn, lucid", color: "#1f77b4", style: "quadrant" as const,
+      members: ["Colonel_Aureliano", "Jose_Arcadio_Segundo", "Aureliano_Babilonia"] },
+    { id: "jose_arcadio", label: "José Arcadio temperament: impulsive, enterprising", color: "#ff7f0e", style: "quadrant" as const,
+      members: ["Jose_Arcadio_Buendia", "Jose_Arcadio", "Arcadio", "Aureliano_Segundo", "Jose_Arcadio_V"] },
+    { id: "parchments", label: "Studied Melquíades's parchments", color: "#2ca02c", style: "dot" as const,
+      members: ["Aureliano_Segundo", "Jose_Arcadio_Segundo", "Aureliano_Babilonia"] },
+  ];
+  const buendiaNotes = {
+    Aureliano_Segundo: "Úrsula suspected the twins were swapped as children: he had a José Arcadio's temperament",
+    Jose_Arcadio_Segundo: "Úrsula suspected the twins were swapped as children: he had an Aureliano's temperament",
+  };
+
+  const dragons: Record<string, string> = {
+    Aegon_I: "Balerion", Visenya: "Vhagar", Rhaenys_Queen: "Meraxes", Aenys_I: "Quicksilver", Maegor_I: "Balerion",
+    Rhaena_Aenys: "Dreamfyre", Aegon_Uncrowned: "Quicksilver", Jaehaerys_I: "Vermithor", Alysanne: "Silverwing",
+    Aerea: "Balerion", Aemon_JA: "Caraxes", Baelon: "Vhagar", Rhaenys_QWNW: "Meleys", Viserys_I: "Balerion",
+    Daemon: "Caraxes", Laena_Velaryon: "Vhagar", Laenor_Velaryon: "Seasmoke", Rhaenyra: "Syrax", Aegon_II: "Sunfyre",
+    Helaena: "Dreamfyre", Aemond: "Vhagar", Daeron_VA: "Tessarion", Baela: "Moondancer", Rhaena_Daemon: "Morning",
+    Jacaerys: "Vermax", Lucerys: "Arrax", Joffrey: "Tyraxes", Aegon_III: "Stormcloud", Daenerys: "Drogon",
+    Jon_Snow: "Rhaegal, in the TV series",
+  };
+  const targaryenTags = [
+    { id: "dragonrider", label: "Dragonrider", color: "#d62728", style: "quadrant" as const, members: Object.keys(dragons) },
+    { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "dot" as const,
+      members: ["Viserys_I", "Helaena", "Daeron_Drunken", "Daenerys"] },
+    { id: "throne", label: "Sat the Iron Throne", color: "#000000", style: "text" as const, abbrev: "Throne",
+      members: ["Aegon_I", "Aenys_I", "Maegor_I", "Jaehaerys_I", "Viserys_I", "Aegon_II", "Rhaenyra", "Aegon_III",
+        "Daeron_I", "Baelor_I", "Viserys_II", "Aegon_IV", "Daeron_II", "Aerys_I", "Maekar_I", "Aegon_V", "Jaehaerys_II", "Aerys_II"] },
+    { id: "vhagar", label: "Rode Vhagar", color: "#7f7f7f", style: "text" as const, abbrev: "Vhagar",
+      members: ["Visenya", "Baelon", "Laena_Velaryon", "Aemond"] },
+    { id: "fireproof", label: "Fireproof", color: "#ff7f0e", style: "text" as const, abbrev: "Fireproof",
+      members: ["Daenerys"] },
+    { id: "madness_disputed", label: "Madness disputed", color: "#000000", style: "text" as const, abbrev: "?",
+      members: ["Daenerys"] },
+  ];
+  const targaryenNotes: Record<string, string> = {
+    ...Object.fromEntries(Object.entries(dragons).map(([id, d]) => [id, `Dragon: ${d}`])),
+    Rhaenyra: "Her claim to the throne was contested by Aegon II in the Dance of the Dragons",
+    Daenerys: "Walked unburnt from Drogo's pyre. Burned King's Landing in the TV series; whether that was madness is disputed",
+    Aerion_Brightflame: "Not fireproof",
+  };
+
 
   const focal = { affected: true };
   const classic: Array<[string, string, Row[]]> = [
@@ -907,21 +987,21 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       description: "16 generations · 96 individuals · sibling, uncle-niece and cousin marriages. Daenerys F = 0.375",
       group: "Fiction",
       citation: "G. R. R. Martin, Fire & Blood (2018) and A Song of Ice and Fire",
-      data: fromRows(targaryen, { deceased: true }),
+      data: withTags(fromRows(targaryen, { deceased: true }), targaryenTags, targaryenNotes),
     },
     {
       label: "The Buendías",
       description: "9 generations · 30 individuals · cousin and aunt-nephew marriages, the pig's tail",
       group: "Fiction",
       citation: "G. García Márquez, One Hundred Years of Solitude (1967)",
-      data: fromRows(buendia, { deceased: true }),
+      data: withTags(fromRows(buendia, { deceased: true }), buendiaTags, buendiaNotes),
     },
     {
       label: "House Atreides",
       description: "5 generations · 33 individuals · the Bene Gesserit breeding programme",
       group: "Fiction",
       citation: "F. Herbert, Dune (1965), Dune Messiah (1969), Children of Dune (1976)",
-      data: fromRows(atreides, {}, beneGesserit),
+      data: withTags(fromRows(atreides), atreidesTags),
     },
   ];
 }
