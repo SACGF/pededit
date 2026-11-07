@@ -4,7 +4,7 @@ export interface ExamplePedigree {
   label: string;
   description: string;
   /** Heading in the example picker. Entries without a group come first, under no heading. */
-  group?: "Historic" | "Classic";
+  group?: "Historic" | "Classic" | "Fiction";
   /** Primary source, shown under the description. */
   citation?: string;
   data: Pedigree;
@@ -613,6 +613,116 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Fetus_2",       F, "Tutankhamun", "KV21A", { name: "Fetus 2" }],
   ];
 
+  // Fiction: test-data/ped/fiction/targaryen.ped. Affected = the Targaryen madness.
+  const targaryen: Row[] = [
+    // Conquest
+    ["Aerion",             M, null, null, { name: "Aerion" }],
+    ["Valaena_Velaryon",   F, null, null, { name: "Valaena Velaryon" }],
+    ["Aegon_I",            M, "Aerion", "Valaena_Velaryon", { name: "Aegon I", notes: "The Conqueror" }],
+    ["Visenya",            F, "Aerion", "Valaena_Velaryon", { name: "Visenya" }],
+    ["Rhaenys_Queen",      F, "Aerion", "Valaena_Velaryon", { name: "Rhaenys" }],
+    // Children of Aegon I by his sister-wives
+    ["Aenys_I",            M, "Aegon_I", "Rhaenys_Queen", { name: "Aenys I" }],
+    ["Maegor_I",           M, "Aegon_I", "Visenya", { name: "Maegor I", notes: "The Cruel. Six wives, among them his niece Rhaena; no surviving children" }],
+    ["Alyssa_Velaryon",    F, null, null, { name: "Alyssa Velaryon" }],
+    // Children of Aenys I
+    ["Rhaena_Aenys",       F, "Aenys_I", "Alyssa_Velaryon", { name: "Rhaena" }],
+    ["Aegon_Uncrowned",    M, "Aenys_I", "Alyssa_Velaryon", { name: "Aegon", notes: "The Uncrowned" }],
+    ["Viserys_Aenys",      M, "Aenys_I", "Alyssa_Velaryon", { name: "Viserys" }],
+    ["Jaehaerys_I",        M, "Aenys_I", "Alyssa_Velaryon", { name: "Jaehaerys I", notes: "The Conciliator" }],
+    ["Alysanne",           F, "Aenys_I", "Alyssa_Velaryon", { name: "Alysanne" }],
+    ["Vaella",             F, "Aenys_I", "Alyssa_Velaryon", { name: "Vaella" }],
+    // Brother-sister marriages of Aenys's children
+    ["Aerea",              F, "Aegon_Uncrowned", "Rhaena_Aenys", { name: "Aerea", notes: "Twin of Rhaella" }],
+    ["Rhaella_Twin",       F, "Aegon_Uncrowned", "Rhaena_Aenys", { name: "Rhaella", notes: "Twin of Aerea" }],
+    ["Aegon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aegon" }],
+    ["Daenerys_JA",        F, "Jaehaerys_I", "Alysanne", { name: "Daenerys" }],
+    ["Aemon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aemon" }],
+    ["Baelon",             M, "Jaehaerys_I", "Alysanne", { name: "Baelon", notes: "The Brave" }],
+    ["Alyssa",             F, "Jaehaerys_I", "Alysanne", { name: "Alyssa" }],
+    ["Maegelle",           F, "Jaehaerys_I", "Alysanne", { name: "Maegelle" }],
+    ["Vaegon",             M, "Jaehaerys_I", "Alysanne", { name: "Vaegon" }],
+    ["Daella_JA",          F, "Jaehaerys_I", "Alysanne", { name: "Daella" }],
+    ["Saera",              F, "Jaehaerys_I", "Alysanne", { name: "Saera" }],
+    ["Viserra",            F, "Jaehaerys_I", "Alysanne", { name: "Viserra" }],
+    ["Gaemon_JA",          M, "Jaehaerys_I", "Alysanne", { name: "Gaemon" }],
+    ["Valerion",           M, "Jaehaerys_I", "Alysanne", { name: "Valerion" }],
+    ["Gael",               F, "Jaehaerys_I", "Alysanne", { name: "Gael" }],
+    ["Jocelyn_Baratheon",  F, null, null, { name: "Jocelyn Baratheon" }],
+    ["Rodrik_Arryn",       M, null, null, { name: "Rodrik Arryn" }],
+    // Grandchildren of Jaehaerys I
+    ["Rhaenys_QWNW",       F, "Aemon_JA", "Jocelyn_Baratheon", { name: "Rhaenys", notes: "The Queen Who Never Was" }],
+    ["Viserys_I",          M, "Baelon", "Alyssa", { name: "Viserys I" }],
+    ["Daemon",             M, "Baelon", "Alyssa", { name: "Daemon" }],
+    ["Aegon_Baelon",       M, "Baelon", "Alyssa", { name: "Aegon", notes: "Died in infancy" }],
+    ["Aemma_Arryn",        F, "Rodrik_Arryn", "Daella_JA", { name: "Aemma Arryn" }],
+    ["Corlys_Velaryon",    M, null, null, { name: "Corlys Velaryon" }],
+    ["Alicent_Hightower",  F, null, null, { name: "Alicent Hightower" }],
+    // The Dance of the Dragons generation
+    ["Laena_Velaryon",     F, "Corlys_Velaryon", "Rhaenys_QWNW", { name: "Laena Velaryon" }],
+    ["Laenor_Velaryon",    M, "Corlys_Velaryon", "Rhaenys_QWNW", { name: "Laenor Velaryon" }],
+    ["Rhaenyra",           F, "Viserys_I", "Aemma_Arryn", { name: "Rhaenyra" }],
+    ["Aegon_II",           M, "Viserys_I", "Alicent_Hightower", { name: "Aegon II" }],
+    ["Helaena",            F, "Viserys_I", "Alicent_Hightower", { name: "Helaena" }],
+    ["Aemond",             M, "Viserys_I", "Alicent_Hightower", { name: "Aemond" }],
+    ["Daeron_VA",          M, "Viserys_I", "Alicent_Hightower", { name: "Daeron" }],
+    ["Baela",              F, "Daemon", "Laena_Velaryon", { name: "Baela" }],
+    ["Rhaena_Daemon",      F, "Daemon", "Laena_Velaryon", { name: "Rhaena" }],
+    ["Jacaerys",           M, "Laenor_Velaryon", "Rhaenyra", { name: "Jacaerys Velaryon", notes: "Recorded as Laenor's son; widely believed to be fathered by Harwin Strong" }],
+    ["Lucerys",            M, "Laenor_Velaryon", "Rhaenyra", { name: "Lucerys Velaryon", notes: "Recorded as Laenor's son; widely believed to be fathered by Harwin Strong" }],
+    ["Joffrey",            M, "Laenor_Velaryon", "Rhaenyra", { name: "Joffrey Velaryon", notes: "Recorded as Laenor's son; widely believed to be fathered by Harwin Strong" }],
+    ["Aegon_III",          M, "Daemon", "Rhaenyra", { name: "Aegon III", notes: "The Dragonbane" }],
+    ["Viserys_II",         M, "Daemon", "Rhaenyra", { name: "Viserys II" }],
+    ["Jaehaerys_AH",       M, "Aegon_II", "Helaena", { name: "Jaehaerys", notes: "Twin of Jaehaera" }],
+    ["Jaehaera",           F, "Aegon_II", "Helaena", { name: "Jaehaera", notes: "Twin of Jaehaerys; first wife of Aegon III, no children" }],
+    ["Maelor",             M, "Aegon_II", "Helaena", { name: "Maelor" }],
+    ["Daenaera_Velaryon",  F, null, null, { name: "Daenaera Velaryon" }],
+    ["Larra_Rogare",       F, null, null, { name: "Larra Rogare" }],
+    // Children of Aegon III and of Viserys II
+    ["Daeron_I",           M, "Aegon_III", "Daenaera_Velaryon", { name: "Daeron I", notes: "The Young Dragon" }],
+    ["Baelor_I",           M, "Aegon_III", "Daenaera_Velaryon", { name: "Baelor I", notes: "The Blessed. Married his sister Daena; the marriage was never consummated" }],
+    ["Daena",              F, "Aegon_III", "Daenaera_Velaryon", { name: "Daena", notes: "The Defiant" }],
+    ["Rhaena_AD",          F, "Aegon_III", "Daenaera_Velaryon", { name: "Rhaena" }],
+    ["Elaena",             F, "Aegon_III", "Daenaera_Velaryon", { name: "Elaena" }],
+    ["Aegon_IV",           M, "Viserys_II", "Larra_Rogare", { name: "Aegon IV", notes: "The Unworthy" }],
+    ["Aemon_Dragonknight", M, "Viserys_II", "Larra_Rogare", { name: "Aemon", notes: "The Dragonknight" }],
+    ["Naerys",             F, "Viserys_II", "Larra_Rogare", { name: "Naerys" }],
+    // Children of Aegon IV: by his sister Naerys, and by his cousin Daena
+    ["Daeron_II",          M, "Aegon_IV", "Naerys", { name: "Daeron II", notes: "The Good. Rumoured to be the son of Aemon the Dragonknight" }],
+    ["Daenerys_AN",        F, "Aegon_IV", "Naerys", { name: "Daenerys" }],
+    ["Daemon_Blackfyre",   M, "Aegon_IV", "Daena", { name: "Daemon Blackfyre", notes: "Legitimised bastard; founder of House Blackfyre" }],
+    ["Myriah_Martell",     F, null, null, { name: "Myriah Martell" }],
+    ["Baelor_Breakspear",  M, "Daeron_II", "Myriah_Martell", { name: "Baelor", notes: "Breakspear" }],
+    ["Aerys_I",            M, "Daeron_II", "Myriah_Martell", { name: "Aerys I" }],
+    ["Rhaegel",            M, "Daeron_II", "Myriah_Martell", { name: "Rhaegel" }],
+    ["Maekar_I",           M, "Daeron_II", "Myriah_Martell", { name: "Maekar I" }],
+    ["Dyanna_Dayne",       F, null, null, { name: "Dyanna Dayne" }],
+    // Children of Maekar I
+    ["Daeron_Drunken",     M, "Maekar_I", "Dyanna_Dayne", { name: "Daeron", notes: "The Drunken" }],
+    ["Aerion_Brightflame", M, "Maekar_I", "Dyanna_Dayne", { name: "Aerion", affected: true, notes: "Brightflame. Drank wildfire believing it would turn him into a dragon" }],
+    ["Maester_Aemon",      M, "Maekar_I", "Dyanna_Dayne", { name: "Aemon", notes: "Maester of the Night's Watch" }],
+    ["Daella_MD",          F, "Maekar_I", "Dyanna_Dayne", { name: "Daella" }],
+    ["Aegon_V",            M, "Maekar_I", "Dyanna_Dayne", { name: "Aegon V", notes: "The Unlikely, called Egg" }],
+    ["Rhae",               F, "Maekar_I", "Dyanna_Dayne", { name: "Rhae" }],
+    ["Betha_Blackwood",    F, null, null, { name: "Betha Blackwood" }],
+    ["Duncan",             M, "Aegon_V", "Betha_Blackwood", { name: "Duncan", notes: "The Small" }],
+    ["Jaehaerys_II",       M, "Aegon_V", "Betha_Blackwood", { name: "Jaehaerys II" }],
+    ["Shaera",             F, "Aegon_V", "Betha_Blackwood", { name: "Shaera" }],
+    ["Daeron_AB",          M, "Aegon_V", "Betha_Blackwood", { name: "Daeron" }],
+    ["Rhaelle",            F, "Aegon_V", "Betha_Blackwood", { name: "Rhaelle" }],
+    // Children of the sibling marriage of Jaehaerys II and Shaera
+    ["Aerys_II",           M, "Jaehaerys_II", "Shaera", { name: "Aerys II", affected: true, notes: "The Mad King" }],
+    ["Rhaella",            F, "Jaehaerys_II", "Shaera", { name: "Rhaella" }],
+    ["Rhaegar",            M, "Aerys_II", "Rhaella", { name: "Rhaegar" }],
+    ["Viserys",            M, "Aerys_II", "Rhaella", { name: "Viserys" }],
+    ["Daenerys",           F, "Aerys_II", "Rhaella", { name: "Daenerys", deceased: false, notes: "Stormborn" }],
+    ["Elia_Martell",       F, null, null, { name: "Elia Martell" }],
+    ["Lyanna_Stark",       F, null, null, { name: "Lyanna Stark" }],
+    ["Rhaenys_RE",         F, "Rhaegar", "Elia_Martell", { name: "Rhaenys" }],
+    ["Aegon_RE",           M, "Rhaegar", "Elia_Martell", { name: "Aegon", notes: "Killed in the Sack of King's Landing, or smuggled to safety, depending on whom you believe" }],
+    ["Jon_Snow",           M, "Rhaegar", "Lyanna_Stark", { name: "Jon Snow", proband: true, deceased: false, notes: "Born Aegon. Raised as Eddard Stark's bastard; Rhaegar's son by Lyanna" }],
+  ];
+
   const focal = { affected: true };
   const classic: Array<[string, string, Row[]]> = [
     ["3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
@@ -702,5 +812,12 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       group: "Classic",
       data: fromRows(rows),
     })),
+    {
+      label: "House Targaryen",
+      description: "16 generations · 96 individuals · sibling, uncle-niece and cousin marriages. Daenerys F = 0.375",
+      group: "Fiction",
+      citation: "G. R. R. Martin, Fire & Blood (2018) and A Song of Ice and Fire",
+      data: fromRows(targaryen, { deceased: true }),
+    },
   ];
 }

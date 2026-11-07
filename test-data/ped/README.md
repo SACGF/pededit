@@ -62,6 +62,22 @@ Hawass Z et al. (2010). Ancestry and Pathology in King Tutankhamun's Family. JAM
   KV21A as mother of the two KV62 fetuses is the paper's tentative assignment.
 - PHENO is missing (0) throughout; this is a full-sib consanguinity example.
 
+### `fiction/targaryen.ped`
+House Targaryen from George R. R. Martin's A Song of Ice and Fire, as set out in Fire &
+Blood (2018) and The World of Ice and Fire (2014), cross-checked against Wikidata
+(members of House Targaryen, P53, with their father P22 and mother P25). Wikidata is
+missing several links (the parents of Viserys I and Daemon, the line from Aegon III
+to Aerys II) and gives Harwin Strong as Jacaerys's father, so it was not used as is.
+- 96 individuals, 16 generations, Aerion and Valaena to Daenerys and Jon Snow.
+- Bloodline only: married-in spouses are founders, childless marriages (Maegor's six
+  wives, Baelor I and Daena) are left out. Children are listed under their officially
+  recorded father. Jon Snow's parents are Rhaegar and Lyanna, as confirmed in the TV series.
+- PHENO 2 = the "Targaryen madness" (Aerys II, Aerion Brightflame), for fun.
+- Exercises: brother-sister, uncle-niece, first cousin and cousin-once-removed marriages,
+  people drawn twice (Daemon, Viserys I, Rhaenyra), a 17-wide row (Jaehaerys I and
+  Alysanne's 13 children), and a married-in spouse inside a sibship's span, which
+  caught an overlap in the post-QP centering pass. kinship2 gives Daenerys F = 0.375.
+
 ### Jicaque pedigree (not included)
 Chapman AM, Jacquard A (1971), Un isolat d'Amérique Centrale: les Indiens Jicaques
 du Honduras, is a French book chapter that is not available online, and the only
@@ -109,6 +125,14 @@ Each has a kinship2 oracle in `layout-engine/tests/oracle/` (see
 | `habsburg.ped` | 33 | 1 | Spanish Habsburgs from Ferdinand and Isabella to Charles II (Alvarez et al. 2009, Fig. 1). Nested uncle-niece, double first cousin and first cousin marriages; nine generation rows. |
 | `queen_victoria.ped` | 49 | 1 | Haemophilia B in Queen Victoria's descendants (Rogaev et al. 2009). Four generations, wide sibships, nine affected males, one cousin marriage. |
 | `tutankhamun.ped` | 10 | 1 | Tutankhamun's family (Hawass et al. 2010, Fig. 2). Brother-sister parents, five generations. |
+
+### `fiction/`: fictional pedigrees
+
+Has a kinship2 oracle like `historic/`.
+
+| File | Individuals | Families | Description |
+|------|-------------|----------|-------------|
+| `targaryen.ped` | 96 | 1 | House Targaryen, 16 generations of sibling, uncle-niece and cousin marriages. |
 
 ### `classic/`: textbook relationships with known kinship coefficients
 

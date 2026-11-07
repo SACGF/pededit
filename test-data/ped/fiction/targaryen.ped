@@ -1,0 +1,114 @@
+# House Targaryen, from Aegon the Conqueror to Daenerys and Jon Snow.
+# George R. R. Martin, A Song of Ice and Fire; Fire & Blood (2018); The World of Ice and
+# Fire (2014). Cross-checked against Wikidata (House Targaryen, P53, with P22/P25).
+# A fun example, not clinical data. Bloodline only: married-in spouses appear as
+# founders and childless marriages (Maegor's six wives, Baelor and Daena) are left out.
+# Children are listed by the father officially recorded: Laenor Velaryon for Rhaenyra's
+# three eldest sons, Aegon IV for Daeron II. Jon Snow's parentage is from the TV series.
+# PHENO 2 = the "Targaryen madness" (Aerys II, Aerion Brightflame).
+# Conquest
+TARG	Aerion	0	0	1	1
+TARG	Valaena_Velaryon	0	0	2	1
+TARG	Aegon_I	Aerion	Valaena_Velaryon	1	1
+TARG	Visenya	Aerion	Valaena_Velaryon	2	1
+TARG	Rhaenys_Queen	Aerion	Valaena_Velaryon	2	1
+# Children of Aegon I by his sister-wives
+TARG	Aenys_I	Aegon_I	Rhaenys_Queen	1	1
+TARG	Maegor_I	Aegon_I	Visenya	1	1
+TARG	Alyssa_Velaryon	0	0	2	1
+# Children of Aenys I
+TARG	Rhaena_Aenys	Aenys_I	Alyssa_Velaryon	2	1
+TARG	Aegon_Uncrowned	Aenys_I	Alyssa_Velaryon	1	1
+TARG	Viserys_Aenys	Aenys_I	Alyssa_Velaryon	1	1
+TARG	Jaehaerys_I	Aenys_I	Alyssa_Velaryon	1	1
+TARG	Alysanne	Aenys_I	Alyssa_Velaryon	2	1
+TARG	Vaella	Aenys_I	Alyssa_Velaryon	2	1
+# Brother-sister marriages of Aenys's children
+TARG	Aerea	Aegon_Uncrowned	Rhaena_Aenys	2	1
+TARG	Rhaella_Twin	Aegon_Uncrowned	Rhaena_Aenys	2	1
+TARG	Aegon_JA	Jaehaerys_I	Alysanne	1	1
+TARG	Daenerys_JA	Jaehaerys_I	Alysanne	2	1
+TARG	Aemon_JA	Jaehaerys_I	Alysanne	1	1
+TARG	Baelon	Jaehaerys_I	Alysanne	1	1
+TARG	Alyssa	Jaehaerys_I	Alysanne	2	1
+TARG	Maegelle	Jaehaerys_I	Alysanne	2	1
+TARG	Vaegon	Jaehaerys_I	Alysanne	1	1
+TARG	Daella_JA	Jaehaerys_I	Alysanne	2	1
+TARG	Saera	Jaehaerys_I	Alysanne	2	1
+TARG	Viserra	Jaehaerys_I	Alysanne	2	1
+TARG	Gaemon_JA	Jaehaerys_I	Alysanne	1	1
+TARG	Valerion	Jaehaerys_I	Alysanne	1	1
+TARG	Gael	Jaehaerys_I	Alysanne	2	1
+TARG	Jocelyn_Baratheon	0	0	2	1
+TARG	Rodrik_Arryn	0	0	1	1
+# Grandchildren of Jaehaerys I
+TARG	Rhaenys_QWNW	Aemon_JA	Jocelyn_Baratheon	2	1
+TARG	Viserys_I	Baelon	Alyssa	1	1
+TARG	Daemon	Baelon	Alyssa	1	1
+TARG	Aegon_Baelon	Baelon	Alyssa	1	1
+TARG	Aemma_Arryn	Rodrik_Arryn	Daella_JA	2	1
+TARG	Corlys_Velaryon	0	0	1	1
+TARG	Alicent_Hightower	0	0	2	1
+# The Dance of the Dragons generation
+TARG	Laena_Velaryon	Corlys_Velaryon	Rhaenys_QWNW	2	1
+TARG	Laenor_Velaryon	Corlys_Velaryon	Rhaenys_QWNW	1	1
+TARG	Rhaenyra	Viserys_I	Aemma_Arryn	2	1
+TARG	Aegon_II	Viserys_I	Alicent_Hightower	1	1
+TARG	Helaena	Viserys_I	Alicent_Hightower	2	1
+TARG	Aemond	Viserys_I	Alicent_Hightower	1	1
+TARG	Daeron_VA	Viserys_I	Alicent_Hightower	1	1
+TARG	Baela	Daemon	Laena_Velaryon	2	1
+TARG	Rhaena_Daemon	Daemon	Laena_Velaryon	2	1
+TARG	Jacaerys	Laenor_Velaryon	Rhaenyra	1	1
+TARG	Lucerys	Laenor_Velaryon	Rhaenyra	1	1
+TARG	Joffrey	Laenor_Velaryon	Rhaenyra	1	1
+TARG	Aegon_III	Daemon	Rhaenyra	1	1
+TARG	Viserys_II	Daemon	Rhaenyra	1	1
+TARG	Jaehaerys_AH	Aegon_II	Helaena	1	1
+TARG	Jaehaera	Aegon_II	Helaena	2	1
+TARG	Maelor	Aegon_II	Helaena	1	1
+TARG	Daenaera_Velaryon	0	0	2	1
+TARG	Larra_Rogare	0	0	2	1
+# Children of Aegon III and of Viserys II
+TARG	Daeron_I	Aegon_III	Daenaera_Velaryon	1	1
+TARG	Baelor_I	Aegon_III	Daenaera_Velaryon	1	1
+TARG	Daena	Aegon_III	Daenaera_Velaryon	2	1
+TARG	Rhaena_AD	Aegon_III	Daenaera_Velaryon	2	1
+TARG	Elaena	Aegon_III	Daenaera_Velaryon	2	1
+TARG	Aegon_IV	Viserys_II	Larra_Rogare	1	1
+TARG	Aemon_Dragonknight	Viserys_II	Larra_Rogare	1	1
+TARG	Naerys	Viserys_II	Larra_Rogare	2	1
+# Children of Aegon IV: by his sister Naerys, and by his cousin Daena
+TARG	Daeron_II	Aegon_IV	Naerys	1	1
+TARG	Daenerys_AN	Aegon_IV	Naerys	2	1
+TARG	Daemon_Blackfyre	Aegon_IV	Daena	1	1
+TARG	Myriah_Martell	0	0	2	1
+TARG	Baelor_Breakspear	Daeron_II	Myriah_Martell	1	1
+TARG	Aerys_I	Daeron_II	Myriah_Martell	1	1
+TARG	Rhaegel	Daeron_II	Myriah_Martell	1	1
+TARG	Maekar_I	Daeron_II	Myriah_Martell	1	1
+TARG	Dyanna_Dayne	0	0	2	1
+# Children of Maekar I
+TARG	Daeron_Drunken	Maekar_I	Dyanna_Dayne	1	1
+TARG	Aerion_Brightflame	Maekar_I	Dyanna_Dayne	1	2
+TARG	Maester_Aemon	Maekar_I	Dyanna_Dayne	1	1
+TARG	Daella_MD	Maekar_I	Dyanna_Dayne	2	1
+TARG	Aegon_V	Maekar_I	Dyanna_Dayne	1	1
+TARG	Rhae	Maekar_I	Dyanna_Dayne	2	1
+TARG	Betha_Blackwood	0	0	2	1
+TARG	Duncan	Aegon_V	Betha_Blackwood	1	1
+TARG	Jaehaerys_II	Aegon_V	Betha_Blackwood	1	1
+TARG	Shaera	Aegon_V	Betha_Blackwood	2	1
+TARG	Daeron_AB	Aegon_V	Betha_Blackwood	1	1
+TARG	Rhaelle	Aegon_V	Betha_Blackwood	2	1
+# Children of the sibling marriage of Jaehaerys II and Shaera
+TARG	Aerys_II	Jaehaerys_II	Shaera	1	2
+TARG	Rhaella	Jaehaerys_II	Shaera	2	1
+TARG	Rhaegar	Aerys_II	Rhaella	1	1
+TARG	Viserys	Aerys_II	Rhaella	1	1
+TARG	Daenerys	Aerys_II	Rhaella	2	1
+TARG	Elia_Martell	0	0	2	1
+TARG	Lyanna_Stark	0	0	2	1
+TARG	Rhaenys_RE	Rhaegar	Elia_Martell	2	1
+TARG	Aegon_RE	Rhaegar	Elia_Martell	1	1
+TARG	Jon_Snow	Rhaegar	Lyanna_Stark	1	1
