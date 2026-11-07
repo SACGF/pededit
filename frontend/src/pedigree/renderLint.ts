@@ -13,7 +13,7 @@
  *   couple-line-slanted    partners sit on different rows (usually a pin moved vertically)
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
- *   symbols-overlap        two symbols sit on top of each other
+ *   symbols-overlap        two symbols sit on top of each other, or touch
  *
  * Used by `__pededit.check()` (devHooks.ts), `scripts/browser/lint.mjs` and the
  * vitest over every example. Framework-free so all three share it.
@@ -43,6 +43,12 @@ export interface LintFinding {
 }
 
 const EPS = 1;
+
+/**
+ * Smallest gap (px) between symbol edges that is not flagged. Symbols one slot
+ * apart are 40px apart at normal spacing and 28px in compact mode.
+ */
+const MIN_SYMBOL_GAP = 8;
 
 export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
   const out: LintFinding[] = [];
@@ -206,13 +212,17 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
     }
   }
 
-  // 4. Symbols on top of each other.
+  // 4. Symbols on top of each other, or touching. Touching symbols (half a slot
+  // apart) read as one shape, so they count too.
+  const near = NODE_SIZE + MIN_SYMBOL_GAP;
   for (let i = 0; i < flow.nodes.length; i++) {
     for (let j = i + 1; j < flow.nodes.length; j++) {
       const A = flow.nodes[i]!, B = flow.nodes[j]!;
-      if (Math.abs(A.position.x - B.position.x) < NODE_SIZE - EPS && Math.abs(A.position.y - B.position.y) < NODE_SIZE - EPS) {
+      const dx = Math.abs(A.position.x - B.position.x), dy = Math.abs(A.position.y - B.position.y);
+      if (dx < near && dy < near) {
         const a = A.data.individual.id, b = B.data.individual.id;
-        out.push({ code: "symbols-overlap", message: `${label(a)} and ${label(b)} overlap`, individuals: [a, b] });
+        const how = dx < NODE_SIZE - EPS && dy < NODE_SIZE - EPS ? "overlap" : "touch";
+        out.push({ code: "symbols-overlap", message: `${label(a)} and ${label(b)} ${how}`, individuals: [a, b] });
       }
     }
   }

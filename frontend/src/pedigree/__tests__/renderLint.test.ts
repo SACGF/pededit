@@ -94,4 +94,12 @@ describe("lintFlow", () => {
     flow.nodes[1]!.position = { ...flow.nodes[0]!.position };
     expect(lintFlow(base, flow).map(f => f.code)).toContain("symbols-overlap");
   });
+
+  it("reports symbols that touch (#74)", () => {
+    const flow = layoutToFlow(base);
+    const [a, b] = flow.nodes;
+    b!.position = { x: a!.position.x + 40, y: a!.position.y };
+    const found = lintFlow(base, flow).filter(f => f.code === "symbols-overlap");
+    expect(found.map(f => f.message)).toEqual(["f and m touch"]);
+  });
 });
