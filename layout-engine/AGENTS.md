@@ -36,6 +36,29 @@ indexing convention inherited from R, and the three rendering rules.
   `buildPedigreeFromFlat`.
 - `quadprog.d.ts` — hand-written typings for the untyped quadprog package.
 
+## Faithful core, improvements on top (decided November 2026, #76)
+
+kinship2's layout code is effectively frozen upstream, so fidelity buys a
+regression oracle, not improvements. The policy is to diverge where kinship2 is
+demonstrably worse, while keeping the port as the tested baseline:
+
+- Slot structure (n, nid, fam, spouse) from `alignPedigree` with default
+  options matches R exactly, and the oracle test
+  (`frontend/src/io/__tests__/kinship2Oracle.test.ts`) enforces it with an
+  empty `STRUCTURE_DIVERGENCES`. Keep it that way: anything that changes who
+  sits where, such as the spouse hint and sibship reordering work in #76, goes
+  behind an option or into the `families.ts` path, not into the default run.
+- Positions already depart from R inside `alignPedigree`: post-QP centering
+  and appended isolated individuals. The oracle test lists every fixture that
+  differs in `POSITION_DIVERGENCES` with a reason, and fails if a listed
+  divergence disappears, so the list stays honest. New position passes follow
+  the same rule.
+- Each improvement ships with its own fixtures (SVG snapshots, #69; the
+  historic examples from #33 are the corpus). A layout cost function
+  (crossings, duplicate copies, dashed arc length, pass-through hops) is the
+  intended regression guard for passes beyond the core: no worse than kinship2
+  on every fixture, better on the ones targeted.
+
 ## Conventions
 
 - Internal arrays are 1-based with index 0 unused, matching the R source.
