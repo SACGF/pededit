@@ -46,6 +46,8 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     setAdopted,
     setTwins,
     removeTwin,
+    removeWithDescendants,
+    removeWithAncestors,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -283,8 +285,23 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
           <MenuItem
             onClick={() => action(() => { deleteIndividual(individualId); setSelectedId(null); })}
             destructive
+            title="Delete (children stay, as founders)"
           >
             Delete
+          </MenuItem>
+          <MenuItem
+            onClick={() => action(() => removeWithDescendants([individualId]))}
+            destructive
+            title="Shift+Delete. Also removes everyone below and partners who married in"
+          >
+            Remove with descendants
+          </MenuItem>
+          <MenuItem
+            onClick={() => action(() => removeWithAncestors([individualId]))}
+            destructive
+            title="Alt+Delete. Also removes everyone above; descendants become founders"
+          >
+            Remove with ancestors
           </MenuItem>
         </div>
 

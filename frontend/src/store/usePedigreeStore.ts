@@ -5,11 +5,21 @@ import type {
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
+import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
+
+/** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
+export interface Notice {
+  id: number;
+  kind: "info" | "error";
+  text: string;
+  /** Offer an Undo button. */
+  undoable?: boolean;
+}
 
 const EMPTY_PEDIGREE: Pedigree = {
   individuals: [],
@@ -161,6 +171,9 @@ interface PedigreeState {
   isDirty: boolean;
   /** Bumped by resetLayout so the canvas can refit the view (#64). Not undoable. */
   layoutResetCount: number;
+  /** The latest notice for the page to show, or null. */
+  notice: Notice | null;
+  setNotice: (notice: Omit<Notice, "id"> | null) => void;
 
   // Lifecycle
   initialize: (p: Pedigree) => void;
@@ -184,6 +197,14 @@ interface PedigreeState {
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
   deleteIndividual: (individualId: string) => void;
+  /**
+   * Remove these individuals with everyone below them, plus partners who
+   * married in and have no other link (#34). Refused, with an error notice,
+   * when nobody would be left. Returns how many were removed.
+   */
+  removeWithDescendants: (individualIds: string[]) => number;
+  /** Remove these individuals with everyone above them; their descendants become founders (#34). */
+  removeWithAncestors: (individualIds: string[]) => number;
   moveSibLeft: (individualId: string) => void;
   moveSibRight: (individualId: string) => void;
 
@@ -256,6 +277,27 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     set(state => ({ pedigree: produce(state.pedigree, recipe) }));
   }
 
+  /** Shared body of removeWithDescendants / removeWithAncestors (#34). */
+  function removeBranch(
+    individualIds: string[],
+    chooser: (pedigree: Pedigree, ids: string[]) => Set<string>,
+    what: "descendants" | "ancestors",
+  ): number {
+    const { pedigree } = get();
+    const ids = individualIds.filter(id => pedigree.individuals.some(i => i.id === id));
+    if (ids.length === 0) return 0;
+    const gone = chooser(pedigree, ids);
+    if (gone.size >= pedigree.individuals.length) {
+      get().setNotice({ kind: "error", text: `Not removed: removing ${ids.length === 1 ? "this person" : "these people"} with their ${what} would leave an empty pedigree. Delete individuals one at a time, or start a new pedigree.` });
+      return 0;
+    }
+    mutate(draft => removeIndividuals(draft, gone));
+    const { selectedId } = get();
+    if (selectedId && gone.has(selectedId)) set({ selectedId: null });
+    get().setNotice({ kind: "info", text: `Removed ${gone.size} ${gone.size === 1 ? "individual" : "individuals"}.`, undoable: true });
+    return gone.size;
+  }
+
   return {
     pedigree: EMPTY_PEDIGREE,
     past: [],
@@ -265,6 +307,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     hoveredId: null,
     isDirty: false,
     layoutResetCount: 0,
+    notice: null,
+
+    setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
 
     initialize: (p) => set({
       pedigree: p,
@@ -534,6 +579,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         }
       });
     },
+
+    removeWithDescendants: (individualIds) => removeBranch(individualIds, removeWithDescendantsSet, "descendants"),
+    removeWithAncestors: (individualIds) => removeBranch(individualIds, removeWithAncestorsSet, "ancestors"),
 
     /**
      * Move a sibling one position left within its sibling group.

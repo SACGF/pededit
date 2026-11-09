@@ -35,7 +35,7 @@ export default function CanvasPage() {
     loadPedigrees, createPedigree, createPedigreeFromData, openPedigree,
     logout, saveActivePedigree, renamePedigree,
   } = useAppStore();
-  const { isDirty, pedigree } = usePedigreeStore();
+  const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") === "true");
   const [compact, setCompact] = useState(() => {
@@ -60,6 +60,13 @@ export default function CanvasPage() {
   const [notFound, setNotFound] = useState(false);
 
   useKeyboardShortcuts();
+
+  // Notices (what an edit did, or why it was refused) fade after a few seconds.
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), notice.kind === "error" ? 8000 : 5000);
+    return () => clearTimeout(timer);
+  }, [notice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load the pedigree identified by the URL param
   useEffect(() => {
@@ -240,8 +247,23 @@ export default function CanvasPage() {
         />
 
         <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <PedigreeCanvas showMinimap={showMinimap} compact={compact} />
+            {notice && (
+              <div
+                role={notice.kind === "error" ? "alert" : "status"}
+                data-testid="notice"
+                className={`absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 px-3 py-1.5 text-xs border bg-white ${notice.kind === "error" ? "border-red-600 text-red-700" : "border-gray-400 text-gray-800"}`}
+              >
+                <span>{notice.text}</span>
+                {notice.undoable && (
+                  <button className="underline underline-offset-2 hover:text-black" onClick={() => { undo(); setNotice(null); }}>
+                    Undo
+                  </button>
+                )}
+                <button className="text-gray-400 hover:text-black" aria-label="Dismiss" onClick={() => setNotice(null)}>×</button>
+              </div>
+            )}
           </div>
 
           <div className="w-60 border-l bg-white shrink-0 overflow-y-auto">

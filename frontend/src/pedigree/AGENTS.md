@@ -84,6 +84,12 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `removal.ts` — branch removal sets (#34): descendants, ancestors,
+  "remove with descendants" (which also takes partners who married in and
+  have no partnership with anyone staying) and `removeIndividuals`, the one
+  routine that strips a set of people out of a draft (partnerships, parentOf,
+  twin sets, pins, unlocks). The store's `removeWithDescendants` /
+  `removeWithAncestors` refuse an empty result with an error notice.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
   to a set key and zygosity; `layoutToFlow` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:

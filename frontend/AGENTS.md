@@ -64,7 +64,8 @@ stub so the app still builds without Google login.
   reads the pedigree from `usePedigreeStore`.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
   undo/redo stacks, active tool, selection, every structural edit
-  (addParent/addChild/addSibling/addPartner/delete/moveSib), flags, pinning,
+  (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with
+  descendants or ancestors), flags, pinning,
   canvas settings, tags. All edits go through immer `produce` and push an undo
   snapshot. Add new edits here, not in components.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
@@ -73,7 +74,12 @@ stub so the app still builds without Google login.
   `Legend`, #75), SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
-  redo, Delete/Backspace removes selection, Escape returns to select tool.
+  redo, Delete/Backspace removes selection (Shift: with descendants, Alt:
+  with ancestors, #34), Escape returns to select tool.
+- Notices: the pedigree store's `notice` / `setNotice` (not undoable) is how
+  an edit reports what it did or why it was refused; `CanvasPage` shows it
+  under the canvas with an Undo button when `undoable` and clears it after a
+  few seconds. There is no toast library; use this instead of `alert`.
 - `api/client.ts` — axios instance with bearer token and a single shared
   refresh promise on 401 (refresh tokens rotate, so concurrent refreshes would
   consume each other).

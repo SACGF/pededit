@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 
 export function useKeyboardShortcuts() {
-  const { undo, redo, deleteIndividual, selectedId, setActiveTool } = usePedigreeStore();
+  const { undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool } = usePedigreeStore();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -14,12 +14,17 @@ export function useKeyboardShortcuts() {
         // Guard: don't delete when typing in an input
         if (document.activeElement?.tagName === "INPUT") return;
         if (document.activeElement?.tagName === "TEXTAREA") return;
-        deleteIndividual(selectedId);
+        if (document.activeElement?.tagName === "SELECT") return;
+        e.preventDefault();
+        // Shift: with descendants; Alt: with ancestors (#34).
+        if (e.shiftKey) removeWithDescendants([selectedId]);
+        else if (e.altKey) removeWithAncestors([selectedId]);
+        else deleteIndividual(selectedId);
       }
       if (e.key === "Escape") setActiveTool("select");
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo, deleteIndividual, selectedId, setActiveTool]);
+  }, [undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool]);
 }
