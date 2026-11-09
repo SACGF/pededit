@@ -10,6 +10,7 @@ import {
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY, carrierDot, CARRIER_RIM,
 } from "../lifeStatus";
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
+import { adoptionBracketSegments } from "../adoption";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
@@ -227,16 +228,29 @@ function SexSymbol({ individual, size, fill, sectors, clipId }: {
   }
 }
 
+/** Square brackets round the symbol of an adopted individual (NSGC). */
+export function AdoptionBrackets({ size }: { size: number }) {
+  return (
+    <g data-adopted="true">
+      {adoptionBracketSegments(size).map(([x1, y1, x2, y2], i) => (
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2} />
+      ))}
+    </g>
+  );
+}
+
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
 export function SymbolShape({ individual, size, sectors = [], clipId }: ShapeProps) {
   const fill = symbolFill(individual);
   const id = clipId ?? `symbol-clip-${individual.id}`;
   const status = individual.lifeStatus;
+  const brackets = individual.adopted ? <AdoptionBrackets size={size} /> : null;
   if (status) {
     const caption = lifeStatusCaption(status);
     return (
       <g>
+        {brackets}
         {usesLossTriangle(status)
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
           : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
@@ -251,6 +265,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId }: ShapePro
   }
   return (
     <g>
+      {brackets}
       <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
     </g>

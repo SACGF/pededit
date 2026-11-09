@@ -58,6 +58,10 @@
           "enum": ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"],
           "description": "Pregnancy or pregnancy loss. Absent means born. Such an individual has no partners or children."
         },
+        "adopted": {
+          "enum": ["in", "out"],
+          "description": "Adoption brackets round the symbol (NSGC). \"in\": adopted into the family shown, dashed line to the adoptive parents. \"out\": placed for adoption, solid line to the biological parents."
+        },
         "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },

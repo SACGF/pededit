@@ -70,6 +70,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `carrier` | boolean | no | Carrier dot in the symbol. |
 | `proband` | boolean | no | Proband arrow. Normally exactly one individual. |
 | `lifeStatus` | `"pregnancy"`, `"miscarriage"`, `"termination"`, `"stillbirth"` or `"ectopic"` | no | Pregnancy or pregnancy loss, drawn with the NSGC symbols (P inside the symbol, a small triangle for miscarriage, termination and ectopic, SB for stillbirth). Absent means born. Such an individual cannot have partners or children. |
+| `adopted` | `"in"` or `"out"` | no | Adoption brackets round the symbol (NSGC). `in` is adopted into the family shown, drawn with a dashed line to the adoptive parents in `parentOf`; `out` is a biological child placed for adoption, drawn with a solid line to the biological parents. PED has no field for this, so Export PED drops it and warns. |
 | `name` | string | no | Display name shown under the symbol. |
 | `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
 | `notes` | string | no | Free-text clinical notes. |

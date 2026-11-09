@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
@@ -184,6 +184,8 @@ interface PedigreeState {
   setSex: (id: string, sex: Sex) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
+  /** Adoption brackets (#12): "in", "out" or none. */
+  setAdopted: (id: string, status: Adoption | undefined) => void;
 
   // Partnership property mutations
   /**
@@ -627,6 +629,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!ind) return;
         if (status === undefined) delete ind.lifeStatus;
         else ind.lifeStatus = status;
+      });
+    },
+
+    setAdopted: (id, status) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (status === undefined) delete ind.adopted;
+        else ind.adopted = status;
       });
     },
 

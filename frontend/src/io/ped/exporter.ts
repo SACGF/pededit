@@ -112,6 +112,11 @@ export function pedLostLifeStatus(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.lifeStatus);
 }
 
+/** Individuals whose adoption brackets (#12) PED cannot carry. */
+export function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
+  return pedigree.individuals.filter(i => !!i.adopted);
+}
+
 /** Partnerships whose childless mark (#15) PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);

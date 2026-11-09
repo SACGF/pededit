@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedLostLifeStatus, pedLostChildless } from "../io/ped/exporter.js";
+import { pedLostLifeStatus, pedLostChildless, pedLostAdoption } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
 import { childlessLabel } from "../pedigree/childless";
+import { adoptionLabel } from "../pedigree/adoption";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
 import { exportJson } from "../io/json/index.js";
@@ -57,12 +58,14 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
     setPedMenuOpen(false);
     const lost = pedLostLifeStatus(pedigree);
     const lostCouples = pedLostChildless(pedigree);
-    if (lost.length === 0 && lostCouples.length === 0) { handleExportPed(dialect); return; }
+    const lostAdopted = pedLostAdoption(pedigree);
+    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0) { handleExportPed(dialect); return; }
     const nameOf = (id: string) => { const i = pedigree.individuals.find(x => x.id === id); return i?.name || id; };
     setPedWarning({
       dialect,
       lines: [
         ...lost.map(i => `${i.name || i.id}: ${lifeStatusLabel(i.lifeStatus!)}`),
+        ...lostAdopted.map(i => `${i.name || i.id}: ${adoptionLabel(i.adopted!)}`),
         ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
       ],
     });
@@ -107,9 +110,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
       <Dialog open={pedWarning !== null} onOpenChange={open => { if (!open) setPedWarning(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>PED drops pregnancies, losses and childless marks</DialogTitle>
+            <DialogTitle>PED drops pregnancies, losses, adoption and childless marks</DialogTitle>
             <DialogDescription>
-              PED has no column for pregnancy, pregnancy loss or a childless couple mark, so{" "}
+              PED has no column for pregnancy, pregnancy loss, adoption or a childless couple mark, so{" "}
               {pedWarning?.lines.length === 1 ? "this will be lost" : `these ${pedWarning?.lines.length} will be lost`}{" "}
               (pregnancies and losses become ordinary children). Download JSON keeps them.
             </DialogDescription>

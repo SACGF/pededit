@@ -9,6 +9,13 @@ export type Sex = "male" | "female" | "unknown";
  */
 export type LifeStatus = "pregnancy" | "miscarriage" | "termination" | "stillbirth" | "ectopic";
 
+/**
+ * Adoption (NSGC 2008): brackets around the symbol. "in" is adopted into the
+ * family shown (dashed line to the adoptive parents), "out" is a biological
+ * child placed for adoption (solid line to the biological parents).
+ */
+export type Adoption = "in" | "out";
+
 export interface Individual {
   id: string;
   sex: Sex;
@@ -22,6 +29,7 @@ export interface Individual {
   notes?: string;        // free text clinical notes
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
   lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
+  adopted?: Adoption;    // brackets round the symbol; "in" also dashes the line from the parents
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
 }
 

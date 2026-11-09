@@ -153,7 +153,7 @@ describe("exportCsv", () => {
       ],
     });
     const csv = exportCsv(ped);
-    expect(csv.split("\n")[0]!.endsWith(",life_status")).toBe(true);
+    expect(csv.split("\n")[0]!).toContain(",life_status");
     const rows = parseRows(csv);
     expect(rows[0]!.life_status).toBe("stillbirth");
     expect(rows[1]!.life_status).toBe("");

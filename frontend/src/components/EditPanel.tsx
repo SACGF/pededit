@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Legend } from "./Legend";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
-import type { Individual, LifeStatus, ChildlessStatus, Pedigree } from "@pedigree-editor/layout-engine";
+import { ADOPTION_OPTIONS } from "../pedigree/adoption";
+import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -39,7 +40,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setCarrier, setLifeStatus } = usePedigreeStore();
+  const { pedigree, updateIndividual, setCarrier, setLifeStatus, setAdopted } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
@@ -89,6 +90,26 @@ function IndividualForm({ individual }: { individual: Individual }) {
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
+      </Field>
+
+      <Field label="Adoption">
+        <select
+          value={individual.adopted ?? ""}
+          aria-label="Adoption"
+          onChange={e => setAdopted(individual.id, (e.target.value || undefined) as Adoption | undefined)}
+          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+        >
+          <option value="">None</option>
+          {ADOPTION_OPTIONS.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        {individual.adopted === "in" && (
+          <p className="text-[10px] text-gray-500">Brackets round the symbol, dashed line to the adoptive parents.</p>
+        )}
+        {individual.adopted === "out" && (
+          <p className="text-[10px] text-gray-500">Brackets round the symbol, solid line to the biological parents.</p>
+        )}
       </Field>
 
       <div className="border-t pt-3 space-y-2">

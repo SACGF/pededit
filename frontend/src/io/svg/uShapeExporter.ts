@@ -6,7 +6,8 @@ import {
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
-import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset } from "./svgExporter";
+import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
+import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -937,10 +938,12 @@ function tangentSeg(u: number, offset: number, halfLen: number, g: Geom): string
 }
 
 /** A straight segment across the tracks at position u, from offset o1 to o2. */
-function normalSeg(u: number, o1: number, o2: number, g: Geom): string {
+function normalSeg(u: number, o1: number, o2: number, g: Geom, attrs = LINE_ATTRS): string {
   const p1 = trackPoint(u, o1, g), p2 = trackPoint(u, o2, g);
-  return `<line x1="${r(p1.x)}" y1="${r(p1.y)}" x2="${r(p2.x)}" y2="${r(p2.y)}" ${LINE_ATTRS}/>`;
+  return `<line x1="${r(p1.x)}" y1="${r(p1.y)}" x2="${r(p2.x)}" y2="${r(p2.y)}" ${attrs}/>`;
 }
+
+const ADOPTED_IN_ATTRS = `${LINE_ATTRS} stroke-dasharray="${ADOPTION_DASH}"`;
 
 const DUP_ATTRS = `fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"`;
 
@@ -986,8 +989,12 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
       const lo = Math.min(uP, ...us), hi = Math.max(uP, ...us);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
-      // A loss triangle's apex sits below the top of the symbol box.
-      w.kids.forEach(c => out.push(normalSeg(c.u, bar, childEdge + HALF + childDropEndOffset(byId.get(c.blood)), g)));
+      // A loss triangle's apex sits below the top of the symbol box. An
+      // adopted-in child's drop is dashed (#12).
+      w.kids.forEach(c => {
+        const ind = byId.get(c.blood);
+        out.push(normalSeg(c.u, bar, childEdge + HALF + childDropEndOffset(ind), g, ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS));
+      });
     }
   });
 
@@ -1040,6 +1047,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   }
   shape += renderCarrierDot(ind, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
+  shape = renderAdoptionBrackets(ind) + shape;
   let marks = renderLifeStatusMarks(ind, geom, clipId);
   if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
     marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;

@@ -54,6 +54,7 @@ class IndividualSerializer(serializers.Serializer):
     notes = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     hpoTerms = _opt(serializers.ListField, child=serializers.CharField())
     lifeStatus = _opt(serializers.ChoiceField, choices=LIFE_STATUS_CHOICES)
+    adopted = _opt(serializers.ChoiceField, choices=["in", "out"])
     tags = _opt(serializers.ListField, child=serializers.CharField())
 
 

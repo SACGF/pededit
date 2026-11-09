@@ -84,6 +84,14 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `adoption.ts` — adoption brackets (#12): the six bracket segments round
+  the symbol box, drawn by `AdoptionBrackets` in `symbols.tsx` (so the
+  legend gets them for free through `SymbolShape`), `renderAdoptionBrackets`
+  in `svgExporter` (shared with the U-shape) and the export key. An
+  adopted-in child's drop from the sibship bar is dashed: `sibshipPath.ts`
+  gained `sibshipPaths`, which splits `sibshipSegments` into solid and dashed
+  by the children's `dashed` flag, keeping the per-child order (couple drop,
+  bar, then one drop per child). The minimap keeps everything solid.
 - `childless.ts` — childless couple marks (#15): segments hung from the
   middle of the couple line (raised by the hop when the line hops; on a
   consanguineous double line, from the lower line). `layoutToFlow` puts

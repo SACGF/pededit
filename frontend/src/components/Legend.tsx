@@ -6,7 +6,8 @@ import {
 import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
-import type { ChildlessStatus } from "@pedigree-editor/layout-engine";
+import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
+import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 import { Button } from "@/components/ui/button";
 import { Tags } from "lucide-react";
@@ -149,6 +150,15 @@ function AffectedCoreSvg({ sex }: { sex: Sex }) {
   );
 }
 
+/** Adoption brackets reuse the canvas renderer; wider so the brackets fit. */
+function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
+  return (
+    <svg width="36" height="28" viewBox="-8 -4 36 28">
+      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, adopted }} size={SZ} clipId={`legend-adopted-${adopted}`} />
+    </svg>
+  );
+}
+
 /** Pregnancy / loss symbols reuse the canvas renderer so the legend matches exactly. */
 function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }) {
   // Extra room below for the "SB" / "ECT" caption and the stillbirth slash overhang.
@@ -250,6 +260,10 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);
     if (ind) indRows.push({ icon: <LifeStatusSvg sex={ind.sex} lifeStatus={o.value} />, label: o.label });
+  }
+  for (const o of ADOPTION_OPTIONS) {
+    const ind = individuals.find(i => i.adopted === o.value);
+    if (ind) indRows.push({ icon: <AdoptedSvg sex={ind.sex} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
   }
 
   const relRows: { icon: React.ReactNode; label: string }[] = [];

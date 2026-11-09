@@ -21,7 +21,7 @@ FULL_PEDIGREE = {
         },
         {
             "id": "c1", "sex": "unknown", "affected": True, "deceased": False,
-            "carrier": False, "proband": True, "sibOrder": 1, "name": "",
+            "carrier": False, "proband": True, "sibOrder": 1, "name": "", "adopted": "in",
         },
         {"id": "w2", "sex": "female", "affected": False, "sibOrder": 0},
     ],

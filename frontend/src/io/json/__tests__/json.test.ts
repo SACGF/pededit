@@ -17,7 +17,7 @@ const fullFeatured: Pedigree = {
   individuals: [
     { id: "a", sex: "male", affected: false, sibOrder: 0, name: "Arthur", dob: "1950-01-02", notes: "founder" },
     { id: "b", sex: "female", affected: true, deceased: true, sibOrder: 0, hpoTerms: ["HP:0001250"], tags: ["t1", "t2"] },
-    { id: "c", sex: "unknown", affected: false, carrier: true, proband: true, sibOrder: 0, name: "Child" },
+    { id: "c", sex: "unknown", affected: false, carrier: true, proband: true, sibOrder: 0, name: "Child", adopted: "in" },
   ],
   partnerships: [
     { id: "p", individual1: "a", individual2: "b", consanguineous: false },
@@ -87,6 +87,15 @@ describe("JSON roundtrip", () => {
     expect(ped.individuals[1]!.tags).toEqual(["t1", "t2"]);
     expect(ped.tags).toEqual(fullFeatured.tags);
     expect(ped.partnerships[1]).toMatchObject({ childless: "infertility", childlessReason: "azoospermia" });
+    expect(ped.individuals[2]!.adopted).toBe("in");
+  });
+
+  it("rejects an unknown adopted value", () => {
+    const bad = JSON.parse(JSON.stringify(fullFeatured));
+    bad.individuals[0].adopted = "maybe";
+    const result = importJson(JSON.stringify(bad));
+    expect(result.hasErrors).toBe(true);
+    expect(result.issues.some(i => i.path === "individuals[0].adopted")).toBe(true);
   });
 
   it("rejects an unknown childless value", () => {

@@ -51,6 +51,10 @@ Rules that keep a bad file from importing as nonsense (#31):
   parent (`isPhantomId`). They are never shown, not even as the dev-mode ID
   label.
 
+PED cannot carry pregnancy / loss status, adoption or childless couple marks.
+`pedLostLifeStatus`, `pedLostAdoption` and `pedLostChildless` in `exporter.ts`
+list what a file would drop; the toolbar warns with them before writing.
+
 ## json/ — native lossless format
 
 `exportJson` / `importJson` wrap the `Pedigree` in a versioned envelope

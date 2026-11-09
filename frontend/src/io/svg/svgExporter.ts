@@ -2,7 +2,8 @@ import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } fro
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
-import { sibshipSegments } from "../../pedigree/sibshipPath";
+import { sibshipPaths } from "../../pedigree/sibshipPath";
+import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
@@ -184,8 +185,16 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
 
 // ── Sibship lines ─────────────────────────────────────────────────────────────
 
-function seg(x1: number, y1: number, x2: number, y2: number): string {
-  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"/>`;
+function seg(x1: number, y1: number, x2: number, y2: number, dashed = false): string {
+  const dash = dashed ? ` stroke-dasharray="${ADOPTION_DASH}"` : "";
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"${dash}/>`;
+}
+
+/** Brackets round an adopted individual's symbol, centred on the origin. Shared with the U-shape exporter. */
+export function renderAdoptionBrackets(ind: Individual): string {
+  if (!ind.adopted) return "";
+  const half = NODE_SIZE / 2;
+  return `<g data-adopted="${ind.adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
 }
 
 function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
@@ -208,11 +217,11 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
       const hop      = hopHeightAt(result, partners, level - 1, f - 1);
       const children = slots.map(s => {
         const child = pedigree.individuals[Math.floor(result.nid[level][s]) - 1];
-        return { ...slotPos.get(`${level}-${s}`)!, topInset: symbolTopInset(child?.lifeStatus, NODE_SIZE) };
+        return { ...slotPos.get(`${level}-${s}`)!, topInset: symbolTopInset(child?.lifeStatus, NODE_SIZE), dashed: child?.adopted === "in" };
       });
-      for (const [x1, y1, x2, y2] of sibshipSegments(coupleX, coupleY, hop, children)) {
-        lines.push(seg(x1, y1, x2, y2));
-      }
+      const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children);
+      for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
+      for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
     }
   }
   return lines;
@@ -249,7 +258,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return shape + renderCarrierDot(ind, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
+  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 

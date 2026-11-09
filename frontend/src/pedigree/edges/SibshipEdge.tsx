@@ -3,7 +3,8 @@ import type { Edge, EdgeProps, Node } from "@xyflow/react";
 import type { SibshipEdgeData, RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { symbolTopInset } from "../lifeStatus";
-import { sibshipSegments, segmentsPathD } from "../sibshipPath";
+import { sibshipPaths, segmentsPathD } from "../sibshipPath";
+import { ADOPTION_DASH } from "../adoption";
 
 export type SibshipEdgeType = Edge<SibshipEdgeData, "sibshipEdge">;
 
@@ -24,22 +25,26 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   const coupleX = (leftParent.position.x + rightParent.position.x) / 2;
   const coupleY = (leftParent.position.y + rightParent.position.y) / 2;
   // Drops end at the top of each child symbol, or at a loss triangle's apex.
-  const d = segmentsPathD(sibshipSegments(
+  // An adopted-in child's drop is dashed (#12).
+  const { solid, dashed } = sibshipPaths(
     coupleX, coupleY, data.hopHeight ?? 0,
-    children.map(c => ({
-      ...c.position,
-      topInset: symbolTopInset((c.data as RFNodeData | undefined)?.individual?.lifeStatus, NODE_SIZE),
-    })),
-  ));
+    children.map(c => {
+      const ind = (c.data as RFNodeData | undefined)?.individual;
+      return { ...c.position, topInset: symbolTopInset(ind?.lifeStatus, NODE_SIZE), dashed: ind?.adopted === "in" };
+    }),
+  );
 
   return (
     <g>
       <path
-        d={d}
+        d={segmentsPathD(solid)}
         stroke="black"
         strokeWidth={2}
         fill="none"
       />
+      {dashed.length > 0 && (
+        <path d={segmentsPathD(dashed)} stroke="black" strokeWidth={2} fill="none" strokeDasharray={ADOPTION_DASH} />
+      )}
     </g>
   );
 }

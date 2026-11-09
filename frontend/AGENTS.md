@@ -44,9 +44,10 @@ stub so the app still builds without Google login.
   added), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
   disconnected individuals, cross-generation and consanguineous matings.
-  Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`); PED cannot
-  carry them, so Export PED warns first. Not yet: twins, adoption, assisted
-  reproduction symbols.
+  Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
+  brackets (`Individual.adopted`, `pedigree/adoption.ts`, #12: "in" also
+  dashes the line from the adoptive parents); PED cannot carry either, so
+  Export PED warns first. Not yet: twins, assisted reproduction symbols.
 - Visual style is black and white, minimal chrome. No colour except tags.
 
 ## Layout of src/

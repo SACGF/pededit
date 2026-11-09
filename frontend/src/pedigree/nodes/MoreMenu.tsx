@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 import { CHILDLESS_OPTIONS } from "../childless";
+import { ADOPTION_OPTIONS } from "../adoption";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -40,6 +41,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     unpinIndividual,
     setIndividualTag,
     setPartnershipChildless,
+    setAdopted,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -183,6 +185,23 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </MenuItem>
           ))}
+          </div>
+        </MenuSection>
+
+        <MenuSection label="Adoption">
+          <div className="flex">
+            <MenuItem onClick={() => action(() => setAdopted(individualId, undefined))} active={!individual.adopted}>
+              None
+            </MenuItem>
+            {ADOPTION_OPTIONS.map(o => (
+              <MenuItem
+                key={o.value}
+                onClick={() => action(() => setAdopted(individualId, o.value))}
+                active={individual.adopted === o.value}
+              >
+                {o.value === "in" ? "In" : "Out"}
+              </MenuItem>
+            ))}
           </div>
         </MenuSection>
 

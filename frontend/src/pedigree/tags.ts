@@ -2,6 +2,7 @@ import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layou
 import { consanguinityTest } from "./consanguinity";
 import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
+import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -468,6 +469,22 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     if (!ind) continue;
     const label = o.value === "stillbirth" ? "Stillbirth (SB)" : o.value === "ectopic" ? "Ectopic pregnancy (ECT)" : o.label;
     rows.push({ label, swatch: sy => renderLifeStatusSwatchSvg(o.value, ind.sex, x, sy) });
+  }
+  // Adoption brackets (#12), drawn a little smaller so they fit the swatch column.
+  for (const o of ADOPTION_OPTIONS) {
+    const ind = inds.find(i => i.adopted === o.value);
+    if (!ind) continue;
+    rows.push({
+      label: adoptionLegendLabel(o.value),
+      swatch: sy => {
+        const s = LEGEND_SWATCH * 0.7, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + (LEGEND_SWATCH - s) / 2;
+        const geom = swatchGeom(ind.sex, ox, oy, s);
+        const brackets = adoptionBracketSegments(s, ox, oy)
+          .map(([x1, y1, x2, y2]) => `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`)
+          .join("");
+        return brackets + `${geom} fill="white" stroke="black" stroke-width="1.5"/>`;
+      },
+    });
   }
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(pedigree);
