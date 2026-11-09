@@ -20,7 +20,7 @@ Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issue
 - **"Extract", "pull out", "split off" and "move" mean move, not copy.** When asked to take future work or any other content out of an issue into its own issue, raise the new issue, then edit the original (body or comment) so only a one-line pointer remains, such as "Future work raised in #72". The original must not still contain the list. Check first whether an existing issue already tracks part of it and point at that instead of duplicating.
 
 What exists:
-- `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup). Connected-component ordering is still open (#39).
+- `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup and twin handling).
 - Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51).
 - React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu, edit panel (name/DOB/notes), settings panel (sibling order, snap to grid), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
 - Tags and colouring (#3): `Pedigree.tags` definitions with quadrant, dot and text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, `TagsDialog`, auto legend in the app and in SVG/PNG/PDF export, per-user tag library (`/api/tag-presets/`). See `claude/phase_7_2_plan.md`.

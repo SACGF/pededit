@@ -22,8 +22,11 @@ indexing convention inherited from R, and the three rendering rules.
   (#11): `Partnership.twins` plays the part of R's `relation` matrix, a twin
   set gets the mean of its members' ranks plus a per-member offset, and
   `shift` moves a whole set (twice over for monozygotic). PED input has no
-  twins, so the oracle comparisons are unaffected. Connected-component
-  ordering is still open (#39).
+  twins, so the oracle comparisons are unaffected. No connected-component
+  pass is needed (#39): alignped1 builds one founder's tree at a time and
+  alignped3 sets the trees side by side, so unrelated families never
+  interleave, and the editor lays each family out alone anyway
+  (`families.ts`). `tests/components.test.ts` pins this.
 - `alignped1.ts` to `alignped4.ts`, `alignPedigree.ts` — the kinship2 placement
   pipeline. alignped4 runs a quadratic program via the `quadprog` npm package.
   Vite needs `optimizeDeps.include: ["quadprog"]` for that package to load.
