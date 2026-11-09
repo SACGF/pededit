@@ -23,8 +23,11 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, selectedId, pedigree } = usePedigreeStore();
+  const { setHoveredId, setSelectedId, selectedId, pedigree, picking, pickIndividual } = usePedigreeStore();
   const isSelected = individual.id === selectedId;
+  // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
+  const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
+  const isPickTarget = picking?.kind === "parents" && picking.childId === individual.id;
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
@@ -62,12 +65,14 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         width: NODE_SIZE,
         height: NODE_SIZE,
         position: "relative",
-        boxShadow: isSelected ? "0 0 0 2px #ef4444" : undefined,
+        boxShadow: isPicked ? "0 0 0 3px #2563eb" : isPickTarget ? "0 0 0 2px #9ca3af" : isSelected ? "0 0 0 2px #ef4444" : undefined,
+        cursor: picking ? "crosshair" : undefined,
       }}
+      data-picked={isPicked ? "true" : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseMove={() => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(); }}
       onMouseLeave={handleMouseLeave}
-      onClick={() => setSelectedId(individual.id)}
+      onClick={() => { if (!pickIndividual(individual.id)) setSelectedId(individual.id); }}
     >
 
       {/* Main pedigree symbol */}
@@ -158,7 +163,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
       <HoverPill
         nodeId={nodeId}
         individualId={individual.id}
-        isVisible={isPillVisible}
+        isVisible={isPillVisible && !picking}
         hasParents={hasParents}
         onPillEnter={cancelHide}
         onPillLeave={scheduleHide}

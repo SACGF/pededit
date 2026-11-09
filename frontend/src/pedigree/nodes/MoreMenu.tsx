@@ -48,12 +48,16 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     removeTwin,
     removeWithDescendants,
     removeWithAncestors,
+    startPickingParents,
+    startPickingChild,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
+  const hasParentsAlready = Object.values(pedigree.parentOf).some(kids => kids.includes(individualId));
+  const ownPartnerships = partnerChoices(pedigree, individualId);
   // Twins (#11): the current set, or the sibling drawn next to this person to pair with.
   const twin = twinSetOf(pedigree, individualId);
   const twinPartnership = parentPartnershipOf(pedigree, individualId);
@@ -130,6 +134,22 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
               individualId={individualId}
               onAdd={(sex, count, partnershipId) => action(() => addChildren(individualId, count, sex, partnershipId))}
             />
+          )}
+          <MenuItem
+            onClick={() => action(() => startPickingParents(individualId))}
+            title={hasParentsAlready ? "Click existing people on the canvas to replace the current parents" : "Click one or two existing people on the canvas to be the parents"}
+          >
+            {hasParentsAlready ? "Replace parents..." : "Set parents..."}
+          </MenuItem>
+          {ownPartnerships.length > 0 && !individual.lifeStatus && (
+            <MenuItem
+              onClick={() => action(() => startPickingChild(ownPartnerships[0]!.partnershipId))}
+              title={ownPartnerships.length > 1
+                ? `Click an existing person on the canvas to make them a child of this couple (with ${ownPartnerships[0]!.label}; use Set parents on the child for another partner)`
+                : "Click an existing person on the canvas to make them a child of this couple"}
+            >
+              Add existing child...
+            </MenuItem>
           )}
         </MenuSection>
 

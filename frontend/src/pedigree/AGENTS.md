@@ -84,6 +84,16 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `parents.ts` and `PickingBanner.tsx` — linking a child to existing
+  parents (#36). The store's `picking` state turns node clicks into picks
+  (`PedigreeSymbolNode` calls `pickIndividual` first and only selects when
+  it returns false; the hover pill hides while picking). `setParentsProblem`
+  is the one rule list (self, descendant, pregnancy, two of the same known
+  sex); the store's `setParents` attaches to the parents' existing
+  partnership or creates one (father role first, consanguineous when they
+  share an ancestor), a single parent gets a placeholder partner, and a
+  re-parented child leaves their old twin set. The banner is a React Flow
+  `Panel` with a name search for people off screen. Escape cancels.
 - `removal.ts` — branch removal sets (#34): descendants, ancestors,
   "remove with descendants" (which also takes partners who married in and
   have no partnership with anyone staying) and `removeIndividuals`, the one

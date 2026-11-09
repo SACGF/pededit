@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 
 export function useKeyboardShortcuts() {
-  const { undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool } = usePedigreeStore();
+  const { undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool, picking, cancelPicking } = usePedigreeStore();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -21,10 +21,10 @@ export function useKeyboardShortcuts() {
         else if (e.altKey) removeWithAncestors([selectedId]);
         else deleteIndividual(selectedId);
       }
-      if (e.key === "Escape") setActiveTool("select");
+      if (e.key === "Escape") { if (picking) cancelPicking(); setActiveTool("select"); }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool]);
+  }, [undo, redo, deleteIndividual, removeWithDescendants, removeWithAncestors, selectedId, setActiveTool, picking, cancelPicking]);
 }

@@ -44,6 +44,9 @@ stub so the app still builds without Google login.
   added), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
   disconnected individuals, cross-generation and consanguineous matings.
+  "Set parents..." / "Replace parents..." and "Add existing child..." in the
+  more menu link existing people (#36), which is how consanguinity loops
+  and "the two families turn out to be related" are drawn.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
   brackets (`Individual.adopted`, `pedigree/adoption.ts`, #12: "in" also
   dashes the line from the adoptive parents); PED cannot carry either, so
@@ -65,7 +68,7 @@ stub so the app still builds without Google login.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
   undo/redo stacks, active tool, selection, every structural edit
   (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with
-  descendants or ancestors), flags, pinning,
+  descendants or ancestors, setParents with on-canvas picking), flags, pinning,
   canvas settings, tags. All edits go through immer `produce` and push an undo
   snapshot. Add new edits here, not in components.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.

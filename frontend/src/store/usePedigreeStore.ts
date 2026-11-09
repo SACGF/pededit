@@ -6,11 +6,21 @@ import type {
 import { shareAncestor } from "../utils/pedigreeRelationship";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
+import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
+
+/**
+ * On-canvas picking (#36): clicks choose existing individuals instead of
+ * selecting. "parents" collects one or two parents for a child; "child"
+ * takes one click, the individual who becomes a child of the partnership.
+ */
+export type Picking =
+  | { kind: "parents"; childId: string; picked: string[] }
+  | { kind: "child"; partnershipId: string };
 
 /** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
 export interface Notice {
@@ -175,6 +185,21 @@ interface PedigreeState {
   notice: Notice | null;
   setNotice: (notice: Omit<Notice, "id"> | null) => void;
 
+  /** Active on-canvas picking, or null. Not undoable. */
+  picking: Picking | null;
+  startPickingParents: (childId: string) => void;
+  startPickingChild: (partnershipId: string) => void;
+  cancelPicking: () => void;
+  /**
+   * Handle a click on an individual while picking. For parents: adds (or
+   * removes) them from the picked list, refusing with a notice when the
+   * rules say no, and applies as soon as two are picked. For a child:
+   * applies at once. Returns true when the click was consumed.
+   */
+  pickIndividual: (id: string) => boolean;
+  /** Apply the parents picked so far (one parent gets a placeholder partner). */
+  applyPicking: () => void;
+
   // Lifecycle
   initialize: (p: Pedigree) => void;
   reset: () => void;
@@ -205,6 +230,14 @@ interface PedigreeState {
   removeWithDescendants: (individualIds: string[]) => number;
   /** Remove these individuals with everyone above them; their descendants become founders (#34). */
   removeWithAncestors: (individualIds: string[]) => number;
+  /**
+   * Make one or two existing individuals the parents of childId (#36). Uses
+   * their existing partnership or creates one (flagged consanguineous when
+   * they are related); a single parent gets a new unknown-sex partner. A
+   * child who already has parents is moved. Returns the reason when
+   * refused, else null.
+   */
+  setParents: (childId: string, parentIds: string[]) => string | null;
   moveSibLeft: (individualId: string) => void;
   moveSibRight: (individualId: string) => void;
 
@@ -308,8 +341,48 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     isDirty: false,
     layoutResetCount: 0,
     notice: null,
+    picking: null,
 
     setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
+
+    startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, selectedId: childId }),
+    startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
+    cancelPicking: () => set({ picking: null }),
+
+    pickIndividual: (id) => {
+      const { picking, pedigree } = get();
+      if (!picking) return false;
+      if (picking.kind === "child") {
+        const p = pedigree.partnerships.find(x => x.id === picking.partnershipId);
+        if (!p) { set({ picking: null }); return true; }
+        const problem = get().setParents(id, [p.individual1, p.individual2]);
+        if (problem) get().setNotice({ kind: "error", text: problem });
+        else set({ picking: null });
+        return true;
+      }
+      if (id === picking.childId) {
+        get().setNotice({ kind: "error", text: "Someone cannot be their own parent." });
+        return true;
+      }
+      const picked = picking.picked.includes(id)
+        ? picking.picked.filter(x => x !== id)
+        : [...picking.picked, id];
+      if (picked.length > picking.picked.length) {
+        const problem = setParentsProblem(pedigree, picking.childId, picked);
+        if (problem) { get().setNotice({ kind: "error", text: problem }); return true; }
+      }
+      set({ picking: { ...picking, picked } });
+      if (picked.length === 2) get().applyPicking();
+      return true;
+    },
+
+    applyPicking: () => {
+      const { picking } = get();
+      if (!picking || picking.kind !== "parents" || picking.picked.length === 0) return;
+      const problem = get().setParents(picking.childId, picking.picked);
+      if (problem) get().setNotice({ kind: "error", text: problem });
+      else set({ picking: null, selectedId: picking.childId });
+    },
 
     initialize: (p) => set({
       pedigree: p,
@@ -318,6 +391,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       activeTool: "select",
       selectedId: null,
       isDirty: false,
+      picking: null,
     }),
 
     reset: () => set({
@@ -327,6 +401,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       activeTool: "select",
       selectedId: null,
       isDirty: false,
+      picking: null,
     }),
 
     getPedigree: () => get().pedigree,
@@ -578,6 +653,57 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
         }
       });
+    },
+
+    setParents: (childId, parentIds) => {
+      const unique = [...new Set(parentIds)];
+      const problem = setParentsProblem(get().pedigree, childId, unique);
+      if (problem) { console.warn(`Cannot set parents: ${problem}`); return problem; }
+      const before = currentParentsOf(get().pedigree, childId);
+      mutate(draft => {
+        // Leave the current parents, if any.
+        if (before) {
+          draft.parentOf[before.id] = (draft.parentOf[before.id] ?? []).filter(c => c !== childId);
+          const old = draft.partnerships.find(p => p.id === before.id);
+          if (old?.twins) {
+            old.twins = old.twins.map(t => ({ ...t, members: t.members.filter(m => m !== childId) })).filter(t => t.members.length >= 2);
+            if (old.twins.length === 0) delete old.twins;
+          }
+        }
+        // The partnership to attach to: existing, or new (with a placeholder for a single parent).
+        let [a, b] = unique as [string, string | undefined];
+        let partnership = b ? draft.partnerships.find(p =>
+          (p.individual1 === a && p.individual2 === b) || (p.individual1 === b && p.individual2 === a)) : undefined;
+        if (!partnership) {
+          if (!b) {
+            const parent = draft.individuals.find(i => i.id === a)!;
+            const partnerSex: Sex = parent.sex === "male" ? "female" : parent.sex === "female" ? "male" : "unknown";
+            const placeholder = makeIndividual(partnerSex, 0);
+            draft.individuals.push(placeholder);
+            b = placeholder.id;
+          }
+          const aSex = draft.individuals.find(i => i.id === a)!.sex;
+          const bSex = draft.individuals.find(i => i.id === b)!.sex;
+          // Keep the father role first where the sexes say so.
+          if (aSex === "female" || (aSex === "unknown" && bSex === "male")) [a, b] = [b, a];
+          partnership = { id: newId(), individual1: a, individual2: b };
+          if (shareAncestor(draft as Pedigree, a, b)) partnership.consanguineous = true;
+          draft.partnerships.push(partnership);
+          draft.parentOf[partnership.id] = [];
+        }
+        const child = draft.individuals.find(i => i.id === childId)!;
+        child.sibOrder = nextSibOrderInFamily(draft, partnership.id);
+        draft.parentOf[partnership.id] = [...(draft.parentOf[partnership.id] ?? []), childId];
+        clearChildless(draft, partnership.id);
+      });
+      const after = currentParentsOf(get().pedigree, childId)!;
+      const name = (id: string) => get().pedigree.individuals.find(i => i.id === id)?.name?.trim() || "an individual";
+      get().setNotice({
+        kind: "info",
+        text: `${name(childId)} is now a child of ${name(after.individual1)} and ${name(after.individual2)}${before ? " (moved from the previous parents)" : ""}.`,
+        undoable: true,
+      });
+      return null;
     },
 
     removeWithDescendants: (individualIds) => removeBranch(individualIds, removeWithDescendantsSet, "descendants"),

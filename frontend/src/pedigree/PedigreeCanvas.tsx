@@ -26,6 +26,7 @@ import { NODE_SIZE } from "./constants";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
+import { PickingBanner } from "./PickingBanner";
 
 const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
 
@@ -297,6 +298,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
             </button>
           </Panel>
         )}
+        <PickingBanner />
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
         <FitOnLayoutChange compact={compact} />
         <Controls />
