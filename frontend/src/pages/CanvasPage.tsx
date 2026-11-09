@@ -13,6 +13,7 @@ import { TagsDialog } from "../components/TagsDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { forgetRecentPedigree } from "../utils/recentPedigrees";
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -64,7 +65,13 @@ export default function CanvasPage() {
   useEffect(() => {
     if (!id) return;
     setNotFound(false);
-    openPedigree(id).catch(() => setNotFound(true));
+    openPedigree(id).catch((err: unknown) => {
+      setNotFound(true);
+      // Gone from the server: drop it from "Recent on this device". A network
+      // error keeps the entry, since the pedigree may still exist.
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 404) forgetRecentPedigree(id);
+    });
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-save: debounce 2 s after the last mutation so changes survive a reload.
@@ -188,6 +195,7 @@ export default function CanvasPage() {
             <div className="text-[10px] text-gray-400 leading-relaxed">
               <p className="mb-2">
                 This pedigree is saved at this URL and nowhere else. Bookmark it or copy the link to come back to it.
+                The home page also lists it under "Recent on this device" in this browser.
               </p>
               <Button
                 size="sm"

@@ -7,8 +7,7 @@ Zustand holds state, Tailwind + shadcn/ui for chrome. Workspace package
 ## Running
 
 ```
-. ~/.nvm/nvm.sh            # node is not on PATH otherwise
-npm -w frontend run dev    # Vite on 5173, proxies /api to Django on 8000
+npm -w frontend run dev    # Vite on 5173, proxies /api to Django on 8000 (Node 20+)
 npm -w frontend run test   # vitest
 npm -w frontend run typecheck
 ```
@@ -30,8 +29,12 @@ stub so the app still builds without Google login.
   pedigree while signed out POSTs to `/api/pedigrees/` with no token; the
   backend stores it with `owner=None` and the UUID in the URL (`/p/<uuid>`) is
   the only key. The landing page and the canvas sidebar both tell the user to
-  bookmark or copy the link. Signing in (Google or GitHub) only adds the
-  "Your pedigrees" list and the per-user tag library.
+  bookmark or copy the link, and the landing page lists "Recent on this
+  device" (#16): `utils/recentPedigrees.ts` keeps the last 20 opened in
+  localStorage `recentPedigrees`, recorded by `openPedigree`, renamed by
+  `renamePedigree`, dropped by `deletePedigree` and by a 404 on open. It is
+  per browser and never sent to the server. Signing in (Google or GitHub)
+  only adds the "Your pedigrees" list and the per-user tag library.
 - Pedigree symbols encode biological sex, not gender (see root AGENTS.md).
 - Structures that competitors refuse but we handle: partnerships with no
   children (`addPartner`; the layout engine feeds them to kinship2 as
@@ -45,8 +48,8 @@ stub so the app still builds without Google login.
 
 ## Layout of src/
 
-- `pages/` — `LandingPage` (create blank, import PED, examples, "Your
-  pedigrees" when signed in), `CanvasPage` (sidebar + toolbar + canvas +
+- `pages/` — `LandingPage` (create blank, import PED, "Recent on this
+  device", examples, "Your pedigrees" when signed in), `CanvasPage` (sidebar + toolbar + canvas +
   panels), `LoginPage`, `GitHubCallbackPage`.
 - `store/useAppStore.ts` — auth tokens (localStorage `access_token` /
   `refresh_token`), pedigree list, open/create/save/rename/delete. Saving

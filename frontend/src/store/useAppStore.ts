@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { authApi, pedigreeApi, PedigreeMeta, UserInfo } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore } from "./usePedigreeStore";
+import { recordRecentPedigree, renameRecentPedigree, forgetRecentPedigree } from "../utils/recentPedigrees";
 
 interface AppState {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -101,6 +102,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     });
     usePedigreeStore.getState().initialize(pedigree);
     set({ activePedigreeId: id, activeTitle: data.title ?? null });
+    recordRecentPedigree(id, data.title ?? "Untitled pedigree");
   },
 
   createPedigree: async (title) => {
@@ -121,6 +123,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   deletePedigree: async (id) => {
     await pedigreeApi.delete(id);
+    forgetRecentPedigree(id);
     set((state) => ({
       pedigrees: state.pedigrees.filter((p) => p.id !== id),
       activePedigreeId: state.activePedigreeId === id ? null : state.activePedigreeId,
@@ -138,6 +141,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   renamePedigree: async (id, title) => {
     const { data } = await pedigreeApi.update(id, { title });
+    renameRecentPedigree(id, data.title);
     set(state => ({
       activeTitle: state.activePedigreeId === id ? data.title : state.activeTitle,
       pedigrees: state.pedigrees.map(p =>

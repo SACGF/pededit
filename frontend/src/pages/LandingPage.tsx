@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
 
 export default function LandingPage() {
   const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout } = useAppStore();
@@ -130,6 +131,9 @@ export default function LandingPage() {
             </Button>
           </div>
 
+          {/* Recent on this device (#16): per browser, no account needed */}
+          <RecentOnThisDevice disabled={loading !== null} />
+
           {/* Examples */}
           <div>
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
@@ -185,6 +189,54 @@ export default function LandingPage() {
         onClose={() => setImportOpen(false)}
         onImport={handleImport}
       />
+    </div>
+  );
+}
+
+function RecentOnThisDevice({ disabled }: { disabled: boolean }) {
+  const navigate = useNavigate();
+  const [recent, setRecent] = useState<RecentPedigree[]>(() => listRecentPedigrees());
+
+  if (!recent.length) return null;
+
+  const forget = (id: string) => {
+    forgetRecentPedigree(id);
+    setRecent(listRecentPedigrees());
+  };
+
+  return (
+    <div className="mb-10" data-testid="recent-on-this-device">
+      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+        Recent on this device
+      </p>
+      <p className="text-[10px] text-gray-400 mb-3">
+        Pedigrees opened in this browser. The list is stored here only, so it does not follow you to another device or browser.
+      </p>
+      <ul className="space-y-1">
+        {recent.map(p => (
+          <li key={p.id} className="flex items-stretch gap-1">
+            <button
+              className="flex-1 min-w-0 text-left px-3 py-2 rounded border hover:bg-gray-50 transition-colors disabled:opacity-50"
+              onClick={() => navigate(`/p/${p.id}`)}
+              disabled={disabled}
+              title={`/p/${p.id}`}
+            >
+              <span className="block text-xs font-medium truncate">{p.title || "Untitled pedigree"}</span>
+              <span className="block text-[10px] text-gray-400">
+                Opened {new Date(p.openedAt).toLocaleDateString()}
+              </span>
+            </button>
+            <button
+              className="px-2 text-xs text-gray-400 hover:text-black rounded border hover:bg-gray-50 transition-colors"
+              onClick={() => forget(p.id)}
+              aria-label={`Remove ${p.title || "Untitled pedigree"} from recent`}
+              title="Remove from this list (the pedigree itself is not deleted)"
+            >
+              ×
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
