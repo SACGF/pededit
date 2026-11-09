@@ -27,7 +27,10 @@ export interface ParseOutput {
  * header, as the widest row). A row that splits into a different number of
  * cells is an error, not a warning: it means an ID contained a space in a
  * space-separated file, or the file mixes tab and space delimiters, and reading
- * it anyway would import nonsense.
+ * it anyway would import nonsense. The one exception is a tab-separated row
+ * that is short only by trailing optional columns (aff, genotypes): text
+ * editors strip trailing whitespace, which removes the tab before an empty
+ * last cell, so such a row is padded with empty cells (#71).
  *
  * A parent ID of "NA" (written by pedtools and kinship2) or an empty cell in a
  * tab-separated file means "no parent" and is read as "0".
@@ -70,6 +73,12 @@ interface ColumnMap {
   affection: number;
   /** Number of columns a row must have to fill every mapped field. */
   required: number;
+  /**
+   * Number of columns a row must have to fill the fields that cannot be
+   * missing (family, id, father, mother, sex). A tab-separated row with at
+   * least this many cells but fewer than expected is padded.
+   */
+  core: number;
   /** Number of columns the layout describes; cells beyond this are extra. */
   width: number;
   /** Column indices below `width` that carry no known field. */
@@ -146,8 +155,14 @@ export function parsePed(text: string): ParseOutput {
   const against = header ? "the header" : "the widest row";
 
   for (const line of lines) {
-    const { cells, lineNumber, text } = line;
+    const { lineNumber, text } = line;
+    let { cells } = line;
     const hint = delimiterHint(text, tabSplit, header !== null);
+
+    // A trimmed trailing tab: only optional columns are missing, so pad them.
+    if (tabSplit && cells.length >= columns.core && cells.length < expected) {
+      cells = [...cells, ...new Array<string>(expected - cells.length).fill("")];
+    }
 
     if (cells.length < columns.required) {
       issues.push({
@@ -191,7 +206,7 @@ export function parsePed(text: string): ParseOutput {
       fatherId: normaliseParent(cells[columns.father]!),
       motherId: normaliseParent(cells[columns.mother]!),
       sex: cells[columns.sex]!,
-      affection: columns.affection >= 0 ? cells[columns.affection]! : MISSING_AFFECTION,
+      affection: columns.affection >= 0 && cells[columns.affection] !== "" ? cells[columns.affection]! : MISSING_AFFECTION,
       lineNumber,
       extraColumns,
     });
@@ -319,12 +334,13 @@ function mapHeaderColumns(header: string[]): ColumnMap | null {
   const used = new Set([family, id, father, mother, sex, affection].filter(i => i >= 0));
   const extra = names.map((_, i) => i).filter(i => !used.has(i));
   const required = Math.max(...[...used]) + 1;
+  const core = Math.max(family, id, father, mother, sex) + 1;
 
   const plink = PLINK_HEADER_PATTERN.test(header.join(" "));
   const kinship2Affection = affection >= 0 && names[affection] === "affected"
     && names.some(n => KINSHIP2_PARENT_NAMES.has(n));
   return {
-    family, id, father, mother, sex, affection, required, width: names.length, extra,
+    family, id, father, mother, sex, affection, required, core, width: names.length, extra,
     exact: plink ? null : names.length, kinship2Affection,
   };
 }
@@ -337,7 +353,7 @@ function mapPositionalColumns(lines: Line[]): ColumnMap {
 
   if (width >= 6) {
     // PLINK: FID IID PAT MAT SEX PHENO [genotypes...]
-    return { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: 5, required: 6, width: 6 };
+    return { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: 5, required: 6, core: 5, width: 6 };
   }
 
   if (width === 5) {
@@ -345,10 +361,10 @@ function mapPositionalColumns(lines: Line[]): ColumnMap {
     const firstCells = lines.filter(l => l.cells.length >= 5).map(l => l.cells[0]!);
     const sameFamily = firstCells.length >= 2 && firstCells.every(c => c === firstCells[0]);
     return sameFamily
-      ? { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: -1, required: 5, width: 5, exact: 5 }
-      : { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: 4, required: 5, width: 5, exact: 5 };
+      ? { ...POSITIONAL, family: 0, id: 1, father: 2, mother: 3, sex: 4, affection: -1, required: 5, core: 5, width: 5, exact: 5 }
+      : { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: 4, required: 5, core: 4, width: 5, exact: 5 };
   }
 
   // id fid mid sex (lines narrower than this are reported as TOO_FEW_COLUMNS)
-  return { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: -1, required: MIN_COLUMNS, width: MIN_COLUMNS, exact: MIN_COLUMNS };
+  return { ...POSITIONAL, family: -1, id: 0, father: 1, mother: 2, sex: 3, affection: -1, required: MIN_COLUMNS, core: MIN_COLUMNS, width: MIN_COLUMNS, exact: MIN_COLUMNS };
 }

@@ -335,6 +335,15 @@ describe("roundtrip: variants/", () => {
     expect(result.pedigrees[0]!.pedigree.partnerships).toHaveLength(1);
   });
 
+  it("aff_trailing_tab_trimmed.ped: rows short by a trimmed trailing aff import as missing affection", () => {
+    const result = importPed(readPed("variants/aff_trailing_tab_trimmed.ped"));
+    expect(result.hasErrors).toBe(false);
+    expect(result.issues).toHaveLength(0);
+    const ped = result.pedigrees[0]!.pedigree;
+    expect(ped.individuals).toHaveLength(4);
+    expect(ped.individuals.filter(i => i.affected).map(i => i.name)).toEqual(["2"]);
+  });
+
   it("two_families_no_famid.ped: one pedigree with two components", () => {
     const result = importPed(readPed("variants/two_families_no_famid.ped"));
     expect(result.hasErrors).toBe(false);

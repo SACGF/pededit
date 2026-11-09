@@ -235,6 +235,7 @@ column import as family `1`; without an affection column everyone is "missing".
 | `na_parents_tab.ped` | 4 (+1 phantom) | Missing parents written as `NA` (pedtools, kinship2). Read as missing: no "NA" individual, no NA = NA couple. One `SINGLE_PARENT` warning (4 has father 1 only). |
 | `kinship2_names.ped` | 5 | kinship2's own header `id dadid momid sex affected`, space-separated. `affected` is kinship2-coded (0 = unaffected, 1 = affected, NA = missing) and is recoded with an `AFFECTION_RECODED` info; 2 and 3 affected. |
 | `two_families_no_famid.ped` | 7 | Five columns with header, no family ID, two disconnected components (1-4 and X1-X3). Should import as two families, or one pedigree with two components. |
+| `aff_trailing_tab_trimmed.ped` | 4 | Header `id fid mid sex aff`, tab-separated. Rows 1 and 3 have no `aff` cell at all (a text editor stripped the trailing tab) and row 4 has an empty one. All four import, with 1, 3 and 4 as missing affection and no warnings (#71). |
 
 ### `malformed/` — Input that should fail with errors
 

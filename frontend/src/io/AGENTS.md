@@ -27,6 +27,11 @@ Rules that keep a bad file from importing as nonsense (#31):
 - Parent IDs `0`, `NA` and an empty tab cell mean missing (`MISSING_PARENT_TOKENS`
   in `parser.ts`). Kept short on purpose: `-`, `.` or lowercase `na` may be
   real IDs.
+- The one exception to the exact column count: a tab-separated row short only
+  by trailing optional columns (`aff`, genotypes) is padded with empty cells
+  (`ColumnMap.core`, #71), because text editors strip the trailing tab before
+  an empty last cell. An empty `aff` cell is missing affection, no warning.
+  Space-separated files get no padding: a short row there is a real error.
 - One ID as father and as mother, in one row or across rows, is a blocking
   `PARENT_BOTH_SEXES`; it would otherwise become a self-partnership.
 - kinship2 codes `affected` 0/1 (1 = affected), unlike PED 1/2. It is recoded
@@ -73,7 +78,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   constants.
 - `uShapeExporter.ts` — `layoutUShape` and `exportUShapeSvg`: horseshoe layout
   for large families (partners, consanguinity, flat bottom, fan for small
-  families). Plan in `claude/export_u_plan.md`.
+  families). Plan in `claude/export_u_plan.md`. Symbols, labels and slashes
+  rotate with the track (that is the design, labels included); only the
+  pregnancy "P" is counter-rotated to stay upright (#71), since a sideways P
+  reads as another letter.
 - `pngExporter.ts` — rasterises the SVG via canvas.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB and notes for de-identified export.

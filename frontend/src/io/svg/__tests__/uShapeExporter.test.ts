@@ -219,6 +219,20 @@ describe("U-shape SVG", () => {
     expect(svg).toMatch(/<path d="M [^"]* A /);
   });
 
+  it("keeps the pregnancy P upright on a rotated symbol (#71)", () => {
+    const p = wide();
+    const layout = layoutUShape(p)!;
+    const rotated = [...layout.nodes.values()].find(n => Math.abs(n.rotation) === 90)!;
+    expect(rotated).toBeDefined();
+    const ind = p.individuals.find(i => i.id === rotated.id)!;
+    ind.lifeStatus = "pregnancy";
+    const svg = exportUShapeSvg(p);
+    const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g>`))!;
+    expect(group).not.toBeNull();
+    expect(group[2]).toContain(`<g transform="rotate(${-Number(group[1])})"><text`);
+    expect(group[2]).toMatch(/>P<\/text>$/);
+  });
+
   it("draws one symbol group per drawn individual", () => {
     const p = wide();
     const svg = exportUShapeSvg(p);

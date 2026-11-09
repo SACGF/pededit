@@ -981,7 +981,13 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
   return out;
 }
 
-function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
+/**
+ * The symbol, rotated with its group. The "P" of a pregnancy is text and
+ * reads as a different letter once it lies on its side, so it is turned back
+ * upright; the slashes of a termination and stillbirth stay with the symbol
+ * like the deceased slash does.
+ */
+function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotation: number): string {
   const fill = ind.affected ? "black" : "white";
   const triangle = lossTriangleGeom(ind);
   let geom: string;
@@ -1006,7 +1012,11 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   }
   shape += renderCarrierDot(ind, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
-  return shape + renderLifeStatusMarks(ind, geom, clipId) + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
+  let marks = renderLifeStatusMarks(ind, geom, clipId);
+  if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
+    marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;
+  }
+  return shape + marks + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
 }
 
 function renderDeceasedSlash(): string {
@@ -1064,7 +1074,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
         renderLabel(ind, pedigree, solo && m.id === n.blood) +
-        renderShape(ind, pedigree, clipId) +
+        renderShape(ind, pedigree, clipId, pos.rotation) +
         (ind.deceased ? renderDeceasedSlash() : "") +
         (ind.proband ? renderProbandArrow() : "") +
         `</g>`,

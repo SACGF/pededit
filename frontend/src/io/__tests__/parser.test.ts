@@ -228,9 +228,34 @@ describe("parsePed: id fid mid sex dialect", () => {
     expect(err!.lineNumbers).toEqual([2]);
   });
 
-  it("reports a short line under a header as TOO_FEW_COLUMNS", () => {
-    const { rows, issues } = parsePed("id\tfid\tmid\tsex\taff\n1\t0\t0\t1\n");
-    expect(rows).toHaveLength(0);
+  it("pads a tab-separated row whose trailing aff cell was trimmed away (#71)", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\taff\n1\t0\t0\t1\n2\t0\t0\t2\t2\n");
+    expect(issues).toHaveLength(0);
+    expect(rows.map(r => r.affection)).toEqual(["0", "2"]);
+  });
+
+  it("reads an empty aff cell in a tab-separated file as missing, without a warning (#71)", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\taff\n1\t0\t0\t1\t\n");
+    expect(issues).toHaveLength(0);
+    expect(rows[0]!.affection).toBe("0");
+  });
+
+  it("pads trimmed trailing genotype cells after a PLINK header", () => {
+    const { rows, issues } = parsePed("FID\tIID\tPAT\tMAT\tSEX\tPHENO\n1\t1\t0\t0\t1\t1\tA\tB\n1\t2\t0\t0\t2\t1\n");
+    expect(issues.filter(i => i.severity === "error")).toHaveLength(0);
+    expect(rows).toHaveLength(2);
+    expect(rows[1]!.affection).toBe("1");
+  });
+
+  it("still reports a tab-separated row missing a required column as TOO_FEW_COLUMNS", () => {
+    const { rows, issues } = parsePed("id\tfid\tmid\tsex\taff\n1\t0\t0\n2\t0\t0\t2\t1\n");
+    expect(rows.map(r => r.individualId)).toEqual(["2"]);
+    expect(issues.find(i => i.code === ValidationIssueCode.TOO_FEW_COLUMNS)?.lineNumbers).toEqual([2]);
+  });
+
+  it("does not pad a short row in a space-separated file", () => {
+    const { rows, issues } = parsePed("id fid mid sex aff\n1 0 0 1\n2 0 0 2 1\n");
+    expect(rows.map(r => r.individualId)).toEqual(["2"]);
     expect(issues.some(i => i.code === ValidationIssueCode.TOO_FEW_COLUMNS)).toBe(true);
   });
 
