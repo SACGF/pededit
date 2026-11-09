@@ -77,9 +77,11 @@ function subPedigree(pedigree: Pedigree, ids: Set<string>): Pedigree {
  * last, as one group laid out together.
  *
  * A pedigree with at most one family is passed straight to `alignPedigree`,
- * so single-family layouts, and the R oracle comparisons, are unchanged.
+ * with `improve` on; the R oracle comparisons call `alignPedigree` directly.
  */
 export function alignPedigreeByFamily(pedigree: Pedigree, options: AlignOptions = {}): LayoutResult {
+  // The editor's path takes the improvements beyond kinship2 (#76) unless told not to.
+  options = { improve: true, ...options };
   const { families, isolated } = splitFamilies(pedigree);
   if (families.length <= 1) return alignPedigree(pedigree, options);
 

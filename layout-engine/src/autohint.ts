@@ -24,12 +24,22 @@ import { buildPartnerSet, isPartnerPair } from "./couples.js";
  * side by side, and `shift` moves a whole twin set when the duplicate fixup
  * moves one of its members.
  */
-export function autohint(input: LayoutInput, pedigree: Pedigree): Hints {
+export interface AutohintOptions {
+  /**
+   * After the duplicate fixup, when someone drawn once has two hinted
+   * partners both placed on the same side of them, flip the later hint to
+   * the other side (#76). Off by default so the default run stays faithful
+   * to R; `alignPedigreeByFamily` turns it on for the editor.
+   */
+  balancePartners?: boolean;
+}
+
+export function autohint(input: LayoutInput, pedigree: Pedigree, options: AutohintOptions = {}): Hints {
   const twins = twinSets(input, pedigree);
   const horder = initialOrder(input, pedigree, twins);
   try {
     // fixupDuplicates shifts sibling ranks in place, so give it a copy.
-    return fixupDuplicates(pedigree, input, horder.slice(), twins);
+    return fixupDuplicates(pedigree, input, horder.slice(), twins, options);
   } catch {
     // R wraps autohint in try() and, when it fails, lays out with a plain
     // ordering and no spouse hints. Discard any ranks the fixup had already
@@ -171,9 +181,9 @@ function toHintMatrix(rows: SpouseHint[]): Int32Array | null {
   return out;
 }
 
-function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64Array, twins: TwinInfo): Hints {
+function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64Array, twins: TwinInfo, options: AutohintOptions): Hints {
   const partners = buildPartnerSet(input);
-  const sptemp: SpouseHint[] = [];
+  let sptemp: SpouseHint[] = [];
 
   const run = (): LayoutResult =>
     alignPedigree(pedigree, { hints: { order: horder, spouse: toHintMatrix(sptemp) }, align: false });
@@ -233,7 +243,48 @@ function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64
     plist = run();
   }
 
+  if (options.balancePartners) sptemp = balanceSpouseHints(sptemp, plist);
+
   return { order: horder, spouse: toHintMatrix(sptemp) };
+}
+
+/**
+ * Spread a person's hinted partners to both sides (#76).
+ *
+ * Each duplicate fixup hint pulls one partner towards that partner's other
+ * copy, so someone married twice to people whose other copies both lie to
+ * one side gets both hints on that side, e.g. `[Daemon, Rhaenyra, 2]` and
+ * `[Laenor, Rhaenyra, 2]`, and alignped1 can only put one of them next to
+ * her: the other marriage becomes a pass-through line. A hint anchored to a
+ * person (anchor 1: they are the left member, partner on the right; anchor
+ * 2: they are the right member, partner on the left) whose side is already
+ * taken by an earlier hint is flipped to the free side, keeping its anchor
+ * on the same person. Only people drawn once are touched: a duplicate's own
+ * copies are what the hints are arranging.
+ */
+function balanceSpouseHints(sptemp: SpouseHint[], plist: LayoutResult): SpouseHint[] {
+  const copies = new Map<number, number>();
+  for (let lev = 0; lev < plist.n.length; lev++) {
+    for (let s = 0; s < plist.n[lev]!; s++) {
+      const id = Math.floor(plist.nid[lev]![s]!);
+      copies.set(id, (copies.get(id) ?? 0) + 1);
+    }
+  }
+  const sides = new Map<number, Set<"left" | "right">>(); // anchored person → sides of their partners
+  return sptemp.map((row): SpouseHint => {
+    const [left, right, anchor] = row;
+    if (anchor === 0) return row;
+    const person = anchor === 1 ? left : right;
+    if ((copies.get(person) ?? 0) !== 1) return row;
+    const side: "left" | "right" = anchor === 1 ? "right" : "left";
+    const used = sides.get(person) ?? new Set();
+    sides.set(person, used);
+    if (!used.has(side)) { used.add(side); return row; }
+    const other: "left" | "right" = side === "right" ? "left" : "right";
+    if (used.has(other)) return row;
+    used.add(other);
+    return anchor === 1 ? [right, left, 2] : [right, left, 1];
+  });
 }
 
 /**

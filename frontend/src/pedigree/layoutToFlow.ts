@@ -104,6 +104,8 @@ export interface LayoutToFlowOptions {
    * at normal spacing) are scaled by the same factors. Default: false.
    */
   compact?: boolean;
+  /** Layout improvements beyond kinship2 (#76). Default true; false gives the plain port, for comparisons. */
+  improveLayout?: boolean;
 }
 
 // ── Duplicate copies ──────────────────────────────────────────────────────────
@@ -161,7 +163,7 @@ export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = 
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] };
   }
-  const result: LayoutResult = alignPedigreeByFamily(pedigree);
+  const result: LayoutResult = alignPedigreeByFamily(pedigree, { improve: options.improveLayout ?? true });
   const spacing = layoutSpacing(options.compact);
 
   const hidden = findLinelessCopies(result);

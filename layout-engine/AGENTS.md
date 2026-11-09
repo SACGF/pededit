@@ -65,6 +65,18 @@ demonstrably worse, while keeping the port as the tested baseline:
   (crossings, duplicate copies, dashed arc length, pass-through hops) is the
   intended regression guard for passes beyond the core: no worse than kinship2
   on every fixture, better on the ones targeted.
+- How that is wired: `AlignOptions.improve` (default false) switches the
+  passes on; `alignPedigreeByFamily` sets it unless told otherwise, so the
+  canvas, exporters and lint get them while a plain `alignPedigree` call,
+  and `__pededit.align()`, stay R-faithful. The first pass is
+  `balanceSpouseHints` in `autohint.ts` (#76): when someone drawn once has
+  two hinted partners on the same side, the later hint flips to the other
+  side, keeping its anchor on that person. `frontend/src/pedigree/layoutCost.ts`
+  is the cost function so far (duplicates, hops, arc length, width) and
+  `frontend/src/pedigree/__tests__/balancePartners.test.ts` is the guard: no
+  worse on every example and oracle fixture, every other fixture's node
+  positions identical, Targaryen's hop gone. `layoutToFlow(p, { improveLayout:
+  false })` gives the plain port for such comparisons.
 
 ## Conventions
 

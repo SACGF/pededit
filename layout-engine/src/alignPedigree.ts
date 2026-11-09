@@ -10,6 +10,12 @@ export interface AlignOptions {
   width?: number;     // default 10
   align?: boolean;    // default true — use QP optimisation
   hints?: Hints;      // if omitted, autohint() is called
+  /**
+   * Layout improvements beyond kinship2 (see layout-engine/AGENTS.md):
+   * currently the spouse-hint balancing of #76. Default false, so a plain
+   * call matches R; `alignPedigreeByFamily` turns it on.
+   */
+  improve?: boolean;
 }
 
 /**
@@ -27,7 +33,7 @@ export function alignPedigree(
   pedigree: Pedigree,
   options: AlignOptions = {},
 ): LayoutResult {
-  const { packed = true, width = 10, align = true } = options;
+  const { packed = true, width = 10, align = true, improve = false } = options;
 
   // 1. Convert to LayoutInput (1-based)
   const input = pedigreeToLayoutInput(pedigree);
@@ -46,7 +52,7 @@ export function alignPedigree(
   for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
 
   // 3. Get ordering hints
-  const hints = options.hints ?? autohint(input, pedigree);
+  const hints = options.hints ?? autohint(input, pedigree, { balancePartners: improve });
 
   // 4. Build spouselist
   const { spouselist, spouselistRows } = buildSpouseList(input, hints, pedigree);

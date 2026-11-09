@@ -133,6 +133,11 @@ each offset these by hand, so change all three together.
 Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.
 
+- `layoutCost.ts` — duplicates, hops, arc length and width of a drawn
+  layout, the regression guard for layout passes beyond kinship2 (#76, see
+  `layout-engine/AGENTS.md`). `layoutToFlow`'s `improveLayout: false` gives
+  the plain port to compare against.
+
 ## Render lint
 
 `renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would
