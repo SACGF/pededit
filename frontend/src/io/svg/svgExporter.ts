@@ -4,6 +4,8 @@ import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
 import { sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
+import { wrapLabel, labelMaxWidth, LABEL_FONT_SIZE } from "../../pedigree/labels";
+import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
@@ -26,7 +28,6 @@ const STROKE = 2;
 const CONSANG_GAP = 4;       // px gap between consanguineous double lines
 const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
 const PROBAND_TAIL = 18;     // matches ProbandArrow in symbols.tsx
-const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
 // Baseline of the first line under the symbol, below its centre. Leaves a gap
 // between the symbol edge and the cap height of a 10px label.
@@ -94,7 +95,10 @@ function computeBounds(
   const hasDob = pedigree.individuals.some(i => i.dob);
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
   const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
-  const labelHeight = LABEL_OFFSET_Y + LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
+  // Names wrap to the slot width (#68), so allow for the most lines any name takes.
+  const labelMax = labelMaxWidth(layoutSpacing(options.compact).slotWidth);
+  const nameLines = Math.max(1, ...pedigree.individuals.map(i => wrapLabel(i.name, labelMax).length));
+  const labelHeight = LABEL_OFFSET_Y + nameLines * LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
   const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
@@ -410,7 +414,7 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos): string[] {
+function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, labelMax: number): string[] {
   const elems: string[] = [];
   const seen = new Set<number>();
 
@@ -429,11 +433,14 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
       const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
         + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
 
-      if (ind.name) {
-        elems.push(`<text x="${cx}" y="${labelBaseY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.name)}</text>`);
-      }
+      // The name wraps to the slot width (#68); the full name is kept as a <title>.
+      const lines = wrapLabel(ind.name, labelMax);
+      lines.forEach((line, k) => {
+        const title = k === 0 && line !== ind.name ? `<title>${escapeXml(ind.name!)}</title>` : "";
+        elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
+      });
       if (ind.dob) {
-        const dobY = labelBaseY + (ind.name ? LABEL_LINE_HEIGHT : 0);
+        const dobY = labelBaseY + lines.length * LABEL_LINE_HEIGHT;
         elems.push(`<text x="${cx}" y="${dobY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.dob)}</text>`);
       }
     }
@@ -477,7 +484,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(...renderSibshipLines(working, result, partners, slotPos));
   lines.push(...renderDuplicateArcs(flow, slotPos));
   lines.push(...renderSymbols(working, result, slotPos, flow));
-  lines.push(...renderLabels(working, result, slotPos));
+  lines.push(...renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;

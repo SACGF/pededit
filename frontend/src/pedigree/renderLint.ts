@@ -14,6 +14,7 @@
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
  *   symbols-overlap        two symbols sit on top of each other, or touch
+ *   labels-overlap         two name or date labels on one row run into each other
  *
  * Used by `__pededit.check()` (devHooks.ts), `scripts/browser/lint.mjs` and the
  * vitest over every example. Framework-free so all three share it.
@@ -22,6 +23,7 @@ import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
+import { linesWidth, textWidth } from "./labels";
 
 export type LintCode =
   | "missing-individual"
@@ -33,7 +35,8 @@ export type LintCode =
   | "couple-line-slanted"
   | "child-without-parents"
   | "child-wrong-parents"
-  | "symbols-overlap";
+  | "symbols-overlap"
+  | "labels-overlap";
 
 export interface LintFinding {
   code: LintCode;
@@ -223,6 +226,25 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
         const a = A.data.individual.id, b = B.data.individual.id;
         const how = dx < NODE_SIZE - EPS && dy < NODE_SIZE - EPS ? "overlap" : "touch";
         out.push({ code: "symbols-overlap", message: `${label(a)} and ${label(b)} ${how}`, individuals: [a, b] });
+      }
+    }
+  }
+
+  // 5. Labels on one row running into each other (#68). Names are wrapped to
+  // the slot width, so this catches dragged nodes and long dates.
+  const labelW = (n: FlowData["nodes"][0]) =>
+    Math.max(linesWidth(n.data.nameLines ?? []), n.data.individual.dob ? textWidth(n.data.individual.dob) : 0);
+  for (let i = 0; i < flow.nodes.length; i++) {
+    for (let j = i + 1; j < flow.nodes.length; j++) {
+      const A = flow.nodes[i]!, B = flow.nodes[j]!;
+      if (Math.abs(A.position.y - B.position.y) >= NODE_SIZE / 2) continue;
+      const wa = labelW(A), wb = labelW(B);
+      if (wa === 0 || wb === 0) continue;
+      const gap = Math.abs(A.position.x - B.position.x) - (wa + wb) / 2;
+      if (gap < 2) {
+        const a = A.data.individual.id, b = B.data.individual.id;
+        if (a === b) continue; // two copies of one person never share a row this closely unless pinned
+        out.push({ code: "labels-overlap", message: `the labels of ${label(a)} and ${label(b)} overlap`, individuals: [a, b] });
       }
     }
   }

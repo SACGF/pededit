@@ -6,20 +6,23 @@ import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Dev-only id under the symbol: UUIDs to 6 characters, long file ids cut to the slot width. */
 function shortDevId(id: string): string {
-  return UUID_RE.test(id) ? id.slice(0, 6) : id;
+  if (UUID_RE.test(id)) return id.slice(0, 6);
+  return id.length > 12 ? id.slice(0, 11) + "\u2026" : id;
 }
 
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
-  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned } = data;
+  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines } = data;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -88,22 +91,25 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
-      {/* Name label below symbol */}
-      {individual.name && (
+      {/* Name label below symbol: wrapped to the slot width, full name in the tooltip (#68) */}
+      {nameLines.length > 0 && (
         <div
+          data-name-label
+          title={individual.name}
           style={{
             position: "absolute",
             top: labelTop,
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",
-            fontSize: 10,
-            lineHeight: 1.2,
+            textAlign: "center",
+            fontSize: LABEL_FONT_SIZE,
+            lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: "none",
           }}
         >
-          {individual.name}
+          {nameLines.map((line, i) => <div key={i}>{line}</div>)}
         </div>
       )}
 
@@ -116,7 +122,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <div
           style={{
             position: "absolute",
-            top: labelTop + (individual.name ? 12 : 0),
+            top: labelTop + nameLines.length * LABEL_LINE_HEIGHT,
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",

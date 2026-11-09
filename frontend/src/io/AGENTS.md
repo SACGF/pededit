@@ -91,6 +91,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
   in track coordinates, since a straight chord between twins far apart along
   the U would cut across the tracks.
+- Names in both SVG exporters wrap like the canvas (`pedigree/labels.ts`,
+  #68); `computeBounds` allows for the most lines any name takes.
+- To look at an export without the dialog: bundle a scratch entry that
+  imports `exportSvg` / `exportUShapeSvg` with
+  `node_modules/.bin/esbuild entry.ts --bundle --platform=node --format=esm`,
+  run it to write the SVG, then `node frontend/scripts/browser/shot.mjs
+  FILE.svg` renders it to PNG to read back.
 - `pngExporter.ts` — rasterises the SVG via canvas.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB and notes for de-identified export.

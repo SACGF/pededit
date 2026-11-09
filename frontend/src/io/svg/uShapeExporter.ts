@@ -9,6 +9,7 @@ import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
 import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
+import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH } from "../../pedigree/labels";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -51,7 +52,6 @@ const DECEASED_OVERHANG = 4;
 const PROBAND_TAIL = 18;
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
-const LABEL_CHAR_WIDTH = 5.8;   // rough sans-serif advance at LABEL_FONT_SIZE
 const CONSANG_GAP = 4;
 
 const MIN_SLOT = 58;            // min centre-to-centre spacing between siblings
@@ -810,9 +810,11 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
     for (const { id } of n.members) {
       const ind = byId.get(id);
       if (!ind) continue;
-      labelLines = Math.max(labelLines, (ind.name ? 1 : 0) + (ind.dob ? 1 : 0)
+      // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
+      const nameLines = wrapLabel(ind.name, labelMaxWidth(MAX_SLOT));
+      labelLines = Math.max(labelLines, nameLines.length + (ind.dob ? 1 : 0)
         + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
-      labelChars = Math.max(labelChars, ind.name?.length ?? 0, ind.dob?.length ?? 0);
+      labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ind.dob?.length ?? 0);
     }
   });
 
@@ -1156,7 +1158,7 @@ function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): 
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
   // by renderShape, over the white backing), name, DOB.
   const caption = lifeStatusCaption(ind.lifeStatus);
-  const below = [ind.name, ind.dob].filter((s): s is string => !!s);
+  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ind.dob].filter((s): s is string => !!s);
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];

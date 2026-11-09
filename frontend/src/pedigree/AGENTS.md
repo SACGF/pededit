@@ -37,8 +37,16 @@ draws NSGC symbols.
   element under the cursor vanishes and the pill gets no mouseleave, so the
   menu calls `onClose` and the pill schedules its own hide.
 - The grey id under each symbol is dev-only; UUIDs are cut to 6 characters
-  there so a batch of new children does not overlap. Unnamed people have no
-  label in production.
+  there, and longer file ids to the slot width, so they do not overlap.
+  Unnamed people have no label in production.
+- `labels.ts` — name labels wrap to the slot width (#68): `wrapLabel` gives
+  at most two lines, cut with an ellipsis, from an estimated 5.8px per
+  character; `layoutToFlow` puts the lines on the node data (`nameLines`),
+  the canvas shows the full name as a tooltip, `svgExporter` writes one
+  text element per line with the full name in a `<title>`, and the U-shape
+  wraps at its widest slot. The `labels-overlap` lint code uses the same
+  estimate, so names fit by construction and it mainly catches dragged
+  nodes. Slots are never widened for labels: the layout is in slot units.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. The lines come from
   `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits
@@ -126,9 +134,9 @@ draws NSGC symbols.
   the canvas, `svgExporter` and `uShapeExporter` draw the same segments. The
   reason text shares the name-label row, so long reasons run into long names.
 
-Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name,
-DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter`
-each offset these by hand, so change all three together.
+Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
+(one or two lines), DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and
+`uShapeExporter` each offset these by hand, so change all three together.
 
 Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.
@@ -142,7 +150,8 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 
 `renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would
 misread (lines through symbols, lines to dropped nodes, children with no line
-from their parents, couple lines between non-partners, overlapping symbols).
+from their parents, couple lines between non-partners, overlapping symbols or
+labels).
 The kinship2 oracle tests compare slots with R, so a bug in the duplicate
 handling here passes them and is only caught by this lint. Its vitest keeps a
 `KNOWN_BROKEN` list of examples; remove an entry when a fix makes it draw

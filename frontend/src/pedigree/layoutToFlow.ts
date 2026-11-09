@@ -9,6 +9,7 @@ import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { twinMembership } from "./twins";
+import { wrapLabel, labelMaxWidth } from "./labels";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -35,6 +36,8 @@ export interface RFNodeData extends Record<string, unknown> {
   /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin (#11). */
   twinSet?: string;
   zygosity?: Zygosity;
+  /** The name wrapped to the slot width, at most two lines, cut with an ellipsis (#68). Empty when unnamed. */
+  nameLines: string[];
 }
 
 /**
@@ -287,6 +290,7 @@ function buildNodes(
           hasParents: childIds.has(individual.id),
           isPinned,
           ...(twins.get(individual.id) ?? {}),
+          nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth)),
         },
       });
     }
