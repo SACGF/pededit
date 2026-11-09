@@ -74,7 +74,12 @@
         "id": { "type": "string", "minLength": 1 },
         "individual1": { "type": "string" },
         "individual2": { "type": "string" },
-        "consanguineous": { "type": "boolean" }
+        "consanguineous": { "type": "boolean" },
+        "childless": {
+          "enum": ["infertility", "byChoice"],
+          "description": "Childless couple mark under the couple line (NSGC): two bars for infertility, one bar for no children by choice. Only on a partnership with no children."
+        },
+        "childlessReason": { "type": "string", "description": "Optional reason shown under the childless mark, e.g. vasectomy." }
       },
       "additionalProperties": true
     },

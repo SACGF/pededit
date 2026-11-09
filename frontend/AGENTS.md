@@ -38,7 +38,10 @@ stub so the app still builds without Google login.
 - Pedigree symbols encode biological sex, not gender (see root AGENTS.md).
 - Structures that competitors refuse but we handle: partnerships with no
   children (`addPartner`; the layout engine feeds them to kinship2 as
-  `childlessCouples`, which R has no way to express), a single known parent (`addParent` inserts an
+  `childlessCouples`, which R has no way to express; `Partnership.childless`
+  adds the NSGC infertility / no-children-by-choice mark under the couple
+  line, #15, set from the edit panel or more menu and cleared when a child is
+  added), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
   disconnected individuals, cross-generation and consanguineous matings.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`); PED cannot

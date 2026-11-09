@@ -111,3 +111,8 @@ export function exportIds(pedigree: Pedigree, rDialect = false): Map<string, str
 export function pedLostLifeStatus(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.lifeStatus);
 }
+
+/** Partnerships whose childless mark (#15) PED cannot carry. */
+export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
+  return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);
+}

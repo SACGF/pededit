@@ -1,6 +1,7 @@
 import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "./consanguinity";
 import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
+import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -477,6 +478,23 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
         const cy = sy + LEGEND_SWATCH / 2;
         const line = (y: number) => `<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(x + LEGEND_SWATCH)}" y2="${fmt(y)}" stroke="black" stroke-width="1.5"/>`;
         return line(cy - 2) + line(cy + 2);
+      },
+    });
+  }
+
+  // Childless couple marks (#15): a short couple line with the mark under it.
+  const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
+  for (const o of CHILDLESS_OPTIONS) {
+    if (!childless.has(o.value)) continue;
+    rows.push({
+      label: o.label,
+      swatch: sy => {
+        const s = LEGEND_SWATCH, cx = x + s / 2, top = sy + 2, bar = sy + s - 2;
+        const line = (x1: number, y1: number, x2: number, y2: number) =>
+          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
+        let out = line(x, top, x + s, top) + line(cx, top, cx, bar) + line(cx - 4, bar, cx + 4, bar);
+        if (o.value === "infertility") out += line(cx - 4, bar - 3, cx + 4, bar - 3);
+        return out;
       },
     });
   }

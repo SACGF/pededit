@@ -7,6 +7,7 @@ import {
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset } from "./svgExporter";
+import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -925,6 +926,16 @@ function trackPath(u1: number, u2: number, offset: number, g: Geom, attrs = LINE
   return `<path d="${d}" ${attrs}/>`;
 }
 
+/** A short segment along the track direction at (u, offset), centred there, 2 * halfLen long. */
+function tangentSeg(u: number, offset: number, halfLen: number, g: Geom): string {
+  const eps = 0.01;
+  const a = trackPoint(u - eps, offset, g), b = trackPoint(u + eps, offset, g);
+  const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const dx = (b.x - a.x) / len * halfLen, dy = (b.y - a.y) / len * halfLen;
+  const c = trackPoint(u, offset, g);
+  return `<line x1="${r(c.x - dx)}" y1="${r(c.y - dy)}" x2="${r(c.x + dx)}" y2="${r(c.y + dy)}" ${LINE_ATTRS}/>`;
+}
+
 /** A straight segment across the tracks at position u, from offset o1 to o2. */
 function normalSeg(u: number, o1: number, o2: number, g: Geom): string {
   const p1 = trackPoint(u, o1, g), p2 = trackPoint(u, o2, g);
@@ -936,6 +947,7 @@ const DUP_ATTRS = `fill="none" stroke="black" stroke-width="1" stroke-dasharray=
 function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): string[] {
   const g = b.geom;
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
+  const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const out: string[] = [];
 
   walk(b.root, n => {
@@ -950,7 +962,23 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
         if (w.consang) out.push(trackPath(uA, uB, track - CONSANG_GAP / 2, g), trackPath(uA, uB, track + CONSANG_GAP / 2, g));
         else out.push(trackPath(uA, uB, track, g));
       }
-      if (!w.kids.length) continue;
+      if (!w.kids.length) {
+        // Childless couple mark (#15): outward from the middle of the couple
+        // line, one bar (by choice) or two (infertility), reason text beyond.
+        const partnership = w.kind !== "solo" && w.pids.length === 1 ? partnershipById.get(w.pids[0]!) : undefined;
+        const childless = partnership && activeChildless(partnership, pedigree);
+        if (partnership && childless) {
+          const uP = descentU(n, w, g);
+          const barOff = track + CHILDLESS_DROP;
+          out.push(normalSeg(uP, track, barOff, g), tangentSeg(uP, barOff, CHILDLESS_BAR / 2, g));
+          if (childless === "infertility") out.push(tangentSeg(uP, barOff - CHILDLESS_BAR_GAP, CHILDLESS_BAR / 2, g));
+          if (partnership.childlessReason) {
+            const t = trackPoint(uP, barOff + CHILDLESS_REASON_FONT_SIZE + 2, g);
+            out.push(`<text x="${r(t.x)}" y="${r(t.y)}" text-anchor="middle" font-family="sans-serif" font-size="${CHILDLESS_REASON_FONT_SIZE}" fill="black">${escapeXml(partnership.childlessReason)}</text>`);
+          }
+        }
+        continue;
+      }
       // Each sibship descends from the middle of its couple line, or from the
       // parent's symbol when the partner is not drawn.
       const uP = descentU(n, w, g);

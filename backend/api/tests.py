@@ -23,9 +23,12 @@ FULL_PEDIGREE = {
             "id": "c1", "sex": "unknown", "affected": True, "deceased": False,
             "carrier": False, "proband": True, "sibOrder": 1, "name": "",
         },
+        {"id": "w2", "sex": "female", "affected": False, "sibOrder": 0},
     ],
     "partnerships": [
         {"id": "p1", "individual1": "f", "individual2": "m", "consanguineous": True},
+        {"id": "p2", "individual1": "f", "individual2": "w2", "childless": "infertility",
+         "childlessReason": "azoospermia"},
     ],
     "parentOf": {"p1": ["c1"]},
     "siblingOrder": {"mode": "manual", "affectedFirst": True},

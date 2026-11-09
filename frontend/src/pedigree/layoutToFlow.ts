@@ -1,12 +1,13 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { hopGeometry } from "./couplePath";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
+import { activeChildless } from "./childless";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -42,6 +43,9 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   hopHeight: number;
   /** Distance (px) from each symbol edge at which a hopping line turns up. */
   hopInset: number;
+  /** Childless couple mark under the line (#15), when the partnership has one and no children. */
+  childless?: ChildlessStatus;
+  childlessReason?: string;
 }
 
 /**
@@ -316,6 +320,8 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
   const edges: Edge<CoupleEdgeData>[] = [];
   const related = consanguinityTest(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
+  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -337,12 +343,19 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
         // between (see consanguinityTest).
         type:         related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))
           ? "consanguineousEdge" : "coupleEdge",
-        data:         hopAt(result, partners, level, slot),
+        data:         { ...hopAt(result, partners, level, slot), ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)) },
       });
     }
   }
 
   return edges;
+
+  function childlessData(a: string, b: string): Pick<CoupleEdgeData, "childless" | "childlessReason"> {
+    const partnership = partnershipOf.get(pairKey(a, b));
+    const childless = partnership && activeChildless(partnership, pedigree);
+    if (!childless) return {};
+    return { childless, childlessReason: partnership!.childlessReason || undefined };
+  }
 }
 
 // ── Sibship edges ─────────────────────────────────────────────────────────────

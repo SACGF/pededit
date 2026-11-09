@@ -3,6 +3,7 @@ import type { Sex } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
+import { CHILDLESS_OPTIONS } from "../childless";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -38,12 +39,17 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     setSelectedId,
     unpinIndividual,
     setIndividualTag,
+    setPartnershipChildless,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
+  // Partnerships of this person with no children: the childless mark applies to these (#15).
+  const childlessCouples = partnerChoices(pedigree, individualId)
+    .filter(c => (pedigree.parentOf[c.partnershipId] ?? []).length === 0)
+    .map(c => ({ ...c, status: pedigree.partnerships.find(p => p.id === c.partnershipId)?.childless }));
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
 
@@ -199,6 +205,30 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
             </MenuItem>
           ))}
         </MenuSection>
+
+        {childlessCouples.length > 0 && (
+          <MenuSection label="Couple without children">
+            {childlessCouples.map(c => (
+              <div key={c.partnershipId}>
+                {childlessCouples.length > 1 && (
+                  <div className="px-2 text-[10px] text-gray-500 truncate">With {c.label}</div>
+                )}
+                <MenuItem onClick={() => action(() => setPartnershipChildless(c.partnershipId, undefined))} active={!c.status}>
+                  No mark
+                </MenuItem>
+                {CHILDLESS_OPTIONS.map(o => (
+                  <MenuItem
+                    key={o.value}
+                    onClick={() => action(() => setPartnershipChildless(c.partnershipId, o.value))}
+                    active={c.status === o.value}
+                  >
+                    {o.label}
+                  </MenuItem>
+                ))}
+              </div>
+            ))}
+          </MenuSection>
+        )}
 
         <div className="border-t mt-1 pt-1">
           <MenuItem

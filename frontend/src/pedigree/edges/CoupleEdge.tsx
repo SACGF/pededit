@@ -3,6 +3,7 @@ import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { couplePathD } from "../couplePath";
+import { ChildlessMark } from "./ChildlessMark";
 
 export type CoupleEdgeType = Edge<CoupleEdgeData, "coupleEdge">;
 
@@ -18,14 +19,18 @@ export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) 
   const tx = targetNode.position.x - half;
   const ty = targetNode.position.y;
 
+  const hop = data?.hopHeight ?? 0;
   return (
     <g>
       <path
-        d={couplePathD(sx, sy, tx, ty, data?.hopHeight ?? 0, data?.hopInset)}
+        d={couplePathD(sx, sy, tx, ty, hop, data?.hopInset)}
         stroke="black"
         strokeWidth={2}
         fill="none"
       />
+      {data?.childless && (
+        <ChildlessMark cx={(sx + tx) / 2} topY={(sy + ty) / 2 - hop} status={data.childless} reason={data.childlessReason} />
+      )}
     </g>
   );
 }

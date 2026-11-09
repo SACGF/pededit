@@ -3,6 +3,7 @@ import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { consanguineousPathsD } from "../couplePath";
+import { ChildlessMark } from "./ChildlessMark";
 
 export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
 
@@ -20,12 +21,16 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
   const tx = targetNode.position.x - half;
   const ty = targetNode.position.y;
 
-  const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, data?.hopHeight ?? 0, GAP, data?.hopInset);
+  const hop = data?.hopHeight ?? 0;
+  const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, hop, GAP, data?.hopInset);
 
   return (
     <g>
       <path d={outer} stroke="black" strokeWidth={2} fill="none" />
       <path d={inner} stroke="black" strokeWidth={2} fill="none" />
+      {data?.childless && (
+        <ChildlessMark cx={(sx + tx) / 2} topY={(sy + ty) / 2 - hop + GAP / 2} status={data.childless} reason={data.childlessReason} />
+      )}
     </g>
   );
 }

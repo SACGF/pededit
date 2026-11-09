@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
@@ -125,6 +125,14 @@ function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferr
   return partnership.id;
 }
 
+/** A child contradicts a childless mark, so adding one removes the mark (#15). */
+function clearChildless(draft: Pedigree, partnershipId: string): void {
+  const p = draft.partnerships.find(x => x.id === partnershipId);
+  if (!p) return;
+  delete p.childless;
+  delete p.childlessReason;
+}
+
 /** Clamp the batch size accepted by addChildren. */
 export const MAX_ADD_CHILDREN = 10;
 
@@ -176,6 +184,15 @@ interface PedigreeState {
   setSex: (id: string, sex: Sex) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
+
+  // Partnership property mutations
+  /**
+   * Childless couple mark (#15). Refused (no-op) when the partnership has
+   * children. Clearing with undefined also drops the reason.
+   */
+  setPartnershipChildless: (partnershipId: string, status: ChildlessStatus | undefined) => void;
+  /** Reason under the mark; empty clears it. */
+  setPartnershipChildlessReason: (partnershipId: string, reason: string) => void;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -370,6 +387,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const child = makeIndividual(sex, nextSibOrderInFamily(draft, partnershipId));
         draft.individuals.push(child);
         draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
+        clearChildless(draft, partnershipId);
       });
     },
 
@@ -399,6 +417,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           draft.individuals.push(child);
           draft.parentOf[pid] = [...(draft.parentOf[pid] ?? []), child.id];
         }
+        clearChildless(draft, pid);
       });
     },
 
@@ -608,6 +627,30 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!ind) return;
         if (status === undefined) delete ind.lifeStatus;
         else ind.lifeStatus = status;
+      });
+    },
+
+    // ── Partnership property mutations ───────────────────────────────────────
+
+    setPartnershipChildless: (partnershipId, status) => {
+      if (status !== undefined && (get().pedigree.parentOf[partnershipId] ?? []).length > 0) {
+        console.warn("Cannot mark a couple with children as childless");
+        return;
+      }
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId);
+        if (!p) return;
+        if (status === undefined) { delete p.childless; delete p.childlessReason; }
+        else p.childless = status;
+      });
+    },
+
+    setPartnershipChildlessReason: (partnershipId, reason) => {
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId);
+        if (!p) return;
+        if (reason === "") delete p.childlessReason;
+        else p.childlessReason = reason;
       });
     },
 

@@ -3,6 +3,7 @@ import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-e
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
 import { sibshipSegments } from "../../pedigree/sibshipPath";
+import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import type { FlowData } from "../../pedigree/layoutToFlow";
@@ -144,6 +145,8 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
   const related = consanguinityTest(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const path = (d: string) => `<path d="${d}" stroke="black" stroke-width="${STROKE}" fill="none"/>`;
+  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
       const sp = result.spouse[level][slot];
@@ -156,10 +159,23 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
       const right = slotPos.get(`${level}-${rc.rightSlot}`)!;
       const { hopHeight: hop, hopInset } = hopAt(result, partners, level, slot);
 
-      if (!related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))) {
+      const a = idAt(level, rc.leftSlot), b = idAt(level, rc.rightSlot);
+      const consang = related(a, b);
+      if (!consang) {
         lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop, hopInset)));
       } else {
         for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP, hopInset)) lines.push(path(d));
+      }
+      // Childless couple mark (#15), hung from the middle of the line.
+      const partnership = partnershipOf.get(pairKey(a, b));
+      const childless = partnership && activeChildless(partnership, pedigree);
+      if (partnership && childless) {
+        const cx = (left.x + right.x) / 2;
+        const topY = (left.y + right.y) / 2 - hop + (consang ? CONSANG_GAP / 2 : 0);
+        for (const [x1, y1, x2, y2] of childlessMarkSegments(cx, topY, childless)) lines.push(seg(x1, y1, x2, y2));
+        if (partnership.childlessReason) {
+          lines.push(`<text x="${cx}" y="${childlessReasonBaselineY(topY)}" text-anchor="middle" font-family="sans-serif" font-size="${CHILDLESS_REASON_FONT_SIZE}" fill="black">${escapeXml(partnership.childlessReason)}</text>`);
+        }
       }
     }
   }

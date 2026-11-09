@@ -5,6 +5,7 @@ import type { JsonImportResult, JsonValidationIssue } from "./types.js";
 const SEX_VALUES = ["male", "female", "unknown"];
 const TAG_STYLES = ["quadrant", "dot", "text"];
 const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"];
+const CHILDLESS_VALUES = ["infertility", "byChoice"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
 
 type Obj = Record<string, unknown>;
@@ -210,6 +211,9 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     const ok1 = c.required(raw, "individual1", pp, "a string", v => typeof v === "string");
     const ok2 = c.required(raw, "individual2", pp, "a string", v => typeof v === "string");
     c.optional(raw, "consanguineous", pp, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "childless", pp, CHILDLESS_VALUES.map(s => `"${s}"`).join(" | "),
+      v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
+    c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
     if (ok1 && ok2) {
       const a = raw.individual1 as string;
       const b = raw.individual2 as string;

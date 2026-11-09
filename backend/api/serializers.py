@@ -65,11 +65,16 @@ class TagSerializer(serializers.Serializer):
     abbrev = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
 
 
+CHILDLESS_CHOICES = ["infertility", "byChoice"]
+
+
 class PartnershipSerializer(serializers.Serializer):
     id = serializers.CharField()
     individual1 = serializers.CharField()
     individual2 = serializers.CharField()
     consanguineous = _opt(serializers.BooleanField)
+    childless = _opt(serializers.ChoiceField, choices=CHILDLESS_CHOICES)
+    childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):

@@ -88,6 +88,8 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `individual1` | string | yes | Id of one partner. Must exist in `individuals`. |
 | `individual2` | string | yes | Id of the other partner. Must exist and differ from `individual1`. |
 | `consanguineous` | boolean | no | Draw a double line between the partners. |
+| `childless` | `"infertility"` or `"byChoice"` | no | Childless couple mark under the couple line (NSGC): a short vertical ending in two bars for infertility, one bar for no children by choice. Only meaningful when the partnership has no children in `parentOf`; the editor clears it when a child is added. |
+| `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
 
 Any other property on a partnership is preserved as-is.
 

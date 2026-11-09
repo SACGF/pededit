@@ -5,6 +5,8 @@ import {
 } from "../pedigree/tags";
 import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
+import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
+import type { ChildlessStatus } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 import { Button } from "@/components/ui/button";
 import { Tags } from "lucide-react";
@@ -165,6 +167,18 @@ function CoupleSvg() {
   );
 }
 
+/** Couple line with the childless mark under it (#15). */
+function ChildlessSvg({ status }: { status: ChildlessStatus }) {
+  return (
+    <svg width="48" height="28" viewBox="0 0 48 28">
+      <line x1={0} y1={4} x2={48} y2={4} stroke="black" strokeWidth={2} />
+      <line x1={24} y1={4} x2={24} y2={22} stroke="black" strokeWidth={2} />
+      <line x1={17} y1={22} x2={31} y2={22} stroke="black" strokeWidth={2} />
+      {status === "infertility" && <line x1={17} y1={18} x2={31} y2={18} stroke="black" strokeWidth={2} />}
+    </svg>
+  );
+}
+
 function ConsanguineousSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -241,6 +255,10 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
   const relRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });
   if (hasConsanguineous) relRows.push({ icon: <ConsanguineousSvg />, label: "Consanguineous couple" });
+  const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
+  for (const o of CHILDLESS_OPTIONS) {
+    if (childless.has(o.value)) relRows.push({ icon: <ChildlessSvg status={o.value} />, label: o.label });
+  }
 
   // Every defined tag is listed so an unused one can still be ticked; the
   // exported key lists only tags someone carries.

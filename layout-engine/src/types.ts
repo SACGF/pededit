@@ -50,12 +50,23 @@ export interface Tag {
   abbrev?: string;
 }
 
+/**
+ * Why a couple has no children (NSGC 2008): drawn under the couple line as a
+ * short vertical with one bar (no children by choice) or two bars
+ * (infertility). Only meaningful on a partnership with no children.
+ */
+export type ChildlessStatus = "infertility" | "byChoice";
+
 /** A partnership (union) between two individuals. Children attach here, not to parents. */
 export interface Partnership {
   id: string;
   individual1: string;
   individual2: string;
   consanguineous?: boolean;
+  /** Childless couple mark. Cleared when a child is added. */
+  childless?: ChildlessStatus;
+  /** Optional reason shown under the mark, e.g. "vasectomy". */
+  childlessReason?: string;
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

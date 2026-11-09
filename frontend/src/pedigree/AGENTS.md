@@ -84,6 +84,15 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `childless.ts` — childless couple marks (#15): segments hung from the
+  middle of the couple line (raised by the hop when the line hops; on a
+  consanguineous double line, from the lower line). `layoutToFlow` puts
+  `childless` / `childlessReason` on the couple edge data only when the
+  partnership has no children (`activeChildless`), so a stale flag on a
+  couple with children is never drawn; `edges/ChildlessMark.tsx` draws it on
+  the canvas, `svgExporter` and `uShapeExporter` draw the same segments. The
+  reason text shares the name-label row, so long reasons run into long names.
+
 Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name,
 DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter`
 each offset these by hand, so change all three together.

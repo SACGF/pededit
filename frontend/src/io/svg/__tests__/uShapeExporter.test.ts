@@ -233,6 +233,19 @@ describe("U-shape SVG", () => {
     expect(group[2]).toMatch(/>P<\/text>$/);
   });
 
+  it("draws the childless mark for a couple with no children (#15)", () => {
+    const p: Pedigree = structuredClone(largerFamily);
+    // A childless second partnership for someone in the second generation (a
+    // founder's extra childless partnership is not drawn in the U-shape).
+    const childIds = new Set(Object.values(p.parentOf).flat());
+    const person = p.individuals.find(i => childIds.has(i.id) && p.partnerships.some(q => q.individual1 === i.id || q.individual2 === i.id))!;
+    p.individuals.push({ id: "spouse2", sex: person.sex === "male" ? "female" : "male", affected: false, sibOrder: 9 });
+    p.partnerships.push({ id: "cl", individual1: person.id, individual2: "spouse2", childless: "infertility", childlessReason: "vasectomy" });
+    p.parentOf.cl = [];
+    const svg = exportUShapeSvg(p);
+    expect(svg).toContain(">vasectomy</text>");
+  });
+
   it("draws one symbol group per drawn individual", () => {
     const p = wide();
     const svg = exportUShapeSvg(p);

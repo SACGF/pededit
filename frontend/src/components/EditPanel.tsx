@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Legend } from "./Legend";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
-import type { Individual, LifeStatus } from "@pedigree-editor/layout-engine";
+import { CHILDLESS_OPTIONS } from "../pedigree/childless";
+import type { Individual, LifeStatus, ChildlessStatus, Pedigree } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -116,6 +117,67 @@ function IndividualForm({ individual }: { individual: Individual }) {
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
         </div>
       </div>
+
+      <CouplesForm individual={individual} />
+    </div>
+  );
+}
+
+/** Label for the other member of a partnership, as the more menu names them. */
+export function partnerLabel(pedigree: Pedigree, individualId: string, partnershipId: string): string {
+  const own = pedigree.partnerships.filter(p => p.individual1 === individualId || p.individual2 === individualId);
+  const i = own.findIndex(p => p.id === partnershipId);
+  const p = own[i];
+  if (!p) return "partner";
+  const otherId = p.individual1 === individualId ? p.individual2 : p.individual1;
+  const other = pedigree.individuals.find(ind => ind.id === otherId);
+  const name = other?.name?.trim();
+  const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
+  return name || `partner ${i + 1} (${sexLabel})`;
+}
+
+/**
+ * Childless couple marks (#15), one block per partnership of this person that
+ * has no children. A couple with children has nothing to set here.
+ */
+function CouplesForm({ individual }: { individual: Individual }) {
+  const { pedigree, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeStore();
+  const childlessEligible = pedigree.partnerships.filter(p =>
+    (p.individual1 === individual.id || p.individual2 === individual.id)
+    && (pedigree.parentOf[p.id] ?? []).length === 0);
+  if (childlessEligible.length === 0) return null;
+
+  return (
+    <div className="border-t pt-3 space-y-3" data-testid="couples-form">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+        Couple without children
+      </div>
+      {childlessEligible.map(p => (
+        <div key={p.id} className="space-y-1">
+          <Field label={`With ${partnerLabel(pedigree, individual.id, p.id)}`}>
+            <select
+              value={p.childless ?? ""}
+              aria-label={`Childless mark with ${partnerLabel(pedigree, individual.id, p.id)}`}
+              onChange={e => setPartnershipChildless(p.id, (e.target.value || undefined) as ChildlessStatus | undefined)}
+              className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+            >
+              <option value="">No mark</option>
+              {CHILDLESS_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </Field>
+          {p.childless && (
+            <Input
+              value={p.childlessReason ?? ""}
+              aria-label="Reason shown under the mark"
+              onChange={e => setPartnershipChildlessReason(p.id, e.target.value)}
+              className="h-7 text-sm"
+              placeholder="Reason (optional), e.g. vasectomy"
+            />
+          )}
+        </div>
+      ))}
     </div>
   );
 }
