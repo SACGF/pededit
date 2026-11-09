@@ -83,7 +83,21 @@
           "enum": ["infertility", "byChoice"],
           "description": "Childless couple mark under the couple line (NSGC): two bars for infertility, one bar for no children by choice. Only on a partnership with no children."
         },
-        "childlessReason": { "type": "string", "description": "Optional reason shown under the childless mark, e.g. vasectomy." }
+        "childlessReason": { "type": "string", "description": "Optional reason shown under the childless mark, e.g. vasectomy." },
+        "twins": {
+          "type": "array",
+          "description": "Twin sets among this partnership's children. Each member is in at most one set.",
+          "items": { "$ref": "#/$defs/TwinSet" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "TwinSet": {
+      "type": "object",
+      "required": ["members", "zygosity"],
+      "properties": {
+        "members": { "type": "array", "minItems": 2, "items": { "type": "string" }, "description": "Ids of children of the partnership, in drawing order." },
+        "zygosity": { "enum": ["monozygotic", "dizygotic", "unknown"], "description": "Monozygotic members must have the same sex." }
       },
       "additionalProperties": true
     },

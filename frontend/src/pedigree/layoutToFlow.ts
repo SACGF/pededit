@@ -1,6 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { hopGeometry } from "./couplePath";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
@@ -8,6 +8,7 @@ import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
+import { twinMembership } from "./twins";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -31,6 +32,9 @@ export interface RFNodeData extends Record<string, unknown> {
    * someone drawn more than once only the copy nearest the pin is moved.
    */
   isPinned: boolean;
+  /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin (#11). */
+  twinSet?: string;
+  zygosity?: Zygosity;
 }
 
 /**
@@ -252,6 +256,7 @@ function buildNodes(
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
   const childIds = new Set(Object.values(pedigree.parentOf).flat());
+  const twins = twinMembership(pedigree);
 
   const nodes: Node<RFNodeData>[] = [];
   for (let level = 0; level < result.n.length; level++) {
@@ -279,6 +284,7 @@ function buildNodes(
           duplicateIndex: isDuplicate ? copies.indexOf(id) + 1 : undefined,
           hasParents: childIds.has(individual.id),
           isPinned,
+          ...(twins.get(individual.id) ?? {}),
         },
       });
     }

@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity
 } from "@pedigree-editor/layout-engine";
 import { shareAncestor } from "../utils/pedigreeRelationship";
+import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -125,6 +126,17 @@ function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferr
   return partnership.id;
 }
 
+/** Take an individual out of any twin set; a set left with one member is dropped (#11). */
+function removeFromTwinSets(draft: Pedigree, individualId: string): void {
+  for (const p of draft.partnerships) {
+    if (!p.twins) continue;
+    p.twins = p.twins
+      .map(t => ({ ...t, members: t.members.filter(m => m !== individualId) }))
+      .filter(t => t.members.length >= 2);
+    if (p.twins.length === 0) delete p.twins;
+  }
+}
+
 /** A child contradicts a childless mark, so adding one removes the mark (#15). */
 function clearChildless(draft: Pedigree, partnershipId: string): void {
   const p = draft.partnerships.find(x => x.id === partnershipId);
@@ -186,6 +198,15 @@ interface PedigreeState {
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
   /** Adoption brackets (#12): "in", "out" or none. */
   setAdopted: (id: string, status: Adoption | undefined) => void;
+  /**
+   * Make (or replace) a twin set (#11) among the children of partnershipId.
+   * Members already in another set of that partnership are moved into this
+   * one. Returns the reason when refused (fewer than two members, not all
+   * children of the couple, different sexes for monozygotic), else null.
+   */
+  setTwins: (partnershipId: string, members: string[], zygosity: Zygosity) => string | null;
+  /** Take an individual out of their twin set; a set left with one member is dropped. */
+  removeTwin: (id: string) => void;
 
   // Partnership property mutations
   /**
@@ -499,6 +520,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         // Remove the individual
         draft.individuals = draft.individuals.filter(i => i.id !== individualId);
+        removeFromTwinSets(draft, individualId);
 
         // Drop their pin and unlock entries, which would otherwise dangle
         // (the JSON importer warns about them on every later load).
@@ -607,11 +629,45 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       });
     },
 
+    /** Monozygotic twins share a sex, so changing one changes the whole set (#11). */
     setSex: (id, sex) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (ind) ind.sex = sex;
+        if (!ind) return;
+        ind.sex = sex;
+        const twin = twinSetOf(draft as Pedigree, id);
+        if (twin?.set.zygosity === "monozygotic") {
+          for (const m of twin.set.members) {
+            const mate = draft.individuals.find(i => i.id === m);
+            if (mate) mate.sex = sex;
+          }
+        }
       });
+    },
+
+    setTwins: (partnershipId, members, zygosity) => {
+      const unique = [...new Set(members)];
+      const problem = twinSetProblem(get().pedigree, partnershipId, unique, zygosity);
+      if (problem) {
+        console.warn(`Cannot make twin set: ${problem}`);
+        return problem;
+      }
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId);
+        if (!p) return;
+        const order = draft.parentOf[partnershipId] ?? [];
+        const sorted = [...unique].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+        const rest = (p.twins ?? [])
+          .map(t => ({ ...t, members: t.members.filter(m => !unique.includes(m)) }))
+          .filter(t => t.members.length >= 2);
+        p.twins = [...rest, { members: sorted, zygosity }];
+      });
+      return null;
+    },
+
+    removeTwin: (id) => {
+      if (!twinSetOf(get().pedigree, id)) return;
+      mutate(draft => removeFromTwinSets(draft, id));
     },
 
     /**

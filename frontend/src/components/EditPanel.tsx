@@ -5,7 +5,9 @@ import { Legend } from "./Legend";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
-import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption } from "@pedigree-editor/layout-engine";
+import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
+import { useState } from "react";
+import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -139,7 +141,97 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </div>
 
+      <TwinsForm individual={individual} />
       <CouplesForm individual={individual} />
+    </div>
+  );
+}
+
+/** Name or a short description of a sibling, for the twins checkboxes. */
+function siblingLabel(pedigree: Pedigree, id: string): string {
+  const ind = pedigree.individuals.find(i => i.id === id);
+  const name = ind?.name?.trim();
+  if (name) return name;
+  const sex = ind?.sex === "male" ? "Brother" : ind?.sex === "female" ? "Sister" : "Sibling";
+  const sibs = pedigree.parentOf[parentPartnershipOf(pedigree, id)?.id ?? ""] ?? [];
+  return `${sex} ${sibs.indexOf(id) + 1}`;
+}
+
+/** The sibling drawn next to this person: the next one in the sibship, or the previous one for the last. */
+export function adjacentSibling(pedigree: Pedigree, individualId: string): string | undefined {
+  const sibs = pedigree.parentOf[parentPartnershipOf(pedigree, individualId)?.id ?? ""] ?? [];
+  const i = sibs.indexOf(individualId);
+  if (i < 0 || sibs.length < 2) return undefined;
+  return sibs[i + 1] ?? sibs[i - 1];
+}
+
+/**
+ * Twins (#11): zygosity for the selected person's twin set and which
+ * siblings are in it. Choosing a zygosity when the person is not a twin yet
+ * pairs them with the sibling drawn next to them.
+ */
+function TwinsForm({ individual }: { individual: Individual }) {
+  const { pedigree, setTwins, removeTwin } = usePedigreeStore();
+  const [problem, setProblem] = useState<string | null>(null);
+  const partnership = parentPartnershipOf(pedigree, individual.id);
+  const siblings = partnership ? (pedigree.parentOf[partnership.id] ?? []).filter(id => id !== individual.id) : [];
+  if (!partnership || siblings.length === 0) return null;
+
+  const twin = twinSetOf(pedigree, individual.id);
+  const members = twin?.set.members ?? [];
+
+  const apply = (zygosity: Zygosity | "", nextMembers: string[]) => {
+    if (zygosity === "") { removeTwin(individual.id); setProblem(null); return; }
+    const chosen = [individual.id, ...nextMembers.filter(m => m !== individual.id)];
+    setProblem(setTwins(partnership.id, chosen, zygosity));
+  };
+
+  return (
+    <div className="border-t pt-3 space-y-2" data-testid="twins-form">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Twins</div>
+      <Field label="Zygosity">
+        <select
+          value={twin?.set.zygosity ?? ""}
+          aria-label="Zygosity"
+          onChange={e => {
+            const z = e.target.value as Zygosity | "";
+            const next = members.length >= 2 ? members : [adjacentSibling(pedigree, individual.id)!];
+            apply(z, next);
+          }}
+          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+        >
+          <option value="">Not a twin</option>
+          {ZYGOSITY_OPTIONS.map(o => {
+            const next = members.length >= 2 ? members : [individual.id, adjacentSibling(pedigree, individual.id)!];
+            const why = twinSetProblem(pedigree, partnership.id, next, o.value);
+            return <option key={o.value} value={o.value} disabled={!!why} title={why ?? undefined}>{o.label}</option>;
+          })}
+        </select>
+      </Field>
+      {twin && (
+        <div className="space-y-1">
+          <Label className="text-xs text-gray-600">Twin of</Label>
+          {siblings.map(id => {
+            const on = members.includes(id);
+            return (
+              <label key={id} className="flex items-center gap-2 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={on}
+                  aria-label={`Twin of ${siblingLabel(pedigree, id)}`}
+                  onChange={e => apply(twin.set.zygosity, e.target.checked ? [...members, id] : members.filter(m => m !== id))}
+                  className="accent-black"
+                />
+                <span>{siblingLabel(pedigree, id)}</span>
+              </label>
+            );
+          })}
+          {twin.set.zygosity === "monozygotic" && (
+            <p className="text-[10px] text-gray-500">Changing the sex of one monozygotic twin changes all of them.</p>
+          )}
+        </div>
+      )}
+      {problem && <p className="text-[10px] text-red-600" role="alert">{problem}</p>}
     </div>
   );
 }

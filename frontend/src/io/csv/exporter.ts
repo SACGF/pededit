@@ -1,7 +1,9 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { twinMembership, twinSetOf } from "../../pedigree/twins";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted";
+  const header = "family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids";
+  const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
   const parents = new Map<string, { f: string; m: string }>();
@@ -36,6 +38,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       (ind.tags ?? []).map(id => tagLabels.get(id) ?? id).join(";"),
       ind.lifeStatus ?? "",
       ind.adopted ?? "",
+      twins.get(ind.id)?.zygosity ?? "",
+      twins.has(ind.id) ? (twinSetOf(pedigree, ind.id)?.set.members ?? []).filter(m => m !== ind.id).join(";") : "",
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

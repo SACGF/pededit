@@ -84,6 +84,15 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
+  to a set key and zygosity; `layoutToFlow` copies that onto the node data
+  so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:
+  in `sibshipPath.ts` every member's drop starts at the set's shared point
+  on the bar (the mean of their x), and `twinForkMarks` gives the bar across
+  monozygotic drops and the "?" for unknown zygosity, both at the points
+  halfway down the drops as R's plot.pedigree does. The minimap stays plain.
+  `twinSetProblem` is the one rule list (two members, same couple, same sex
+  for monozygotic); the store's `setTwins` returns its message when refused.
 - `adoption.ts` — adoption brackets (#12): the six bracket segments round
   the symbol box, drawn by `AdoptionBrackets` in `symbols.tsx` (so the
   legend gets them for free through `SymbolShape`), `renderAdoptionBrackets`

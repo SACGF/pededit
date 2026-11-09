@@ -7,6 +7,7 @@ const TAG_STYLES = ["quadrant", "dot", "text"];
 const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"];
 const CHILDLESS_VALUES = ["infertility", "byChoice"];
 const ADOPTION_VALUES = ["in", "out"];
+const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
 
 type Obj = Record<string, unknown>;
@@ -217,6 +218,16 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "childless", pp, CHILDLESS_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
     c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
+    c.optional(raw, "twins", pp, "an array of twin sets", Array.isArray);
+    if (Array.isArray(raw.twins)) {
+      raw.twins.forEach((t, k) => {
+        const tp = `${pp}.twins[${k}]`;
+        if (!isObject(t)) { c.error(JsonIssueCode.WRONG_TYPE, `${tp} must be an object`, tp); return; }
+        c.required(t, "members", tp, "an array of at least two individual ids", v => isStringArray(v) && v.length >= 2);
+        c.required(t, "zygosity", tp, ZYGOSITY_VALUES.map(s => `"${s}"`).join(" | "),
+          v => typeof v === "string" && ZYGOSITY_VALUES.includes(v));
+      });
+    }
     if (ok1 && ok2) {
       const a = raw.individual1 as string;
       const b = raw.individual2 as string;
@@ -276,6 +287,33 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       c.error(JsonIssueCode.CIRCULAR_ANCESTRY, `Circular ancestry: ${cycle.join(" -> ")}`, p("parentOf"), cycle);
     }
   }
+
+  // ---- Twin sets (#11): members must be children of their partnership, in one set only ----
+  const inSet = new Set<string>();
+  (ped.partnerships as unknown[]).forEach((raw, i) => {
+    if (!isObject(raw) || !Array.isArray(raw.twins)) return;
+    const pid = typeof raw.id === "string" ? raw.id : "";
+    const children = new Set(isStringArray((ped.parentOf as Obj)[pid]) ? ((ped.parentOf as Obj)[pid] as string[]) : []);
+    const kept: unknown[] = [];
+    raw.twins.forEach((t, k) => {
+      if (!isObject(t) || !isStringArray(t.members)) return;
+      const tp = p(`partnerships[${i}].twins[${k}]`);
+      const outsiders = t.members.filter(m => !children.has(m));
+      const repeated = t.members.filter(m => inSet.has(m));
+      if (t.members.length < 2 || outsiders.length || repeated.length) {
+        const why = outsiders.length ? `${outsiders.map(m => `'${m}'`).join(", ")} not a child of partnership '${pid}'`
+          : repeated.length ? `${repeated.map(m => `'${m}'`).join(", ")} already in another twin set`
+          : "fewer than two members";
+        c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `Twin set dropped: ${why}`, tp, t.members);
+        return;
+      }
+      for (const m of t.members) inSet.add(m);
+      kept.push(t);
+    });
+    if (kept.length !== raw.twins.length) {
+      if (kept.length) raw.twins = kept; else delete raw.twins;
+    }
+  });
 
   // ---- Optional top-level fields ----
   if (ped.pinnedPositions !== undefined && ped.pinnedPositions !== null) {

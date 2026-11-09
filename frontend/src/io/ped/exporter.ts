@@ -117,6 +117,19 @@ export function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.adopted);
 }
 
+/** Twin sets (#11) PED cannot carry, as [partnership, members, zygosity]. */
+export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
+  const out: { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] = [];
+  for (const p of pedigree.partnerships) {
+    const children = new Set(pedigree.parentOf[p.id] ?? []);
+    for (const t of p.twins ?? []) {
+      const members = t.members.filter(m => children.has(m));
+      if (members.length >= 2) out.push({ partnership: p, members, zygosity: t.zygosity });
+    }
+  }
+  return out;
+}
+
 /** Partnerships whose childless mark (#15) PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);

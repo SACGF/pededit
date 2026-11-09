@@ -47,7 +47,11 @@ stub so the app still builds without Google login.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
   brackets (`Individual.adopted`, `pedigree/adoption.ts`, #12: "in" also
   dashes the line from the adoptive parents); PED cannot carry either, so
-  Export PED warns first. Not yet: twins, assisted reproduction symbols.
+  Export PED warns first. Twins (#11) live on the partnership as
+  `Partnership.twins` sets with a zygosity (`pedigree/twins.ts`): the layout
+  keeps a set side by side (autohint, as kinship2 does), the sibship edge
+  draws the shared fork, and `setSex` on a monozygotic twin changes the whole
+  set. Not yet: assisted reproduction symbols.
 - Visual style is black and white, minimal chrome. No colour except tags.
 
 ## Layout of src/

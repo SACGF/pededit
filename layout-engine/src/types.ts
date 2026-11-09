@@ -65,6 +65,19 @@ export interface Tag {
  */
 export type ChildlessStatus = "infertility" | "byChoice";
 
+export type Zygosity = "monozygotic" | "dizygotic" | "unknown";
+
+/**
+ * Twins (or triplets, ...) among one partnership's children (#11). Members are
+ * child ids of that partnership, at least two, each in at most one set.
+ * Monozygotic members have the same sex. Drawn as a shared fork from the
+ * sibship bar, a bar across the fork for monozygotic, "?" for unknown.
+ */
+export interface TwinSet {
+  members: string[];
+  zygosity: Zygosity;
+}
+
 /** A partnership (union) between two individuals. Children attach here, not to parents. */
 export interface Partnership {
   id: string;
@@ -75,6 +88,8 @@ export interface Partnership {
   childless?: ChildlessStatus;
   /** Optional reason shown under the mark, e.g. "vasectomy". */
   childlessReason?: string;
+  /** Twin sets among this partnership's children. */
+  twins?: TwinSet[];
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

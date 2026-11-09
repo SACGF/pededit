@@ -18,14 +18,18 @@ import { buildPartnerSet, isPartnerPair } from "./couples.js";
  * The alignment is re-run after each generation is fixed, since a change on one
  * level shifts everything below it.
  *
- * Twin handling from the R version is not ported: the data model has no twin
- * relation yet.
+ * Twins (R: the `relation` matrix with codes 1 = MZ, 2 = DZ, 3 = unknown)
+ * come from `Partnership.twins` (#11). As in R, the members of a twin set get
+ * the mean of their ranks plus a small per-member offset, so they are drawn
+ * side by side, and `shift` moves a whole twin set when the duplicate fixup
+ * moves one of its members.
  */
 export function autohint(input: LayoutInput, pedigree: Pedigree): Hints {
-  const horder = initialOrder(input, pedigree);
+  const twins = twinSets(input, pedigree);
+  const horder = initialOrder(input, pedigree, twins);
   try {
     // fixupDuplicates shifts sibling ranks in place, so give it a copy.
-    return fixupDuplicates(pedigree, input, horder.slice());
+    return fixupDuplicates(pedigree, input, horder.slice(), twins);
   } catch {
     // R wraps autohint in try() and, when it fails, lays out with a plain
     // ordering and no spouse hints. Discard any ranks the fixup had already
@@ -34,9 +38,41 @@ export function autohint(input: LayoutInput, pedigree: Pedigree): Hints {
   }
 }
 
+// ── Twin sets (R: twinset, twinord, twinrel) ───────────────────────────────────
+
+/**
+ * Per 1-based individual: the set they belong to (0 = not a twin), their
+ * order within it (1-based, R's twinord) and whether the set is monozygotic.
+ * Sets with fewer than two resolvable members are ignored.
+ */
+interface TwinInfo {
+  set: Int32Array;
+  ord: Int32Array;
+  mono: Uint8Array;
+  any: boolean;
+}
+
+function twinSets(input: LayoutInput, pedigree: Pedigree): TwinInfo {
+  const n = input.n;
+  const info: TwinInfo = { set: new Int32Array(n + 1), ord: new Int32Array(n + 1), mono: new Uint8Array(n + 1), any: false };
+  const idToIdx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
+  let nextSet = 0;
+  for (const p of pedigree.partnerships) {
+    const children = new Set(pedigree.parentOf[p.id] ?? []);
+    for (const t of p.twins ?? []) {
+      const members = t.members.filter(id => children.has(id)).map(id => idToIdx.get(id) ?? 0).filter(i => i > 0 && info.set[i] === 0);
+      if (members.length < 2) continue;
+      nextSet++;
+      members.forEach((m, k) => { info.set[m] = nextSet; info.ord[m] = k + 1; info.mono[m] = t.zygosity === "monozygotic" ? 1 : 0; });
+      info.any = true;
+    }
+  }
+  return info;
+}
+
 // ── Initial sibling order ──────────────────────────────────────────────────────
 
-function initialOrder(input: LayoutInput, pedigree: Pedigree): Float64Array {
+function initialOrder(input: LayoutInput, pedigree: Pedigree, twins: TwinInfo): Float64Array {
   const n = input.n;
   const depth = kindepth(input, true);
   const horder = new Float64Array(n + 1);
@@ -85,6 +121,26 @@ function initialOrder(input: LayoutInput, pedigree: Pedigree): Float64Array {
     }
   }
 
+  // R: twins get the mean of their ranks plus twinord/100, then each depth is
+  // re-ranked, so a twin set is drawn together in its members' order.
+  if (twins.any) {
+    const bySet = new Map<number, number[]>();
+    for (let i = 1; i <= n; i++) {
+      if (twins.set[i]! > 0) {
+        if (!bySet.has(twins.set[i]!)) bySet.set(twins.set[i]!, []);
+        bySet.get(twins.set[i]!)!.push(i);
+      }
+    }
+    for (const who of bySet.values()) {
+      const mean = who.reduce((acc, i) => acc + horder[i]!, 0) / who.length;
+      for (const i of who) horder[i] = mean + twins.ord[i]! / 100;
+    }
+    for (const [, members] of depthGroups) {
+      const ranked = [...members].sort((a, b) => horder[a]! - horder[b]!);
+      ranked.forEach((i, k) => { horder[i] = k + 1; });
+    }
+  }
+
   return horder;
 }
 
@@ -115,7 +171,7 @@ function toHintMatrix(rows: SpouseHint[]): Int32Array | null {
   return out;
 }
 
-function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64Array): Hints {
+function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64Array, twins: TwinInfo): Hints {
   const partners = buildPartnerSet(input);
   const sptemp: SpouseHint[] = [];
 
@@ -143,7 +199,7 @@ function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64
           // Connected to parents at this position: familial anchor.
           anchor[j] = 1;
           const sibs = findsibs(mypos, plist, lev).map(s => idlist[s]!);
-          if (sibs.length > 1) shift(idlist[mypos]!, sibs, goleft, horder);
+          if (sibs.length > 1) shift(idlist[mypos]!, sibs, goleft, horder, twins);
         } else {
           // Is the spouse at this position connected to parents?
           const sp = findspouse(mypos, plist, lev, partners);
@@ -151,7 +207,7 @@ function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64
           if (plist.fam[lev]![sp]! > 0) {
             anchor[j] = 2; // spousal anchor
             const sibs = findsibs(sp, plist, lev).map(s => idlist[s]!);
-            if (sibs.length > 1) shift(idlist[sp]!, sibs, goleft, horder);
+            if (sibs.length > 1) shift(idlist[sp]!, sibs, goleft, horder, twins);
           }
         }
       }
@@ -183,10 +239,20 @@ function fixupDuplicates(pedigree: Pedigree, input: LayoutInput, horder: Float64
 /**
  * Move `id` to the left or right edge of its sibship by rewriting the hints of
  * all `sibs` (individual indices), then re-rank so the hints stay 1..k.
+ *
+ * A twin's co-twins move with them, by the sibship's whole rank range so they
+ * stay together past the edge; R moves a monozygotic set a second time, which
+ * keeps it ahead of other twin sets moved the same way.
  */
-function shift(id: number, sibs: number[], goleft: boolean, hint: Float64Array): void {
+function shift(id: number, sibs: number[], goleft: boolean, hint: Float64Array, twins: TwinInfo): void {
   const vals = sibs.map(s => hint[s]!);
-  hint[id] = goleft ? Math.min(...vals) - 1 : Math.max(...vals) + 1;
+  if (twins.set[id]! > 0) {
+    const amt = 1 + (Math.max(...vals) - Math.min(...vals));
+    const mates = sibs.filter(s => twins.set[s] === twins.set[id]);
+    const times = twins.mono[id] ? 2 : 1;
+    for (const s of mates) hint[s] = hint[s]! + (goleft ? -amt : amt) * times;
+  }
+  hint[id] = goleft ? Math.min(...sibs.map(s => hint[s]!)) - 1 : Math.max(...sibs.map(s => hint[s]!)) + 1;
   const ranked = [...sibs].sort((a, b) => hint[a]! - hint[b]!);
   ranked.forEach((s, i) => { hint[s] = i + 1; });
 }

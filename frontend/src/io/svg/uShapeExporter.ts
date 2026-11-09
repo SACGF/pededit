@@ -8,6 +8,7 @@ import {
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
 import { ADOPTION_DASH } from "../../pedigree/adoption";
+import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -104,6 +105,8 @@ interface Union {
 }
 
 interface TNode {
+  /** Twin set key (#11); the root sibship is never split between the arms inside a set. */
+  twinSet?: string;
   /** The individual whose parents place this node. For the root, the shared founder. */
   blood: string;
   isRoot: boolean;
@@ -309,11 +312,23 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const o = mode === "birthDate" && ind.dob ? new Date(ind.dob).getTime() : ind.sibOrder ?? 0;
     return [a, o];
   };
-  const sortSibs = (ids: string[]) =>
-    [...new Set(ids)].sort((x, y) => {
-      const [ax, ox] = orderKey(x), [ay, oy] = orderKey(y);
-      return ax - ay || ox - oy;
+  // Twins (#11) sort by the mean of their set's keys, then by their place in
+  // the set, so they stay side by side as autohint keeps them on the canvas.
+  const twinOf = twinMembership(pedigree);
+  const sortSibs = (ids: string[]) => {
+    const unique = [...new Set(ids)];
+    const keys = new Map(unique.map(id => [id, orderKey(id) as [number, number, number]]));
+    for (const [, members] of groupBy(unique, id => twinOf.get(id)?.twinSet)) {
+      if (members.length < 2) continue;
+      const a = members.reduce((acc, id) => acc + keys.get(id)![0], 0) / members.length;
+      const o = members.reduce((acc, id) => acc + keys.get(id)![1], 0) / members.length;
+      members.forEach((id, k) => keys.set(id, [a, o, k + 1]));
+    }
+    return unique.sort((x, y) => {
+      const [ax, ox, kx = 0] = keys.get(x)!, [ay, oy, ky = 0] = keys.get(y)!;
+      return ax - ay || ox - oy || kx - ky;
     });
+  };
 
   // Breadth-first, so a child of two blood relatives hangs from whichever
   // parent is closer to the founders. Each individual has exactly one node.
@@ -349,6 +364,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       for (const kid of ids) {
         assigned.add(kid);
         const child = mkNode(kid, node.depth + 1, node, w);
+        child.twinSet = twinOf.get(kid)?.twinSet;
         w.kids.push(child);
         nodeOf.set(kid, child);
         queue.push(child);
@@ -641,7 +657,12 @@ function packTree(root: TNode, g: Geom, slide: boolean): number {
   };
   const splits: number[] = [];
   if (groups.length > 1) splits.push(groups[0].kids.length);
-  else for (let i = 1; i < kids.length; i++) splits.push(i);
+  else for (let i = 1; i < kids.length; i++) {
+    // Twins stay on one arm (#11).
+    if (kids[i - 1].twinSet !== undefined && kids[i - 1].twinSet === kids[i].twinSet) continue;
+    splits.push(i);
+  }
+  if (splits.length === 0 && groups.length === 1) splits.push(kids.length);
   const firstMin = groups.length > 1 ? COUPLE_GAP / 2 : -Infinity;
 
   // Two ways to even out the arms: choose where the sibship is split between
@@ -927,6 +948,18 @@ function trackPath(u1: number, u2: number, offset: number, g: Geom, attrs = LINE
   return `<path d="${d}" ${attrs}/>`;
 }
 
+/** Group items by a key, dropping items whose key is undefined. */
+function groupBy<T>(items: T[], keyOf: (t: T) => string | undefined): Map<string, T[]> {
+  const out = new Map<string, T[]>();
+  for (const it of items) {
+    const k = keyOf(it);
+    if (k === undefined) continue;
+    if (!out.has(k)) out.set(k, []);
+    out.get(k)!.push(it);
+  }
+  return out;
+}
+
 /** A short segment along the track direction at (u, offset), centred there, 2 * halfLen long. */
 function tangentSeg(u: number, offset: number, halfLen: number, g: Geom): string {
   const eps = 0.01;
@@ -945,12 +978,35 @@ function normalSeg(u: number, o1: number, o2: number, g: Geom, attrs = LINE_ATTR
 
 const ADOPTED_IN_ATTRS = `${LINE_ATTRS} stroke-dasharray="${ADOPTION_DASH}"`;
 
+/**
+ * A diagonal from (u1, o1) to (u2, o2) in track coordinates, drawn as a
+ * polyline that follows the curve (a straight chord in the plane would cut
+ * across the tracks when the two points are far apart along the U).
+ */
+function diagonalPath(u1: number, o1: number, u2: number, o2: number, g: Geom, attrs = LINE_ATTRS): string {
+  const steps = Math.max(1, Math.ceil(Math.abs(u2 - u1) / 12));
+  const pts: string[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const pt = trackPoint(u1 + t * (u2 - u1), o1 + t * (o2 - o1), g);
+    pts.push(`${r(pt.x)} ${r(pt.y)}`);
+  }
+  return `<path d="M ${pts.join(" L ")}" ${attrs}/>`;
+}
+
+/** The point half way along such a diagonal. */
+function diagonalMid(u1: number, o1: number, u2: number, o2: number, g: Geom): { x: number; y: number } {
+  const pt = trackPoint((u1 + u2) / 2, (o1 + o2) / 2, g);
+  return { x: pt.x, y: pt.y };
+}
+
 const DUP_ATTRS = `fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"`;
 
 function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): string[] {
   const g = b.geom;
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
+  const twins = twinMembership(pedigree);
   const out: string[] = [];
 
   walk(b.root, n => {
@@ -990,11 +1046,37 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       const lo = Math.min(uP, ...us), hi = Math.max(uP, ...us);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
       // A loss triangle's apex sits below the top of the symbol box. An
-      // adopted-in child's drop is dashed (#12).
+      // adopted-in child's drop is dashed (#12). Twins share one fork point
+      // on the bar, at the mean of their positions (#11).
+      const forkU = new Map<string, number>();
+      for (const [key, members] of groupBy(w.kids, c => twins.get(c.blood)?.twinSet)) {
+        if (members.length >= 2) forkU.set(key, members.reduce((a, c) => a + c.u, 0) / members.length);
+      }
       w.kids.forEach(c => {
         const ind = byId.get(c.blood);
-        out.push(normalSeg(c.u, bar, childEdge + HALF + childDropEndOffset(ind), g, ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS));
+        const attrs = ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS;
+        const end = childEdge + HALF + childDropEndOffset(ind);
+        const key = twins.get(c.blood)?.twinSet;
+        if (key !== undefined && forkU.has(key)) {
+          out.push(diagonalPath(forkU.get(key)!, bar, c.u, end, g, attrs));
+        } else {
+          out.push(normalSeg(c.u, bar, end, g, attrs));
+        }
       });
+      // Monozygotic: a bar between the midpoints of neighbouring drops; unknown: "?".
+      for (const [key, members] of groupBy(w.kids, c => twins.get(c.blood)?.twinSet)) {
+        if (members.length < 2) continue;
+        const z = twins.get(members[0]!.blood)!.zygosity;
+        if (z === "dizygotic") continue;
+        const fu = forkU.get(key)!;
+        const sorted = [...members].sort((a, b) => a.u - b.u);
+        const mid = (c: TNode) => diagonalMid(fu, bar, c.u, childEdge + HALF + childDropEndOffset(byId.get(c.blood)), g);
+        for (let i = 0; i + 1 < sorted.length; i++) {
+          const pa = mid(sorted[i]!), pb = mid(sorted[i + 1]!);
+          if (z === "monozygotic") out.push(`<line x1="${r(pa.x)}" y1="${r(pa.y)}" x2="${r(pb.x)}" y2="${r(pb.y)}" ${LINE_ATTRS}/>`);
+          else out.push(`<text x="${r((pa.x + pb.x) / 2)}" y="${r((pa.y + pb.y) / 2 + TWIN_QUESTION_FONT_SIZE * 0.35)}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
+        }
+      }
     }
   });
 

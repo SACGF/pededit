@@ -2,7 +2,8 @@ import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } fro
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
-import { sibshipPaths } from "../../pedigree/sibshipPath";
+import { sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
+import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
@@ -199,6 +200,7 @@ export function renderAdoptionBrackets(ind: Individual): string {
 
 function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
+  const twins = twinMembership(pedigree);
 
   for (let level = 1; level < result.n.length; level++) {
     const groups = new Map<number, number[]>();
@@ -217,11 +219,20 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
       const hop      = hopHeightAt(result, partners, level - 1, f - 1);
       const children = slots.map(s => {
         const child = pedigree.individuals[Math.floor(result.nid[level][s]) - 1];
-        return { ...slotPos.get(`${level}-${s}`)!, topInset: symbolTopInset(child?.lifeStatus, NODE_SIZE), dashed: child?.adopted === "in" };
+        return {
+          ...slotPos.get(`${level}-${s}`)!,
+          topInset: symbolTopInset(child?.lifeStatus, NODE_SIZE),
+          dashed: child?.adopted === "in",
+          ...(child ? twins.get(child.id) ?? {} : {}),
+        };
       });
       const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children);
       for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
       for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
+      for (const m of twinForkMarks(coupleY, children)) {
+        if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3]));
+        else lines.push(`<text x="${m.x}" y="${m.y + TWIN_QUESTION_FONT_SIZE * 0.35}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
+      }
     }
   }
   return lines;

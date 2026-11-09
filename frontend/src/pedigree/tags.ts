@@ -3,6 +3,7 @@ import { consanguinityTest } from "./consanguinity";
 import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
+import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -511,6 +512,25 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
           `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
         let out = line(x, top, x + s, top) + line(cx, top, cx, bar) + line(cx - 4, bar, cx + 4, bar);
         if (o.value === "infertility") out += line(cx - 4, bar - 3, cx + 4, bar - 3);
+        return out;
+      },
+    });
+  }
+
+  // Twin forks (#11).
+  const zygosities = zygositiesInUse(pedigree);
+  for (const o of ZYGOSITY_OPTIONS) {
+    if (!zygosities.has(o.value)) continue;
+    rows.push({
+      label: twinLegendLabel(o.value),
+      swatch: sy => {
+        const s = LEGEND_SWATCH, cx = x + s / 2, top = sy + 1, bottom = sy + s;
+        const line = (x1: number, y1: number, x2: number, y2: number) =>
+          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
+        let out = line(x + 2, top, x + s - 2, top) + line(cx, top, x + 1, bottom) + line(cx, top, x + s - 1, bottom);
+        const my = (top + bottom) / 2;
+        if (o.value === "monozygotic") out += line(cx - 4, my, cx + 4, my);
+        if (o.value === "unknown") out += `<text x="${fmt(cx)}" y="${fmt(my + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text>`;
         return out;
       },
     });

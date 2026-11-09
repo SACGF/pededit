@@ -7,6 +7,8 @@ import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
+import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/twins";
+import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 import { Button } from "@/components/ui/button";
@@ -189,6 +191,19 @@ function ChildlessSvg({ status }: { status: ChildlessStatus }) {
   );
 }
 
+/** Twin fork (#11): two drops from one point on the bar, a bar across for MZ, "?" for unknown. */
+function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
+  return (
+    <svg width="48" height="28" viewBox="0 0 48 28">
+      <line x1={8} y1={3} x2={40} y2={3} stroke="black" strokeWidth={2} />
+      <line x1={24} y1={3} x2={12} y2={27} stroke="black" strokeWidth={2} />
+      <line x1={24} y1={3} x2={36} y2={27} stroke="black" strokeWidth={2} />
+      {zygosity === "monozygotic" && <line x1={18} y1={15} x2={30} y2={15} stroke="black" strokeWidth={2} />}
+      {zygosity === "unknown" && <text x={24} y={19} textAnchor="middle" fontFamily="sans-serif" fontSize={11} fontWeight="bold">?</text>}
+    </svg>
+  );
+}
+
 function ConsanguineousSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -272,6 +287,10 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
   const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
   for (const o of CHILDLESS_OPTIONS) {
     if (childless.has(o.value)) relRows.push({ icon: <ChildlessSvg status={o.value} />, label: o.label });
+  }
+  const zygosities = zygositiesInUse(pedigree);
+  for (const o of ZYGOSITY_OPTIONS) {
+    if (zygosities.has(o.value)) relRows.push({ icon: <TwinsSvg zygosity={o.value} />, label: twinLegendLabel(o.value) });
   }
 
   // Every defined tag is listed so an unused one can still be ticked; the

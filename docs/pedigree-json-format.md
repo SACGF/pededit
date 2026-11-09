@@ -91,8 +91,16 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `consanguineous` | boolean | no | Draw a double line between the partners. |
 | `childless` | `"infertility"` or `"byChoice"` | no | Childless couple mark under the couple line (NSGC): a short vertical ending in two bars for infertility, one bar for no children by choice. Only meaningful when the partnership has no children in `parentOf`; the editor clears it when a child is added. |
 | `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
+| `twins` | `TwinSet[]` | no | Twin sets (twins, triplets, ...) among this partnership's children. PED has no field for this, so Export PED drops it and warns. |
 
 Any other property on a partnership is preserved as-is.
+
+### `TwinSet`
+
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `members` | string[] | yes | At least two ids, all children of the partnership in `parentOf`, each in at most one set. The layout keeps them side by side in this order. |
+| `zygosity` | `"monozygotic"`, `"dizygotic"` or `"unknown"` | yes | Drawn as a shared fork from the sibship bar, with a bar across the fork for monozygotic and a `?` for unknown. Monozygotic members must have the same sex; the editor changes the sex of all of them together. |
 
 ## Validation on import
 
@@ -115,6 +123,7 @@ Warnings allow the import and are shown to the user:
 - the document `version` is newer than the editor's
 - `pinnedPositions` or `unlockedIndividuals` name an individual that does not exist
 - an individual's `tags` names a tag that is not in `Pedigree.tags`
+- a twin set has fewer than two members, a member who is not a child of that partnership, or a member listed in two sets (the set is dropped)
 
 ## Worked example
 

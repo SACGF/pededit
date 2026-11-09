@@ -246,6 +246,22 @@ describe("U-shape SVG", () => {
     expect(svg).toContain(">vasectomy</text>");
   });
 
+  it("keeps twins side by side and draws the fork marks (#11)", () => {
+    const p: Pedigree = structuredClone(largerFamily);
+    const [pid, kids] = Object.entries(p.parentOf).find(([, k]) => k.length >= 3)!;
+    const partnership = p.partnerships.find(q => q.id === pid)!;
+    // Twins are the first and last of the sibship in stored order.
+    const a = kids[0]!, b = kids[kids.length - 1]!;
+    p.individuals.find(i => i.id === b)!.sex = p.individuals.find(i => i.id === a)!.sex;
+    partnership.twins = [{ members: [a, b], zygosity: "monozygotic" }];
+    const layout = layoutUShape(p)!;
+    const us = kids.map(id => layout.nodes.get(id)!.u).sort((x, y) => x - y);
+    const ua = layout.nodes.get(a)!.u, ub = layout.nodes.get(b)!.u;
+    expect(Math.abs(us.indexOf(ua) - us.indexOf(ub))).toBe(1);
+    partnership.twins = [{ members: [a, b], zygosity: "unknown" }];
+    expect(exportUShapeSvg(p)).toContain(">?</text>");
+  });
+
   it("draws one symbol group per drawn individual", () => {
     const p = wide();
     const svg = exportUShapeSvg(p);

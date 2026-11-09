@@ -67,6 +67,12 @@ class TagSerializer(serializers.Serializer):
 
 
 CHILDLESS_CHOICES = ["infertility", "byChoice"]
+ZYGOSITY_CHOICES = ["monozygotic", "dizygotic", "unknown"]
+
+
+class TwinSetSerializer(serializers.Serializer):
+    members = serializers.ListField(child=serializers.CharField(), min_length=2)
+    zygosity = serializers.ChoiceField(choices=ZYGOSITY_CHOICES)
 
 
 class PartnershipSerializer(serializers.Serializer):
@@ -76,6 +82,7 @@ class PartnershipSerializer(serializers.Serializer):
     consanguineous = _opt(serializers.BooleanField)
     childless = _opt(serializers.ChoiceField, choices=CHILDLESS_CHOICES)
     childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    twins = _opt(TwinSetSerializer, many=True)
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):

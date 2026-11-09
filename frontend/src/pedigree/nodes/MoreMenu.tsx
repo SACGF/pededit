@@ -5,6 +5,8 @@ import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../sto
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
+import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
+import { adjacentSibling } from "../../components/EditPanel";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -42,12 +44,18 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     setIndividualTag,
     setPartnershipChildless,
     setAdopted,
+    setTwins,
+    removeTwin,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
+  // Twins (#11): the current set, or the sibling drawn next to this person to pair with.
+  const twin = twinSetOf(pedigree, individualId);
+  const twinPartnership = parentPartnershipOf(pedigree, individualId);
+  const twinMembers = twin?.set.members ?? [individualId, adjacentSibling(pedigree, individualId) ?? ""].filter(Boolean);
   // Partnerships of this person with no children: the childless mark applies to these (#15).
   const childlessCouples = partnerChoices(pedigree, individualId)
     .filter(c => (pedigree.parentOf[c.partnershipId] ?? []).length === 0)
@@ -187,6 +195,28 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
           ))}
           </div>
         </MenuSection>
+
+        {twinPartnership && twinMembers.length >= 2 && (
+          <MenuSection label="Twins">
+            <MenuItem onClick={() => action(() => removeTwin(individualId))} active={!twin}>
+              Not a twin
+            </MenuItem>
+            {ZYGOSITY_OPTIONS.map(o => {
+              const why = twinSetProblem(pedigree, twinPartnership.id, twinMembers, o.value);
+              return (
+                <MenuItem
+                  key={o.value}
+                  onClick={() => action(() => setTwins(twinPartnership.id, twinMembers, o.value))}
+                  active={twin?.set.zygosity === o.value}
+                  disabled={!!why}
+                  title={why ?? (twin ? undefined : "Pairs with the sibling drawn next to this person; pick others in the edit panel")}
+                >
+                  {o.label}
+                </MenuItem>
+              );
+            })}
+          </MenuSection>
+        )}
 
         <MenuSection label="Adoption">
           <div className="flex">

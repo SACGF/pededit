@@ -18,7 +18,11 @@ indexing convention inherited from R, and the three rendering rules.
   `align=true` (tries to level spouses) and falls back to `align=false` when
   that fails.
 - `autohint.ts` — spouse and ordering hints. Full port of the kinship2
-  duplicate fixup (sibling shift plus spouse hints). Connected-component
+  duplicate fixup (sibling shift plus spouse hints) and of its twin handling
+  (#11): `Partnership.twins` plays the part of R's `relation` matrix, a twin
+  set gets the mean of its members' ranks plus a per-member offset, and
+  `shift` moves a whole set (twice over for monozygotic). PED input has no
+  twins, so the oracle comparisons are unaffected. Connected-component
   ordering is still open (#39).
 - `alignped1.ts` to `alignped4.ts`, `alignPedigree.ts` — the kinship2 placement
   pipeline. alignped4 runs a quadratic program via the `quadprog` npm package.
