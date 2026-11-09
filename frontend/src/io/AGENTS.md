@@ -51,9 +51,10 @@ Rules that keep a bad file from importing as nonsense (#31):
   parent (`isPhantomId`). They are never shown, not even as the dev-mode ID
   label.
 
-PED cannot carry pregnancy / loss status, adoption or childless couple marks.
-`pedLostLifeStatus`, `pedLostAdoption` and `pedLostChildless` in `exporter.ts`
-list what a file would drop; the toolbar warns with them before writing.
+PED cannot carry pregnancy / loss status, twins, adoption or childless couple
+marks. `pedLostLifeStatus`, `pedLostTwins`, `pedLostAdoption` and
+`pedLostChildless` in `exporter.ts` list what a file would drop; the toolbar
+warns with them before writing.
 
 ## json/ — native lossless format
 
@@ -85,7 +86,11 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   families). Plan in `claude/export_u_plan.md`. Symbols, labels and slashes
   rotate with the track (that is the design, labels included); only the
   pregnancy "P" is counter-rotated to stay upright (#71), since a sideways P
-  reads as another letter.
+  reads as another letter. Twins (#11): `sortSibs` averages a set's order
+  keys so members stay side by side, the root sibship is never split between
+  the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
+  in track coordinates, since a straight chord between twins far apart along
+  the U would cut across the tracks.
 - `pngExporter.ts` — rasterises the SVG via canvas.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB and notes for de-identified export.
