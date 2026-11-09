@@ -221,3 +221,41 @@ class AgentTokenCommandTests(APITestCase):
         get_user_model().objects.create_user("claude_agent", password="hunter22")
         with self.assertRaises(CommandError):
             self._mint()
+
+
+class HealthCheckTests(APITestCase):
+    def test_health_is_public_and_reports_version(self):
+        from peded.version import VERSION
+
+        resp = self.client.get("/api/health/")
+        self.assertEqual(resp.status_code, 200, resp.content)
+        self.assertEqual(resp.json(), {"status": "ok", "version": VERSION, "database": "ok"})
+        self.assertNotEqual(VERSION, "")
+        # A git checkout reports its commit; an exported tree reports "unknown".
+        self.assertTrue(VERSION == "unknown" or len(VERSION) == 40, VERSION)
+
+    def test_bad_token_does_not_break_health(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer not-a-token")
+        self.assertEqual(self.client.get("/api/health/").status_code, 200)
+
+    def test_database_failure_is_503(self):
+        from unittest.mock import patch
+
+        with patch("api.health.connection") as conn:
+            conn.cursor.side_effect = RuntimeError("down")
+            with self.assertLogs("api.health", level="ERROR"):
+                resp = self.client.get("/api/health/")
+        self.assertEqual(resp.status_code, 503)
+        body = resp.json()
+        self.assertEqual(body["status"], "error")
+        self.assertEqual(body["database"], "unavailable")
+        self.assertNotIn("down", resp.content.decode())
+
+    def test_version_env_override(self):
+        import os
+        from unittest.mock import patch
+
+        from peded.version import get_version
+
+        with patch.dict(os.environ, {"PEDEDIT_VERSION": "v1.2.3"}):
+            self.assertEqual(get_version(), "v1.2.3")

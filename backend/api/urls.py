@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import RegisterView, MeView, PedigreeViewSet, TagPresetViewSet
+from .health import HealthView
 from .social_auth import GoogleLoginView, GitHubLoginView
 
 router = DefaultRouter()
@@ -8,6 +9,7 @@ router.register(r"pedigrees", PedigreeViewSet, basename="pedigree")
 router.register(r"tag-presets", TagPresetViewSet, basename="tag-preset")
 
 urlpatterns = [
+    path("health/", HealthView.as_view(), name="health"),
     path("auth/register/", RegisterView.as_view(), name="register"),
     path("auth/me/", MeView.as_view(), name="me"),
     path("auth/google/", GoogleLoginView.as_view(), name="google-login"),

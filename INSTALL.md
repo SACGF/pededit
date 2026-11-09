@@ -246,7 +246,10 @@ Verify it started:
 
 ```bash
 sudo systemctl status pededit
+curl -s http://127.0.0.1:8000/api/health/
 ```
+
+The health check answers `{"status": "ok", "version": "<git commit>", "database": "ok"}` with 200, or 503 when the database round trip fails. It needs no token and is not rate limited, so point uptime monitoring at `https://your-domain/api/health/`. Nginx and Gunicorn keep it out of their access logs (`deploy/pededit-nginx.conf`, `deploy/gunicorn.conf.py`).
 
 If something is wrong, check the logs:
 
@@ -269,6 +272,7 @@ This opens an override file. Add:
 ExecStart=
 ExecStart=/opt/pededit/backend/.venv/bin/gunicorn \
   peded.wsgi:application \
+  -c /opt/pededit/deploy/gunicorn.conf.py \
   --bind 127.0.0.1:8000 \
   --workers 9 \
   --timeout 30 \
@@ -331,9 +335,11 @@ Use the deploy script, which pulls social login client IDs from `/etc/pededit/pe
 sudo bash /opt/pededit/deploy/deploy.sh
 ```
 
-This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn. Nginx does not need a restart.
+This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served. Nginx does not need a restart, but if `deploy/pededit-nginx.conf` or `deploy/pededit.service` changed, copy them into place again as in steps 6 and 7.
 
 ## Troubleshooting
+
+**`deploy.sh` says the health check did not return 200** — Gunicorn failed to start or cannot reach the database. `sudo journalctl -u pededit -e` shows why; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
 
 **502 Bad Gateway** — Gunicorn isn't running. Check `sudo systemctl status pededit` and `sudo journalctl -u pededit -e`.
 

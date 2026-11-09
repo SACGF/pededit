@@ -55,6 +55,15 @@ supplied.
 ## URLs
 
 `peded/urls.py` mounts admin, the simplejwt token views, and `api/urls.py`
-(pedigrees, tag-presets, auth/me, auth/google, auth/github, auth/register).
+(health, pedigrees, tag-presets, auth/me, auth/google, auth/github,
+auth/register).
+
+`GET /api/health/` (`api/health.py`, #50) has `authentication_classes = []`
+on purpose: with the default JWT authentication a stale token in the request
+would turn a healthy app into a 401. The version it reports is the git commit
+(`peded/version.py`, cached at import, `PEDEDIT_VERSION` overrides). The
+database error is logged, never returned. `settings.LOGGING` filters the
+check out of runserver's request log; production does the same in
+`deploy/gunicorn.conf.py` and the Nginx vhost.
 Static files are served under `djstatic/` so they do not collide with the
 Vite build.

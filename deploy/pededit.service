@@ -9,6 +9,7 @@ Group=pededit
 WorkingDirectory=/opt/pededit/backend
 ExecStart=/opt/pededit/backend/.venv/bin/gunicorn \
   peded.wsgi:application \
+  -c /opt/pededit/deploy/gunicorn.conf.py \
   --bind 127.0.0.1:8000 \
   --workers 3 \
   --timeout 30 \

@@ -75,6 +75,39 @@ STATIC_URL = "djstatic/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ── Logging ─────────────────────────────────────────────────────────────────
+# runserver logs every request through django.server; keep the health check
+# out of it the way Nginx and Gunicorn do in production (deploy/).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "skip_health_checks": {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": lambda record: "/api/health/" not in record.getMessage(),
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+        "django.server": {
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+            "filters": ["skip_health_checks"],
+        },
+    },
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
+        },
+    },
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO"},
+        "django.server": {"handlers": ["django.server"], "level": "INFO", "propagate": False},
+    },
+}
+
 # ── DRF ──────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

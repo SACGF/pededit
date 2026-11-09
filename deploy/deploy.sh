@@ -36,4 +36,22 @@ sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
 echo "==> Restarting Gunicorn"
 sudo systemctl restart pededit
 
-echo "==> Done"
+echo "==> Waiting for the health check"
+EXPECTED=$(cd /opt/pededit && sudo -u pededit git rev-parse HEAD)
+HEALTH_URL="http://127.0.0.1:8000/api/health/"
+for _ in $(seq 1 30); do
+    if BODY=$(curl -fsS "$HEALTH_URL" 2>/dev/null); then
+        VERSION=$(printf '%s' "$BODY" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version',''))")
+        if [[ "$VERSION" == "$EXPECTED" ]]; then
+            echo "    healthy, serving $VERSION"
+            echo "==> Done"
+            exit 0
+        fi
+        echo "Error: health check is serving $VERSION, expected $EXPECTED" >&2
+        exit 1
+    fi
+    sleep 1
+done
+echo "Error: $HEALTH_URL did not return 200 within 30s" >&2
+echo "       sudo journalctl -u pededit -e" >&2
+exit 1
