@@ -317,7 +317,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const twinOf = twinMembership(pedigree);
   const sortSibs = (ids: string[]) => {
     const unique = [...new Set(ids)];
-    const keys = new Map(unique.map(id => [id, orderKey(id) as [number, number, number]]));
+    const keys = new Map(unique.map(id => [id, [...orderKey(id), 0] as [number, number, number]]));
     for (const [, members] of groupBy(unique, id => twinOf.get(id)?.twinSet)) {
       if (members.length < 2) continue;
       const a = members.reduce((acc, id) => acc + keys.get(id)![0], 0) / members.length;
@@ -325,7 +325,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       members.forEach((id, k) => keys.set(id, [a, o, k + 1]));
     }
     return unique.sort((x, y) => {
-      const [ax, ox, kx = 0] = keys.get(x)!, [ay, oy, ky = 0] = keys.get(y)!;
+      const [ax, ox, kx] = keys.get(x)!, [ay, oy, ky] = keys.get(y)!;
       return ax - ay || ox - oy || kx - ky;
     });
   };
