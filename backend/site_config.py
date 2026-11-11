@@ -46,3 +46,11 @@ ALLOWED_HOSTS    = _cfg.get("allowed_hosts", ["localhost", "127.0.0.1"])
 GOOGLE_CLIENT_ID     = _cfg.get("google_client_id", "")
 GITHUB_CLIENT_ID     = _cfg.get("github_client_id", "")
 GITHUB_CLIENT_SECRET = _cfg.get("github_client_secret", "")
+
+# ── Health check (api/health.py) ─────────────────────────────────────────────
+# GET /api/health/ answers 503 when any of these filesystems has less free
+# space than the floor. /var/lib/postgresql is where Ubuntu keeps the database;
+# it is skipped where it does not exist. Add the data directory here if
+# Postgres lives on another volume.
+HEALTH_DISK_PATHS       = _cfg.get("health_disk_paths", ["/", "/var/lib/postgresql"])
+HEALTH_DISK_MIN_FREE_MB = _cfg.get("health_disk_min_free_mb", 1024)

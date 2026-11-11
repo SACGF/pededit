@@ -75,6 +75,10 @@ STATIC_URL = "djstatic/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ── Health check ────────────────────────────────────────────────────────────
+HEALTH_DISK_PATHS       = _secrets.HEALTH_DISK_PATHS
+HEALTH_DISK_MIN_FREE_MB = _secrets.HEALTH_DISK_MIN_FREE_MB
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 # runserver logs every request through django.server; keep the health check
 # out of it the way Nginx and Gunicorn do in production (deploy/).

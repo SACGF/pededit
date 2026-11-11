@@ -60,10 +60,25 @@ auth/register).
 
 `GET /api/health/` (`api/health.py`, #50) has `authentication_classes = []`
 on purpose: with the default JWT authentication a stale token in the request
-would turn a healthy app into a 401. The version it reports is the git commit
-(`peded/version.py`, cached at import, `PEDEDIT_VERSION` overrides). The
-database error is logged, never returned. `settings.LOGGING` filters the
-check out of runserver's request log; production does the same in
-`deploy/gunicorn.conf.py` and the Nginx vhost.
+would turn a healthy app into a 401. It is the URL uptime monitoring polls,
+so anything added to it must be cheap and must mean "users are affected" when
+it fails.
+
+- It fails on low disk space (`HEALTH_DISK_PATHS`, `HEALTH_DISK_MIN_FREE_MB`,
+  from the site config) because `SELECT 1` keeps passing on a full disk while
+  every save fails.
+- The version is the git commit (`peded/version.py`, cached at import,
+  `PEDEDIT_VERSION` overrides). It is returned only when `REMOTE_ADDR` is
+  loopback and the request carries no proxy headers, which is `deploy.sh`
+  asking Gunicorn directly. Do not put it back in the public answer: the repo
+  is public, so a commit tells a scanner which fixes a server is missing. The
+  Django test client counts as local; pass `HTTP_X_FORWARDED_PROTO` to test
+  the public answer.
+- It has its own `head()`. Monitors send `HEAD`, and without it Django runs
+  `get()` and Gunicorn logs a warning about the dropped body on every poll.
+- Errors and free-space figures are logged, never returned.
+  `settings.LOGGING` filters the check out of runserver's request log;
+  production does the same in `deploy/gunicorn.conf.py` and the Nginx vhost.
+
 Static files are served under `djstatic/` so they do not collide with the
 Vite build.

@@ -13,13 +13,25 @@ Deployment" half).
   in `post_fork` (filters on a logger are not inherited by handlers, and the
   access lines are logged by the workers, so `when_ready` in the master is
   the wrong hook).
-- `GET /api/health/` (`backend/api/health.py`, #50) reports the git commit of
-  the checkout (`backend/peded/version.py` reads `.git` directly, no git
-  subprocess) and a database round trip. `deploy.sh` polls it after the
+- `GET /api/health/` (`backend/api/health.py`, #50) checks a database round
+  trip and free disk space, 200 or 503. `deploy.sh` polls it after the
   restart and fails if it does not answer 200 with the pulled commit within
-  30 seconds. The Nginx vhost has an `access_log off` location for it.
-  Neither Nginx nor the unit file is re-copied by `deploy.sh`; a change to
-  either has to be installed by hand (INSTALL.md steps 6 and 7).
+  30 seconds. The commit (`backend/peded/version.py` reads `.git` directly,
+  no git subprocess) is only in the answer for a loopback caller with no
+  proxy headers, so `deploy.sh` must keep asking Gunicorn on `127.0.0.1:8000`
+  and every Nginx location must keep setting `X-Forwarded-*`. Through Nginx
+  the commit is hidden on purpose: the repo is public and a commit names the
+  fixes a server lacks.
+- The health check is what uptime monitoring polls (UptimeRobot, which only
+  reads the status code and sends `HEAD` by default). It cannot see Nginx or
+  the frontend build, since Nginx serves `frontend/dist` without touching
+  Gunicorn, so monitoring needs a second check on `/`. There is no Node
+  process in production.
+- The Nginx vhost has an `access_log off` location for the health check.
+  Neither Nginx nor the unit file is installed by `deploy.sh`. The installed
+  vhost has been edited by Certbot (TLS) and by hand (`server_name`), so a
+  change to `pededit-nginx.conf` is merged into it by hand, never copied over
+  it.
 - `pededit-nginx.conf` — serves the Vite build, proxies `/api/` and `/admin/`
   to Gunicorn, serves `/djstatic/`.
 - `pededit.json.example` — template for the config file.

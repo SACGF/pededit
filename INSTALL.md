@@ -249,7 +249,11 @@ sudo systemctl status pededit
 curl -s http://127.0.0.1:8000/api/health/
 ```
 
-The health check answers `{"status": "ok", "version": "<git commit>", "database": "ok"}` with 200, or 503 when the database round trip fails. It needs no token and is not rate limited, so point uptime monitoring at `https://your-domain/api/health/`. Nginx and Gunicorn keep it out of their access logs (`deploy/pededit-nginx.conf`, `deploy/gunicorn.conf.py`).
+The health check answers `{"status": "ok", "database": "ok", "disk": "ok", "version": "<git commit>"}` with 200. It answers 503 when the database round trip fails (`"database": "unavailable"`) or a disk is nearly full (`"disk": "low"`). It needs no token and is not rate limited, and Nginx and Gunicorn keep it out of their access logs (`deploy/pededit-nginx.conf`, `deploy/gunicorn.conf.py`). See step 11 for pointing a monitor at it.
+
+`version` is only in the answer when you ask on the box as above. Through Nginx it is left out: the code is public, so a commit would tell anyone which fixes a server is missing.
+
+The disk check fails when `/` or `/var/lib/postgresql` has less than 1024 MB free. A full disk does not stop Postgres answering reads, so without it the check would stay green while every save fails. To change the floor or the filesystems, add `"health_disk_min_free_mb"` or `"health_disk_paths"` (a list) to `/etc/pededit/pededit.json`. Do that if Postgres keeps its data on another volume.
 
 If something is wrong, check the logs:
 
@@ -335,11 +339,24 @@ Use the deploy script, which pulls social login client IDs from `/etc/pededit/pe
 sudo bash /opt/pededit/deploy/deploy.sh
 ```
 
-This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served. Nginx does not need a restart, but if `deploy/pededit-nginx.conf` or `deploy/pededit.service` changed, copy them into place again as in steps 6 and 7.
+This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
+
+The script does not install the service file or the Nginx config. If `deploy/pededit.service` changed, copy it into place again as in step 6. If `deploy/pededit-nginx.conf` changed, make the same edit by hand in `/etc/nginx/sites-available/pededit`, then `sudo nginx -t && sudo systemctl reload nginx`. Do not copy the file over the installed one: that loses your `server_name` and the TLS lines Certbot added.
+
+## 11. Uptime monitoring
+
+Any monitor that reads the HTTP status works (UptimeRobot's free HTTP monitor does). Set up two:
+
+- `https://your-domain/api/health/`: Gunicorn, the database and free disk space. 200 is up, 503 or no answer is down. `HEAD` and `GET` both work.
+- `https://your-domain/`: Nginx and the frontend build. The health check cannot see these, because Nginx serves the frontend as static files without touching Gunicorn.
+
+Neither can tell that the app loads but then breaks in the browser. That needs error reporting (#49).
 
 ## Troubleshooting
 
-**`deploy.sh` says the health check did not return 200** — Gunicorn failed to start or cannot reach the database. `sudo journalctl -u pededit -e` shows why; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
+**`deploy.sh` says the health check did not return 200.** With no "last answer" line, Gunicorn failed to start. With one, the answer names the failing check: `"database": "unavailable"` or `"disk": "low"` (free some space, `df -h`). `sudo journalctl -u pededit -e` has the detail; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
+
+**`deploy.sh` says the health check is serving `''`.** The answer had no `version`, so the app did not see the request as local. The script must ask Gunicorn directly on `127.0.0.1:8000`, not through Nginx or another proxy.
 
 **502 Bad Gateway** — Gunicorn isn't running. Check `sudo systemctl status pededit` and `sudo journalctl -u pededit -e`.
 

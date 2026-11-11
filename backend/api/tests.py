@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from .models import Pedigree, TagPreset
@@ -229,15 +230,44 @@ class AgentTokenCommandTests(APITestCase):
 
 
 class HealthCheckTests(APITestCase):
-    def test_health_is_public_and_reports_version(self):
+    def test_health_is_public(self):
+        # A request that came through the proxy: no token needed, no version.
+        resp = self.client.get("/api/health/", HTTP_X_FORWARDED_PROTO="https")
+        self.assertEqual(resp.status_code, 200, resp.content)
+        self.assertEqual(resp.json(), {"status": "ok", "database": "ok", "disk": "ok"})
+
+    def test_version_only_for_a_caller_on_the_box(self):
         from peded.version import VERSION
 
-        resp = self.client.get("/api/health/")
-        self.assertEqual(resp.status_code, 200, resp.content)
-        self.assertEqual(resp.json(), {"status": "ok", "version": VERSION, "database": "ok"})
-        self.assertNotEqual(VERSION, "")
+        # deploy.sh: loopback, straight to Gunicorn, no proxy headers.
+        body = self.client.get("/api/health/").json()
+        self.assertEqual(body["version"], VERSION)
         # A git checkout reports its commit; an exported tree reports "unknown".
         self.assertTrue(VERSION == "unknown" or len(VERSION) == 40, VERSION)
+
+        proxied = [
+            {"HTTP_X_FORWARDED_PROTO": "https"},
+            {"HTTP_X_FORWARDED_FOR": "203.0.113.5"},
+            {"HTTP_X_REAL_IP": "203.0.113.5"},
+            {"HTTP_FORWARDED": "for=203.0.113.5"},
+            {"REMOTE_ADDR": "203.0.113.5"},
+            {"REMOTE_ADDR": ""},
+        ]
+        for extra in proxied:
+            with self.subTest(extra=extra):
+                resp = self.client.get("/api/health/", **extra)
+                self.assertEqual(resp.status_code, 200)
+                self.assertNotIn("version", resp.json())
+                self.assertNotIn(VERSION, resp.content.decode())
+
+    def test_head_answers_like_get(self):
+        # UptimeRobot's HTTP monitor sends HEAD by default.
+        resp = self.client.head("/api/health/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content, b"")
+        with override_settings(HEALTH_DISK_MIN_FREE_MB=10**12):
+            with self.assertLogs("api.health", level="ERROR"):
+                self.assertEqual(self.client.head("/api/health/").status_code, 503)
 
     def test_bad_token_does_not_break_health(self):
         self.client.credentials(HTTP_AUTHORIZATION="Bearer not-a-token")
@@ -254,7 +284,49 @@ class HealthCheckTests(APITestCase):
         body = resp.json()
         self.assertEqual(body["status"], "error")
         self.assertEqual(body["database"], "unavailable")
+        self.assertEqual(body["disk"], "ok")
         self.assertNotIn("down", resp.content.decode())
+
+    def test_low_disk_is_503(self):
+        from collections import namedtuple
+        from unittest.mock import patch
+
+        Usage = namedtuple("Usage", "total used free")
+        mb = 1024 * 1024
+
+        def usage(free_mb):
+            return Usage(100_000 * mb, (100_000 - free_mb) * mb, free_mb * mb)
+
+        with override_settings(HEALTH_DISK_PATHS=["/", "/data"], HEALTH_DISK_MIN_FREE_MB=1024):
+            # Every filesystem above the floor.
+            with patch("api.health.shutil.disk_usage", return_value=usage(1024)):
+                self.assertEqual(self.client.get("/api/health/").status_code, 200)
+
+            # One of them below it. The figures are logged, not returned.
+            free = {"/": usage(50_000), "/data": usage(1023)}
+            with patch("api.health.shutil.disk_usage", side_effect=lambda p: free[p]):
+                with self.assertLogs("api.health", level="ERROR") as logs:
+                    resp = self.client.get("/api/health/")
+            self.assertEqual(resp.status_code, 503)
+            self.assertEqual(resp.json(), {
+                "status": "error", "database": "ok", "disk": "low",
+                "version": resp.json()["version"],
+            })
+            self.assertIn("/data has 1023 MB free", logs.output[0])
+            self.assertNotIn("1023", resp.content.decode())
+
+    def test_unmeasurable_disk_paths_do_not_fail_the_check(self):
+        from unittest.mock import patch
+
+        with override_settings(HEALTH_DISK_PATHS=["/no/such/path/pededit"]):
+            self.assertEqual(self.client.get("/api/health/").status_code, 200)
+
+        with override_settings(HEALTH_DISK_PATHS=["/"]):
+            with patch("api.health.shutil.disk_usage", side_effect=PermissionError("denied")):
+                with self.assertLogs("api.health", level="WARNING"):
+                    resp = self.client.get("/api/health/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["disk"], "ok")
 
     def test_version_env_override(self):
         import os
