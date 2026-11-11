@@ -97,12 +97,12 @@ export default function LandingPage() {
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-8 py-16">
-        <div className="w-full max-w-lg">
-          <p className="text-sm text-gray-500 mb-3">
+        <div className="w-full max-w-4xl">
+          <p className="text-sm text-gray-500 mb-3 max-w-xl">
             Automatic layout from <a href="https://cran.r-project.org/package=kinship2" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">kinship2</a>, handling consanguinity and complex families. Drag-and-drop repositioning. <a href="https://github.com/SACGF/pededit" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">Open source</a>.
           </p>
           {!isAuthenticated && (
-            <p className="text-sm text-gray-500 mb-8">
+            <p className="text-sm text-gray-500 mb-8 max-w-xl">
               <span className="text-black font-medium">No account required.</span>{" "}
               Click a button below to start drawing. Each pedigree is saved at its own private URL, so bookmark the link to come back to it or share it with a colleague.{" "}
               <span
@@ -114,7 +114,7 @@ export default function LandingPage() {
           {isAuthenticated && <div className="mb-8" />}
 
           {/* Primary actions */}
-          <div className="flex gap-2 mb-10">
+          <div className="flex flex-wrap gap-2 mb-10">
             <Button
               className="h-8 text-xs px-4"
               onClick={handleCreateBlank}
@@ -145,7 +145,7 @@ export default function LandingPage() {
                 {group && (
                   <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">{group}</p>
                 )}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {EXAMPLES.map((ex, i) => (ex.group ?? "") === group && (
                     <button
                       key={i}
@@ -217,7 +217,7 @@ function RecentOnThisDevice({ disabled }: { disabled: boolean }) {
       <p className="text-[10px] text-gray-400 mb-3">
         Pedigrees opened in this browser. The list is stored here only, so it does not follow you to another device or browser.
       </p>
-      <ul className="space-y-1">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
         {recent.map(p => (
           <li key={p.id} className="flex items-stretch gap-1">
             <button
@@ -262,7 +262,7 @@ function MyPedigrees() {
       <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
         Your pedigrees
       </p>
-      <ul className="space-y-1">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
         {pedigrees.map((p) => (
           <li key={p.id}>
             <button
