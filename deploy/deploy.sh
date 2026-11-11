@@ -19,7 +19,15 @@ GITHUB_CID=$(python3 -c "import json; print(json.load(open('$CONFIG')).get('gith
 
 echo "==> Pulling latest code"
 cd /opt/pededit
+BEFORE=$(sudo -u pededit git rev-parse HEAD:deploy/deploy.sh)
 sudo -u pededit git pull
+# Bash keeps running the copy of this script it started with, so steps added
+# by the pull would be skipped. If the pull changed this file, start the new
+# one (it pulls again, a no-op, then runs every step).
+if [[ -z "${PEDEDIT_DEPLOY_REEXEC:-}" && "$(sudo -u pededit git rev-parse HEAD:deploy/deploy.sh)" != "$BEFORE" ]]; then
+    echo "    deploy.sh changed, restarting it"
+    PEDEDIT_DEPLOY_REEXEC=1 exec bash /opt/pededit/deploy/deploy.sh "$@"
+fi
 
 echo "==> Installing Node dependencies"
 sudo -u pededit npm ci
