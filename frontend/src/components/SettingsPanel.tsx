@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import type { SiblingOrderMode } from "@pedigree-editor/layout-engine";
+import { nameLabelMode } from "../pedigree/labels";
 
 interface SettingsPanelProps {
   open: boolean;
@@ -34,6 +35,8 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
       navigate("/");
     }
   }
+
+  const truncateNames = nameLabelMode(pedigree) === "truncate";
 
   const modes: { value: SiblingOrderMode; label: string; description: string }[] = [
     {
@@ -88,6 +91,20 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 <div className="text-sm">Compact layout</div>
                 <div className="text-xs text-gray-400">
                   Tighter spacing between generations so larger pedigrees fit on screen. Pinned positions are scaled to match.
+                </div>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer mt-2">
+              <input
+                type="checkbox"
+                name="truncateNames"
+                checked={truncateNames}
+                onChange={e => updateCanvasSettings({ nameLabels: e.target.checked ? "truncate" : "wrap" })}
+              />
+              <div>
+                <div className="text-sm">Truncate long names</div>
+                <div className="text-xs text-gray-400">
+                  Names too long for their slot are cut to one line, not wrapped onto two. Hover a name to read it in full. Exports still wrap.
                 </div>
               </div>
             </label>

@@ -94,6 +94,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     nodesMoveable = serializers.BooleanField()
     snapToGrid = serializers.BooleanField()
     snapGridSize = serializers.FloatField(min_value=0)
+    nameLabels = _opt(serializers.ChoiceField, choices=["wrap", "truncate"])
 
 
 class PositionSerializer(serializers.Serializer):

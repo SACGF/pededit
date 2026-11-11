@@ -8,12 +8,14 @@ interface HoverPillProps {
   individualId: string;    // pedigree Individual.id
   isVisible: boolean;
   hasParents: boolean;     // disable +parents if already has both parents filled
+  name?: string;           // full name, shown under the pill (the pill covers the name label)
+  nameOnly?: boolean;      // a cut name label is hovered: show the full name without the buttons
   onPillEnter: () => void; // called when mouse enters pill (cancel hide timer)
   onPillLeave: () => void; // called when mouse leaves pill (schedule hide)
   onMenuClose?: () => void; // more menu closed (it gives no mouseleave, see MoreMenu)
 }
 
-export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
+export function HoverPill({ nodeId, individualId, isVisible, hasParents, name, nameOnly, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
   const { addParent, addChild, addSibling, pedigree, unlockIndividual, lockIndividual } = usePedigreeStore();
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const isUnlocked = nodesMoveable || (pedigree.unlockedIndividuals ?? []).includes(individualId);
@@ -23,12 +25,16 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
   return (
     <NodeToolbar
       nodeId={nodeId}
-      isVisible={isVisible}
+      isVisible={isVisible || !!nameOnly}
       position={Position.Bottom}
       offset={6}
+      className="flex flex-col items-center"
+      // With only the name showing, clicks go through to the label underneath.
+      style={isVisible ? undefined : { pointerEvents: "none" }}
     >
       <div
         className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-xs text-xs"
+        style={isVisible ? undefined : { display: "none" }}
         onMouseEnter={onPillEnter}
         onMouseMove={onPillEnter}
         onMouseLeave={onPillLeave}
@@ -98,6 +104,17 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, onPillE
         {/* More menu */}
         <MoreMenu individualId={individualId} onClose={onMenuClose} />
       </div>
+      {/* The pill sits over the name label, and the label may be cut to fit its
+          slot (#68), so the full name is repeated here. */}
+      {name?.trim() && (
+        <div
+          data-full-name
+          className="mt-0.5 px-1.5 py-0.5 bg-white border border-gray-300 text-xs text-black text-center pointer-events-none"
+          style={{ maxWidth: 280 }}
+        >
+          {name.trim()}
+        </div>
+      )}
     </NodeToolbar>
   );
 }

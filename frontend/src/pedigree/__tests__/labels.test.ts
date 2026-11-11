@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH, ELLIPSIS, linesWidth } from "../labels";
+import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH, ELLIPSIS, linesWidth, nameLabelMode, isLabelCut } from "../labels";
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -39,20 +39,20 @@ describe("wrapLabel (#68)", () => {
   });
 });
 
-describe("labels on the canvas, in exports and in the lint (#68)", () => {
-  function pair(name: string, dx = SLOT_WIDTH, other = "Bea"): Pedigree {
-    return {
-      individuals: [
-        { id: "a", sex: "male", affected: false, sibOrder: 0, name },
-        { id: "b", sex: "female", affected: false, sibOrder: 1, name: other },
-      ],
-      partnerships: [{ id: "p", individual1: "a", individual2: "b" }],
-      parentOf: { p: [] },
-      siblingOrder: { mode: "insertion", affectedFirst: false },
-      pinnedPositions: { b: { x: dx, y: 0 }, a: { x: 0, y: 0 } },
-    };
-  }
+function pair(name: string, dx = SLOT_WIDTH, other = "Bea"): Pedigree {
+  return {
+    individuals: [
+      { id: "a", sex: "male", affected: false, sibOrder: 0, name },
+      { id: "b", sex: "female", affected: false, sibOrder: 1, name: other },
+    ],
+    partnerships: [{ id: "p", individual1: "a", individual2: "b" }],
+    parentOf: { p: [] },
+    siblingOrder: { mode: "insertion", affectedFirst: false },
+    pinnedPositions: { b: { x: dx, y: 0 }, a: { x: 0, y: 0 } },
+  };
+}
 
+describe("labels on the canvas, in exports and in the lint (#68)", () => {
   it("layoutToFlow puts the wrapped lines on the node data", () => {
     const flow = layoutToFlow(pair("Ferdinand of Aragon"));
     expect(flow.nodes.find(n => n.data.individual.id === "a")!.data.nameLines).toEqual(["Ferdinand of", "Aragon"]);
@@ -82,6 +82,53 @@ describe("labels on the canvas, in exports and in the lint (#68)", () => {
     for (const ex of EXAMPLES) {
       for (const compact of [false, true]) {
         const found = lintFlow(ex.data, layoutToFlow(ex.data, { compact })).filter(f => f.code === "labels-overlap");
+        expect({ label: ex.label, compact, found }).toEqual({ label: ex.label, compact, found: [] });
+      }
+    }
+  });
+});
+
+describe("name label setting: wrap or truncate (#68)", () => {
+  const truncated = (p: Pedigree): Pedigree => ({
+    ...p,
+    canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, nameLabels: "truncate" },
+  });
+
+  it("is wrap unless the pedigree says truncate", () => {
+    expect(nameLabelMode(pair("Bob"))).toBe("wrap");
+    expect(nameLabelMode({ canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20 } })).toBe("wrap");
+    expect(nameLabelMode(truncated(pair("Bob")))).toBe("truncate");
+  });
+
+  it("truncate gives one line on the canvas, cut with an ellipsis", () => {
+    const p = truncated(pair("Ferdinand of Aragon"));
+    const lines = layoutToFlow(p).nodes[0]!.data.nameLines;
+    expect(lines).toHaveLength(1);
+    expect(lines[0]!.endsWith(ELLIPSIS)).toBe(true);
+    expect(linesWidth(lines)).toBeLessThanOrEqual(max);
+    expect(layoutToFlow(truncated(pair("Mary"))).nodes[0]!.data.nameLines).toEqual(["Mary"]);
+    expect(layoutToFlow(pair("Ferdinand of Aragon")).nodes[0]!.data.nameLines).toEqual(["Ferdinand of", "Aragon"]);
+  });
+
+  it("knows when a label leaves part of the name out", () => {
+    expect(isLabelCut(["Ferdinand of", "Aragon"], "Ferdinand of Aragon")).toBe(false);
+    expect(isLabelCut(["Mary"], "  Mary ")).toBe(false);
+    expect(isLabelCut(wrapLabel("Bartholomewson", max), "Bartholomewson")).toBe(false); // split mid-word, nothing lost
+    expect(isLabelCut(wrapLabel("Ferdinand of Aragon", max, 1), "Ferdinand of Aragon")).toBe(true);
+    expect(isLabelCut(wrapLabel("Maria Anna Josepha Antonia", max), "Maria Anna Josepha Antonia")).toBe(true);
+  });
+
+  it("exports wrap whatever the setting, since a file cannot be hovered", () => {
+    const svg = exportSvg(truncated(pair("Ferdinand of Aragon")));
+    expect(svg).toContain(">Ferdinand of</text>");
+    expect(svg).toContain(">Aragon</text>");
+  });
+
+  it("no example's labels overlap when truncated, in normal or compact spacing", () => {
+    for (const ex of EXAMPLES) {
+      for (const compact of [false, true]) {
+        const p = truncated(ex.data);
+        const found = lintFlow(p, layoutToFlow(p, { compact })).filter(f => f.code === "labels-overlap");
         expect({ label: ex.label, compact, found }).toEqual({ label: ex.label, compact, found: [] });
       }
     }

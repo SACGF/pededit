@@ -7,6 +7,7 @@ const TAG_STYLES = ["quadrant", "dot", "text"];
 const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"];
 const CHILDLESS_VALUES = ["infertility", "byChoice"];
 const ADOPTION_VALUES = ["in", "out"];
+const NAME_LABEL_VALUES = ["wrap", "truncate"];
 const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
 
@@ -340,6 +341,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       c.required(cs, "nodesMoveable", cp, "a boolean", v => typeof v === "boolean");
       c.required(cs, "snapToGrid", cp, "a boolean", v => typeof v === "boolean");
       c.required(cs, "snapGridSize", cp, "a number", isFiniteNumber);
+      c.optional(cs, "nameLabels", cp, NAME_LABEL_VALUES.map(s => `"${s}"`).join(" | "),
+        v => typeof v === "string" && NAME_LABEL_VALUES.includes(v));
     }
   }
 

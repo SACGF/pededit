@@ -92,7 +92,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   in track coordinates, since a straight chord between twins far apart along
   the U would cut across the tracks.
 - Names in both SVG exporters wrap like the canvas (`pedigree/labels.ts`,
-  #68); `computeBounds` allows for the most lines any name takes.
+  #68); `computeBounds` allows for the most lines any name takes. They wrap
+  even when the pedigree's `canvasSettings.nameLabels` is "truncate": that
+  setting is for the canvas, where hovering gives the full name.
 - To look at an export without the dialog: bundle a scratch entry that
   imports `exportSvg` / `exportUShapeSvg` with
   `node_modules/.bin/esbuild entry.ts --bundle --platform=node --format=esm`,

@@ -104,7 +104,14 @@ export interface CanvasSettings {
   nodesMoveable: boolean;
   snapToGrid: boolean;
   snapGridSize: number;
+  /**
+   * How a name too long for its slot is shown on the canvas (#68): "wrap"
+   * onto two lines, or "truncate" to one line. Absent means "wrap".
+   */
+  nameLabels?: NameLabelMode;
 }
+
+export type NameLabelMode = "wrap" | "truncate";
 
 export interface Pedigree {
   individuals: Individual[];

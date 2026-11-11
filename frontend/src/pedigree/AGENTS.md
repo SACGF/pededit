@@ -42,11 +42,21 @@ draws NSGC symbols.
 - `labels.ts` — name labels wrap to the slot width (#68): `wrapLabel` gives
   at most two lines, cut with an ellipsis, from an estimated 5.8px per
   character; `layoutToFlow` puts the lines on the node data (`nameLines`),
-  the canvas shows the full name as a tooltip, `svgExporter` writes one
-  text element per line with the full name in a `<title>`, and the U-shape
-  wraps at its widest slot. The `labels-overlap` lint code uses the same
-  estimate, so names fit by construction and it mainly catches dragged
-  nodes. Slots are never widened for labels: the layout is in slot units.
+  `svgExporter` writes one text element per line with the full name in a
+  `<title>`, and the U-shape wraps at its widest slot. The `labels-overlap`
+  lint code uses the same estimate, so names fit by construction and it
+  mainly catches dragged nodes. Slots are never widened for labels: the
+  layout is in slot units.
+  `canvasSettings.nameLabels` "truncate" (Settings, "Truncate long names")
+  gives one line on the canvas only; exports always wrap, because a file
+  cannot be hovered.
+- Reading a cut name: the full name is repeated under the hover pill, which
+  sits on top of the name label. A cut label (`data-name-cut`) also takes
+  the mouse itself: hovering it shows the name alone, without the pill
+  buttons, since a pill opening under the cursor turns a click on the name
+  into a click on a button. A `title` attribute on the label does nothing
+  while it has `pointer-events: none`, which is how the first version of
+  #68 shipped a tooltip that never appeared.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. The lines come from
   `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits

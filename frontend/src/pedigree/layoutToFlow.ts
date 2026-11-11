@@ -9,7 +9,7 @@ import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { twinMembership } from "./twins";
-import { wrapLabel, labelMaxWidth } from "./labels";
+import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -36,7 +36,10 @@ export interface RFNodeData extends Record<string, unknown> {
   /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin (#11). */
   twinSet?: string;
   zygosity?: Zygosity;
-  /** The name wrapped to the slot width, at most two lines, cut with an ellipsis (#68). Empty when unnamed. */
+  /**
+   * The name fitted to the slot width and cut with an ellipsis (#68): at most
+   * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
+   */
   nameLines: string[];
 }
 
@@ -262,6 +265,7 @@ function buildNodes(
   const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
   const childIds = new Set(Object.values(pedigree.parentOf).flat());
   const twins = twinMembership(pedigree);
+  const labelLines = canvasLabelLines(nameLabelMode(pedigree));
 
   const nodes: Node<RFNodeData>[] = [];
   for (let level = 0; level < result.n.length; level++) {
@@ -290,7 +294,7 @@ function buildNodes(
           hasParents: childIds.has(individual.id),
           isPinned,
           ...(twins.get(individual.id) ?? {}),
-          nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth)),
+          nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth), labelLines),
         },
       });
     }

@@ -2,9 +2,15 @@
  * Name labels under symbols (#68). Slots are 80px apart (68px compact) and a
  * long name at a fixed width runs into its neighbours, so names wrap onto up
  * to two lines at the slot width and are cut with an ellipsis beyond that.
- * The full name stays in the data (and in the canvas tooltip). Framework-free
+ * The full name stays in the data and shows under the hover pill. Framework-free
  * and shared by the canvas, `svgExporter`, `uShapeExporter` and the lint.
+ *
+ * A pedigree can ask for one line instead (`canvasSettings.nameLabels`
+ * "truncate"). That applies to the canvas only, where hovering gives the full
+ * name; exports cannot be hovered, so they always wrap.
  */
+
+import type { NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -12,6 +18,22 @@ export const LABEL_CHAR_WIDTH = 5.8;
 export const LABEL_LINE_HEIGHT = 12;
 export const MAX_LABEL_LINES = 2;
 export const ELLIPSIS = "…";
+
+/** The pedigree's name label setting; anything absent or unrecognised is "wrap". */
+export function nameLabelMode(pedigree: Pick<Pedigree, "canvasSettings">): NameLabelMode {
+  return pedigree.canvasSettings?.nameLabels === "truncate" ? "truncate" : "wrap";
+}
+
+/** Lines a name may take on the canvas in each mode. */
+export function canvasLabelLines(mode: NameLabelMode): number {
+  return mode === "truncate" ? 1 : MAX_LABEL_LINES;
+}
+
+/** True when `lines` (from wrapLabel) leave out part of `text`. */
+export function isLabelCut(lines: string[], text: string | undefined): boolean {
+  const squash = (s: string) => s.replace(/\s+/g, "");
+  return squash(lines.join("")) !== squash(text ?? "");
+}
 
 /** Estimated rendered width (px) of a line of label text. */
 export function textWidth(text: string): number {

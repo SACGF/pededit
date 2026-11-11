@@ -57,6 +57,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `nodesMoveable` | boolean | When `true` every node is draggable without an individual unlock. |
 | `snapToGrid` | boolean | Snap dragged nodes to a grid. |
 | `snapGridSize` | number | Grid spacing in canvas pixels. |
+| `nameLabels` | `"wrap"` or `"truncate"` | Optional. How a name too long for its slot is shown on the canvas: wrapped onto two lines, or cut to one line. Absent means `"wrap"`. Exports always wrap. |
 
 ## `Individual`
 

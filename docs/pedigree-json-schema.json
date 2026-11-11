@@ -127,7 +127,11 @@
       "properties": {
         "nodesMoveable": { "type": "boolean" },
         "snapToGrid": { "type": "boolean" },
-        "snapGridSize": { "type": "number" }
+        "snapGridSize": { "type": "number" },
+        "nameLabels": {
+          "enum": ["wrap", "truncate"],
+          "description": "How a name too long for its slot is shown on the canvas: wrapped onto two lines, or cut to one line. Absent means \"wrap\". Exports always wrap."
+        }
       }
     }
   },

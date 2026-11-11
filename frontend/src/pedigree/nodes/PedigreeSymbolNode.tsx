@@ -6,7 +6,7 @@ import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
-import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT } from "../labels";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
@@ -25,9 +25,11 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
   const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines } = data;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
+  const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { setHoveredId, setSelectedId, selectedId, pedigree, picking, pickIndividual } = usePedigreeStore();
   const isSelected = individual.id === selectedId;
+  const nameCut = isLabelCut(nameLines, individual.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
   const isPickTarget = picking?.kind === "parents" && picking.childId === individual.id;
@@ -51,7 +53,10 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
     }
   }
 
-  function handleMouseEnter() {
+  function handleMouseEnter(e?: React.MouseEvent) {
+    // Over a cut name label only the full name shows (#68): the pill would
+    // open under the cursor, where a click meant for the name hits a button.
+    if (e && (e.target as Element).closest?.("[data-name-label]")) return;
     cancelHide();
     setIsPillVisible(true);
     setHoveredId(individual.id);
@@ -73,7 +78,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
       }}
       data-picked={isPicked ? "true" : undefined}
       onMouseEnter={handleMouseEnter}
-      onMouseMove={() => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(); }}
+      onMouseMove={e => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(e); }}
       onMouseLeave={handleMouseLeave}
       onClick={() => { if (!pickIndividual(individual.id)) setSelectedId(individual.id); }}
     >
@@ -91,11 +96,14 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
-      {/* Name label below symbol: wrapped to the slot width, full name in the tooltip (#68) */}
+      {/* Name label below symbol, fitted to the slot width (#68). A cut label
+          takes the mouse: hovering it shows the full name, clicking it selects. */}
       {nameLines.length > 0 && (
         <div
           data-name-label
-          title={individual.name}
+          data-name-cut={nameCut ? "true" : undefined}
+          onMouseEnter={() => setIsNameHovered(true)}
+          onMouseLeave={() => setIsNameHovered(false)}
           style={{
             position: "absolute",
             top: labelTop,
@@ -106,7 +114,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
             fontSize: LABEL_FONT_SIZE,
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
-            pointerEvents: "none",
+            pointerEvents: nameCut ? "auto" : "none",
           }}
         >
           {nameLines.map((line, i) => <div key={i}>{line}</div>)}
@@ -171,6 +179,8 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         individualId={individual.id}
         isVisible={isPillVisible && !picking}
         hasParents={hasParents}
+        name={individual.name}
+        nameOnly={isNameHovered && nameCut}
         onPillEnter={cancelHide}
         onPillLeave={scheduleHide}
         onMenuClose={scheduleHide}
