@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { BUILD_DATE, formatDate } from "../utils/buildInfo";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { ImportPedDialog } from "../components/ImportPedDialog";
@@ -173,15 +174,19 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t px-8 py-4 text-center">
+      <footer className="border-t px-8 py-4 text-center text-xs text-gray-400">
         <a
           href="https://github.com/SACGF/pededit"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          className="hover:text-gray-600 transition-colors"
         >
           GitHub
         </a>
+        <span className="mx-2 text-gray-300">·</span>
+        <Link to="/changelog" className="hover:text-gray-600 transition-colors" title="Changelog">
+          {BUILD_DATE ? `Updated ${formatDate(BUILD_DATE)}` : "Changelog"}
+        </Link>
       </footer>
 
       <ImportPedDialog

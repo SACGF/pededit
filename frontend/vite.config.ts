@@ -67,6 +67,9 @@ function servedCommitPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), servedCommitPlugin()],
+  // Shown as "Last deployed" in the footer and on /changelog (#79). Production
+  // builds run in deploy.sh, so build time is deploy time.
+  define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(new Date().toISOString()) },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

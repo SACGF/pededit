@@ -23,3 +23,4 @@ test-output
 *.njsproj
 *.sln
 *.sw?
+public/changelog.json

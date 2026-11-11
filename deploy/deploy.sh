@@ -19,6 +19,12 @@ sudo -u pededit git pull
 echo "==> Installing Node dependencies"
 sudo -u pededit npm ci
 
+echo "==> Writing the changelog from GitHub milestones"
+# Into frontend/public (gitignored), so the build copies it into dist. On
+# failure the previous file stays and the page shows the last good changelog.
+sudo -u pededit node frontend/scripts/changelog.mjs \
+    || echo "    (changelog fetch failed, keeping the previous one)"
+
 echo "==> Building frontend"
 echo "    VITE_GOOGLE_CLIENT_ID=${GOOGLE_CID:+(set)}"
 echo "    VITE_GITHUB_CLIENT_ID=${GITHUB_CID:+(set)}"

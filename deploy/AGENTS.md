@@ -22,6 +22,11 @@ Deployment" half).
   and every Nginx location must keep setting `X-Forwarded-*`. Through Nginx
   the commit is hidden on purpose: the repo is public and a commit names the
   fixes a server lacks.
+- Before the build `deploy.sh` runs `frontend/scripts/changelog.mjs` (#79),
+  which needs outbound HTTPS to api.github.com and writes the gitignored
+  `frontend/public/changelog.json`. A failure keeps the previous file and
+  does not stop the deploy. It must never write a tracked file, or the next
+  `git pull` would refuse to run.
 - After a healthy restart `deploy.sh` prints `manage.py usage_stats` (#78).
   It runs after the deploy is live and its failure is swallowed, so keep
   anything that must gate a deploy before the health check.
