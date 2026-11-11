@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issues), not in plan files. Check there before starting anything.
 
+**Pull before starting new work.** Run `git pull --rebase` on `main` before each new task, not only at the start of a session: other agents and the maintainer push to `main` while you work, and a stale checkout means reviewing or building on old code and a rejected push at the end. If the tree has uncommitted changes, stop and ask rather than stash or discard them. Fetch again before pushing.
+
 ### Issue and release workflow
 
 - **Why issues exist.** They are for humans: so a bug reported twice can be found as already captured, and so changes that need manual testing get tested. Decide whether work needs one on that basis:
