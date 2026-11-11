@@ -80,5 +80,11 @@ it fails.
   `settings.LOGGING` filters the check out of runserver's request log;
   production does the same in `deploy/gunicorn.conf.py` and the Nginx vhost.
 
+`manage.py usage_stats [--days N] [--json]` (#78) prints signed-in users and
+signed-in vs anonymous pedigrees created and edited in the window; `deploy.sh`
+runs it at the end. Social login never sets `User.last_login`, so "active
+users" means owners of a pedigree touched in the window, and anonymous users
+can only be counted as pedigrees. `claude_agent` is excluded.
+
 Static files are served under `djstatic/` so they do not collide with the
 Vite build.

@@ -22,6 +22,9 @@ Deployment" half).
   and every Nginx location must keep setting `X-Forwarded-*`. Through Nginx
   the commit is hidden on purpose: the repo is public and a commit names the
   fixes a server lacks.
+- After a healthy restart `deploy.sh` prints `manage.py usage_stats` (#78).
+  It runs after the deploy is live and its failure is swallowed, so keep
+  anything that must gate a deploy before the health check.
 - The health check is what uptime monitoring polls (UptimeRobot, which only
   reads the status code and sends `HEAD` by default). It cannot see Nginx or
   the frontend build, since Nginx serves `frontend/dist` without touching

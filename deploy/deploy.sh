@@ -51,6 +51,11 @@ for _ in $(seq 1 30); do
             VERSION=$(printf '%s' "$BODY" | python3 -c "import json,sys; print(json.load(sys.stdin).get('version',''))")
             if [[ "$VERSION" == "$EXPECTED" ]]; then
                 echo "    healthy, serving $VERSION"
+                echo "==> Usage"
+                # Informational only (#78): a failure here must not fail a deploy
+                # that is already live.
+                (cd /opt/pededit/backend && sudo -u pededit .venv/bin/python manage.py usage_stats) \
+                    || echo "    (usage_stats failed)"
                 echo "==> Done"
                 exit 0
             fi

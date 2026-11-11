@@ -339,3 +339,63 @@ class HealthCheckTests(APITestCase):
 
         with patch.dict(os.environ, {"PEDEDIT_VERSION": "v1.2.3"}):
             self.assertEqual(get_version(), "v1.2.3")
+
+
+class UsageStatsCommandTests(APITestCase):
+    def _stats(self, *args):
+        from io import StringIO
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("usage_stats", "--json", *args, stdout=out)
+        return json.loads(out.getvalue())
+
+    def _pedigree(self, owner=None, created_days_ago=0, updated_days_ago=None):
+        from datetime import timedelta
+        from django.utils import timezone
+
+        p = Pedigree.objects.create(owner=owner, data={})
+        now = timezone.now()
+        created = now - timedelta(days=created_days_ago)
+        updated = now - timedelta(days=created_days_ago if updated_days_ago is None else updated_days_ago)
+        # .update() skips auto_now, so the backdated times stick.
+        Pedigree.objects.filter(pk=p.pk).update(created=created, updated=updated)
+        return p
+
+    def test_counts_signed_in_and_anonymous_separately(self):
+        from datetime import timedelta
+        from django.utils import timezone
+
+        alice = User.objects.create_user("alice")
+        bob = User.objects.create_user("bob")
+        User.objects.filter(pk=bob.pk).update(date_joined=timezone.now() - timedelta(days=30))
+        agent = User.objects.create_user("claude_agent")
+
+        self._pedigree(alice)                                         # created this week
+        self._pedigree(bob, created_days_ago=30, updated_days_ago=2)  # old, edited this week
+        self._pedigree(bob, created_days_ago=30)                      # old, untouched
+        self._pedigree(None)                                          # anon, created this week
+        self._pedigree(None)
+        self._pedigree(None, created_days_ago=20, updated_days_ago=1)
+        self._pedigree(None, created_days_ago=20)
+        self._pedigree(agent)                                         # ignored
+
+        s = self._stats()
+        self.assertEqual(s["days"], 7)
+        self.assertEqual(s["users"], {"total": 2, "new": 1, "active": 2})
+        self.assertEqual(s["pedigrees"]["signed_in"], {"total": 3, "created": 1, "edited": 1})
+        self.assertEqual(s["pedigrees"]["anonymous"], {"total": 4, "created": 2, "edited": 1})
+
+        s30 = self._stats("--days", "40")
+        self.assertEqual(s30["pedigrees"]["signed_in"], {"total": 3, "created": 3, "edited": 0})
+
+    def test_text_output(self):
+        from io import StringIO
+        from django.core.management import call_command
+
+        self._pedigree(None)
+        out = StringIO()
+        call_command("usage_stats", stdout=out)
+        text = out.getvalue()
+        self.assertIn("last 7 days", text)
+        self.assertIn("anonymous pedigrees", text)
