@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ $EUID -ne 0 ]]; then
+    echo "Error: run as root: sudo $0" >&2
+    exit 1
+fi
+
 CONFIG="/etc/pededit/pededit.json"
 
 if [[ ! -f "$CONFIG" ]]; then
