@@ -32,7 +32,8 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
   const nameCut = isLabelCut(nameLines, individual.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
-  const isPickTarget = picking?.kind === "parents" && picking.childId === individual.id;
+  const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)
+    || (picking?.kind === "partner" && picking.individualId === individual.id);
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.

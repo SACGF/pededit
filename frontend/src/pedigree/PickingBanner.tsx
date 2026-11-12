@@ -3,6 +3,7 @@ import { Panel } from "@xyflow/react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { setParentsProblem } from "./parents";
+import { linkPartnerProblem } from "./partners";
 
 function nameOf(pedigree: Pedigree, id: string): string {
   const ind = pedigree.individuals.find(i => i.id === id);
@@ -15,7 +16,7 @@ function nameOf(pedigree: Pedigree, id: string): string {
 
 /**
  * Instructions, the picks so far and a name search while on-canvas picking
- * (#36) is active. Sits over the canvas as a React Flow panel.
+ * (#36, and #84 for a partner) is active. Sits over the canvas as a React Flow panel.
  */
 export function PickingBanner() {
   const { pedigree, picking, pickIndividual, applyPicking, cancelPicking } = usePedigreeStore();
@@ -24,18 +25,22 @@ export function PickingBanner() {
 
   const isParents = picking.kind === "parents";
   const picked = isParents ? picking.picked : [];
-  const excluded = new Set(isParents ? [picking.childId, ...picked] : []);
+  const isPartner = picking.kind === "partner";
+  const excluded = new Set(isParents ? [picking.childId, ...picked] : isPartner ? [picking.individualId] : []);
   const q = query.trim().toLowerCase();
   const matches = q
     ? pedigree.individuals
       .filter(i => !excluded.has(i.id) && ((i.name ?? "").toLowerCase().includes(q) || i.id.toLowerCase().includes(q)))
       .filter(i => !isParents || !setParentsProblem(pedigree, picking.childId, [...picked, i.id]))
+      .filter(i => !isPartner || !linkPartnerProblem(pedigree, picking.individualId, i.id))
       .slice(0, 8)
     : [];
 
-  const partnership = !isParents ? pedigree.partnerships.find(p => p.id === picking.partnershipId) : undefined;
+  const partnership = picking.kind === "child" ? pedigree.partnerships.find(p => p.id === picking.partnershipId) : undefined;
   const heading = isParents
     ? `Click one or two people to be the parents of ${nameOf(pedigree, picking.childId)}`
+    : isPartner
+      ? `Click a person already on the tree to be the partner of ${nameOf(pedigree, picking.individualId)}`
     : partnership
       ? `Click a person to make them a child of ${nameOf(pedigree, partnership.individual1)} and ${nameOf(pedigree, partnership.individual2)}`
       : "Click a person";

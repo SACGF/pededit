@@ -7,6 +7,7 @@ import { shareAncestor } from "../utils/pedigreeRelationship";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
+import { linkPartnerProblem } from "../pedigree/partners";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -17,10 +18,13 @@ export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
  * On-canvas picking (#36): clicks choose existing individuals instead of
  * selecting. "parents" collects one or two parents for a child; "child"
  * takes one click, the individual who becomes a child of the partnership.
+ * "partner" (#84) takes one click, the existing individual who becomes the
+ * partner of individualId.
  */
 export type Picking =
   | { kind: "parents"; childId: string; picked: string[] }
-  | { kind: "child"; partnershipId: string };
+  | { kind: "child"; partnershipId: string }
+  | { kind: "partner"; individualId: string };
 
 /** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
 export interface Notice {
@@ -189,12 +193,13 @@ interface PedigreeState {
   picking: Picking | null;
   startPickingParents: (childId: string) => void;
   startPickingChild: (partnershipId: string) => void;
+  startPickingPartner: (individualId: string) => void;
   cancelPicking: () => void;
   /**
    * Handle a click on an individual while picking. For parents: adds (or
    * removes) them from the picked list, refusing with a notice when the
-   * rules say no, and applies as soon as two are picked. For a child:
-   * applies at once. Returns true when the click was consumed.
+   * rules say no, and applies as soon as two are picked. For a child or a
+   * partner: applies at once. Returns true when the click was consumed.
    */
   pickIndividual: (id: string) => boolean;
   /** Apply the parents picked so far (one parent gets a placeholder partner). */
@@ -221,6 +226,13 @@ interface PedigreeState {
   addChildren: (individualId: string, count: number, sex: Sex, partnershipId?: string) => void;
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
+  /**
+   * Make two existing individuals partners (#84), which is how a marriage
+   * between relatives is drawn. The new partnership has no children, keeps
+   * the father role first and is flagged consanguineous when they are
+   * related. Returns the reason when refused, else null.
+   */
+  linkPartner: (individualId: string, partnerId: string) => string | null;
   deleteIndividual: (individualId: string) => void;
   /**
    * Remove these individuals with everyone below them, plus partners who
@@ -347,6 +359,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, selectedId: childId }),
     startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
+    startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, selectedId: individualId }),
     cancelPicking: () => set({ picking: null }),
 
     pickIndividual: (id) => {
@@ -358,6 +371,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const problem = get().setParents(id, [p.individual1, p.individual2]);
         if (problem) get().setNotice({ kind: "error", text: problem });
         else set({ picking: null });
+        return true;
+      }
+      if (picking.kind === "partner") {
+        const problem = get().linkPartner(picking.individualId, id);
+        if (problem) get().setNotice({ kind: "error", text: problem });
+        else set({ picking: null, selectedId: picking.individualId });
         return true;
       }
       if (id === picking.childId) {
@@ -610,6 +629,31 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           partnership.consanguineous = true;
         }
       });
+    },
+
+    linkPartner: (individualId, partnerId) => {
+      const problem = linkPartnerProblem(get().pedigree, individualId, partnerId);
+      if (problem) { console.warn(`Cannot link partners: ${problem}`); return problem; }
+      let related = false;
+      mutate(draft => {
+        let [a, b] = [individualId, partnerId];
+        const aSex = draft.individuals.find(i => i.id === a)!.sex;
+        const bSex = draft.individuals.find(i => i.id === b)!.sex;
+        // Keep the father role first where the sexes say so, as setParents does.
+        if (aSex === "female" || (aSex === "unknown" && bSex === "male")) [a, b] = [b, a];
+        const partnership: Partnership = { id: newId(), individual1: a, individual2: b };
+        related = shareAncestor(draft as Pedigree, a, b);
+        if (related) partnership.consanguineous = true;
+        draft.partnerships.push(partnership);
+        draft.parentOf[partnership.id] = [];
+      });
+      const name = (id: string) => get().pedigree.individuals.find(i => i.id === id)?.name?.trim() || "an individual";
+      get().setNotice({
+        kind: "info",
+        text: `${name(individualId)} and ${name(partnerId)} are now partners${related ? " (related, so drawn with a double line)" : ""}.`,
+        undoable: true,
+      });
+      return null;
     },
 
     /**

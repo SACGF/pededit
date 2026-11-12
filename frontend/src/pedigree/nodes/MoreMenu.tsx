@@ -50,6 +50,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     removeWithAncestors,
     startPickingParents,
     startPickingChild,
+    startPickingPartner,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -121,6 +122,17 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
           >
             Add partner
           </MenuItem>
+          {pedigree.individuals.length > 1 && (
+            <MenuItem
+              onClick={() => action(() => startPickingPartner(individualId))}
+              disabled={!!individual.lifeStatus}
+              title={individual.lifeStatus
+                ? "A pregnancy or pregnancy loss cannot have a partner"
+                : "Click someone already on the tree to make them this person's partner, for example a relative"}
+            >
+              Add existing partner...
+            </MenuItem>
+          )}
           <MenuItem
             onClick={() => setShowAddChildren(v => !v)}
             active={showAddChildren}

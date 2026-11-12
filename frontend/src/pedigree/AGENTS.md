@@ -120,6 +120,15 @@ draws NSGC symbols.
   share an ancestor), a single parent gets a placeholder partner, and a
   re-parented child leaves their old twin set. The banner is a React Flow
   `Panel` with a name search for people off screen. Escape cancels.
+- `partners.ts` — linking two existing people as partners (#84), the third
+  picking kind (`{ kind: "partner" }`, one click applies). `linkPartnerProblem`
+  is the one rule list (self, already partners, pregnancy, two of the same
+  known sex). Relatives are deliberately not refused, parent and child
+  included: inbred pedigrees are the reason the feature exists. The store's
+  `linkPartner` makes a childless partnership, father role first,
+  consanguineous when they share an ancestor. A cross-generation link draws
+  the older partner twice with the dashed arc, as kinship2 does; that is the
+  layout, not a bug in the link.
 - `removal.ts` — branch removal sets (#34): descendants, ancestors,
   "remove with descendants" (which also takes partners who married in and
   have no partnership with anyone staying) and `removeIndividuals`, the one
