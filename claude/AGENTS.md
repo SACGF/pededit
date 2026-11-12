@@ -8,6 +8,9 @@ what you need.
   AGENTS.md.
 - `layout_engine_guide.md` — required reading before touching the layout
   engine or renderer.
+- `nsgc_nomenclature.md`: the NSGC pedigree standard we follow, rule by rule,
+  with where PedEdit conforms and the open gaps. Check it before drawing any
+  new symbol, line or label.
 - `search_report.md` — survey of 60+ existing pedigree tools with a feature
   gap analysis in three tiers (open source table stakes, commercial only,
   nobody does it).

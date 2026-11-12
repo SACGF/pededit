@@ -63,6 +63,7 @@ Each major directory has its own `AGENTS.md` with the non-obvious facts about th
 ## Key Reference Documents
 
 - `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
+- `claude/nsgc_nomenclature.md`: the NSGC pedigree nomenclature (Bennett et al. 2008, 2022 revision) that the drawing follows, where we conform, where we differ on purpose (sex, not gender) and the open gaps. Read it before adding or changing any symbol, line or text under a symbol.
 - `claude/search_report.md` — domain research and feature gap analysis
 - `claude/export_u_plan.md`: how the U-shape export works (open items on #2). `claude/phase_7_2_plan.md`: how tags and colouring work (#3). Design notes for other open issues are linked from the issues themselves.
 
