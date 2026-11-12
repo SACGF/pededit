@@ -23,6 +23,14 @@ export type LifeStatus = "pregnancy" | "miscarriage" | "termination" | "stillbir
  */
 export type Adoption = "in" | "out";
 
+/**
+ * Assisted reproduction (NSGC 2008 Fig. 3, #45): the letter drawn inside the
+ * symbol. "donor" (D) gave the sperm or egg; "surrogate" (S) carried a
+ * pregnancy she is not the genetic mother of. A woman who is both egg donor
+ * and carrier is a donor only.
+ */
+export type ReproductiveRole = "donor" | "surrogate";
+
 export interface Individual {
   id: string;
   /** Biological sex (sex assigned at birth). Drives layout, kinship, PED and twins. */
@@ -67,6 +75,23 @@ export interface Individual {
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
   lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
   adopted?: Adoption;    // brackets round the symbol; "in" also dashes the line from the parents
+  /** Gamete donor "D" or surrogate "S" inside the symbol (#45). */
+  reproductiveRole?: ReproductiveRole;
+  /**
+   * Assisted reproduction (#45): the woman who carried this pregnancy when
+   * she is not the genetic mother (a surrogate, or the mother of a child
+   * conceived with a donor egg). Drawn as a solid line from her to the
+   * child, since a pregnancy is a biological relationship (teratogens), but
+   * she is not a parent for kinship or PED. The genetic parents are the
+   * partnership in `parentOf`.
+   */
+  carriedBy?: string;
+  /**
+   * Assisted reproduction (#45): parents of this child who are not its
+   * genetic parents, such as the intended father when donor sperm is used.
+   * Drawn as a dashed line of descent; not parents for kinship or PED.
+   */
+  socialParents?: string[];
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
   /**
    * Age of onset of the affected status (#93), free text such as "45y",
@@ -171,6 +196,14 @@ export interface Partnership {
    * strokes across the couple line (NSGC 2008, #98). Absent means false.
    */
   ended?: boolean;
+  /**
+   * Assisted reproduction (#45): the children were conceived with a donated
+   * sperm or egg, so the partners are their genetic parents but not a
+   * couple. No relationship line is drawn between them (NSGC 2008 Fig. 3);
+   * each partner's line of descent runs to the children instead. Kinship
+   * and the layout treat them as ordinary parents.
+   */
+  donorConception?: boolean;
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

@@ -18,7 +18,8 @@ export const RELAXED_WIDTH_SLACK = 2;
 
 /**
  * Split a pedigree into its families: sets of individuals joined by
- * partnerships or parent-child links. Families are ordered by the position of
+ * partnerships, parent-child links or the lines of assisted reproduction
+ * (`carriedBy`, `socialParents`, #45). Families are ordered by the position of
  * their first member in `pedigree.individuals`, and members keep that order.
  * Individuals with no partner and no parent or child links are returned
  * separately as `isolated`.
@@ -43,6 +44,11 @@ export function splitFamilies(pedigree: Pedigree): { families: string[][]; isola
   for (const p of pedigree.partnerships) {
     union(p.individual1, p.individual2);
     for (const child of pedigree.parentOf[p.id] ?? []) union(p.individual1, child);
+  }
+  // A surrogate or social parent is drawn with the child they are linked to (#45).
+  for (const ind of pedigree.individuals) {
+    if (ind.carriedBy) union(ind.carriedBy, ind.id);
+    for (const sp of ind.socialParents ?? []) union(sp, ind.id);
   }
 
   const byRoot = new Map<string, string[]>();

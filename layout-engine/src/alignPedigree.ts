@@ -165,16 +165,39 @@ export function alignPedigree(
   // QP on purpose: the QP bounds every row by the widest row, so counting the
   // isolated people in the top row would leave the connected families no room
   // to centre parents over children.
-  appendIsolated(input, level, rval, nidInt, spouseMatrix, pos);
+  appendIsolated(input, level, rval, nidInt, spouseMatrix, pos, assistedLevels(pedigree, level));
 
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
   return toLayoutResult(rval, nidInt, pos, spouseMatrix, maxlev);
 }
 
 /**
+ * Rows for people joined to a child only by a line of assisted reproduction
+ * (#45): a surrogate (`carriedBy`) or a social parent with no partner or
+ * parents of their own would otherwise land in the founder row, however far
+ * down the child is. They go in the row above the child instead (1-based
+ * levels, by 1-based index).
+ */
+function assistedLevels(pedigree: Pedigree, level: Int32Array): Map<number, number> {
+  const idx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
+  const out = new Map<number, number>();
+  for (const child of pedigree.individuals) {
+    const c = idx.get(child.id)!;
+    for (const id of [child.carriedBy, ...(child.socialParents ?? [])]) {
+      const p = id === undefined ? undefined : idx.get(id);
+      if (p === undefined || p === c) continue;
+      const lev = Math.max(1, level[c]! - 1);
+      out.set(p, Math.min(out.get(p) ?? lev, lev));
+    }
+  }
+  return out;
+}
+
+/**
  * Add every individual not yet placed to the end of their generation row,
  * one slot to the right of the current rightmost position. Extends all
- * per-row arrays in place.
+ * per-row arrays in place. `levelOverride` moves someone to another row
+ * (see `assistedLevels`).
  */
 function appendIsolated(
   input: LayoutInput,
@@ -183,6 +206,7 @@ function appendIsolated(
   nidInt: Int32Array[],
   spouseMatrix: number[][],
   pos: Float64Array[],
+  levelOverride: Map<number, number> = new Map(),
 ): void {
   const maxlev = rval.n.length - 1;
   const placed = new Set<number>();
@@ -198,7 +222,7 @@ function appendIsolated(
   };
   for (let i = 1; i <= input.n; i++) {
     if (placed.has(i)) continue;
-    const lev = level[i]!;
+    const lev = levelOverride.get(i) ?? level[i]!;
     if (!lev || lev > maxlev) continue;
     const ni = rval.n[lev] ?? 0;
     const col = ni + 1;

@@ -67,6 +67,9 @@ class IndividualSerializer(serializers.Serializer):
     hpoTerms = _opt(serializers.ListField, child=serializers.CharField())
     lifeStatus = _opt(serializers.ChoiceField, choices=LIFE_STATUS_CHOICES)
     adopted = _opt(serializers.ChoiceField, choices=["in", "out"])
+    reproductiveRole = _opt(serializers.ChoiceField, choices=["donor", "surrogate"])
+    carriedBy = _opt(serializers.CharField)
+    socialParents = _opt(serializers.ListField, child=serializers.CharField())
     tags = _opt(serializers.ListField, child=serializers.CharField())
     onset = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     tagOnset = _opt(
@@ -103,6 +106,7 @@ class PartnershipSerializer(serializers.Serializer):
     childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     twins = _opt(TwinSetSerializer, many=True)
     ended = _opt(serializers.BooleanField)
+    donorConception = _opt(serializers.BooleanField)
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):

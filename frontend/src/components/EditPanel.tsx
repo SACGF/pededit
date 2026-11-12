@@ -15,9 +15,10 @@ import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity } from "@pedigree-editor/layout-engine";
+import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
+import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -172,6 +173,8 @@ function IndividualForm({ individual }: { individual: Individual }) {
           )}
         </Field>
       )}
+
+      <AssistedForm key={individual.id} individual={individual} />
 
       <div className="border-t pt-3 space-y-2">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -559,7 +562,8 @@ function capitalise(text: string): string {
  */
 function EndedForm({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipEnded } = usePedigreeStore();
-  const own = pedigree.partnerships.filter(p => p.individual1 === individual.id || p.individual2 === individual.id);
+  // A gamete donation pair (#45) is not a couple and has no line to mark.
+  const own = pedigree.partnerships.filter(p => (p.individual1 === individual.id || p.individual2 === individual.id) && !p.donorConception);
   if (own.length === 0) return null;
   return (
     <div className="border-t pt-3 space-y-2" data-testid="ended-form">
@@ -621,6 +625,96 @@ function CouplesForm({ individual }: { individual: Individual }) {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Assisted reproduction (#45): the letter in this person's symbol, and for
+ * a child, who carried them and who are their social parents. Donors and
+ * surrogates are added from the more menu.
+ */
+function AssistedForm({ individual }: { individual: Individual }) {
+  const { pedigree, setReproductiveRole, setCarriedBy, setSocialParents } = usePedigreeStore();
+  const candidates = assistedCandidates(pedigree, individual.id);
+  const label = (id: string) => {
+    const ind = pedigree.individuals.find(i => i.id === id);
+    const letter = ind && symbolLetter(ind);
+    return (ind?.name?.trim() || (letter ? `${letter === "D" ? "Donor" : "Surrogate"} (${ind!.sex})` : `Unnamed ${ind?.sex ?? ""}`)).trim();
+  };
+  const hasParents = geneticParents(pedigree, individual.id).length > 0;
+  const donorConceived = !!pedigree.partnerships.find(p => (pedigree.parentOf[p.id] ?? []).includes(individual.id))?.donorConception;
+  const linked = !!individual.carriedBy || !!individual.socialParents?.length || donorConceived;
+  const [expanded, setExpanded] = useState(false);
+  const social = individual.socialParents ?? [];
+  const carriers = candidates.filter(c => c.sex !== "male" || c.id === individual.carriedBy);
+  const addable = candidates.filter(c => !social.includes(c.id) && c.id !== individual.carriedBy);
+  return (
+    <div className="space-y-2" data-testid="assisted-form">
+      <Field label="Donor / surrogate">
+        <select
+          value={individual.reproductiveRole ?? ""}
+          aria-label="Donor or surrogate"
+          onChange={e => setReproductiveRole(individual.id, (e.target.value || undefined) as ReproductiveRole | undefined)}
+          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+        >
+          <option value="">None</option>
+          {REPRODUCTIVE_ROLE_OPTIONS.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </Field>
+      {hasParents && !linked && !expanded && (
+        <button className="text-[11px] text-gray-500 underline hover:text-black" onClick={() => setExpanded(true)}>
+          Carried by someone else, or social parents...
+        </button>
+      )}
+      {(linked || expanded) && (
+        <>
+          <Field label="Carried by">
+            <select
+              value={individual.carriedBy ?? ""}
+              aria-label="Carried by"
+              onChange={e => setCarriedBy(individual.id, e.target.value || undefined)}
+              className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+            >
+              <option value="">The genetic mother</option>
+              {carriers.map(c => <option key={c.id} value={c.id}>{label(c.id)}</option>)}
+            </select>
+            {individual.carriedBy && (
+              <p className="text-[10px] text-gray-500">Solid line from her: she carried the pregnancy but is not the genetic mother, so not a parent for kinship.</p>
+            )}
+          </Field>
+          <Field label="Social parents">
+            {social.map(id => (
+              <div key={id} className="flex items-center justify-between text-xs text-gray-600">
+                <span className="truncate">{label(id)}</span>
+                <button
+                  className="px-1 text-gray-400 hover:text-black"
+                  aria-label={`Remove ${label(id)} as social parent`}
+                  onClick={() => setSocialParents(individual.id, social.filter(x => x !== id))}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {addable.length > 0 && (
+              <select
+                value=""
+                aria-label="Add social parent"
+                onChange={e => e.target.value && setSocialParents(individual.id, [...social, e.target.value])}
+                className="w-full h-7 border rounded px-2 text-sm bg-white text-gray-500 focus:outline-hidden focus:ring-1 focus:ring-black"
+              >
+                <option value="">Add a social parent...</option>
+                {addable.map(c => <option key={c.id} value={c.id}>{label(c.id)}</option>)}
+              </select>
+            )}
+            {social.length > 0 && (
+              <p className="text-[10px] text-gray-500">Dashed line: a parent who is not a genetic parent, such as the intended father with donor sperm.</p>
+            )}
+          </Field>
+        </>
+      )}
     </div>
   );
 }

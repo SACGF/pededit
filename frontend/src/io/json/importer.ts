@@ -8,6 +8,7 @@ const TAG_STYLES = ["quadrant", "dot", "text"];
 const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"];
 const CHILDLESS_VALUES = ["infertility", "byChoice"];
 const ADOPTION_VALUES = ["in", "out"];
+const REPRODUCTIVE_ROLE_VALUES = ["donor", "surrogate"];
 const NAME_LABEL_VALUES = ["wrap", "truncate"];
 const GENDER_IDENTITY_VALUES = ["man", "woman", "nonbinary"];
 const SYMBOLS_SHOW_VALUES = ["gender", "sex"];
@@ -206,6 +207,10 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       v => typeof v === "string" && LIFE_STATUS_VALUES.includes(v));
     c.optional(raw, "adopted", ip, ADOPTION_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && ADOPTION_VALUES.includes(v));
+    c.optional(raw, "reproductiveRole", ip, REPRODUCTIVE_ROLE_VALUES.map(s => `"${s}"`).join(" | "),
+      v => typeof v === "string" && REPRODUCTIVE_ROLE_VALUES.includes(v));
+    c.optional(raw, "carriedBy", ip, "an individual id", v => typeof v === "string");
+    c.optional(raw, "socialParents", ip, "an array of individual ids", isStringArray);
     c.optional(raw, "name", ip, "a string", v => typeof v === "string");
     c.optional(raw, "dob", ip, "a string", v => typeof v === "string");
     c.optional(raw, "age", ip, "a string", v => typeof v === "string");
@@ -246,6 +251,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
     c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
     c.optional(raw, "ended", pp, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "donorConception", pp, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "twins", pp, "an array of twin sets", Array.isArray);
     if (Array.isArray(raw.twins)) {
       raw.twins.forEach((t, k) => {
@@ -340,6 +346,25 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     });
     if (kept.length !== raw.twins.length) {
       if (kept.length) raw.twins = kept; else delete raw.twins;
+    }
+  });
+
+  // ---- Assisted reproduction lines (#45): drop references to nobody ----
+  (ped.individuals as unknown[]).forEach((raw, i) => {
+    if (!isObject(raw)) return;
+    const ip = p(`individuals[${i}]`);
+    const bad = (ref: unknown) => typeof ref !== "string" || !individualIds.has(ref) || ref === raw.id;
+    if (typeof raw.carriedBy === "string" && bad(raw.carriedBy)) {
+      c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `carriedBy '${raw.carriedBy}' dropped: not another individual in the pedigree`, `${ip}.carriedBy`, [raw.carriedBy]);
+      delete raw.carriedBy;
+    }
+    if (isStringArray(raw.socialParents)) {
+      const dropped = raw.socialParents.filter(bad);
+      if (dropped.length) {
+        c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `socialParents ${dropped.map(d => `'${d}'`).join(", ")} dropped: not another individual in the pedigree`, `${ip}.socialParents`, dropped);
+        const kept = raw.socialParents.filter(x => !bad(x));
+        if (kept.length) raw.socialParents = kept; else delete raw.socialParents;
+      }
     }
   });
 

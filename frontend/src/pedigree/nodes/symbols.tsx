@@ -11,6 +11,7 @@ import {
 } from "../lifeStatus";
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
 import { adoptionBracketSegments } from "../adoption";
+import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill } from "../assisted";
 import { familyHistoryMarkAt, FAMILY_HISTORY_FONT_SIZE } from "../familyHistory";
 import {
   drawsPresymptomatic, presymptomaticLine, documentedMarkAt, PRESYMPTOMATIC_RIM, PRESYMPTOMATIC_STROKE,
@@ -297,7 +298,29 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
       <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
+      <RoleLetter individual={individual} size={size} halo={sectors.length > 0} />
     </g>
+  );
+}
+
+/**
+ * "D" (gamete donor) or "S" (surrogate) inside the symbol (#45). White on a
+ * filled symbol; with a white halo over tag colours so it stays legible.
+ */
+export function RoleLetter({ individual, size, halo = false }: { individual: Individual; size: number; halo?: boolean }) {
+  const letter = symbolLetter(individual);
+  if (!letter) return null;
+  return (
+    <text
+      data-role-letter={letter}
+      x={size / 2} y={roleLetterBaselineY(size)}
+      textAnchor="middle" fontFamily="sans-serif" fontSize={roleLetterFontSize(size)} fontWeight="bold"
+      fill={roleLetterFill(individual)}
+      {...(halo ? { stroke: "white", strokeWidth: 3, paintOrder: "stroke" } : {})}
+      style={{ pointerEvents: "none", userSelect: "none" }}
+    >
+      {letter}
+    </text>
   );
 }
 

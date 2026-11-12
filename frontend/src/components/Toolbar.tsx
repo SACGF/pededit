@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded } from "../io/ped/exporter.js";
+import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded, pedLostAssisted } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
 import { childlessLabel } from "../pedigree/childless";
 import { adoptionLabel } from "../pedigree/adoption";
+import { assistedLossText } from "../pedigree/assisted";
 import { twinLegendLabel } from "../pedigree/twins";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
@@ -63,7 +64,8 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
     const lostAdopted = pedLostAdoption(pedigree);
     const lostTwins = pedLostTwins(pedigree);
     const lostEnded = pedLostEnded(pedigree);
-    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0) { handleExportPed(dialect); return; }
+    const lostAssisted = pedLostAssisted(pedigree);
+    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0 && lostAssisted.length === 0) { handleExportPed(dialect); return; }
     const nameOf = (id: string) => { const i = pedigree.individuals.find(x => x.id === id); return i?.name || id; };
     setPedWarning({
       dialect,
@@ -73,6 +75,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
         ...lostTwins.map(t => `${t.members.map(nameOf).join(", ")}: ${twinLegendLabel(t.zygosity as "monozygotic" | "dizygotic" | "unknown")}`),
         ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
         ...lostEnded.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: relationship ended`),
+        ...lostAssisted.map(i => `${i.name || i.id}: ${assistedLossText(i, nameOf)}`),
       ],
     });
   }

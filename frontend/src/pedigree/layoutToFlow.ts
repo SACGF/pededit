@@ -17,6 +17,7 @@ import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, detailsBacked, nameLabelText } from "./labels";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
+import { assistedLinks, type LinePoint } from "./assisted";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -122,6 +123,28 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   childYs: number[];
   /** y (canvas px) of the highest child row; the sibship bar sits halfway up to the couple. */
   childY: number;
+  /**
+   * The parents are not a couple (`Partnership.donorConception`, #45): no
+   * couple line, and a line from each parent's symbol down to the bar in
+   * place of the drop from the couple line. The parents' positions, for the
+   * minimap; the canvas edge reads the live node positions.
+   */
+  apart?: LinePoint[];
+}
+
+/**
+ * A line of assisted reproduction (#45) from a woman who carried the child
+ * (solid) or a parent who is not genetic (dashed). Source is that person's
+ * node, target the child's. When the same person is linked the same way to
+ * every child of a sibship, one line runs to the point where the sibship's
+ * line of descent meets the bar instead (`bar`), so it is not repeated.
+ */
+export interface AssistedEdgeData extends Record<string, unknown> {
+  kind: "carrier" | "social";
+  /** Individual ids of the children the line stands for. */
+  children: string[];
+  /** The sibship the line joins: the same ids as its SibshipEdgeData, to find the join point live. */
+  bar?: { leftParentId: string; rightParentId: string; childIds: string[]; barOffset: number };
 }
 
 /** Dashed arc joining two copies of the same person. */
@@ -136,6 +159,8 @@ export interface FlowData {
   sibshipEdges: Edge<SibshipEdgeData>[];
   /** One per pair of consecutive copies of someone drawn more than once. */
   duplicateEdges: Edge<DuplicateEdgeData>[];
+  /** Lines of assisted reproduction (#45): carrier and social parent to child. */
+  assistedEdges: Edge<AssistedEdgeData>[];
 }
 
 export interface LayoutToFlowOptions {
@@ -232,7 +257,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   // Hidden descendants (#94) are not laid out or drawn.
   const pedigree = drawnPedigree(full);
   if (pedigree.individuals.length === 0) {
-    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] };
+    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] };
   }
   const result: LayoutResult = alignPedigreeByFamily(pedigree, { improve: options.improveLayout ?? true });
   const spacing = layoutSpacing(options.compact);
@@ -256,13 +281,85 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   }
 
   const partners = buildPartnerSetFromPedigree(pedigree);
+  const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos);
 
   return {
     nodes,
     coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight),
-    sibshipEdges:   buildSibshipEdges(result, partners, slotPos),
+    sibshipEdges,
     duplicateEdges: buildDuplicateEdges(nodes, spacing),
+    assistedEdges:  buildAssistedEdges(pedigree, nodes, sibshipEdges),
   };
+}
+
+// ── Assisted reproduction lines (#45) ─────────────────────────────────────────
+
+/**
+ * One edge per carrier or social parent and child, or per sibship when they
+ * are linked to all of it (see AssistedEdgeData). Someone drawn twice is
+ * joined from the copy nearest the child; the child end is the copy that
+ * hangs from its parents.
+ */
+function buildAssistedEdges(
+  pedigree: Pedigree,
+  nodes: Node<RFNodeData>[],
+  sibshipEdges: Edge<SibshipEdgeData>[],
+): Edge<AssistedEdgeData>[] {
+  const links = assistedLinks(pedigree);
+  if (links.length === 0) return [];
+  const copies = new Map<string, Node<RFNodeData>[]>();
+  for (const n of nodes) {
+    const id = n.data.individual.id;
+    if (!copies.has(id)) copies.set(id, []);
+    copies.get(id)!.push(n);
+  }
+  const nodeById = new Map(nodes.map(n => [n.id, n]));
+  const indOf = (nodeId: string) => nodeById.get(nodeId)?.data.individual.id;
+  // The sibship edge each child hangs from.
+  const sibshipOf = new Map<string, Edge<SibshipEdgeData>>();
+  for (const e of sibshipEdges) for (const c of e.data?.childIds ?? []) { const id = indOf(c); if (id) sibshipOf.set(id, e); }
+  const nearest = (froms: Node<RFNodeData>[], to: { x: number; y: number }) => {
+    const d = (n: Node) => (n.position.x - to.x) ** 2 + (n.position.y - to.y) ** 2;
+    return froms.reduce((a, b) => (d(b) < d(a) ? b : a));
+  };
+
+  const edges: Edge<AssistedEdgeData>[] = [];
+  const done = new Set<string>();
+  for (const link of links) {
+    const key = `${link.kind}|${link.from}|${link.child}`;
+    if (done.has(key)) continue;
+    const kids = copies.get(link.child), froms = copies.get(link.from);
+    if (!kids?.length || !froms?.length) continue;
+    const sib = sibshipOf.get(link.child);
+    const sibKids = sib ? sib.data!.childIds.map(indOf).filter((x): x is string => !!x) : [];
+    const whole = sibKids.length > 0 && sibKids.every(k => links.some(l => l.kind === link.kind && l.from === link.from && l.child === k));
+    if (whole) {
+      for (const k of sibKids) done.add(`${link.kind}|${link.from}|${k}`);
+      const d = sib!.data!;
+      edges.push({
+        id:     `assisted-${link.kind}-${link.from}-${sib!.id}`,
+        source: nearest(froms, { x: d.coupleX, y: d.sibBarY }).id,
+        target: d.childIds[0]!,
+        type:   "assistedEdge",
+        data:   {
+          kind: link.kind,
+          children: sibKids,
+          bar: { leftParentId: d.leftParentId, rightParentId: d.rightParentId, childIds: d.childIds, barOffset: d.barOffset },
+        },
+      });
+      continue;
+    }
+    done.add(key);
+    const child = kids.find(k => sib?.data?.childIds.includes(k.id)) ?? kids[0]!;
+    edges.push({
+      id:     `assisted-${link.kind}-${link.from}-${link.child}`,
+      source: nearest(froms, child.position).id,
+      target: child.id,
+      type:   "assistedEdge",
+      data:   { kind: link.kind, children: [link.child] },
+    });
+  }
+  return edges;
 }
 
 /**
@@ -430,6 +527,8 @@ function buildCoupleEdges(
       // passing through to a further partner: connect the real partners and
       // hop over whatever sits between them.
       const rc = resolveCouple(result, partners, level, slot);
+      // Gamete donation (#45): the genetic parents are not a couple, so no line.
+      if (partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.donorConception) continue;
       const double = related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot));
 
       edges.push({
@@ -484,12 +583,26 @@ function buildCoupleEdges(
 
 // ── Sibship edges ─────────────────────────────────────────────────────────────
 
+const pairKeyOf = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+
+/** Partner pairs who are genetic parents through gamete donation, not a couple (#45). */
+function donorPairs(pedigree: Pedigree): Set<string> {
+  return new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKeyOf(p.individual1, p.individual2)));
+}
+
 function buildSibshipEdges(
+  pedigree: Pedigree,
   result: LayoutResult,
   partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
 ): Edge<SibshipEdgeData>[] {
   const edges: Edge<SibshipEdgeData>[] = [];
+  const apart = donorPairs(pedigree);
+  const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]?.id ?? "";
+  const shapeAt = (level: number, slot: number) => {
+    const ind = pedigree.individuals[result.nid[level][slot] - 1];
+    return ind ? symbolSex(ind, pedigree) : undefined;
+  };
 
   for (let level = 1; level < result.n.length; level++) {
     // Group slots at this level by their fam value.
@@ -521,6 +634,8 @@ function buildSibshipEdges(
       const childY   = Math.min(...childYs);
       const sibBarY  = (coupleY + childY) / 2;
       const hopHeight = hopHeightAt(result, partners, level - 1, leftParentSlot);
+      const rc = resolveCouple(result, partners, level - 1, leftParentSlot);
+      const isApart = apart.has(pairKeyOf(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
 
       // Source = left parent node; target = leftmost resolved child node.
       edges.push({
@@ -535,6 +650,10 @@ function buildSibshipEdges(
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
           coupleX, coupleY, hopHeight, sibBarY, barOffset: 0, childXs, childYs, childY,
+          ...(isApart ? { apart: [
+            { ...leftPos, sex: shapeAt(level - 1, leftParentSlot) },
+            { ...rightPos, sex: shapeAt(level - 1, rightParentSlot) },
+          ] } : {}),
         },
       });
     }

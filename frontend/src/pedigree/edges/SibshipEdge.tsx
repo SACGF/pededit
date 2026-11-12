@@ -41,7 +41,12 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   // The bar's offset (#80) comes from the layout, so it is as of the last
   // layout while a node is being dragged.
   const barOffset = data.barOffset ?? 0;
-  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset);
+  // Parents who are not a couple (gamete donation, #45): a line from each.
+  const sexOf = (n: Node) => { const d = n.data as RFNodeData | undefined; return d?.shape ?? d?.individual?.sex; };
+  const apart = data.apart
+    ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
+    : undefined;
+  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset, apart);
   // Twin forks (#11): a bar across monozygotic drops, "?" between unknown ones.
   const marks = twinForkMarks(coupleY, kids, barOffset);
 

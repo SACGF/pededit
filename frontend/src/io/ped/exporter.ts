@@ -117,6 +117,15 @@ export function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.adopted);
 }
 
+/**
+ * Individuals with assisted reproduction details (#45) PED cannot carry: the
+ * D or S in the symbol, who carried them, their social parents. The genetic
+ * parents (a donor included) are written as the parents.
+ */
+export function pedLostAssisted(pedigree: Pedigree): Pedigree["individuals"] {
+  return pedigree.individuals.filter(i => !!i.reproductiveRole || !!i.carriedBy || !!i.socialParents?.length);
+}
+
 /** Twin sets (#11) PED cannot carry, as [partnership, members, zygosity]. */
 export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
   const out: { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] = [];

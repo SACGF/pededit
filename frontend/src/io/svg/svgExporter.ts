@@ -9,6 +9,7 @@ import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, detailsBacked, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
+import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill, assistedEdgeSegment, type LinePoint } from "../../pedigree/assisted";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
@@ -186,13 +187,15 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
       const { hopHeight: hop, hopInset } = hopAt(result, partners, level, slot);
 
       const a = idAt(level, rc.leftSlot), b = idAt(level, rc.rightSlot);
+      const partnership = partnershipOf.get(pairKey(a, b));
+      // Gamete donation (#45): the genetic parents are not a couple, so no line.
+      if (partnership?.donorConception) continue;
       const consang = related(a, b);
       if (!consang) {
         lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop, hopInset)));
       } else {
         for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP, hopInset)) lines.push(path(d));
       }
-      const partnership = partnershipOf.get(pairKey(a, b));
       // Ended relationship (#98): two strokes across the line, aside from
       // anything hung from its middle.
       if (partnership?.ended) {
@@ -247,7 +250,14 @@ export function renderAdoptionBrackets(ind: Individual): string {
 function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   const twins = twinMembership(pedigree);
-  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[] }[] = [];
+  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[]; apart?: LinePoint[] }[] = [];
+  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+  const donorPairs = new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKey(p.individual1, p.individual2)));
+  const idAt = (level: number, slot: number) => pedigree.individuals[Math.floor(result.nid[level][slot]) - 1]?.id ?? "";
+  const sexAt = (level: number, slot: number) => {
+    const ind = pedigree.individuals[Math.floor(result.nid[level][slot]) - 1];
+    return ind ? symbolSex(ind, pedigree) : undefined;
+  };
 
   for (let level = 1; level < result.n.length; level++) {
     const groups = new Map<number, number[]>();
@@ -273,7 +283,10 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
           ...(child ? twins.get(child.id) ?? {} : {}),
         };
       });
-      sibships.push({ coupleX, coupleY, hop, children });
+      // Gamete donation (#45): a line from each parent instead of the couple drop.
+      const rc = resolveCouple(result, partners, level - 1, f - 1);
+      const apart = donorPairs.has(pairKey(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot))) ? [{ ...leftPos, sex: sexAt(level - 1, f - 1) }, { ...rightPos, sex: sexAt(level - 1, f) }] : undefined;
+      sibships.push({ coupleX, coupleY, hop, children, apart });
     }
   }
 
@@ -281,8 +294,8 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
   const offsets = sibshipBarOffsets(sibships.map(s => ({
     coupleX: s.coupleX, coupleY: s.coupleY, childXs: s.children.map(c => c.x), childYs: s.children.map(c => c.y),
   })));
-  sibships.forEach(({ coupleX, coupleY, hop, children }, i) => {
-    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i]);
+  sibships.forEach(({ coupleX, coupleY, hop, children, apart }, i) => {
+    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i], apart);
     for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
     for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
     for (const m of twinForkMarks(coupleY, children, offsets[i])) {
@@ -291,6 +304,27 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
     }
   });
   return lines;
+}
+
+/** Lines of assisted reproduction (#45), from the same edges the canvas draws. */
+function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
+  const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
+  return flow.assistedEdges.flatMap(e => {
+    const s = assistedEdgeSegment(e, id => {
+      const p = slotPos.get(id);
+      return p && { position: p, individual: nodeById.get(id)?.data.individual, shape: nodeById.get(id)?.data.shape };
+    });
+    return s ? [seg(s[0], s[1], s[2], s[3], e.data?.kind === "social")] : [];
+  });
+}
+
+/** "D" or "S" inside the symbol (#45), centred on the origin. Shared with the U-shape exporter. */
+export function renderRoleLetterSvg(ind: Individual, halo = false): string {
+  const letter = symbolLetter(ind);
+  if (!letter) return "";
+  const half = NODE_SIZE / 2;
+  const h = halo ? ` stroke="white" stroke-width="3" paint-order="stroke"` : "";
+  return `<text x="0" y="${roleLetterBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${roleLetterFontSize(NODE_SIZE)}" font-weight="bold" fill="${roleLetterFill(ind)}"${h}>${letter}</text>`;
 }
 
 // ── Symbols ───────────────────────────────────────────────────────────────────
@@ -324,7 +358,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0)
+  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0) + renderRoleLetterSvg(ind, sectors.length > 0)
     + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
@@ -554,6 +588,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const group = (cls: string, body: string[]) => lines.push(`<g class="${cls}">`, ...body, `</g>`);
   group("couple-lines", renderCoupleLines(working, result, partners, slotPos));
   group("sibship-lines", renderSibshipLines(working, result, partners, slotPos));
+  group("assisted-lines", renderAssistedLines(flow, slotPos));
   group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
   group("symbols", renderSymbols(working, result, slotPos, flow));
   group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));

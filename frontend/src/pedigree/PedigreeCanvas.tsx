@@ -23,7 +23,10 @@ import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import { DuplicateEdge }      from "./edges/DuplicateEdge";
-import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow";
+import { AssistedEdge }       from "./edges/AssistedEdge";
+import type { RFNodeData, SibshipEdgeData, CoupleEdgeData, AssistedEdgeData } from "./layoutToFlow";
+import { assistedEdgeSegment } from "./assisted";
+import { ADOPTION_DASH } from "./adoption";
 import { NODE_SIZE } from "./constants";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { endedBreakX, endedMarkSegments } from "./ended";
@@ -47,6 +50,7 @@ const edgeTypes: EdgeTypes = {
   consanguineousEdge: ConsanguineousEdge,
   sibshipEdge:        SibshipEdge,
   duplicateEdge:      DuplicateEdge,
+  assistedEdge:       AssistedEdge,
 };
 
 // ── Custom minimap ─────────────────────────────────────────────────────────────
@@ -65,9 +69,10 @@ interface PedigreeMinimapProps {
   nodes:        Node<RFNodeData>[];
   coupleEdges:  Edge<CoupleEdgeData>[];
   sibshipEdges: Edge<SibshipEdgeData>[];
+  assistedEdges: Edge<AssistedEdgeData>[];
 }
 
-function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: PedigreeMinimapProps) {
+function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges, assistedEdges }: PedigreeMinimapProps) {
   if (nodes.length === 0) return null;
 
   // Bounding box over all node extents (nodes are centered at position with nodeOrigin=[0.5,0.5])
@@ -115,10 +120,24 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
           if (!data?.childXs?.length) return null;
           const kids = data.childXs.map((x, i) => ({ x, y: data.childYs?.[i] ?? data.childY }));
           const d = segmentsPathD(
-            sibshipSegments(data.coupleX, data.coupleY, 0, kids, data.barOffset ?? 0),
+            sibshipSegments(data.coupleX, data.coupleY, 0, kids, data.barOffset ?? 0, data.apart),
             (x, y) => [mx(x), my(y)],
           );
           return <path key={edge.id} d={d} stroke="black" strokeWidth={1} fill="none" />;
+        })}
+
+        {/* Assisted reproduction lines (#45) */}
+        {assistedEdges.map(edge => {
+          const seg = assistedEdgeSegment(edge, id => {
+            const n = nodes.find(x => x.id === id);
+            return n && { position: n.position, individual: n.data.individual, shape: n.data.shape };
+          });
+          if (!seg) return null;
+          const [x1, y1, x2, y2] = seg;
+          return (
+            <line key={edge.id} data-minimap-assisted x1={mx(x1)} y1={my(y1)} x2={mx(x2)} y2={my(y2)} stroke="black" strokeWidth={1}
+              strokeDasharray={edge.data?.kind === "social" ? ADOPTION_DASH : undefined} />
+          );
         })}
 
         {/* Couple edges */}
@@ -238,10 +257,10 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
 
-  const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges } = useMemo(
+  const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges, assistedEdges } = useMemo(
     () => pedigree.individuals.length > 0
       ? layoutToFlow(pedigree, { compact })
-      : { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] },
+      : { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] },
     [pedigree, compact],
   );
 
@@ -302,7 +321,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     setSelection([...selectedIds, ...added], added.length > 0 ? added[added.length - 1] : selectedId);
   }, [setSelection]);
 
-  const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges];
+  const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges, ...assistedEdges];
 
   // The chart title (#20) rides along as one more node, above the layout.
   const pedigreeName = useAppStore(s => s.activeTitle);
@@ -456,6 +475,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
             nodes={rfNodes as Node<RFNodeData>[]}
             coupleEdges={coupleEdges as Edge<CoupleEdgeData>[]}
             sibshipEdges={sibshipEdges as Edge<SibshipEdgeData>[]}
+            assistedEdges={assistedEdges as Edge<AssistedEdgeData>[]}
           />
         )}
       </ReactFlow>

@@ -3,6 +3,7 @@ import { consanguinityTest } from "./consanguinity";
 import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "./ended";
 import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
+import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "./assisted";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
 import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
@@ -548,6 +549,16 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
       },
     });
   }
+  // Assisted reproduction (#45): the symbol with its "D" or "S".
+  for (const o of REPRODUCTIVE_ROLE_OPTIONS) {
+    const ind = inds.find(i => symbolLetter(i) === o.letter);
+    if (!ind) continue;
+    rows.push({
+      label: roleLegendLabel(o.value),
+      swatch: sy => `${swatchGeom(shape(ind), x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
+        + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">${o.letter}</text>`,
+    });
+  }
   // Collapsed branches (#1): a diamond with "n" in it.
   if (collapseInfo(pedigree).placeholders.size > 0) {
     rows.push({
@@ -616,6 +627,16 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
         if (o.value === "unknown") out += `<text x="${fmt(cx)}" y="${fmt(my + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text>`;
         return out;
       },
+    });
+  }
+
+  // Lines of assisted reproduction (#45): a slanting line, dashed for a social parent.
+  const linkKinds = new Set(assistedLinks(pedigree).map(l => l.kind));
+  for (const kind of ["carrier", "social"] as const) {
+    if (!linkKinds.has(kind)) continue;
+    rows.push({
+      label: kind === "carrier" ? CARRIER_LINE_LEGEND : SOCIAL_LINE_LEGEND,
+      swatch: sy => `<line x1="${fmt(x + 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + LEGEND_SWATCH - 2)}" y2="${fmt(sy + LEGEND_SWATCH - 1)}" stroke="black" stroke-width="1.5"${kind === "social" ? ` stroke-dasharray="4 2"` : ""}/>`,
     });
   }
 

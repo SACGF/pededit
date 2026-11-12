@@ -9,10 +9,11 @@ import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
 import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
-import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
+import { ADOPTION_OPTIONS, adoptionLegendLabel, ADOPTION_DASH } from "../pedigree/adoption";
+import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "../pedigree/assisted";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/twins";
 import type { Zygosity } from "@pedigree-editor/layout-engine";
-import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
+import type { ChildlessStatus, Adoption, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "@/pedigree/ended";
 import { segmentsPathD } from "@/pedigree/sibshipPath";
@@ -205,6 +206,24 @@ function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
   );
 }
 
+/** "D" or "S" inside the symbol (#45), from the canvas renderer. */
+function RoleSvg({ sex, role }: { sex: Sex; role: ReproductiveRole }) {
+  return (
+    <svg width="28" height="28" viewBox="-2 -2 28 28">
+      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, reproductiveRole: role }} size={SZ} clipId={`legend-role-${role}`} />
+    </svg>
+  );
+}
+
+/** A slanting line of assisted reproduction (#45), dashed for a social parent. */
+function AssistedLineSvg({ dashed }: { dashed: boolean }) {
+  return (
+    <svg width="48" height="20" viewBox="0 0 48 20">
+      <line x1={14} y1={2} x2={34} y2={18} stroke="black" strokeWidth={2} strokeDasharray={dashed ? ADOPTION_DASH : undefined} />
+    </svg>
+  );
+}
+
 /** A collapsed branch (#1): a diamond with "n" in it. */
 function CollapsedBranchSvg() {
   const c = SZ / 2;
@@ -330,7 +349,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const probandInd  = individuals.find(i => arrowKind(i) === "proband");
   const consultandInd = individuals.find(i => arrowKind(i) === "consultand");
 
-  const hasCouples        = partnerships.length > 0;
+  const hasCouples        = partnerships.some(p => !p.donorConception); // a donor pair (#45) has no couple line
   // Same rule the canvas uses for the double line: flagged, or related by blood.
   const related = consanguinityTest(pedigree);
   const hasConsanguineous = partnerships.some(p => related(p.individual1, p.individual2));
@@ -366,6 +385,10 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
     if (ind) indRows.push({ icon: <AdoptedSvg sex={shape(ind)} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
   }
 
+  for (const o of REPRODUCTIVE_ROLE_OPTIONS) {
+    const ind = individuals.find(i => symbolLetter(i) === o.letter);
+    if (ind) indRows.push({ icon: <RoleSvg sex={shape(ind)} role={o.value} />, label: roleLegendLabel(o.value) });
+  }
   if (placeholders.size > 0) indRows.push({ icon: <CollapsedBranchSvg />, label: COLLAPSED_BRANCH_LABEL });
 
   const relRows: { icon: React.ReactNode; label: string }[] = [];
@@ -380,6 +403,9 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   for (const o of ZYGOSITY_OPTIONS) {
     if (zygosities.has(o.value)) relRows.push({ icon: <TwinsSvg zygosity={o.value} />, label: twinLegendLabel(o.value) });
   }
+  const linkKinds = new Set(assistedLinks(pedigree).map(l => l.kind));
+  if (linkKinds.has("carrier")) relRows.push({ icon: <AssistedLineSvg dashed={false} />, label: CARRIER_LINE_LEGEND });
+  if (linkKinds.has("social"))  relRows.push({ icon: <AssistedLineSvg dashed />,        label: SOCIAL_LINE_LEGEND });
 
   // Every defined tag is listed so an unused one can still be ticked; the
   // exported key lists only tags someone carries.

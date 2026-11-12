@@ -80,6 +80,12 @@
           "enum": ["in", "out"],
           "description": "Adoption brackets round the symbol (NSGC). \"in\": adopted into the family shown, dashed line to the adoptive parents. \"out\": placed for adoption, solid line to the biological parents."
         },
+        "reproductiveRole": {
+          "enum": ["donor", "surrogate"],
+          "description": "Assisted reproduction (NSGC): \"donor\" draws D inside the symbol (sperm or egg donor), \"surrogate\" draws S (a woman who carried a pregnancy she is not the genetic mother of)."
+        },
+        "carriedBy": { "type": "string", "description": "Id of the woman who carried this pregnancy when she is not the genetic mother (a surrogate, or the mother of a child conceived with a donor egg). Solid line from her to the child; not a parent for kinship or PED." },
+        "socialParents": { "type": "array", "items": { "type": "string" }, "description": "Ids of parents who are not genetic parents, such as the intended father when donor sperm is used. Dashed line to the child; not parents for kinship or PED." },
         "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },
@@ -116,7 +122,8 @@
           "description": "Twin sets among this partnership's children. Each member is in at most one set.",
           "items": { "$ref": "#/$defs/TwinSet" }
         },
-        "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." }
+        "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." },
+        "donorConception": { "type": "boolean", "description": "The children were conceived with a donated sperm or egg: the partners are the genetic parents but not a couple, so no couple line is drawn and each partner's line runs to the children (NSGC)." }
       },
       "additionalProperties": true
     },

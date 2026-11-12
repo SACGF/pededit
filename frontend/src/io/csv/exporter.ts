@@ -6,7 +6,7 @@ import { evaluationsCsv } from "../../pedigree/evaluation";
 import { genderIdentityOf } from "../../pedigree/gender";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -60,6 +60,10 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       evaluationsCsv(ind),
       // Gender identity (#26); sex stays in its own column and drives father/mother.
       genderIdentityOf(ind) ?? "",
+      // Assisted reproduction (#45); father_id and mother_id are the genetic parents.
+      ind.reproductiveRole ?? "",
+      ind.carriedBy ?? "",
+      (ind.socialParents ?? []).join(";"),
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

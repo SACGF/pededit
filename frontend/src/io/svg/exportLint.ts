@@ -15,6 +15,7 @@
  *   line-through-symbol    a sibship line passes through a symbol it does not end at
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    the line above someone leads to a couple who are not the parents
+ *   assisted-not-drawn     a carrier or social parent (#45) has no line to the child
  *   labels-overlap         two label lines on one row run into each other
  *   consanguinity-label-collides  the degree of relationship over a double line (#97)
  *                          runs into a symbol, a line or other text
@@ -37,6 +38,7 @@ import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
 import { drawnPedigree } from "../../pedigree/collapse";
+import { assistedLinks } from "../../pedigree/assisted";
 import type { SvgExportOptions } from "./types";
 
 export type ExportLintCode =
@@ -50,6 +52,7 @@ export type ExportLintCode =
   | "line-through-symbol"
   | "child-without-parents"
   | "child-wrong-parents"
+  | "assisted-not-drawn"
   | "labels-overlap"
   | "consanguinity-label-collides";
 
@@ -71,6 +74,8 @@ interface Parsed {
   symbols: Pt[];
   couples: Pt[][];
   sibs: Seg[];
+  /** Lines of assisted reproduction (#45), group `assisted-lines`. */
+  assisted: Seg[];
   texts: { x: number; y: number; text: string }[];
   /** Lines of the consanguinity labels (#97), group `consanguinity-labels`. */
   coupleTexts: { x: number; y: number; text: string }[];
@@ -96,7 +101,7 @@ function polyline(d: string): Pt[] | null {
 
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
-  const out: Parsed = { symbols: [], couples: [], sibs: [], texts: [], coupleTexts: [], questionMarks: [], structured: false, origin: [0, 0] };
+  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], structured: false, origin: [0, 0] };
   type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
@@ -146,9 +151,9 @@ export function parseExportSvg(svg: string): Parsed {
     if (name === "path" && g === "couple-lines" && !attrs["stroke-dasharray"]) {
       const pts = polyline(attrs.d ?? "");
       if (pts) out.couples.push(pts.map(([x, y]) => [x + ox, y + oy] as Pt));
-    } else if (name === "line" && g === "sibship-lines") {
+    } else if (name === "line" && (g === "sibship-lines" || g === "assisted-lines")) {
       const n = (k: string) => Number(attrs[k]);
-      out.sibs.push([n("x1") + ox, n("y1") + oy, n("x2") + ox, n("y2") + oy]);
+      (g === "sibship-lines" ? out.sibs : out.assisted).push([n("x1") + ox, n("y1") + oy, n("x2") + ox, n("y2") + oy]);
     } else if (name === "text" && (g === "labels" || g === "consanguinity-labels")) {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
@@ -262,6 +267,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   }
   for (const p of pedigree.partnerships) {
     if (!drawn.has(p.individual1) || !drawn.has(p.individual2)) continue;
+    if (p.donorConception) continue; // gamete donation (#45): not a couple, no line
     if (!drawnPairs.has(pairKey(p.individual1, p.individual2))) {
       out.push({ code: "partnership-not-drawn", message: `partnership ${label(p.individual1)} = ${label(p.individual2)} has no couple line in the export`, individuals: [p.individual1, p.individual2] });
     }
@@ -309,11 +315,8 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   const parentsOf = new Map<string, string>();
   for (const [pid, kids] of Object.entries(pedigree.parentOf)) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
-  for (const [child, pid] of parentsOf) {
-    const p = partnershipById.get(pid);
-    if (!p || !drawn.has(child)) continue;
-    const want = pairKey(p.individual1, p.individual2);
-    // Every line connected to a line ending at any copy of the child, then the couples those reach.
+  /** Every sibship segment joined to a line ending at any copy of the child. */
+  const componentOf = (child: string): Set<number> => {
     const mine = symbols.filter(s => s.id === child);
     const seen = new Set<number>(sibs.flatMap((s, i) => (ends(s).some(e => symbolsAt(e).some(x => mine.includes(x))) ? [i] : [])));
     const queue = [...seen];
@@ -321,9 +324,23 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       const i = queue.pop()!;
       sibs.forEach((t, j) => { if (!seen.has(j) && touches(sibs[i]!, t)) { seen.add(j); queue.push(j); } });
     }
+    return seen;
+  };
+  for (const [child, pid] of parentsOf) {
+    const p = partnershipById.get(pid);
+    if (!p || !drawn.has(child)) continue;
+    const want = pairKey(p.individual1, p.individual2);
+    // Every line connected to a line ending at any copy of the child, then the couples those reach.
+    const seen = componentOf(child);
     const got = new Set<string>();
     for (const i of seen) for (const e of ends(sibs[i]!)) for (const c of onCouple(e)) if (c.key) got.add(c.key);
     if (got.has(want)) continue;
+    // Gamete donation (#45): no couple line; a line runs from each parent's symbol.
+    if (p.donorConception) {
+      const reached = new Set<string>();
+      for (const i of seen) for (const e of ends(sibs[i]!)) for (const sym of symbolsAt(e)) reached.add(sym.id);
+      if (reached.has(p.individual1) && reached.has(p.individual2)) continue;
+    }
     if (got.size) {
       const [from] = [...got];
       out.push({
@@ -338,6 +355,44 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
         individuals: [child, p.individual1, p.individual2],
       });
     }
+  }
+
+  // 3b. Lines of assisted reproduction (#45): from the carrier or social
+  // parent's symbol to the child's, through no other symbol.
+  const assisted = parsed.assisted.map(([x1, y1, x2, y2]): Seg => {
+    const [a, b] = [toCanvas([x1, y1]), toCanvas([x2, y2])];
+    return [a[0], a[1], b[0], b[1]];
+  });
+  // An end is at a symbol, or on a sibship line (a line standing for the
+  // whole sibship meets its line of descent at the bar).
+  const drawnAssisted: { from: string[]; to: string[]; sibs: number[] }[] = [];
+  for (const s of assisted) {
+    const [ea, eb] = ends(s);
+    const sa = symbolsAt(ea!), sb = symbolsAt(eb!);
+    const onSib = (e: Pt) => sibs.flatMap((t, i) => (distToSeg(e, t) <= TOUCH ? [i] : []));
+    const [fromSyms, toEnd] = sa.length ? [sa, eb!] : [sb, ea!];
+    const toSyms = symbolsAt(toEnd), toSibs = toSyms.length ? [] : onSib(toEnd);
+    if (!fromSyms.length || (!toSyms.length && !toSibs.length)) {
+      once(`dangle-assisted-${at([s[0], s[1]])}`, { code: "missing-node", message: `a line of assisted reproduction ends where nothing is drawn`, individuals: [] });
+      continue;
+    }
+    drawnAssisted.push({ from: fromSyms.map(x => x.id), to: toSyms.map(x => x.id), sibs: toSibs });
+    for (const sym of symbols) {
+      if (fromSyms.includes(sym) || toSyms.includes(sym)) continue;
+      if (segCrossesBox(s, sym.pos, half - 1)) {
+        once(`lts-a-${sym.id}-${at(sym.pos)}`, { code: "line-through-symbol", message: `a line of assisted reproduction runs through ${label(sym.id)} in the export`, individuals: [sym.id] });
+      }
+    }
+  }
+  for (const link of assistedLinks(pedigree)) {
+    if (!drawn.has(link.from) || !drawn.has(link.child)) continue;
+    const reach = componentOf(link.child);
+    if (drawnAssisted.some(d => d.from.includes(link.from) && (d.to.includes(link.child) || d.sibs.some(i => reach.has(i))))) continue;
+    out.push({
+      code: "assisted-not-drawn",
+      message: `in the export ${label(link.from)} has no line to ${label(link.child)}, whom they ${link.kind === "carrier" ? "carried" : "parent"}`,
+      individuals: [link.from, link.child],
+    });
   }
 
   // 4. Label lines on one baseline running into each other.

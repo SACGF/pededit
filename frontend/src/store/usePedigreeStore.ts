@@ -1,16 +1,17 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity, ClinicalDetails, ViewFilters
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, ReproductiveRole, Zygosity, ClinicalDetails, ViewFilters
 } from "@pedigree-editor/layout-engine";
 import type { Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
-import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
+import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals, dropAssistedLinks } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { linkPartnerProblem } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
+import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -349,6 +350,19 @@ interface PedigreeState {
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
   /** Adoption brackets (#12): "in", "out" or none. */
   setAdopted: (id: string, status: Adoption | undefined) => void;
+  /**
+   * Assisted reproduction (#45). addDonor makes a new sperm or egg donor the
+   * child's genetic parent in place of one parent, who stays linked to the
+   * child (see `applyAddDonor` in pedigree/assisted.ts); addSurrogate adds
+   * the woman who carried the child. Both return a reason when refused.
+   */
+  addDonor: (childId: string, gamete: Gamete) => string | null;
+  addSurrogate: (childId: string) => string | null;
+  setReproductiveRole: (id: string, role: ReproductiveRole | undefined) => void;
+  /** The woman who carried the child when not its genetic mother; undefined clears it. */
+  setCarriedBy: (childId: string, carrierId: string | undefined) => void;
+  /** Parents of the child who are not genetic parents (dashed line). */
+  setSocialParents: (childId: string, parentIds: string[]) => void;
   /**
    * Make (or replace) a twin set (#11) among the children of partnershipId.
    * Members already in another set of that partnership are moved into this
@@ -832,6 +846,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         // Remove the individual
         draft.individuals = draft.individuals.filter(i => i.id !== individualId);
         removeFromTwinSets(draft, individualId);
+        dropAssistedLinks(draft, new Set([individualId]));
 
         // Drop their pin and unlock entries, which would otherwise dangle
         // (the JSON importer warns about them on every later load).
@@ -1122,6 +1137,48 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!ind) return;
         if (status === undefined) delete ind.lifeStatus;
         else ind.lifeStatus = status;
+      });
+    },
+
+    addDonor: (childId, gamete) => {
+      const problem = addDonorProblem(get().pedigree, childId, gamete);
+      if (problem) { console.warn(`Cannot add a donor: ${problem}`); return problem; }
+      mutate(draft => { applyAddDonor(draft, childId, gamete, newId(), newId()); });
+      return null;
+    },
+
+    addSurrogate: (childId) => {
+      const problem = addSurrogateProblem(get().pedigree, childId);
+      if (problem) { console.warn(`Cannot add a surrogate: ${problem}`); return problem; }
+      mutate(draft => { applyAddSurrogate(draft, childId, newId()); });
+      return null;
+    },
+
+    setReproductiveRole: (id, role) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (role === undefined) delete ind.reproductiveRole;
+        else ind.reproductiveRole = role;
+      });
+    },
+
+    setCarriedBy: (childId, carrierId) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === childId);
+        if (!ind) return;
+        if (!carrierId || carrierId === childId) delete ind.carriedBy;
+        else ind.carriedBy = carrierId;
+      });
+    },
+
+    setSocialParents: (childId, parentIds) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === childId);
+        if (!ind) return;
+        const ids = [...new Set(parentIds)].filter(id => id !== childId);
+        if (ids.length) ind.socialParents = ids;
+        else delete ind.socialParents;
       });
     },
 

@@ -107,6 +107,7 @@ export function removeIndividuals(draft: Pedigree, gone: Set<string>): void {
     if (p.twins.length === 0) delete p.twins;
   }
   draft.individuals = draft.individuals.filter(i => !gone.has(i.id));
+  dropAssistedLinks(draft, gone);
   if (draft.pinnedPositions) {
     for (const id of gone) delete draft.pinnedPositions[id];
     if (Object.keys(draft.pinnedPositions).length === 0) delete draft.pinnedPositions;
@@ -114,5 +115,19 @@ export function removeIndividuals(draft: Pedigree, gone: Set<string>): void {
   if (draft.unlockedIndividuals) {
     draft.unlockedIndividuals = draft.unlockedIndividuals.filter(id => !gone.has(id));
     if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
+  }
+}
+
+/**
+ * Clear `carriedBy` and `socialParents` (#45) that name someone in `gone`,
+ * in place (an immer draft).
+ */
+export function dropAssistedLinks(draft: Pedigree, gone: Set<string>): void {
+  for (const ind of draft.individuals) {
+    if (ind.carriedBy && gone.has(ind.carriedBy)) delete ind.carriedBy;
+    if (ind.socialParents?.some(id => gone.has(id))) {
+      const kept = ind.socialParents.filter(id => !gone.has(id));
+      if (kept.length) ind.socialParents = kept; else delete ind.socialParents;
+    }
   }
 }

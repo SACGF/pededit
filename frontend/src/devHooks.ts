@@ -10,6 +10,7 @@
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
  *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
+ *   __pededit.exportSvg({ uShape: true })   // the export as an SVG string, for shot.mjs FILE.svg
  *   __pededit.align().pos      // raw kinship2 LayoutResult
  *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
  *   __pededit.kinship(undefined, { chromosome: "X" }).inbreeding("a")   // X-linked (#87)
@@ -20,6 +21,8 @@ import { layoutToFlow } from "./pedigree/layoutToFlow";
 import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
 import { lintFlow } from "./pedigree/renderLint";
 import { lintExport } from "./io/svg/exportLint";
+import { exportSvg } from "./io/svg/svgExporter";
+import { exportUShapeSvg } from "./io/svg/uShapeExporter";
 import { chartTitle } from "./pedigree/labels";
 import type { SvgExportOptions } from "./io/svg/types";
 import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
@@ -75,6 +78,11 @@ const hooks = {
     // With the chart title the export dialog would draw (#20); none when de-identified.
     const title = options?.deidentify ? undefined : chartTitle(p, useAppStore.getState().activeTitle) || undefined;
     return lintExport(p, { ...canvasOptions(), title, ...options });
+  },
+  /** The SVG export of the current pedigree (save it and `shot.mjs FILE.svg` to look at it). */
+  exportSvg: (options?: SvgExportOptions) => {
+    const p = usePedigreeStore.getState().getPedigree();
+    return (options?.uShape ? exportUShapeSvg : exportSvg)(p, { ...canvasOptions(), ...options });
   },
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),

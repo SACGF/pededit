@@ -52,8 +52,10 @@ Rules that keep a bad file from importing as nonsense (#31):
   label.
 
 PED cannot carry pregnancy / loss status, twins, adoption, childless couple
-marks or ended relationships. `pedLostLifeStatus`, `pedLostTwins`, `pedLostAdoption`,
-`pedLostChildless` and `pedLostEnded` in `exporter.ts` list what a file would drop; the toolbar
+marks, ended relationships or assisted reproduction details (#45: the D/S
+letter, `carriedBy`, `socialParents`; a donor is written as the genetic
+parent, which is right). `pedLostLifeStatus`, `pedLostTwins`, `pedLostAdoption`,
+`pedLostChildless`, `pedLostEnded` and `pedLostAssisted` in `exporter.ts` list what a file would drop; the toolbar
 warns with them before writing.
 
 ## json/ — native lossless format

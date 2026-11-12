@@ -134,7 +134,7 @@ describe("gender identity on the symbol (#26)", () => {
     expect(exportSvg(family(), { deidentify: true })).toContain(">AFAB</text>");
   });
 
-  it("round-trips through JSON, rejects unknown values, and has the last CSV column", () => {
+  it("round-trips through JSON, rejects unknown values, and has a CSV column", () => {
     const back = importJson(exportJson(family("sex"))).pedigree;
     expect(back.individuals.find(i => i.id === "t")!.genderIdentity).toBe("man");
     expect(back.canvasSettings?.symbolsShow).toBe("sex");
@@ -148,7 +148,7 @@ describe("gender identity on the symbol (#26)", () => {
     const [header, ...rows] = exportCsv(family()).split("\n");
     const cols = header!.split(",");
     const col = cols.indexOf("gender_identity");
-    expect(col).toBe(cols.length - 1);
+    expect(col).toBe(cols.indexOf("evaluations") + 1);
     expect(rows.map(r => r.split(",")[col])).toEqual(['""', '"woman"', '"man"', '"man"', '"nonbinary"']);
   });
 });

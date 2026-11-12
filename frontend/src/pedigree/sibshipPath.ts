@@ -1,4 +1,5 @@
 import { NODE_SIZE } from "./constants";
+import { donorDescentSegments, type LinePoint } from "./assisted";
 
 /** A straight line segment [x1, y1, x2, y2]. */
 export type Segment = [number, number, number, number];
@@ -49,6 +50,7 @@ export function sibshipSegments(
   hopHeight: number,
   children: SibshipChild[],
   barOffset = 0,
+  apart?: LinePoint[],
 ): Segment[] {
   if (children.length === 0) return [];
   const half = NODE_SIZE / 2;
@@ -56,8 +58,10 @@ export function sibshipSegments(
   const sibBarY = (coupleY + childRowY) / 2 + barOffset;
   const xs = children.map(c => c.x);
   const segs: Segment[] = [
-    // Drop from the couple line (raised when it hops) to the bar.
-    [coupleX, coupleY - hopHeight, coupleX, sibBarY],
+    // Drop from the couple line (raised when it hops) to the bar. Parents
+    // who are not a couple (gamete donation, #45) each get a line to the
+    // bar instead (`apart`).
+    ...(apart ? donorDescentSegments(apart, coupleX, sibBarY) : [[coupleX, coupleY - hopHeight, coupleX, sibBarY] as Segment]),
     [Math.min(coupleX, ...xs), sibBarY, Math.max(coupleX, ...xs), sibBarY],
   ];
   const forks = forkXs(children);
@@ -123,8 +127,9 @@ export function sibshipPaths(
   hopHeight: number,
   children: SibshipChild[],
   barOffset = 0,
+  apart?: LinePoint[],
 ): { solid: Segment[]; dashed: Segment[] } {
-  const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset);
+  const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset, apart);
   if (segs.length === 0 || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };
   const fixed = segs.length - children.length; // couple drop and bar
   const solid = segs.slice(0, fixed), dashed: Segment[] = [];

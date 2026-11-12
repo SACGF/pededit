@@ -381,6 +381,32 @@ draws NSGC symbols.
   gained `sibshipPaths`, which splits `sibshipSegments` into solid and dashed
   by the children's `dashed` flag, keeping the per-child order (couple drop,
   bar, then one drop per child). The minimap keeps everything solid.
+- `assisted.ts` — assisted reproduction (#45, NSGC 2008 Fig. 3). The model
+  keeps genetics in the ordinary structure so kinship, X-linked kinship,
+  relationship names, the double line and PED need nothing special: the
+  child's partnership is its GENETIC parents (donor included), flagged
+  `Partnership.donorConception` when one is a gamete donor. Such a pair gets
+  no couple edge (`layoutToFlow` skips it, both lints skip
+  `partnership-not-drawn` for it), and its sibship edge carries `apart`: a
+  line from each parent's symbol to the bar replaces the couple drop
+  (`sibshipSegments`' last argument). kinship2 lays the pair out as a
+  couple, which is what puts the donor beside the other parent. The other
+  lines are per child: `carriedBy` (solid, the woman who carried it but is
+  not the genetic mother) and `socialParents` (dashed); `assistedLinks`
+  drops any that name a genetic parent. They are `assistedEdges` in the
+  flow (edge type `assistedEdge`), one per person and child, or one per
+  sibship when the person is linked the same way to every child of it (the
+  line then ends where the sibship's descent meets the bar, so siblings do
+  not each get a crossing line). `assistedEdgeSegment` is the one geometry,
+  for the canvas, the minimap and `svgExporter` (group `assisted-lines`,
+  read by the export lint); the U-shape draws its own along the tracks.
+  Lines leave the symbol from a lower corner (`symbolExitPoint`) so they
+  clear the name under it. A surrogate with no partner of her own would be
+  an isolated founder: `families.ts` keeps her in the child's family and
+  `alignPedigree` appends her to the row above the child, not the top row.
+  Editing: `applyAddDonor` / `applyAddSurrogate` (store `addDonor`,
+  `addSurrogate`, more menu "Assisted reproduction"); the edit panel's
+  `AssistedForm` sets the letter, carrier and social parents.
 - `childless.ts` — childless couple marks (#15): segments hung from the
   middle of the couple line (raised by the hop when the line hops; on a
   consanguineous double line, from the lower line). `layoutToFlow` puts

@@ -13,6 +13,7 @@
  *   couple-line-slanted    partners sit on different rows (usually a pin moved vertically)
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
+ *   assisted-not-drawn     a carrier or social parent (#45) has no line to the child
  *   sibship-bars-overlap   two couples' sibship bars run along the same line, so they read as one sibship
  *   symbols-overlap        two symbols sit on top of each other, or touch
  *   labels-overlap         two name or date labels on one row run into each other
@@ -23,6 +24,7 @@
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import { drawnPedigree } from "./collapse";
+import { assistedLinks } from "./assisted";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { linesWidth } from "./labels";
@@ -37,6 +39,7 @@ export type LintCode =
   | "couple-line-slanted"
   | "child-without-parents"
   | "child-wrong-parents"
+  | "assisted-not-drawn"
   | "sibship-bars-overlap"
   | "symbols-overlap"
   | "labels-overlap";
@@ -143,6 +146,7 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
   }
   for (const p of pedigree.partnerships) {
     if (!drawn.has(p.individual1) || !drawn.has(p.individual2)) continue; // already reported
+    if (p.donorConception) continue; // gamete donation (#45): not a couple, no line
     if (!drawnPairs.has(pairKey(p.individual1, p.individual2))) {
       out.push({
         code: "partnership-not-drawn",
@@ -220,6 +224,17 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
         individuals: [child, p.individual1, p.individual2],
       });
     }
+  }
+
+  // 3a. Lines of assisted reproduction (#45).
+  const linked = new Set(flow.assistedEdges.flatMap(e => (e.data?.children ?? []).map(c => `${indOf(e.source)}>${c}`)));
+  for (const link of assistedLinks(pedigree)) {
+    if (!drawn.has(link.from) || !drawn.has(link.child) || linked.has(`${link.from}>${link.child}`)) continue;
+    out.push({
+      code: "assisted-not-drawn",
+      message: `${label(link.from)} has no line to ${label(link.child)}, whom they ${link.kind === "carrier" ? "carried" : "parent"}`,
+      individuals: [link.from, link.child],
+    });
   }
 
   // 3b. Sibship bars of different couples along the same line (#80). Bars

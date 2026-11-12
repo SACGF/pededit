@@ -8,7 +8,8 @@ import {
   hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
-import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
+import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets, renderRoleLetterSvg } from "./svgExporter";
+import { assistedLinks } from "../../pedigree/assisted";
 import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
@@ -1038,6 +1039,12 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const twins = twinMembership(pedigree);
   const out: string[] = [];
+  // Assisted reproduction (#45): carrier and social parent lines. One that
+  // covers a whole sibship goes to the bar under its line of descent.
+  const links = assistedLinks(pedigree);
+  const linkDone = new Set<string>();
+  const linkKey = (l: { kind: string; from: string; child: string }) => `${l.kind}|${l.from}|${l.child}`;
+  const linkAttrs = (kind: string) => (kind === "social" ? ADOPTED_IN_ATTRS : LINE_ATTRS);
 
   walk(b.root, n => {
     const track = n.depth * g.ringGap;
@@ -1045,7 +1052,9 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
     const bar = childEdge - BAR_CLEARANCE;
 
     for (const w of n.unions) {
-      if (w.kind !== "solo") {
+      // Gamete donation (#45): no couple line; a line from each parent to the bar.
+      const donor = w.kind !== "solo" && w.pids.length === 1 && !!partnershipById.get(w.pids[0]!)?.donorConception;
+      if (w.kind !== "solo" && !donor) {
         const uA = memberU(n, w.a, g);
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
         if (w.consang) out.push(trackPath(uA, uB, track - CONSANG_GAP / 2, g), trackPath(uA, uB, track + CONSANG_GAP / 2, g));
@@ -1079,9 +1088,24 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       // parent's symbol when the partner is not drawn.
       const uP = descentU(n, w, g);
       const us = w.kids.map(c => c.u);
-      out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
+      if (donor) {
+        const uA = memberU(n, w.a, g);
+        const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
+        out.push(diagonalPath(uA, track + HALF, uP, bar, g), diagonalPath(uB, track + HALF, uP, bar, g));
+      } else {
+        out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
+      }
       const lo = Math.min(uP, ...us), hi = Math.max(uP, ...us);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
+      for (const l of links) {
+        if (linkDone.has(linkKey(l)) || l.child !== w.kids[0]!.blood) continue;
+        const from = layout.nodes.get(l.from);
+        if (!from || from.depth >= n.depth + 1) continue;
+        const all = w.kids.every(c => links.some(m => m.kind === l.kind && m.from === l.from && m.child === c.blood));
+        if (!all) continue;
+        for (const c of w.kids) linkDone.add(linkKey({ ...l, child: c.blood }));
+        out.push(diagonalPath(from.u, from.depth * g.ringGap + HALF, uP, bar, g, linkAttrs(l.kind)));
+      }
       // A loss triangle's apex sits below the top of the symbol box. An
       // adopted-in child's drop is dashed (#12). Twins share one fork point
       // on the bar, at the mean of their positions (#11).
@@ -1116,6 +1140,17 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       }
     }
   });
+
+  // Assisted reproduction (#45): a line from the woman who carried the child
+  // (solid) or a parent who is not genetic (dashed), when both are drawn.
+  for (const link of links) {
+    const from = layout.nodes.get(link.from), child = layout.nodes.get(link.child);
+    if (!from || !child || linkDone.has(linkKey(link))) continue;
+    const below = child.depth > from.depth;
+    const o1 = from.depth * g.ringGap + (below ? HALF : -HALF);
+    const o2 = child.depth * g.ringGap + (below ? childDropEndOffset(byId.get(link.child)) : HALF);
+    out.push(diagonalPath(from.u, o1, child.u, o2, g, linkAttrs(link.kind)));
+  }
 
   // Somebody drawn twice: a dashed link between the copies. On one track it
   // follows the track just inside the symbols. Across tracks it is a straight
@@ -1168,6 +1203,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   shape += renderPresymptomaticSvg(ind, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
+  // "D" or "S" (#45) is text, kept upright like the "P".
+  const letter = renderRoleLetterSvg(ind, sectors.length > 0);
+  shape += letter && rotation !== 0 ? `<g transform="rotate(${r(-rotation)})">${letter}</g>` : letter;
   let marks = renderLifeStatusMarks(ind, geom, clipId);
   if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
     marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;

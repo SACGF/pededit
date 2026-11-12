@@ -33,6 +33,10 @@ FULL_PEDIGREE = {
             ],
         },
         {"id": "c2", "sex": "unknown", "affected": False, "sibOrder": 2},
+        {"id": "c2", "sex": "unknown", "affected": False, "sibOrder": 2,
+         "carriedBy": "s", "socialParents": ["w2"]},
+        {"id": "d", "sex": "male", "affected": False, "sibOrder": 0, "reproductiveRole": "donor"},
+        {"id": "s", "sex": "female", "affected": False, "sibOrder": 0, "reproductiveRole": "surrogate"},
     ],
     "partnerships": [
         {"id": "p1", "individual1": "f", "individual2": "m", "consanguineous": True,
@@ -40,6 +44,7 @@ FULL_PEDIGREE = {
          "twins": [{"members": ["c1", "c2"], "zygosity": "monozygotic"}]},
         {"id": "p2", "individual1": "f", "individual2": "w2", "childless": "infertility",
          "childlessReason": "azoospermia", "ended": True},
+        {"id": "p3", "individual1": "m", "individual2": "d", "donorConception": True},
     ],
     "parentOf": {"p1": ["c1", "c2"]},
     "siblingOrder": {"mode": "manual", "affectedFirst": True},
@@ -148,6 +153,10 @@ class PedigreeRoundTripTests(APITestCase):
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
                                         "snapGridSize": 20, "layoutWidth": "wide"}},
             {**base, "filters": {"affectedOnly": "maybe"}},
+            {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
+                                      "reproductiveRole": "father"}]},
+            {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
+                                      "socialParents": "b"}]},
             [],
         ]
         for data in bad_cases:

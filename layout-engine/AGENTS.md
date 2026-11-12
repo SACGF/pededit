@@ -36,6 +36,13 @@ indexing convention inherited from R, and the three rendering rules.
   read as one family; this lays out each family alone and joins them with
   `FAMILY_GAP`, with unconnected people last. With one family it returns
   `alignPedigree` unchanged, so keep `alignPedigree` R-faithful for the oracle.
+- Assisted reproduction (#45) needs nothing in kinship: a donor is in the
+  child's partnership as its genetic parent. `carriedBy` and
+  `socialParents` (lines on the drawing only) touch the layout in two
+  places: `splitFamilies` joins those people to the child's family, and
+  `alignPedigree`'s `appendIsolated` puts such a person with no partner or
+  parents of their own in the row above the child (`assistedLevels`)
+  instead of the founder row. PED input never has them.
 - `kinship.ts` — `kinshipCoefficients` (#32): kinship of any two people and
   the inbreeding coefficient, by the same parents-first recursion as
   kinship2's `kinship()`. Not part of the layout. It follows blood rather

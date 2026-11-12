@@ -105,6 +105,9 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `familyHistoryUnknown` | boolean | no | Family history not known (NSGC): a "?" above the symbol. |
 | `lifeStatus` | `"pregnancy"`, `"miscarriage"`, `"termination"`, `"stillbirth"` or `"ectopic"` | no | Pregnancy or pregnancy loss, drawn with the NSGC symbols (P inside the symbol, a small triangle for miscarriage, termination and ectopic, SB for stillbirth). Absent means born. Such an individual cannot have partners or children. |
 | `adopted` | `"in"` or `"out"` | no | Adoption brackets round the symbol (NSGC). `in` is adopted into the family shown, drawn with a dashed line to the adoptive parents in `parentOf`; `out` is a biological child placed for adoption, drawn with a solid line to the biological parents. PED has no field for this, so Export PED drops it and warns. |
+| `reproductiveRole` | `"donor"` or `"surrogate"` | no | Assisted reproduction (NSGC 2008 Fig. 3): `donor` draws a D inside the symbol (sperm or egg donor), `surrogate` an S (a woman who carried a pregnancy she is not the genetic mother of). A woman who is both egg donor and carrier is a donor. |
+| `carriedBy` | string | no | Id of the woman who carried this pregnancy when she is not its genetic mother: a surrogate, or the mother of a child conceived with a donor egg. Drawn as a solid line from her to the child (a pregnancy is a biological relationship). Not a parent: kinship and PED use the genetic parents in `parentOf`. |
+| `socialParents` | string[] | no | Ids of parents who are not the child's genetic parents, such as the intended father when donor sperm is used. Drawn as a dashed line of descent. Not parents for kinship or PED. PED has no field for these three, so Export PED drops them and warns. |
 | `name` | string | no | Display name shown under the symbol. |
 | `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
 | `age` | string | no | The individual's age as free text, such as `"50s"`, `"d. 72"` or `"34 y"`, for an approximate age or one known without a date. Shown under the symbol in place of the date of birth, cut to one line. Not an age of onset. De-identified exports leave it out. |
@@ -132,6 +135,7 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
 | `twins` | `TwinSet[]` | no | Twin sets (twins, triplets, ...) among this partnership's children. PED has no field for this, so Export PED drops it and warns. |
 | `ended` | boolean | no | The relationship no longer exists (separated, divorced). Drawn as two short diagonal strokes across the couple line (NSGC). Absent means `false`. |
+| `donorConception` | boolean | no | The children were conceived with a donated sperm or egg (NSGC 2008 Fig. 3). The partners are the children's genetic parents, and kinship and PED treat them as such, but they are not a couple: no couple line is drawn, and a line runs from each of them to the children instead. Absent means `false`. |
 
 Any other property on a partnership is preserved as-is.
 

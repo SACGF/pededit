@@ -5,6 +5,7 @@ import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../sto
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
+import { addDonorProblem, addSurrogateProblem } from "../assisted";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
 import { adjacentSibling } from "../../components/EditPanel";
 import { batchLockState, batchCollapseState } from "../selection";
@@ -97,6 +98,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setPartnershipConsanguineous,
     setPartnershipEnded,
     setAdopted,
+    addDonor,
+    addSurrogate,
     setTwins,
     removeTwin,
     removeWithDescendants,
@@ -113,6 +116,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
   const hasParentsAlready = Object.values(pedigree.parentOf).some(kids => kids.includes(individualId));
   const ownPartnerships = partnerChoices(pedigree, individualId);
+  // Gamete donation pairs (#45) have no couple line, so no line to mark.
+  const couples = ownPartnerships.filter(c => !pedigree.partnerships.find(p => p.id === c.partnershipId)?.donorConception);
   // Twins (#11): the current set, or the sibling drawn next to this person to pair with.
   const twin = twinSetOf(pedigree, individualId);
   const twinPartnership = parentPartnershipOf(pedigree, individualId);
@@ -320,6 +325,34 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </div>
         </MenuSection>
 
+        <MenuSection label="Assisted reproduction">
+          {([["sperm", "Add sperm donor"], ["egg", "Add egg donor"]] as const).map(([gamete, text]) => {
+            const why = addDonorProblem(pedigree, individualId, gamete);
+            return (
+              <MenuItem
+                key={gamete}
+                onClick={() => action(() => addDonor(individualId, gamete))}
+                disabled={!!why}
+                title={why ?? `This person was conceived with donor ${gamete}: the donor (D) becomes the genetic parent, and the parent they replace keeps a line to this person`}
+              >
+                {text}
+              </MenuItem>
+            );
+          })}
+          {(() => {
+            const why = addSurrogateProblem(pedigree, individualId);
+            return (
+              <MenuItem
+                onClick={() => action(() => addSurrogate(individualId))}
+                disabled={!!why}
+                title={why ?? "A surrogate (S) carried this pregnancy: drawn with a solid line to this person, not a parent for kinship"}
+              >
+                Add surrogate
+              </MenuItem>
+            );
+          })()}
+        </MenuSection>
+
         <MenuSection label="Pregnancy / loss">
           <MenuItem
             onClick={() => action(() => setLifeStatus(individualId, undefined))}
@@ -340,22 +373,22 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           ))}
         </MenuSection>
 
-        {ownPartnerships.length > 0 && (
+        {couples.length > 0 && (
           <MenuSection label="Consanguinity">
-            {ownPartnerships.map(c => (
+            {couples.map(c => (
               <ConsanguineousItem
                 key={c.partnershipId}
                 partnershipId={c.partnershipId}
-                label={ownPartnerships.length > 1 ? `Consanguineous with ${c.label}` : "Consanguineous"}
+                label={couples.length > 1 ? `Consanguineous with ${c.label}` : "Consanguineous"}
                 onToggle={on => action(() => setPartnershipConsanguineous(c.partnershipId, on))}
               />
             ))}
           </MenuSection>
         )}
 
-        {ownPartnerships.length > 0 && (
+        {couples.length > 0 && (
           <MenuSection label="Relationship">
-            {ownPartnerships.map(c => {
+            {couples.map(c => {
               const ended = !!pedigree.partnerships.find(p => p.id === c.partnershipId)?.ended;
               return (
                 <MenuItem
@@ -365,7 +398,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                   checked={ended}
                   title={ENDED_TITLE}
                 >
-                  {ownPartnerships.length > 1 ? `Ended with ${c.label}` : "Ended"}
+                  {couples.length > 1 ? `Ended with ${c.label}` : "Ended"}
                 </MenuItem>
               );
             })}

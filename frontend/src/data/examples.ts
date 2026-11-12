@@ -431,6 +431,48 @@ export const EXAMPLES: ExamplePedigree[] = [
       },
     },
   },
+  {
+    label: "Assisted reproduction",
+    description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate",
+    data: {
+      siblingOrder,
+      individuals: [
+        // 1. Sperm donor: the woman carries a pregnancy by donor sperm; her
+        // partner is the intended (social) father, dashed line.
+        { id: "ar_h1", sex: "male",    affected: false, sibOrder: 0, name: "Partner" },
+        { id: "ar_w1", sex: "female",  affected: false, sibOrder: 0 },
+        { id: "ar_d1", sex: "male",    affected: false, sibOrder: 0, reproductiveRole: "donor" },
+        { id: "ar_c1", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", socialParents: ["ar_h1"] },
+        // 2. Egg donor: the man's sperm and a donor egg; his partner carries
+        // the pregnancy (solid line, a biological relationship).
+        { id: "ar_h2", sex: "male",    affected: false, sibOrder: 0 },
+        { id: "ar_w2", sex: "female",  affected: false, sibOrder: 0, name: "Partner" },
+        { id: "ar_d2", sex: "female",  affected: false, sibOrder: 0, reproductiveRole: "donor" },
+        { id: "ar_c2", sex: "male",    affected: true,  sibOrder: 0, carriedBy: "ar_w2" },
+        // 3. Surrogate only: the couple's own embryo, carried by a surrogate.
+        { id: "ar_gf", sex: "male",    affected: false, sibOrder: 0 },
+        { id: "ar_gm", sex: "female",  affected: false, sibOrder: 0 },
+        { id: "ar_h3", sex: "male",    affected: false, sibOrder: 0 },
+        { id: "ar_w3", sex: "female",  affected: false, sibOrder: 0 },
+        { id: "ar_s3", sex: "female",  affected: false, sibOrder: 0, reproductiveRole: "surrogate" },
+        { id: "ar_c3", sex: "female",  affected: false, sibOrder: 0, carriedBy: "ar_s3" },
+      ],
+      partnerships: [
+        { id: "ar_pp1", individual1: "ar_h1", individual2: "ar_w1" },
+        { id: "ar_pd1", individual1: "ar_d1", individual2: "ar_w1", donorConception: true },
+        { id: "ar_pp2", individual1: "ar_h2", individual2: "ar_w2" },
+        { id: "ar_pd2", individual1: "ar_h2", individual2: "ar_d2", donorConception: true },
+        { id: "ar_pg",  individual1: "ar_gf", individual2: "ar_gm" },
+        { id: "ar_pp3", individual1: "ar_h3", individual2: "ar_w3" },
+      ],
+      parentOf: {
+        ar_pd1: ["ar_c1"],
+        ar_pd2: ["ar_c2"],
+        ar_pg:  ["ar_w3"],
+        ar_pp3: ["ar_c3"],
+      },
+    },
+  },
   ...historicAndClassicExamples(),
 ];
 
