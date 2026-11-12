@@ -112,7 +112,16 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   (childless and twin marks). It never writes ids into the SVG: symbols are
   matched to people by position, because an id can be a name after a PED
   import and must not leak from a de-identified export.
-- `pngExporter.ts` — rasterises the SVG via canvas.
+- `pngExporter.ts` — rasterises the SVG via canvas at a chosen DPI (#18),
+  taking the SVG's CSS pixels as 96 to the inch, so the printed size is the
+  same at every DPI. `pngDpi.ts` writes the DPI into a pHYs chunk after
+  IHDR (Chromium's `toBlob` writes none; any existing one is replaced), which is what Word and journal
+  upload checks read. Past `MAX_CANVAS_SIDE` (16384, Safari's limit;
+  Chromium accepts more) or `MAX_CANVAS_AREA` (64 Mpx) `pngSizeForDpi`
+  lowers the DPI to fit and the file records the lowered DPI; the export
+  dialog says so before download. To get the bytes in a page check,
+  `await import("/src/io/svg/index.ts")` inside `eval.mjs` and return the
+  blob as base64.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB and notes for de-identified export.
 - `types.ts` — `SvgExportOptions`.

@@ -1,7 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf } from "../io/svg/index";
+import {
+  exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf,
+  svgPixelSize, pngSizeForDpi, PNG_DPI_CHOICES, DEFAULT_PNG_DPI, CSS_PX_PER_INCH,
+} from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 interface ExportDialogProps {
@@ -26,7 +29,8 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
-  const [pngScale, setPngScale]     = useState<1 | 2 | 3>(2);
+  const [pngDpi, setPngDpi]         = useState<number>(DEFAULT_PNG_DPI);
+  const [error, setError]           = useState<string | null>(null);
   const [uShape, setUShape]         = useState(false);
   const [busy, setBusy]             = useState(false);
 
@@ -36,6 +40,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
   // Follow the canvas setting each time the dialog opens.
   useEffect(() => {
     if (open) setCompact(defaultCompact);
+    if (open) setError(null);
   }, [open, defaultCompact]);
 
   // The U shape is a descendant chart of one founder couple. With nobody to
@@ -48,22 +53,34 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
   const useU = uShape && uAvailable;
   const omittedCount = uLayout?.omitted.length ?? 0;
 
+  // The SVG every format is made from. Built while the dialog is open so the
+  // PNG option can show the pixel and printed size it will produce.
+  const svgString = useMemo(() => {
+    if (!open) return null;
+    const exportFn = useU ? exportUShapeSvg : exportSvg;
+    return exportFn(pedigree, {
+      deidentify: deident,
+      ageBuckets: deident && ageBuckets,
+      title: deident ? undefined : title,
+      uShapePartners: uPartners,
+      compact,
+    });
+  }, [open, useU, pedigree, deident, ageBuckets, title, uPartners, compact]);
+
+  const svgSize = svgString ? svgPixelSize(svgString) : null;
+  const pngSize = svgSize ? pngSizeForDpi(svgSize.width, svgSize.height, pngDpi) : null;
+  const cm = (cssPx: number) => (cssPx / CSS_PX_PER_INCH * 2.54).toFixed(1);
+
   async function handleDownload() {
+    if (!svgString) return;
     setBusy(true);
+    setError(null);
     try {
-      const exportFn = useU ? exportUShapeSvg : exportSvg;
-      const svgString = exportFn(pedigree, {
-        deidentify: deident,
-        ageBuckets: deident && ageBuckets,
-        title: deident ? undefined : title,
-        uShapePartners: uPartners,
-        compact,
-      });
 
       if (format === "svg") {
         downloadBlob(new Blob([svgString], { type: "image/svg+xml" }), `${title}.svg`);
       } else if (format === "png") {
-        const blob = await exportPng(svgString, pngScale);
+        const blob = await exportPng(svgString, pngDpi);
         downloadBlob(blob, `${title}.png`);
       } else {
         const blob = await exportPdf(svgString, title);
@@ -71,6 +88,8 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
       }
 
       onOpenChange(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -103,24 +122,31 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
             </div>
           </div>
 
-          {/* PNG scale — only when PNG selected */}
+          {/* PNG resolution (#18), only when PNG selected */}
           {format === "png" && (
             <div className="space-y-1.5">
               <div className="text-xs font-medium text-gray-700">Resolution</div>
               <div className="flex gap-4">
-                {([1, 2, 3] as const).map(s => (
-                  <label key={s} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                {PNG_DPI_CHOICES.map(d => (
+                  <label key={d} className="flex items-center gap-1.5 text-xs cursor-pointer">
                     <input
                       type="radio"
-                      name="pngScale"
-                      value={s}
-                      checked={pngScale === s}
-                      onChange={() => setPngScale(s)}
+                      name="pngDpi"
+                      value={d}
+                      checked={pngDpi === d}
+                      onChange={() => setPngDpi(d)}
                     />
-                    {s}×{s === 2 && " (retina)"}
+                    {d} dpi{d === CSS_PX_PER_INCH && " (screen)"}
                   </label>
                 ))}
               </div>
+              {svgSize && pngSize && (
+                <p className="text-xs text-muted-foreground" data-testid="png-size">
+                  {pngSize.width} × {pngSize.height} px, printed {cm(svgSize.width)} × {cm(svgSize.height)} cm
+                  {pngSize.capped &&
+                    `. Too large for a browser at ${pngDpi} dpi, so it will be saved at ${pngSize.dpi} dpi at the same printed size. Use SVG or PDF for full resolution.`}
+                </p>
+              )}
             </div>
           )}
 
@@ -199,6 +225,8 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
             )}
           </div>
         </div>
+
+        {error && <p className="text-xs text-red-700" role="alert">Export failed: {error}</p>}
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
