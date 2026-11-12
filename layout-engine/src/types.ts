@@ -22,6 +22,19 @@ export interface Individual {
   affected: boolean;
   deceased?: boolean;
   carrier?: boolean;
+  /**
+   * Asymptomatic or presymptomatic carrier (#101, NSGC 2008 Fig. 4):
+   * clinically unaffected now but may develop the condition, drawn as a
+   * vertical line through the symbol. The editor keeps it and `carrier`
+   * exclusive (one "carrier status" choice); absent means false.
+   */
+  presymptomatic?: boolean;
+  /**
+   * Evaluations and test results (#101, NSGC 2008 Fig. 4), written under
+   * the symbol as "E+ (BRCA1 c.5266dupC)", numbered E1, E2 when there are
+   * several. A documented one puts a "*" at the symbol's lower right.
+   */
+  evaluations?: Evaluation[];
   proband?: boolean;
   /** Consultand (#99): the person seeking counselling, drawn with an arrow without the proband's "P". */
   consultand?: boolean;
@@ -58,6 +71,17 @@ export interface Individual {
    * brings the branch back.
    */
   descendantsHidden?: boolean;
+}
+
+/** Result of an evaluation (#101): "+", "-" or "u" after the E. Absent: no result recorded. */
+export type EvaluationResult = "positive" | "negative" | "uninformative";
+
+export interface Evaluation {
+  result?: EvaluationResult;
+  /** Short text shown in parentheses after the E, e.g. "BRCA1 c.5266dupC" or "echo". */
+  detail?: string;
+  /** Examined by your team, or an outside result reviewed and verified: "*" by the symbol. */
+  documented?: boolean;
 }
 
 /**

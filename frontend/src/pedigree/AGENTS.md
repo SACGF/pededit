@@ -167,6 +167,23 @@ draws NSGC symbols.
   canvas and legend, `renderFamilyHistorySvg` in both exporters (upright in
   the U-shape). It reaches about 13px above the row, inside the title gap.
 
+- `evaluation.ts` — evaluation notation and presymptomatic carrier (#101,
+  NSGC 2008 Fig. 4). `Individual.evaluations` is a list of `{ result,
+  detail, documented }`; `labels.ts` writes each as a detail section
+  between onset and the pedigree number ("E+ (BRCA1 c.5266dupC)", numbered
+  E1, E2 per person only when there are several), up to two lines each
+  because variant names rarely fit a slot. The numbers are per person, not
+  pedigree-wide: the detail beside each says what it was, so the key only
+  explains the notation. Any documented evaluation puts a "*" just right of
+  the symbol's lower right corner (outside adoption brackets), canvas and
+  both exporters, not the minimap. `Individual.presymptomatic` is a
+  vertical line through the symbol, drawn inside `SymbolShape` (so the
+  minimap gets it) and by `renderPresymptomaticSvg`; like the carrier dot
+  it is not drawn on an affected fill. The editor offers carrier and
+  presymptomatic as one "Carrier" select, and the store setters keep them
+  exclusive; old data with only `carrier` loads unchanged. De-identified
+  exports keep the evaluations, details included, as they keep onset.
+
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected
   status and `Individual.tagOnset` per quadrant tag, both free text since
   onset is often known only as "40s" or "childhood". `onsetsOf` is the one

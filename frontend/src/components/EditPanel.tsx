@@ -15,6 +15,8 @@ import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
+import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
+import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -58,7 +60,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setCarrier, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
+  const { pedigree, updateIndividual, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
@@ -164,18 +166,29 @@ function IndividualForm({ individual }: { individual: Individual }) {
               />
             </div>
           )}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={!!individual.carrier}
-              onChange={e => setCarrier(individual.id, e.target.checked)}
-              className="accent-black"
-            />
-            <span>Carrier</span>
-          </label>
-          {individual.carrier && individual.affected && (
+          {/* One carrier status (#101): the dot, or the presymptomatic vertical line. */}
+          <div className="flex items-center gap-2">
+            <span className="shrink-0">Carrier</span>
+            <select
+              value={individual.presymptomatic ? "presymptomatic" : individual.carrier ? "carrier" : ""}
+              aria-label="Carrier status"
+              onChange={e => {
+                const v = e.target.value;
+                if (v === "carrier") setCarrier(individual.id, true);
+                else if (v === "presymptomatic") setPresymptomatic(individual.id, true);
+                else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
+                else setCarrier(individual.id, false);
+              }}
+              className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+            >
+              <option value="">No</option>
+              <option value="carrier">Carrier (dot)</option>
+              <option value="presymptomatic">Presymptomatic (vertical line)</option>
+            </select>
+          </div>
+          {(individual.carrier || individual.presymptomatic) && individual.affected && (
             <p className="text-[10px] text-gray-500 pl-5">
-              Not drawn: the affected fill replaces the carrier dot. Use a gene result tag to show it.
+              Not drawn: the affected fill replaces the carrier mark. Use a gene result tag to show it.
             </p>
           )}
           <label className="flex items-center gap-2 cursor-pointer" title="Draws a ? above the symbol (NSGC)">
@@ -195,10 +208,86 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </div>
 
+      <EvaluationsForm individual={individual} />
       <TwinsForm individual={individual} />
       <RelatednessSection individual={individual} />
       <EndedForm individual={individual} />
       <CouplesForm individual={individual} />
+    </div>
+  );
+}
+
+/**
+ * Evaluations and test results (#101, NSGC): each drawn under the symbol as
+ * "E+ (detail)", numbered E1, E2 when there are several; a documented one
+ * adds a "*" at the symbol's lower right.
+ */
+function EvaluationsForm({ individual }: { individual: Individual }) {
+  const { setEvaluations } = usePedigreeStore();
+  const evs = evaluationsOf(individual);
+  const change = (i: number, patch: Partial<Evaluation>) => {
+    setEvaluations(individual.id, evs.map((e, k) => {
+      if (k !== i) return e;
+      const next: Evaluation = { ...e, ...patch };
+      if (!next.result) delete next.result;
+      if (!next.detail) delete next.detail;
+      if (!next.documented) delete next.documented;
+      return next;
+    }));
+  };
+  return (
+    <div className="border-t pt-3 space-y-2" data-testid="evaluations-form">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Evaluations</div>
+      {evs.map((ev, i) => (
+        <div key={i} className="space-y-1" data-evaluation-row={i}>
+          <div className="flex items-center gap-1 text-xs">
+            <span className="w-5 shrink-0 text-gray-600">E{evs.length > 1 ? i + 1 : ""}</span>
+            <select
+              value={ev.result ?? ""}
+              aria-label={`Evaluation ${i + 1} result`}
+              onChange={e => change(i, { result: (e.target.value || undefined) as EvaluationResult | undefined })}
+              className="flex-1 min-w-0 h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+            >
+              <option value="">No result</option>
+              {EVALUATION_RESULT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <button
+              type="button"
+              aria-label={`Remove evaluation ${i + 1}`}
+              title="Remove this evaluation"
+              onClick={() => setEvaluations(individual.id, evs.filter((_, k) => k !== i))}
+              className="px-1 text-gray-500 hover:text-black"
+            >
+              ×
+            </button>
+          </div>
+          <Input
+            value={ev.detail ?? ""}
+            aria-label={`Evaluation ${i + 1} detail`}
+            onChange={e => change(i, { detail: e.target.value })}
+            className="h-6 text-xs"
+            placeholder="e.g. BRCA1 c.5266dupC, echo"
+          />
+          <label className="flex items-center gap-1 cursor-pointer text-xs pl-6" title="Documented: examined by your team, or an outside result reviewed and verified. Draws a * at the symbol's lower right (NSGC).">
+            <input
+              type="checkbox"
+              checked={!!ev.documented}
+              aria-label={`Evaluation ${i + 1} documented`}
+              onChange={e => change(i, { documented: e.target.checked })}
+              className="accent-black"
+            />
+            <span>Documented (*)</span>
+          </label>
+        </div>
+      ))}
+      <button
+        type="button"
+        data-testid="add-evaluation"
+        onClick={() => setEvaluations(individual.id, [...evs, {}])}
+        className="text-xs underline text-gray-600 hover:text-black"
+      >
+        Add evaluation
+      </button>
     </div>
   );
 }

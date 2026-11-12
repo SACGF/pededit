@@ -15,6 +15,7 @@ import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { labelNumbers } from "../../pedigree/layoutToFlow";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
+import { renderPresymptomaticSvg, renderDocumentedMarkSvg, hasDocumentedEvaluation } from "../../pedigree/evaluation";
 import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
@@ -1163,6 +1164,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
       + `${geom} ${stroke} fill="none"/>`;
   }
   shape += renderCarrierDot(ind, sectors.length > 0);
+  shape += renderPresymptomaticSvg(ind, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
   let marks = renderLifeStatusMarks(ind, geom, clipId);
@@ -1236,6 +1238,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         (ind.deceased ? renderDeceasedSlash() : "") +
         (arrowKind(ind) ? renderProbandArrow(arrowKind(ind)!, pos.rotation) : "") +
         (ind.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -HALF, -HALF, -pos.rotation) : "") +
+        (hasDocumentedEvaluation(ind) ? renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -HALF, -HALF, -pos.rotation) : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
         (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.children.length, NODE_SIZE)}</g>` : "") +
         `</g>`,

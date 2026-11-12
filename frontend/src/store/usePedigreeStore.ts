@@ -3,6 +3,7 @@ import { produce } from "immer";
 import type {
   Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity, ClinicalDetails
 } from "@pedigree-editor/layout-engine";
+import type { Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
@@ -326,7 +327,12 @@ interface PedigreeState {
   updateIndividual: (id: string, updates: Partial<Individual>) => void;
   setAffected: (id: string, affected: boolean) => void;
   setDeceased: (id: string, deceased: boolean) => void;
+  /** Carrier dot. Setting it clears `presymptomatic`: the two are one carrier status (#101). */
   setCarrier: (id: string, carrier: boolean) => void;
+  /** Presymptomatic carrier, a vertical line through the symbol (#101). Setting it clears `carrier`. */
+  setPresymptomatic: (id: string, presymptomatic: boolean) => void;
+  /** Replace the person's evaluations (#101); an empty list removes the field. */
+  setEvaluations: (id: string, evaluations: Evaluation[]) => void;
   setProband: (id: string) => void;
   /** Consultand arrow without the "P" (#99). Several people may be consultands. */
   setConsultand: (id: string, consultand: boolean) => void;
@@ -981,7 +987,27 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setCarrier: (id, carrier) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (ind) ind.carrier = carrier;
+        if (!ind) return;
+        ind.carrier = carrier;
+        if (carrier) delete ind.presymptomatic;
+      });
+    },
+
+    setPresymptomatic: (id, presymptomatic) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (presymptomatic) { ind.presymptomatic = true; if (ind.carrier) ind.carrier = false; }
+        else delete ind.presymptomatic;
+      });
+    },
+
+    setEvaluations: (id, evaluations) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (evaluations.length > 0) ind.evaluations = evaluations.map(e => ({ ...e }));
+        else delete ind.evaluations;
       });
     },
 

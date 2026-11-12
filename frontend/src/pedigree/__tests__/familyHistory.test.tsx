@@ -59,7 +59,7 @@ describe("family history not known (#100)", () => {
     expect(back.individuals.find(i => i.id === "f")!.familyHistoryUnknown).toBe(true);
     const [header, ...rows] = exportCsv(family()).split("\n");
     const col = header!.split(",").indexOf("family_history_unknown");
-    expect(col).toBe(header!.split(",").length - 1);
+    expect(col).toBe(header!.split(",").indexOf("consultand") + 1);
     expect(rows.map(r => r.split(",")[col])).toEqual(['"1"', '"0"', '"1"', '"0"']);
   });
 });

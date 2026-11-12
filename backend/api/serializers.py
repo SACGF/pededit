@@ -41,12 +41,20 @@ def _opt(field_cls, **kwargs):
 LIFE_STATUS_CHOICES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"]
 
 
+class EvaluationSerializer(serializers.Serializer):
+    result = _opt(serializers.ChoiceField, choices=["positive", "negative", "uninformative"])
+    detail = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    documented = _opt(serializers.BooleanField)
+
+
 class IndividualSerializer(serializers.Serializer):
     id = serializers.CharField()
     sex = serializers.ChoiceField(choices=["male", "female", "unknown"])
     affected = serializers.BooleanField()
     deceased = _opt(serializers.BooleanField)
     carrier = _opt(serializers.BooleanField)
+    presymptomatic = _opt(serializers.BooleanField)
+    evaluations = _opt(serializers.ListField, child=EvaluationSerializer())
     proband = _opt(serializers.BooleanField)
     consultand = _opt(serializers.BooleanField)
     familyHistoryUnknown = _opt(serializers.BooleanField)

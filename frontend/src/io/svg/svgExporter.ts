@@ -19,6 +19,7 @@ import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
+import { renderPresymptomaticSvg, renderDocumentedMarkSvg, hasDocumentedEvaluation } from "../../pedigree/evaluation";
 import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import type { SvgExportOptions } from "./types";
 import {
@@ -322,7 +323,8 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
+  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0)
+    + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 
@@ -447,6 +449,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       const arrow = arrowKind(ind);
       if (arrow) elems.push(renderProbandArrow(arrow));
       if (ind.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -NODE_SIZE / 2, -NODE_SIZE / 2));
+      if (hasDocumentedEvaluation(ind)) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
       const branch = branchOf(pedigree, ind.id);
       if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)

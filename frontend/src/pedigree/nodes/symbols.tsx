@@ -12,6 +12,10 @@ import {
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
 import { adoptionBracketSegments } from "../adoption";
 import { familyHistoryMarkAt, FAMILY_HISTORY_FONT_SIZE } from "../familyHistory";
+import {
+  drawsPresymptomatic, presymptomaticLine, documentedMarkAt, PRESYMPTOMATIC_RIM, PRESYMPTOMATIC_STROKE,
+  DOCUMENTED_FONT_SIZE, DOCUMENTED_MARK,
+} from "../evaluation";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
@@ -191,6 +195,20 @@ function CarrierDot({ size, status, rim }: { size: number; status: LifeStatus | 
     : <circle cx={d.cx} cy={d.cy} r={d.r} fill="black" />;
 }
 
+/**
+ * Presymptomatic carrier (#101): a vertical line through the symbol, with a
+ * white rim over tag colours as the carrier dot has. Geometry in `evaluation.ts`.
+ */
+function PresymptomaticLine({ size, status, rim }: { size: number; status: LifeStatus | undefined; rim: boolean }) {
+  const l = presymptomaticLine(status, size);
+  return (
+    <g data-presymptomatic="true">
+      {rim && <line {...l} stroke="white" strokeWidth={PRESYMPTOMATIC_STROKE + 2 * PRESYMPTOMATIC_RIM} />}
+      <line {...l} stroke="black" strokeWidth={PRESYMPTOMATIC_STROKE} />
+    </g>
+  );
+}
+
 /** "P" inside the sex symbol of a current pregnancy. */
 function PregnancyMark({ size, fill }: { size: number; fill: FillDescriptor }) {
   const carrier = fill.type === "carrier-dot";
@@ -259,6 +277,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
           : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
+        {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
         {status === "stillbirth" && (
           <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
@@ -272,6 +291,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
       {brackets}
       <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
+      {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
     </g>
   );
 }
@@ -359,6 +379,21 @@ export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParen
       style={{ userSelect: "none" }}
     >
       ?
+    </text>
+  );
+}
+
+/** "*" at the lower right: a documented evaluation (#101). Placement in `evaluation.ts`. */
+export function DocumentedMark({ size, adopted }: { size: number; adopted: boolean }) {
+  const p = documentedMarkAt(size, adopted);
+  return (
+    <text
+      data-documented-evaluation
+      x={p.x} y={p.y}
+      fontFamily="sans-serif" fontSize={DOCUMENTED_FONT_SIZE} fill="black"
+      style={{ userSelect: "none" }}
+    >
+      {DOCUMENTED_MARK}
     </text>
   );
 }

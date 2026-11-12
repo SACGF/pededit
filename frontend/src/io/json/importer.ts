@@ -12,6 +12,7 @@ const NAME_LABEL_VALUES = ["wrap", "truncate"];
 const LAYOUT_WIDTH_VALUES = ["minimal", "relaxed"];
 const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
+const EVALUATION_RESULT_VALUES = ["positive", "negative", "uninformative"];
 
 type Obj = Record<string, unknown>;
 
@@ -185,6 +186,18 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "proband", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "consultand", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "familyHistoryUnknown", ip, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "presymptomatic", ip, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "evaluations", ip, "an array of evaluations", Array.isArray);
+    if (Array.isArray(raw.evaluations)) {
+      raw.evaluations.forEach((e, k) => {
+        const ep = `${ip}.evaluations[${k}]`;
+        if (!isObject(e)) { c.error(JsonIssueCode.WRONG_TYPE, `${ep} must be an object`, ep); return; }
+        c.optional(e, "result", ep, EVALUATION_RESULT_VALUES.map(s => `"${s}"`).join(" | "),
+          v => typeof v === "string" && EVALUATION_RESULT_VALUES.includes(v));
+        c.optional(e, "detail", ep, "a string", v => typeof v === "string");
+        c.optional(e, "documented", ep, "a boolean", v => typeof v === "boolean");
+      });
+    }
     c.optional(raw, "lifeStatus", ip, LIFE_STATUS_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && LIFE_STATUS_VALUES.includes(v));
     c.optional(raw, "adopted", ip, ADOPTION_VALUES.map(s => `"${s}"`).join(" | "),

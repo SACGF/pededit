@@ -14,6 +14,7 @@ import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layou
 import { onsetsOf } from "./onset";
 import { tagCanvasText } from "./tags";
 import { branchOf } from "./collapse";
+import { evaluationsOf, evaluationParts } from "./evaluation";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -74,7 +75,8 @@ export function wrapLabel(text: string | undefined, maxWidth: number, maxLines =
     }
     if (lines.length >= maxLines) {
       const rest = [word, ...words.slice(w + 1)].filter(Boolean);
-      if (rest.length || current) return truncate(lines, maxChars, [current, ...rest].filter(Boolean).join(" "));
+      // Splitting a long word can push past maxLines: keep only maxLines.
+      if (rest.length || current || lines.length > maxLines) return truncate(lines.slice(0, maxLines), maxChars, [current, ...rest].filter(Boolean).join(" "));
     }
   }
   if (current) lines.push(current);
@@ -107,8 +109,10 @@ export function linesWidth(lines: string[]): number {
  *   1. `age`: the free-text age (#20) when set, otherwise the year of birth
  *      ("b. 1978"), as the standard prefers a year or age to a full date;
  *   2. `onset`: one line per age of onset (#93);
- *   3. (gender identity #26 and evaluation #101 go here, before the number);
- *   4. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
+ *   3. (gender identity #26 goes here);
+ *   4. `evaluation`: each evaluation (#101), "E1+ (BRCA1 ...)", up to two
+ *      lines each;
+ *   5. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
  * A collapsed-branch group symbol (#1) has none. Shared by the canvas, both
@@ -117,16 +121,18 @@ export function linesWidth(lines: string[]): number {
 export interface DetailSections {
   age: string[];
   onset: string[];
+  evaluation: string[];
   number: string[];
 }
 
 export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
   const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
   const branch = branchOf(pedigree, ind.id);
-  if (branch) return { age: [], onset: [], number };
+  if (branch) return { age: [], onset: [], evaluation: [], number };
   return {
     age: wrapLabel(ageText(ind), maxWidth, 1),
     onset: onsetLines(ind, pedigree, maxWidth),
+    evaluation: evaluationLines(ind, maxWidth),
     number,
   };
 }
@@ -134,7 +140,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
 /** Every line under the name, top to bottom (see `detailSections`). */
 export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): string[] {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return [...s.age, ...s.onset, ...s.number];
+  return [...s.age, ...s.onset, ...s.evaluation, ...s.number];
 }
 
 /**
@@ -146,7 +152,7 @@ export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigre
  */
 export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return s.onset.length + s.number.length > 0;
+  return s.onset.length + s.evaluation.length + s.number.length > 0;
 }
 
 /**
@@ -181,6 +187,24 @@ export function onsetLines(ind: Individual, pedigree: Pedigree, maxWidth: number
     return `${wrapLabel(head, room, 1)[0]} ${onset}`;
   });
 }
+
+/**
+ * Evaluation lines (#101): "E+ (BRCA1 c.5266dupC)", or "E1+", "E2-" when
+ * there are several. A variant name rarely fits one slot, so each evaluation
+ * may wrap onto a second line ("E+ (BRCA1" / "c.5266dupC)") and is cut with
+ * an ellipsis beyond that. The E and its result come first, so they always
+ * show.
+ */
+export function evaluationLines(ind: Individual, maxWidth: number): string[] {
+  const evs = evaluationsOf(ind);
+  return evs.flatMap((ev, i) => {
+    const { head, detail } = evaluationParts(ev, i, evs.length);
+    return detail ? wrapLabel(`${head} (${detail})`, maxWidth, EVALUATION_LINES).slice(0, EVALUATION_LINES) : [head];
+  });
+}
+
+/** Lines one evaluation may take under the symbol. */
+export const EVALUATION_LINES = 2;
 
 // ── Chart title (#20) ───────────────────────────────────────────────────────
 

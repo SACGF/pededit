@@ -24,7 +24,13 @@ FULL_PEDIGREE = {
             "id": "c1", "sex": "unknown", "affected": True, "deceased": False,
             "carrier": False, "proband": True, "sibOrder": 1, "name": "", "adopted": "in",
         },
-        {"id": "w2", "sex": "female", "affected": False, "sibOrder": 0},
+        {
+            "id": "w2", "sex": "female", "affected": False, "sibOrder": 0, "presymptomatic": True,
+            "evaluations": [
+                {"result": "positive", "detail": "BRCA1 c.5266dupC", "documented": True},
+                {"result": "uninformative"}, {},
+            ],
+        },
         {"id": "c2", "sex": "unknown", "affected": False, "sibOrder": 2},
     ],
     "partnerships": [
@@ -125,6 +131,8 @@ class PedigreeRoundTripTests(APITestCase):
             {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
                                       "lifeStatus": "reborn"}]},
             {**base, "individuals": [{"id": "a", "sex": "robot", "affected": False}]},
+            {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
+                                      "evaluations": [{"result": "maybe"}]}]},
             {**base, "individuals": [{"id": "a", "sex": "male"}]},
             {**base, "partnerships": [{"id": "p", "individual1": "a"}]},
             {"individuals": [], "partnerships": []},
@@ -159,6 +167,7 @@ class SerializerMatchesSchemaTests(APITestCase):
             "SiblingOrderSettings": s.SiblingOrderSettingsSerializer,
             "CanvasSettings": s.CanvasSettingsSerializer,
             "ClinicalDetails": s.ClinicalDetailsSerializer,
+            "Evaluation": s.EvaluationSerializer,
         }
         # sibOrder is required by the format but optional here so that
         # pedigrees saved before it existed still load.

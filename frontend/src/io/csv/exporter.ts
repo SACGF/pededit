@@ -2,9 +2,10 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { twinMembership, twinSetOf } from "../../pedigree/twins";
 import { onsetsOf, onsetSubject } from "../../pedigree/onset";
 import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
+import { evaluationsCsv } from "../../pedigree/evaluation";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -53,6 +54,9 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       // Added after pedigree_number so earlier columns keep their positions.
       ind.consultand ? "1" : "0",
       ind.familyHistoryUnknown ? "1" : "0",
+      ind.presymptomatic ? "1" : "0",
+      // "E1+ (BRCA1 c.5266dupC) *; E2-" (#101), as under the symbol, " *" for documented.
+      evaluationsCsv(ind),
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

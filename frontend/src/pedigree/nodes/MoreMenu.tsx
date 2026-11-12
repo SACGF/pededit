@@ -81,6 +81,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setAffected,
     setDeceased,
     setCarrier,
+    setPresymptomatic,
     setProband,
     setConsultand,
     setFamilyHistoryUnknown,
@@ -215,6 +216,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </MenuItem>
           <MenuItem onClick={() => action(() => setCarrier(individualId, !individual.carrier))}>
             {individual.carrier ? "Unmark carrier" : "Mark carrier"}
+          </MenuItem>
+          <MenuItem
+            onClick={() => action(() => setPresymptomatic(individualId, !individual.presymptomatic))}
+            title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)"
+            checked={!!individual.presymptomatic}
+          >
+            Presymptomatic carrier
           </MenuItem>
           <MenuItem onClick={() => action(() => setProband(individualId))}>
             {individual.proband ? "Unmark proband" : "Mark as proband"}

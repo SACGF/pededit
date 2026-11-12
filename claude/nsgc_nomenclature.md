@@ -76,9 +76,12 @@ Use initials or first names rather than full names on clinical pedigrees.
 
 Donor "D", surrogate "S", evaluation "E" with results, documented evaluation
 "*", carrier dot, and a vertical line through the symbol for an asymptomatic
-or presymptomatic carrier. PedEdit has the carrier dot. It has none of the
-assisted reproduction symbols, no evaluation notation and no presymptomatic
-symbol.
+or presymptomatic carrier. PedEdit has the carrier dot, the presymptomatic
+line and the evaluation notation (#101): per-person evaluations written
+under the symbol as "E+ (detail)", numbered E1, E2 when there are several,
+with the detail in parentheses standing in for a key entry per number, and
+"*" at the lower right for a documented one. It has none of the assisted
+reproduction symbols.
 
 The 2022 revision is reported to change how carrier status is shown. We have
 not seen the paper, so this is unconfirmed.
@@ -123,6 +126,6 @@ use for groups.
 3. **Full date of birth on the canvas (#20).** Fixed: year of birth.
 4. **Consanguinity degree label** above the double line. Fixed (#97).
 5. **Proband arrow without "P".** Fixed, with a consultand arrow (#99).
-6. Not yet built: presymptomatic carrier, evaluation (E) notation (#101),
-   assisted reproduction (D, S). "?" for unknown family history: done (#100).
+6. Not yet built: assisted reproduction (D, S). Presymptomatic carrier and
+   evaluation (E) notation: done (#101). "?" for unknown family history: done (#100).
    Ended relationship: done (#98). Clinical key fields: done (#102).

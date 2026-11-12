@@ -164,4 +164,6 @@ should not anchor on the line end, so a new column can go last.
 the figure shows numbers), blank for people hidden under a collapsed branch.
 It is how the numbers link back to the ids. PED stays six columns (#31).
 New columns go on the end so earlier positions never move: `consultand`
-(#99, 1/0), `family_history_unknown` (#100, 1/0).
+(#99, 1/0), `family_history_unknown` (#100, 1/0), `presymptomatic` (#101,
+1/0), `evaluations` (#101: "E1+ (BRCA1 c.5266dupC) *; E2-", as under the
+symbol, " *" after a documented one).

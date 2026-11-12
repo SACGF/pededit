@@ -3,7 +3,8 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape, ProbandArrow, FamilyHistoryMark } from "../pedigree/nodes/symbols";
+import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark } from "../pedigree/nodes/symbols";
+import { evaluationKeyInfo, PRESYMPTOMATIC_LEGEND_LABEL, EVALUATION_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
 import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
@@ -87,6 +88,35 @@ function FamilyHistorySvg({ sex }: { sex: Sex }) {
     <svg width="36" height="36" viewBox="-6 -14 36 42">
       <SymbolShape individual={{ id: "legend", sex, affected: false, sibOrder: 0 }} size={SZ} />
       <FamilyHistoryMark size={SZ} hasParents={false} />
+    </svg>
+  );
+}
+
+/** Presymptomatic carrier (#101): the canvas's own symbol with its vertical line. */
+function PresymptomaticSvg({ sex }: { sex: Sex }) {
+  return (
+    <svg width="28" height="28" viewBox="-2 -2 28 28">
+      <SymbolShape individual={{ id: "legend", sex, affected: false, presymptomatic: true, sibOrder: 0 }} size={SZ} />
+    </svg>
+  );
+}
+
+/** "E" for the evaluation notation row (#101). */
+function EvaluationSvg() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28">
+      <text x={14} y={18} textAnchor="middle" fontFamily="sans-serif" fontSize={12} fill="black">E</text>
+    </svg>
+  );
+}
+
+/** Symbol with the "*" at its lower right: documented evaluation (#101). */
+function DocumentedSvg({ sex }: { sex: Sex }) {
+  const s = 18;
+  return (
+    <svg width="28" height="28" viewBox="-2 -2 30 30">
+      <SymbolShape individual={{ id: "legend", sex, affected: false, sibOrder: 0 }} size={s} />
+      <DocumentedMark size={s} adopted={false} />
     </svg>
   );
 }
@@ -311,11 +341,15 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
     indRows.push({ icon: <AffectedCoreSvg sex={coreInd.sex} />, label: "Affected, with tags (black centre)" });
   }
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
+  const ev = evaluationKeyInfo(individuals);
+  if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={ev.presymptomatic.sex} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
   if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
   const historyInd = individuals.find(i => i.familyHistoryUnknown);
   if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={historyInd.sex} />, label: FAMILY_HISTORY_LEGEND_LABEL });
   if (consultandInd) indRows.push({ icon: <ProbandSvg sex={consultandInd.sex} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
+  if (ev.evaluated) indRows.push({ icon: <EvaluationSvg />, label: EVALUATION_LEGEND_LABEL });
+  if (ev.documented) indRows.push({ icon: <DocumentedSvg sex={ev.documented.sex} />, label: DOCUMENTED_LEGEND_LABEL });
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);
     if (ind) indRows.push({ icon: <LifeStatusSvg sex={ind.sex} lifeStatus={o.value} />, label: o.label });

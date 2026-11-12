@@ -3,7 +3,8 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
+import { hasDocumentedEvaluation } from "../evaluation";
 import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
@@ -115,6 +116,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         {individual.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
+        {hasDocumentedEvaluation(individual) && <DocumentedMark size={NODE_SIZE} adopted={!!individual.adopted} />}
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
@@ -144,7 +146,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       )}
 
       {/* Under the name in NSGC order: age or DOB (#20), ages of onset (#93),
-          pedigree number (#8). Past the age line the block can reach the
+          evaluations (#101), pedigree number (#8). Past the age line the block can reach the
           sibship bar of the person's children, so it gets a white backing. */}
       {details.length > 0 && (
         <div

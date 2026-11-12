@@ -9,6 +9,7 @@ import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
+import { evaluationKeyInfo, PRESYMPTOMATIC_LEGEND_LABEL, EVALUATION_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -467,6 +468,16 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   // The dot is drawn on every unaffected carrier, pregnancies and losses included (#14).
   const carrier = inds.find(i => i.carrier && !i.affected);
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
+  // Presymptomatic carrier and evaluation notation (#101).
+  const ev = evaluationKeyInfo(inds);
+  if (ev.presymptomatic) {
+    const sex = ev.presymptomatic.sex;
+    rows.push({
+      label: PRESYMPTOMATIC_LEGEND_LABEL,
+      swatch: sy => `${swatchGeom(sex, x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
+        + `<line x1="${fmt(x + LEGEND_SWATCH / 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + LEGEND_SWATCH / 2)}" y2="${fmt(sy + LEGEND_SWATCH - 1)}" stroke="black" stroke-width="1.5"/>`,
+    });
+  }
   const deceased = inds.find(i => i.deceased);
   if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
   // Proband and consultand arrows (#99).
@@ -484,6 +495,23 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
         const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + LEGEND_SWATCH - s;
         return `${swatchGeom(history.sex, ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
           + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(oy - 1)}" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="black">?</text>`;
+      },
+    });
+  }
+  if (ev.evaluated) {
+    rows.push({
+      label: EVALUATION_LEGEND_LABEL,
+      swatch: sy => `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">E</text>`,
+    });
+  }
+  if (ev.documented) {
+    const sex = ev.documented.sex;
+    rows.push({
+      label: DOCUMENTED_LEGEND_LABEL,
+      swatch: sy => {
+        const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2 - 2, oy = sy + (LEGEND_SWATCH - s) / 2;
+        return `${swatchGeom(sex, ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
+          + `<text x="${fmt(ox + s + 0.5)}" y="${fmt(oy + s + 5)}" font-family="sans-serif" font-size="11" fill="black">*</text>`;
       },
     });
   }

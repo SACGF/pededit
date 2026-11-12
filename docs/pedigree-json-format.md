@@ -87,6 +87,8 @@ What the NSGC nomenclature (2008, Fig. 1 instructions) asks a clinical pedigree'
 | `sibOrder` | number | yes | 0-indexed position within the sibling group (or among founders). |
 | `deceased` | boolean | no | Diagonal slash through the symbol. |
 | `carrier` | boolean | no | Carrier dot in the symbol. |
+| `presymptomatic` | boolean | no | Asymptomatic or presymptomatic carrier (NSGC 2008 Fig. 4): clinically unaffected now but may develop the condition, a vertical line through the symbol. The editor offers it as one carrier status with `carrier`, so it never sets both. Not drawn on an affected symbol. |
+| `evaluations` | array of objects | no | Evaluations and test results (NSGC 2008 Fig. 4), one line each under the symbol: `E`, then `+`, `-` or `u` for the result, then the detail in parentheses, e.g. "E+ (BRCA1 c.5266dupC)". With several they are numbered E1, E2 in list order. Each object has `result` (`"positive"`, `"negative"` or `"uninformative"`, absent for no result yet), `detail` (string) and `documented` (boolean: a "*" at the symbol's lower right). |
 | `proband` | boolean | no | Proband arrow, with a "P" at its tail (NSGC). Normally exactly one individual. |
 | `consultand` | boolean | no | Consultand arrow, without the "P" (NSGC): the person seeking counselling, who may be unaffected. Someone who is also the proband is drawn as the proband. |
 | `familyHistoryUnknown` | boolean | no | Family history not known (NSGC): a "?" above the symbol. |

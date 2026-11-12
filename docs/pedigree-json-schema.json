@@ -58,6 +58,12 @@
         "affected": { "type": "boolean" },
         "deceased": { "type": "boolean" },
         "carrier": { "type": "boolean" },
+        "presymptomatic": { "type": "boolean", "description": "Asymptomatic or presymptomatic carrier (NSGC): a vertical line through the symbol. The editor never sets it together with carrier." },
+        "evaluations": {
+          "type": "array",
+          "description": "Evaluations and test results (NSGC), written under the symbol as E+ (detail), numbered E1, E2 when there are several.",
+          "items": { "$ref": "#/$defs/Evaluation" }
+        },
         "proband": { "type": "boolean", "description": "Proband arrow with a P (NSGC). Normally exactly one individual." },
         "consultand": { "type": "boolean", "description": "Consultand arrow, without the P (NSGC): the person seeking counselling. Someone who is also the proband is drawn as the proband." },
         "familyHistoryUnknown": { "type": "boolean", "description": "Family history not known (NSGC): a ? above the symbol." },
@@ -106,6 +112,15 @@
           "items": { "$ref": "#/$defs/TwinSet" }
         },
         "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." }
+      },
+      "additionalProperties": true
+    },
+    "Evaluation": {
+      "type": "object",
+      "properties": {
+        "result": { "enum": ["positive", "negative", "uninformative"], "description": "+, - or u after the E. Absent: no result recorded." },
+        "detail": { "type": "string", "description": "Short text shown in parentheses, e.g. BRCA1 c.5266dupC." },
+        "documented": { "type": "boolean", "description": "Documented evaluation: a * at the symbol's lower right." }
       },
       "additionalProperties": true
     },
