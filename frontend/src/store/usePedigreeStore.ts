@@ -20,12 +20,14 @@ export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
  * selecting. "parents" collects one or two parents for a child; "child"
  * takes one click, the individual who becomes a child of the partnership.
  * "partner" (#84) takes one click, the existing individual who becomes the
- * partner of individualId.
+ * partner of individualId. "relatedness" (#90) takes one click and selects
+ * that person with individualId, so the panel shows how the two are related.
  */
 export type Picking =
   | { kind: "parents"; childId: string; picked: string[] }
   | { kind: "child"; partnershipId: string }
-  | { kind: "partner"; individualId: string };
+  | { kind: "partner"; individualId: string }
+  | { kind: "relatedness"; individualId: string };
 
 /** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
 export interface Notice {
@@ -236,6 +238,7 @@ interface PedigreeState {
   startPickingParents: (childId: string) => void;
   startPickingChild: (partnershipId: string) => void;
   startPickingPartner: (individualId: string) => void;
+  startPickingRelatedness: (individualId: string) => void;
   cancelPicking: () => void;
   /**
    * Handle a click on an individual while picking. For parents: adds (or
@@ -463,6 +466,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, ...selectOnly(childId) }),
     startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
     startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, ...selectOnly(individualId) }),
+    startPickingRelatedness: (individualId) => set({ picking: { kind: "relatedness", individualId }, ...selectOnly(individualId) }),
     cancelPicking: () => set({ picking: null }),
 
     pickIndividual: (id) => {
@@ -474,6 +478,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const problem = get().setParents(id, [p.individual1, p.individual2]);
         if (problem) get().setNotice({ kind: "error", text: problem });
         else set({ picking: null });
+        return true;
+      }
+      if (picking.kind === "relatedness") {
+        if (id === picking.individualId) return true;
+        set({ picking: null, ...selectionOf([picking.individualId, id], id) });
         return true;
       }
       if (picking.kind === "partner") {

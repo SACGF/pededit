@@ -77,6 +77,17 @@ describe("selection (#21)", () => {
     expect(selectedPair(get())).toBeNull();
   });
 
+  it("Relatedness to... picks one more person and selects the pair (#90)", () => {
+    get().startPickingRelatedness("dad");
+    expect(get().picking).toEqual({ kind: "relatedness", individualId: "dad" });
+    expect(get().pickIndividual("dad")).toBe(true); // clicking the same person does nothing
+    expect(get().picking).not.toBeNull();
+    expect(get().pickIndividual("gk")).toBe(true);
+    expect(get().picking).toBeNull();
+    expect(selectedPair(get())).toEqual(["dad", "gk"]);
+    expect(get().past.length).toBe(0); // not an edit
+  });
+
   it("selectDescendants takes the branch with married-in partners, person as primary", () => {
     expect(get().selectDescendants("dad")).toBe(6);
     expect(new Set(get().selectedIds)).toEqual(new Set(["dad", "mum", "kid1", "kid2", "spouse", "gk"]));

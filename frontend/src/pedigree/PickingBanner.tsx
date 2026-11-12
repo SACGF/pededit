@@ -26,7 +26,8 @@ export function PickingBanner() {
   const isParents = picking.kind === "parents";
   const picked = isParents ? picking.picked : [];
   const isPartner = picking.kind === "partner";
-  const excluded = new Set(isParents ? [picking.childId, ...picked] : isPartner ? [picking.individualId] : []);
+  const excluded = new Set(isParents ? [picking.childId, ...picked]
+    : picking.kind === "partner" || picking.kind === "relatedness" ? [picking.individualId] : []);
   const q = query.trim().toLowerCase();
   const matches = q
     ? pedigree.individuals
@@ -41,6 +42,8 @@ export function PickingBanner() {
     ? `Click one or two people to be the parents of ${nameOf(pedigree, picking.childId)}`
     : isPartner
       ? `Click a person already on the tree to be the partner of ${nameOf(pedigree, picking.individualId)}`
+    : picking.kind === "relatedness"
+      ? `Click a person to see how they are related to ${nameOf(pedigree, picking.individualId)}`
     : partnership
       ? `Click a person to make them a child of ${nameOf(pedigree, partnership.individual1)} and ${nameOf(pedigree, partnership.individual2)}`
       : "Click a person";

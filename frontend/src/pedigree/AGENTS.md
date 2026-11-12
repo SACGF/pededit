@@ -192,6 +192,16 @@ draws NSGC symbols.
   must build a fresh one. The section appears for anyone who is
   inbred or has a partner, since each couple carries the double-line
   checkbox.
+- `relationship.ts` — `nameRelationship` (#90), the plain-language name for
+  any two people ("great-aunt", "half first cousin once removed", "identical
+  twin brother"), shown by the pair panel (`components/SelectionPanel.tsx`)
+  when exactly two are selected. It reads the closest common ancestors, then
+  names the pair only if the kinship that relationship implies equals the
+  engine's kinship; any second line of descent, inbred ancestor or
+  monozygotic twin up the tree makes them differ, and then there is no name,
+  only the coefficient and degree. That check is what keeps it honest, so do
+  not relax it to "name the closest path". `pairLabels` names the two people
+  (name, else "the unnamed female", else selection order).
 - `consanguinity.ts` — `consanguinityTest`, the one rule for a double couple
   line (#85), shared by the canvas, the legend and both SVG exporters. The
   line is double when the couple's kinship is above 0, so it follows blood:

@@ -592,7 +592,7 @@ function AddChildrenPanel({ individualId, onAdd }: {
  * them) the batch unlock and lock (#21).
  */
 function SelectionMenuSection({ individualId, action }: { individualId: string; action: (fn: () => void) => void }) {
-  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals } = usePedigreeStore();
+  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness } = usePedigreeStore();
   const batch = selectedIds.length > 1 && selectedIds.includes(individualId);
   const { toUnlock, toLock } = batchLockState(pedigree, batch ? selectedIds : []);
   return (
@@ -603,6 +603,14 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
       >
         Select with descendants
       </MenuItem>
+      {pedigree.individuals.length > 1 && (
+        <MenuItem
+          onClick={() => action(() => startPickingRelatedness(individualId))}
+          title="Click another person to select the two and see their kinship and relationship"
+        >
+          Relatedness to...
+        </MenuItem>
+      )}
       {toUnlock.length > 0 && (
         <MenuItem onClick={() => action(() => unlockIndividuals(toUnlock))} title="Let the selected people be dragged">
           Unlock {toUnlock.length}

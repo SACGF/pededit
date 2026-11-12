@@ -90,7 +90,10 @@ stub so the app still builds without Google login.
   items read. Change it only through `setSelectedId` / `toggleSelected` /
   `setSelection` / `selectDescendants`, which keep the two in step; every
   edit, undo and redo drops ids that no longer exist. `selectedPair(state)`
-  gives exactly two selected people, for pairwise views. Batch edits
+  gives exactly two selected people, for pairwise views: the panel then shows
+  their kinship and named relationship (#90), and the more menu's
+  "Relatedness to..." is a pick mode (`picking.kind === "relatedness"`) that
+  only selects the pair, with no edit. Batch edits
   (`pinIndividuals`, `lockIndividuals`, `unlockIndividuals`,
   `deleteIndividuals`) are one undo step each.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
