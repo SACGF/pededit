@@ -81,6 +81,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setDeceased,
     setCarrier,
     setProband,
+    setConsultand,
     setSex,
     setLifeStatus,
     moveSibLeft,
@@ -215,6 +216,12 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </MenuItem>
           <MenuItem onClick={() => action(() => setProband(individualId))}>
             {individual.proband ? "Unmark proband" : "Mark as proband"}
+          </MenuItem>
+          <MenuItem
+            onClick={() => action(() => setConsultand(individualId, !individual.consultand))}
+            title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P."
+          >
+            {individual.consultand ? "Unmark consultand" : "Mark as consultand"}
           </MenuItem>
         </MenuSection>
 

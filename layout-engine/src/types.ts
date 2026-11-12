@@ -23,6 +23,8 @@ export interface Individual {
   deceased?: boolean;
   carrier?: boolean;
   proband?: boolean;
+  /** Consultand (#99): the person seeking counselling, drawn with an arrow without the proband's "P". */
+  consultand?: boolean;
   sibOrder: number;      // 0-indexed position within sibling group
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"

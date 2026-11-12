@@ -10,6 +10,7 @@ import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
+import { arrowKind } from "../proband";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -39,6 +40,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
     || ((picking?.kind === "partner" || picking?.kind === "relatedness") && picking.individualId === individual.id);
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
+  const arrow = arrowKind(individual);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
   // name, then the detail lines in NSGC order (age, onset, pedigree number).
   const captionOffset = captionRowHeight(individual.lifeStatus);
@@ -111,7 +113,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       >
         <SymbolShape individual={individual} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
-        {individual.proband  && <ProbandArrow  size={NODE_SIZE} />}
+        {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 

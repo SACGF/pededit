@@ -14,6 +14,7 @@ import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ende
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { labelNumbers } from "../../pedigree/layoutToFlow";
+import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -53,7 +54,7 @@ const NODE_SIZE = 40;
 const HALF = NODE_SIZE / 2;
 const STROKE = 2;
 const DECEASED_OVERHANG = 4;
-const PROBAND_TAIL = 18;
+const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 const LABEL_FONT_SIZE = 10;
 const LABEL_LINE_HEIGHT = 13;
 const CONSANG_GAP = 4;
@@ -1175,9 +1176,9 @@ function renderDeceasedSlash(): string {
   return `<line x1="${-o}" y1="${-o}" x2="${o}" y2="${o}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function renderProbandArrow(): string {
-  const tipX = -HALF, tipY = HALF;
-  return `<line x1="${tipX - PROBAND_TAIL}" y1="${tipY + PROBAND_TAIL}" x2="${tipX}" y2="${tipY}" stroke="black" stroke-width="${STROKE}" marker-end="url(#proband-arrowhead)"/>`;
+/** Proband arrow with its "P" (kept upright in the rotated symbol), or the consultand's without (#99). */
+function renderProbandArrow(kind: ArrowKind, rotation: number): string {
+  return renderArrowSvg(kind, NODE_SIZE, -HALF, -HALF, { stroke: STROKE, markerId: "proband-arrowhead", uprightDeg: -rotation });
 }
 
 /**
@@ -1231,7 +1232,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         renderLabel(ind, pedigree, solo && m.id === n.blood) +
         renderShape(ind, pedigree, clipId, pos.rotation) +
         (ind.deceased ? renderDeceasedSlash() : "") +
-        (ind.proband ? renderProbandArrow() : "") +
+        (arrowKind(ind) ? renderProbandArrow(arrowKind(ind)!, pos.rotation) : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
         (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.children.length, NODE_SIZE)}</g>` : "") +
         `</g>`,

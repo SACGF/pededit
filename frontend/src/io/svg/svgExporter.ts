@@ -15,6 +15,7 @@ import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ende
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
+import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import type { SvgExportOptions } from "./types";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
@@ -30,7 +31,7 @@ import {
 const STROKE = 2;
 const CONSANG_GAP = 4;       // px gap between consanguineous double lines
 const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
-const PROBAND_TAIL = 18;     // matches ProbandArrow in symbols.tsx
+const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 const LABEL_LINE_HEIGHT = 13;
 // Baseline of the first line under the symbol, below its centre. Leaves a gap
 // between the symbol edge and the cap height of a 10px label.
@@ -93,7 +94,7 @@ function computeBounds(
     if (y > rawMaxY) rawMaxY = y;
   }
 
-  const hasProband = pedigree.individuals.some(i => i.proband);
+  const hasProband = pedigree.individuals.some(i => arrowKind(i));
   const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
 
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
@@ -397,11 +398,10 @@ function renderDeceasedSlash(): string {
   return `<line x1="${-half - o}" y1="${-half - o}" x2="${half + o}" y2="${half + o}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-function renderProbandArrow(): string {
+/** Proband arrow with its "P", or the consultand's arrow without (#99). */
+function renderProbandArrow(kind: ArrowKind): string {
   const half = NODE_SIZE / 2;
-  const tipX = -half, tipY = half;
-  const tailX = tipX - PROBAND_TAIL, tailY = tipY + PROBAND_TAIL;
-  return `<line x1="${tailX}" y1="${tailY}" x2="${tipX}" y2="${tipY}" stroke="black" stroke-width="${STROKE}" marker-end="url(#proband-arrowhead)"/>`;
+  return renderArrowSvg(kind, NODE_SIZE, -half, -half, { stroke: STROKE, markerId: "proband-arrowhead" });
 }
 
 /** Copy number of someone drawn more than once, top right, as DuplicateSuperscript on the canvas. */
@@ -427,7 +427,8 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       elems.push(`<g transform="translate(${cx} ${cy})">`);
       elems.push(renderShape(ind, pedigree, `symbol-clip-${level}-${slot}`));
       if (ind.deceased) elems.push(renderDeceasedSlash());
-      if (ind.proband)  elems.push(renderProbandArrow());
+      const arrow = arrowKind(ind);
+      if (arrow) elems.push(renderProbandArrow(arrow));
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
       const branch = branchOf(pedigree, ind.id);
       if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)

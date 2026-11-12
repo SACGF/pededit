@@ -4,7 +4,7 @@ import { onsetsOf, onsetSubject } from "../../pedigree/onset";
 import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -50,6 +50,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       // Age of onset (#93): "Affected: 45y;Breast cancer: 52y"
       onsetsOf(ind, pedigree).map(o => `${onsetSubject(o)}: ${o.onset}`).join(";"),
       numbers.get(ind.id) ?? "",
+      // Added after pedigree_number so earlier columns keep their positions.
+      ind.consultand ? "1" : "0",
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

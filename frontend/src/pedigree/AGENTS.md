@@ -45,14 +45,14 @@ draws NSGC symbols.
   slash over an affected fill) a 1px non-scaling hairline, since 2px scaled
   by about 0.2 vanishes. Left out on purpose, being unreadable at that size:
   the "SB" / "ECT" caption (`caption={false}`), the annotation row, names
-  and the proband arrow. Its lines stay plain (no hops, twin marks, dashed
+  and the proband and consultand arrows. Its lines stay plain (no hops, twin marks, dashed
   adoption drops or childless marks).
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, tag quadrants and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
-- `nodes/MoreMenu.tsx` — affected, deceased, proband, sex, lock/unlock,
+- `nodes/MoreMenu.tsx` — affected, deceased, proband, consultand, sex, lock/unlock,
   move sib left/right, delete, and "Add children..." (count stepper, plus a
   partner choice when the person has several partnerships). The menu is
   about 600px tall, so it is capped at Radix's
@@ -147,6 +147,17 @@ draws NSGC symbols.
   The carrier dot is never drawn on an affected symbol (the edit panel says
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
+
+- `proband.ts` — proband and consultand arrows (#99, NSGC 2008 Fig. 1):
+  the proband's arrow has a bold "P" below-left of its tail, a consultand's
+  (`Individual.consultand`, several allowed) has none, and someone who is
+  both is drawn as the proband (`arrowKind`). `arrowGeometry` is shared by
+  `ProbandArrow` on the canvas and the legend, `renderArrowSvg` by both
+  exporters (the U-shape turns the P upright), `renderArrowKeySwatchSvg` by
+  the export key, which had no proband row before. The P ends 4px left of
+  the tail so it clears the line of descent that drops half a slot gap left
+  of a proband whose partner is on their left; a white box behind it gives
+  any other line a gap instead of running through the letter.
 
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected
   status and `Individual.tagOnset` per quadrant tag, both free text since

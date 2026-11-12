@@ -48,6 +48,7 @@ class IndividualSerializer(serializers.Serializer):
     deceased = _opt(serializers.BooleanField)
     carrier = _opt(serializers.BooleanField)
     proband = _opt(serializers.BooleanField)
+    consultand = _opt(serializers.BooleanField)
     sibOrder = serializers.FloatField(required=False)
     name = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     dob = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)

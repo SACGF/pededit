@@ -11,6 +11,7 @@ import {
 } from "../lifeStatus";
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
 import { adoptionBracketSegments } from "../adoption";
+import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
@@ -314,19 +315,35 @@ export function DeceasedSlash({ size }: { size: number }) {
   return <line {...deceasedSlashEnds(size)} stroke="black" strokeWidth={2} />;
 }
 
-/** NSGC proband arrow: solid arrowhead pointing up-right toward the symbol's bottom-left corner. */
-export function ProbandArrow({ size }: { size: number }) {
-  // Tip at the bottom-left corner of the symbol; tail 18px below-left.
-  // The <marker> id is registered globally in PedigreeCanvas to avoid duplicate defs.
-  const tipX = 0, tipY = size;
-  const tailX = tipX - 18, tailY = tipY + 18;
+/**
+ * NSGC proband or consultand arrow (#99): solid arrowhead pointing up-right
+ * at the symbol's bottom-left corner, with a "P" at the tail for the proband
+ * only. Geometry in `proband.ts`, shared with the exporters. The default
+ * marker id is registered globally in PedigreeCanvas to avoid duplicate defs.
+ */
+export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrowhead" }: { size: number; kind?: ArrowKind; markerId?: string }) {
+  const { tip, tail, letter, letterBox } = arrowGeometry(size);
   return (
-    <line
-      x1={tailX} y1={tailY}
-      x2={tipX}  y2={tipY}
-      stroke="black" strokeWidth={2}
-      markerEnd="url(#proband-arrowhead)"
-    />
+    <g data-arrow={kind}>
+      <line
+        x1={tail.x} y1={tail.y}
+        x2={tip.x}  y2={tip.y}
+        stroke="black" strokeWidth={2}
+        markerEnd={`url(#${markerId})`}
+      />
+      {kind === "proband" && (
+        <rect x={letterBox.x} y={letterBox.y} width={letterBox.w} height={letterBox.h} fill="white" />
+      )}
+      {kind === "proband" && (
+        <text
+          x={letter.x} y={letter.y}
+          textAnchor="end" fontFamily="sans-serif" fontSize={PROBAND_LETTER_SIZE} fontWeight="bold" fill="black"
+          style={{ userSelect: "none" }}
+        >
+          {PROBAND_LETTER}
+        </text>
+      )}
+    </g>
   );
 }
 

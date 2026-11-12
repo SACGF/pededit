@@ -3,7 +3,8 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape } from "../pedigree/nodes/symbols";
+import { SymbolShape, ProbandArrow } from "../pedigree/nodes/symbols";
+import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
@@ -79,11 +80,11 @@ function DeceasedSvg({ sex }: { sex: Sex }) {
   );
 }
 
-function ProbandSvg({ sex }: { sex: Sex }) {
+/** Proband arrow with its "P", or the consultand's without (#99), drawn by the canvas's own ProbandArrow. */
+function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
   const cx = SZ / 2, cy = SZ / 2, r = SZ / 2 - 1;
-  // Arrow tip at (0, SZ); tail at (-18, SZ+18)
   return (
-    <svg width="46" height="48" viewBox="-22 -2 46 50">
+    <svg width="46" height="46" viewBox="-30 -2 56 56">
       <defs>
         <marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
           <polygon points="0 0, 6 3, 0 6" fill="black" />
@@ -101,12 +102,7 @@ function ProbandSvg({ sex }: { sex: Sex }) {
           stroke="black" strokeWidth={2} fill="white"
         />
       )}
-      <line
-        x1={-18} y1={SZ + 18}
-        x2={0}   y2={SZ}
-        stroke="black" strokeWidth={2}
-        markerEnd="url(#legend-arrowhead)"
-      />
+      <ProbandArrow size={SZ} kind={kind} markerId="legend-arrowhead" />
     </svg>
   );
 }
@@ -286,7 +282,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const affectedInd = individuals.find(i => i.affected);
   const carrierInd  = individuals.find(i => i.carrier && !i.affected);
   const deceasedInd = individuals.find(i => i.deceased);
-  const probandInd  = individuals.find(i => i.proband);
+  const probandInd  = individuals.find(i => arrowKind(i) === "proband");
+  const consultandInd = individuals.find(i => arrowKind(i) === "consultand");
 
   const hasCouples        = partnerships.length > 0;
   // Same rule the canvas uses for the double line: flagged, or related by blood.
@@ -304,7 +301,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   }
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
-  if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} />,          label: "Proband (index case)" });
+  if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
+  if (consultandInd) indRows.push({ icon: <ProbandSvg sex={consultandInd.sex} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);
     if (ind) indRows.push({ icon: <LifeStatusSvg sex={ind.sex} lifeStatus={o.value} />, label: o.label });

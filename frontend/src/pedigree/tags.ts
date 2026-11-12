@@ -7,6 +7,7 @@ import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
 import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
+import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -467,6 +468,12 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
   const deceased = inds.find(i => i.deceased);
   if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
+  // Proband and consultand arrows (#99).
+  for (const kind of ["proband", "consultand"] as const) {
+    if (inds.some(i => arrowKind(i) === kind)) {
+      rows.push({ label: ARROW_LEGEND_LABEL[kind], swatch: sy => renderArrowKeySwatchSvg(kind, x, sy, LEGEND_SWATCH) });
+    }
+  }
   // Pregnancies and losses, in the in-app legend's order and wording.
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = inds.find(i => i.lifeStatus === o.value);

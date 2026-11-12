@@ -160,6 +160,8 @@ helpers, not tests.
 The last column, `onset` (#93), lists ages of onset as
 `Affected: 40s;Breast cancer: 45y` (tag labels, from `onsetsOf`). Tests
 should not anchor on the line end, so a new column can go last.
-`pedigree_number` (#8) is last: the "II-3" the figure shows (whether or not
+`pedigree_number` (#8) follows: the "II-3" the figure shows (whether or not
 the figure shows numbers), blank for people hidden under a collapsed branch.
 It is how the numbers link back to the ids. PED stays six columns (#31).
+New columns go on the end so earlier positions never move: `consultand`
+(#99, 1/0).

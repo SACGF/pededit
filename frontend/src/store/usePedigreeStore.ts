@@ -328,6 +328,8 @@ interface PedigreeState {
   setDeceased: (id: string, deceased: boolean) => void;
   setCarrier: (id: string, carrier: boolean) => void;
   setProband: (id: string) => void;
+  /** Consultand arrow without the "P" (#99). Several people may be consultands. */
+  setConsultand: (id: string, consultand: boolean) => void;
   setSex: (id: string, sex: Sex) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
@@ -990,6 +992,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         for (const ind of draft.individuals) {
           ind.proband = (!isAlreadyProband && ind.id === id) ? true : undefined;
         }
+      });
+    },
+
+    setConsultand: (id, consultand) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (consultand) ind.consultand = true;
+        else delete ind.consultand;
       });
     },
 

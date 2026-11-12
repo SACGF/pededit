@@ -179,6 +179,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
           )}
           {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
+          {individual.consultand && <div className="font-medium">{individual.proband ? "Also the consultand" : "Consultand"}</div>}
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
         </div>
       </div>

@@ -58,7 +58,8 @@
         "affected": { "type": "boolean" },
         "deceased": { "type": "boolean" },
         "carrier": { "type": "boolean" },
-        "proband": { "type": "boolean" },
+        "proband": { "type": "boolean", "description": "Proband arrow with a P (NSGC). Normally exactly one individual." },
+        "consultand": { "type": "boolean", "description": "Consultand arrow, without the P (NSGC): the person seeking counselling. Someone who is also the proband is drawn as the proband." },
         "lifeStatus": {
           "enum": ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"],
           "description": "Pregnancy or pregnancy loss. Absent means born. Such an individual has no partners or children."
