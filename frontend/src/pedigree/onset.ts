@@ -1,5 +1,5 @@
 import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
-import { tagsOf, tagCanvasText } from "./tags";
+import { tagsOf } from "./tags";
 
 /**
  * Age of onset (#93). An individual records it for the affected status
@@ -41,12 +41,4 @@ export function onsetsOf(individual: Individual, pedigree: Pedigree): OnsetItem[
 /** Name of what an onset belongs to, for the CSV and other text: the tag label, or "Affected". */
 export function onsetSubject(item: OnsetItem): string {
   return item.tag ? item.tag.label : "Affected";
-}
-
-/**
- * Short text for under the symbol: "onset 45y" for the affected status,
- * the tag's canvas text then the age ("BC 45y") for a condition.
- */
-export function onsetLabel(item: OnsetItem): string {
-  return item.tag ? `${tagCanvasText(item.tag)} ${item.onset}` : `onset ${item.onset}`;
 }

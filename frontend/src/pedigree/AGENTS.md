@@ -141,7 +141,8 @@ draws NSGC symbols.
   carried, not a quadrant tag), so the panel, canvas and exports agree. The
   store also deletes them when the tag is untagged or deleted, or the
   person is set unaffected. Edited in the panel next to "Affected" and
-  under each ticked quadrant tag row of the legend.
+  under each ticked quadrant tag row of the legend. Drawn under the symbol
+  as "onset 40s" or "BC 45y" (tag abbrev, cut before the age is).
 
 - `parents.ts` and `PickingBanner.tsx` — linking a child to existing
   parents (#36). The store's `picking` state turns node clicks into picks
@@ -226,7 +227,12 @@ Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
 set, otherwise the DOB (`detailLines` in `labels.ts`, #20). Only one line, on
 purpose: a two-line name plus DOB plus age ran into the sibship bar halfway
 to the next row, so the age replaces the DOB under the symbol (the DOB stays
-in the data, the edit panel and CSV). The canvas (`PedigreeSymbolNode`),
+in the data, the edit panel and CSV). After it, one line per age of onset
+(#93, `onsetLines`): these do reach the sibship bar of the person's own
+children, so when someone has an onset their detail block gets a white
+backing (canvas div background, a `<rect>` in the export's labels group,
+which `exportLint` ignores) and the bar shows a gap under the text rather
+than running through it. The canvas (`PedigreeSymbolNode`),
 `svgExporter` and `uShapeExporter` each offset these by hand, so change all
 three together.
 

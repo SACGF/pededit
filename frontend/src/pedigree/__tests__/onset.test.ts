@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { onsetsOf, onsetLabel, onsetSubject } from "../onset";
+import { onsetsOf, onsetSubject } from "../onset";
+import { onsetLines, detailLines } from "../labels";
+import { exportSvg } from "../../io/svg/svgExporter";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportCsv } from "../../io/csv/exporter";
 import { importJson, exportJson } from "../../io/json";
@@ -28,7 +30,7 @@ describe("onsetsOf (#93)", () => {
     ped.individuals[0]!.onset = " 40s ";
     ped.individuals[0]!.tagOnset = { bc: "45y" };
     const items = onsetsOf(ped.individuals[0]!, ped);
-    expect(items.map(onsetLabel)).toEqual(["onset 40s", "BC 45y"]);
+    expect(onsetLines(ped.individuals[0]!, ped, 74)).toEqual(["onset 40s", "BC 45y"]);
     expect(items.map(onsetSubject)).toEqual(["Affected", "Breast cancer"]);
   });
 
@@ -45,6 +47,31 @@ describe("onsetsOf (#93)", () => {
 
   it("loads a pedigree saved before onset existed", () => {
     expect(onsetsOf(pedigree().individuals[0]!, pedigree())).toEqual([]);
+  });
+});
+
+describe("onset under the symbol (#93)", () => {
+  it("follows the age or DOB line", () => {
+    const ped = pedigree();
+    Object.assign(ped.individuals[0]!, { dob: "1950-01-01", tagOnset: { bc: "45y" } });
+    expect(detailLines(ped.individuals[0]!, 74, ped)).toEqual(["1950-01-01", "BC 45y"]);
+  });
+
+  it("cuts the tag text, not the age, when the line is too wide", () => {
+    const ped = pedigree();
+    ped.tags![0]!.abbrev = undefined;
+    ped.individuals[0]!.tagOnset = { bc: "45y" };
+    const [line] = onsetLines(ped.individuals[0]!, ped, 74);
+    expect(line).toMatch(/^Breast.*… 45y$/);
+    expect(line!.length * 5.8).toBeLessThanOrEqual(74);
+  });
+
+  it("is drawn in the SVG export", () => {
+    const ped = pedigree();
+    Object.assign(ped.individuals[0]!, { onset: "40s", tagOnset: { bc: "45y" } });
+    const svg = exportSvg(ped);
+    expect(svg).toContain(">onset 40s</text>");
+    expect(svg).toContain(">BC 45y</text>");
   });
 });
 

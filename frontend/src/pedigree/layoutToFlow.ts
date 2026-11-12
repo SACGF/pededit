@@ -300,7 +300,7 @@ function buildNodes(
           isPinned,
           ...(twins.get(individual.id) ?? {}),
           nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth), labelLines),
-          detailLines: detailLines(individual, labelMaxWidth(slotWidth)),
+          detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree),
         },
       });
     }

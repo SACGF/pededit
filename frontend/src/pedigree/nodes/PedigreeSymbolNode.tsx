@@ -9,6 +9,7 @@ import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
+import { onsetsOf } from "../onset";
 import { isPhantomId } from "../../io/ped/converter";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,6 +40,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
     || (picking?.kind === "partner" && picking.individualId === individual.id);
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
+  const hasOnset = onsetsOf(individual, pedigree).length > 0;
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, age or DOB.
   const captionOffset = captionRowHeight(individual.lifeStatus);
   const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
@@ -139,7 +141,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         </div>
       )}
 
-      {/* The free-text age, or else the date of birth, under the name (#20). */}
+      {/* The free-text age, or else the date of birth, under the name (#20),
+          then ages of onset (#93). Onset lines can reach the sibship bar of
+          the person's children, so the block gets a white backing then. */}
       {details.length > 0 && (
         <div
           data-detail-label
@@ -154,6 +158,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: "none",
+            ...(hasOnset ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {details.map((line, i) => <div key={i}>{line}</div>)}

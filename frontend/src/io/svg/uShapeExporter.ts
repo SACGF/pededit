@@ -816,7 +816,7 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
       if (!ind) continue;
       // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
       const nameLines = wrapLabel(ind.name, labelMaxWidth(MAX_SLOT));
-      const details = detailLines(ind, labelMaxWidth(MAX_SLOT));
+      const details = detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree);
       labelLines = Math.max(labelLines, nameLines.length + details.length
         + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
       labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ...details.map(l => l.length));
@@ -1163,7 +1163,7 @@ function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): 
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
   // by renderShape, over the white backing), name, age or DOB.
   const caption = lifeStatusCaption(ind.lifeStatus);
-  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT))];
+  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree)];
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];
