@@ -390,10 +390,23 @@ draws NSGC symbols.
   `partnership-not-drawn` for it), and its sibship edge carries `apart`: a
   line from each parent's symbol to the bar replaces the couple drop
   (`sibshipSegments`' last argument). kinship2 lays the pair out as a
-  couple, which is what puts the donor beside the other parent. The other
-  lines are per child: `carriedBy` (solid, the woman who carried it but is
-  not the genetic mother) and `socialParents` (dashed); `assistedLinks`
-  drops any that name a genetic parent. They are `assistedEdges` in the
+  couple, which is what puts the donor beside the other parent. A donor
+  pair's ONLY child is drawn as NSGC Fig. 3 draws a pregnancy (`converge`
+  on the sibship edge): no bar, a line from each parent straight to the top
+  of its symbol. Where the child is drawn is not always its genetic
+  parents: `placementParentOf` (layout-engine) hangs a child carried by the
+  partner of its genetic father from that couple (scenario 2), and the
+  renderer, both lints and the U-shape read that map for structure while
+  kinship, relationship names and PED read `parentOf`. The layout puts an
+  only child under the woman carrying it (`shiftUnderCarrier`), so her
+  line runs straight down through her labels: `labelsOverLines` marks such
+  nodes `labelsBacked`, and the canvas and the export give their labels a
+  white backing. The other lines are per child (`assistedLinks`): "genetic"
+  (solid, a genetic parent the child is not drawn under, the egg donor of
+  scenario 2), "carrier" (solid, the woman who carried it, when she is not
+  a parent it hangs from) and "social" (dashed). A social parent whose
+  partner has a biological line to the child gets none (the couple line is
+  the link, scenarios 1 and 4), and nobody is drawn twice. They are `assistedEdges` in the
   flow (edge type `assistedEdge`), one per person and child, or one per
   sibship when the person is linked the same way to every child of it (the
   line then ends where the sibship's descent meets the bar, so siblings do

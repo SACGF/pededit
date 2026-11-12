@@ -433,18 +433,19 @@ export const EXAMPLES: ExamplePedigree[] = [
   },
   {
     label: "Assisted reproduction",
-    description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate",
+    description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate · egg donor who carries",
     data: {
       siblingOrder,
       individuals: [
         // 1. Sperm donor: the woman carries a pregnancy by donor sperm; her
-        // partner is the intended (social) father, dashed line.
+        // partner is the intended (social) father, linked by the couple line.
         { id: "ar_h1", sex: "male",    affected: false, sibOrder: 0, name: "Partner" },
         { id: "ar_w1", sex: "female",  affected: false, sibOrder: 0 },
         { id: "ar_d1", sex: "male",    affected: false, sibOrder: 0, reproductiveRole: "donor" },
         { id: "ar_c1", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", socialParents: ["ar_h1"] },
         // 2. Egg donor: the man's sperm and a donor egg; his partner carries
-        // the pregnancy (solid line, a biological relationship).
+        // the pregnancy, so the child hangs from the couple (a biological
+        // relationship) and the donor has her own line.
         { id: "ar_h2", sex: "male",    affected: false, sibOrder: 0 },
         { id: "ar_w2", sex: "female",  affected: false, sibOrder: 0, name: "Partner" },
         { id: "ar_d2", sex: "female",  affected: false, sibOrder: 0, reproductiveRole: "donor" },
@@ -456,6 +457,13 @@ export const EXAMPLES: ExamplePedigree[] = [
         { id: "ar_w3", sex: "female",  affected: false, sibOrder: 0 },
         { id: "ar_s3", sex: "female",  affected: false, sibOrder: 0, reproductiveRole: "surrogate" },
         { id: "ar_c3", sex: "female",  affected: false, sibOrder: 0, carriedBy: "ar_s3" },
+        // 4a. Surrogate ovum donor: the man's sperm inseminates a woman who
+        // carries the pregnancy for the couple (drawn only as the donor); his
+        // partner is linked by the couple line.
+        { id: "ar_d4", sex: "female",  affected: false, sibOrder: 0, reproductiveRole: "donor" },
+        { id: "ar_h4", sex: "male",    affected: false, sibOrder: 0 },
+        { id: "ar_w4", sex: "female",  affected: false, sibOrder: 0 },
+        { id: "ar_c4", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", carriedBy: "ar_d4", socialParents: ["ar_w4"] },
       ],
       partnerships: [
         { id: "ar_pp1", individual1: "ar_h1", individual2: "ar_w1" },
@@ -464,12 +472,15 @@ export const EXAMPLES: ExamplePedigree[] = [
         { id: "ar_pd2", individual1: "ar_h2", individual2: "ar_d2", donorConception: true },
         { id: "ar_pg",  individual1: "ar_gf", individual2: "ar_gm" },
         { id: "ar_pp3", individual1: "ar_h3", individual2: "ar_w3" },
+        { id: "ar_pp4", individual1: "ar_h4", individual2: "ar_w4" },
+        { id: "ar_pd4", individual1: "ar_h4", individual2: "ar_d4", donorConception: true },
       ],
       parentOf: {
         ar_pd1: ["ar_c1"],
         ar_pd2: ["ar_c2"],
         ar_pg:  ["ar_w3"],
         ar_pp3: ["ar_c3"],
+        ar_pd4: ["ar_c4"],
       },
     },
   },

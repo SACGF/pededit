@@ -4,6 +4,7 @@ import { autohint } from "./autohint.js";
 import { alignped1 } from "./alignped1.js";
 import { alignped3 } from "./alignped3.js";
 import { alignped4 } from "./alignped4.js";
+import { placementParentOf, carrierAbove } from "./assisted.js";
 
 export interface AlignOptions {
   packed?: boolean;   // default true
@@ -42,7 +43,9 @@ export function alignPedigree(
 ): LayoutResult {
   const { packed = true, width = 10, align = true, improve = false, widthSlack = 0 } = options;
 
-  // 1. Convert to LayoutInput (1-based)
+  // 1. Convert to LayoutInput (1-based). A child of assisted reproduction may
+  // hang from the couple carrying it rather than its genetic parents (#45).
+  pedigree = { ...pedigree, parentOf: placementParentOf(pedigree) };
   const input = pedigreeToLayoutInput(pedigree);
 
   // 2. Assign generations
@@ -167,6 +170,9 @@ export function alignPedigree(
   // to centre parents over children.
   appendIsolated(input, level, rval, nidInt, spouseMatrix, pos, assistedLevels(pedigree, level));
 
+  // 8.8. A pregnancy by assisted reproduction goes under the woman carrying it (#45).
+  shiftUnderCarrier(pedigree, pedigree.parentOf, rval, nidInt, pos);
+
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
   return toLayoutResult(rval, nidInt, pos, spouseMatrix, maxlev);
 }
@@ -191,6 +197,53 @@ function assistedLevels(pedigree: Pedigree, level: Int32Array): Map<number, numb
     }
   }
   return out;
+}
+
+/**
+ * NSGC 2008 Fig. 3 places the pregnancy "below the woman who is carrying
+ * the pregnancy". kinship2 centres a child under its two parents; this moves
+ * an only child with no partner of its own under the person `carrierAbove`
+ * names (in the row above), as far as its neighbours allow. Ordinary
+ * children and PED input are untouched.
+ */
+function shiftUnderCarrier(
+  pedigree: Pedigree,
+  parentOf: Pedigree["parentOf"],
+  rval: AlignState,
+  nidInt: Int32Array[],
+  pos: Float64Array[],
+): void {
+  if (!pedigree.individuals.some(i => i.carriedBy) && !pedigree.partnerships.some(p => p.donorConception)) return;
+  const idx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
+  const partnered = new Set(pedigree.partnerships.flatMap(p => [p.individual1, p.individual2]));
+  const maxlev = rval.n.length - 1;
+  for (let lev = 2; lev <= maxlev; lev++) {
+    const ni = rval.n[lev] ?? 0;
+    const count = new Map<number, number>();
+    for (let c = 1; c <= ni; c++) {
+      const f = rval.fam[lev]![c]!;
+      if (f > 0) count.set(f, (count.get(f) ?? 0) + 1);
+    }
+    for (let c = 1; c <= ni; c++) {
+      const f = rval.fam[lev]![c]!;
+      if (f === 0 || count.get(f) !== 1) continue;
+      const child = pedigree.individuals[nidInt[lev]![c]! - 1];
+      if (!child || partnered.has(child.id)) continue;
+      const carrier = carrierAbove(pedigree, parentOf, child.id);
+      const k = carrier === undefined ? undefined : idx.get(carrier);
+      if (k === undefined) continue;
+      let best: number | undefined;
+      for (let j = 1; j <= (rval.n[lev - 1] ?? 0); j++) {
+        if (nidInt[lev - 1]![j] !== k) continue;
+        if (best === undefined || Math.abs(pos[lev - 1]![j]! - pos[lev]![c]!) < Math.abs(pos[lev - 1]![best]! - pos[lev]![c]!)) best = j;
+      }
+      if (best === undefined) continue;
+      let shift = pos[lev - 1]![best]! - pos[lev]![c]!;
+      if (shift < 0 && c > 1) shift = Math.max(shift, -(pos[lev]![c]! - pos[lev]![c - 1]! - 1));
+      if (shift > 0 && c < ni) shift = Math.min(shift, pos[lev]![c + 1]! - pos[lev]![c]! - 1);
+      if (Math.abs(shift) > 1e-6) pos[lev]![c] = pos[lev]![c]! + shift;
+    }
+  }
 }
 
 /**

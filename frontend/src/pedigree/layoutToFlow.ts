@@ -17,7 +17,7 @@ import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, detailsBacked, nameLabelText } from "./labels";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
-import { assistedLinks, type LinePoint } from "./assisted";
+import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint } from "./assisted";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -61,6 +61,13 @@ export interface RFNodeData extends Record<string, unknown> {
   detailLines: string[];
   /** The detail block runs past the age line, so it gets a white backing (`detailsBacked`). */
   detailsBacked?: boolean;
+  /**
+   * A line of descent leaves the bottom of this symbol straight down through
+   * its labels (#45: the woman carrying a pregnancy by assisted reproduction
+   * has it below her, NSGC 2008 Fig. 3), so the labels get a white backing
+   * and the line passes behind them (`labelsOverLines`).
+   */
+  labelsBacked?: boolean;
   /**
    * Set on the diamond standing for a collapsed branch (#1), whose
    * `individual` is a stand-in that is not in the stored pedigree. Such a
@@ -130,6 +137,11 @@ export interface SibshipEdgeData extends Record<string, unknown> {
    * minimap; the canvas edge reads the live node positions.
    */
   apart?: LinePoint[];
+  /**
+   * An only child of a donor pair (#45): no bar, a line from each parent
+   * runs straight to the top of its symbol (see `sibshipSegments`).
+   */
+  converge?: boolean;
 }
 
 /**
@@ -140,7 +152,7 @@ export interface SibshipEdgeData extends Record<string, unknown> {
  * line of descent meets the bar instead (`bar`), so it is not repeated.
  */
 export interface AssistedEdgeData extends Record<string, unknown> {
-  kind: "carrier" | "social";
+  kind: AssistedLink["kind"];
   /** Individual ids of the children the line stands for. */
   children: string[];
   /** The sibship the line joins: the same ids as its SibshipEdgeData, to find the join point live. */
@@ -283,13 +295,50 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   const partners = buildPartnerSetFromPedigree(pedigree);
   const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos);
 
+  const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
+  for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
+    const n = nodes.find(x => x.id === id);
+    if (n) n.data.labelsBacked = true;
+  }
+
   return {
     nodes,
     coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight),
     sibshipEdges,
     duplicateEdges: buildDuplicateEdges(nodes, spacing),
-    assistedEdges:  buildAssistedEdges(pedigree, nodes, sibshipEdges),
+    assistedEdges,
   };
+}
+
+/**
+ * Nodes with a line running straight down from the bottom of the symbol,
+ * through the labels under it (#45): a parent of a donor pair's only child
+ * drawn below them (`converge`), or the source of a line of assisted
+ * reproduction that leaves the symbol at the bottom middle.
+ */
+export function labelsOverLines(
+  nodes: Node<RFNodeData>[],
+  sibshipEdges: Edge<SibshipEdgeData>[],
+  assistedEdges: Edge<AssistedEdgeData>[],
+): Set<string> {
+  const out = new Set<string>();
+  if (assistedEdges.length === 0 && !sibshipEdges.some(e => e.data?.converge)) return out;
+  const byId = new Map(nodes.map(n => [n.id, n]));
+  const below = (from: string, x: number, y: number) => {
+    const n = byId.get(from);
+    if (n && Math.abs(n.position.x - x) < NODE_SIZE / 2 && y > n.position.y + NODE_SIZE) out.add(from);
+  };
+  for (const e of sibshipEdges) {
+    const d = e.data;
+    if (!d?.converge) continue;
+    below(d.leftParentId, d.childXs[0]!, d.childYs[0]!);
+    below(d.rightParentId, d.childXs[0]!, d.childYs[0]!);
+  }
+  for (const e of assistedEdges) {
+    const seg = assistedEdgeSegment(e, id => byId.get(id) && { position: byId.get(id)!.position, individual: byId.get(id)!.data.individual, shape: byId.get(id)!.data.shape });
+    if (seg) below(e.source, seg[2], seg[3]);
+  }
+  return out;
 }
 
 // ── Assisted reproduction lines (#45) ─────────────────────────────────────────
@@ -332,7 +381,7 @@ function buildAssistedEdges(
     if (!kids?.length || !froms?.length) continue;
     const sib = sibshipOf.get(link.child);
     const sibKids = sib ? sib.data!.childIds.map(indOf).filter((x): x is string => !!x) : [];
-    const whole = sibKids.length > 0 && sibKids.every(k => links.some(l => l.kind === link.kind && l.from === link.from && l.child === k));
+    const whole = sibKids.length > 1 && sibKids.every(k => links.some(l => l.kind === link.kind && l.from === link.from && l.child === k));
     if (whole) {
       for (const k of sibKids) done.add(`${link.kind}|${link.from}|${k}`);
       const d = sib!.data!;
@@ -636,6 +685,7 @@ function buildSibshipEdges(
       const hopHeight = hopHeightAt(result, partners, level - 1, leftParentSlot);
       const rc = resolveCouple(result, partners, level - 1, leftParentSlot);
       const isApart = apart.has(pairKeyOf(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
+      const converge = slots.length === 1 && isApart;
 
       // Source = left parent node; target = leftmost resolved child node.
       edges.push({
@@ -654,6 +704,7 @@ function buildSibshipEdges(
             { ...leftPos, sex: shapeAt(level - 1, leftParentSlot) },
             { ...rightPos, sex: shapeAt(level - 1, rightParentSlot) },
           ] } : {}),
+          ...(converge ? { converge: true } : {}),
         },
       });
     }

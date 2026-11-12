@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { produce } from "immer";
-import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
+import { kinshipCoefficients, placementParentOf } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import {
   assistedLinks, applyAddDonor, addDonorProblem, applyAddSurrogate, addSurrogateProblem,
   assistedLinkSegment, donorDescentSegments, symbolExitPoint,
 } from "../assisted";
 import { layoutToFlow } from "../layoutToFlow";
+import { sibshipSegments } from "../sibshipPath";
 import { lintFlow } from "../renderLint";
 import { nameRelationship } from "../relationship";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -77,7 +78,11 @@ describe("assisted reproduction: editing (#45)", () => {
     expect(c2.socialParents).toBeUndefined();
     expect(kinshipCoefficients(p).kinship("w", "c2")).toBe(0);
     expect(kinshipCoefficients(p, { chromosome: "X" }).kinship("d", "c2")).toBe(1 / 2);
-    expect(assistedLinks(p)).toEqual([{ from: "w", child: "c2", kind: "carrier" }]);
+    // NSGC Fig. 3 scenario 2: the child hangs from the couple (the father and
+    // the woman carrying it); the donor has her own line.
+    expect(placementParentOf(p).hw).toEqual(["c1", "c2"]);
+    expect(placementParentOf(p).hd).toEqual([]);
+    expect(assistedLinks(p)).toEqual([{ from: "d", child: "c2", kind: "genetic" }]);
   });
 
   it("both donors (embryo donation): the empty donor pair goes, the couple keep their lines", () => {
@@ -125,7 +130,8 @@ describe("assisted reproduction: editing (#45)", () => {
     expect(c1.carriedBy).toBe("sis");
     expect(c1.socialParents).toEqual(["w"]);
     expect(p.individuals.find(i => i.id === "sis")!.reproductiveRole).toBe("donor");
-    expect(assistedLinks(p).filter(l => l.child === "c1")).toEqual([{ from: "w", child: "c1", kind: "social" }]);
+    // Wendy is linked by her couple line to Harry, the genetic father (NSGC Fig. 3 scenario 4b).
+    expect(assistedLinks(p).filter(l => l.child === "c1")).toEqual([]);
   });
 
   it("an existing woman as surrogate; refusals", () => {
@@ -193,6 +199,12 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(assistedLinkSegment({ x: 0, y: 0 }, { x: 0, y: 120 })).toEqual([0, 20, 0, 100]);
     expect(donorDescentSegments([{ x: 0, y: 0, sex: "male" }, { x: 80, y: 0, sex: "male" }], 40, 60))
       .toEqual([[20, 20, 40, 60], [60, 20, 40, 60]]);
+    // A donor pair's only child (converge): a line from each parent straight to
+    // the top of the child, no bar (NSGC Fig. 3); the mother above it, vertical.
+    const parents = [{ x: 0, y: 0, sex: "male" as const }, { x: 80, y: 0, sex: "female" as const }];
+    expect(sibshipSegments(40, 0, 0, [{ x: 80, y: 120 }], 0, parents, true))
+      .toEqual([[20, 20, 80, 100], [80, 20, 80, 100]]);
+    expect(sibshipSegments(40, 0, 0, [{ x: 80, y: 120 }, { x: 160, y: 120 }], 0, parents, true)).toHaveLength(5);
   });
 
   it("the canvas: no couple line between donor and parent, a line from each, and the extra lines", () => {
@@ -204,9 +216,28 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(couples).not.toContain("ar_d2=ar_h2");
     expect(couples).toContain("ar_h1=ar_w1");
     const apart = flow.sibshipEdges.filter(e => e.data?.apart).map(e => e.data!.childIds.map(ind).join());
-    expect(apart.sort()).toEqual(["ar_c1", "ar_c2"]);
+    expect(apart.sort()).toEqual(["ar_c1", "ar_c4"]);
+    expect(flow.sibshipEdges.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4"]);
+    // Scenario 1: no line from the intended father; scenario 2: the child hangs
+    // from the couple and the egg donor has her own line; scenario 4: none from the wife.
     const links = flow.assistedEdges.map(e => `${e.data!.kind}:${ind(e.source)}>${e.data!.children.join()}`).sort();
-    expect(links).toEqual(["carrier:ar_s3>ar_c3", "carrier:ar_w2>ar_c2", "social:ar_h1>ar_c1"]);
+    expect(links).toEqual(["carrier:ar_s3>ar_c3", "genetic:ar_d2>ar_c2"]);
+    const hangs = flow.sibshipEdges.map(e => `${ind(e.data!.leftParentId)}=${ind(e.data!.rightParentId)}>${e.data!.childIds.map(ind).join()}`);
+    expect(hangs.find(h => h.endsWith(">ar_c2"))!.split(">")[0]!.split("=").sort()).toEqual(["ar_h2", "ar_w2"]);
+    // The pregnancy sits below the woman carrying it (NSGC Fig. 3), or below
+    // the couple when she is half of it.
+    const at = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position;
+    expect(at("ar_c1").x).toBeCloseTo(at("ar_w1").x, 3);
+    expect(at("ar_c2").x).toBeCloseTo((at("ar_h2").x + at("ar_w2").x) / 2, 3);
+    expect(at("ar_c3").x).toBeCloseTo(at("ar_s3").x, 3);
+    expect(at("ar_c4").x).toBeCloseTo(at("ar_d4").x, 3);
+    // A line runs straight down through the labels of those carrying women: white backing.
+    expect(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_s3", "ar_w1"]);
+    // Kinship and PED still follow the genetic parents.
+    const k = kinshipCoefficients(p);
+    expect(k.kinship("ar_d2", "ar_c2")).toBe(1 / 4);
+    expect(k.kinship("ar_w2", "ar_c2")).toBe(0);
+    expect(k.kinship("ar_w4", "ar_c4")).toBe(0);
     expect(lintFlow(p, flow)).toEqual([]);
     // The lint notices a missing line.
     expect(lintFlow(p, { ...flow, assistedEdges: [] }).map(f => f.code)).toContain("assisted-not-drawn");
@@ -218,8 +249,10 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(svg).toMatch(/>D<\/text>/);
     expect(svg).toMatch(/>S<\/text>/);
     const group = svg.slice(svg.indexOf('<g class="assisted-lines">'), svg.indexOf('<g class="duplicate-arcs">'));
-    expect(group.match(/<line /g)).toHaveLength(3);
-    expect(group.match(/stroke-dasharray/g)).toHaveLength(1);
+    expect(group.match(/<line /g)).toHaveLength(2);
+    expect(group.match(/stroke-dasharray/g)).toBeNull();
+    // The carrying women's labels get a white backing under the line.
+    expect(svg.slice(svg.indexOf('<g class="labels">')).match(/<rect [^>]*fill="white"/g)?.length).toBeGreaterThan(0);
     expect(lintExport(p)).toEqual([]);
     expect(lintExport(p, { deidentify: true })).toEqual([]);
     // With the lines taken out, the export lint notices.
@@ -227,14 +260,20 @@ describe("assisted reproduction: drawing (#45)", () => {
     const stripped = svg.replace(/<g class="assisted-lines">[^]*?<\/g>/, '<g class="assisted-lines"></g>');
     expect(lintExportSvg(p, flow, stripped).map(f => f.code)).toContain("assisted-not-drawn");
     const key = renderExportKeySvg(p, 0, 0).markup.join("");
-    for (const text of ["Sperm or egg donor (D)", "Surrogate (S)", "Carried the pregnancy", "Not a genetic parent"]) expect(key).toContain(text);
+    for (const text of ["Sperm or egg donor (D)", "Surrogate (S)", "Carried the pregnancy"]) expect(key).toContain(text);
+    // No dashed line in the example any more (the intended parents are linked by their couple lines).
+    expect(key).not.toContain("Not a genetic parent");
   });
 
   it("the U-shape export draws a donor family without the donor couple line", () => {
     const p = produce(family(), d => { applyAddDonor(d, "c1", "sperm", "d", "wd"); });
     const svg = exportUShapeSvg(p);
     expect(svg).toMatch(/>D<\/text>/);
-    expect(svg).toMatch(/stroke-dasharray="5 3"/); // the social father's line
+    // The intended father is linked by his couple line to the mother (NSGC Fig. 3 scenario 1), not dashed.
+    expect(svg).not.toMatch(/stroke-dasharray="5 3"/);
+    const q = produce(p, d => { d.individuals.find(i => i.id === "c1")!.socialParents = ["gf"]; });
+    expect(exportUShapeSvg(q)).toMatch(/stroke-dasharray="5 3"/); // a social parent with no such link
+    expect(renderExportKeySvg(q, 0, 0).markup.join("")).toContain("Not a genetic parent");
   });
 });
 
@@ -264,7 +303,7 @@ describe("assisted reproduction: files (#45)", () => {
     const row = (id: string) => rows.find(r => r[1] === id)!;
     expect(row("ar_c1").slice(2, 4)).toEqual(["ar_d1", "ar_w1"]);
     expect(row("ar_c2").slice(2, 4)).toEqual(["ar_h2", "ar_d2"]);
-    expect(pedLostAssisted(p).map(i => i.id).sort()).toEqual(["ar_c1", "ar_c2", "ar_c3", "ar_d1", "ar_d2", "ar_s3"]);
+    expect(pedLostAssisted(p).map(i => i.id).sort()).toEqual(["ar_c1", "ar_c2", "ar_c3", "ar_c4", "ar_d1", "ar_d2", "ar_d4", "ar_s3"]);
     const [header, ...lines] = exportCsv(p).split("\n");
     const cols = header!.split(",");
     const c1 = lines.find(l => l.includes('"ar_c1"'))!.split(",");

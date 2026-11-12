@@ -1,4 +1,4 @@
-import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
+import { placementParentOf, type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
 import { symbolSex } from "../../pedigree/gender";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -207,14 +207,16 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const sexOf = (id: string) => byId.get(id)?.sex;
   const partnershipsOf = new Map<string, Partnership[]>();
   const hasParents = new Set<string>();
+  // Where each child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  const placed = placementParentOf(pedigree);
   for (const p of pedigree.partnerships) {
     for (const id of [p.individual1, p.individual2]) {
       if (!partnershipsOf.has(id)) partnershipsOf.set(id, []);
       partnershipsOf.get(id)!.push(p);
     }
-    for (const c of pedigree.parentOf[p.id] ?? []) hasParents.add(c);
+    for (const c of placed[p.id] ?? []) hasParents.add(c);
   }
-  const kidIds = (p: Partnership): string[] => pedigree.parentOf[p.id] ?? [];
+  const kidIds = (p: Partnership): string[] => placed[p.id] ?? [];
   const otherOf = (p: Partnership, id: string) => (p.individual1 === id ? p.individual2 : p.individual1);
 
   const descendants = (ids: string[]): Set<string> => {
@@ -372,7 +374,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       if (solo.length) node.unions.push(mkUnion("solo", solo.map(p => p.id), null, false));
     }
     for (const w of node.unions) {
-      const ids = sortSibs(w.pids.flatMap(pid => pedigree.parentOf[pid] ?? [])).filter(c => !assigned.has(c));
+      const ids = sortSibs(w.pids.flatMap(pid => placed[pid] ?? [])).filter(c => !assigned.has(c));
       for (const kid of ids) {
         assigned.add(kid);
         const child = mkNode(kid, node.depth + 1, node, w);

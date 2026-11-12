@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { alignPedigree, alignPedigreeByFamily, kinshipCoefficients, splitFamilies } from "../src/index.js";
+import { alignPedigree, alignPedigreeByFamily, kinshipCoefficients, splitFamilies, placementParentOf, carrierAbove } from "../src/index.js";
 import type { Pedigree, Individual } from "../src/index.js";
 
 /**
@@ -116,5 +116,48 @@ describe("assisted reproduction: layout (#45)", () => {
     // Only the surrogate moves (from the founder row to the couple's row).
     expect(a.n.reduce((x, y) => x + y)).toBe(b.n.reduce((x, y) => x + y));
     expect(rowOf(plain, a, "s")).toBe(0);
+  });
+
+  // NSGC 2008 Fig. 3: "the pregnancy symbol and its line of descent are
+  // positioned below the woman who is carrying the pregnancy".
+  it("scenario 1: the pregnancy sits below the mother, not between her and the donor", () => {
+    const r = alignPedigreeByFamily(spermDonor);
+    const [w] = slotsOf(spermDonor, r, "w"), [c] = slotsOf(spermDonor, r, "c");
+    expect(c!.x).toBeCloseTo(w!.x);
+    expect(carrierAbove(spermDonor, spermDonor.parentOf, "c")).toBe("w");
+  });
+
+  it("scenario 2: the child hangs from the couple carrying it; kinship keeps the donor", () => {
+    const placed = placementParentOf(eggDonor);
+    expect(placed.hw).toEqual(["c"]);
+    expect(placed.hd).toEqual([]);
+    expect(eggDonor.parentOf.hd).toEqual(["c"]); // not modified
+    const r = alignPedigreeByFamily(eggDonor);
+    const [h] = slotsOf(eggDonor, r, "h"), [w] = slotsOf(eggDonor, r, "w"), [c] = slotsOf(eggDonor, r, "c");
+    expect(c!.x).toBeCloseTo((h!.x + w!.x) / 2);
+    expect(Math.abs(w!.x - h!.x)).toBeCloseTo(1);
+    expect(slotsOf(eggDonor, r, "d")).toHaveLength(1); // still beside the father
+    expect(carrierAbove(eggDonor, placed, "c")).toBeUndefined();
+    expect(kinshipCoefficients(eggDonor).kinship("d", "c")).toBe(1 / 4);
+  });
+
+  it("scenario 3: the child sits below the surrogate", () => {
+    const r = alignPedigreeByFamily(surrogate);
+    const [s] = slotsOf(surrogate, r, "s"), [c] = slotsOf(surrogate, r, "c");
+    expect(c!.x).toBeCloseTo(s!.x);
+  });
+
+  it("a child in a twin set, or with siblings, stays where kinship2 puts it", () => {
+    const twins: Pedigree = {
+      ...eggDonor,
+      individuals: [...eggDonor.individuals, ind("c2", "male", { carriedBy: "w" })],
+      partnerships: eggDonor.partnerships.map(p => (p.id === "hd" ? { ...p, twins: [{ members: ["c", "c2"], zygosity: "dizygotic" as const }] } : p)),
+      parentOf: { hd: ["c", "c2"] },
+    };
+    expect(placementParentOf(twins)).toBe(twins.parentOf);
+    const sibs: Pedigree = { ...surrogate, individuals: [...surrogate.individuals, ind("c2", "female")], parentOf: { ...surrogate.parentOf, hw: ["c", "c2"] } };
+    const plain: Pedigree = { ...sibs, individuals: sibs.individuals.map(i => ({ ...i, carriedBy: undefined })) };
+    const a = alignPedigreeByFamily(plain), b = alignPedigreeByFamily(sibs);
+    expect(slotsOf(sibs, b, "c")[0]!.x).toBeCloseTo(slotsOf(plain, a, "c")[0]!.x);
   });
 });

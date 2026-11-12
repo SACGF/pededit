@@ -22,7 +22,7 @@
  * vitest over every example. Framework-free so all three share it.
  */
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
-import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily, placementParentOf } from "@pedigree-editor/layout-engine";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
 import type { FlowData } from "./layoutToFlow";
@@ -172,7 +172,8 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
 
   // 3. Children hang from their own parents.
   const parentsOf = new Map<string, string>(); // child id -> partnership id
-  for (const [pid, kids] of Object.entries(pedigree.parentOf)) for (const k of kids) parentsOf.set(k, pid);
+  // Where the child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  for (const [pid, kids] of Object.entries(placementParentOf(pedigree))) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const hasLineFrom = new Map<string, Set<string>>(); // child id -> pair keys of couples it hangs from
   for (const e of flow.sibshipEdges) {
@@ -241,7 +242,7 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
   // that only meet end to end count too: they still read as one bar.
   const bars = flow.sibshipEdges.flatMap(e => {
     const d = e.data;
-    if (!d || d.childXs.length === 0) return [];
+    if (!d || d.childXs.length === 0 || d.converge) return [];
     const kids = d.childIds.map(indOf).filter((x): x is string => !!x);
     return [{ y: d.sibBarY, x1: Math.min(d.coupleX, ...d.childXs), x2: Math.max(d.coupleX, ...d.childXs), kids }];
   });

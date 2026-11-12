@@ -250,7 +250,7 @@ export function renderAdoptionBrackets(ind: Individual): string {
 function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   const twins = twinMembership(pedigree);
-  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[]; apart?: LinePoint[] }[] = [];
+  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[]; apart?: LinePoint[]; converge: boolean }[] = [];
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const donorPairs = new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKey(p.individual1, p.individual2)));
   const idAt = (level: number, slot: number) => pedigree.individuals[Math.floor(result.nid[level][slot]) - 1]?.id ?? "";
@@ -286,7 +286,8 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
       // Gamete donation (#45): a line from each parent instead of the couple drop.
       const rc = resolveCouple(result, partners, level - 1, f - 1);
       const apart = donorPairs.has(pairKey(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot))) ? [{ ...leftPos, sex: sexAt(level - 1, f - 1) }, { ...rightPos, sex: sexAt(level - 1, f) }] : undefined;
-      sibships.push({ coupleX, coupleY, hop, children, apart });
+      const converge = slots.length === 1 && !!apart;
+      sibships.push({ coupleX, coupleY, hop, children, apart, converge });
     }
   }
 
@@ -294,8 +295,8 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
   const offsets = sibshipBarOffsets(sibships.map(s => ({
     coupleX: s.coupleX, coupleY: s.coupleY, childXs: s.children.map(c => c.x), childYs: s.children.map(c => c.y),
   })));
-  sibships.forEach(({ coupleX, coupleY, hop, children, apart }, i) => {
-    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i], apart);
+  sibships.forEach(({ coupleX, coupleY, hop, children, apart, converge }, i) => {
+    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i], apart, converge);
     for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
     for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
     for (const m of twinForkMarks(coupleY, children, offsets[i])) {
@@ -505,7 +506,7 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, labelMax: number): string[] {
+function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, labelMax: number, backed: Set<string> = new Set()): string[] {
   const elems: string[] = [];
   const seen = new Set<number>();
   const numbers = labelNumbers(pedigree);
@@ -529,6 +530,11 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
       // The name wraps to the slot width (#68); the full text is kept as a <title>.
       const text = nameLabelText(ind);
       const lines = wrapLabel(text, labelMax);
+      // A line of descent runs down through this person's labels (#45): white backing, as on the canvas.
+      if (backed.has(ind.id) && lines.length > 0) {
+        const w = linesWidth(lines) + 4;
+        elems.push(`<rect x="${cx - w / 2}" y="${labelBaseY - LABEL_FONT_SIZE}" width="${w}" height="${lines.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
+      }
       lines.forEach((line, k) => {
         const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
         elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
@@ -537,7 +543,7 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
       // age line the block can reach the sibship bar of the person's
       // children, so it gets a white backing then, as on the canvas.
       const details = detailLines(ind, labelMax, pedigree, numbers);
-      if (details.length > 0 && detailsBacked(ind, labelMax, pedigree, numbers)) {
+      if (details.length > 0 && (backed.has(ind.id) || detailsBacked(ind, labelMax, pedigree, numbers))) {
         const w = linesWidth(details) + 4;
         const top = labelBaseY + lines.length * LABEL_LINE_HEIGHT - LABEL_FONT_SIZE;
         elems.push(`<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${details.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
@@ -591,7 +597,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   group("assisted-lines", renderAssistedLines(flow, slotPos));
   group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
   group("symbols", renderSymbols(working, result, slotPos, flow));
-  group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));
+  const backed = new Set(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id));
+  group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth), backed));
   group("consanguinity-labels", renderConsanguinityLabels(flow));
   lines.push(`</g>`);
 

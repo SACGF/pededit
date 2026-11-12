@@ -46,7 +46,7 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   const apart = data.apart
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;
-  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset, apart);
+  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset, apart, data.converge);
   // Twin forks (#11): a bar across monozygotic drops, "?" between unknown ones.
   const marks = twinForkMarks(coupleY, kids, barOffset);
 

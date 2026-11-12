@@ -42,7 +42,15 @@ indexing convention inherited from R, and the three rendering rules.
   places: `splitFamilies` joins those people to the child's family, and
   `alignPedigree`'s `appendIsolated` puts such a person with no partner or
   parents of their own in the row above the child (`assistedLevels`)
-  instead of the founder row. PED input never has them.
+  instead of the founder row. Two more, for NSGC Fig. 3 ("the pregnancy
+  ... below the woman who is carrying the pregnancy"), in `assisted.ts`:
+  `placementParentOf` moves a child carried by the partner of its genetic
+  father under that couple for the layout only (`alignPedigree` swaps it
+  into `parentOf` before `pedigreeToLayoutInput`, so the donor pair becomes
+  a childless couple and the donor stays beside the father), and
+  `shiftUnderCarrier` moves an only child with no partner under
+  `carrierAbove` after `appendIsolated`, as far as its row neighbours
+  allow. PED input never has them.
 - `kinship.ts` — `kinshipCoefficients` (#32): kinship of any two people and
   the inbreeding coefficient, by the same parents-first recursion as
   kinship2's `kinship()`. Not part of the layout. It follows blood rather

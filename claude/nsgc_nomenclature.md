@@ -87,10 +87,12 @@ reproduction symbols (#45):
 |---|---|
 | "D" inside the donor's symbol, "S" inside the surrogate's | Follows: `Individual.reproductiveRole`. |
 | No relationship line between the woman carrying the pregnancy and a sperm donor; the donor's line of descent runs to the child | Follows: the donor and the other genetic parent are a `donorConception` partnership, drawn with no couple line and a line from each to the child. |
-| The woman carrying the pregnancy has a solid line to it even when not the genetic mother | Follows: `Individual.carriedBy`. |
-| Dashed line of descent for a non-biological parent | Follows: `Individual.socialParents` (the intended father with donor sperm). Kinship and PED use the genetic parents. |
+| The woman carrying the pregnancy has a solid line to it even when not the genetic mother | Follows: `Individual.carriedBy`. When she is the partner of the genetic father (scenario 2), the child hangs from that couple and their line of descent is the solid line; the egg donor gets her own line. |
+| The intended parent who is not genetic is joined only by the couple line (scenarios 1 and 4: no line from the husband, or the wife, to the pregnancy) | Follows: a social parent whose partner has a biological line to the child gets no line of their own. |
+| Dashed line of descent for a non-biological parent (scenario 5) | Partly: `Individual.socialParents` with no such partner get a dashed line each, from their own symbols rather than one from the couple line, and there are no brackets (adoption makes the child a founder for kinship, #12). Kinship and PED use the genetic parents. |
 | A woman who is both egg donor and carrier is shown only as the donor | Follows: no carrier line is drawn to a genetic parent. |
-| The pregnancy sits below the woman carrying it | Differs: the child is laid out under its genetic parents (kinship2), and the carrier's line reaches it there. Drag to move. |
+| The pregnancy sits below the woman carrying it, the lines meeting at its top | Follows for an only child: below the mother or donor carrying it (scenarios 1, 4), below the couple when she is half of it (2), below a surrogate (3), as far as the neighbours in its row allow (`shiftUnderCarrier` in `alignPedigree`). A donor pair's lines run straight to its top; a couple's line of descent keeps its elbow (scenario 3 draws it diagonally, which would cross the wife's name). Siblings keep the sibship bar. |
+| Person order: H, W, D (1, 2) | Differs: kinship2 puts the donor beside the parent who shares the donor pair (D, W, H in 1; W, H, D in 2). A man whose partner and egg donor are sisters (4b) is drawn twice, as kinship2 does for anyone with partners on both sides of a sibship. |
 
 The 2022 revision is reported to change how carrier status is shown. We have
 not seen the paper, so this is unconfirmed.

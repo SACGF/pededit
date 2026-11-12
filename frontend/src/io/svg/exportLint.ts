@@ -29,7 +29,7 @@
  * `exportSvg` writes (couple-lines, sibship-lines, symbols, labels) and the
  * `class="mark"` on childless and twin marks, which are not connecting lines.
  */
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { placementParentOf, type Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { FlowData } from "../../pedigree/layoutToFlow";
@@ -313,7 +313,8 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   });
   const touches = (s: Seg, t: Seg) => ends(t).some(e => distToSeg(e, s) <= TOUCH) || ends(s).some(e => distToSeg(e, t) <= TOUCH);
   const parentsOf = new Map<string, string>();
-  for (const [pid, kids] of Object.entries(pedigree.parentOf)) for (const k of kids) parentsOf.set(k, pid);
+  // Where the child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  for (const [pid, kids] of Object.entries(placementParentOf(pedigree))) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   /** Every sibship segment joined to a line ending at any copy of the child. */
   const componentOf = (child: string): Set<number> => {

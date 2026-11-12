@@ -139,6 +139,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: nameCut ? "auto" : "none",
+            ...(data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {nameLines.map((line, i) => <div key={i}>{line}</div>)}
@@ -162,7 +163,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: "none",
-            ...(data.detailsBacked ? { background: "#fff", padding: "0 2px" } : {}),
+            ...(data.detailsBacked || data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {details.map((line, i) => <div key={i}>{line}</div>)}
@@ -187,6 +188,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: 1.2,
             color: "#888",
             pointerEvents: "none",
+            ...(data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {shortDevId(individual.id)}

@@ -18,6 +18,12 @@ export type Segment = [number, number, number, number];
  * `topInset` is how far below the top of the symbol box the symbol starts:
  * a loss triangle's apex sits lower than a square's top edge (#13).
  *
+ * `converge` (a donor pair's only child, #45): no bar; the line from each
+ * parent in `apart` runs straight to the top of the child's symbol, where
+ * any other line of assisted reproduction meets it too, as NSGC 2008 Fig. 3
+ * draws them (the child sits under the woman carrying it, so her line is
+ * vertical). The result is then just those lines.
+ *
  * The result is the couple drop, the bar, then one drop per child in input
  * order; `sibshipPaths` splits off the drops of adopted-in children (#12),
  * which are drawn dashed.
@@ -51,9 +57,15 @@ export function sibshipSegments(
   children: SibshipChild[],
   barOffset = 0,
   apart?: LinePoint[],
+  converge = false,
 ): Segment[] {
   if (children.length === 0) return [];
   const half = NODE_SIZE / 2;
+  if (converge && apart && children.length === 1) {
+    const c = children[0]!;
+    const top = c.y - half + (c.topInset ?? 0);
+    if (top > coupleY + half) return donorDescentSegments(apart, c.x, top);
+  }
   const childRowY = Math.min(...children.map(c => c.y));
   const sibBarY = (coupleY + childRowY) / 2 + barOffset;
   const forks = forkXs(children);
@@ -129,9 +141,12 @@ export function sibshipPaths(
   children: SibshipChild[],
   barOffset = 0,
   apart?: LinePoint[],
+  converge = false,
 ): { solid: Segment[]; dashed: Segment[] } {
-  const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset, apart);
-  if (segs.length === 0 || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };
+  const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset, apart, converge);
+  // A converged only child (#45) has no drop of its own to dash.
+  const ownDrops = segs.length - children.length >= 2;
+  if (segs.length === 0 || !ownDrops || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };
   const fixed = segs.length - children.length; // couple drop and bar
   const solid = segs.slice(0, fixed), dashed: Segment[] = [];
   children.forEach((c, i) => (c.dashed ? dashed : solid).push(segs[fixed + i]!));
