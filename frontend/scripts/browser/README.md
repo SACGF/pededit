@@ -146,7 +146,7 @@ node that is not drawn, a couple line between non-partners or through
 another symbol, two couple lines overlapping on one row, a slanted couple
 line, a child off their siblings' row (the drop line misses), a partnership with
 no couple line, a child with no line from their parents or hanging from the
-wrong couple, overlapping symbols. The kinship2 oracle tests check slots
+wrong couple, two couples' sibship bars along one line, overlapping symbols. The kinship2 oracle tests check slots
 against R; this checks what is drawn from them. `console.mjs` and `shot.mjs`
 run it on every editor page (`render lint clean` in the summary). The same
 checks run in vitest over every example

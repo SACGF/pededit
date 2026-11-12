@@ -61,7 +61,15 @@ draws NSGC symbols.
   the sibship bar follows dragged nodes. The lines come from
   `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits
   halfway to the highest child and every child gets its own drop, so a child
-  pinned off its siblings' row is still reached. `CoupleEdge` and
+  pinned off its siblings' row is still reached. Bars of different couples
+  that would run along one line each get their own height (#80,
+  `sibshipBarOffsets`): this happens whenever a row of children is wider
+  than the row of their parents, so each sibship sits to one side of its
+  parents. Offsets only lower a bar (labels hang above the halfway line),
+  and the order is chosen so drops cross other bars as little as possible.
+  `layoutToFlow` puts the offset on the edge data (`barOffset`), so during a
+  drag the heights are as of the last layout; `svgExporter` calls the same
+  function. The U-shape export has its own geometry and does not use it. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
   the dashed arc between copies; its path is `duplicateArcD` in
   `couplePath.ts`, shared with the SVG exporter.
@@ -160,8 +168,8 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 
 `renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would
 misread (lines through symbols, lines to dropped nodes, children with no line
-from their parents, couple lines between non-partners, overlapping symbols or
-labels).
+from their parents, couple lines between non-partners, sibship bars of two
+couples along one line, overlapping symbols or labels).
 The kinship2 oracle tests compare slots with R, so a bug in the duplicate
 handling here passes them and is only caught by this lint. Its vitest keeps a
 `KNOWN_BROKEN` list of examples; remove an entry when a fix makes it draw

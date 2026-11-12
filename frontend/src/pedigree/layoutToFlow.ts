@@ -9,6 +9,7 @@ import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { twinMembership } from "./twins";
+import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
 
 // ── Output types ──────────────────────────────────────────────────────────────
@@ -79,8 +80,10 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   coupleY: number;
   /** Rise (px) of the parents' couple line when it hops over an intermediate partner; 0 otherwise. */
   hopHeight: number;
-  /** y (canvas px) of the sibship bar = (level - SIB_BAR_FACTOR) * ROW_HEIGHT. */
+  /** y (canvas px) of the sibship bar: halfway between the couple and the highest child, plus `barOffset`. */
   sibBarY: number;
+  /** How far (px) the bar is lowered so it does not overlap another couple's bar (#80); usually 0. */
+  barOffset: number;
   /** x (canvas px) of each child's slot centre, in slot order. */
   childXs: number[];
   /** y (canvas px) of each child's centre, in slot order (differs when a child is pinned off the row). */
@@ -426,11 +429,18 @@ function buildSibshipEdges(
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
-          coupleX, coupleY, hopHeight, sibBarY, childXs, childYs, childY,
+          coupleX, coupleY, hopHeight, sibBarY, barOffset: 0, childXs, childYs, childY,
         },
       });
     }
   }
+
+  // Bars that would run along the same line get a height each (#80).
+  const offsets = sibshipBarOffsets(edges.map(e => e.data!));
+  edges.forEach((e, i) => {
+    e.data!.barOffset = offsets[i]!;
+    e.data!.sibBarY += offsets[i]!;
+  });
 
   return edges;
 }
