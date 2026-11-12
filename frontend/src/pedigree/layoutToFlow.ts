@@ -10,7 +10,7 @@ import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
-import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
+import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines } from "./labels";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -42,6 +42,8 @@ export interface RFNodeData extends Record<string, unknown> {
    * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
    */
   nameLines: string[];
+  /** The line under the name: free-text age, or else the DOB (#20). Empty when neither. */
+  detailLines: string[];
 }
 
 /**
@@ -298,6 +300,7 @@ function buildNodes(
           isPinned,
           ...(twins.get(individual.id) ?? {}),
           nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth), labelLines),
+          detailLines: detailLines(individual, labelMaxWidth(slotWidth)),
         },
       });
     }

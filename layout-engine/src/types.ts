@@ -26,6 +26,12 @@ export interface Individual {
   sibOrder: number;      // 0-indexed position within sibling group
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"
+  /**
+   * The individual's age as free text, shown under the symbol in place of
+   * the DOB (#20): "50s", "d. 72", "34 y". For an approximate age, or one
+   * known without a date. Not an age of onset.
+   */
+  age?: string;
   notes?: string;        // free text clinical notes
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
   lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
@@ -144,6 +150,12 @@ export interface Pedigree {
    * their sector from their order here. Individuals reference tags by id.
    */
   tags?: Tag[];
+  /**
+   * Title drawn above the chart on the canvas and in exports (#20). Absent
+   * means the pedigree's name (unless it is the default "Untitled pedigree");
+   * an empty string means no title.
+   */
+  chartTitle?: string;
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

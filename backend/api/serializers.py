@@ -51,6 +51,7 @@ class IndividualSerializer(serializers.Serializer):
     sibOrder = serializers.FloatField(required=False)
     name = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     dob = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    age = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     notes = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     hpoTerms = _opt(serializers.ListField, child=serializers.CharField())
     lifeStatus = _opt(serializers.ChoiceField, choices=LIFE_STATUS_CHOICES)
@@ -114,6 +115,7 @@ class PedigreeDataSerializer(serializers.Serializer):
     canvasSettings = _opt(CanvasSettingsSerializer)
     unlockedIndividuals = _opt(serializers.ListField, child=serializers.CharField())
     tags = _opt(TagSerializer, many=True)
+    chartTitle = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
 
 
 class PedigreeDataField(serializers.Field):

@@ -188,6 +188,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       v => typeof v === "string" && ADOPTION_VALUES.includes(v));
     c.optional(raw, "name", ip, "a string", v => typeof v === "string");
     c.optional(raw, "dob", ip, "a string", v => typeof v === "string");
+    c.optional(raw, "age", ip, "a string", v => typeof v === "string");
     c.optional(raw, "notes", ip, "a string", v => typeof v === "string");
     c.optional(raw, "hpoTerms", ip, "an array of strings", isStringArray);
     c.optional(raw, "tags", ip, "an array of tag ids", isStringArray);
@@ -348,6 +349,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         v => typeof v === "string" && LAYOUT_WIDTH_VALUES.includes(v));
     }
   }
+
+  c.optional(ped, "chartTitle", base, "a string", v => typeof v === "string");
 
   if (ped.unlockedIndividuals !== undefined && ped.unlockedIndividuals !== null) {
     const up = p("unlockedIndividuals");

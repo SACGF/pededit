@@ -361,6 +361,8 @@ interface PedigreeState {
 
   // Canvas settings
   updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
+  /** Title above the chart (#20). "" hides it; undefined falls back to the pedigree's name. */
+  setChartTitle: (title: string | undefined) => void;
 
   // Tags (definitions live on the pedigree; individuals reference them by id)
   addTag: (tag: Omit<Tag, "id"> & { id?: string }) => string;
@@ -1197,6 +1199,13 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     // ── Canvas settings ───────────────────────────────────────────────────────
+
+    setChartTitle: (title) => {
+      mutate(draft => {
+        if (title === undefined) delete draft.chartTitle;
+        else draft.chartTitle = title;
+      });
+    },
 
     updateCanvasSettings: (settings) => {
       mutate(draft => {

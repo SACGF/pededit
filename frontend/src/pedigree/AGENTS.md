@@ -197,8 +197,24 @@ draws NSGC symbols.
   reason text shares the name-label row, so long reasons run into long names.
 
 Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
-(one or two lines), DOB. The canvas (`PedigreeSymbolNode`), `svgExporter` and
-`uShapeExporter` each offset these by hand, so change all three together.
+(one or two lines), then one detail line: the free-text `Individual.age` when
+set, otherwise the DOB (`detailLines` in `labels.ts`, #20). Only one line, on
+purpose: a two-line name plus DOB plus age ran into the sibship bar halfway
+to the next row, so the age replaces the DOB under the symbol (the DOB stays
+in the data, the edit panel and CSV). The canvas (`PedigreeSymbolNode`),
+`svgExporter` and `uShapeExporter` each offset these by hand, so change all
+three together.
+
+- Chart title (#20): `chartTitle(pedigree, name)` in `labels.ts` is the one
+  rule. `Pedigree.chartTitle` wins when set, `""` meaning no title; absent
+  falls back to the pedigree's name (`useAppStore.activeTitle`), except the
+  default "Untitled pedigree". On the canvas it is an extra React Flow node
+  (`nodes/ChartTitleNode.tsx`, id `__chart-title`, not selectable, no
+  pointer events) added in `PedigreeCanvas` beside `rfNodes`, not by
+  `layoutToFlow`, so lints and the minimap never see it; being a node keeps
+  it in fit view. It sits `TITLE_GAP` above the highest symbol, as in the
+  SVG export. The export dialog and `__pededit.checkExport()` pass the same
+  string as `SvgExportOptions.title`.
 
 Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.

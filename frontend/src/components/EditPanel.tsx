@@ -8,6 +8,8 @@ import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { useState } from "react";
+import { useAppStore } from "../store/useAppStore";
+import { chartTitle } from "../pedigree/labels";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
@@ -28,7 +30,10 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
       {individual ? (
         <IndividualForm individual={individual} />
       ) : (
-        <p className="text-xs text-gray-400">Select an individual to edit</p>
+        <>
+          <ChartTitleField />
+          <p className="text-xs text-gray-400">Select an individual to edit</p>
+        </>
       )}
       <div className="border-t pt-3">
         <Legend
@@ -69,6 +74,19 @@ function IndividualForm({ individual }: { individual: Individual }) {
           onChange={e => updateIndividual(individual.id, { dob: e.target.value || undefined })}
           className="h-7 text-sm"
         />
+      </Field>
+
+      <Field label="Age">
+        <Input
+          value={individual.age ?? ""}
+          onChange={e => updateIndividual(individual.id, { age: e.target.value || undefined })}
+          className="h-7 text-sm"
+          placeholder="e.g. 50s, d. 72"
+          aria-label="Age"
+        />
+        {individual.age?.trim() && individual.dob && (
+          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the date of birth.</p>
+        )}
       </Field>
 
       <Field label="Notes">
@@ -394,5 +412,27 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <Label className="text-xs text-gray-600">{label}</Label>
       {children}
     </div>
+  );
+}
+
+/**
+ * The chart title (#20), shown when nothing is selected. Until edited it
+ * shows the pedigree's name, which is what the canvas and exports draw;
+ * clearing it hides the title.
+ */
+function ChartTitleField() {
+  const { pedigree, setChartTitle } = usePedigreeStore();
+  const pedigreeName = useAppStore(s => s.activeTitle);
+  return (
+    <Field label="Chart title">
+      <Input
+        value={pedigree.chartTitle ?? chartTitle(pedigree, pedigreeName)}
+        onChange={e => setChartTitle(e.target.value)}
+        className="h-7 text-sm"
+        placeholder="No title"
+        aria-label="Chart title"
+      />
+      <p className="text-[10px] text-gray-500">Drawn above the pedigree and in exports. Clear it for no title.</p>
+    </Field>
   );
 }

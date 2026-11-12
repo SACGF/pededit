@@ -30,8 +30,11 @@ import { PickingBanner } from "./PickingBanner";
 import { SymbolShape, DeceasedSlash } from "./nodes/symbols";
 import { sectorsFor } from "./tags";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { ChartTitleNode, chartTitleNode } from "./nodes/ChartTitleNode";
+import { chartTitle } from "./labels";
+import { useAppStore } from "../store/useAppStore";
 
-const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
+const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode, chartTitle: ChartTitleNode };
 
 const edgeTypes: EdgeTypes = {
   coupleEdge:         CoupleEdge,
@@ -215,6 +218,12 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
 
   const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges];
 
+  // The chart title (#20) rides along as one more node, above the layout.
+  const pedigreeName = useAppStore(s => s.activeTitle);
+  const title = chartTitle(pedigree, pedigreeName);
+  const titleNode = useMemo(() => chartTitleNode(title, computedNodes), [title, computedNodes]);
+  const flowNodes = titleNode ? [...rfNodes, titleNode as unknown as Node<RFNodeData>] : rfNodes;
+
   // Background dots follow the snap grid when snap is on (React Flow's
   // default of 20 otherwise). React Flow centres a dot in each pattern tile,
   // so shift by half a tile to put the dots on grid points.
@@ -249,7 +258,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
       </svg>
 
       <ReactFlow
-        nodes={rfNodes}
+        nodes={flowNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}

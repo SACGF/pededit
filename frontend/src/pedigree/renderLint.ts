@@ -24,7 +24,7 @@ import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
-import { linesWidth, textWidth } from "./labels";
+import { linesWidth } from "./labels";
 
 export type LintCode =
   | "missing-individual"
@@ -259,7 +259,7 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
   // 5. Labels on one row running into each other (#68). Names are wrapped to
   // the slot width, so this catches dragged nodes and long dates.
   const labelW = (n: FlowData["nodes"][0]) =>
-    Math.max(linesWidth(n.data.nameLines ?? []), n.data.individual.dob ? textWidth(n.data.individual.dob) : 0);
+    Math.max(linesWidth(n.data.nameLines ?? []), linesWidth(n.data.detailLines ?? []));
   for (let i = 0; i < flow.nodes.length; i++) {
     for (let j = i + 1; j < flow.nodes.length; j++) {
       const A = flow.nodes[i]!, B = flow.nodes[j]!;

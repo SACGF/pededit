@@ -5,7 +5,7 @@ import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from ".
 import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
 import type { SibshipChild } from "../../pedigree/sibshipPath";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { wrapLabel, labelMaxWidth, LABEL_FONT_SIZE } from "../../pedigree/labels";
+import { wrapLabel, labelMaxWidth, detailLines, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
@@ -77,9 +77,10 @@ function computeBounds(
   options: SvgExportOptions,
 ): CanvasBounds {
   const padding = options.padding ?? 40;
-  // The title's baseline is at padding + 16; the band below it must clear a
-  // deceased slash, which reaches DECEASED_OVERHANG above the top row.
-  const titleHeight = options.title ? 24 + DECEASED_OVERHANG + 8 : 0;
+  // The title's baseline is at padding + 16, TITLE_GAP above the top row of
+  // symbols plus room for a deceased slash, which reaches DECEASED_OVERHANG
+  // above the row.
+  const titleHeight = options.title ? 16 + TITLE_GAP + DECEASED_OVERHANG : 0;
 
   let rawMinX = Infinity, rawMaxX = -Infinity;
   let rawMinY = Infinity, rawMaxY = -Infinity;
@@ -93,17 +94,15 @@ function computeBounds(
   const hasProband = pedigree.individuals.some(i => i.proband);
   const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
 
-  const hasDob = pedigree.individuals.some(i => i.dob);
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
   const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
-  // Names wrap to the slot width (#68), so allow for the most lines any name takes.
+  // Names wrap to the slot width (#68) and the age or DOB takes a line (#20),
+  // so allow for the most lines anyone takes.
   const labelMax = labelMaxWidth(layoutSpacing(options.compact).slotWidth);
-  const nameLines = Math.max(1, ...pedigree.individuals.map(i => wrapLabel(i.name, labelMax).length));
-  const labelHeight = LABEL_OFFSET_Y + nameLines * LABEL_LINE_HEIGHT + (hasDob ? LABEL_LINE_HEIGHT : 0)
+  const textLines = Math.max(1, ...pedigree.individuals.map(i =>
+    wrapLabel(i.name, labelMax).length + detailLines(i, labelMax).length));
+  const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
-
-  const offsetX = padding + NODE_SIZE / 2 + probandExtra - rawMinX;
-  const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
 
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra;
@@ -112,10 +111,16 @@ function computeBounds(
   const legend = renderExportKeySvg(pedigree, 0, 0);
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
 
+  // A title wider than the drawing widens the figure; the drawing is then
+  // centred under it.
+  const innerW = Math.max(contentW, legend.width, options.title ? titleWidth(options.title) : 0);
+  const offsetX = padding + (innerW - Math.max(contentW, legend.width)) / 2 + NODE_SIZE / 2 + probandExtra - rawMinX;
+  const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
+
   return {
     offsetX,
     offsetY,
-    width:  Math.ceil(Math.max(contentW, legend.width) + 2 * padding),
+    width:  Math.ceil(innerW + 2 * padding),
     height: Math.ceil(contentH + 2 * padding + titleHeight + legendExtra),
   };
 }
@@ -441,7 +446,7 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
 
       const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = pos;
-      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
+      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, age or DOB.
       const caption = lifeStatusCaption(ind.lifeStatus);
       if (caption) elems.push(renderLifeStatusCaption(caption, cx, cy + LABEL_OFFSET_Y));
       const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
@@ -453,10 +458,11 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
         const title = k === 0 && line !== ind.name ? `<title>${escapeXml(ind.name!)}</title>` : "";
         elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
       });
-      if (ind.dob) {
-        const dobY = labelBaseY + lines.length * LABEL_LINE_HEIGHT;
-        elems.push(`<text x="${cx}" y="${dobY}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(ind.dob)}</text>`);
-      }
+      // The free-text age, or else the date of birth (#20).
+      detailLines(ind, labelMax).forEach((line, k) => {
+        const y = labelBaseY + (lines.length + k) * LABEL_LINE_HEIGHT;
+        elems.push(`<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
+      });
     }
   }
   return elems;
@@ -488,7 +494,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   if (options.title) {
     const padding = options.padding ?? 40;
     lines.push(
-      `<text x="${width / 2}" y="${padding + 16}" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">${escapeXml(options.title)}</text>`,
+      `<text class="chart-title" x="${width / 2}" y="${padding + 16}" text-anchor="middle" font-family="sans-serif" font-size="${TITLE_FONT_SIZE}" font-weight="bold" fill="black">${escapeXml(options.title)}</text>`,
     );
   }
 

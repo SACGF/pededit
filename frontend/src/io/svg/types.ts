@@ -1,6 +1,6 @@
 export interface SvgExportOptions {
   /**
-   * Replace names/DOB/notes with NSGC generation-individual notation
+   * Replace names/DOB/age/notes with NSGC generation-individual notation
    * (I-1, I-2, II-1 …) before rendering. The data model is NOT mutated.
    */
   deidentify?: boolean;
@@ -15,7 +15,10 @@ export interface SvgExportOptions {
   /** Padding (px) added on all four sides. Default: 40. */
   padding?: number;
 
-  /** Optional title line rendered above the pedigree. Default: none. */
+  /**
+   * Optional title line rendered above the pedigree. Default: none. Callers
+   * pass `chartTitle(pedigree, name)` from `pedigree/labels.ts` (#20).
+   */
   title?: string;
 
   /**

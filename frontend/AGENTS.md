@@ -95,7 +95,8 @@ stub so the app still builds without Google login.
   `deleteIndividuals`) are one undo step each.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
-- `components/` — Toolbar, EditPanel (individual form, the
+- `components/` — Toolbar, EditPanel (the chart title field when nothing is
+  selected, #20; individual form with name, DOB, free-text age, the
   Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75),
   SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.

@@ -10,7 +10,7 @@ import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEnd
 import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH } from "../../pedigree/labels";
+import { wrapLabel, labelMaxWidth, detailLines, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -816,9 +816,10 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
       if (!ind) continue;
       // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
       const nameLines = wrapLabel(ind.name, labelMaxWidth(MAX_SLOT));
-      labelLines = Math.max(labelLines, nameLines.length + (ind.dob ? 1 : 0)
+      const details = detailLines(ind, labelMaxWidth(MAX_SLOT));
+      labelLines = Math.max(labelLines, nameLines.length + details.length
         + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
-      labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ind.dob?.length ?? 0);
+      labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ...details.map(l => l.length));
     }
   });
 
@@ -1160,9 +1161,9 @@ function renderProbandArrow(): string {
  */
 function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): string {
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
-  // by renderShape, over the white backing), name, DOB.
+  // by renderShape, over the white backing), name, age or DOB.
   const caption = lifeStatusCaption(ind.lifeStatus);
-  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ind.dob].filter((s): s is string => !!s);
+  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT))];
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];
@@ -1245,7 +1246,11 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   }
   const legend = renderExportKeySvg(working, padding, 0);
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
-  const width = Math.ceil(Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding));
+  const titleW = options.title ? titleWidth(options.title) + 2 * padding : 0;
+  const drawingW = Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding);
+  const width = Math.ceil(Math.max(drawingW, titleW));
+  // A title wider than the drawing widens the figure; the drawing is centred under it.
+  const shiftX = (width - drawingW) / 2;
   const height = Math.ceil(maxY - minY + 2 * margin + titleH + legendExtra);
 
   const out: string[] = [
@@ -1260,11 +1265,11 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   ];
   if (options.title) {
     out.push(
-      `<text x="${width / 2}" y="${padding / 2 + 14}" text-anchor="middle" font-family="sans-serif" ` +
-      `font-size="14" font-weight="bold" fill="black">${escapeXml(options.title)}</text>`,
+      `<text class="chart-title" x="${width / 2}" y="${padding / 2 + 14}" text-anchor="middle" font-family="sans-serif" ` +
+      `font-size="${TITLE_FONT_SIZE}" font-weight="bold" fill="black">${escapeXml(options.title)}</text>`,
     );
   }
-  out.push(`<g transform="translate(${r(margin - minX)} ${r(margin - minY + titleH)})">`);
+  out.push(`<g transform="translate(${r(margin - minX + shiftX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout, working));
   out.push(...renderSymbols(working, b));

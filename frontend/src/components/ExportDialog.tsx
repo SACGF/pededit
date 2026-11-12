@@ -6,11 +6,13 @@ import {
   svgPixelSize, pngSizeForDpi, PNG_DPI_CHOICES, DEFAULT_PNG_DPI, CSS_PX_PER_INCH,
 } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { chartTitle } from "../pedigree/labels";
 
 interface ExportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pedigree: Pedigree;
+  /** The pedigree's name: the file name, and the chart title unless the pedigree sets its own. */
   title: string;
   /** Initial state of the compact toggle, normally the canvas setting. */
   defaultCompact?: boolean;
@@ -61,7 +63,8 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
     return exportFn(pedigree, {
       deidentify: deident,
       ageBuckets: deident && ageBuckets,
-      title: deident ? undefined : title,
+      // The chart title (#20), as on the canvas. A de-identified export has none.
+      title: deident ? undefined : chartTitle(pedigree, title) || undefined,
       uShapePartners: uPartners,
       compact,
     });

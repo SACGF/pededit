@@ -30,6 +30,7 @@ For convenience the importer also accepts a bare `Pedigree` object (no envelope)
 | `canvasSettings` | `CanvasSettings` | no | Drag and snap settings. Absent means all defaults (nodes locked, no snapping). |
 | `unlockedIndividuals` | `string[]` | no | Ids of individuals unlocked for dragging when `canvasSettings.nodesMoveable` is `false`. |
 | `tags` | `Tag[]` | no | Tag definitions (conditions, sample status, genotypes) in display order. Individuals reference them by id. |
+| `chartTitle` | string | no | Title drawn above the chart on the canvas and in SVG, PNG and PDF exports. Absent means the pedigree's name (the envelope `title`), unless that is still the default "Untitled pedigree"; an empty string means no title. De-identified exports never draw it. |
 
 Any other property on the pedigree object is preserved as-is through import and export.
 
@@ -75,6 +76,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `adopted` | `"in"` or `"out"` | no | Adoption brackets round the symbol (NSGC). `in` is adopted into the family shown, drawn with a dashed line to the adoptive parents in `parentOf`; `out` is a biological child placed for adoption, drawn with a solid line to the biological parents. PED has no field for this, so Export PED drops it and warns. |
 | `name` | string | no | Display name shown under the symbol. |
 | `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
+| `age` | string | no | The individual's age as free text, such as `"50s"`, `"d. 72"` or `"34 y"`, for an approximate age or one known without a date. Shown under the symbol in place of the date of birth, cut to one line. Not an age of onset. De-identified exports leave it out. |
 | `notes` | string | no | Free-text clinical notes. |
 | `hpoTerms` | string[] | no | HPO term codes, e.g. `["HP:0001250"]`. |
 | `tags` | string[] | no | Ids of tags from `Pedigree.tags` applied to this individual. |

@@ -20,6 +20,7 @@ import { layoutToFlow } from "./pedigree/layoutToFlow";
 import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
 import { lintFlow } from "./pedigree/renderLint";
 import { lintExport } from "./io/svg/exportLint";
+import { chartTitle } from "./pedigree/labels";
 import type { SvgExportOptions } from "./io/svg/types";
 import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import { importPed, exportPed } from "./io/ped";
@@ -69,8 +70,12 @@ const hooks = {
    * Export lint (io/svg/exportLint.ts): what the standard SVG export (and so
    * PNG and PDF) draws, checked the same way. [] means clean.
    */
-  checkExport: (pedigree?: Pedigree, options?: SvgExportOptions) =>
-    lintExport(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
+  checkExport: (pedigree?: Pedigree, options?: SvgExportOptions) => {
+    const p = pedigree ?? usePedigreeStore.getState().getPedigree();
+    // With the chart title the export dialog would draw (#20); none when de-identified.
+    const title = options?.deidentify ? undefined : chartTitle(p, useAppStore.getState().activeTitle) || undefined;
+    return lintExport(p, { ...canvasOptions(), title, ...options });
+  },
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),
 };

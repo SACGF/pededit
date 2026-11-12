@@ -42,7 +42,7 @@ describe("exportCsv", () => {
   it("exports correct header", () => {
     const ped = makePedigree();
     const csv = exportCsv(ped);
-    expect(csv.startsWith("family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes")).toBe(true);
+    expect(csv.startsWith("family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes")).toBe(true);
   });
 
   it("empty pedigree produces only header row", () => {

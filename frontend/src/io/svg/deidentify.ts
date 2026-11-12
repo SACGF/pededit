@@ -44,12 +44,16 @@ export function deidentify(pedigree: Pedigree, options: SvgExportOptions = {}): 
   const result = alignPedigreeByFamily(pedigree);
   const notations = buildNotationMap(pedigree, result);
 
+  // The chart title and the free-text age (#20) can name or date someone, so
+  // both go; age ranges come from the DOB only.
   return {
     ...pedigree,
+    chartTitle: "",
     individuals: pedigree.individuals.map(ind => ({
       ...ind,
       name:  notations.get(ind.id) ?? ind.id,
       dob:   options.ageBuckets && ind.dob ? ageBucket(ind.dob) : undefined,
+      age:   undefined,
       notes: undefined,
     })),
   };

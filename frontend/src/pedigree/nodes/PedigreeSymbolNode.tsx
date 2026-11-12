@@ -23,6 +23,7 @@ export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
   const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines } = data;
+  const details = data.detailLines ?? [];
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
@@ -36,7 +37,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
     || (picking?.kind === "partner" && picking.individualId === individual.id);
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
-  // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, DOB.
+  // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, age or DOB.
   const captionOffset = captionRowHeight(individual.lifeStatus);
   const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
 
@@ -122,6 +123,27 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         </div>
       )}
 
+      {/* The free-text age, or else the date of birth, under the name (#20). */}
+      {details.length > 0 && (
+        <div
+          data-detail-label
+          style={{
+            position: "absolute",
+            top: labelTop + nameLines.length * LABEL_LINE_HEIGHT,
+            left: "50%",
+            transform: "translateX(-50%)",
+            whiteSpace: "nowrap",
+            textAlign: "center",
+            fontSize: LABEL_FONT_SIZE,
+            lineHeight: `${LABEL_LINE_HEIGHT}px`,
+            color: "#000",
+            pointerEvents: "none",
+          }}
+        >
+          {details.map((line, i) => <div key={i}>{line}</div>)}
+        </div>
+      )}
+
       {/* Dev-mode ID label, so a screenshot of the canvas names each node for bug
           reports. Generated ids are UUIDs, which are wider than a slot and
           overlap their neighbours, so those show only their first 6
@@ -131,7 +153,7 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
         <div
           style={{
             position: "absolute",
-            top: labelTop + nameLines.length * LABEL_LINE_HEIGHT,
+            top: labelTop + (nameLines.length + details.length) * LABEL_LINE_HEIGHT,
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",

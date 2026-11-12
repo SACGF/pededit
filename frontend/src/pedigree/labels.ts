@@ -10,7 +10,7 @@
  * name; exports cannot be hovered, so they always wrap.
  */
 
-import type { NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
+import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -89,4 +89,41 @@ function truncate(lines: string[], maxChars: number, _dropped: string): string[]
 /** Width (px) of the widest of several label lines. */
 export function linesWidth(lines: string[]): number {
   return lines.reduce((w, l) => Math.max(w, textWidth(l)), 0);
+}
+
+/**
+ * The line under the name (#20): the free-text age when set, otherwise the
+ * date of birth, cut to one line at `maxWidth` with an ellipsis. Only one, so
+ * a two-line name plus this line still clears the sibship bar halfway to the
+ * next row. Shared by the canvas, both SVG exporters and the lints.
+ */
+export function detailLines(ind: Pick<Individual, "dob" | "age">, maxWidth: number): string[] {
+  const age = ind.age?.trim();
+  return wrapLabel(age ? age : ind.dob, maxWidth, 1);
+}
+
+// ── Chart title (#20) ───────────────────────────────────────────────────────
+
+/** The name a new pedigree gets. Never drawn as a chart title. */
+export const DEFAULT_PEDIGREE_NAME = "Untitled pedigree";
+export const TITLE_FONT_SIZE = 14;
+/** Rough advance (px) per character of the bold title at TITLE_FONT_SIZE. */
+export const TITLE_CHAR_WIDTH = 8.4;
+/** Gap (px) from the title's baseline down to the top of the highest symbol. */
+export const TITLE_GAP = 20;
+
+/**
+ * The title drawn above the chart, or "" for none. `Pedigree.chartTitle`
+ * wins when set (an empty string hides the title); otherwise the pedigree's
+ * name, unless that is still the default name.
+ */
+export function chartTitle(pedigree: Pick<Pedigree, "chartTitle">, pedigreeName?: string | null): string {
+  if (pedigree.chartTitle !== undefined && pedigree.chartTitle !== null) return pedigree.chartTitle.trim();
+  const name = (pedigreeName ?? "").trim();
+  return name === DEFAULT_PEDIGREE_NAME ? "" : name;
+}
+
+/** Estimated rendered width (px) of a chart title. */
+export function titleWidth(title: string): number {
+  return title.length * TITLE_CHAR_WIDTH;
 }

@@ -12,7 +12,7 @@ FULL_PEDIGREE = {
         {
             "id": "f", "sex": "male", "affected": False, "deceased": True,
             "carrier": False, "proband": False, "sibOrder": 0,
-            "name": "John Smith", "dob": "1950-03-01",
+            "name": "John Smith", "dob": "1950-03-01", "age": "d. 72",
             "notes": "Line one\nLine two ", "hpoTerms": ["HP:0001250"],
             "tags": ["t1", "t2"],
         },
@@ -43,6 +43,7 @@ FULL_PEDIGREE = {
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant"},
         {"id": "t2", "label": "Sequenced", "color": "#1f77b4", "style": "dot", "abbrev": "WGS"},
     ],
+    "chartTitle": "Smith family",
 }
 
 

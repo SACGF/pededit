@@ -2,7 +2,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { twinMembership, twinSetOf } from "../../pedigree/twins";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -27,6 +27,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.name ?? "",
       ind.sex,
       ind.dob ?? "",
+      ind.age ?? "",
       ind.affected ? "1" : "0",
       ind.deceased ? "1" : "0",
       ind.carrier ? "1" : "0",

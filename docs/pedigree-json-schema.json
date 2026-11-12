@@ -40,6 +40,10 @@
           "type": "array",
           "description": "Tag definitions in display order. Quadrant tags take their sector from this order.",
           "items": { "$ref": "#/$defs/Tag" }
+        },
+        "chartTitle": {
+          "type": "string",
+          "description": "Title drawn above the chart and in exports. Absent means the pedigree's name; an empty string means no title."
         }
       },
       "additionalProperties": true
@@ -65,6 +69,7 @@
         "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },
+        "age": { "type": "string", "description": "The individual's age as free text, e.g. \"50s\" or \"d. 72\", shown under the symbol in place of the DOB. Not an age of onset." },
         "notes": { "type": "string" },
         "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },
         "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." }

@@ -123,7 +123,16 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `await import("/src/io/svg/index.ts")` inside `eval.mjs` and return the
   blob as base64.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
-- `deidentify.ts` — strips names, DOB and notes for de-identified export.
+- `deidentify.ts` — strips names, DOB, free-text age and notes for
+  de-identified export, and blanks `chartTitle`; the export dialog also
+  passes no title. Age ranges come from the DOB only: free text such as
+  "3 mo" cannot be bucketed safely.
+- The chart title (#20) is `options.title`, resolved by the caller with
+  `chartTitle()` from `pedigree/labels.ts`. Its width is estimated
+  (`titleWidth`); a title wider than the drawing widens the figure and the
+  drawing is centred under it, in both exporters. It is a
+  `<text class="chart-title">` outside the `labels` group, so the export
+  lint ignores it.
 - `types.ts` — `SvgExportOptions`.
 
 `__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render
