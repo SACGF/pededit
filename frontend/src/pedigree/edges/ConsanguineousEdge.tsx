@@ -2,7 +2,7 @@ import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { consanguineousPathsD } from "../couplePath";
+import { consanguineousPathsD, couplePathD } from "../couplePath";
 import { ChildlessMark } from "./ChildlessMark";
 
 export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
@@ -25,7 +25,9 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
   const [outer, inner] = consanguineousPathsD(sx, sy, tx, ty, hop, GAP, data?.hopInset);
 
   return (
-    <g>
+    <g data-partnership-id={data?.partnershipId}>
+      {/* Wide invisible stroke so the line can be right-clicked (#95). */}
+      <path d={couplePathD(sx, sy, tx, ty, hop, data?.hopInset)} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
       <path d={outer} stroke="black" strokeWidth={2} fill="none" />
       <path d={inner} stroke="black" strokeWidth={2} fill="none" />
       {data?.childless && (

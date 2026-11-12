@@ -33,6 +33,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { ChartTitleNode, chartTitleNode } from "./nodes/ChartTitleNode";
 import { chartTitle } from "./labels";
 import { useAppStore } from "../store/useAppStore";
+import { CanvasContextMenu, type ContextMenuTarget } from "./CanvasContextMenu";
 
 const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode, chartTitle: ChartTitleNode };
 
@@ -190,7 +191,8 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false, compact = false }: PedigreeCanvasProps) {
-  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout } = usePedigreeStore();
+  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout, picking } = usePedigreeStore();
+  const [contextMenu, setContextMenu] = useState<ContextMenuTarget | null>(null);
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
 
@@ -277,6 +279,22 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     setSelectedId(null);
   }, [setSelectedId]);
 
+  // Right-click (#95): the more menu at the cursor on a person, the couple
+  // items on a couple line. The browser's own menu is kept everywhere else.
+  // Not while picking, where clicks on people mean something else.
+  const handleNodeContextMenu = useCallback((event: React.MouseEvent, node: Node<RFNodeData>) => {
+    if (picking || node.type !== "pedigreeSymbol") return;
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY, individualId: node.data.individual.id });
+  }, [picking]);
+
+  const handleEdgeContextMenu = useCallback((event: React.MouseEvent, edge: Edge) => {
+    const partnershipId = (edge.data as CoupleEdgeData | undefined)?.partnershipId;
+    if (picking || (edge.type !== "coupleEdge" && edge.type !== "consanguineousEdge") || !partnershipId) return;
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY, partnershipId });
+  }, [picking]);
+
   const handleNodeDragStop: OnNodeDrag<Node<RFNodeData>> = useCallback(
     (_event, node, nodes) => {
       // Every dragged node (the whole selection, #21) is pinned as one undo
@@ -294,8 +312,20 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     [pinIndividuals, compact],
   );
 
+  // Radix's own outside-click dismissal never fires on the canvas, because
+  // React Flow stops the mouse events it waits for. Close the menu on any
+  // press or scroll in the canvas outside it (the menu is portalled but a
+  // React child here, so its own presses arrive too and are let through).
+  const closeContextMenuOutside = useCallback((e: React.SyntheticEvent) => {
+    if (!(e.target as Element).closest?.("[data-context-menu]")) setContextMenu(null);
+  }, []);
+
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      style={{ width: "100%", height: "100%", position: "relative" }}
+      onPointerDownCapture={contextMenu ? closeContextMenuOutside : undefined}
+      onWheelCapture={contextMenu ? closeContextMenuOutside : undefined}
+    >
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
@@ -332,6 +362,8 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         minZoom={MIN_ZOOM}
         onPaneClick={handlePaneClick}
         onNodeDragStop={handleNodeDragStop}
+        onNodeContextMenu={handleNodeContextMenu}
+        onEdgeContextMenu={handleEdgeContextMenu}
         proOptions={{ hideAttribution: true }}
       >
         {pedigree.individuals.length === 0 && (
@@ -381,6 +413,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
           />
         )}
       </ReactFlow>
+      <CanvasContextMenu target={contextMenu} onClose={() => setContextMenu(null)} />
     </div>
   );
 }

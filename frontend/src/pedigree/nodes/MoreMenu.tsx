@@ -8,6 +8,7 @@ import { ADOPTION_OPTIONS } from "../adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
 import { adjacentSibling } from "../../components/EditPanel";
 import { batchLockState } from "../selection";
+import { coupleConsanguinity } from "../consanguinity";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -24,8 +25,52 @@ interface MoreMenuProps {
   onClose?: () => void;
 }
 
+/**
+ * Classes for a popover holding `MoreMenuItems` or `CoupleMenuItems`: never
+ * taller than the room Radix finds on the chosen side, since the menu is
+ * about 600px and must stay usable on a 1280x720 laptop.
+ */
+export const MENU_CONTENT_CLASS = "w-44 p-1 overflow-y-auto max-h-(--radix-popover-content-available-height)";
+
+/** The "···" button in the hover pill and the menu it opens. */
 export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
   const [open, setOpen] = useState(false);
+
+  function close() {
+    setOpen(false);
+    onClose?.();
+  }
+
+  return (
+    <Popover open={open} onOpenChange={(o) => { if (o) setOpen(true); else close(); }}>
+      <PopoverTrigger asChild>
+        <button
+          title="More options"
+          onClick={(e) => e.stopPropagation()}
+          className="px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors"
+        >
+          ···
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className={MENU_CONTENT_CLASS}
+        side="bottom"
+        align="end"
+        collisionPadding={8}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MoreMenuItems individualId={individualId} onDone={close} />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/**
+ * Everything the more menu offers for one person. The hover pill's "···"
+ * and the right-click menu (#95) both show this list, so an item added here
+ * appears in both. `onDone` closes whichever popover holds it.
+ */
+export function MoreMenuItems({ individualId, onDone }: { individualId: string; onDone: () => void }) {
   const [showAddChildren, setShowAddChildren] = useState(false);
   const {
     pedigree,
@@ -44,6 +89,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     unpinIndividual,
     setIndividualTag,
     setPartnershipChildless,
+    setPartnershipConsanguineous,
     setAdopted,
     setTwins,
     removeTwin,
@@ -84,37 +130,13 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
     }
   }
 
-  function close() {
-    setOpen(false);
-    setShowAddChildren(false);
-    onClose?.();
-  }
-
   function action(fn: () => void) {
     fn();
-    close();
+    onDone();
   }
 
   return (
-    <Popover open={open} onOpenChange={(o) => { if (o) setOpen(true); else close(); }}>
-      <PopoverTrigger asChild>
-        <button
-          title="More options"
-          onClick={(e) => e.stopPropagation()}
-          className="px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors"
-        >
-          ···
-        </button>
-      </PopoverTrigger>
-      {/* Never taller than the room Radix finds on the chosen side: the menu
-          is about 600px and must stay usable on a 1280x720 laptop. */}
-      <PopoverContent
-        className="w-44 p-1 overflow-y-auto max-h-(--radix-popover-content-available-height)"
-        side="bottom"
-        align="end"
-        collisionPadding={8}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <>
         <SelectionMenuSection individualId={individualId} action={action} />
         <MenuSection label="Add">
           <MenuItem
@@ -291,6 +313,19 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
           ))}
         </MenuSection>
 
+        {ownPartnerships.length > 0 && (
+          <MenuSection label="Consanguinity">
+            {ownPartnerships.map(c => (
+              <ConsanguineousItem
+                key={c.partnershipId}
+                partnershipId={c.partnershipId}
+                label={ownPartnerships.length > 1 ? `Consanguineous with ${c.label}` : "Consanguineous"}
+                onToggle={on => action(() => setPartnershipConsanguineous(c.partnershipId, on))}
+              />
+            ))}
+          </MenuSection>
+        )}
+
         {childlessCouples.length > 0 && (
           <MenuSection label="Couple without children">
             {childlessCouples.map(c => (
@@ -346,8 +381,88 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
             </MenuItem>
           </div>
         )}
-      </PopoverContent>
-    </Popover>
+      </>
+  );
+}
+
+/**
+ * The consanguinity override for one couple (#92), as a toggle. A couple the
+ * pedigree already shows to be related is ticked and disabled, as in the
+ * edit panel: their line is double whatever the flag says.
+ */
+function ConsanguineousItem({ partnershipId, label, onToggle }: {
+  partnershipId: string;
+  label: string;
+  onToggle: (on: boolean) => void;
+}) {
+  const pedigree = usePedigreeStore(s => s.pedigree);
+  const state = coupleConsanguinity(pedigree, partnershipId);
+  if (!state) return null;
+  const on = state.related || state.flagged;
+  return (
+    <MenuItem
+      onClick={() => onToggle(!state.flagged)}
+      active={on}
+      disabled={state.related}
+      checked={on}
+      title={state.related
+        ? "The pedigree shows they are related, so the couple line is already double"
+        : "Draws the couple line double, for a couple known to be related when the pedigree does not show how"}
+    >
+      {label}
+    </MenuItem>
+  );
+}
+
+/**
+ * The right-click menu of a couple line (#95, #92): what the more menu offers
+ * for one partnership, without the person items.
+ */
+export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, startPickingChild } = usePedigreeStore();
+  const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
+  if (!partnership) return null;
+  const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
+  const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
+  const childless = (pedigree.parentOf[partnershipId] ?? []).length === 0;
+
+  function action(fn: () => void) {
+    fn();
+    onDone();
+  }
+
+  return (
+    <>
+      <MenuSection label={n1 && n2 ? `${n1} and ${n2}` : "Couple"}>
+        <ConsanguineousItem
+          partnershipId={partnershipId}
+          label="Consanguineous"
+          onToggle={on => action(() => setPartnershipConsanguineous(partnershipId, on))}
+        />
+        <MenuItem
+          onClick={() => action(() => startPickingChild(partnershipId))}
+          title="Click an existing person on the canvas to make them a child of this couple"
+        >
+          Add existing child...
+        </MenuItem>
+      </MenuSection>
+      {childless && (
+        <MenuSection label="Couple without children">
+          <MenuItem onClick={() => action(() => setPartnershipChildless(partnershipId, undefined))} active={!partnership.childless}>
+            No mark
+          </MenuItem>
+          {CHILDLESS_OPTIONS.map(o => (
+            <MenuItem
+              key={o.value}
+              onClick={() => action(() => setPartnershipChildless(partnershipId, o.value))}
+              active={partnership.childless === o.value}
+            >
+              {o.label}
+            </MenuItem>
+          ))}
+        </MenuSection>
+      )}
+    </>
   );
 }
 
@@ -503,12 +618,16 @@ interface MenuItemProps {
   destructive?: boolean;
   disabled?: boolean;
   title?: string;
+  /** A toggle: shows a tick when true and sets aria-checked. */
+  checked?: boolean;
 }
 
-function MenuItem({ onClick, children, active, destructive, disabled, title }: MenuItemProps) {
+function MenuItem({ onClick, children, active, destructive, disabled, title, checked }: MenuItemProps) {
   return (
     <button
       onClick={onClick}
+      role={checked === undefined ? undefined : "menuitemcheckbox"}
+      aria-checked={checked}
       disabled={disabled}
       title={title}
       className={`
@@ -520,6 +639,7 @@ function MenuItem({ onClick, children, active, destructive, disabled, title }: M
       `}
     >
       {children}
+      {checked && <span className="text-gray-400"> ✓</span>}
     </button>
   );
 }

@@ -56,6 +56,8 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   hopHeight: number;
   /** Distance (px) from each symbol edge at which a hopping line turns up. */
   hopInset: number;
+  /** The partnership the line draws, for the couple line's right-click menu (#95). */
+  partnershipId?: string;
   /** Childless couple mark under the line (#15), when the partnership has one and no children. */
   childless?: ChildlessStatus;
   childlessReason?: string;
@@ -365,7 +367,11 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
         // between (see consanguinityTest).
         type:         related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))
           ? "consanguineousEdge" : "coupleEdge",
-        data:         { ...hopAt(result, partners, level, slot), ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)) },
+        data:         {
+          ...hopAt(result, partners, level, slot),
+          partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
+          ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
+        },
       });
     }
   }

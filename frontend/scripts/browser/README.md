@@ -241,6 +241,7 @@ Steps run in the order given, each followed by `--step-wait` ms (default 300):
 | Step | Does |
 | --- | --- |
 | `--click SEL`, `--dblclick SEL`, `--hover SEL` | act on the element |
+| `--right-click SEL` | right-click it (`contextmenu`): a node or couple line opens its menu, then `--click` an item, e.g. `--click '[data-context-menu] >> text=Mark affected'` |
 | `--wait-for SEL` | wait until one is visible |
 | `--press KEY` | a key or chord: `Delete`, `Control+z` |
 | `--key-down KEY`, `--key-up KEY` | hold a modifier across the steps between them: `--key-down Shift --click SEL --key-up Shift` is a shift-click, and a `--drag` in between is a Shift+drag (rubber band, #21) |

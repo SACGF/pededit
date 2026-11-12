@@ -21,7 +21,9 @@ export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) 
 
   const hop = data?.hopHeight ?? 0;
   return (
-    <g>
+    <g data-partnership-id={data?.partnershipId}>
+      {/* Wide invisible stroke so the line can be right-clicked (#95). */}
+      <path d={couplePathD(sx, sy, tx, ty, hop, data?.hopInset)} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
       <path
         d={couplePathD(sx, sy, tx, ty, hop, data?.hopInset)}
         stroke="black"

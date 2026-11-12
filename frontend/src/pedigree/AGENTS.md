@@ -60,6 +60,20 @@ draws NSGC symbols.
   1280x720 after adding items. It is portalled: when an item closes it, the
   element under the cursor vanishes and the pill gets no mouseleave, so the
   menu calls `onClose` and the pill schedules its own hide.
+  The items are `MoreMenuItems`, so the right-click menu shows the same list:
+  add new items there, not in `MoreMenu`.
+- `CanvasContextMenu.tsx` — the right-click menu (#95), opened by
+  `PedigreeCanvas`'s `onNodeContextMenu` / `onEdgeContextMenu` at the cursor
+  (a Radix `PopoverAnchor` on a fixed zero-size span). A person gets
+  `MoreMenuItems`; a couple line gets `CoupleMenuItems` (consanguinity,
+  add existing child, childless mark). The browser menu is suppressed only
+  on nodes and couple lines, and not while picking. Couple edges carry
+  `partnershipId` in their data and draw a wide transparent stroke so the
+  2px line can be hit. Radix's outside-click dismissal never fires for
+  presses on the canvas (React Flow stops the mouse events the Popover waits
+  for, `deferPointerDownOutside`), so `PedigreeCanvas` closes the menu itself
+  on a pointerdown or wheel outside it. The harness drives it with
+  `--right-click`.
 - The grey id under each symbol is dev-only; UUIDs are cut to 6 characters
   there, and longer file ids to the slot width, so they do not overlap.
   Unnamed people have no label in production.
@@ -183,8 +197,11 @@ draws NSGC symbols.
   line is double when the couple's kinship is above 0, so it follows blood:
   an adopted-in partner is not related. `Partnership.consanguineous` is only
   an override on top, for a couple known to be related whose common
-  ancestors are not drawn, and only the panel's checkbox
-  (`setPartnershipConsanguineous`) writes it. Do not set it when creating a
+  ancestors are not drawn, and only the explicit controls write it
+  (`setPartnershipConsanguineous`): the panel's "Consanguineous with"
+  checkbox and the "Consanguineous" toggle in the more and right-click menus
+  (#92), which all read `coupleConsanguinity` and are ticked and disabled
+  when the kinship already relates the couple. Do not set it when creating a
   partnership: a stored flag does not follow later edits, which is why
   `linkPartner`, `setParents` and PED import stopped writing it. Pedigrees
   saved before #85 may carry the flag on couples who are related anyway; it

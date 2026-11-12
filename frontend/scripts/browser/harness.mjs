@@ -30,7 +30,7 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
 /** Flags that become ordered interaction steps, run after the page settles. */
 const STEP_FLAGS = new Set([
-  "click", "dblclick", "hover", "press", "key-down", "key-up", "fill", "wait-for",
+  "click", "dblclick", "right-click", "hover", "press", "key-down", "key-up", "fill", "wait-for",
   "drag", "reload", "upload", "download", "sleep", "mouse-away", "select", "choose",
 ]);
 /** Steps that take no value. */
@@ -123,6 +123,7 @@ Common options:
 Steps, run in order after load (a step whose element never appears, is
 disabled, or matches several visible elements is reported, not skipped):
   --click SEL  --dblclick SEL  --hover SEL  --wait-for SEL
+  --right-click SEL   Right-click (contextmenu), e.g. a node for its menu.
   --press KEY         A key or chord, e.g. Delete, Control+z.
   --key-down KEY      Hold a key (Shift, Control, Meta) for the clicks and
   --key-up KEY        drags that follow, then release it: shift-click is
@@ -546,6 +547,20 @@ export async function runSteps(page, steps, findings, { timeout = 5000, stepWait
       switch (step.kind) {
         case "click": await (await target(page, step.arg, opts)).click({ timeout }); break;
         case "dblclick": await (await target(page, step.arg, opts)).dblclick({ timeout }); break;
+        case "right-click": {
+          // A straight couple line is an SVG group with a zero-height box,
+          // which Playwright never calls visible: right-click its centre.
+          const flat = page.locator(step.arg).first();
+          const box = (await flat.count())
+            ? await flat.evaluate(e => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; })
+            : null;
+          if (box && box.width > 0 && box.height === 0) {
+            await page.mouse.click(box.x + box.width / 2, box.y, { button: "right" });
+          } else {
+            await (await target(page, step.arg, opts)).click({ button: "right", timeout });
+          }
+          break;
+        }
         case "hover": await (await target(page, step.arg, opts)).hover({ timeout }); break;
         case "wait-for": await target(page, step.arg, { ...opts, first: true }); break;
         case "press": await page.keyboard.press(step.arg); break;
