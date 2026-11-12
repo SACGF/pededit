@@ -6,11 +6,11 @@ import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/s
 import type { SibshipChild } from "../../pedigree/sibshipPath";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { onsetsOf } from "../../pedigree/onset";
-import { wrapLabel, labelMaxWidth, detailLines, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
+import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
-import { layoutToFlow } from "../../pedigree/layoutToFlow";
+import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
@@ -101,8 +101,9 @@ function computeBounds(
   // Names wrap to the slot width (#68), the age or DOB takes a line (#20) and
   // so does each age of onset (#93), so allow for the most lines anyone takes.
   const labelMax = labelMaxWidth(layoutSpacing(options.compact).slotWidth);
+  const numbers = labelNumbers(pedigree);
   const textLines = Math.max(1, ...pedigree.individuals.map(i =>
-    wrapLabel(i.name, labelMax).length + detailLines(i, labelMax, pedigree).length));
+    wrapLabel(nameLabelText(i, numbers), labelMax).length + detailLines(i, labelMax, pedigree).length));
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
@@ -439,6 +440,7 @@ function escapeXml(s: string): string {
 function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, labelMax: number): string[] {
   const elems: string[] = [];
   const seen = new Set<number>();
+  const numbers = labelNumbers(pedigree);
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
@@ -455,10 +457,12 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
       const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
         + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
 
-      // The name wraps to the slot width (#68); the full name is kept as a <title>.
-      const lines = wrapLabel(ind.name, labelMax);
+      // The name wraps to the slot width (#68), after the pedigree number
+      // when shown (#8); the full text is kept as a <title>.
+      const text = nameLabelText(ind, numbers);
+      const lines = wrapLabel(text, labelMax);
       lines.forEach((line, k) => {
-        const title = k === 0 && line !== ind.name ? `<title>${escapeXml(ind.name!)}</title>` : "";
+        const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
         elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
       });
       // The free-text age, or else the date of birth (#20), then ages of onset

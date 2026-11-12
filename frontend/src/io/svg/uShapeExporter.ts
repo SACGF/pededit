@@ -11,7 +11,8 @@ import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEnd
 import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { wrapLabel, labelMaxWidth, detailLines, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
+import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
+import { labelNumbers } from "../../pedigree/layoutToFlow";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 
@@ -816,7 +817,7 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
       const ind = byId.get(id);
       if (!ind) continue;
       // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
-      const nameLines = wrapLabel(ind.name, labelMaxWidth(MAX_SLOT));
+      const nameLines = wrapLabel(nameLabelText(ind, labelNumbers(pedigree)), labelMaxWidth(MAX_SLOT));
       const details = detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree);
       labelLines = Math.max(labelLines, nameLines.length + details.length
         + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
@@ -1164,7 +1165,9 @@ function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): 
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
   // by renderShape, over the white backing), name, age or DOB.
   const caption = lifeStatusCaption(ind.lifeStatus);
-  const below = [...wrapLabel(ind.name, labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree)];
+  // The pedigree number (#8) is the one the standard figure shows, so the
+  // two exports agree, even though it need not read left to right here.
+  const below = [...wrapLabel(nameLabelText(ind, labelNumbers(pedigree)), labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree)];
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];

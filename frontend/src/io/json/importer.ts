@@ -350,6 +350,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         v => typeof v === "string" && NAME_LABEL_VALUES.includes(v));
       c.optional(cs, "layoutWidth", cp, LAYOUT_WIDTH_VALUES.map(s => `"${s}"`).join(" | "),
         v => typeof v === "string" && LAYOUT_WIDTH_VALUES.includes(v));
+      c.optional(cs, "showNumbers", cp, "a boolean", v => typeof v === "boolean");
     }
   }
 

@@ -88,6 +88,18 @@ function truncate(lines: string[], maxChars: number, _dropped: string): string[]
   return [...lines.slice(0, -1), kept + ELLIPSIS];
 }
 
+/**
+ * The text of the name label: the pedigree number (#8) before the name when
+ * `numbers` (from `pedigreeNumbers`, only when the setting is on) has one,
+ * so the two wrap together and the number is never the part cut off.
+ */
+export function nameLabelText(ind: Individual, numbers?: Map<string, string>): string | undefined {
+  const number = numbers?.get(ind.id);
+  if (!number) return ind.name;
+  const name = ind.name?.trim();
+  return name ? `${number} ${name}` : number;
+}
+
 /** Width (px) of the widest of several label lines. */
 export function linesWidth(lines: string[]): number {
   return lines.reduce((w, l) => Math.max(w, textWidth(l)), 0);

@@ -108,6 +108,20 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 </div>
               </div>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer mt-2">
+              <input
+                type="checkbox"
+                name="showNumbers"
+                checked={pedigree.canvasSettings?.showNumbers === true}
+                onChange={e => updateCanvasSettings({ showNumbers: e.target.checked })}
+              />
+              <div>
+                <div className="text-sm">Show pedigree numbers</div>
+                <div className="text-xs text-gray-400">
+                  Generation and position (II-3) before each name, on the canvas and in exports. Numbers follow the layout, so adding someone renumbers the people to their right.
+                </div>
+              </div>
+            </label>
           </div>
 
           <div>

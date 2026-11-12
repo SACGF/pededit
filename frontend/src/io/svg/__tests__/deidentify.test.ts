@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { deidentify, buildNotationMap } from "../deidentify";
+import { deidentify } from "../deidentify";
+import { numberFromLayout as buildNotationMap } from "../../../pedigree/numbering";
 import { alignPedigree } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 

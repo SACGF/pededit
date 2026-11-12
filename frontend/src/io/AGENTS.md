@@ -126,7 +126,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 - `deidentify.ts` — strips names, DOB, free-text age and notes for
   de-identified export, and blanks `chartTitle`; the export dialog also
   passes no title. Age ranges come from the DOB only: free text such as
-  "3 mo" cannot be bucketed safely.
+  "3 mo" cannot be bucketed safely. The names become the pedigree numbers
+  (`pedigreeNumbers`, #8), and the copy has `showNumbers` turned off so a
+  numbered pedigree does not draw "II-3 II-3".
 - The chart title (#20) is `options.title`, resolved by the caller with
   `chartTitle()` from `pedigree/labels.ts`. Its width is estimated
   (`titleWidth`); a title wider than the drawing widens the figure and the
@@ -149,3 +151,6 @@ helpers, not tests.
 The last column, `onset` (#93), lists ages of onset as
 `Affected: 40s;Breast cancer: 45y` (tag labels, from `onsetsOf`). Tests
 should not anchor on the line end, so a new column can go last.
+`pedigree_number` (#8) is last: the "II-3" the figure shows (whether or not
+the figure shows numbers), blank for people hidden under a collapsed branch.
+It is how the numbers link back to the ids. PED stays six columns (#31).

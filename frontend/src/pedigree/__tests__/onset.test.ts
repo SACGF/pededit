@@ -119,9 +119,10 @@ describe("onset in exports (#93)", () => {
     ped.individuals[0]!.onset = "40s";
     ped.individuals[0]!.tagOnset = { bc: "45y" };
     const [header, rowA, rowB] = exportCsv(ped).split("\n");
-    expect(header!.split(",").at(-1)).toBe("onset");
-    expect(rowA!.split(",").at(-1)).toBe('"Affected: 40s;Breast cancer: 45y"');
-    expect(rowB!.split(",").at(-1)).toBe('""');
+    const col = header!.split(",").indexOf("onset");
+    expect(col).toBeGreaterThan(0);
+    expect(rowA!.split(",")[col]).toBe('"Affected: 40s;Breast cancer: 45y"');
+    expect(rowB!.split(",")[col]).toBe('""');
   });
 
   it("round-trips through JSON", () => {

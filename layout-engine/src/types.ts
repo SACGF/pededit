@@ -144,6 +144,12 @@ export interface CanvasSettings {
    * "minimal".
    */
   layoutWidth?: LayoutWidthMode;
+  /**
+   * Draw each person's pedigree number ("II-3", #8) before their name, on the
+   * canvas and in exports. The numbers are computed from the layout, never
+   * stored. Absent means false.
+   */
+  showNumbers?: boolean;
 }
 
 export type NameLabelMode = "wrap" | "truncate";

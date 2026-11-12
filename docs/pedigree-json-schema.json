@@ -147,6 +147,10 @@
         "layoutWidth": {
           "enum": ["minimal", "relaxed"],
           "description": "How wide the automatic layout may be: no wider than the widest generation, or up to two slots wider so children sit more directly under their parents. Absent means \"minimal\". Applies to the canvas and to exports."
+        },
+        "showNumbers": {
+          "type": "boolean",
+          "description": "Draw each person's pedigree number (generation in Roman numerals, then place in the row, e.g. \"II-3\") before their name, on the canvas and in figure exports. The numbers are computed from the layout, not stored. Absent means false."
         }
       }
     }

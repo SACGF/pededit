@@ -34,7 +34,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
-  const nameCut = isLabelCut(nameLines, individual.name);
+  const nameCut = isLabelCut(nameLines, data.labelText ?? individual.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
   const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)

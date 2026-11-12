@@ -13,6 +13,10 @@ describe("export lint over every example", () => {
       expect(summary(ex.data)).toEqual([]);
       expect(summary(ex.data, { compact: true })).toEqual([]);
       expect(summary(ex.data, { deidentify: true, title: "T" })).toEqual([]);
+      // Pedigree numbers before the names (#8).
+      const numbered = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, showNumbers: true } };
+      expect(summary(numbered)).toEqual([]);
+      expect(summary(numbered, { compact: true })).toEqual([]);
     });
   }
 

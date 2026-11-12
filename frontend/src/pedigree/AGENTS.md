@@ -294,6 +294,19 @@ three together.
   it in fit view. It sits `TITLE_GAP` above the highest symbol, as in the
   SVG export. The export dialog and `__pededit.checkExport()` pass the same
   string as `SvgExportOptions.title`.
+- Pedigree numbers (#8, "II-3"): `pedigreeNumbers(pedigree)` in
+  `layoutToFlow.ts` (counting and Roman numerals in `numbering.ts`) numbers
+  the drawn pedigree from the same `alignPedigreeByFamily` layout the
+  canvas and SVG export draw, row by row in slot order, skipping the
+  lineless copies the canvas leaves out. Pins do not renumber: a dragged
+  person keeps their layout number. Hidden people (#94) get none, and a
+  generation with nobody drawn is not counted, so there are no gaps. Never
+  stored. With `canvasSettings.showNumbers` the number goes before the name
+  (`nameLabelText`) and wraps with it, on the canvas, in both SVG exporters
+  and in the lints, so it adds no line of its own; `RFNodeData.labelText`
+  is the wrapped text, which `isLabelCut` compares against. The U-shape
+  uses the standard figure's numbers so the two exports agree. Tests:
+  `__tests__/numbering.test.ts`.
 
 Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.

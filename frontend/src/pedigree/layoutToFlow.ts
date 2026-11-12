@@ -11,7 +11,8 @@ import { activeChildless } from "./childless";
 import { drawnPedigree } from "./collapse";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
-import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines } from "./labels";
+import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, nameLabelText } from "./labels";
+import { numberFromLayout, showsNumbers } from "./numbering";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -41,8 +42,11 @@ export interface RFNodeData extends Record<string, unknown> {
   /**
    * The name fitted to the slot width and cut with an ellipsis (#68): at most
    * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
+   * With pedigree numbers shown (#8) the number comes first, as `labelText`.
    */
   nameLines: string[];
+  /** The text `nameLines` was wrapped from: the name, after the pedigree number when shown (#8). */
+  labelText?: string;
   /** The line under the name: free-text age, or else the DOB (#20). Empty when neither. */
   detailLines: string[];
 }
@@ -171,6 +175,34 @@ function findLinelessCopies(result: LayoutResult): Set<string> {
   return out;
 }
 
+// ── Pedigree numbers (#8) ────────────────────────────────────────────────────
+
+const numbersCache = new WeakMap<Pedigree, Map<string, string>>();
+
+/**
+ * Pedigree numbers ("II-3") of everyone drawn, from the same layout the
+ * canvas and the SVG export draw, so the numbers read left to right in each
+ * row. Hidden people (#94) and empty pedigrees get none. Cached per pedigree
+ * object. See `numbering.ts`.
+ */
+export function pedigreeNumbers(full: Pedigree): Map<string, string> {
+  const pedigree = drawnPedigree(full);
+  const cached = numbersCache.get(pedigree);
+  if (cached) return cached;
+  let numbers = new Map<string, string>();
+  if (pedigree.individuals.length > 0) {
+    const result = alignPedigreeByFamily(pedigree, { improve: true });
+    numbers = numberFromLayout(pedigree, result, findLinelessCopies(result));
+  }
+  numbersCache.set(pedigree, numbers);
+  return numbers;
+}
+
+/** The numbers to put before the names (#8), or undefined when the pedigree does not show them. */
+export function labelNumbers(pedigree: Pedigree): Map<string, string> | undefined {
+  return showsNumbers(pedigree) ? pedigreeNumbers(pedigree) : undefined;
+}
+
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
@@ -276,6 +308,7 @@ function buildNodes(
   const childIds = new Set(Object.values(pedigree.parentOf).flat());
   const twins = twinMembership(pedigree);
   const labelLines = canvasLabelLines(nameLabelMode(pedigree));
+  const numbers = showsNumbers(pedigree) ? numberFromLayout(pedigree, result, hidden) : undefined;
 
   const nodes: Node<RFNodeData>[] = [];
   for (let level = 0; level < result.n.length; level++) {
@@ -304,7 +337,8 @@ function buildNodes(
           hasParents: childIds.has(individual.id),
           isPinned,
           ...(twins.get(individual.id) ?? {}),
-          nameLines: wrapLabel(individual.name, labelMaxWidth(slotWidth), labelLines),
+          nameLines: wrapLabel(nameLabelText(individual, numbers), labelMaxWidth(slotWidth), labelLines),
+          labelText: nameLabelText(individual, numbers),
           detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree),
         },
       });

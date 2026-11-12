@@ -1,35 +1,7 @@
-import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 import type { SvgExportOptions } from "./types";
 import { asDrawn, drawnPedigree } from "../../pedigree/collapse";
-
-// Supports generations I–X (more than sufficient for clinical pedigrees)
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
-function toRoman(n: number): string {
-  return ROMAN[n - 1] ?? `G${n}`;
-}
-
-export function buildNotationMap(
-  pedigree: Pedigree,
-  result: LayoutResult,
-): Map<string, string> {
-  const assigned = new Map<string, string>();   // individualId → "II-3"
-  const generationCounters: number[] = [];       // [level] → next individual #
-
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const nid = Math.floor(result.nid[level][slot]);   // 1-based
-      const individual = pedigree.individuals[nid - 1];
-      if (assigned.has(individual.id)) continue;         // skip duplicate slots
-
-      if (generationCounters[level] === undefined) generationCounters[level] = 1;
-      const num = generationCounters[level]++;
-      assigned.set(individual.id, `${toRoman(level + 1)}-${num}`);
-    }
-  }
-  return assigned;
-}
 
 function ageBucket(dob: string, referenceDate = new Date()): string {
   const birth = new Date(dob);
@@ -48,14 +20,17 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
-  const result = alignPedigreeByFamily(pedigree);
-  const notations = buildNotationMap(pedigree, result);
+  // The pedigree numbers (#8), so a de-identified figure reads like the
+  // numbered one.
+  const notations = pedigreeNumbers(pedigree);
 
   // The chart title and the free-text age (#20) can name or date someone, so
   // both go; age ranges come from the DOB only.
   return asDrawn({
     ...pedigree,
     chartTitle: "",
+    // The names are the numbers now: drawing them again would repeat them.
+    ...(pedigree.canvasSettings ? { canvasSettings: { ...pedigree.canvasSettings, showNumbers: false } } : {}),
     individuals: pedigree.individuals.map(ind => ({
       ...ind,
       name:  notations.get(ind.id) ?? ind.id,
