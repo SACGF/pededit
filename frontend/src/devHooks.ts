@@ -9,6 +9,7 @@
  *   __pededit.usePedigreeStore.getState().past.length
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
+ *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
  *   __pededit.align().pos      // raw kinship2 LayoutResult
  *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
  */
@@ -17,6 +18,8 @@ import { useAppStore } from "./store/useAppStore";
 import { layoutToFlow } from "./pedigree/layoutToFlow";
 import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
 import { lintFlow } from "./pedigree/renderLint";
+import { lintExport } from "./io/svg/exportLint";
+import type { SvgExportOptions } from "./io/svg/types";
 import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import { importPed, exportPed } from "./io/ped";
 import { importJson, exportJson } from "./io/json";
@@ -60,6 +63,12 @@ const hooks = {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
     return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }));
   },
+  /**
+   * Export lint (io/svg/exportLint.ts): what the standard SVG export (and so
+   * PNG and PDF) draws, checked the same way. [] means clean.
+   */
+  checkExport: (pedigree?: Pedigree, options?: SvgExportOptions) =>
+    lintExport(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),
 };

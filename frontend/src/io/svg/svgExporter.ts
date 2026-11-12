@@ -179,7 +179,7 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
       if (partnership && childless) {
         const cx = (left.x + right.x) / 2;
         const topY = (left.y + right.y) / 2 - hop + (consang ? CONSANG_GAP / 2 : 0);
-        for (const [x1, y1, x2, y2] of childlessMarkSegments(cx, topY, childless)) lines.push(seg(x1, y1, x2, y2));
+        for (const [x1, y1, x2, y2] of childlessMarkSegments(cx, topY, childless)) lines.push(seg(x1, y1, x2, y2, false, true));
         if (partnership.childlessReason) {
           lines.push(`<text x="${cx}" y="${childlessReasonBaselineY(topY)}" text-anchor="middle" font-family="sans-serif" font-size="${CHILDLESS_REASON_FONT_SIZE}" fill="black">${escapeXml(partnership.childlessReason)}</text>`);
         }
@@ -191,9 +191,13 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
 
 // ── Sibship lines ─────────────────────────────────────────────────────────────
 
-function seg(x1: number, y1: number, x2: number, y2: number, dashed = false): string {
+/**
+ * A straight line. `mark` tags a childless or twin mark, which is not a line
+ * joining people, so the export lint (exportLint.ts) leaves it out.
+ */
+function seg(x1: number, y1: number, x2: number, y2: number, dashed = false, mark = false): string {
   const dash = dashed ? ` stroke-dasharray="${ADOPTION_DASH}"` : "";
-  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"${dash}/>`;
+  return `<line${mark ? ` class="mark"` : ""} x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"${dash}/>`;
 }
 
 /** Brackets round an adopted individual's symbol, centred on the origin. Shared with the U-shape exporter. */
@@ -245,7 +249,7 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
     for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
     for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
     for (const m of twinForkMarks(coupleY, children, offsets[i])) {
-      if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3]));
+      if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3], false, true));
       else lines.push(`<text x="${m.x}" y="${m.y + TWIN_QUESTION_FONT_SIZE * 0.35}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
     }
   });
@@ -490,11 +494,13 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
   const partners = buildPartnerSetFromPedigree(working);
-  lines.push(...renderCoupleLines(working, result, partners, slotPos));
-  lines.push(...renderSibshipLines(working, result, partners, slotPos));
-  lines.push(...renderDuplicateArcs(flow, slotPos));
-  lines.push(...renderSymbols(working, result, slotPos, flow));
-  lines.push(...renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));
+  // The group classes are what the export lint (exportLint.ts) reads.
+  const group = (cls: string, body: string[]) => lines.push(`<g class="${cls}">`, ...body, `</g>`);
+  group("couple-lines", renderCoupleLines(working, result, partners, slotPos));
+  group("sibship-lines", renderSibshipLines(working, result, partners, slotPos));
+  group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
+  group("symbols", renderSymbols(working, result, slotPos, flow));
+  group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;
