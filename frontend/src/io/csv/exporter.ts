@@ -1,8 +1,9 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { twinMembership, twinSetOf } from "../../pedigree/twins";
+import { onsetsOf, onsetSubject } from "../../pedigree/onset";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -41,6 +42,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.adopted ?? "",
       twins.get(ind.id)?.zygosity ?? "",
       twins.has(ind.id) ? (twinSetOf(pedigree, ind.id)?.set.members ?? []).filter(m => m !== ind.id).join(";") : "",
+      // Age of onset (#93): "Affected: 45y;Breast cancer: 52y"
+      onsetsOf(ind, pedigree).map(o => `${onsetSubject(o)}: ${o.onset}`).join(";"),
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

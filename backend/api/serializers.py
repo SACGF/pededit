@@ -57,6 +57,11 @@ class IndividualSerializer(serializers.Serializer):
     lifeStatus = _opt(serializers.ChoiceField, choices=LIFE_STATUS_CHOICES)
     adopted = _opt(serializers.ChoiceField, choices=["in", "out"])
     tags = _opt(serializers.ListField, child=serializers.CharField())
+    onset = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    tagOnset = _opt(
+        serializers.DictField,
+        child=serializers.CharField(allow_blank=True, trim_whitespace=False),
+    )
 
 
 class TagSerializer(serializers.Serializer):

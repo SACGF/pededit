@@ -118,6 +118,15 @@ draws NSGC symbols.
   so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
   way to show it.
 
+- `onset.ts` — age of onset (#93): `Individual.onset` for the affected
+  status and `Individual.tagOnset` per quadrant tag, both free text since
+  onset is often known only as "40s" or "childhood". `onsetsOf` is the one
+  reader and skips values that no longer apply (not affected, tag not
+  carried, not a quadrant tag), so the panel, canvas and exports agree. The
+  store also deletes them when the tag is untagged or deleted, or the
+  person is set unaffected. Edited in the panel next to "Affected" and
+  under each ticked quadrant tag row of the legend.
+
 - `parents.ts` and `PickingBanner.tsx` — linking a child to existing
   parents (#36). The store's `picking` state turns node clicks into picks
   (`PedigreeSymbolNode` calls `pickIndividual` first and only selects when

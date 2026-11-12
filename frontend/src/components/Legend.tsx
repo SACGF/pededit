@@ -12,6 +12,8 @@ import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { tagTakesOnset } from "@/pedigree/onset";
 import { Tags } from "lucide-react";
 
 /**
@@ -240,10 +242,12 @@ interface LegendProps {
   /** When set, the tag rows are checkboxes that tag or untag this person. */
   individual?: Individual;
   onToggleTag?: (tagId: string, on: boolean) => void;
+  /** Age of onset for a condition tag the person carries (#93). */
+  onSetTagOnset?: (tagId: string, value: string) => void;
   onManageTags?: () => void;
 }
 
-export function Legend({ pedigree, individual, onToggleTag, onManageTags }: LegendProps) {
+export function Legend({ pedigree, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
   const { individuals, partnerships } = pedigree;
 
   const hasMale    = individuals.some(i => i.sex === "male");
@@ -336,16 +340,30 @@ export function Legend({ pedigree, individual, onToggleTag, onManageTags }: Lege
               if (individual && onToggleTag) {
                 const on = individual.tags?.includes(tag.id) ?? false;
                 return (
-                  <label key={tag.id} className="flex items-center gap-1.5 cursor-pointer min-w-0">
-                    <input
-                      type="checkbox"
-                      checked={on}
-                      onChange={e => onToggleTag(tag.id, e.target.checked)}
-                      className="accent-black shrink-0"
-                    />
-                    {swatch}
-                    {text}
-                  </label>
+                  <div key={tag.id}>
+                    <label className="flex items-center gap-1.5 cursor-pointer min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={e => onToggleTag(tag.id, e.target.checked)}
+                        className="accent-black shrink-0"
+                      />
+                      {swatch}
+                      {text}
+                    </label>
+                    {on && onSetTagOnset && tagTakesOnset(tag) && (
+                      <div className="flex items-center gap-2 pl-5 pb-1 text-xs text-gray-600">
+                        <span className="shrink-0">Age of onset</span>
+                        <Input
+                          value={individual.tagOnset?.[tag.id] ?? ""}
+                          aria-label={`Age of onset of ${tag.label}`}
+                          onChange={e => onSetTagOnset(tag.id, e.target.value)}
+                          className="h-6 text-xs"
+                          placeholder="e.g. 45y"
+                        />
+                      </div>
+                    )}
+                  </div>
                 );
               }
               return (

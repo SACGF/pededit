@@ -72,7 +72,13 @@
         "age": { "type": "string", "description": "The individual's age as free text, e.g. \"50s\" or \"d. 72\", shown under the symbol in place of the DOB. Not an age of onset." },
         "notes": { "type": "string" },
         "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },
-        "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." }
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." },
+        "onset": { "type": "string", "description": "Age of onset of the affected status, free text such as \"45y\" or \"40s\". Used only while affected is true." },
+        "tagOnset": {
+          "type": "object",
+          "description": "Age of onset per condition: id of a quadrant tag this individual carries, to free text as for onset.",
+          "additionalProperties": { "type": "string" }
+        }
       },
       "additionalProperties": true
     },

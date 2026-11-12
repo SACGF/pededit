@@ -37,6 +37,16 @@ export interface Individual {
   lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
   adopted?: Adoption;    // brackets round the symbol; "in" also dashes the line from the parents
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
+  /**
+   * Age of onset of the affected status (#93), free text such as "45y",
+   * "40s" or "childhood". Used only while `affected` is true.
+   */
+  onset?: string;
+  /**
+   * Age of onset per condition (#93): Tag.id of a quadrant tag this
+   * individual carries, to free text as for `onset`.
+   */
+  tagOnset?: Record<string, string>;
 }
 
 /**

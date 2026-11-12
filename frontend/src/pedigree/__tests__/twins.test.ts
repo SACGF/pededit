@@ -91,7 +91,7 @@ describe("twins on the canvas and in exports (#11)", () => {
 
   it("CSV carries zygosity and co-twin ids", () => {
     const line = exportCsv(pedigree()).split("\n").find(l => l.includes('"a"'))!;
-    expect(line).toMatch(/"monozygotic","b"$/);
+    expect(line).toMatch(/"monozygotic","b",/);
   });
 
   it("JSON round trip keeps the sets and drops a set naming a non-child with a warning", () => {

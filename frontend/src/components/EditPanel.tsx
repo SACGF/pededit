@@ -22,7 +22,7 @@ interface EditPanelProps {
  * person's tag checkboxes (#75).
  */
 export function EditPanel({ onManageTags }: EditPanelProps) {
-  const { pedigree, selectedId, setIndividualTag } = usePedigreeStore();
+  const { pedigree, selectedId, setIndividualTag, setOnset } = usePedigreeStore();
   const individual = pedigree.individuals.find(i => i.id === selectedId);
 
   return (
@@ -40,6 +40,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
           pedigree={pedigree}
           individual={individual}
           onToggleTag={individual ? (tagId, on) => setIndividualTag(individual.id, tagId, on) : undefined}
+          onSetTagOnset={individual ? (tagId, value) => setOnset(individual.id, tagId, value) : undefined}
           onManageTags={onManageTags}
         />
       </div>
@@ -48,7 +49,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setCarrier, setLifeStatus, setAdopted } = usePedigreeStore();
+  const { pedigree, updateIndividual, setCarrier, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
@@ -140,6 +141,18 @@ function IndividualForm({ individual }: { individual: Individual }) {
         <div className="text-xs text-gray-600 space-y-1">
           <div>Sex: <span className="font-medium">{individual.sex}</span></div>
           <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
+          {individual.affected && (
+            <div className="flex items-center gap-2 pl-5">
+              <span className="shrink-0">Age of onset</span>
+              <Input
+                value={individual.onset ?? ""}
+                aria-label="Age of onset"
+                onChange={e => setOnset(individual.id, null, e.target.value)}
+                className="h-6 text-xs"
+                placeholder="e.g. 45y, 40s, childhood"
+              />
+            </div>
+          )}
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"

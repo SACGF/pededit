@@ -161,6 +161,13 @@ function removeFromTwinSets(draft: Pedigree, individualId: string): void {
   }
 }
 
+/** Drop an individual's age of onset for one tag (#93), and the map when it empties. */
+function removeTagOnset(ind: Individual, tagId: string): void {
+  if (!ind.tagOnset || !(tagId in ind.tagOnset)) return;
+  delete ind.tagOnset[tagId];
+  if (Object.keys(ind.tagOnset).length === 0) delete ind.tagOnset;
+}
+
 /** A child contradicts a childless mark, so adding one removes the mark (#15). */
 function clearChildless(draft: Pedigree, partnershipId: string): void {
   const p = draft.partnerships.find(x => x.id === partnershipId);
@@ -370,6 +377,11 @@ interface PedigreeState {
   deleteTag: (id: string) => void;
   moveTag: (id: string, direction: -1 | 1) => void;
   setIndividualTag: (individualId: string, tagId: string, on: boolean) => void;
+  /**
+   * Age of onset (#93) of the affected status (tagId null) or of a condition
+   * tag. An empty or blank value removes it.
+   */
+  setOnset: (individualId: string, tagId: string | null, value: string) => void;
 }
 
 // ── Store implementation ───────────────────────────────────────────────────────
@@ -901,7 +913,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setAffected: (id, affected) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (ind) ind.affected = affected;
+        if (!ind) return;
+        ind.affected = affected;
+        // Onset belongs to the affected status (#93).
+        if (!affected) delete ind.onset;
       });
     },
 
@@ -1161,6 +1176,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         draft.tags = draft.tags.filter(t => t.id !== id);
         if (draft.tags.length === 0) delete draft.tags;
         for (const ind of draft.individuals) {
+          removeTagOnset(ind, id);
           if (!ind.tags?.includes(id)) continue;
           ind.tags = ind.tags.filter(t => t !== id);
           if (ind.tags.length === 0) delete ind.tags;
@@ -1194,6 +1210,22 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         } else if (!on && has) {
           ind.tags = ind.tags!.filter(t => t !== tagId);
           if (ind.tags.length === 0) delete ind.tags;
+          removeTagOnset(ind, tagId);
+        }
+      });
+    },
+
+    setOnset: (individualId, tagId, value) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === individualId);
+        if (!ind) return;
+        const keep = value.trim() !== "";
+        if (tagId === null) {
+          if (keep) ind.onset = value; else delete ind.onset;
+        } else if (keep) {
+          ind.tagOnset = { ...(ind.tagOnset ?? {}), [tagId]: value };
+        } else {
+          removeTagOnset(ind, tagId);
         }
       });
     },

@@ -70,7 +70,7 @@ describe("adoption brackets (#12)", () => {
     const csv = exportCsv(pedigree());
     expect(csv.split("\n")[0]).toContain(",adopted");
     expect(csv).toContain('"ain",');
-    expect(csv.split("\n").find(l => l.includes('"ain"'))).toMatch(/"in","",""$/);
+    expect(csv.split("\n").find(l => l.includes('"ain"'))).toMatch(/"in","","",/);
   });
 });
 

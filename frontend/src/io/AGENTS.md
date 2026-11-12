@@ -141,3 +141,6 @@ helpers, not tests.
 ## csv/ — tabular export
 
 `exporter.ts` writes one row per individual with relationships and tags.
+The last column, `onset` (#93), lists ages of onset as
+`Affected: 40s;Breast cancer: 45y` (tag labels, from `onsetsOf`). Tests
+should not anchor on the line end, so a new column can go last.
