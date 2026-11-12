@@ -206,10 +206,15 @@ export async function newContext(browser, { asAgent = false, viewport, deviceSca
     });
     // Once per tab (sessionStorage survives reloads), so a value the app
     // writes during the run is not put back by a --reload.
+    // Storage throws on opaque-origin documents (about:blank and the like,
+    // seen with --fixture-via-api), so skip those instead of reporting it
+    // as the app's uncaught error.
     await context.addInitScript(pairs => {
-      if (sessionStorage.getItem("__pededit_seeded")) return;
-      for (const [k, v] of pairs) localStorage.setItem(k, v);
-      sessionStorage.setItem("__pededit_seeded", "1");
+      try {
+        if (sessionStorage.getItem("__pededit_seeded")) return;
+        for (const [k, v] of pairs) localStorage.setItem(k, v);
+        sessionStorage.setItem("__pededit_seeded", "1");
+      } catch { /* no storage in this document */ }
     }, pairs);
   }
   if (asAgent) {
