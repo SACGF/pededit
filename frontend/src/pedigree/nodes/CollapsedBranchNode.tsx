@@ -10,10 +10,11 @@ import { branchCountFontSize, branchTooltip } from "../collapse";
 export type CollapsedBranchNodeType = Node<RFNodeData, "collapsedBranch">;
 
 /**
- * A collapsed branch (#1): the diamond standing for everyone hidden under a
- * couple, with their number inside and the affected count below. Clicking it
- * shows the branch again. It is no one in the pedigree, so it has no hover
- * pill, menu, selection or drag.
+ * A collapsed branch (#1): the symbol standing for a collapsed couple's
+ * unaffected children, with their number inside (NSGC: a diamond, or a
+ * square or circle when they share a sex). Affected children are drawn
+ * beside it as themselves. Clicking it shows the branch again. It is no one
+ * in the pedigree, so it has no hover pill, menu, selection or drag.
  */
 export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>) {
   const { individual, branch } = data;
@@ -21,7 +22,7 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
   const setDescendantsHidden = usePedigreeStore(s => s.setDescendantsHidden);
   const picking = usePedigreeStore(s => s.picking);
   if (!branch) return null;
-  const n = branch.hidden.size;
+  const n = branch.children.length;
   const fs = branchCountFontSize(n, NODE_SIZE);
 
   return (

@@ -150,7 +150,7 @@ describe("drawing with hidden descendants (#94)", () => {
     for (const p of [plain({ son: true }), plain({ dau: true }), plain({ gm: true })]) {
       const svg = exportSvg(p);
       expect(svg.match(/class="branch-count"/g)).toHaveLength(1);
-      expect(svg).toContain("Descendants not shown");
+      expect(svg).toContain("descendants not shown");
       expect(lintExport(p)).toEqual([]);
       expect(lintExport(p, { deidentify: true })).toEqual([]);
     }
@@ -173,8 +173,9 @@ describe("drawing with hidden descendants (#94)", () => {
     expect(d.individuals.filter(i => i.name?.startsWith("II-")).map(i => i.id)).toEqual(["cousin"]);
     expect(collapseInfo(d).placeholders.get(diamond.id)!.hidden.size).toBe(6);
     const svg = exportSvg(pedigree({ gm: true }), { deidentify: true });
-    expect(svg).toMatch(/class="branch-count"[^>]*>6</);
-    expect(svg).toContain(">1 affected<");
+    // The number of siblings grouped (son and dau), not of everyone hidden.
+    expect(svg).toMatch(/class="branch-count"[^>]*>2</);
+    expect(svg).not.toContain(" affected<");
   });
 });
 
@@ -224,8 +225,9 @@ describe("collapsed branch diamond (#1)", () => {
     expect(b.roots).toEqual(["gm"]);
     expect(b.partnershipId).toBe("g");
     expect(sorted(b.hidden)).toEqual(["dau", "gc1", "gc2", "gc3", "son", "wife"]);
-    expect([b.male, b.female, b.unknownSex, b.affected]).toEqual([2, 3, 1, 1]);
-    expect(branchTooltip(b)).toBe("6 people not shown (2 male, 3 female, 1 unknown sex, 1 affected). Click to show.");
+    expect(b.children).toEqual(["son", "dau"]);
+    expect([b.male, b.female, b.unknownSex, b.affected]).toEqual([1, 1, 0, 1]);
+    expect(branchTooltip(b)).toBe("2 unaffected children (1 male, 1 female). 6 people not shown in all, 1 of them affected. Click to show.");
     const diamond = drawn.individuals.find(i => i.id === branchPlaceholderId("g"))!;
     expect(diamond).toEqual({ id: branchPlaceholderId("g"), sex: "unknown", affected: false, sibOrder: 0 });
   });
@@ -250,8 +252,10 @@ describe("collapsed branch diamond (#1)", () => {
     p.individuals.find(i => i.id === "son")!.descendantsHidden = true;
     const { placeholders, branches } = collapseInfo(p);
     expect(placeholders.get(branchPlaceholderId("sw"))!.hidden.size).toBe(2);
-    expect(placeholders.get(branchPlaceholderId("sw2"))!.affected).toBe(1);
-    expect(branches.get("son")!.size).toBe(3);
+    // gc5 is affected: drawn as himself, so sw2 has no group symbol.
+    expect(placeholders.has(branchPlaceholderId("sw2"))).toBe(false);
+    expect(drawnPedigree(p).parentOf.sw2).toEqual(["gc5"]);
+    expect(branches.get("son")!.size).toBe(2);
     expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
   });
 
@@ -291,8 +295,118 @@ describe("collapsed branch diamond (#1)", () => {
   });
 
   it("the export key has a diamond row only while a branch is collapsed", () => {
-    expect(renderExportKeySvg(pedigree({ son: true }), 0, 0).markup.join("")).toContain("Descendants not shown");
-    expect(renderExportKeySvg(pedigree({ loner: true }), 0, 0).markup.join("")).not.toContain("Descendants not shown");
+    expect(renderExportKeySvg(pedigree({ son: true }), 0, 0).markup.join("")).toContain("descendants not shown");
+    expect(renderExportKeySvg(pedigree({ loner: true }), 0, 0).markup.join("")).not.toContain("descendants not shown");
+  });
+});
+
+/**
+ *   p1 = p2                      p1 collapsed
+ *   ├ a, b, e  unaffected        grouped into one symbol
+ *   ├ c        affected = h      drawn as herself; h (married in) and k hidden
+ *   │            └ k
+ *   └ d        condition tag     drawn as herself
+ */
+function sibship(sexOfE: "male" | "female" = "female"): Pedigree {
+  return {
+    individuals: [
+      { id: "p1", sex: "male", affected: false, sibOrder: 0, descendantsHidden: true },
+      { id: "p2", sex: "female", affected: false, sibOrder: 1 },
+      { id: "a", sex: "male", affected: false, sibOrder: 0 },
+      { id: "b", sex: "male", affected: false, sibOrder: 1 },
+      { id: "c", sex: "female", affected: true, sibOrder: 2, deceased: true },
+      { id: "d", sex: "female", affected: false, sibOrder: 3, tags: ["t1"] },
+      { id: "e", sex: sexOfE, affected: false, sibOrder: 4 },
+      { id: "h", sex: "male", affected: false, sibOrder: 5 },
+      { id: "k", sex: "male", affected: true, sibOrder: 0 },
+    ],
+    partnerships: [
+      { id: "pp", individual1: "p1", individual2: "p2" },
+      { id: "ch", individual1: "c", individual2: "h" },
+    ],
+    parentOf: { pp: ["a", "b", "c", "d", "e"], ch: ["k"] },
+    siblingOrder: { mode: "insertion", affectedFirst: false },
+    tags: [{ id: "t1", label: "Cancer", color: "#d62728", style: "quadrant" }],
+  };
+}
+
+describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
+  it("groups only the unaffected children; affected and tagged ones are drawn as themselves", () => {
+    const p = sibship();
+    const { drawn, hidden, placeholders } = collapseInfo(p);
+    expect(sorted(hidden)).toEqual(["a", "b", "e", "h", "k"]);
+    expect(ids(drawn)).toEqual(sorted(["p1", "p2", "c", "d", branchPlaceholderId("pp")]));
+    const b = placeholders.get(branchPlaceholderId("pp"))!;
+    expect(b.children).toEqual(["a", "b", "e"]);
+    expect(sorted(b.hidden)).toEqual(["a", "b", "e", "h", "k"]);
+    expect(b.affected).toBe(1);
+    expect(branchTooltip(b)).toBe("3 unaffected children (2 male, 1 female). 5 people not shown in all, 1 of them affected. Click to show.");
+    // Mixed sex: a diamond. The affected child keeps her own symbol state.
+    expect(drawn.individuals.find(i => i.id === branchPlaceholderId("pp"))!.sex).toBe("unknown");
+    expect(drawn.individuals.find(i => i.id === "c")).toEqual(p.individuals.find(i => i.id === "c"));
+    // Her partner and child are hidden, and so is the partnership.
+    expect(drawn.partnerships.map(q => q.id)).toEqual(["pp"]);
+    expect(drawn.parentOf.ch).toBeUndefined();
+  });
+
+  it("draws a square or circle with the number when the grouped children share a sex", () => {
+    const { drawn } = collapseInfo(sibship("male"));
+    expect(drawn.individuals.find(i => i.id === branchPlaceholderId("pp"))!.sex).toBe("male");
+  });
+
+  it("draws no group symbol when every child is drawn as themselves", () => {
+    const p = sibship();
+    p.parentOf.pp = ["c", "d"];
+    p.individuals = p.individuals.filter(i => !["a", "b", "e"].includes(i.id));
+    const { drawn, placeholders, hidden } = collapseInfo(p);
+    expect(placeholders.size).toBe(0);
+    expect(sorted(hidden)).toEqual(["h", "k"]);
+    expect(drawn.parentOf.pp).toEqual(["c", "d"]);
+    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+  });
+
+  it("lays the symbol out on the sibship line in the first grouped child's birth order place", () => {
+    const p = sibship();
+    p.individuals.find(i => i.id === "a")!.sibOrder = 9; // b is now the first grouped child
+    p.individuals.find(i => i.id === "b")!.sibOrder = 3;
+    p.individuals.find(i => i.id === "d")!.sibOrder = 1;
+    const flow = layoutToFlow(p);
+    const x = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const sym = branchPlaceholderId("pp");
+    // c (2) and d (1) come before b (3), so the group symbol is last.
+    expect(x("d")).toBeLessThan(x("c"));
+    expect(x("c")).toBeLessThan(x(sym));
+    const sib = flow.sibshipEdges.find(e => e.data!.childIds.length === 3)!;
+    expect(sib).toBeDefined();
+    expect(lintFlow(p, flow)).toEqual([]);
+    const node = flow.nodes.find(n => n.data.individual.id === sym)!;
+    expect(node.type).toBe("collapsedBranch");
+    expect(node.data.detailLines).toEqual([]);
+  });
+
+  it("numbers the drawn affected children and skips the group symbol (#8)", () => {
+    // The group symbol is first (a, sibOrder 0), and takes no number.
+    const numbers = pedigreeNumbers(sibship());
+    expect(numbers.has(branchPlaceholderId("pp"))).toBe(false);
+    expect([...numbers].filter(([, n]) => n.startsWith("II-")).map(([id, n]) => `${id}:${n}`).sort())
+      .toEqual(["c:II-1", "d:II-2"]);
+  });
+
+  it("exports the number of grouped siblings, the affected child, and lints clean", () => {
+    const p = sibship();
+    const svg = exportSvg(p);
+    expect(svg).toMatch(/class="branch-count"[^>]*>3</);
+    // p1, p2, the group symbol, c and d.
+    expect(parseExportSvg(svg).symbols).toHaveLength(5);
+    expect(lintExport(p)).toEqual([]);
+    expect(lintExport(p, { deidentify: true })).toEqual([]);
+  });
+
+  it("shows the branch again when an edit would hide a drawn affected child", () => {
+    const before = sibship();
+    const after = sibship();
+    after.individuals.find(i => i.id === "c")!.affected = false;
+    expect(rootsHidingNew(before, after)).toEqual(["p1"]);
   });
 });
 

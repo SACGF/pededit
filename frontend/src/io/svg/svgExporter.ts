@@ -430,7 +430,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       if (ind.proband)  elems.push(renderProbandArrow());
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
       const branch = branchOf(pedigree, ind.id);
-      if (branch) elems.push(renderBranchCountSvg(branch.hidden.size, NODE_SIZE)); // collapsed branch (#1)
+      if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)
       elems.push(`</g>`);
     }
   }

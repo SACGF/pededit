@@ -13,7 +13,7 @@
 import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
 import { onsetsOf } from "./onset";
 import { tagCanvasText } from "./tags";
-import { branchOf, branchNote } from "./collapse";
+import { branchOf } from "./collapse";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -111,9 +111,8 @@ export function linesWidth(lines: string[]): number {
  *   4. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
- * A collapsed-branch diamond (#1) has instead its affected count, when any
- * of its people are affected. Shared by the canvas, both SVG exporters and
- * the lints through `detailLines`.
+ * A collapsed-branch group symbol (#1) has none. Shared by the canvas, both
+ * SVG exporters and the lints through `detailLines`.
  */
 export interface DetailSections {
   age: string[];
@@ -124,7 +123,7 @@ export interface DetailSections {
 export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
   const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
   const branch = branchOf(pedigree, ind.id);
-  if (branch) return { age: wrapLabel(branchNote(branch), maxWidth, 1), onset: [], number };
+  if (branch) return { age: [], onset: [], number };
   return {
     age: wrapLabel(ageText(ind), maxWidth, 1),
     onset: onsetLines(ind, pedigree, maxWidth),

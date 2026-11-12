@@ -29,13 +29,16 @@ import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } 
  * drawn collapsed person above them. A flag on someone with no descendants
  * hides nothing and is dropped from the drawn copy.
  *
- * The hidden people are drawn as one diamond per couple (#1), the NSGC
- * symbol for several people of unspecified sex with their number inside: the
- * drawn copy gets a stand-in child (`branchPlaceholderId`) under each drawn
- * partnership of a collapsed person whose children were all hidden. Being an
- * ordinary child of the couple, it is laid out, joined by the sibship line
- * and drawn by every renderer like anyone else; `CollapseInfo.placeholders`
- * carries what it stands for. It is never in the stored pedigree.
+ * A collapsed couple's children are drawn as NSGC 2008 Fig. 1 has it (#1):
+ * a number inside a symbol means that many siblings, and affected people are
+ * not grouped. Each child who is affected, or carries a condition tag (a
+ * quadrant fill), stays drawn as themselves (`shown`), with their own
+ * partners and descendants hidden. The other children are drawn as one
+ * stand-in child (`branchPlaceholderId`) with their number inside: a square
+ * or circle when they all share a sex, a diamond otherwise. Being an ordinary
+ * child of the couple, it is laid out, joined by the sibship line and drawn
+ * by every renderer like anyone else; `CollapseInfo.placeholders` carries
+ * what it stands for. It is never in the stored pedigree.
  */
 
 export interface CollapseInfo {
@@ -46,23 +49,30 @@ export interface CollapseInfo {
   /**
    * For each drawn collapsed person, the hidden people under them: their
    * hidden descendants and the hidden partners of those. Someone below two
-   * collapsed people (descendants who intermarry) is listed under both. For
-   * a branch drawn as one node with a count (#1), this is the count.
+   * collapsed people (descendants who intermarry) is listed under both.
    */
   branches: Map<string, Set<string>>;
-  /** The diamonds standing for hidden people (#1), by placeholder id. Their individuals are in `drawn`. */
+  /** The group symbols standing for hidden siblings (#1), by placeholder id. Their individuals are in `drawn`. */
   placeholders: Map<string, CollapsedBranch>;
 }
 
-/** What one collapsed-branch diamond stands for (#1). */
+/** What one collapsed-branch group symbol stands for (#1). */
 export interface CollapsedBranch {
   /** The collapsed partner (or both partners) whose flag hides these people; expanding clears it. */
   roots: string[];
-  /** The drawn partnership the diamond hangs from. */
+  /** The drawn partnership the symbol hangs from. */
   partnershipId: string;
-  /** The hidden people under this partnership: its children, their descendants and the hidden partners of those. */
+  /** The couple's children the symbol groups: the number inside it. */
+  children: string[];
+  /**
+   * Everyone hidden under this partnership: the grouped children, the
+   * descendants of all its children (drawn affected ones included) and the
+   * hidden partners of those.
+   */
   hidden: Set<string>;
+  /** Affected people among `hidden` (grandchildren and below; the grouped children are unaffected). */
   affected: number;
+  /** Sex breakdown of the grouped children. */
   male: number;
   female: number;
   unknownSex: number;
@@ -70,7 +80,7 @@ export interface CollapsedBranch {
 
 const PLACEHOLDER_PREFIX = "collapsed-branch:";
 
-/** Id of the diamond under partnership `partnershipId` in the drawn pedigree. */
+/** Id of the group symbol under partnership `partnershipId` in the drawn pedigree. */
 export function branchPlaceholderId(partnershipId: string): string {
   return PLACEHOLDER_PREFIX + partnershipId;
 }
@@ -85,7 +95,27 @@ export function branchOf(drawn: Pedigree, id: string): CollapsedBranch | undefin
   return isBranchPlaceholderId(id) ? collapseInfo(drawn).placeholders.get(id) : undefined;
 }
 
+/**
+ * True when a child of a collapsed couple is drawn as themselves rather than
+ * counted in the group symbol: affected, or carrying a condition tag (a
+ * quadrant fill). NSGC: affected people are not grouped.
+ */
+export function drawnIndividually(individual: Individual, pedigree: Pedigree): boolean {
+  if (individual.affected) return true;
+  const conditions = new Set((pedigree.tags ?? []).filter(t => t.style === "quadrant").map(t => t.id));
+  return (individual.tags ?? []).some(t => conditions.has(t));
+}
+
 const cache = new WeakMap<Pedigree, CollapseInfo>();
+
+function partnersOf(pedigree: Pedigree, id: string): string[] {
+  const out: string[] = [];
+  for (const p of pedigree.partnerships) {
+    if (p.individual1 === id) out.push(p.individual2);
+    else if (p.individual2 === id) out.push(p.individual1);
+  }
+  return out;
+}
 
 /** Who is drawn and who is hidden (see the module comment). Cached per pedigree object. */
 export function collapseInfo(pedigree: Pedigree): CollapseInfo {
@@ -96,16 +126,26 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
 
   // One root at a time: descendantsOf leaves out the ids it starts from, and
   // a collapsed person below another one is hidden too.
-  const hidden = withMarriedInPartners(pedigree, roots.flatMap(r => [...descendantsOf(pedigree, [r])]));
+  const below = new Set(roots.flatMap(r => [...descendantsOf(pedigree, [r])]));
+  const drawnRoots = new Set(roots.filter(r => !below.has(r)));
+  // The couples whose children are collapsed: a drawn collapsed person and a
+  // partner who is drawn too (not below another collapsed person).
+  const couples = pedigree.partnerships.filter(p =>
+    (drawnRoots.has(p.individual1) || drawnRoots.has(p.individual2))
+    && !below.has(p.individual1) && !below.has(p.individual2)
+    && (pedigree.parentOf[p.id]?.length ?? 0) > 0);
+  const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
+  const shown = new Set<string>();
+  for (const p of couples) for (const c of pedigree.parentOf[p.id]!) {
+    const child = byId.get(c);
+    if (child && drawnIndividually(child, pedigree)) shown.add(c);
+  }
+
+  const hidden = withMarriedInPartners(pedigree, below);
+  for (const id of shown) hidden.delete(id);
   const branches = new Map<string, Set<string>>();
-  for (const root of roots) {
-    if (hidden.has(root)) continue;
-    const below = [...descendantsOf(pedigree, [root])];
-    const branch = new Set(below);
-    for (const id of below) for (const p of pedigree.partnerships) {
-      const other = p.individual1 === id ? p.individual2 : p.individual2 === id ? p.individual1 : null;
-      if (other && hidden.has(other)) branch.add(other);
-    }
+  for (const root of drawnRoots) {
+    const branch = hiddenUnder(pedigree, descendantsOf(pedigree, [root]), hidden);
     if (branch.size > 0) branches.set(root, branch);
   }
 
@@ -118,6 +158,14 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
     ...(pedigree.pinnedPositions ? { pinnedPositions: { ...pedigree.pinnedPositions } } : {}),
   };
   removeIndividuals(drawn, hidden);
+  // A child drawn as themselves keeps none of their own partnerships: their
+  // partners and children are part of the hidden branch. A partner drawn
+  // elsewhere (a cousin) stays, without the couple line.
+  const cut = new Set(drawn.partnerships.filter(p => shown.has(p.individual1) || shown.has(p.individual2)).map(p => p.id));
+  if (cut.size > 0) {
+    drawn.partnerships = drawn.partnerships.filter(p => !cut.has(p.id));
+    for (const id of cut) delete drawn.parentOf[id];
+  }
   for (const p of drawn.partnerships) {
     // Children hidden, not absent: the couple is not childless.
     if ((pedigree.parentOf[p.id]?.length ?? 0) > 0 && (drawn.parentOf[p.id]?.length ?? 0) === 0) {
@@ -131,7 +179,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
     return rest as Individual;
   });
 
-  const placeholders = addPlaceholders(pedigree, drawn, hidden, branches);
+  const placeholders = addPlaceholders(pedigree, drawn, hidden, couples.filter(p => !cut.has(p.id)), drawnRoots);
 
   const info: CollapseInfo = { drawn, hidden, branches, placeholders };
   cache.set(pedigree, info);
@@ -141,44 +189,62 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   return info;
 }
 
+/** The hidden people among `people`, plus the hidden partners of any of `people`. */
+function hiddenUnder(pedigree: Pedigree, people: Iterable<string>, hidden: Set<string>): Set<string> {
+  const out = new Set<string>();
+  for (const id of people) {
+    if (hidden.has(id)) out.add(id);
+    for (const other of partnersOf(pedigree, id)) if (hidden.has(other)) out.add(other);
+  }
+  return out;
+}
+
 /**
- * Add a diamond child (#1) under each drawn partnership of a drawn collapsed
- * person that had children in the full pedigree. All of that couple's
- * children are hidden (they are the collapsed person's descendants), so the
- * diamond is the couple's only drawn child. A collapsed person whose every
- * partnership with children is gone from the drawing (their partner is
- * hidden under another collapsed person) gets no diamond: those people are
- * counted in that other person's diamond.
+ * Add a group symbol child (#1) under each collapsed couple that has
+ * children to group (those not drawn as themselves). The symbol takes the
+ * birth order (sibOrder and date of birth) of the first grouped child, so it
+ * sits among the drawn affected siblings where that child would. A couple
+ * whose children are all drawn as themselves gets no symbol. A collapsed
+ * person whose every partnership with children is gone from the drawing
+ * (their partner is hidden under another collapsed person) gets none either:
+ * those people are counted under that other person.
  */
 function addPlaceholders(
-  full: Pedigree, drawn: Pedigree, hidden: Set<string>, branches: Map<string, Set<string>>,
+  full: Pedigree, drawn: Pedigree, hidden: Set<string>, couples: Pedigree["partnerships"], drawnRoots: Set<string>,
 ): Map<string, CollapsedBranch> {
   const out = new Map<string, CollapsedBranch>();
   const byId = new Map(full.individuals.map(i => [i.id, i]));
   const added: Individual[] = [];
-  for (const p of drawn.partnerships) {
-    const roots = [p.individual1, p.individual2].filter(id => branches.has(id));
+  const { mode } = full.siblingOrder ?? { mode: "insertion" };
+  const orderKey = (i: Individual) => mode === "birthDate" && i.dob ? new Date(i.dob).getTime() : i.sibOrder;
+  for (const p of couples) {
+    if (!drawn.partnerships.some(q => q.id === p.id)) continue;
     const children = full.parentOf[p.id] ?? [];
-    if (roots.length === 0 || children.length === 0 || (drawn.parentOf[p.id]?.length ?? 0) > 0) continue;
-    const below = new Set([...children, ...descendantsOf(full, children)]);
-    const set = new Set(below);
-    for (const id of below) for (const q of full.partnerships) {
-      const other = q.individual1 === id ? q.individual2 : q.individual2 === id ? q.individual1 : null;
-      if (other && hidden.has(other)) set.add(other);
-    }
+    const kept = new Set(drawn.parentOf[p.id] ?? []);
+    const grouped = children.filter(c => !kept.has(c)).map(c => byId.get(c)!).filter(Boolean);
+    if (grouped.length === 0) continue;
+    const set = hiddenUnder(full, [...children, ...descendantsOf(full, children)], hidden);
     const people = [...set].map(id => byId.get(id)!).filter(Boolean);
+    const sexes = new Set(grouped.map(i => i.sex));
+    const sex = sexes.size === 1 ? grouped[0]!.sex : "unknown";
+    const first = [...grouped].sort((a, b) => orderKey(a) - orderKey(b))[0]!;
     const id = branchPlaceholderId(p.id);
     out.set(id, {
-      roots,
+      roots: [p.individual1, p.individual2].filter(r => drawnRoots.has(r)),
       partnershipId: p.id,
+      children: grouped.map(i => i.id),
       hidden: set,
       affected: people.filter(i => i.affected).length,
-      male: people.filter(i => i.sex === "male").length,
-      female: people.filter(i => i.sex === "female").length,
-      unknownSex: people.filter(i => i.sex === "unknown").length,
+      male: grouped.filter(i => i.sex === "male").length,
+      female: grouped.filter(i => i.sex === "female").length,
+      unknownSex: grouped.filter(i => i.sex === "unknown").length,
     });
-    added.push({ id, sex: "unknown", affected: false, sibOrder: 0 });
-    drawn.parentOf[p.id] = [id];
+    added.push({ id, sex, affected: false, sibOrder: first.sibOrder, ...(first.dob ? { dob: first.dob } : {}) });
+    // In the first grouped child's place among the drawn siblings.
+    const at = children.indexOf(first.id);
+    const before = children.slice(0, at).filter(c => kept.has(c));
+    const after = children.slice(at).filter(c => kept.has(c));
+    drawn.parentOf[p.id] = [...before, id, ...after];
   }
   drawn.individuals = [...drawn.individuals, ...added];
   return out;
@@ -230,33 +296,32 @@ export function rootsHidingNew(before: Pedigree, after: Pedigree): string[] {
 
 // ── Diamond ───────────────────────────────────────────────────────────────────
 
-/** Legend wording for the collapsed-branch diamond. */
-export const COLLAPSED_BRANCH_LABEL = "Descendants not shown (number of people)";
+/** Legend wording for the collapsed-branch group symbol. */
+export const COLLAPSED_BRANCH_LABEL = "Unaffected siblings (number); descendants not shown";
 
-/** Font size of the count inside a diamond of `symbolSize`: smaller for three digits and more. */
+/** Font size of the count inside a group symbol of `symbolSize`: smaller for three digits and more. */
 export function branchCountFontSize(count: number, symbolSize: number): number {
   const digits = String(count).length;
   return Math.round(symbolSize * (digits >= 3 ? 0.26 : 0.34));
 }
 
-/** The note under a diamond: how many of the hidden people are affected. */
-export function branchNote(branch: CollapsedBranch): string | undefined {
-  return branch.affected > 0 ? `${branch.affected} affected` : undefined;
-}
-
-/** Hover text for a diamond on the canvas: count, sex breakdown, affected count. */
+/** Hover text for a group symbol on the canvas: the grouped children, then everyone hidden under the couple. */
 export function branchTooltip(branch: CollapsedBranch): string {
+  const k = branch.children.length;
   const n = branch.hidden.size;
   const parts = [
     branch.male && `${branch.male} male`,
     branch.female && `${branch.female} female`,
     branch.unknownSex && `${branch.unknownSex} unknown sex`,
   ].filter(Boolean).join(", ");
-  const affected = branch.affected > 0 ? `, ${branch.affected} affected` : "";
-  return `${n} ${n === 1 ? "person" : "people"} not shown (${parts}${affected}). Click to show.`;
+  const head = `${k} unaffected ${k === 1 ? "child" : "children"} (${parts})`;
+  const all = n > k
+    ? `. ${n} people not shown in all${branch.affected > 0 ? `, ${branch.affected} of them affected` : ""}`
+    : "";
+  return `${head}${all}. Click to show.`;
 }
 
-/** SVG text of the count centred on (cx, cy), the centre of a diamond of `symbolSize`. */
+/** SVG text of the count centred on (cx, cy), the centre of a group symbol of `symbolSize`. */
 export function renderBranchCountSvg(count: number, symbolSize: number, cx = 0, cy = 0): string {
   const fs = branchCountFontSize(count, symbolSize);
   // A baseline offset rather than dominant-baseline, which some rasterisers ignore.

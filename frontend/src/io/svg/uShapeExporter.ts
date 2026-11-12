@@ -1233,7 +1233,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         (ind.deceased ? renderDeceasedSlash() : "") +
         (ind.proband ? renderProbandArrow() : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
-        (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.hidden.size, NODE_SIZE)}</g>` : "") +
+        (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.children.length, NODE_SIZE)}</g>` : "") +
         `</g>`,
       );
     });

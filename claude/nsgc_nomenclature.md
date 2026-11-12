@@ -36,7 +36,7 @@ Section numbers refer to the 2008 figures.
 |---|---|
 | Square, circle, diamond. Diamond for sex not specified. Do not write age inside the symbol. | Follows. Symbols encode biological sex: see "Where we differ" below. |
 | Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3). |
-| **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Only used for collapsed branches (#1). See the gaps below. |
+| **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Follows, for collapsed branches (#1): a collapsed couple's unaffected children are one symbol with their number inside (square or circle when they share a sex, diamond otherwise), and affected or condition-tagged children are drawn as themselves beside it. |
 | Deceased: a slash through the symbol, extending past it. Do not use a cross. Cause of death below if known. | Follows. |
 | Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | **Gap:** the proband arrow has no "P". No consultand arrow. |
 | Stillbirth "SB" with gestational age; pregnancy "P" inside the symbol; miscarriage (SAB), termination (TOP) and ectopic (ECT) as small triangles. | Follows (#12 era work, `pedigree/lifeStatus.ts`). |
@@ -117,11 +117,8 @@ use for groups.
 
 ## Open gaps (November 2026)
 
-1. **Collapsed branch diamond (#1).** The number counts every hidden person,
-   including partners who married in and grandchildren, and affected people
-   are folded in with an "n affected" note. To follow the standard, the
-   diamond should count the couple's children only, and affected children
-   should be drawn as their own symbols beside it.
+1. **Collapsed branch symbol (#1).** Fixed: the number counts the couple's
+   unaffected children only, and affected children are drawn beside it.
 2. **Pedigree number placement (#8).** It should go on its own line below the
    age and evaluation text, not before the name.
 3. **Full date of birth on the canvas (#20).** Prefer year of birth or age.

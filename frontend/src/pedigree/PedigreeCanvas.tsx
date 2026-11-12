@@ -18,6 +18,7 @@ import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeSt
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
+import { branchCountFontSize } from "./collapse";
 import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
@@ -156,7 +157,7 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
         {/* Nodes, on top of the edges: the canvas symbols scaled down (#6) */}
         {nodes.map(node => {
           const { x, y } = node.position;
-          const { individual } = node.data as RFNodeData;
+          const { individual, branch } = node.data as RFNodeData;
           return (
             <g
               key={node.id}
@@ -171,11 +172,29 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
                 caption={false}
               />
               {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
+              {branch && <BranchCount count={branch.children.length} />}
             </g>
           );
         })}
       </svg>
     </Panel>
+  );
+}
+
+/** The number inside a collapsed-branch group symbol (#1), as on the canvas, for the minimap. */
+function BranchCount({ count }: { count: number }) {
+  const fs = branchCountFontSize(count, NODE_SIZE);
+  return (
+    <text
+      x={NODE_SIZE / 2}
+      y={NODE_SIZE / 2 + Math.round(fs * 0.36 * 10) / 10}
+      textAnchor="middle"
+      fontFamily="sans-serif"
+      fontSize={fs}
+      fill="black"
+    >
+      {count}
+    </text>
   );
 }
 

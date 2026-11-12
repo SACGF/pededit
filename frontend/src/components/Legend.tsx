@@ -274,7 +274,7 @@ interface LegendProps {
 
 export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
   // Only what is drawn: hidden descendants (#94) add no entries, and the
-  // diamonds standing for them (#1) have their own row.
+  // group symbols standing for collapsed siblings (#1) have their own row.
   const { drawn: pedigree, placeholders } = collapseInfo(full);
   const { partnerships } = pedigree;
   const individuals = pedigree.individuals.filter(i => !isBranchPlaceholderId(i.id));

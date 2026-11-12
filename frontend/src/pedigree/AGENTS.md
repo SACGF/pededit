@@ -236,26 +236,36 @@ draws NSGC symbols.
   Data exports (JSON, PED, CSV) keep everyone. `collapseInfo(...).branches`
   maps each drawn collapsed person to the hidden people under them. A stale
   flag on someone with no descendants is dropped from the drawn copy.
-- Collapsed-branch diamonds (#1): the drawn copy also gets one stand-in
-  child (id `collapsed-branch:<partnershipId>`, `isBranchPlaceholderId`)
-  under each drawn couple of a collapsed person, an unknown-sex individual
-  that is never in the stored pedigree. Being an ordinary child, kinship2
-  lays it out and every renderer draws its diamond and descent line with no
-  special geometry; `collapseInfo(...).placeholders` / `branchOf` say what
-  it stands for (count, sex and affected breakdown, the collapsed partner or
-  partners whose flag it clears). Each renderer adds only the count inside
-  (`renderBranchCountSvg`, `CollapsedBranchNode`) and `detailLines` gives
-  the "n affected" note. On the canvas it is its own node type
+- Collapsed-branch group symbols (#1), following NSGC 2008 Fig. 1 (a
+  number inside a symbol means that many siblings; affected people are not
+  grouped). For each drawn couple of a collapsed person, children who are
+  affected or carry a quadrant (condition) tag (`drawnIndividually`) stay in
+  the drawn copy as themselves, real selectable people, with their own
+  partners and descendants hidden and their own partnerships dropped. The
+  other children become one stand-in child (id
+  `collapsed-branch:<partnershipId>`, `isBranchPlaceholderId`), never in the
+  stored pedigree: sex male or female when all grouped children share it,
+  unknown (diamond) otherwise, with the first grouped child's sibOrder and
+  dob so it sits in that child's birth order place. No grouped children, no
+  symbol (the branch is then shown again from the menu). Being an ordinary
+  child, kinship2 lays it out and every renderer draws it and its descent
+  line with no special geometry; `collapseInfo(...).placeholders` /
+  `branchOf` say what it stands for (`children` is the number drawn inside,
+  `hidden` everyone hidden under the couple for the tooltip, the collapsed
+  partner or partners whose flag it clears). Each renderer adds only the
+  count inside (`renderBranchCountSvg`, `CollapsedBranchNode`, the minimap's
+  `BranchCount`). On the canvas it is its own node type
   (`collapsedBranch`), not selectable or draggable, so it needs
   `style.pointerEvents: "all"` or React Flow makes it click-through. Code
   that walks the drawn pedigree's people as people (legend sex rows,
   de-identified numbering, and #8's pedigree numbers) must skip the
   placeholders. Someone below two collapsed people (descendants who
-  intermarry) is counted in both diamonds. A collapsed person whose every
-  couple with children is gone from the drawing (the partner hidden under
-  another collapsed person) has no diamond of their own: those people are in
-  the other diamond. A derived copy of a drawn pedigree (de-identified names)
-  must go through `asDrawn`, or the placeholders are taken for real people.
+  intermarry) is counted in both. A collapsed person whose every couple
+  with children is gone from the drawing (the partner hidden under another
+  collapsed person) has no symbol of their own. A derived copy of a drawn
+  pedigree (de-identified names) must go through `asDrawn`, or the
+  placeholders are taken for real people. Making a drawn affected child
+  unaffected would hide them, so `rootsHidingNew` shows the branch instead.
   The store's `mutate` reveals a branch when an edit would add or move
   someone into it (`rootsHidingNew`), so "add child" to a collapsed person
   never makes the child vanish; only `setDescendantsHidden` hides people.
