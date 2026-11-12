@@ -38,7 +38,7 @@ Section numbers refer to the 2008 figures.
 | Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3). |
 | **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Follows, for collapsed branches (#1): a collapsed couple's unaffected children are one symbol with their number inside (square or circle when they share a sex, diamond otherwise), and affected or condition-tagged children are drawn as themselves beside it. |
 | Deceased: a slash through the symbol, extending past it. Do not use a cross. Cause of death below if known. | Follows. |
-| Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | **Gap:** the proband arrow has no "P". No consultand arrow. |
+| Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | Follows (#99): `Individual.consultand`; a proband who is also the consultand keeps the "P". |
 | Stillbirth "SB" with gestational age; pregnancy "P" inside the symbol; miscarriage (SAB), termination (TOP) and ectopic (ECT) as small triangles. | Follows (#12 era work, `pedigree/lifeStatus.ts`). |
 
 ### Text below the symbol (Fig. 1 instructions)
@@ -54,8 +54,8 @@ Use initials or first names rather than full names on clinical pedigrees.
 
 | Rule | PedEdit |
 |---|---|
-| Age / year of birth first | Free-text age (#20) and DOB. **Gap:** the canvas shows the full date of birth, where the standard prefers year or age. |
-| Pedigree number last, below the other text | **Gap:** #8 puts the number before the name on the same line. |
+| Age / year of birth first | Follows (#20): the free-text age, else the year of birth ("b. 1978"). The full DOB stays in the data, the edit panel and CSV. There is no date of death field, so "d. 2007" comes from the free-text age. |
+| Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |
 
 ### Lines (Fig. 2)
@@ -70,7 +70,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Twins: monozygotic with a horizontal bar between the individual's lines, dizygotic without, "?" when unknown. | Follows (#11). |
 | No children by choice: one bar under the line of descent. Infertility: two bars. Reason written below. | Follows (#15). |
 | Adoption: brackets around the adopted person; dashed line from adoptive parents, solid from biological. | Follows (#12). |
-| "Family history not known": "?" above the symbol. | **Gap:** not supported. |
+| "Family history not known": "?" above the symbol. | Follows (#100): `Individual.familyHistoryUnknown`. |
 
 ### Assisted reproduction (Fig. 3) and evaluation (Fig. 4)
 
@@ -119,12 +119,11 @@ use for groups.
 
 1. **Collapsed branch symbol (#1).** Fixed: the number counts the couple's
    unaffected children only, and affected children are drawn beside it.
-2. **Pedigree number placement (#8).** It should go on its own line below the
-   age and evaluation text, not before the name.
-3. **Full date of birth on the canvas (#20).** Prefer year of birth or age.
+2. **Pedigree number placement (#8).** Fixed: its own line, last.
+3. **Full date of birth on the canvas (#20).** Fixed: year of birth.
 4. **Consanguinity degree label** above the double line when the relationship
    is not obvious from the drawing (#85, #90, #92).
-5. **Proband arrow without "P".** Small fix.
-6. Not yet built: consultand arrow, presymptomatic carrier, evaluation (E)
-   notation, assisted reproduction (D, S), "?" for unknown family history.
+5. **Proband arrow without "P".** Fixed, with a consultand arrow (#99).
+6. Not yet built: presymptomatic carrier, evaluation (E) notation (#101),
+   assisted reproduction (D, S). "?" for unknown family history: done (#100).
    Ended relationship: done (#98). Clinical key fields: done (#102).
