@@ -16,6 +16,8 @@
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    the line above someone leads to a couple who are not the parents
  *   labels-overlap         two label lines on one row run into each other
+ *   consanguinity-label-collides  the degree of relationship over a double line (#97)
+ *                          runs into a symbol, a line or other text
  *
  * PNG and PDF are rasterised from this SVG, so the lint covers them too. The
  * U-shape export has its own geometry and is not checked here.
@@ -31,6 +33,7 @@ import { NODE_SIZE } from "../../pedigree/constants";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { textWidth } from "../../pedigree/labels";
+import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
 import { drawnPedigree } from "../../pedigree/collapse";
@@ -47,7 +50,8 @@ export type ExportLintCode =
   | "line-through-symbol"
   | "child-without-parents"
   | "child-wrong-parents"
-  | "labels-overlap";
+  | "labels-overlap"
+  | "consanguinity-label-collides";
 
 export interface ExportLintFinding {
   code: ExportLintCode;
@@ -68,6 +72,10 @@ interface Parsed {
   couples: Pt[][];
   sibs: Seg[];
   texts: { x: number; y: number; text: string }[];
+  /** Lines of the consanguinity labels (#97), group `consanguinity-labels`. */
+  coupleTexts: { x: number; y: number; text: string }[];
+  /** Baselines of the "?" marks over symbols (#100). */
+  questionMarks: Pt[];
   /** False when the SVG has none of the groups exportSvg writes. */
   structured: boolean;
   /** Offset of the pedigree group: canvas coordinates plus this give SVG coordinates. */
@@ -88,7 +96,7 @@ function polyline(d: string): Pt[] | null {
 
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
-  const out: Parsed = { symbols: [], couples: [], sibs: [], texts: [], structured: false, origin: [0, 0] };
+  const out: Parsed = { symbols: [], couples: [], sibs: [], texts: [], coupleTexts: [], questionMarks: [], structured: false, origin: [0, 0] };
   type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
@@ -96,13 +104,13 @@ export function parseExportSvg(svg: string): Parsed {
   const inSymbol = () => stack.some(f => f.symbol);
   const skipped = () => stack.some(f => f.name === "defs" || f.name === "clipPath" || f.name === "marker" || f.group === "pedigree-key");
   const TAG = /<(\/?)([a-zA-Z]+)((?:\s+[\w:-]+="[^"]*")*)\s*(\/?)>/g;
-  let textStart = -1, textAt: Pt | null = null;
+  let textStart = -1, textAt: Pt | null = null, textInto = out.texts;
   for (let m: RegExpExecArray | null; (m = TAG.exec(svg)); ) {
     const [, closing, name, attrText, selfClosing] = m;
     if (closing) {
       if (name === "text" && textAt && textStart >= 0) {
         const inner = svg.slice(textStart, m.index).replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "");
-        out.texts.push({ x: textAt[0], y: textAt[1], text: unescapeXml(inner) });
+        textInto.push({ x: textAt[0], y: textAt[1], text: unescapeXml(inner) });
         textAt = null;
       }
       // Pop to the matching element (the exporter's markup is well formed).
@@ -130,6 +138,9 @@ export function parseExportSvg(svg: string): Parsed {
     if (!selfClosing && name !== "line" && name !== "path" && name !== "rect" && name !== "circle" && name !== "polygon") {
       stack.push({ name, dx: 0, dy: 0 });
     }
+    if (name === "text" && attrs.class === "family-history-unknown" && !skipped()) {
+      out.questionMarks.push([Number(attrs.x) + ox, Number(attrs.y) + oy]);
+    }
     if (skipped() || inSymbol()) continue;
     if (attrs.class === "mark") continue;
     if (name === "path" && g === "couple-lines" && !attrs["stroke-dasharray"]) {
@@ -138,9 +149,10 @@ export function parseExportSvg(svg: string): Parsed {
     } else if (name === "line" && g === "sibship-lines") {
       const n = (k: string) => Number(attrs[k]);
       out.sibs.push([n("x1") + ox, n("y1") + oy, n("x2") + ox, n("y2") + oy]);
-    } else if (name === "text" && g === "labels") {
+    } else if (name === "text" && (g === "labels" || g === "consanguinity-labels")) {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
+      textInto = g === "labels" ? out.texts : out.coupleTexts;
     }
   }
   return out;
@@ -339,6 +351,32 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       }
     }
   }
+
+  // 5. Consanguinity labels (#97): the text box, from cap height to just
+  // below the baseline, must touch no symbol (slash included), line or
+  // other text.
+  type Box = [number, number, number, number];
+  const overlaps = (a: Box, b: Box) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+  const textBox = (t: { x: number; y: number }, w: number, cap: number): Box => [t.x - w / 2 - 1, t.y - cap - 1, t.x + w / 2 + 1, t.y + 3];
+  const segBox = ([x1, y1, x2, y2]: Seg): Box => [Math.min(x1, x2) - 1, Math.min(y1, y2) - 1, Math.max(x1, x2) + 1, Math.max(y1, y2) + 1];
+  const lineSegs: Seg[] = [...parsed.sibs, ...parsed.couples.flatMap(segsOf)];
+  const coupleBoxes = parsed.coupleTexts.map(t => ({ t, box: textBox(t, consanguinityLabelWidth(t.text), 7) }));
+  coupleBoxes.forEach(({ t, box }, i) => {
+    const hit = (what: string) => out.push({
+      code: "consanguinity-label-collides",
+      message: `the label "${t.text}" above a double line runs into ${what}`,
+      individuals: [],
+    });
+    const sym = parsed.symbols.find(([x, y]) => overlaps(box, [x - half - 4, y - half - 4, x + half + 4, y + half]));
+    if (sym) { hit(`the symbol at ${at(toCanvas(sym))}`); return; }
+    const q = parsed.questionMarks.find(([x, y]) => overlaps(box, [x - 4, y - 10, x + 4, y + 1]));
+    if (q) { hit(`the "?" at ${at(toCanvas(q))}`); return; }
+    if (lineSegs.some(s => overlaps(box, segBox(s)))) { hit("a line"); return; }
+    const other = texts.find(o => o.w && overlaps(box, textBox(o, o.w, 8)));
+    if (other) { hit(`the label "${other.text}"`); return; }
+    const twin = coupleBoxes.find((o, j) => j !== i && overlaps(box, o.box));
+    if (twin) hit(`the label "${twin.t.text}"`);
+  });
   return out;
 }
 

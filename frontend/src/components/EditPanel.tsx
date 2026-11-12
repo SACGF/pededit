@@ -8,6 +8,7 @@ import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
+import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
@@ -383,10 +384,51 @@ function RelatednessSection({ individual }: { individual: Individual }) {
                   Double line. The pedigree does not show how they are related, so there is no coefficient.
                 </p>
               )}
+              {(related || flagged) && <ConsanguinityLabelField partnershipId={c.partnershipId} />}
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/**
+ * The text above a couple's double line (#97). NSGC writes the degree of
+ * relationship there when the drawing does not show it, so it matters most
+ * for the manual override. When the pedigree names the relationship, a
+ * button fills it in.
+ */
+function ConsanguinityLabelField({ partnershipId }: { partnershipId: string }) {
+  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeStore();
+  const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
+  if (!partnership) return null;
+  const named = namedCoupleRelationship(pedigree, partnership);
+  const own = partnership.consanguinityLabel ?? "";
+  const auto = !own.trim() && pedigree.canvasSettings?.relationshipLabels ? named : null;
+  return (
+    <div className="pl-5 pt-1 space-y-1" data-testid="consanguinity-label">
+      <Input
+        value={own}
+        aria-label="Written above the double line"
+        onChange={e => setPartnershipConsanguinityLabel(partnershipId, e.target.value)}
+        className="h-7 text-sm"
+        placeholder={auto ?? "Above the line, e.g. third cousins"}
+      />
+      <p className="text-[10px] text-gray-500">
+        {auto
+          ? `"${auto}" is written above the line (Settings, name consanguineous relationships). Type to replace it.`
+          : "Written above the double line. For when the pedigree does not show how they are related."}
+      </p>
+      {named && own.trim() !== named && !auto && (
+        <button
+          type="button"
+          onClick={() => setPartnershipConsanguinityLabel(partnershipId, named)}
+          className="text-[10px] underline text-gray-600 hover:text-black"
+        >
+          Write "{named}"
+        </button>
+      )}
     </div>
   );
 }

@@ -224,6 +224,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     const ok1 = c.required(raw, "individual1", pp, "a string", v => typeof v === "string");
     const ok2 = c.required(raw, "individual2", pp, "a string", v => typeof v === "string");
     c.optional(raw, "consanguineous", pp, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "consanguinityLabel", pp, "a string", v => typeof v === "string");
     c.optional(raw, "childless", pp, CHILDLESS_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
     c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
@@ -355,6 +356,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       c.optional(cs, "layoutWidth", cp, LAYOUT_WIDTH_VALUES.map(s => `"${s}"`).join(" | "),
         v => typeof v === "string" && LAYOUT_WIDTH_VALUES.includes(v));
       c.optional(cs, "showNumbers", cp, "a boolean", v => typeof v === "boolean");
+      c.optional(cs, "relationshipLabels", cp, "a boolean", v => typeof v === "boolean");
     }
   }
 

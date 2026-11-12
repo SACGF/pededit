@@ -27,6 +27,7 @@ import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow
 import { NODE_SIZE } from "./constants";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { endedBreakX, endedMarkSegments } from "./ended";
+import { highestConsanguinityLabel } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
@@ -302,7 +303,10 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   // The chart title (#20) rides along as one more node, above the layout.
   const pedigreeName = useAppStore(s => s.activeTitle);
   const title = chartTitle(pedigree, pedigreeName);
-  const titleNode = useMemo(() => chartTitleNode(title, computedNodes), [title, computedNodes]);
+  const titleNode = useMemo(
+    () => chartTitleNode(title, computedNodes, highestConsanguinityLabel({ nodes: computedNodes, coupleEdges })),
+    [title, computedNodes, coupleEdges],
+  );
   const flowNodes = titleNode ? [...rfNodes, titleNode as unknown as Node<RFNodeData>] : rfNodes;
 
   // Background dots follow the snap grid when snap is on (React Flow's

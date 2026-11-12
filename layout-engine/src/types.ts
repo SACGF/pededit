@@ -116,6 +116,12 @@ export interface Partnership {
    * be related needs no flag (the editor tests kinship above 0, #85).
    */
   consanguineous?: boolean;
+  /**
+   * Text written above the double line (#97), e.g. "third cousins": the
+   * degree of relationship when the drawing does not show it. Only drawn
+   * when the line is double.
+   */
+  consanguinityLabel?: string;
   /** Childless couple mark. Cleared when a child is added. */
   childless?: ChildlessStatus;
   /** Optional reason shown under the mark, e.g. "vasectomy". */
@@ -159,6 +165,12 @@ export interface CanvasSettings {
    * stored. Absent means false.
    */
   showNumbers?: boolean;
+  /**
+   * Write the relationship ("first cousins") above every consanguineous
+   * couple's double line that can be named and has no text of its own
+   * (#97). Absent means false.
+   */
+  relationshipLabels?: boolean;
 }
 
 export type NameLabelMode = "wrap" | "truncate";

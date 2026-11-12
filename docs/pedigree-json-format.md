@@ -75,6 +75,7 @@ What the NSGC nomenclature (2008, Fig. 1 instructions) asks a clinical pedigree'
 | `nameLabels` | `"wrap"` or `"truncate"` | Optional. How a name too long for its slot is shown on the canvas: wrapped onto two lines, or cut to one line. Absent means `"wrap"`. Exports always wrap. |
 | `layoutWidth` | `"minimal"` or `"relaxed"` | Optional. How wide the automatic layout may be: no wider than the widest generation, or up to two slots wider so children sit more directly under their parents. Absent means `"minimal"`. Applies to the canvas and to exports. |
 | `showNumbers` | boolean | Optional. Draw each person's pedigree number (generation in Roman numerals, then place in the row, e.g. `"II-3"`) before their name, on the canvas and in figure exports. The numbers are computed from the layout, not stored. Absent means `false`. |
+| `relationshipLabels` | boolean | Optional. Write the relationship (for example `"first cousins"`) above every consanguineous couple's double line that can be named and has no `consanguinityLabel` of its own, on the canvas and in figure exports. Absent means `false`. |
 
 ## `Individual`
 
@@ -113,6 +114,7 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `individual1` | string | yes | Id of one partner. Must exist in `individuals`. |
 | `individual2` | string | yes | Id of the other partner. Must exist and differ from `individual1`. |
 | `consanguineous` | boolean | no | Draw a double line between the partners. |
+| `consanguinityLabel` | string | no | Text written above the double line, for example `"third cousins"`: the degree of relationship when the drawing does not show it (NSGC). Drawn only when the line is double. |
 | `childless` | `"infertility"` or `"byChoice"` | no | Childless couple mark under the couple line (NSGC): a short vertical ending in two bars for infertility, one bar for no children by choice. Only meaningful when the partnership has no children in `parentOf`; the editor clears it when a child is added. |
 | `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
 | `twins` | `TwinSet[]` | no | Twin sets (twins, triplets, ...) among this partnership's children. PED has no field for this, so Export PED drops it and warns. |

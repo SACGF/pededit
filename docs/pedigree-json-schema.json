@@ -94,6 +94,7 @@
         "individual1": { "type": "string" },
         "individual2": { "type": "string" },
         "consanguineous": { "type": "boolean" },
+        "consanguinityLabel": { "type": "string", "description": "Text written above the double line, e.g. third cousins: the degree of relationship when the drawing does not show it. Drawn only when the line is double." },
         "childless": {
           "enum": ["infertility", "byChoice"],
           "description": "Childless couple mark under the couple line (NSGC): two bars for infertility, one bar for no children by choice. Only on a partnership with no children."
@@ -168,6 +169,10 @@
         "showNumbers": {
           "type": "boolean",
           "description": "Draw each person's pedigree number (generation in Roman numerals, then place in the row, e.g. \"II-3\") before their name, on the canvas and in figure exports. The numbers are computed from the layout, not stored. Absent means false."
+        },
+        "relationshipLabels": {
+          "type": "boolean",
+          "description": "Write the relationship (e.g. \"first cousins\") above every consanguineous couple's double line that can be named and has no consanguinityLabel of its own. Absent means false."
         }
       }
     }

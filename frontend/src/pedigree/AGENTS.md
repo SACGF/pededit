@@ -236,6 +236,33 @@ draws NSGC symbols.
   saved before #85 may carry the flag on couples who are related anyway; it
   is harmless there and shows as a ticked, editable checkbox only if a later
   edit removes the relationship.
+- `consanguinityLabel.ts` — the degree of relationship above a double line
+  (#97, NSGC "if not obvious from the pedigree, state it above the line").
+  `consanguinityLabelText` is the one rule: the couple's own
+  `Partnership.consanguinityLabel` always (the only way to say anything for
+  the manual override, whose common ancestors are not drawn); otherwise,
+  with `canvasSettings.relationshipLabels` ("Name consanguineous
+  relationships" in Settings, off by default), `nameCoupleRelationship`
+  from `relationship.ts` ("first cousins", "uncle and niece"), which is null
+  whenever `nameRelationship` cannot name the pair for certain, so inbred
+  lines get nothing. Never drawn on a single line. `layoutToFlow` puts the
+  wrapped lines on the double edge's data (`consanguinityLabel`): wrapped to
+  `consanguinityLabelRoom`, which keeps clear of what lands on each symbol
+  top (the line of descent, the "?" of #100) and runs over a bare top; one
+  line when rows are compact. A new mark above the symbol must be added
+  there and to the lint. The text sits above the symbol tops and any
+  deceased slash, or above the line where it hops higher.
+  `ConsanguineousEdge` and `svgExporter` (group `consanguinity-labels`)
+  draw it from `consanguinityLabelBaselines`; both raise the chart title
+  over a top-row label (`highestConsanguinityLabel`, `chartTitleNode`'s
+  `aboveTop`). The export lint's `consanguinity-label-collides` checks it
+  against symbols, lines and other text. Known: in compact rows a label over
+  a sibling couple can touch the name of a parent drawn straight above
+  (House Targaryen with the setting on). The U-shape export leaves the
+  label out: on its tracks it ran into names and dashed arcs. Edited in the
+  panel under the "Consanguineous with" checkbox (with a "Write <name>"
+  button when the pedigree names the relationship) and "Text above line..."
+  in the couple line's right-click menu.
 - `removal.ts` — branch removal sets (#34): descendants, ancestors,
   "remove with descendants" (which also takes partners who married in and
   have no partnership with anyone staying) and `removeIndividuals`, the one

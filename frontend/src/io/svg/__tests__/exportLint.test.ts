@@ -17,6 +17,13 @@ describe("export lint over every example", () => {
       const numbered = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, showNumbers: true } };
       expect(summary(numbered)).toEqual([]);
       expect(summary(numbered, { compact: true })).toEqual([]);
+      // Named relationships above every double line (#97).
+      const named = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, relationshipLabels: true } };
+      expect(summary(named, { title: "T" })).toEqual([]);
+      // Compact rows leave 84px, and a label over a sibling couple can then
+      // touch the name of the parent drawn straight above (House Targaryen).
+      // Known and accepted; it must still clear every symbol and line.
+      expect(summary(named, { compact: true }).filter(s => !/runs into the label/.test(s))).toEqual([]);
     });
   }
 

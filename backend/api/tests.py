@@ -29,6 +29,7 @@ FULL_PEDIGREE = {
     ],
     "partnerships": [
         {"id": "p1", "individual1": "f", "individual2": "m", "consanguineous": True,
+         "consanguinityLabel": "third cousins",
          "twins": [{"members": ["c1", "c2"], "zygosity": "monozygotic"}]},
         {"id": "p2", "individual1": "f", "individual2": "w2", "childless": "infertility",
          "childlessReason": "azoospermia", "ended": True},
@@ -37,7 +38,8 @@ FULL_PEDIGREE = {
     "siblingOrder": {"mode": "manual", "affectedFirst": True},
     "pinnedPositions": {"c1": {"x": 12.5, "y": -40.0}},
     "canvasSettings": {"nodesMoveable": True, "snapToGrid": True, "snapGridSize": 20,
-                       "nameLabels": "truncate", "layoutWidth": "relaxed"},
+                       "nameLabels": "truncate", "layoutWidth": "relaxed",
+                       "relationshipLabels": True},
     "unlockedIndividuals": ["f"],
     "tags": [
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant"},

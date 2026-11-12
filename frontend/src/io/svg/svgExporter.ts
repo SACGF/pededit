@@ -12,6 +12,9 @@ import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILD
 import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
+import {
+  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
+} from "../../pedigree/consanguinityLabel";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -79,6 +82,7 @@ function computeBounds(
   pedigree: Pedigree,
   slotPos: SlotPos,
   options: SvgExportOptions,
+  aboveTop = Infinity,
 ): CanvasBounds {
   const padding = options.padding ?? 40;
   // The title's baseline is at padding + 16, TITLE_GAP above the top row of
@@ -110,8 +114,10 @@ function computeBounds(
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
+  // Consanguinity labels (#97) over the top row reach above the symbols.
+  const aboveExtra = Math.max(0, Math.ceil(rawMinY - NODE_SIZE / 2 - aboveTop));
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
-  const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra;
+  const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
   const legend = renderExportKeySvg(pedigree, 0, 0);
@@ -121,7 +127,7 @@ function computeBounds(
   // centred under it.
   const innerW = Math.max(contentW, legend.width, options.title ? titleWidth(options.title) : 0);
   const offsetX = padding + (innerW - Math.max(contentW, legend.width)) / 2 + NODE_SIZE / 2 + probandExtra - rawMinX;
-  const offsetY = padding + NODE_SIZE / 2 + titleHeight - rawMinY;
+  const offsetY = padding + NODE_SIZE / 2 + titleHeight + aboveExtra - rawMinY;
 
   return {
     offsetX,
@@ -207,6 +213,15 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
     }
   }
   return lines;
+}
+
+/** Degree of relationship above double couple lines (#97), placed as on the canvas. */
+function renderConsanguinityLabels(flow: FlowData): string[] {
+  return consanguinityLabelPlacements(flow).flatMap(({ x, cy, hop, lines }) => {
+    const baselines = consanguinityLabelBaselines(cy, hop, lines.length);
+    return lines.map((line, i) =>
+      `<text x="${x}" y="${baselines[i]}" text-anchor="middle" font-family="sans-serif" font-size="${CONSANGUINITY_LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
+  });
 }
 
 // ── Sibship lines ─────────────────────────────────────────────────────────────
@@ -512,7 +527,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const result  = alignPedigreeByFamily(working);
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
-  const bounds  = computeBounds(working, slotPos, options);
+  const bounds  = computeBounds(working, slotPos, options, highestConsanguinityLabel(flow));
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [
@@ -538,6 +553,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
   group("symbols", renderSymbols(working, result, slotPos, flow));
   group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth)));
+  group("consanguinity-labels", renderConsanguinityLabels(flow));
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;

@@ -9,6 +9,7 @@ import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { middleTaken } from "./ended";
+import { consanguinityLabelRoom, consanguinityLabelText, wrapConsanguinityLabel } from "./consanguinityLabel";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
@@ -80,6 +81,8 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   ended?: boolean;
   /** A line of descent or a childless mark hangs from the middle of the line, so the break moves aside. */
   middleTaken?: boolean;
+  /** Degree of relationship written above a double line (#97), wrapped. */
+  consanguinityLabel?: string[];
 }
 
 /**
@@ -250,7 +253,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
 
   return {
     nodes,
-    coupleEdges:    buildCoupleEdges(pedigree, result, partners),
+    coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight),
     sibshipEdges:   buildSibshipEdges(result, partners, slotPos),
     duplicateEdges: buildDuplicateEdges(nodes, spacing),
   };
@@ -396,12 +399,20 @@ function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing):
 
 // ── Couple edges ──────────────────────────────────────────────────────────────
 
-function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet): Edge<CoupleEdgeData>[] {
+function buildCoupleEdges(
+  pedigree: Pedigree,
+  result: LayoutResult,
+  partners: PartnerSet,
+  slotPos: Map<string, { x: number; y: number }>,
+  rowHeight: number,
+): Edge<CoupleEdgeData>[] {
   const edges: Edge<CoupleEdgeData>[] = [];
   const related = consanguinityTest(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
+  // Partners with no parents drawn have nothing landing on their symbol tops (#97).
+  const hasParents = new Set(Object.values(pedigree.parentOf).flat());
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -412,6 +423,7 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
       // passing through to a further partner: connect the real partners and
       // hop over whatever sits between them.
       const rc = resolveCouple(result, partners, level, slot);
+      const double = related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot));
 
       edges.push({
         id:           `couple-${level}-${slot}`,
@@ -421,13 +433,13 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
         targetHandle: "couple-in",   // left edge of right partner
         // Line style from the real partners, not the slots the marker sits
         // between (see consanguinityTest).
-        type:         related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot))
-          ? "consanguineousEdge" : "coupleEdge",
+        type:         double ? "consanguineousEdge" : "coupleEdge",
         data:         {
           ...hopAt(result, partners, level, slot),
           partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
           ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
           ...endedData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
+          ...(double ? labelData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot), `${level}-${rc.leftSlot}`, `${level}-${rc.rightSlot}`) : {}),
         },
       });
     }
@@ -440,6 +452,20 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
     const childless = partnership && activeChildless(partnership, pedigree);
     if (!childless) return {};
     return { childless, childlessReason: partnership!.childlessReason || undefined };
+  }
+
+  function labelData(a: string, b: string, left: string, right: string): Pick<CoupleEdgeData, "consanguinityLabel"> {
+    const partnership = partnershipOf.get(pairKey(a, b));
+    const text = partnership && consanguinityLabelText(pedigree, partnership);
+    const l = slotPos.get(left), r = slotPos.get(right);
+    if (!text || !l || !r) return {};
+    const top = (id: string) => ({
+      hasParents: hasParents.has(id),
+      familyHistoryUnknown: !!pedigree.individuals.find(i => i.id === id)?.familyHistoryUnknown,
+    });
+    const [lx, rx] = l.x <= r.x ? [l.x, r.x] : [r.x, l.x];
+    const [lt, rt] = l.x <= r.x ? [top(a), top(b)] : [top(b), top(a)];
+    return { consanguinityLabel: wrapConsanguinityLabel(text, consanguinityLabelRoom(lx, rx, lt, rt), rowHeight) };
   }
 
   function endedData(a: string, b: string): Pick<CoupleEdgeData, "ended" | "middleTaken"> {

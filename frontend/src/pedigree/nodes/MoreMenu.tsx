@@ -9,6 +9,7 @@ import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from
 import { adjacentSibling } from "../../components/EditPanel";
 import { batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
+import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 
 function clampCount(n: number): number {
@@ -435,6 +436,46 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   );
 }
 
+/**
+ * "Text above line..." for a couple with a double line (#97): opens a text
+ * box in the menu, filled with the couple's text or else the relationship's
+ * name. Enter or Apply sets it, an empty box clears it.
+ */
+function ConsanguinityLabelItem({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
+  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeStore();
+  const [value, setValue] = useState<string | null>(null);
+  const state = coupleConsanguinity(pedigree, partnershipId);
+  const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
+  if (!state || !partnership || !(state.related || state.flagged)) return null;
+  const apply = () => { setPartnershipConsanguinityLabel(partnershipId, (value ?? "").trim()); onDone(); };
+  if (value === null) {
+    return (
+      <MenuItem
+        onClick={() => setValue(partnership.consanguinityLabel ?? namedCoupleRelationship(pedigree, partnership) ?? "")}
+        title="Write the degree of relationship above the double line, e.g. third cousins"
+      >
+        Text above line...
+      </MenuItem>
+    );
+  }
+  return (
+    <div className="px-2 py-1 space-y-1" data-consanguinity-label-editor>
+      <input
+        autoFocus
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={e => { e.stopPropagation(); if (e.key === "Enter") apply(); }}
+        placeholder="e.g. third cousins"
+        aria-label="Text above the double line"
+        className="w-full h-6 border rounded px-1 text-xs focus:outline-hidden focus:ring-1 focus:ring-black"
+      />
+      <button type="button" onClick={apply} className="w-full text-xs border rounded py-0.5 hover:bg-gray-100">
+        Apply
+      </button>
+    </div>
+  );
+}
+
 const ENDED_TITLE = "Separated or divorced: two short strokes across the couple line";
 
 /**
@@ -491,6 +532,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           label="Consanguineous"
           onToggle={on => action(() => setPartnershipConsanguineous(partnershipId, on))}
         />
+        <ConsanguinityLabelItem partnershipId={partnershipId} onDone={onDone} />
         <MenuItem
           onClick={() => action(() => setPartnershipEnded(partnershipId, !partnership.ended))}
           active={!!partnership.ended}

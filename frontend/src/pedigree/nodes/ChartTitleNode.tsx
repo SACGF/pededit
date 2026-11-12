@@ -19,8 +19,14 @@ const LINE_HEIGHT = TITLE_FONT_SIZE + 4;
 /**
  * The title node centred over the symbols, its baseline TITLE_GAP (plus room
  * for a deceased slash) above the highest one, as in the SVG export.
+ * `aboveTop` is the highest point of anything drawn over the symbols (the
+ * consanguinity labels of #97); the title is raised to clear it.
  */
-export function chartTitleNode(title: string, symbols: { position: { x: number; y: number } }[]): ChartTitleNodeType | null {
+export function chartTitleNode(
+  title: string,
+  symbols: { position: { x: number; y: number } }[],
+  aboveTop = Infinity,
+): ChartTitleNodeType | null {
   if (!title || symbols.length === 0) return null;
   let minX = Infinity, maxX = -Infinity, minY = Infinity;
   for (const { position: { x, y } } of symbols) {
@@ -29,7 +35,8 @@ export function chartTitleNode(title: string, symbols: { position: { x: number; 
   const width = Math.ceil(titleWidth(title)) + 8;
   // nodeOrigin is [0.5, 0.5], so the position is the box centre; the baseline
   // sits about a third of the font size below it.
-  const baseline = minY - NODE_SIZE / 2 - TITLE_GAP - 4;
+  const top = Math.min(minY - NODE_SIZE / 2, aboveTop);
+  const baseline = top - TITLE_GAP - 4;
   return {
     id: CHART_TITLE_NODE_ID,
     type: "chartTitle",

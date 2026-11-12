@@ -122,6 +122,20 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 </div>
               </div>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer mt-2">
+              <input
+                type="checkbox"
+                name="relationshipLabels"
+                checked={pedigree.canvasSettings?.relationshipLabels === true}
+                onChange={e => updateCanvasSettings({ relationshipLabels: e.target.checked })}
+              />
+              <div>
+                <div className="text-sm">Name consanguineous relationships</div>
+                <div className="text-xs text-gray-400">
+                  Write the relationship ("first cousins") above every double line it can be worked out for. Text set on a couple in the edit panel is always shown.
+                </div>
+              </div>
+            </label>
           </div>
 
           <div>

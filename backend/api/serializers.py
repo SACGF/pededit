@@ -89,6 +89,7 @@ class PartnershipSerializer(serializers.Serializer):
     individual1 = serializers.CharField()
     individual2 = serializers.CharField()
     consanguineous = _opt(serializers.BooleanField)
+    consanguinityLabel = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     childless = _opt(serializers.ChoiceField, choices=CHILDLESS_CHOICES)
     childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     twins = _opt(TwinSetSerializer, many=True)
@@ -107,6 +108,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     nameLabels = _opt(serializers.ChoiceField, choices=["wrap", "truncate"])
     layoutWidth = _opt(serializers.ChoiceField, choices=["minimal", "relaxed"])
     showNumbers = _opt(serializers.BooleanField)
+    relationshipLabels = _opt(serializers.BooleanField)
 
 
 class ClinicalDetailsSerializer(serializers.Serializer):

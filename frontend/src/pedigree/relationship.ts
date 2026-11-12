@@ -19,6 +19,11 @@ export interface RelationshipName {
   objectId: string;
   /** "mother", "half-brother", "first cousin twice removed". */
   term: string;
+  /** Generations from the closest common ancestors down to the subject and to the object (up <= down). */
+  up: number;
+  down: number;
+  /** Related through one common ancestor rather than a couple. */
+  half: boolean;
 }
 
 const EPS = 1e-9;
@@ -154,7 +159,25 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
   if (Math.abs(expected - kinship) > EPS) return null;
 
   const [subjectId, objectId, up, down] = m < n ? [a, b, m, n] : [b, a, n, m];
-  return { subjectId, objectId, term: term(up, down, half, sexOf(subjectId), twin) };
+  return { subjectId, objectId, term: term(up, down, half, sexOf(subjectId), twin), up, down, half };
+}
+
+/**
+ * The relationship of a couple as NSGC writes it above a consanguineous
+ * double line (#97): "first cousins", "half second cousins once removed",
+ * "uncle and niece". Null when `nameRelationship` cannot name them.
+ */
+export function nameCoupleRelationship(pedigree: Pedigree, a: string, b: string, kinship: number): string | null {
+  const named = nameRelationship(pedigree, a, b, kinship);
+  if (!named) return null;
+  const { up, down, half } = named;
+  if (up >= 2) return named.term.replace(/cousin/, "cousins");
+  if (up === 1 && down === 1) return half ? "half-siblings" : "siblings";
+  const objectSex = pedigree.individuals.find(i => i.id === named.objectId)?.sex;
+  const object = up === 0
+    ? greats(down - 2) + (down === 1 ? bySex(objectSex, "son", "daughter", "child") : bySex(objectSex, "grandson", "granddaughter", "grandchild"))
+    : greats(down - 2) + bySex(objectSex, "nephew", "niece", "niece or nephew");
+  return `${named.term} and ${object}`;
 }
 
 /**
