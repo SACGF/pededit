@@ -17,6 +17,7 @@ import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "@/p
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tagTakesOnset } from "@/pedigree/onset";
+import { clinicalDetailLines } from "@/pedigree/clinicalDetails";
 import { Tags } from "lucide-react";
 
 /**
@@ -331,6 +332,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   // Every defined tag is listed so an unused one can still be ticked; the
   // exported key lists only tags someone carries.
   const tags = pedigreeTags(pedigree);
+  const details = clinicalDetailLines(full);
   const used = new Set(tagsInUse(pedigree).map(t => t.id));
 
   const manage = onManageTags && (
@@ -423,6 +425,20 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
           <div>
             {relRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
           </div>
+        </div>
+      )}
+
+      {!individual && details.length > 0 && (
+        <div className="space-y-1" data-testid="legend-clinical-details">
+          <SectionHeader>Clinical details</SectionHeader>
+          <dl className="text-xs text-gray-800 space-y-0.5">
+            {details.map(d => (
+              <div key={d.field} data-detail={d.field}>
+                <dt className="inline font-medium">{d.label}:</dt>{" "}
+                <dd className="inline break-words">{d.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       )}
     </div>

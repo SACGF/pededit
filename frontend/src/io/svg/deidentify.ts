@@ -15,8 +15,8 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
 
 /**
  * The drawn pedigree (hidden descendants left out, #94) with names replaced by
- * generation numbers, dates bucketed or dropped, and free-text age, notes
- * and chart title dropped.
+ * generation numbers, dates bucketed or dropped, and free-text age, notes,
+ * chart title and clinical key fields dropped.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
@@ -26,8 +26,13 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
 
   // The chart title and the free-text age (#20) can name or date someone, so
   // both go; age ranges come from the DOB only.
+  // The clinical key fields (#102) name the recorder and historian and date
+  // the visit; the reason and ancestry are free text that can name people
+  // too, so the whole block goes.
+  const rest: Pedigree = { ...pedigree };
+  delete rest.clinicalDetails;
   return asDrawn({
-    ...pedigree,
+    ...rest,
     chartTitle: "",
     // The names are the numbers now: drawing them again would repeat them.
     ...(pedigree.canvasSettings ? { canvasSettings: { ...pedigree.canvasSettings, showNumbers: false } } : {}),

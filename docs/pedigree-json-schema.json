@@ -44,7 +44,8 @@
         "chartTitle": {
           "type": "string",
           "description": "Title drawn above the chart and in exports. Absent means the pedigree's name; an empty string means no title."
-        }
+        },
+        "clinicalDetails": { "$ref": "#/$defs/ClinicalDetails" }
       },
       "additionalProperties": true
     },
@@ -133,6 +134,19 @@
         "mode": { "enum": ["insertion", "manual", "birthDate"] },
         "affectedFirst": { "type": "boolean" }
       }
+    },
+    "ClinicalDetails": {
+      "type": "object",
+      "description": "Clinical key fields (NSGC 2008, Fig. 1 instructions). All free text; absent or empty means not recorded. Shown in the key when filled; de-identified exports drop them.",
+      "properties": {
+        "referralReason": { "type": "string", "description": "Reason for taking the pedigree." },
+        "recordedBy": { "type": "string", "description": "Who drew the pedigree." },
+        "recordedOn": { "type": "string", "description": "Date of intake or last update, normally ISO YYYY-MM-DD." },
+        "historian": { "type": "string", "description": "Who gave the family history." },
+        "maternalAncestry": { "type": "string", "description": "Ancestry of the maternal side, relative to the proband." },
+        "paternalAncestry": { "type": "string", "description": "Ancestry of the paternal side, relative to the proband." }
+      },
+      "additionalProperties": true
     },
     "CanvasSettings": {
       "type": "object",

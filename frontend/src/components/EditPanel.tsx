@@ -11,6 +11,8 @@ import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedig
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
+import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
@@ -37,6 +39,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
       ) : (
         <>
           <ChartTitleField />
+          <ClinicalDetailsSection />
           <p className="text-xs text-gray-400">Select an individual to edit</p>
         </>
       )}
@@ -482,5 +485,66 @@ function ChartTitleField() {
       />
       <p className="text-[10px] text-gray-500">Drawn above the pedigree and in exports. Clear it for no title.</p>
     </Field>
+  );
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Clinical key fields (#102), under the chart title when nothing is selected.
+ * Folded by default so a new pedigree's panel stays short; the header says
+ * how many are filled, and the legend below lists them.
+ */
+function ClinicalDetailsSection() {
+  const { pedigree, setClinicalDetail } = usePedigreeStore();
+  const [open, setOpen] = useState(false);
+  const filled = clinicalDetailLines(pedigree).length;
+  const details = pedigree.clinicalDetails ?? {};
+  return (
+    <div className="space-y-2" data-testid="clinical-details">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="flex items-center gap-1 text-xs text-gray-600 hover:text-black"
+        title="Reason for referral, ancestry, historian, recorder and date, for the key (NSGC)"
+      >
+        {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+        Clinical details
+        {filled > 0 && <span className="text-gray-400">({filled} filled)</span>}
+      </button>
+      {open && (
+        <div className="space-y-2 pl-4">
+          {CLINICAL_DETAIL_OPTIONS.map(o => {
+            const value = details[o.field] ?? "";
+            // A date typed elsewhere (an imported file) is kept as text rather than hidden by the picker.
+            const asDate = o.date && (value === "" || ISO_DATE.test(value));
+            return (
+              <Field key={o.field} label={o.label}>
+                {o.long ? (
+                  <textarea
+                    value={value}
+                    onChange={e => setClinicalDetail(o.field, e.target.value)}
+                    className="w-full border rounded px-2 py-1 text-sm resize-none h-12 focus:outline-hidden focus:ring-1 focus:ring-black"
+                    placeholder={o.placeholder}
+                    aria-label={o.label}
+                  />
+                ) : <Input
+                  type={asDate ? "date" : "text"}
+                  value={value}
+                  onChange={e => setClinicalDetail(o.field, e.target.value)}
+                  className="h-7 text-sm"
+                  placeholder={o.placeholder}
+                  aria-label={o.label}
+                />}
+              </Field>
+            );
+          })}
+          <p className="text-[10px] text-gray-500">
+            Filled fields are listed in the key and in exports. De-identified exports leave them all out.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

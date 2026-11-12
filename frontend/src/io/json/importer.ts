@@ -1,6 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { JSON_FORMAT, JSON_VERSION, JsonIssueCode } from "./types.js";
 import type { JsonImportResult, JsonValidationIssue } from "./types.js";
+import { CLINICAL_DETAIL_FIELDS } from "../../pedigree/clinicalDetails";
 
 const SEX_VALUES = ["male", "female", "unknown"];
 const TAG_STYLES = ["quadrant", "dot", "text"];
@@ -356,6 +357,17 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
   }
 
   c.optional(ped, "chartTitle", base, "a string", v => typeof v === "string");
+
+  if (ped.clinicalDetails !== undefined && ped.clinicalDetails !== null) {
+    const kp = p("clinicalDetails");
+    if (!isObject(ped.clinicalDetails)) {
+      c.error(JsonIssueCode.WRONG_TYPE, `${kp} must be an object`, kp);
+    } else {
+      for (const field of CLINICAL_DETAIL_FIELDS) {
+        c.optional(ped.clinicalDetails, field, kp, "a string", v => typeof v === "string");
+      }
+    }
+  }
 
   if (ped.unlockedIndividuals !== undefined && ped.unlockedIndividuals !== null) {
     const up = p("unlockedIndividuals");

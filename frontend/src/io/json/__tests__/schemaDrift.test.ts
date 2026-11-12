@@ -53,7 +53,7 @@ function literalUnion(type: ts.TypeNode | undefined): string[] | null {
 /** Fields the TS type requires but the format lets a file omit (the importer defaults them). */
 const DEFAULTED = new Set(["Pedigree.siblingOrder"]);
 
-const DEFS = ["Pedigree", "Individual", "Partnership", "Tag", "SiblingOrderSettings", "CanvasSettings"];
+const DEFS = ["Pedigree", "Individual", "Partnership", "Tag", "SiblingOrderSettings", "CanvasSettings", "ClinicalDetails"];
 
 describe("pedigree-json-schema.json matches types.ts", () => {
   for (const name of DEFS) {

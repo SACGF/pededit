@@ -184,6 +184,29 @@ export interface Pedigree {
    * an empty string means no title.
    */
   chartTitle?: string;
+  /**
+   * What NSGC asks a clinical pedigree's key to record besides the symbols
+   * (#102): why it was taken, who took it and when, who gave the history,
+   * and the ancestry of both sides. Shown in the legend and the export key
+   * when filled; de-identified export drops all of it.
+   */
+  clinicalDetails?: ClinicalDetails;
+}
+
+/** Free-text clinical key fields (#102). Absent or empty means not recorded. */
+export interface ClinicalDetails {
+  /** Reason for taking the pedigree, e.g. "Family history of breast cancer". */
+  referralReason?: string;
+  /** Who drew the pedigree. */
+  recordedBy?: string;
+  /** Date of intake or last update, as typed (ISO "2026-11-12" from the date picker). */
+  recordedOn?: string;
+  /** Who gave the history, e.g. "Proband and her mother". */
+  historian?: string;
+  /** Ancestry of the maternal side, relative to the proband. */
+  maternalAncestry?: string;
+  /** Ancestry of the paternal side, relative to the proband. */
+  paternalAncestry?: string;
 }
 
 // ---- Internal layout representation (1-based, mirrors kinship2 internals) ----

@@ -6,6 +6,7 @@ import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
 import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
+import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -561,7 +562,8 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   }
 
   const tags = tagsInUse(pedigree);
-  if (rows.length === 0 && tags.length === 0) return { markup: [], width: 0, height: 0 };
+  const details = renderClinicalDetailsSvg(pedigree, x, 0);
+  if (rows.length === 0 && tags.length === 0 && details.height === 0) return { markup: [], width: 0, height: 0 };
 
   const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
   const rowY = (i: number) => y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2;
@@ -571,9 +573,48 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   tags.forEach((tag, j) => markup.push(renderTagLegendRowSvg(tag, pedigree, x, rowY(rows.length + j), labelOffset)));
 
   const longest = Math.max(0, ...rows.map(r => r.label.length), ...tags.map(t => t.label.length));
+  const symbolsHeight = (rows.length + tags.length) * LEGEND_ROW_HEIGHT;
+  // The clinical details (#102) go under the symbol rows, a half row apart.
+  const gap = symbolsHeight > 0 && details.height > 0 ? LEGEND_ROW_HEIGHT / 2 : 0;
+  if (details.height > 0) {
+    markup.push(`<g class="clinical-details" transform="translate(0 ${fmt(y + symbolsHeight + gap)})">`, ...details.markup, `</g>`);
+  }
   return {
     markup,
-    width: labelOffset + longest * LEGEND_CHAR_WIDTH,
-    height: (rows.length + tags.length) * LEGEND_ROW_HEIGHT,
+    width: Math.max(symbolsHeight > 0 ? labelOffset + longest * LEGEND_CHAR_WIDTH : 0, details.width),
+    height: symbolsHeight + gap + details.height,
   };
+}
+
+/** Characters per line of a clinical detail in the export key before it wraps. */
+const DETAIL_WRAP = 70;
+const DETAIL_LINE_HEIGHT = 14;
+const DETAIL_INDENT = 12;
+
+/**
+ * The filled clinical key fields (#102) as "Label: value" text lines, top-left
+ * at (x, y), long values wrapped. Empty when none is filled.
+ */
+export function renderClinicalDetailsSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
+  const lines = clinicalDetailLines(pedigree);
+  if (lines.length === 0) return { markup: [], width: 0, height: 0 };
+  const markup: string[] = [];
+  let widest = 0;
+  let row = 0;
+  for (const { label, value } of lines) {
+    const head = `${label}: `;
+    const wrapped = wrapText(value, DETAIL_WRAP - head.length);
+    wrapped.forEach((text, i) => {
+      const baseline = y + row * DETAIL_LINE_HEIGHT + LEGEND_FONT_SIZE;
+      const body = i === 0
+        ? `<tspan font-weight="bold">${escapeXml(label)}:</tspan> ${escapeXml(text)}`
+        : escapeXml(text);
+      // A hanging indent: the bold label's real width is not known here.
+      const indent = i === 0 ? 0 : DETAIL_INDENT;
+      markup.push(`<text x="${fmt(x + indent)}" y="${fmt(baseline)}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${body}</text>`);
+      widest = Math.max(widest, i === 0 ? head.length + text.length : DETAIL_INDENT / LEGEND_CHAR_WIDTH + text.length);
+      row++;
+    });
+  }
+  return { markup, width: widest * LEGEND_CHAR_WIDTH, height: row * DETAIL_LINE_HEIGHT };
 }

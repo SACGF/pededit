@@ -107,6 +107,15 @@ class CanvasSettingsSerializer(serializers.Serializer):
     showNumbers = _opt(serializers.BooleanField)
 
 
+class ClinicalDetailsSerializer(serializers.Serializer):
+    referralReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    recordedBy = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    recordedOn = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    historian = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    maternalAncestry = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    paternalAncestry = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+
+
 class PositionSerializer(serializers.Serializer):
     x = serializers.FloatField()
     y = serializers.FloatField()
@@ -124,6 +133,7 @@ class PedigreeDataSerializer(serializers.Serializer):
     unlockedIndividuals = _opt(serializers.ListField, child=serializers.CharField())
     tags = _opt(TagSerializer, many=True)
     chartTitle = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    clinicalDetails = _opt(ClinicalDetailsSerializer)
 
 
 class PedigreeDataField(serializers.Field):

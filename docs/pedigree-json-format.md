@@ -31,6 +31,7 @@ For convenience the importer also accepts a bare `Pedigree` object (no envelope)
 | `unlockedIndividuals` | `string[]` | no | Ids of individuals unlocked for dragging when `canvasSettings.nodesMoveable` is `false`. |
 | `tags` | `Tag[]` | no | Tag definitions (conditions, sample status, genotypes) in display order. Individuals reference them by id. |
 | `chartTitle` | string | no | Title drawn above the chart on the canvas and in SVG, PNG and PDF exports. Absent means the pedigree's name (the envelope `title`), unless that is still the default "Untitled pedigree"; an empty string means no title. De-identified exports never draw it. |
+| `clinicalDetails` | `ClinicalDetails` | no | Clinical key fields: reason for referral, recorder, date, historian, ancestry. |
 
 Any other property on the pedigree object is preserved as-is through import and export.
 
@@ -50,6 +51,19 @@ Any other property on the pedigree object is preserved as-is through import and 
 | --- | --- | --- |
 | `mode` | `"insertion"`, `"manual"` or `"birthDate"` | Which ordering rule applies within each sibship. |
 | `affectedFirst` | boolean | When `true`, affected siblings are drawn before unaffected ones. |
+
+### `ClinicalDetails`
+
+What the NSGC nomenclature (2008, Fig. 1 instructions) asks a clinical pedigree's key to record besides the symbols. Every field is an optional string; absent or empty means not recorded. Filled fields are listed in the in-app legend and under the key in SVG, PNG and PDF exports. De-identified exports drop all of them.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `referralReason` | string | Reason for taking the pedigree. |
+| `recordedBy` | string | Who drew the pedigree. |
+| `recordedOn` | string | Date of intake or last update. The editor writes ISO `YYYY-MM-DD`; other text is kept and shown as is. |
+| `historian` | string | Who gave the family history. |
+| `maternalAncestry` | string | Ancestry of the maternal side, relative to the proband. |
+| `paternalAncestry` | string | Ancestry of the paternal side, relative to the proband. |
 
 ### `CanvasSettings`
 

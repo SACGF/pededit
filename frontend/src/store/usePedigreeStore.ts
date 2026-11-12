@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity, ClinicalDetails
 } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
@@ -382,6 +382,8 @@ interface PedigreeState {
   updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
   /** Title above the chart (#20). "" hides it; undefined falls back to the pedigree's name. */
   setChartTitle: (title: string | undefined) => void;
+  /** Set one clinical key field (#102); an empty value removes it, and the block goes when empty. */
+  setClinicalDetail: (field: keyof ClinicalDetails, value: string) => void;
 
   // Tags (definitions live on the pedigree; individuals reference them by id)
   addTag: (tag: Omit<Tag, "id"> & { id?: string }) => string;
@@ -1289,6 +1291,16 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         if (title === undefined) delete draft.chartTitle;
         else draft.chartTitle = title;
+      });
+    },
+
+    setClinicalDetail: (field, value) => {
+      mutate(draft => {
+        const details = { ...(draft.clinicalDetails ?? {}) };
+        if (value.trim() === "") delete details[field];
+        else details[field] = value;
+        if (Object.keys(details).length === 0) delete draft.clinicalDetails;
+        else draft.clinicalDetails = details;
       });
     },
 

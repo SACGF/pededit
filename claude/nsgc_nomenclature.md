@@ -92,7 +92,7 @@ history, the reason for referral and the ancestry of both sides.
 | Rule | PedEdit |
 |---|---|
 | Key defines every fill and symbol | Auto legend (#3). |
-| Reason for referral, recorder, date, historian, ancestry | Only the chart title (#20). Not otherwise. |
+| Reason for referral, recorder, date, historian, ancestry | Follows (#102): pedigree-level fields, listed in the legend and the export key, dropped by de-identified export. The proband is marked on the chart, not in these fields. |
 
 ### Publication and masking (2008, pp. 425-426)
 
@@ -129,5 +129,5 @@ use for groups.
    is not obvious from the drawing (#85, #90, #92).
 5. **Proband arrow without "P".** Small fix.
 6. Not yet built: consultand arrow, presymptomatic carrier, evaluation (E)
-   notation, assisted reproduction (D, S), "?" for unknown family history,
-   and clinical key fields. (Ended relationship: done in #98.)
+   notation, assisted reproduction (D, S), "?" for unknown family history.
+   Ended relationship: done (#98). Clinical key fields: done (#102).

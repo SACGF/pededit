@@ -7,6 +7,7 @@ import {
 } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { chartTitle } from "../pedigree/labels";
+import { clinicalDetailLines } from "../pedigree/clinicalDetails";
 
 interface ExportDialogProps {
   open: boolean;
@@ -173,6 +174,9 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
                 />
                 <span>Include age range (infant / child / 30s …)</span>
               </label>
+            )}
+            {deident && clinicalDetailLines(pedigree).length > 0 && (
+              <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
             )}
           </div>
 

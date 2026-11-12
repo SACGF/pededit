@@ -44,6 +44,7 @@ FULL_PEDIGREE = {
         {"id": "t2", "label": "Sequenced", "color": "#1f77b4", "style": "dot", "abbrev": "WGS"},
     ],
     "chartTitle": "Smith family",
+    "clinicalDetails": {"referralReason": "Breast cancer", "recordedOn": "2026-11-12"},
 }
 
 
@@ -155,6 +156,7 @@ class SerializerMatchesSchemaTests(APITestCase):
             "Tag": s.TagSerializer,
             "SiblingOrderSettings": s.SiblingOrderSettingsSerializer,
             "CanvasSettings": s.CanvasSettingsSerializer,
+            "ClinicalDetails": s.ClinicalDetailsSerializer,
         }
         # sibOrder is required by the format but optional here so that
         # pedigrees saved before it existed still load.

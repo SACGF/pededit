@@ -122,9 +122,16 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   dialog says so before download. To get the bytes in a page check,
   `await import("/src/io/svg/index.ts")` inside `eval.mjs` and return the
   blob as base64.
+- Clinical key fields (#102, `Pedigree.clinicalDetails`) are drawn by
+  `renderExportKeySvg` as "Label: value" text lines in a
+  `<g class="clinical-details">` under the symbol rows, so every exporter
+  (standard, U-shape, PNG, PDF) gets them with no code of its own. Text is
+  wrapped by character count (`wrapText`), continuation lines take a fixed
+  hanging indent because the bold label's real width is unknown.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB, free-text age and notes for
-  de-identified export, and blanks `chartTitle`; the export dialog also
+  de-identified export, blanks `chartTitle` and drops `clinicalDetails`
+  entirely (reason and ancestry are free text that can name people); the export dialog also
   passes no title. Age ranges come from the DOB only: free text such as
   "3 mo" cannot be bucketed safely. The names become the pedigree numbers
   (`pedigreeNumbers`, #8), and the copy has `showNumbers` turned off so a
