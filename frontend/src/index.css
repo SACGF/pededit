@@ -119,3 +119,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Multi-select (#21). The store owns the selection and a group is dragged by
+   any of its nodes, so React Flow's box round the selected nodes (left after
+   a rubber band, and covering them) is not used. The band itself is grey. */
+.react-flow__nodesselection {
+  display: none;
+}
+.react-flow {
+  --xy-selection-background-color: rgba(0, 0, 0, 0.04);
+  --xy-selection-border: 1px dashed rgba(0, 0, 0, 0.5);
+}

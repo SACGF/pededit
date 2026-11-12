@@ -21,15 +21,17 @@ function shortDevId(id: string): string {
 
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
-export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) {
+export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
   const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines } = data;
   const details = data.detailLines ?? [];
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, selectedId, pedigree, picking, pickIndividual } = usePedigreeStore();
-  const isSelected = individual.id === selectedId;
+  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual } = usePedigreeStore();
+  // React Flow's flag, which PedigreeCanvas mirrors from the store's
+  // selection (#21) and which also shows a rubber band as it is drawn.
+  const isSelected = !!selected;
   const nameCut = isLabelCut(nameLines, individual.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
@@ -82,7 +84,21 @@ export function PedigreeSymbolNode({ data }: NodeProps<PedigreeSymbolNodeType>) 
       onMouseEnter={handleMouseEnter}
       onMouseMove={e => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(e); }}
       onMouseLeave={handleMouseLeave}
-      onClick={() => { if (!pickIndividual(individual.id)) setSelectedId(individual.id); }}
+      onPointerDown={e => {
+        // Pressing on an unselected person selects them alone first, so a
+        // drag moves just them; pressing on a selected one keeps the group
+        // for a group drag (#21). Only for the symbol itself: the hover pill
+        // and more menu are portals whose events bubble here too.
+        if (picking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
+        if (e.currentTarget.contains(e.target as Element)) setSelectedId(individual.id);
+      }}
+      onClick={e => {
+        if (pickIndividual(individual.id)) return;
+        const onSymbol = e.currentTarget.contains(e.target as Element);
+        if (onSymbol && (e.shiftKey || e.ctrlKey || e.metaKey)) toggleSelected(individual.id);
+        // A click in this person's hover pill keeps a selection they are in.
+        else if (onSymbol || !selected) setSelectedId(individual.id);
+      }}
     >
 
       {/* Main pedigree symbol */}

@@ -30,7 +30,7 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
 /** Flags that become ordered interaction steps, run after the page settles. */
 const STEP_FLAGS = new Set([
-  "click", "dblclick", "hover", "press", "fill", "wait-for",
+  "click", "dblclick", "hover", "press", "key-down", "key-up", "fill", "wait-for",
   "drag", "reload", "upload", "download", "sleep", "mouse-away", "select", "choose",
 ]);
 /** Steps that take no value. */
@@ -124,6 +124,9 @@ Steps, run in order after load (a step whose element never appears, is
 disabled, or matches several visible elements is reported, not skipped):
   --click SEL  --dblclick SEL  --hover SEL  --wait-for SEL
   --press KEY         A key or chord, e.g. Delete, Control+z.
+  --key-down KEY      Hold a key (Shift, Control, Meta) for the clicks and
+  --key-up KEY        drags that follow, then release it: shift-click is
+                      --key-down Shift --click SEL --key-up Shift.
   --fill 'SEL=>TEXT'  Type into an input (replaces its value).
   --select 'SEL=>V'   Choose an option of a native <select> by value or label.
   --choose 'SEL=>TEXT' Click SEL (a Radix popover or menu trigger, such as the
@@ -546,6 +549,8 @@ export async function runSteps(page, steps, findings, { timeout = 5000, stepWait
         case "hover": await (await target(page, step.arg, opts)).hover({ timeout }); break;
         case "wait-for": await target(page, step.arg, { ...opts, first: true }); break;
         case "press": await page.keyboard.press(step.arg); break;
+        case "key-down": await page.keyboard.down(step.arg); break;
+        case "key-up": await page.keyboard.up(step.arg); break;
         case "sleep": {
           const ms = Number(step.arg);
           if (!Number.isFinite(ms)) throw new UsageError(`--sleep wants milliseconds, got ${step.arg}`);

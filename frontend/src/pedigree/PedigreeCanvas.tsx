@@ -190,7 +190,7 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false, compact = false }: PedigreeCanvasProps) {
-  const { pedigree, setSelectedId, pinIndividual, resetLayout } = usePedigreeStore();
+  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout } = usePedigreeStore();
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
 
@@ -201,20 +201,62 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     [pedigree, compact],
   );
 
+  // Rubber band in progress (Shift+drag, #21): the React Flow node ids inside
+  // it so far, or null. While set, React Flow's own select changes drive the
+  // highlight; the store gets the result when the band ends. The band adds
+  // to the selection it started with (Shift adds, as for a click).
+  const boxRef = useRef<Set<string> | null>(null);
+  const boxBaseRef = useRef<Set<string>>(new Set());
+  const individualOfRef = useRef(new Map<string, string>());
+  individualOfRef.current = new Map(computedNodes.map(n => [n.id, n.data.individual.id]));
+  const inBox = (nodeId: string) =>
+    !!boxRef.current?.has(nodeId) || boxBaseRef.current.has(individualOfRef.current.get(nodeId) ?? "");
+
   // Local node state so React Flow can track positions during drag.
   // Synced from computedNodes whenever the store changes (structure edits,
-  // undo/redo, pin commits) — but not on intermediate drag moves.
+  // undo/redo, pin commits) — but not on intermediate drag moves. Each
+  // node's `selected` mirrors the store's selection (every copy of a
+  // selected person), which is what makes React Flow drag them together.
   const [rfNodes, setRfNodes] = useState<Node<RFNodeData>[]>(computedNodes);
   useEffect(() => {
-    setRfNodes(computedNodes);
-  }, [computedNodes]);
+    const sel = new Set(selectedIds);
+    setRfNodes(computedNodes.map(n => {
+      const selected = boxRef.current ? inBox(n.id) : sel.has(n.data.individual.id);
+      return n.selected === selected ? n : { ...n, selected };
+    }));
+  }, [computedNodes, selectedIds]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange<Node<RFNodeData>>[]) => {
-      setRfNodes(prev => applyNodeChanges(changes, prev));
+      // The store owns the selection: node clicks go through
+      // PedigreeSymbolNode, so React Flow's own select changes count only
+      // inside a rubber band. Deleting is the store's job too.
+      const box = boxRef.current;
+      const kept = changes.filter(c => {
+        if (c.type === "remove") return false;
+        if (c.type !== "select") return true;
+        if (!box) return false;
+        if (c.selected) box.add(c.id); else box.delete(c.id);
+        return true;
+      }).map(c => (c.type === "select" ? { ...c, selected: inBox(c.id) } : c));
+      if (kept.length > 0) setRfNodes(prev => applyNodeChanges(kept, prev));
     },
     [],
   );
+
+  const handleSelectionStart = useCallback(() => {
+    boxRef.current = new Set();
+    boxBaseRef.current = new Set(usePedigreeStore.getState().selectedIds);
+  }, []);
+
+  const handleSelectionEnd = useCallback(() => {
+    const box = boxRef.current;
+    boxRef.current = null;
+    if (!box) return;
+    const { selectedIds, selectedId } = usePedigreeStore.getState();
+    const added = [...box].map(id => individualOfRef.current.get(id)).filter((id): id is string => !!id);
+    setSelection([...selectedIds, ...added], added.length > 0 ? added[added.length - 1] : selectedId);
+  }, [setSelection]);
 
   const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges];
 
@@ -236,14 +278,20 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   }, [setSelectedId]);
 
   const handleNodeDragStop: OnNodeDrag<Node<RFNodeData>> = useCallback(
-    (_event, node) => {
-      // Pins are stored at normal spacing; map the dragged position back.
-      pinIndividual(
-        node.data.individual.id,
-        unscalePinnedPosition(node.position, layoutSpacing(compact)),
-      );
+    (_event, node, nodes) => {
+      // Every dragged node (the whole selection, #21) is pinned as one undo
+      // step. React Flow snaps a group's delta, not each node, so the group
+      // keeps its shape. Pins are stored at normal spacing; map back. A
+      // person drawn twice keeps the copy that was grabbed, else the first.
+      const spacing = layoutSpacing(compact);
+      const positions: Record<string, { x: number; y: number }> = {};
+      for (const n of [node, ...nodes]) {
+        const id = n.data.individual.id;
+        if (!positions[id]) positions[id] = unscalePinnedPosition(n.position, spacing);
+      }
+      pinIndividuals(positions);
     },
-    [pinIndividual, compact],
+    [pinIndividuals, compact],
   );
 
   return (
@@ -265,6 +313,13 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         nodeOrigin={[0.5, 0.5]}
         nodesDraggable={false}
         nodesConnectable={false}
+        // Selection is the store's (#21): Shift+click or Ctrl/Cmd+click
+        // toggles, Shift+drag draws a rubber band, plain drag pans. React
+        // Flow's own delete key would drop nodes from the canvas only.
+        selectNodesOnDrag={false}
+        deleteKeyCode={null}
+        onSelectionStart={handleSelectionStart}
+        onSelectionEnd={handleSelectionEnd}
         snapToGrid={pedigree.canvasSettings?.snapToGrid ?? false}
         snapGrid={[
           pedigree.canvasSettings?.snapGridSize ?? DEFAULT_SNAP_GRID_SIZE,

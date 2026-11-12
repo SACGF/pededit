@@ -243,6 +243,7 @@ Steps run in the order given, each followed by `--step-wait` ms (default 300):
 | `--click SEL`, `--dblclick SEL`, `--hover SEL` | act on the element |
 | `--wait-for SEL` | wait until one is visible |
 | `--press KEY` | a key or chord: `Delete`, `Control+z` |
+| `--key-down KEY`, `--key-up KEY` | hold a modifier across the steps between them: `--key-down Shift --click SEL --key-up Shift` is a shift-click, and a `--drag` in between is a Shift+drag (rubber band, #21) |
 | `--fill 'SEL=>TEXT'` | replace an input's value |
 | `--select 'SEL=>VALUE'` | pick a native `<select>` option by value or label (lists the options when none matches) |
 | `--choose 'SEL=>TEXT'` | click a Radix popover or menu trigger, then the item in what opened whose text, first line or `title` is TEXT (case-insensitive; a unique substring also works). Fails, listing the items, when none matches; fails when several match (unless `--first`) or the item is disabled. The app's settings and edit-panel dropdowns are native, so use `--select` for those |
