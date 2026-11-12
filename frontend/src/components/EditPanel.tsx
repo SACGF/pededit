@@ -2,6 +2,7 @@ import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Legend } from "./Legend";
+import { SelectionPanel } from "./SelectionPanel";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
@@ -22,12 +23,16 @@ interface EditPanelProps {
  * person's tag checkboxes (#75).
  */
 export function EditPanel({ onManageTags }: EditPanelProps) {
-  const { pedigree, selectedId, setIndividualTag, setOnset } = usePedigreeStore();
-  const individual = pedigree.individuals.find(i => i.id === selectedId);
+  const { pedigree, selectedId, selectedIds, setIndividualTag, setOnset } = usePedigreeStore();
+  // Several selected (#21): the batch panel, and the legend without one person's tag checkboxes.
+  const multiple = selectedIds.length > 1;
+  const individual = multiple ? undefined : pedigree.individuals.find(i => i.id === selectedId);
 
   return (
     <div className="p-4 space-y-4">
-      {individual ? (
+      {multiple ? (
+        <SelectionPanel />
+      ) : individual ? (
         <IndividualForm individual={individual} />
       ) : (
         <>

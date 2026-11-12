@@ -101,8 +101,9 @@ stub so the app still builds without Google login.
   SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
-  redo, Delete/Backspace removes selection (Shift: with descendants, Alt:
-  with ancestors, #34), Escape returns to select tool.
+  redo, Delete/Backspace removes every selected person (Shift: with
+  descendants, Alt: with ancestors, #34), Escape cancels picking, else
+  clears the selection, and returns to the select tool.
 - Notices: the pedigree store's `notice` / `setNotice` (not undoable) is how
   an edit reports what it did or why it was refused; `CanvasPage` shows it
   under the canvas with an Undo button when `undoable` and clears it after a

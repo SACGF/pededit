@@ -7,6 +7,7 @@ import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
 import { adjacentSibling } from "../../components/EditPanel";
+import { batchLockState } from "../selection";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -114,6 +115,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
         collisionPadding={8}
         onClick={(e) => e.stopPropagation()}
       >
+        <SelectionMenuSection individualId={individualId} action={action} />
         <MenuSection label="Add">
           <MenuItem
             onClick={() => action(() => addPartner(individualId))}
@@ -452,6 +454,36 @@ function AddChildrenPanel({ individualId, onAdd }: {
         Add {shown} of unknown sex
       </MenuItem>
     </div>
+  );
+}
+
+/**
+ * Select with descendants, and with several selected (this person among
+ * them) the batch unlock and lock (#21).
+ */
+function SelectionMenuSection({ individualId, action }: { individualId: string; action: (fn: () => void) => void }) {
+  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals } = usePedigreeStore();
+  const batch = selectedIds.length > 1 && selectedIds.includes(individualId);
+  const { toUnlock, toLock } = batchLockState(pedigree, batch ? selectedIds : []);
+  return (
+    <MenuSection label={batch ? `${selectedIds.length} selected` : "Select"}>
+      <MenuItem
+        onClick={() => action(() => selectDescendants(individualId))}
+        title="Select this person, everyone below them and the partners who married in, to move the branch together"
+      >
+        Select with descendants
+      </MenuItem>
+      {toUnlock.length > 0 && (
+        <MenuItem onClick={() => action(() => unlockIndividuals(toUnlock))} title="Let the selected people be dragged">
+          Unlock {toUnlock.length}
+        </MenuItem>
+      )}
+      {toLock.length > 0 && (
+        <MenuItem onClick={() => action(() => lockIndividuals(toLock))} title="Lock the selected people and drop their pinned positions">
+          Lock {toLock.length} (return to auto layout)
+        </MenuItem>
+      )}
+    </MenuSection>
   );
 }
 

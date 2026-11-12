@@ -20,9 +20,25 @@ draws NSGC symbols.
   engine's `pedigreeToGeometry` and the SVG exporters use the same numbers;
   change them together.
 - `PedigreeCanvas.tsx` — the React Flow instance, custom always-fit minimap,
-  drag handling (drag end pins the node), click to select, pane click clears
-  selection. New individuals are added from the Toolbar and hover pill, not by
-  clicking the canvas.
+  drag handling (drag end pins every dragged node, one undo step), pane
+  click clears selection. New individuals are added from the Toolbar and
+  hover pill, not by clicking the canvas.
+- Multi-select (#21): the store's `selectedIds` is the selection, and the
+  canvas copies it onto each node's React Flow `selected` flag (every copy
+  of a selected person), which is what makes React Flow drag the selected,
+  draggable nodes together and snap the group's delta rather than each
+  node. React Flow's own select changes are dropped except inside a
+  rubber band (Shift+drag, `onSelectionStart` / `onSelectionEnd`, added to
+  the selection at the end); clicks select through `PedigreeSymbolNode`
+  (Shift / Ctrl / Cmd toggles). Pressing on an unselected person selects
+  them alone on pointerdown, before React Flow collects the drag items,
+  so dragging them does not take an old selection along. The hover pill
+  and more menu are portals whose React events bubble to the node, so the
+  node checks DOM containment before treating an event as a click on the
+  symbol. React Flow's box round a finished selection is hidden in
+  `index.css`, and its delete key is off (the store deletes).
+  `selection.ts` has the batch lock counts used by the more menu's
+  "N selected" section and the edit panel's `SelectionPanel`.
 - The minimap (#6) draws each person with the canvas's own `SymbolShape` and
   `DeceasedSlash`, at NODE_SIZE inside a scaled `<g>`, so new symbol features
   reach it for free. A scoped `<style>` makes black strokes (and the white
