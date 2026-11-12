@@ -7,7 +7,7 @@ import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
 import { adjacentSibling } from "../../components/EditPanel";
-import { batchLockState } from "../selection";
+import { batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
 import { hasDescendants } from "../collapse";
 
@@ -592,9 +592,12 @@ function AddChildrenPanel({ individualId, onAdd }: {
  * them) the batch unlock and lock (#21).
  */
 function SelectionMenuSection({ individualId, action }: { individualId: string; action: (fn: () => void) => void }) {
-  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness } = usePedigreeStore();
+  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness, setDescendantsHidden } = usePedigreeStore();
   const batch = selectedIds.length > 1 && selectedIds.includes(individualId);
   const { toUnlock, toLock } = batchLockState(pedigree, batch ? selectedIds : []);
+  // Collapse a selection (#1): hide (or show) the descendants of every
+  // selected person who has any.
+  const { toHide, toShow } = batchCollapseState(pedigree, batch ? selectedIds : []);
   return (
     <MenuSection label={batch ? `${selectedIds.length} selected` : "Select"}>
       <MenuItem
@@ -619,6 +622,19 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
       {toLock.length > 0 && (
         <MenuItem onClick={() => action(() => lockIndividuals(toLock))} title="Lock the selected people and drop their pinned positions">
           Lock {toLock.length} (return to auto layout)
+        </MenuItem>
+      )}
+      {toHide.length > 0 && (
+        <MenuItem
+          onClick={() => action(() => setDescendantsHidden(toHide, true))}
+          title="Leave everyone below the selected people out of the drawing and exports, without deleting them"
+        >
+          Hide descendants of {toHide.length}
+        </MenuItem>
+      )}
+      {toShow.length > 0 && (
+        <MenuItem onClick={() => action(() => setDescendantsHidden(toShow, false))} title="Draw everyone below the selected people again">
+          Show descendants of {toShow.length}
         </MenuItem>
       )}
     </MenuSection>

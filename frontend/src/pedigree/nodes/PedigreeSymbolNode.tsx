@@ -3,7 +3,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow, CollapsedMarkIcon } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
@@ -11,7 +11,6 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { onsetsOf } from "../onset";
 import { isPhantomId } from "../../io/ped/converter";
-import { collapseInfo, collapsedMarkBox } from "../collapse";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -30,7 +29,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual, setDescendantsHidden } = usePedigreeStore();
+  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual } = usePedigreeStore();
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
@@ -206,27 +205,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
           }}
         />
       )}
-
-      {/* Hidden descendants (#94): click the mark to show them again. */}
-      {individual.descendantsHidden && (() => {
-        const box = collapsedMarkBox(NODE_SIZE);
-        const n = collapseInfo(pedigree).branches.get(individual.id)?.size ?? 0;
-        return (
-          <button
-            type="button"
-            data-descendants-hidden={individual.id}
-            title={`${n} ${n === 1 ? "person" : "people"} hidden below. Click to show.`}
-            className="nodrag"
-            // Not a press on the symbol: neither selects nor starts a drag.
-            onPointerDown={e => e.stopPropagation()}
-            onMouseDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); setDescendantsHidden([individual.id], false); }}
-            style={{ position: "absolute", left: box.x - 3, top: box.y - 3, width: box.size + 6, height: box.size + 6, padding: 3, border: 0, background: "transparent", cursor: "pointer" }}
-          >
-            <CollapsedMarkIcon size={box.size} />
-          </button>
-        );
-      })()}
 
       {/* Duplicate superscript */}
       {isDuplicate && duplicateIndex !== undefined && (

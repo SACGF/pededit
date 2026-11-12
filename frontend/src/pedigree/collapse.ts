@@ -27,7 +27,15 @@ import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } 
  *
  * A collapsed person who is themselves hidden folds into the branch of the
  * drawn collapsed person above them. A flag on someone with no descendants
- * hides nothing and is dropped from the drawn copy, so no marker is drawn.
+ * hides nothing and is dropped from the drawn copy.
+ *
+ * The hidden people are drawn as one diamond per couple (#1), the NSGC
+ * symbol for several people of unspecified sex with their number inside: the
+ * drawn copy gets a stand-in child (`branchPlaceholderId`) under each drawn
+ * partnership of a collapsed person whose children were all hidden. Being an
+ * ordinary child of the couple, it is laid out, joined by the sibship line
+ * and drawn by every renderer like anyone else; `CollapseInfo.placeholders`
+ * carries what it stands for. It is never in the stored pedigree.
  */
 
 export interface CollapseInfo {
@@ -42,6 +50,39 @@ export interface CollapseInfo {
    * a branch drawn as one node with a count (#1), this is the count.
    */
   branches: Map<string, Set<string>>;
+  /** The diamonds standing for hidden people (#1), by placeholder id. Their individuals are in `drawn`. */
+  placeholders: Map<string, CollapsedBranch>;
+}
+
+/** What one collapsed-branch diamond stands for (#1). */
+export interface CollapsedBranch {
+  /** The collapsed partner (or both partners) whose flag hides these people; expanding clears it. */
+  roots: string[];
+  /** The drawn partnership the diamond hangs from. */
+  partnershipId: string;
+  /** The hidden people under this partnership: its children, their descendants and the hidden partners of those. */
+  hidden: Set<string>;
+  affected: number;
+  male: number;
+  female: number;
+  unknownSex: number;
+}
+
+const PLACEHOLDER_PREFIX = "collapsed-branch:";
+
+/** Id of the diamond under partnership `partnershipId` in the drawn pedigree. */
+export function branchPlaceholderId(partnershipId: string): string {
+  return PLACEHOLDER_PREFIX + partnershipId;
+}
+
+/** True for the stand-in individual of a collapsed branch, who is drawn but is nobody in the pedigree. */
+export function isBranchPlaceholderId(id: string): boolean {
+  return typeof id === "string" && id.startsWith(PLACEHOLDER_PREFIX);
+}
+
+/** The branch a drawn individual stands for, or undefined for a real person. */
+export function branchOf(drawn: Pedigree, id: string): CollapsedBranch | undefined {
+  return isBranchPlaceholderId(id) ? collapseInfo(drawn).placeholders.get(id) : undefined;
 }
 
 const cache = new WeakMap<Pedigree, CollapseInfo>();
@@ -51,7 +92,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   const cached = cache.get(pedigree);
   if (cached) return cached;
   const roots = pedigree.individuals.filter(i => i.descendantsHidden).map(i => i.id);
-  if (roots.length === 0) return { drawn: pedigree, hidden: new Set(), branches: new Map() };
+  if (roots.length === 0) return { drawn: pedigree, hidden: new Set(), branches: new Map(), placeholders: new Map() };
 
   // One root at a time: descendantsOf leaves out the ids it starts from, and
   // a collapsed person below another one is hidden too.
@@ -90,22 +131,68 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
     return rest as Individual;
   });
 
-  const info: CollapseInfo = { drawn, hidden, branches };
+  const placeholders = addPlaceholders(pedigree, drawn, hidden, branches);
+
+  const info: CollapseInfo = { drawn, hidden, branches, placeholders };
   cache.set(pedigree, info);
   // The drawn copy is already drawn: asking again hands back the same answer,
   // with the branch counts, so callers can pass either object.
-  cache.set(drawn, { drawn, hidden: new Set(), branches });
+  cache.set(drawn, { drawn, hidden: new Set(), branches, placeholders });
   return info;
+}
+
+/**
+ * Add a diamond child (#1) under each drawn partnership of a drawn collapsed
+ * person that had children in the full pedigree. All of that couple's
+ * children are hidden (they are the collapsed person's descendants), so the
+ * diamond is the couple's only drawn child. A collapsed person whose every
+ * partnership with children is gone from the drawing (their partner is
+ * hidden under another collapsed person) gets no diamond: those people are
+ * counted in that other person's diamond.
+ */
+function addPlaceholders(
+  full: Pedigree, drawn: Pedigree, hidden: Set<string>, branches: Map<string, Set<string>>,
+): Map<string, CollapsedBranch> {
+  const out = new Map<string, CollapsedBranch>();
+  const byId = new Map(full.individuals.map(i => [i.id, i]));
+  const added: Individual[] = [];
+  for (const p of drawn.partnerships) {
+    const roots = [p.individual1, p.individual2].filter(id => branches.has(id));
+    const children = full.parentOf[p.id] ?? [];
+    if (roots.length === 0 || children.length === 0 || (drawn.parentOf[p.id]?.length ?? 0) > 0) continue;
+    const below = new Set([...children, ...descendantsOf(full, children)]);
+    const set = new Set(below);
+    for (const id of below) for (const q of full.partnerships) {
+      const other = q.individual1 === id ? q.individual2 : q.individual2 === id ? q.individual1 : null;
+      if (other && hidden.has(other)) set.add(other);
+    }
+    const people = [...set].map(id => byId.get(id)!).filter(Boolean);
+    const id = branchPlaceholderId(p.id);
+    out.set(id, {
+      roots,
+      partnershipId: p.id,
+      hidden: set,
+      affected: people.filter(i => i.affected).length,
+      male: people.filter(i => i.sex === "male").length,
+      female: people.filter(i => i.sex === "female").length,
+      unknownSex: people.filter(i => i.sex === "unknown").length,
+    });
+    added.push({ id, sex: "unknown", affected: false, sibOrder: 0 });
+    drawn.parentOf[p.id] = [id];
+  }
+  drawn.individuals = [...drawn.individuals, ...added];
+  return out;
 }
 
 /**
  * Record that `derived` (a copy of an already drawn pedigree with, say, names
  * replaced, as de-identified export does) is itself drawn, keeping the branch
- * counts. Without this, the collapsed people in it have no descendants left
- * and would lose their mark. Returns `derived`.
+ * counts and diamonds. Without this, the diamonds would be taken for real
+ * people and the collapsed people for childless ones. Returns `derived`.
  */
 export function asDrawn(derived: Pedigree, source: Pedigree): Pedigree {
-  cache.set(derived, { drawn: derived, hidden: new Set(), branches: collapseInfo(source).branches });
+  const { branches, placeholders } = collapseInfo(source);
+  cache.set(derived, { drawn: derived, hidden: new Set(), branches, placeholders });
   return derived;
 }
 
@@ -141,34 +228,37 @@ export function rootsHidingNew(before: Pedigree, after: Pedigree): string[] {
   return after.individuals.filter(i => i.descendantsHidden && line.has(i.id)).map(i => i.id);
 }
 
-// ── Marker ────────────────────────────────────────────────────────────────────
+// ── Diamond ───────────────────────────────────────────────────────────────────
 
-/**
- * The mark on a collapsed person: a small boxed "+" just off the symbol's
- * lower right corner, clear of adoption brackets, the couple line (at mid
- * height) and the labels below. Shared by the canvas (`PedigreeSymbolNode`)
- * and both SVG exporters. Coordinates are relative to the symbol box's top
- * left corner.
- */
-export const COLLAPSED_MARK = { x: 6, y: -10, size: 10 } as const;
+/** Legend wording for the collapsed-branch diamond. */
+export const COLLAPSED_BRANCH_LABEL = "Descendants not shown (number of people)";
 
-/** Box (x, y, size) of the mark for a size × size symbol whose top-left corner is (ox, oy). */
-export function collapsedMarkBox(symbolSize: number, ox = 0, oy = 0) {
-  return { x: ox + symbolSize + COLLAPSED_MARK.x, y: oy + symbolSize + COLLAPSED_MARK.y, size: COLLAPSED_MARK.size };
+/** Font size of the count inside a diamond of `symbolSize`: smaller for three digits and more. */
+export function branchCountFontSize(count: number, symbolSize: number): number {
+  const digits = String(count).length;
+  return Math.round(symbolSize * (digits >= 3 ? 0.26 : 0.34));
 }
 
-/** SVG markup of the mark beside a symbol, for the exporters. */
-export function renderCollapsedMarkSvg(symbolSize: number, ox = 0, oy = 0): string {
-  const { x, y, size } = collapsedMarkBox(symbolSize, ox, oy);
-  return `<g class="descendants-hidden">${collapsedMarkSvgAt(x, y, size)}</g>`;
+/** The note under a diamond: how many of the hidden people are affected. */
+export function branchNote(branch: CollapsedBranch): string | undefined {
+  return branch.affected > 0 ? `${branch.affected} affected` : undefined;
 }
 
-/** Legend wording for the mark. */
-export const COLLAPSED_MARK_LABEL = "Descendants not shown";
+/** Hover text for a diamond on the canvas: count, sex breakdown, affected count. */
+export function branchTooltip(branch: CollapsedBranch): string {
+  const n = branch.hidden.size;
+  const parts = [
+    branch.male && `${branch.male} male`,
+    branch.female && `${branch.female} female`,
+    branch.unknownSex && `${branch.unknownSex} unknown sex`,
+  ].filter(Boolean).join(", ");
+  const affected = branch.affected > 0 ? `, ${branch.affected} affected` : "";
+  return `${n} ${n === 1 ? "person" : "people"} not shown (${parts}${affected}). Click to show.`;
+}
 
-/** SVG markup of the mark in a size × size box with top-left (x, y). */
-export function collapsedMarkSvgAt(x: number, y: number, size: number = COLLAPSED_MARK.size): string {
-  const m = size / 2, arm = size / 2 - 2.5;
-  return `<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="white" stroke="black" stroke-width="1"/>`
-    + `<path d="M ${x + m - arm} ${y + m} H ${x + m + arm} M ${x + m} ${y + m - arm} V ${y + m + arm}" stroke="black" stroke-width="1.2"/>`;
+/** SVG text of the count centred on (cx, cy), the centre of a diamond of `symbolSize`. */
+export function renderBranchCountSvg(count: number, symbolSize: number, cx = 0, cy = 0): string {
+  const fs = branchCountFontSize(count, symbolSize);
+  // A baseline offset rather than dominant-baseline, which some rasterisers ignore.
+  return `<text class="branch-count" x="${cx}" y="${cy + Math.round(fs * 0.36 * 10) / 10}" text-anchor="middle" font-family="sans-serif" font-size="${fs}" fill="black">${count}</text>`;
 }

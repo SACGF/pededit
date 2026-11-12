@@ -13,6 +13,7 @@
 import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
 import { onsetsOf } from "./onset";
 import { tagCanvasText } from "./tags";
+import { branchOf, branchNote } from "./collapse";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -111,9 +112,12 @@ export function linesWidth(lines: string[]): number {
  * ellipsis. Only one, so a two-line name plus this line still clears the
  * sibship bar halfway to the next row. Then one line per age of onset (#93),
  * which only people with a recorded onset have. Shared by the canvas, both
- * SVG exporters and the lints.
+ * SVG exporters and the lints. A collapsed-branch diamond (#1) has instead
+ * its affected count, when any of its people are affected.
  */
 export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree): string[] {
+  const branch = branchOf(pedigree, ind.id);
+  if (branch) return wrapLabel(branchNote(branch), maxWidth, 1);
   const age = ind.age?.trim();
   return [...wrapLabel(age ? age : ind.dob, maxWidth, 1), ...onsetLines(ind, pedigree, maxWidth)];
 }

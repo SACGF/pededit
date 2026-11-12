@@ -1,7 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 import type { SvgExportOptions } from "./types";
-import { asDrawn, drawnPedigree } from "../../pedigree/collapse";
+import { asDrawn, drawnPedigree, isBranchPlaceholderId } from "../../pedigree/collapse";
 
 function ageBucket(dob: string, referenceDate = new Date()): string {
   const birth = new Date(dob);
@@ -33,7 +33,7 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     ...(pedigree.canvasSettings ? { canvasSettings: { ...pedigree.canvasSettings, showNumbers: false } } : {}),
     individuals: pedigree.individuals.map(ind => ({
       ...ind,
-      name:  notations.get(ind.id) ?? ind.id,
+      name:  isBranchPlaceholderId(ind.id) ? undefined : notations.get(ind.id) ?? ind.id,
       dob:   options.ageBuckets && ind.dob ? ageBucket(ind.dob) : undefined,
       age:   undefined,
       notes: undefined,

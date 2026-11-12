@@ -349,13 +349,3 @@ export function DuplicateSuperscript({ index }: { index: number }) {
     </span>
   );
 }
-
-/** The hidden descendants mark (#94), a boxed "+": its own little SVG, for the canvas and the legend. */
-export function CollapsedMarkIcon({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: "block" }}>
-      <rect x={0.5} y={0.5} width={size - 1} height={size - 1} fill="white" stroke="black" strokeWidth={1} />
-      <path d={`M 2.5 ${size / 2} H ${size - 2.5} M ${size / 2} 2.5 V ${size - 2.5}`} stroke="black" strokeWidth={1.2} />
-    </svg>
-  );
-}

@@ -17,6 +17,7 @@ import "@xyflow/react/dist/style.css";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
+import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
 import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
@@ -35,7 +36,7 @@ import { chartTitle } from "./labels";
 import { useAppStore } from "../store/useAppStore";
 import { CanvasContextMenu, type ContextMenuTarget } from "./CanvasContextMenu";
 
-const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode, chartTitle: ChartTitleNode };
+const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode, collapsedBranch: CollapsedBranchNode, chartTitle: ChartTitleNode };
 
 const edgeTypes: EdgeTypes = {
   coupleEdge:         CoupleEdge,

@@ -10,6 +10,7 @@
  */
 
 import type { LayoutResult, Pedigree } from "@pedigree-editor/layout-engine";
+import { isBranchPlaceholderId } from "./collapse";
 
 const ROMAN: [number, string][] = [
   [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
@@ -27,7 +28,8 @@ export function toRoman(n: number): string {
 
 /**
  * Number everyone in `result` (a layout of `pedigree`, already the drawn
- * pedigree), level by level in slot order. Someone drawn twice keeps the
+ * pedigree), level by level in slot order. Collapsed-branch diamonds (#1)
+ * get no number. Someone drawn twice keeps the
  * number of their first copy; slots in `skip` ("level-slot", copies the
  * canvas leaves out) are passed over.
  */
@@ -44,6 +46,7 @@ export function numberFromLayout(
       if (skip.has(`${level}-${slot}`)) continue;
       const individual = pedigree.individuals[result.nid[level][slot] - 1];
       if (!individual || assigned.has(individual.id)) continue;
+      if (isBranchPlaceholderId(individual.id)) continue; // a collapsed-branch diamond (#1) is nobody
       if (count === 0) generation++;
       assigned.set(individual.id, `${toRoman(generation)}-${++count}`);
     }

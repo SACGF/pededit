@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { collapseInfo, drawnPedigree, asDrawn, rootsHidingNew, hasDescendants } from "../collapse";
-import { layoutToFlow } from "../layoutToFlow";
+import { collapseInfo, drawnPedigree, asDrawn, rootsHidingNew, hasDescendants, branchPlaceholderId, isBranchPlaceholderId, branchTooltip } from "../collapse";
+import { batchCollapseState } from "../selection";
+import { parseExportSvg } from "../../io/svg/exportLint";
+import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { renderExportKeySvg } from "../tags";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -66,7 +68,7 @@ describe("collapseInfo / drawnPedigree (#94)", () => {
     expect(ids(drawn)).not.toContain("gc1");
     expect(ids(drawn)).toContain("wife");
     expect(drawn.partnerships.map(q => q.id)).toContain("sw");
-    expect(drawn.parentOf.sw).toEqual([]);
+    expect(drawn.parentOf.sw).toEqual([branchPlaceholderId("sw")]);
     expect(drawn.pinnedPositions).toBeUndefined();
     expect(sorted(branches.get("son")!)).toEqual(["gc1", "gc2"]);
     expect(drawn.individuals.find(i => i.id === "son")!.descendantsHidden).toBe(true);
@@ -82,7 +84,7 @@ describe("collapseInfo / drawnPedigree (#94)", () => {
     const { drawn, hidden, branches } = collapseInfo(pedigree({ gm: true }));
     // wife married in to son only, so she goes; cousin has parents of his own, so he stays.
     expect(sorted(hidden)).toEqual(["dau", "gc1", "gc2", "gc3", "son", "wife"]);
-    expect(ids(drawn)).toEqual(["aunt", "cousin", "gf", "gm", "loner", "uncle"]);
+    expect(ids(drawn)).toEqual(["aunt", branchPlaceholderId("g"), "cousin", "gf", "gm", "loner", "uncle"]);
     expect(drawn.partnerships.map(q => q.id).sort()).toEqual(["g", "ua"]);
     expect(drawn.partnerships.find(q => q.id === "g")!.twins).toBeUndefined();
     expect(sorted(branches.get("gm")!)).toEqual(["dau", "gc1", "gc2", "gc3", "son", "wife"]);
@@ -93,7 +95,7 @@ describe("collapseInfo / drawnPedigree (#94)", () => {
     const { drawn, hidden } = collapseInfo(pedigree({ dau: true }));
     expect(sorted(hidden)).toEqual(["gc3"]);
     expect(ids(drawn)).toContain("cousin");
-    expect(drawn.parentOf.dc).toEqual([]);
+    expect(drawn.parentOf.dc).toEqual([branchPlaceholderId("dc")]);
   });
 
   it("folds a collapsed person who is hidden into the branch above", () => {
@@ -106,7 +108,7 @@ describe("collapseInfo / drawnPedigree (#94)", () => {
     const p = pedigree({ loner: true });
     expect(hasDescendants(p, "loner")).toBe(false);
     expect(drawnPedigree(p).individuals.find(i => i.id === "loner")!.descendantsHidden).toBeUndefined();
-    expect(exportSvg(p)).not.toContain("descendants-hidden");
+    expect(exportSvg(p)).not.toContain("branch-count");
   });
 
   it("clears a childless mark on a couple whose children are hidden", () => {
@@ -147,7 +149,7 @@ describe("drawing with hidden descendants (#94)", () => {
     expect(lintExport(plain({}))).toEqual([]);
     for (const p of [plain({ son: true }), plain({ dau: true }), plain({ gm: true })]) {
       const svg = exportSvg(p);
-      expect(svg.match(/class="descendants-hidden"/g)).toHaveLength(1);
+      expect(svg.match(/class="branch-count"/g)).toHaveLength(1);
       expect(svg).toContain("Descendants not shown");
       expect(lintExport(p)).toEqual([]);
       expect(lintExport(p, { deidentify: true })).toEqual([]);
@@ -155,17 +157,24 @@ describe("drawing with hidden descendants (#94)", () => {
     // The U-shape draws one family, the proband's.
     const u = plain({ son: true });
     u.individuals.find(i => i.id === "dau")!.proband = true;
-    expect(exportUShapeSvg(u).match(/class="descendants-hidden"/g)).toHaveLength(1);
+    expect(exportUShapeSvg(u).match(/class="branch-count"/g)).toHaveLength(1);
     expect(exportUShapeSvg(u)).not.toContain('data-id="gc1"');
     // wife is the only affected person and is hidden with gm's branch: no Affected key row.
     expect(renderExportKeySvg(drawnPedigree(pedigree({ gm: true })), 0, 0).markup.join("")).not.toContain(">Affected<");
     expect(exportSvg(pedigree({ gm: true }))).not.toContain('data-id="wife"');
   });
 
-  it("de-identified export numbers only the drawn people and keeps the mark", () => {
+  it("de-identified export numbers only the drawn people and keeps the diamond", () => {
     const d = deidentify(pedigree({ gm: true }));
-    expect(d.individuals).toHaveLength(6);
-    expect(exportSvg(pedigree({ gm: true }), { deidentify: true })).toContain('class="descendants-hidden"');
+    expect(d.individuals).toHaveLength(7); // six people and the diamond
+    const diamond = d.individuals.find(i => isBranchPlaceholderId(i.id))!;
+    expect(diamond.name).toBeUndefined();
+    // The diamond takes no number: generation II has only the cousin.
+    expect(d.individuals.filter(i => i.name?.startsWith("II-")).map(i => i.id)).toEqual(["cousin"]);
+    expect(collapseInfo(d).placeholders.get(diamond.id)!.hidden.size).toBe(6);
+    const svg = exportSvg(pedigree({ gm: true }), { deidentify: true });
+    expect(svg).toMatch(/class="branch-count"[^>]*>6</);
+    expect(svg).toContain(">1 affected<");
   });
 });
 
@@ -204,5 +213,101 @@ describe("setDescendantsHidden (#94)", () => {
     store().addChildren("wife", 1, "male");
     expect(store().pedigree.individuals.find(i => i.id === "son")!.descendantsHidden).toBeUndefined();
     expect(collapseInfo(store().pedigree).hidden.size).toBe(0);
+  });
+});
+
+describe("collapsed branch diamond (#1)", () => {
+  it("counts the hidden people under each couple, with sex and affected breakdown", () => {
+    const { placeholders, drawn } = collapseInfo(pedigree({ gm: true }));
+    expect([...placeholders.keys()]).toEqual([branchPlaceholderId("g")]);
+    const b = placeholders.get(branchPlaceholderId("g"))!;
+    expect(b.roots).toEqual(["gm"]);
+    expect(b.partnershipId).toBe("g");
+    expect(sorted(b.hidden)).toEqual(["dau", "gc1", "gc2", "gc3", "son", "wife"]);
+    expect([b.male, b.female, b.unknownSex, b.affected]).toEqual([2, 3, 1, 1]);
+    expect(branchTooltip(b)).toBe("6 people not shown (2 male, 3 female, 1 unknown sex, 1 affected). Click to show.");
+    const diamond = drawn.individuals.find(i => i.id === branchPlaceholderId("g"))!;
+    expect(diamond).toEqual({ id: branchPlaceholderId("g"), sex: "unknown", affected: false, sibOrder: 0 });
+  });
+
+  it("is never in the stored pedigree, and not in data exports' input", () => {
+    const p = pedigree({ son: true });
+    collapseInfo(p);
+    expect(p.individuals.some(i => isBranchPlaceholderId(i.id))).toBe(false);
+  });
+
+  it("names both partners when both are collapsed, so one click shows the branch", () => {
+    const b = collapseInfo(pedigree({ son: true, wife: true })).placeholders.get(branchPlaceholderId("sw"))!;
+    expect(b.roots).toEqual(["son", "wife"]);
+    expect(b.hidden.size).toBe(2);
+  });
+
+  it("draws one diamond per couple for someone with children by two partners", () => {
+    const p = pedigree();
+    p.individuals.push({ id: "wife2", sex: "female", affected: false, sibOrder: 6 }, { id: "gc5", sex: "male", affected: true, sibOrder: 0 });
+    p.partnerships.push({ id: "sw2", individual1: "son", individual2: "wife2" });
+    p.parentOf.sw2 = ["gc5"];
+    p.individuals.find(i => i.id === "son")!.descendantsHidden = true;
+    const { placeholders, branches } = collapseInfo(p);
+    expect(placeholders.get(branchPlaceholderId("sw"))!.hidden.size).toBe(2);
+    expect(placeholders.get(branchPlaceholderId("sw2"))!.affected).toBe(1);
+    expect(branches.get("son")!.size).toBe(3);
+    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+  });
+
+  it("sits on the row below the couple, under them, joined by their sibship line", () => {
+    const p = pedigree({ son: true });
+    const flow = layoutToFlow(p);
+    const node = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!;
+    const diamond = node(branchPlaceholderId("sw"));
+    expect(diamond.type).toBe("collapsedBranch");
+    expect(diamond.draggable).toBe(false);
+    expect(diamond.selectable).toBe(false);
+    expect(diamond.data.branch!.hidden.size).toBe(2);
+    const son = node("son"), wife = node("wife");
+    expect(diamond.position.y).toBeGreaterThan(son.position.y);
+    const lo = Math.min(son.position.x, wife.position.x), hi = Math.max(son.position.x, wife.position.x);
+    expect(diamond.position.x).toBeGreaterThanOrEqual(lo);
+    expect(diamond.position.x).toBeLessThanOrEqual(hi);
+    const sib = flow.sibshipEdges.find(e => e.data!.childIds.includes(diamond.id))!;
+    expect(new Set([sib.data!.leftParentId, sib.data!.rightParentId])).toEqual(new Set([son.id, wife.id]));
+    expect(sib.data!.childIds).toEqual([diamond.id]);
+    expect(lintFlow(p, flow)).toEqual([]);
+    // No affected people hidden: no note under the diamond.
+    expect(diamond.data.detailLines).toEqual([]);
+    expect(node(branchPlaceholderId("sw")).data.nameLines).toEqual([]);
+  });
+
+  it("puts the count inside the diamond in the export", () => {
+    const p = pedigree({ son: true });
+    delete p.partnerships[0]!.twins;
+    delete p.pinnedPositions;
+    const svg = exportSvg(p);
+    // In the symbols group, centred on the symbol's own origin (its centre).
+    const symbols = svg.slice(svg.indexOf('<g class="symbols">'), svg.indexOf('<g class="labels">'));
+    expect(symbols).toMatch(/<text class="branch-count" x="0" y="[\d.]+"[^>]*>2<\/text>/);
+    expect(parseExportSvg(svg).symbols).toHaveLength(drawnPedigree(p).individuals.length);
+    expect(svg).not.toContain(">1 affected<");
+  });
+
+  it("the export key has a diamond row only while a branch is collapsed", () => {
+    expect(renderExportKeySvg(pedigree({ son: true }), 0, 0).markup.join("")).toContain("Descendants not shown");
+    expect(renderExportKeySvg(pedigree({ loner: true }), 0, 0).markup.join("")).not.toContain("Descendants not shown");
+  });
+});
+
+describe("pedigree numbers with a collapsed branch (#1, #8)", () => {
+  it("skip the diamond", () => {
+    const numbers = pedigreeNumbers(pedigree({ gm: true }));
+    expect(numbers.has(branchPlaceholderId("g"))).toBe(false);
+    expect([...numbers].filter(([, n]) => n.startsWith("II-")).map(([id]) => id)).toEqual(["cousin"]);
+  });
+});
+
+describe("batchCollapseState (#1)", () => {
+  it("hides the topmost selected people with descendants, shows the collapsed ones", () => {
+    const p = pedigree({ dau: true });
+    expect(batchCollapseState(p, ["gf", "son", "loner"])).toEqual({ toHide: ["gf"], toShow: [] });
+    expect(batchCollapseState(p, ["son", "dau", "uncle"])).toEqual({ toHide: ["son", "uncle"], toShow: ["dau"] });
   });
 });

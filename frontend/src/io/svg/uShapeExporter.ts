@@ -1,6 +1,6 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
-import { drawnPedigree, renderCollapsedMarkSvg } from "../../pedigree/collapse";
+import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
   needsAffectedCore, renderAffectedCoreSvg,
@@ -1200,13 +1200,15 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       if (!ind) return;
       const pos = nodeAt(n, i, b.geom);
       const clipId = `symbol-clip-${seq++}`;
+      const branch = branchOf(pedigree, ind.id);
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
         renderLabel(ind, pedigree, solo && m.id === n.blood) +
         renderShape(ind, pedigree, clipId, pos.rotation) +
         (ind.deceased ? renderDeceasedSlash() : "") +
         (ind.proband ? renderProbandArrow() : "") +
-        (ind.descendantsHidden ? renderCollapsedMarkSvg(NODE_SIZE, -NODE_SIZE / 2, -NODE_SIZE / 2) : "") +
+        // The count in a collapsed-branch diamond (#1), kept upright.
+        (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.hidden.size, NODE_SIZE)}</g>` : "") +
         `</g>`,
       );
     });

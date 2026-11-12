@@ -14,7 +14,7 @@ import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
-import { drawnPedigree, renderCollapsedMarkSvg } from "../../pedigree/collapse";
+import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
 import type { SvgExportOptions } from "./types";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
@@ -419,7 +419,8 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       if (ind.deceased) elems.push(renderDeceasedSlash());
       if (ind.proband)  elems.push(renderProbandArrow());
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
-      if (ind.descendantsHidden) elems.push(renderCollapsedMarkSvg(NODE_SIZE, -NODE_SIZE / 2, -NODE_SIZE / 2));
+      const branch = branchOf(pedigree, ind.id);
+      if (branch) elems.push(renderBranchCountSvg(branch.hidden.size, NODE_SIZE)); // collapsed branch (#1)
       elems.push(`</g>`);
     }
   }

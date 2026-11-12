@@ -3,7 +3,7 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape, CollapsedMarkIcon } from "../pedigree/nodes/symbols";
+import { SymbolShape } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
@@ -11,7 +11,7 @@ import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/
 import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
-import { drawnPedigree, COLLAPSED_MARK, COLLAPSED_MARK_LABEL } from "@/pedigree/collapse";
+import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "@/pedigree/collapse";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tagTakesOnset } from "@/pedigree/onset";
@@ -164,12 +164,14 @@ function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
   );
 }
 
-/** The hidden descendants mark (#94), as drawn beside a symbol. */
-function CollapsedMarkSvg() {
+/** A collapsed branch (#1): a diamond with "n" in it. */
+function CollapsedBranchSvg() {
+  const c = SZ / 2;
   return (
-    <span style={{ width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-      <CollapsedMarkIcon size={COLLAPSED_MARK.size} />
-    </span>
+    <svg width="28" height="28" viewBox="-2 -2 28 28">
+      <polygon points={`${c},1 ${SZ - 1},${c} ${c},${SZ - 1} 1,${c}`} stroke="black" strokeWidth={2} fill="white" />
+      <text x={c} y={c + 4} textAnchor="middle" fontFamily="sans-serif" fontSize={11} fontStyle="italic">n</text>
+    </svg>
   );
 }
 
@@ -258,9 +260,11 @@ interface LegendProps {
 }
 
 export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
-  // Only what is drawn: hidden descendants (#94) add no entries.
-  const pedigree = drawnPedigree(full);
-  const { individuals, partnerships } = pedigree;
+  // Only what is drawn: hidden descendants (#94) add no entries, and the
+  // diamonds standing for them (#1) have their own row.
+  const { drawn: pedigree, placeholders } = collapseInfo(full);
+  const { partnerships } = pedigree;
+  const individuals = pedigree.individuals.filter(i => !isBranchPlaceholderId(i.id));
 
   const hasMale    = individuals.some(i => i.sex === "male");
   const hasFemale  = individuals.some(i => i.sex === "female");
@@ -297,7 +301,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
     if (ind) indRows.push({ icon: <AdoptedSvg sex={ind.sex} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
   }
 
-  if (individuals.some(i => i.descendantsHidden)) indRows.push({ icon: <CollapsedMarkSvg />, label: COLLAPSED_MARK_LABEL });
+  if (placeholders.size > 0) indRows.push({ icon: <CollapsedBranchSvg />, label: COLLAPSED_BRANCH_LABEL });
 
   const relRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });

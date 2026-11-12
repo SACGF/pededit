@@ -8,7 +8,8 @@ import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
-import { drawnPedigree } from "./collapse";
+import { drawnPedigree, branchOf } from "./collapse";
+import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, nameLabelText } from "./labels";
@@ -49,6 +50,12 @@ export interface RFNodeData extends Record<string, unknown> {
   labelText?: string;
   /** The line under the name: free-text age, or else the DOB (#20). Empty when neither. */
   detailLines: string[];
+  /**
+   * Set on the diamond standing for a collapsed branch (#1), whose
+   * `individual` is a stand-in that is not in the stored pedigree. Such a
+   * node has type "collapsedBranch" and can be neither selected nor dragged.
+   */
+  branch?: CollapsedBranch;
 }
 
 /**
@@ -322,12 +329,16 @@ function buildNodes(
       const isDuplicate = copies.length > 1;
       const isPinned = pinnedSlot.get(nid) === id;
       const pinnedPos = pedigree.pinnedPositions?.[individual.id];
+      const branch = branchOf(pedigree, individual.id);
 
       nodes.push({
         id,
-        type:     "pedigreeSymbol",
+        type:     branch ? "collapsedBranch" : "pedigreeSymbol",
         position: isPinned && pinnedPos ? scalePinnedPosition(pinnedPos, spacing) : autoPos(level, slot),
-        draggable: nodesMoveable || unlockedSet.has(individual.id),
+        draggable: !branch && (nodesMoveable || unlockedSet.has(individual.id)),
+        // Not selectable or draggable, so React Flow would turn its pointer
+        // events off; the diamond is clicked to show the branch again.
+        ...(branch ? { selectable: false, style: { pointerEvents: "all" as const } } : {}),
         width:  NODE_SIZE,
         height: NODE_SIZE,
         data: {
@@ -340,6 +351,7 @@ function buildNodes(
           nameLines: wrapLabel(nameLabelText(individual, numbers), labelMaxWidth(slotWidth), labelLines),
           labelText: nameLabelText(individual, numbers),
           detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree),
+          ...(branch ? { branch } : {}),
         },
       });
     }

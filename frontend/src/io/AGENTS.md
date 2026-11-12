@@ -137,7 +137,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   lint ignores it.
 - Hidden descendants (#94): `deidentify` works on the drawn pedigree, so the
   generation numbers count only people who are drawn, and returns its copy
-  through `asDrawn` so collapsed people keep their mark. `exportSvg` and
+  through `asDrawn` so the collapsed-branch diamonds (#1) stay diamonds. The
+  diamonds take no generation number and no name. `exportSvg` and
   `exportUShapeSvg` start from `drawnPedigree()` the same way; CSV, PED and
   JSON export everyone.
 - `types.ts` — `SvgExportOptions`.

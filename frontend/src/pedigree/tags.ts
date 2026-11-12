@@ -4,7 +4,7 @@ import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangl
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
-import { COLLAPSED_MARK, COLLAPSED_MARK_LABEL, collapsedMarkSvgAt, drawnPedigree } from "./collapse";
+import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -488,10 +488,13 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
       },
     });
   }
-  // Hidden descendants mark (#94).
-  if (drawnPedigree(pedigree).individuals.some(i => i.descendantsHidden)) {
-    const s = COLLAPSED_MARK.size;
-    rows.push({ label: COLLAPSED_MARK_LABEL, swatch: sy => collapsedMarkSvgAt(x + (LEGEND_SWATCH - s) / 2, sy + (LEGEND_SWATCH - s) / 2) });
+  // Collapsed branches (#1): a diamond with "n" in it.
+  if (collapseInfo(pedigree).placeholders.size > 0) {
+    rows.push({
+      label: COLLAPSED_BRANCH_LABEL,
+      swatch: sy => `${swatchGeom("unknown", x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
+        + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-style="italic" fill="black">n</text>`,
+    });
   }
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(pedigree);
