@@ -85,6 +85,14 @@ stub so the app still builds without Google login.
   picking), flags, pinning,
   canvas settings, tags. All edits go through immer `produce` and push an undo
   snapshot. Add new edits here, not in components.
+  Selection (#21) is `selectedIds` (every selected person) plus `selectedId`,
+  the primary (last clicked) one that the edit panel and single-person menu
+  items read. Change it only through `setSelectedId` / `toggleSelected` /
+  `setSelection` / `selectDescendants`, which keep the two in step; every
+  edit, undo and redo drops ids that no longer exist. `selectedPair(state)`
+  gives exactly two selected people, for pairwise views. Batch edits
+  (`pinIndividuals`, `lockIndividuals`, `unlockIndividuals`,
+  `deleteIndividuals`) are one undo step each.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
 - `components/` — Toolbar, EditPanel (individual form, the

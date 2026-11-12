@@ -169,6 +169,32 @@ function clearChildless(draft: Pedigree, partnershipId: string): void {
   delete p.childlessReason;
 }
 
+/**
+ * Selection fields for selecting exactly `id` (or nothing). Every store write
+ * of the selection goes through here or `selectionOf`, so `selectedId` is
+ * always the primary member of `selectedIds` (#21).
+ */
+function selectOnly(id: string | null): { selectedId: string | null; selectedIds: string[] } {
+  return { selectedId: id, selectedIds: id ? [id] : [] };
+}
+
+/** Selection fields for `ids` (deduplicated), with `primary` (default the last id) as selectedId. */
+function selectionOf(ids: string[], primary?: string | null): { selectedId: string | null; selectedIds: string[] } {
+  const selectedIds = [...new Set(ids)];
+  const selectedId = primary && selectedIds.includes(primary) ? primary : (selectedIds[selectedIds.length - 1] ?? null);
+  return { selectedId, selectedIds };
+}
+
+/**
+ * The two selected individuals when exactly two are selected, else null:
+ * the primary (last clicked) second. For pairwise views such as #90.
+ */
+export function selectedPair(state: { selectedId: string | null; selectedIds: string[] }): [string, string] | null {
+  if (state.selectedIds.length !== 2 || !state.selectedId) return null;
+  const other = state.selectedIds.find(id => id !== state.selectedId)!;
+  return [other, state.selectedId];
+}
+
 /** Clamp the batch size accepted by addChildren. */
 export const MAX_ADD_CHILDREN = 10;
 
@@ -180,7 +206,15 @@ interface PedigreeState {
   future: Pedigree[];  // redo stack, newest last
 
   activeTool: ActiveTool;
+  /**
+   * Selection (#21). `selectedIds` holds every selected individual id;
+   * `selectedId` is the primary one (the last clicked), which the edit
+   * panel and single-person actions use. With nothing selected they are
+   * [] and null; with one, [id] and id. Kept in step by the actions below,
+   * never set directly. `selectedPair` reads exactly two.
+   */
   selectedId: string | null;
+  selectedIds: string[];
   hoveredId: string | null;
   isDirty: boolean;
   /** Bumped by resetLayout so the canvas can refit the view (#64). Not undoable. */
@@ -212,7 +246,18 @@ interface PedigreeState {
 
   // Tool + selection
   setActiveTool: (tool: ActiveTool) => void;
+  /** Select only this individual, or clear the selection with null. */
   setSelectedId: (id: string | null) => void;
+  /** Shift / Ctrl / Cmd+click: add id to the selection (as primary) or take it out. */
+  toggleSelected: (id: string) => void;
+  /** Replace the selection (rubber band, select descendants). Primary defaults to the last id. */
+  setSelection: (ids: string[], primary?: string | null) => void;
+  /**
+   * Select a person, their descendants and the partners who married into
+   * that branch (the "remove with descendants" set, #34), with the person
+   * as primary. Returns how many are selected.
+   */
+  selectDescendants: (id: string) => number;
   setHoveredId: (id: string | null) => void;
 
   // Undo/redo
@@ -235,6 +280,12 @@ interface PedigreeState {
    */
   linkPartner: (individualId: string, partnerId: string) => string | null;
   deleteIndividual: (individualId: string) => void;
+  /**
+   * Delete several individuals as one undo step (Delete with a multiple
+   * selection, #21); children stay, as founders. Refused, with an error
+   * notice, when nobody would be left. Returns how many were removed.
+   */
+  deleteIndividuals: (individualIds: string[]) => number;
   /**
    * Remove these individuals with everyone below them, plus partners who
    * married in and have no other link (#34). Refused, with an error notice,
@@ -295,12 +346,18 @@ interface PedigreeState {
 
   // Pin / drag
   pinIndividual: (individualId: string, pos: { x: number; y: number }) => void;
+  /** Pin several individuals as one undo step (a group drag, #21). Positions in normal spacing. */
+  pinIndividuals: (positions: Record<string, { x: number; y: number }>) => void;
   unpinIndividual: (individualId: string) => void;
   resetLayout: () => void;
 
   // Lock / unlock per-node
   unlockIndividual: (individualId: string) => void;
   lockIndividual: (individualId: string) => void;
+  /** Unlock several individuals as one undo step (#21). No-op when all are unlocked already. */
+  unlockIndividuals: (individualIds: string[]) => void;
+  /** Lock several individuals as one undo step, dropping their pins (back to auto layout). */
+  lockIndividuals: (individualIds: string[]) => void;
 
   // Canvas settings
   updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
@@ -327,25 +384,33 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
   function mutate(recipe: (draft: Pedigree) => void) {
     snapshot();
     set(state => ({ pedigree: produce(state.pedigree, recipe) }));
+    pruneSelection();
+  }
+
+  /** Drop selected ids that are no longer in the pedigree (after a removal, undo or redo). */
+  function pruneSelection() {
+    const { pedigree, selectedIds, selectedId } = get();
+    if (selectedIds.length === 0) return;
+    const present = new Set(pedigree.individuals.map(i => i.id));
+    const kept = selectedIds.filter(id => present.has(id));
+    if (kept.length !== selectedIds.length) set(selectionOf(kept, selectedId));
   }
 
   /** Shared body of removeWithDescendants / removeWithAncestors (#34). */
   function removeBranch(
     individualIds: string[],
     chooser: (pedigree: Pedigree, ids: string[]) => Set<string>,
-    what: "descendants" | "ancestors",
+    what: "descendants" | "ancestors" | null,
   ): number {
     const { pedigree } = get();
     const ids = individualIds.filter(id => pedigree.individuals.some(i => i.id === id));
     if (ids.length === 0) return 0;
     const gone = chooser(pedigree, ids);
     if (gone.size >= pedigree.individuals.length) {
-      get().setNotice({ kind: "error", text: `Not removed: removing ${ids.length === 1 ? "this person" : "these people"} with their ${what} would leave an empty pedigree. Delete individuals one at a time, or start a new pedigree.` });
+      get().setNotice({ kind: "error", text: `Not removed: removing ${ids.length === 1 ? "this person" : "these people"}${what ? ` with their ${what}` : ""} would leave an empty pedigree. Delete individuals one at a time, or start a new pedigree.` });
       return 0;
     }
     mutate(draft => removeIndividuals(draft, gone));
-    const { selectedId } = get();
-    if (selectedId && gone.has(selectedId)) set({ selectedId: null });
     get().setNotice({ kind: "info", text: `Removed ${gone.size} ${gone.size === 1 ? "individual" : "individuals"}.`, undoable: true });
     return gone.size;
   }
@@ -356,6 +421,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     future: [],
     activeTool: "select",
     selectedId: null,
+    selectedIds: [],
     hoveredId: null,
     isDirty: false,
     layoutResetCount: 0,
@@ -364,9 +430,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
 
-    startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, selectedId: childId }),
+    startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, ...selectOnly(childId) }),
     startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
-    startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, selectedId: individualId }),
+    startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, ...selectOnly(individualId) }),
     cancelPicking: () => set({ picking: null }),
 
     pickIndividual: (id) => {
@@ -383,7 +449,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (picking.kind === "partner") {
         const problem = get().linkPartner(picking.individualId, id);
         if (problem) get().setNotice({ kind: "error", text: problem });
-        else set({ picking: null, selectedId: picking.individualId });
+        else set({ picking: null, ...selectOnly(picking.individualId) });
         return true;
       }
       if (id === picking.childId) {
@@ -407,7 +473,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (!picking || picking.kind !== "parents" || picking.picked.length === 0) return;
       const problem = get().setParents(picking.childId, picking.picked);
       if (problem) get().setNotice({ kind: "error", text: problem });
-      else set({ picking: null, selectedId: picking.childId });
+      else set({ picking: null, ...selectOnly(picking.childId) });
     },
 
     initialize: (p) => set({
@@ -415,7 +481,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       past: [],
       future: [],
       activeTool: "select",
-      selectedId: null,
+      ...selectOnly(null),
       isDirty: false,
       picking: null,
     }),
@@ -425,7 +491,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       past: [],
       future: [],
       activeTool: "select",
-      selectedId: null,
+      ...selectOnly(null),
       isDirty: false,
       picking: null,
     }),
@@ -433,7 +499,20 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     getPedigree: () => get().pedigree,
 
     setActiveTool: (tool) => set({ activeTool: tool }),
-    setSelectedId: (id) => set({ selectedId: id }),
+    setSelectedId: (id) => set(selectOnly(id)),
+    toggleSelected: (id) => {
+      const { selectedIds, selectedId } = get();
+      if (selectedIds.includes(id)) set(selectionOf(selectedIds.filter(x => x !== id), selectedId));
+      else set(selectionOf([...selectedIds, id], id));
+    },
+    setSelection: (ids, primary) => set(selectionOf(ids, primary)),
+    selectDescendants: (id) => {
+      const { pedigree } = get();
+      if (!pedigree.individuals.some(i => i.id === id)) return 0;
+      const ids = [...removeWithDescendantsSet(pedigree, [id])];
+      set(selectionOf(ids, id));
+      return ids.length;
+    },
     setHoveredId: (id) => set({ hoveredId: id }),
 
     undo: () => {
@@ -446,6 +525,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         future: [structuredClone(pedigree), ...future],
         isDirty: true,
       });
+      pruneSelection();
     },
 
     redo: () => {
@@ -458,6 +538,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         past: [...past, structuredClone(pedigree)],
         isDirty: true,
       });
+      pruneSelection();
     },
 
     // ── Structural mutations ─────────────────────────────────────────────────
@@ -751,6 +832,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       return null;
     },
 
+    deleteIndividuals: (individualIds) => removeBranch(individualIds, (_p, ids) => new Set(ids), null),
+
     removeWithDescendants: (individualIds) => removeBranch(individualIds, removeWithDescendantsSet, "descendants"),
     removeWithAncestors: (individualIds) => removeBranch(individualIds, removeWithAncestorsSet, "ancestors"),
 
@@ -970,6 +1053,18 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       });
     },
 
+    pinIndividuals: (positions) => {
+      const entries = Object.entries(positions);
+      if (entries.length === 0) return;
+      mutate(draft => {
+        if (!draft.pinnedPositions) draft.pinnedPositions = {};
+        // A group drag keeps its shape: the canvas snaps the group's delta,
+        // and nodes start on the grid, so rounding each one is a no-op there.
+        const grid = activeSnapGrid(draft as Pedigree);
+        for (const [id, pos] of entries) draft.pinnedPositions[id] = snapPoint(pos, grid);
+      });
+    },
+
     unpinIndividual: (individualId) => {
       mutate(draft => {
         if (draft.pinnedPositions) {
@@ -995,6 +1090,32 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!draft.unlockedIndividuals) draft.unlockedIndividuals = [];
         if (!draft.unlockedIndividuals.includes(individualId)) {
           draft.unlockedIndividuals.push(individualId);
+        }
+      });
+    },
+
+    unlockIndividuals: (individualIds) => {
+      const unlocked = new Set(get().pedigree.unlockedIndividuals ?? []);
+      const ids = [...new Set(individualIds)].filter(id => !unlocked.has(id));
+      if (ids.length === 0) return;
+      mutate(draft => {
+        draft.unlockedIndividuals = [...(draft.unlockedIndividuals ?? []), ...ids];
+      });
+    },
+
+    lockIndividuals: (individualIds) => {
+      const { pedigree } = get();
+      const ids = new Set(individualIds);
+      const changes = [...ids].some(id => (pedigree.unlockedIndividuals ?? []).includes(id) || pedigree.pinnedPositions?.[id]);
+      if (!changes) return;
+      mutate(draft => {
+        if (draft.unlockedIndividuals) {
+          draft.unlockedIndividuals = draft.unlockedIndividuals.filter(id => !ids.has(id));
+          if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
+        }
+        if (draft.pinnedPositions) {
+          for (const id of ids) delete draft.pinnedPositions[id];
+          if (Object.keys(draft.pinnedPositions).length === 0) delete draft.pinnedPositions;
         }
       });
     },
