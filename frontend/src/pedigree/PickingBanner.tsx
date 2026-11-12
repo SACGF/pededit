@@ -15,6 +15,14 @@ function nameOf(pedigree: Pedigree, id: string): string {
   return `unnamed (${sex})`;
 }
 
+function matchRank(ind: Pedigree["individuals"][number], q: string): number {
+  const name = (ind.name ?? "").trim().toLowerCase();
+  if (name === q) return 0;
+  if (name.startsWith(q)) return 1;
+  if (name.includes(q)) return 2;
+  return ind.id.toLowerCase() === q ? 0 : 3;
+}
+
 /**
  * Instructions, the picks so far and a name search while on-canvas picking
  * (#36, and #84 for a partner) is active. Sits over the canvas as a React Flow panel.
@@ -34,6 +42,9 @@ export function PickingBanner() {
   const matches = q
     ? pedigree.individuals
       .filter(i => !excluded.has(i.id) && ((i.name ?? "").toLowerCase().includes(q) || i.id.toLowerCase().includes(q)))
+      // Best match first: a name equal to the query, then one starting with it, then the rest
+      // (ids are UUIDs, so a short query such as "9" matches many of them, #104).
+      .sort((a, b) => matchRank(a, q) - matchRank(b, q))
       .filter(i => !isParents || !setParentsProblem(pedigree, picking.childId, [...picked, i.id]))
       .filter(i => !isPartner || !linkPartnerProblem(pedigree, picking.individualId, i.id))
       .filter(i => picking.kind !== "donor" || !addDonorProblem(pedigree, picking.childId, picking.gamete, i.id))
