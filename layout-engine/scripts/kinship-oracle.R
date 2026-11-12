@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 #
-# Kinship oracle (#32): run kinship2::kinship() and write the kinship
-# coefficient of every related pair, for comparison with src/kinship.ts.
+# Kinship oracle (#32, #87): run kinship2::kinship() and write the kinship
+# coefficient of every related pair, autosomal and X-linked, for comparison
+# with src/kinship.ts.
 #
 #   Rscript layout-engine/scripts/kinship-oracle.R <out.json> <name=in.ped> ...
 #
@@ -9,6 +10,14 @@
 # the TypeScript PED importer uses) and `pairs`, the non-zero entries of the
 # kinship matrix as [i, j, phi] with 1-based i <= j. The diagonal is the
 # kinship of someone with themself, (1 + F) / 2.
+#
+# `pairs_x` is the same for kinship(chrtype = "x") (#87), where a male with
+# himself is 1. It is left out of a family with anyone of unknown sex:
+# kinship2 gives NA for an unknown-sex child and 0 (not a coefficient) on the
+# diagonal of an unknown-sex founder, where src/kinship.ts keeps every value
+# that does not depend on the unknown sex, so the two cannot be compared
+# there. It is also left out of one-person families, where kinship2 returns
+# sex / 2 (a male 1/2, a female 1), the wrong way round.
 #
 # PED files cannot say who is a twin, so the `twins` section is built here:
 # small pedigrees with monozygotic sets, written out with their rows so the
@@ -51,7 +60,11 @@ for (spec in args[-1]) {
       message("skipped ", name, "/", fid, ": ", trimws(conditionMessage(attr(p, "condition"))))
       next
     }
-    families[[fid]] <- list(ids = I(rows$iid), pairs = sparse(kinship(p)))
+    fam <- list(ids = I(rows$iid), pairs = sparse(kinship(p)))
+    if (nrow(rows) > 1 && all(sex_code[ped$fid == fid] %in% c(1L, 2L))) {
+      fam$pairs_x <- sparse(kinship(p, chrtype = "x"))
+    }
+    families[[fid]] <- fam
   }
   if (length(families)) files[[name]] <- list(source = infile, families = families)
 }
@@ -69,7 +82,8 @@ twin_case <- function(rows, mz) {
                 relation = rel, missid = 0)
   list(rows = lapply(seq_len(nrow(d)), function(i) I(as.integer(d[i, ]))),
        mz = lapply(mz, function(s) I(as.integer(s))),
-       ids = I(as.integer(d$id)), pairs = sparse(kinship(p)))
+       ids = I(as.integer(d$id)), pairs = sparse(kinship(p)),
+       pairs_x = sparse(kinship(p, chrtype = "x")))
 }
 
 twins <- list(

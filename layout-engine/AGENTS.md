@@ -41,10 +41,16 @@ indexing convention inherited from R, and the three rendering rules.
   kinship2's `kinship()`. Not part of the layout. It follows blood rather
   than the drawing: someone `adopted: "in"` is a founder, and a monozygotic
   twin set is one row of the matrix (dizygotic and unknown zygosity are
-  ordinary siblings). Autosomal only. Ground truth is
+  ordinary siblings). `{ chromosome: "X" }` gives X-linked kinship (#87),
+  which finds the mother by sex, not by side of the couple. Unknown sex is
+  worked out both ways and a value is NaN only where the answers differ;
+  kinship2 instead gives NA for an unknown-sex child's whole row and 0 on an
+  unknown-sex founder's diagonal, and returns `sex / 2` for a one-person
+  pedigree (male 1/2, wrong), so the oracle leaves those families out of
+  `pairs_x`. Ground truth is
   `tests/oracle/kinship.json`, written by `scripts/kinship-oracle.R` (every
-  related pair of 26 PED files, plus twin cases built in the script because
-  PED cannot name twins); the PED comparison runs in the frontend
+  related pair of 26 PED files, autosomal `pairs` and X-linked `pairs_x`,
+  plus twin cases built in the script because PED cannot name twins); the PED comparison runs in the frontend
   (`src/io/__tests__/kinshipOracle.test.ts`) since the importer lives there.
   R refuses families the editor accepts (a father recorded as female), and
   the script skips those.

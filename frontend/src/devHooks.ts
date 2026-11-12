@@ -12,6 +12,7 @@
  *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
  *   __pededit.align().pos      // raw kinship2 LayoutResult
  *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
+ *   __pededit.kinship(undefined, { chromosome: "X" }).inbreeding("a")   // X-linked (#87)
  */
 import { usePedigreeStore } from "./store/usePedigreeStore";
 import { useAppStore } from "./store/useAppStore";
@@ -24,7 +25,7 @@ import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engi
 import { importPed, exportPed } from "./io/ped";
 import { importJson, exportJson } from "./io/json";
 import { EXAMPLES } from "./data/examples";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { KinshipOptions, Pedigree } from "@pedigree-editor/layout-engine";
 
 /** The canvas reads compact mode from localStorage at mount and writes it on toggle. */
 function canvasOptions(): LayoutToFlowOptions {
@@ -53,8 +54,9 @@ const hooks = {
     layoutToFlow(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
   /** The raw kinship2 LayoutResult (alignPedigree) for a pedigree, default the current one. */
   align: (pedigree?: Pedigree) => alignPedigree(pedigree ?? usePedigreeStore.getState().getPedigree()),
-  /** Kinship and inbreeding coefficients (#32): `.kinship(a, b)` and `.inbreeding(id)`. */
-  kinship: (pedigree?: Pedigree) => kinshipCoefficients(pedigree ?? usePedigreeStore.getState().getPedigree()),
+  /** Kinship and inbreeding coefficients (#32): `.kinship(a, b)` and `.inbreeding(id)`; `{ chromosome: "X" }` for X-linked (#87). */
+  kinship: (pedigree?: Pedigree, options?: KinshipOptions) =>
+    kinshipCoefficients(pedigree ?? usePedigreeStore.getState().getPedigree(), options),
   /**
    * Render lint (pedigree/renderLint.ts): lines through symbols, lines to
    * missing nodes, children with no parent line, and so on. [] means clean.
