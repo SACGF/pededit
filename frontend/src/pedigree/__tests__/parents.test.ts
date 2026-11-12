@@ -166,3 +166,41 @@ describe("picking (#36)", () => {
     expect(store().picking).toMatchObject({ kind: "child" });
   });
 });
+
+describe("detachFromParents and removePartnership (#104)", () => {
+  beforeEach(() => usePedigreeStore.getState().initialize(pedigree()));
+  const st = () => usePedigreeStore.getState();
+
+  it("detaching a child makes them a founder, leaves the parents and drops the twin set", () => {
+    st().detachFromParents("dau");
+    const p = st().pedigree;
+    expect(p.parentOf.g).toEqual(["son"]);
+    expect(p.partnerships.find(x => x.id === "g")!.twins).toBeUndefined();
+    expect(p.individuals.length).toBe(pedigree().individuals.length);
+    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    st().undo();
+    expect(st().pedigree.parentOf.g).toEqual(["son", "dau"]);
+  });
+
+  it("detaching the last child of a donor pair removes the pair", () => {
+    st().initialize({
+      ...pedigree(),
+      partnerships: [...pedigree().partnerships, { id: "don", individual1: "loner", individual2: "orphan", donorConception: true }],
+      parentOf: { ...pedigree().parentOf, don: ["preg"] },
+    });
+    st().detachFromParents("preg");
+    expect(st().pedigree.partnerships.some(x => x.id === "don")).toBe(false);
+    expect(st().pedigree.parentOf.don).toBeUndefined();
+  });
+
+  it("removes a childless partnership, keeping both people; refuses one with children", () => {
+    expect(st().linkPartner("orphan", "loner")).toBeNull();
+    const pid = st().pedigree.partnerships.find(x => x.individual1 === "loner" || x.individual2 === "loner")!.id;
+    expect(st().removePartnership(pid)).toBeNull();
+    expect(st().pedigree.partnerships.some(x => x.id === pid)).toBe(false);
+    expect(st().pedigree.parentOf[pid]).toBeUndefined();
+    expect(st().pedigree.individuals.map(i => i.id)).toContain("loner");
+    expect(st().removePartnership("sw")).toMatch(/a child/);
+    expect(st().pedigree.partnerships.some(x => x.id === "sw")).toBe(true);
+  });
+});

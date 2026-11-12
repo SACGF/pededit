@@ -110,6 +110,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     startPickingPartner,
     startPickingDonor,
     startPickingSurrogate,
+    detachFromParents,
+    removePartnership,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -191,6 +193,14 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           >
             {hasParentsAlready ? "Replace parents..." : "Set parents..."}
           </MenuItem>
+          {hasParentsAlready && (
+            <MenuItem
+              onClick={() => action(() => detachFromParents(individualId))}
+              title="Take this person out of their parents' sibship: they become a founder, and the parents stay"
+            >
+              Detach from parents
+            </MenuItem>
+          )}
           {ownPartnerships.length > 0 && !individual.lifeStatus && (
             <MenuItem
               onClick={() => action(() => startPickingChild(ownPartnerships[0]!.partnershipId))}
@@ -447,6 +457,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                     {o.label}
                   </MenuItem>
                 ))}
+                <MenuItem
+                  onClick={() => action(() => removePartnership(c.partnershipId))}
+                  destructive
+                  title={REMOVE_PARTNERSHIP_TITLE}
+                >
+                  Remove partnership
+                </MenuItem>
               </div>
             ))}
           </MenuSection>
@@ -576,7 +593,7 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, startPickingChild } = usePedigreeStore();
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, startPickingChild, removePartnership } = usePedigreeStore();
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
@@ -611,6 +628,14 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
         >
           Add existing child...
         </MenuItem>
+        <MenuItem
+          onClick={() => action(() => removePartnership(partnershipId))}
+          destructive
+          disabled={!childless}
+          title={childless ? REMOVE_PARTNERSHIP_TITLE : "This couple has children: use Replace parents or Detach from parents on them first"}
+        >
+          Remove partnership
+        </MenuItem>
       </MenuSection>
       {childless && (
         <MenuSection label="Couple without children">
@@ -631,6 +656,8 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
     </>
   );
 }
+
+const REMOVE_PARTNERSHIP_TITLE = "Remove the couple line, keeping both people (for a partner linked by mistake)";
 
 /** Partners of individualId, one per partnership, in partnership order. */
 function partnerChoices(pedigree: ReturnType<typeof usePedigreeStore.getState>["pedigree"], individualId: string) {

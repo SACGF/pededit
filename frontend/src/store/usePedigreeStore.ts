@@ -334,6 +334,18 @@ interface PedigreeState {
    * refused, else null.
    */
   setParents: (childId: string, parentIds: string[]) => string | null;
+  /**
+   * Take childId out of their parents' sibship (#104): they become a founder
+   * and the parents stay, as a couple (a gamete donor pair left with no
+   * children is removed, as it is not a couple).
+   */
+  detachFromParents: (childId: string) => void;
+  /**
+   * Remove a partnership without removing either person (#104), for a
+   * partner linked by mistake. Refused, with the reason, while it has
+   * children: they would lose a parent, so move them first.
+   */
+  removePartnership: (partnershipId: string) => string | null;
   moveSibLeft: (individualId: string) => void;
   moveSibRight: (individualId: string) => void;
 
@@ -878,6 +890,43 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
         }
       });
+    },
+
+    detachFromParents: (childId) => {
+      const before = currentParentsOf(get().pedigree, childId);
+      if (!before) return;
+      mutate(draft => {
+        draft.parentOf[before.id] = (draft.parentOf[before.id] ?? []).filter(c => c !== childId);
+        const old = draft.partnerships.find(p => p.id === before.id)!;
+        if (old.twins) {
+          old.twins = old.twins.map(t => ({ ...t, members: t.members.filter(m => m !== childId) })).filter(t => t.members.length >= 2);
+          if (old.twins.length === 0) delete old.twins;
+        }
+        if (old.donorConception && draft.parentOf[old.id]!.length === 0) {
+          draft.partnerships = draft.partnerships.filter(p => p.id !== old.id);
+          delete draft.parentOf[old.id];
+        }
+        const child = draft.individuals.find(i => i.id === childId);
+        if (child) child.sibOrder = nextRootSibOrder(draft);
+      });
+      const name = (id: string) => get().pedigree.individuals.find(i => i.id === id)?.name?.trim() || "This person";
+      get().setNotice({ kind: "info", text: `${name(childId)} no longer has parents drawn.`, undoable: true });
+    },
+
+    removePartnership: (partnershipId) => {
+      const { pedigree } = get();
+      const p = pedigree.partnerships.find(x => x.id === partnershipId);
+      if (!p) return "Unknown partnership.";
+      const kids = pedigree.parentOf[partnershipId] ?? [];
+      if (kids.length > 0) {
+        return `Not removed: this couple has ${kids.length === 1 ? "a child" : `${kids.length} children`}. Use Replace parents or Detach from parents on ${kids.length === 1 ? "the child" : "each child"} first.`;
+      }
+      mutate(draft => {
+        draft.partnerships = draft.partnerships.filter(x => x.id !== partnershipId);
+        delete draft.parentOf[partnershipId];
+      });
+      get().setNotice({ kind: "info", text: "Partnership removed; both people stay.", undoable: true });
+      return null;
     },
 
     setParents: (childId, parentIds) => {

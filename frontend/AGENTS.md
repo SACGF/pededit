@@ -52,7 +52,12 @@ stub so the app still builds without Google login.
   disconnected individuals, cross-generation and consanguineous matings.
   "Set parents..." / "Replace parents..." and "Add existing child..." in the
   more menu link existing people (#36), which is how consanguinity loops
-  and "the two families turn out to be related" are drawn.
+  and "the two families turn out to be related" are drawn. Their undo:
+  "Detach from parents" (`detachFromParents`) makes a child a founder again,
+  and "Remove partnership" (`removePartnership`, couple line menu and a
+  childless couple's section of the person menu, #104) drops a couple line
+  while keeping both people; it refuses a couple with children, who would
+  silently lose a parent.
   "Add existing partner..." (#84, `linkPartner`) joins two people already
   on the tree, relatives included; "Add partner" always makes a new person.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
