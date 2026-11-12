@@ -129,6 +129,17 @@ draws NSGC symbols.
   consanguineous when they share an ancestor. A cross-generation link draws
   the older partner twice with the dashed arc, as kinship2 does; that is the
   layout, not a bug in the link.
+- `relatedness.ts` — what the edit panel's Relatedness section says (#32):
+  `formatCoefficient` (a fraction with its decimal up to a denominator of
+  256, a decimal alone beyond), `degreeOfRelationship` (1/4 first degree,
+  halving per degree, "between" when it lands in a gap) and `relatednessOf`.
+  The numbers come from the layout engine's `kinshipCoefficients`. Nothing
+  is stored or drawn: the section is derived on every render and appears
+  only for someone who is inbred or related to a partner. The double couple
+  line still comes from `consanguinityTest` (shared ancestor, or the stored
+  flag), which does not know about adoption, so a couple can be drawn double
+  with kinship 0; the section says so in words. Moving the line to
+  kinship > 0 is the "validation hook" still open on #32.
 - `removal.ts` — branch removal sets (#34): descendants, ancestors,
   "remove with descendants" (which also takes partners who married in and
   have no partnership with anyone staying) and `removeIndividuals`, the one

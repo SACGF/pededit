@@ -1,6 +1,8 @@
 export { alignPedigree } from "./alignPedigree.js";
 export { alignPedigreeByFamily, splitFamilies, FAMILY_GAP, RELAXED_WIDTH_SLACK } from "./families.js";
 export { kindepth } from "./kindepth.js";
+export { kinshipCoefficients } from "./kinship.js";
+export type { KinshipCoefficients } from "./kinship.js";
 export { autohint } from "./autohint.js";
 export type { AutohintOptions } from "./autohint.js";
 export type { AlignOptions } from "./alignPedigree.js";

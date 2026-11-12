@@ -6,7 +6,10 @@ import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
-import { useState } from "react";
+import { consanguinityTest } from "../pedigree/consanguinity";
+import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
+import { useMemo, useState } from "react";
+import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
@@ -142,6 +145,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
       </div>
 
       <TwinsForm individual={individual} />
+      <RelatednessSection individual={individual} />
       <CouplesForm individual={individual} />
     </div>
   );
@@ -247,6 +251,53 @@ export function partnerLabel(pedigree: Pedigree, individualId: string, partnersh
   const name = other?.name?.trim();
   const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
   return name || `partner ${i + 1} (${sexLabel})`;
+}
+
+/**
+ * Relatedness worked out from the drawn structure (#32): the person's
+ * inbreeding coefficient, and for each partner they are related to the
+ * couple's kinship coefficient, which is what their children's inbreeding
+ * coefficient will be. Read-only, and absent when there is nothing to say:
+ * most people are not inbred and not related to their partner.
+ */
+function RelatednessSection({ individual }: { individual: Individual }) {
+  const { pedigree } = usePedigreeStore();
+  const coefficients = useMemo(() => kinshipCoefficients(pedigree), [pedigree]);
+  const { inbreeding, couples } = relatednessOf(pedigree, individual.id, coefficients);
+  // A double line with no blood relationship behind it (an adopted-in
+  // partner, or a flag left from an earlier structure) is worth explaining.
+  const drawnDouble = consanguinityTest(pedigree);
+  const shown = couples.filter(c => c.kinship > 0 || drawnDouble(individual.id, c.partnerId));
+  if (!(inbreeding > 0) && shown.length === 0) return null;
+
+  return (
+    <div className="border-t pt-3 space-y-2" data-testid="relatedness">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relatedness</div>
+      <div className="text-xs text-gray-600 space-y-1.5">
+        {inbreeding > 0 && (
+          <div data-testid="inbreeding" title="The chance that this person's two copies of a gene are the same copy inherited through both parents. It equals the kinship coefficient of the parents.">
+            Inbreeding coefficient (F): <span className="font-medium">{formatCoefficient(inbreeding)}</span>
+            <div className="text-[10px] text-gray-500">Parents {degreeOfRelationship(inbreeding)}.</div>
+          </div>
+        )}
+        {shown.map(c => (
+          <div key={c.partnershipId} data-testid="couple-kinship" title="The kinship coefficient of a couple is the inbreeding coefficient of their children.">
+            With {partnerLabel(pedigree, individual.id, c.partnershipId)}: kinship{" "}
+            <span className="font-medium">{formatCoefficient(c.kinship)}</span>
+            <div className="text-[10px] text-gray-500">
+              {c.kinship > 0
+                ? `${capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = ${formatCoefficient(c.kinship)}.`
+                : "No blood relationship in this pedigree, although the couple line is double."}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function capitalise(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /**

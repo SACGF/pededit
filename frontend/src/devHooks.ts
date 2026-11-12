@@ -10,13 +10,14 @@
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
  *   __pededit.align().pos      // raw kinship2 LayoutResult
+ *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
  */
 import { usePedigreeStore } from "./store/usePedigreeStore";
 import { useAppStore } from "./store/useAppStore";
 import { layoutToFlow } from "./pedigree/layoutToFlow";
 import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
 import { lintFlow } from "./pedigree/renderLint";
-import { alignPedigree } from "@pedigree-editor/layout-engine";
+import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import { importPed, exportPed } from "./io/ped";
 import { importJson, exportJson } from "./io/json";
 import { EXAMPLES } from "./data/examples";
@@ -49,6 +50,8 @@ const hooks = {
     layoutToFlow(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
   /** The raw kinship2 LayoutResult (alignPedigree) for a pedigree, default the current one. */
   align: (pedigree?: Pedigree) => alignPedigree(pedigree ?? usePedigreeStore.getState().getPedigree()),
+  /** Kinship and inbreeding coefficients (#32): `.kinship(a, b)` and `.inbreeding(id)`. */
+  kinship: (pedigree?: Pedigree) => kinshipCoefficients(pedigree ?? usePedigreeStore.getState().getPedigree()),
   /**
    * Render lint (pedigree/renderLint.ts): lines through symbols, lines to
    * missing nodes, children with no parent line, and so on. [] means clean.

@@ -36,6 +36,18 @@ indexing convention inherited from R, and the three rendering rules.
   read as one family; this lays out each family alone and joins them with
   `FAMILY_GAP`, with unconnected people last. With one family it returns
   `alignPedigree` unchanged, so keep `alignPedigree` R-faithful for the oracle.
+- `kinship.ts` — `kinshipCoefficients` (#32): kinship of any two people and
+  the inbreeding coefficient, by the same parents-first recursion as
+  kinship2's `kinship()`. Not part of the layout. It follows blood rather
+  than the drawing: someone `adopted: "in"` is a founder, and a monozygotic
+  twin set is one row of the matrix (dizygotic and unknown zygosity are
+  ordinary siblings). Autosomal only. Ground truth is
+  `tests/oracle/kinship.json`, written by `scripts/kinship-oracle.R` (every
+  related pair of 26 PED files, plus twin cases built in the script because
+  PED cannot name twins); the PED comparison runs in the frontend
+  (`src/io/__tests__/kinshipOracle.test.ts`) since the importer lives there.
+  R refuses families the editor accepts (a father recorded as female), and
+  the script skips those.
 - `pedigreeToGeometry.ts` — turns a Pedigree into pixel coordinates using the
   same constants as the frontend (slot 80, row 120, node 40). Useful for tests
   and headless export; the U-shape exporter and SVG exporter build on this.

@@ -128,6 +128,8 @@ include it):
   for comparing with R. The canvas lays out each family separately
   (`alignPedigreeByFamily`, #64), so for a file with several families this
   differs from `layout()` positions.
+- `kinship(pedigree?)`: kinship and inbreeding coefficients (#32), as
+  `.kinship(idA, idB)` and `.inbreeding(id)`.
 - `check(pedigree?, options?)`: the render lint, `[]` when clean.
 - `load(pedigree)`: replace the editor's pedigree (clears undo history).
 
@@ -267,6 +269,10 @@ fixtures, viewport, login and reporting match the CLI.
 
 ## Gotchas
 
+- A running Vite did not pick up a new export added to
+  `layout-engine/src/index.ts` (the page failed with "does not provide an
+  export named ..." and `touch` did not help); `servers.mjs down` then `up`
+  fixed it. Edits under `frontend/src/` hot-reload as usual.
 - `networkidle` is not "rendered": React Flow lays out on animation frames,
   so the tools wait `--wait` ms (default 1500) after idle.
 - React 18 dev reports an event-handler error twice and StrictMode renders
