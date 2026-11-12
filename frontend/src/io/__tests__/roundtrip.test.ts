@@ -3,6 +3,8 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { importPed, exportPed, ValidationIssueCode } from "../ped/index.js";
+import { consanguinityTest } from "../../pedigree/consanguinity";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEST_DATA = join(__dirname, "../../../../test-data/ped");
@@ -74,41 +76,25 @@ describe("roundtrip: simple/", () => {
 
 // ── consanguineous/ ────────────────────────────────────────────────────────────
 
+/** Couples drawn with a double line. Import stores no flag: it comes from kinship (#85). */
+function doubleLined(ped: Pedigree) {
+  const double = consanguinityTest(ped);
+  return ped.partnerships.filter(p => double(p.individual1, p.individual2));
+}
+
 describe("roundtrip: consanguineous/", () => {
-  it("sibling_mating.ped: consanguineous flag set on sibling partnership", () => {
-    const result = importPed(readPed("consanguineous/sibling_mating.ped"));
+  it.each([
+    ["sibling_mating.ped", 1],
+    ["first_cousin.ped", 1],
+    ["double_first_cousin.ped", 1],
+    ["uncle_niece.ped", 1],
+    ["half_sibling_mating.ped", 1],
+  ])("%s: the related couple is drawn double, nothing is flagged", (file, count) => {
+    const result = importPed(readPed(`consanguineous/${file}`));
     expect(result.hasErrors).toBe(false);
     const ped = result.pedigrees[0]!.pedigree;
-    const consPships = ped.partnerships.filter(p => p.consanguineous);
-    expect(consPships.length).toBeGreaterThan(0);
-  });
-
-  it("first_cousin.ped: consanguineous flag set on cousin partnership", () => {
-    const result = importPed(readPed("consanguineous/first_cousin.ped"));
-    expect(result.hasErrors).toBe(false);
-    const ped = result.pedigrees[0]!.pedigree;
-    expect(ped.partnerships.some(p => p.consanguineous)).toBe(true);
-  });
-
-  it("double_first_cousin.ped: consanguineous detected", () => {
-    const result = importPed(readPed("consanguineous/double_first_cousin.ped"));
-    expect(result.hasErrors).toBe(false);
-    const ped = result.pedigrees[0]!.pedigree;
-    expect(ped.partnerships.some(p => p.consanguineous)).toBe(true);
-  });
-
-  it("uncle_niece.ped: consanguineous detected", () => {
-    const result = importPed(readPed("consanguineous/uncle_niece.ped"));
-    expect(result.hasErrors).toBe(false);
-    const ped = result.pedigrees[0]!.pedigree;
-    expect(ped.partnerships.some(p => p.consanguineous)).toBe(true);
-  });
-
-  it("half_sibling_mating.ped: consanguineous detected", () => {
-    const result = importPed(readPed("consanguineous/half_sibling_mating.ped"));
-    expect(result.hasErrors).toBe(false);
-    const ped = result.pedigrees[0]!.pedigree;
-    expect(ped.partnerships.some(p => p.consanguineous)).toBe(true);
+    expect(ped.partnerships.some(p => p.consanguineous !== undefined)).toBe(false);
+    expect(doubleLined(ped)).toHaveLength(count);
   });
 });
 

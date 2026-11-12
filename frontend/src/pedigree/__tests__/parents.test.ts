@@ -3,6 +3,7 @@ import { setParentsProblem } from "../parents";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { lintFlow } from "../renderLint";
 import { layoutToFlow } from "../layoutToFlow";
+import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /** gf = gm → son, dau (twins); son = wife → gc1; orphan and loner have no parents. */
@@ -68,10 +69,11 @@ describe("setParents (#36)", () => {
     expect(p.consanguineous).toBeUndefined();
   });
 
-  it("flags a new partnership between relatives as consanguineous", () => {
+  it("a new partnership between relatives is drawn double, with no flag stored (#85)", () => {
     expect(store().setParents("orphan", ["dau", "gc1"])).toBeNull();
     const p = ped().partnerships.find(q => (ped().parentOf[q.id] ?? []).includes("orphan"))!;
-    expect(p.consanguineous).toBe(true);
+    expect(p.consanguineous).toBeUndefined();
+    expect(consanguinityTest(ped())(p.individual1, p.individual2)).toBe(true);
     expect(lintFlow(ped(), layoutToFlow(ped()))).toEqual([]);
   });
 

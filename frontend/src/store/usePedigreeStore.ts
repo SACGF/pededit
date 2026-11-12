@@ -3,11 +3,11 @@ import { produce } from "immer";
 import type {
   Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity
 } from "@pedigree-editor/layout-engine";
-import { shareAncestor } from "../utils/pedigreeRelationship";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { linkPartnerProblem } from "../pedigree/partners";
+import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -229,8 +229,9 @@ interface PedigreeState {
   /**
    * Make two existing individuals partners (#84), which is how a marriage
    * between relatives is drawn. The new partnership has no children, keeps
-   * the father role first and is flagged consanguineous when they are
-   * related. Returns the reason when refused, else null.
+   * the father role first. Nothing records that they are related: the double
+   * line comes from their kinship (#85). Returns the reason when refused,
+   * else null.
    */
   linkPartner: (individualId: string, partnerId: string) => string | null;
   deleteIndividual: (individualId: string) => void;
@@ -244,8 +245,8 @@ interface PedigreeState {
   removeWithAncestors: (individualIds: string[]) => number;
   /**
    * Make one or two existing individuals the parents of childId (#36). Uses
-   * their existing partnership or creates one (flagged consanguineous when
-   * they are related); a single parent gets a new unknown-sex partner. A
+   * their existing partnership or creates one; a single parent gets a new
+   * unknown-sex partner. A
    * child who already has parents is moved. Returns the reason when
    * refused, else null.
    */
@@ -282,6 +283,12 @@ interface PedigreeState {
   setPartnershipChildless: (partnershipId: string, status: ChildlessStatus | undefined) => void;
   /** Reason under the mark; empty clears it. */
   setPartnershipChildlessReason: (partnershipId: string, reason: string) => void;
+  /**
+   * The double-line override (#85): mark a couple as related when the
+   * pedigree does not show how. False removes the flag; a couple the
+   * pedigree shows to be related keeps its double line either way.
+   */
+  setPartnershipConsanguineous: (partnershipId: string, related: boolean) => void;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -624,17 +631,14 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!draft.parentOf[partnership.id]) {
           draft.parentOf[partnership.id] = [];
         }
-        // Auto-detect consanguinity: set flag if the two individuals share an ancestor
-        if (shareAncestor(draft as unknown as Pedigree, individualId, partner.id)) {
-          partnership.consanguineous = true;
-        }
       });
     },
 
     linkPartner: (individualId, partnerId) => {
       const problem = linkPartnerProblem(get().pedigree, individualId, partnerId);
       if (problem) { console.warn(`Cannot link partners: ${problem}`); return problem; }
-      let related = false;
+      // Related couples are found at draw time from kinship (#85); nothing is stored.
+      const related = kinshipOf(get().pedigree).kinship(individualId, partnerId) > 0;
       mutate(draft => {
         let [a, b] = [individualId, partnerId];
         const aSex = draft.individuals.find(i => i.id === a)!.sex;
@@ -642,8 +646,6 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         // Keep the father role first where the sexes say so, as setParents does.
         if (aSex === "female" || (aSex === "unknown" && bSex === "male")) [a, b] = [b, a];
         const partnership: Partnership = { id: newId(), individual1: a, individual2: b };
-        related = shareAncestor(draft as Pedigree, a, b);
-        if (related) partnership.consanguineous = true;
         draft.partnerships.push(partnership);
         draft.parentOf[partnership.id] = [];
       });
@@ -731,7 +733,6 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           // Keep the father role first where the sexes say so.
           if (aSex === "female" || (aSex === "unknown" && bSex === "male")) [a, b] = [b, a];
           partnership = { id: newId(), individual1: a, individual2: b };
-          if (shareAncestor(draft as Pedigree, a, b)) partnership.consanguineous = true;
           draft.partnerships.push(partnership);
           draft.parentOf[partnership.id] = [];
         }
@@ -936,6 +937,16 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!p) return;
         if (reason === "") delete p.childlessReason;
         else p.childlessReason = reason;
+      });
+    },
+
+    setPartnershipConsanguineous: (partnershipId, related) => {
+      const current = get().pedigree.partnerships.find(x => x.id === partnershipId);
+      if (!current || !!current.consanguineous === related) return;
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId)!;
+        if (related) p.consanguineous = true;
+        else delete p.consanguineous;
       });
     },
 

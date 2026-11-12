@@ -1,28 +1,29 @@
-import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { shareAncestor } from "../utils/pedigreeRelationship";
+import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
+import { kinshipOf } from "./relatedness";
 
 /**
- * Whether the couple line between two partners is drawn double.
+ * Whether the couple line between two partners is drawn double (#85).
  *
- * kinship2's spouse code (2 = consanguineous) is worked out for the two slots
- * a marker sits between. When the line hops over a partner in between (three
- * or more partners) those are not the couple, so the code can be wrong both
- * ways; and it ignores the `consanguineous` flag a user can set. Here a line
- * is double when the partnership is flagged, or when the two partners are
- * related by blood in the pedigree (share an ancestor, or one descends from
- * the other). Shared by the canvas and the SVG exporter.
+ * A line is double when the two partners are related by blood in the
+ * pedigree, which is to say their kinship coefficient is above 0 (#32). That
+ * follows blood, not the drawing: someone adopted in is not related to the
+ * family they hang from. A partnership's stored `consanguineous` flag is an
+ * override on top, for a couple known to be related whose common ancestors
+ * are not drawn. The editor only writes it from the edit panel's checkbox.
+ *
+ * kinship2's own spouse code (2 = consanguineous) is not used: it is worked
+ * out for the two slots a marker sits between, which are not the couple when
+ * the line hops over a partner in between, and it knows nothing of adoption
+ * or the flag. Shared by the canvas, the legend and the SVG exporters.
  */
 export function consanguinityTest(pedigree: Pedigree): (id1: string, id2: string) => boolean {
   const key = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const flagged = new Set(
     pedigree.partnerships.filter(p => p.consanguineous).map(p => key(p.individual1, p.individual2)),
   );
-  const memo = new Map<string, boolean>();
-  return (id1, id2) => {
-    const k = key(id1, id2);
-    if (flagged.has(k)) return true;
-    let v = memo.get(k);
-    if (v === undefined) { v = shareAncestor(pedigree, id1, id2); memo.set(k, v); }
-    return v;
-  };
+  // Most callers ask about a handful of couples, and a pedigree with no
+  // couples never needs the matrix.
+  let coefficients: KinshipCoefficients | undefined;
+  return (id1, id2) =>
+    flagged.has(key(id1, id2)) || (coefficients ??= kinshipOf(pedigree)).kinship(id1, id2) > 0;
 }

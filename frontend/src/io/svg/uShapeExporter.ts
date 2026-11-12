@@ -8,6 +8,7 @@ import {
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
 import { ADOPTION_DASH } from "../../pedigree/adoption";
+import { consanguinityTest } from "../../pedigree/consanguinity";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH } from "../../pedigree/labels";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
@@ -93,7 +94,7 @@ interface Union {
   order: number;
   pids: string[];
   partner: string | null;
-  /** Double couple line: flagged consanguineous, or the partner is a blood relative. */
+  /** Double couple line: the couple are related, or flagged as related (see consanguinityTest). */
   consang: boolean;
   kids: TNode[];
   /** Member indices of the couple. b is null for solo and join. */
@@ -236,6 +237,9 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     if (score > best) { best = score; rootP = p; }
   }
 
+  const drawnDouble = consanguinityTest(pedigree);
+  const isDouble = (p: Partnership) => drawnDouble(p.individual1, p.individual2);
+
   let nextOrder = 0;
   const mkUnion = (kind: Union["kind"], pids: string[], partner: string | null, consang: boolean): Union =>
     ({ kind, order: nextOrder++, pids, partner, consang, kids: [], a: 0, b: null, joinNode: null, joinSide: 1 });
@@ -250,7 +254,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     if (!p) return mkNode(pedigree.individuals[0].id, 0, null, null);
     const root = mkNode(p.individual1, 0, null, null);
     root.members = [{ id: p.individual1, dx: -COUPLE_GAP / 2, dup: false }, { id: p.individual2, dx: COUPLE_GAP / 2, dup: false }];
-    root.unions = [{ ...mkUnion("spouse", [p.id], p.individual2, !!p.consanguineous), a: 0, b: 1 }];
+    root.unions = [{ ...mkUnion("spouse", [p.id], p.individual2, isDouble(p)), a: 0, b: 1 }];
     return root;
   }
 
@@ -284,7 +288,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const second = otherOf(rootP, first);
     root = mkNode(first, 0, null, null);
     root.members = [{ id: first, dx: -COUPLE_GAP / 2, dup: false }, { id: second, dx: COUPLE_GAP / 2, dup: false }];
-    root.unions = [{ ...mkUnion("spouse", [rootP.id], second, !!rootP.consanguineous), a: 0, b: 1 }];
+    root.unions = [{ ...mkUnion("spouse", [rootP.id], second, isDouble(rootP)), a: 0, b: 1 }];
   } else {
     // Earlier partnership on the left, the shared parent in the middle.
     consumed.add(extraP.id);
@@ -298,7 +302,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       { id: otherOf(pr, hub), dx: COUPLE_GAP, dup: isDup(pr) },
     ];
     root.unions = [pl, pr].map((p, i) => ({
-      ...mkUnion(isDup(p) ? "dup" : "spouse", [p.id], otherOf(p, hub), !!p.consanguineous || isDup(p)),
+      ...mkUnion(isDup(p) ? "dup" : "spouse", [p.id], otherOf(p, hub), isDouble(p)),
       a: 1, b: i === 0 ? 0 : 2,
     }));
   }
@@ -355,7 +359,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
         const related = bloodLine.has(other);
         const dup = related || drawn.has(other);
         if (!dup) drawn.add(other);
-        node.unions.push(mkUnion(dup ? "dup" : "spouse", [p.id], other, !!p.consanguineous || related));
+        node.unions.push(mkUnion(dup ? "dup" : "spouse", [p.id], other, isDouble(p)));
       }
       if (solo.length) node.unions.push(mkUnion("solo", solo.map(p => p.id), null, false));
     }

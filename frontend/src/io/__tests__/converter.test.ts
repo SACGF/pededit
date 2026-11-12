@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { convertFamily, isPhantomId } from "../ped/converter.js";
 import type { PedRow } from "../ped/types.js";
+import { consanguinityTest } from "../../pedigree/consanguinity";
 
 function makeRow(overrides: Partial<PedRow> & { individualId: string }): PedRow {
   return {
@@ -113,7 +114,8 @@ describe("convertFamily", () => {
     expect(phantomFather!.sex).toBe("male");
   });
 
-  it("detects sibling mating as consanguineous", () => {
+  // The double line comes from kinship at draw time (#85); import stores no flag.
+  it("a sibling mating is drawn double, with no flag stored", () => {
     // 1+2 → 3 (son) + 4 (daughter); 3+4 → 5
     const rows = [
       makeRow({ individualId: "1", sex: "1" }),
@@ -125,10 +127,12 @@ describe("convertFamily", () => {
     const ped = convertFamily(rows);
     const p = ped.partnerships.find(p => p.individual1 === "3" && p.individual2 === "4");
     expect(p).toBeDefined();
-    expect(p!.consanguineous).toBe(true);
+    expect(p!.consanguineous).toBeUndefined();
+    expect(consanguinityTest(ped)("3", "4")).toBe(true);
+    expect(consanguinityTest(ped)("1", "2")).toBe(false);
   });
 
-  it("detects first-cousin mating as consanguineous", () => {
+  it("a first-cousin mating is drawn double, with no flag stored", () => {
     const rows = [
       makeRow({ individualId: "1", sex: "1" }),
       makeRow({ individualId: "2", sex: "2" }),
@@ -143,10 +147,14 @@ describe("convertFamily", () => {
     const ped = convertFamily(rows);
     const p = ped.partnerships.find(p => p.individual1 === "7" && p.individual2 === "8");
     expect(p).toBeDefined();
-    expect(p!.consanguineous).toBe(true);
+    expect(p!.consanguineous).toBeUndefined();
+    const double = consanguinityTest(ped);
+    expect(double("7", "8")).toBe(true);
+    expect(double("3", "5")).toBe(false);
+    expect(double("6", "4")).toBe(false);
   });
 
-  it("marks unrelated couple as not consanguineous", () => {
+  it("an unrelated couple is drawn single", () => {
     const rows = [
       makeRow({ individualId: "1", sex: "1" }),
       makeRow({ individualId: "2", sex: "2" }),
@@ -155,6 +163,7 @@ describe("convertFamily", () => {
     const ped = convertFamily(rows);
     const p = ped.partnerships[0]!;
     expect(p.consanguineous).toBeUndefined();
+    expect(consanguinityTest(ped)(p.individual1, p.individual2)).toBe(false);
   });
 
   it("assigns sibOrder by file order within sibling group", () => {
