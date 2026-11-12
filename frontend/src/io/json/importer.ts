@@ -213,6 +213,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "socialParents", ip, "an array of individual ids", isStringArray);
     c.optional(raw, "name", ip, "a string", v => typeof v === "string");
     c.optional(raw, "dob", ip, "a string", v => typeof v === "string");
+    c.optional(raw, "dod", ip, "a string", v => typeof v === "string");
     c.optional(raw, "age", ip, "a string", v => typeof v === "string");
     c.optional(raw, "notes", ip, "a string", v => typeof v === "string");
     c.optional(raw, "hpoTerms", ip, "an array of strings", isStringArray);

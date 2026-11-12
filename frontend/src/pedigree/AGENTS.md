@@ -52,7 +52,7 @@ draws NSGC symbols.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
-- `nodes/MoreMenu.tsx` — affected, deceased, proband, consultand, sex, lock/unlock,
+- `nodes/MoreMenu.tsx` — affected, deceased (Mark living also clears the date of death, #103), proband, consultand, sex, lock/unlock,
   move sib left/right, delete, and "Add children..." (count stepper, plus a
   partner choice when the person has several partnerships). The menu is
   about 600px tall, so it is capped at Radix's
@@ -441,10 +441,16 @@ renderer:
    year of birth, "b. 1978" (#20). NSGC prefers a year or an age to a full
    date for privacy, so the full DOB is never drawn; it stays in the data,
    the edit panel and CSV. A DOB not starting with a year (the age range a
-   de-identified export puts in `dob`) is drawn as it is. There is no date
-   of death field: "d. 72" comes from the free-text age. Only one line, on
+   de-identified export puts in `dob`) is drawn as it is. One line, on
    purpose: a two-line name plus DOB plus age ran into the sibship bar
-   halfway to the next row, so the age replaces the year;
+   halfway to the next row, so the age replaces the year. The date of death
+   (#103, `ageLines`): with full dates of birth and death the line is the
+   age at death alone, "d. 72y" ("4 mo", "5 d" for infants); otherwise
+   "d. 2007" (from a year, year-month or full date), under "b. 1935" when
+   that is known too. Those two lines count as past the age line for
+   `detailsBacked`. A `dod` shows only while `deceased` is set (the store
+   sets one with the other, and unticking deceased deletes `dod`). The
+   free-text age still wins over all of it;
 2. one line per age of onset (#93, `onsetLines`);
 3. (gender identity #26 and evaluation #101 belong here, before the number);
 4. the pedigree number (#8), last, on its own line.

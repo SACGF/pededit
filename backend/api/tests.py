@@ -12,7 +12,7 @@ FULL_PEDIGREE = {
         {
             "id": "f", "sex": "male", "affected": False, "deceased": True,
             "carrier": False, "proband": False, "sibOrder": 0,
-            "name": "John Smith", "dob": "1950-03-01", "age": "d. 72",
+            "name": "John Smith", "dob": "1950-03-01", "dod": "2022", "age": "d. 72",
             "notes": "Line one\nLine two ", "hpoTerms": ["HP:0001250"],
             "tags": ["t1", "t2"], "onset": "40s", "tagOnset": {"t1": "52y"},
         },

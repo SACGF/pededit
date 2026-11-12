@@ -96,7 +96,7 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `genderIdentity` | `"man"`, `"woman"` or `"nonbinary"` | no | Gender identity (NSGC 2022); `"nonbinary"` covers non-binary and gender diverse. Changes only the symbol drawn, when `CanvasSettings.symbolsShow` is `"gender"` (the default). Ignored for pregnancies and losses. |
 | `affected` | boolean | yes | Filled symbol when `true`. |
 | `sibOrder` | number | yes | 0-indexed position within the sibling group (or among founders). |
-| `deceased` | boolean | no | Diagonal slash through the symbol. |
+| `deceased` | boolean | no | Diagonal slash through the symbol. Alone it means deceased, date of death unknown. |
 | `carrier` | boolean | no | Carrier dot in the symbol. |
 | `presymptomatic` | boolean | no | Asymptomatic or presymptomatic carrier (NSGC 2008 Fig. 4): clinically unaffected now but may develop the condition, a vertical line through the symbol. The editor offers it as one carrier status with `carrier`, so it never sets both. Not drawn on an affected symbol. |
 | `evaluations` | array of objects | no | Evaluations and test results (NSGC 2008 Fig. 4), one line each under the symbol: `E`, then `+`, `-` or `u` for the result, then the detail in parentheses, e.g. "E+ (BRCA1 c.5266dupC)". With several they are numbered E1, E2 in list order. Each object has `result` (`"positive"`, `"negative"` or `"uninformative"`, absent for no result yet), `detail` (string) and `documented` (boolean: a "*" at the symbol's lower right). |
@@ -109,7 +109,8 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `carriedBy` | string | no | Id of the woman who carried this pregnancy when she is not its genetic mother: a surrogate, or the mother of a child conceived with a donor egg. Drawn as a solid line from her to the child (a pregnancy is a biological relationship). Not a parent: kinship and PED use the genetic parents in `parentOf`. |
 | `socialParents` | string[] | no | Ids of parents who are not the child's genetic parents, such as the intended father when donor sperm is used. Drawn as a dashed line of descent. Not parents for kinship or PED. PED has no field for these three, so Export PED drops them and warns. |
 | `name` | string | no | Display name shown under the symbol. |
-| `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. |
+| `dob` | string | no | Date of birth as an ISO date, `YYYY-MM-DD`. A bare year (`"1935"`) is drawn as the year too. |
+| `dod` | string | no | Date of death: `YYYY-MM-DD`, or `YYYY-MM` or `YYYY` when only part is known. Only drawn when `deceased` is `true` (the editor sets both together). Under the symbol it is the age at death, `"d. 72y"`, when both dates are full, otherwise the year, `"d. 2007"` (under `"b. 1935"` when the year of birth is known). The free-text `age` wins over both. De-identified exports leave it out. |
 | `age` | string | no | The individual's age as free text, such as `"50s"`, `"d. 72"` or `"34 y"`, for an approximate age or one known without a date. Shown under the symbol in place of the date of birth, cut to one line. Not an age of onset. De-identified exports leave it out. |
 | `notes` | string | no | Free-text clinical notes. |
 | `hpoTerms` | string[] | no | HPO term codes, e.g. `["HP:0001250"]`. |

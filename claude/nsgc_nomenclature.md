@@ -54,7 +54,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 
 | Rule | PedEdit |
 |---|---|
-| Age / year of birth first | Follows (#20): the free-text age, else the year of birth ("b. 1978"). The full DOB stays in the data, the edit panel and CSV. There is no date of death field, so "d. 2007" comes from the free-text age. |
+| Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the edit panel and CSV. "Deceased" alone means date unknown. |
 | Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |
 

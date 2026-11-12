@@ -1,6 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 import type { SvgExportOptions } from "./types";
+import { parsePartialDate } from "../../pedigree/labels";
 import { asDrawn, drawnPedigree, isBranchPlaceholderId } from "../../pedigree/collapse";
 
 function ageBucket(dob: string, referenceDate = new Date()): string {
@@ -15,7 +16,8 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
 
 /**
  * The drawn pedigree (hidden descendants left out, #94) with names replaced by
- * generation numbers, dates bucketed or dropped, and free-text age, notes,
+ * generation numbers, dates bucketed or dropped (the date of death always),
+ * and free-text age, notes,
  * chart title and clinical key fields dropped.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
@@ -39,7 +41,10 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     individuals: pedigree.individuals.map(ind => ({
       ...ind,
       name:  isBranchPlaceholderId(ind.id) ? undefined : notations.get(ind.id) ?? ind.id,
-      dob:   options.ageBuckets && ind.dob ? ageBucket(ind.dob) : undefined,
+      // A date of death (#103) dates someone like a DOB does, so it goes;
+      // with age ranges, someone with both dates gets the range at death.
+      dob:   options.ageBuckets && ind.dob ? (ind.deceased && ind.dod && parsePartialDate(ind.dod.trim()) ? `d. ${ageBucket(ind.dob, new Date(ind.dod))}` : ageBucket(ind.dob)) : undefined,
+      dod:   undefined,
       age:   undefined,
       notes: undefined,
     })),

@@ -66,6 +66,14 @@ export interface Individual {
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"
   /**
+   * Date of death (#103): "YYYY-MM-DD", or "YYYY-MM" / "YYYY" when only
+   * part is known. Implies `deceased`, which alone means deceased with the
+   * date unknown; the editor sets `deceased` with it and clears it when
+   * `deceased` is unticked. Drawn as the age at death ("d. 72y") with a
+   * full DOB, else the year ("d. 2007").
+   */
+  dod?: string;
+  /**
    * The individual's age as free text, shown under the symbol in place of
    * the DOB (#20): "50s", "d. 72", "34 y". For an approximate age, or one
    * known without a date. Not an age of onset.

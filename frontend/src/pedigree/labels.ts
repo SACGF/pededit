@@ -107,8 +107,9 @@ export function linesWidth(lines: string[]): number {
  * instructions: age or year of birth or death, then evaluation, then the
  * pedigree number), each cut to the label width:
  *
- *   1. `age`: the free-text age (#20) when set, otherwise the year of birth
- *      ("b. 1978"), as the standard prefers a year or age to a full date;
+ *   1. `age`: the free-text age (#20) when set, otherwise birth and death
+ *      (`ageLines`: "b. 1978", "d. 72y", or "b. 1935" over "d. 2007"), as
+ *      the standard prefers a year or age to a full date;
  *   2. `onset`: one line per age of onset (#93);
  *   3. `gender`: the sex assigned at birth ("AMAB", "AFAB", "UAAB") under
  *      a symbol drawn by gender identity (#26, NSGC 2022);
@@ -133,7 +134,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
   const branch = branchOf(pedigree, ind.id);
   if (branch) return { age: [], onset: [], gender: [], evaluation: [], number };
   return {
-    age: wrapLabel(ageText(ind), maxWidth, 1),
+    age: ageLines(ind).flatMap(l => wrapLabel(l, maxWidth, 1)),
     onset: onsetLines(ind, pedigree, maxWidth),
     gender: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1),
     evaluation: evaluationLines(ind, maxWidth),
@@ -148,32 +149,79 @@ export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigre
 }
 
 /**
- * True when the detail block runs past the age line. A two-line name plus
- * the age line clears the sibship bar of the person's children; anything
+ * True when the detail block runs past one age line (a birth and a death
+ * line count as two). A two-line name plus one age line clears the sibship bar of the person's children; anything
  * more can reach it, so the block then gets a white backing (canvas div
  * background, a `<rect>` in the exports) and the bar shows a gap under the
  * text instead of running through it.
  */
 export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return s.onset.length + s.gender.length + s.evaluation.length + s.number.length > 0;
+  return s.age.length > 1 || s.onset.length + s.gender.length + s.evaluation.length + s.number.length > 0;
 }
 
 /**
- * The age line's text (#20): the free-text age when set, otherwise the year
- * of birth as "b. 1978". NSGC prefers a year or an age to a full date, for
- * privacy. A date of birth that does not start with a year (the age range a
- * de-identified export puts there, #4) is shown as it is. The full date
- * stays in the data, the edit panel and the CSV. There is no date of death
- * field, so "d. 2007" or "d. 72" can only come from the free-text age.
+ * The age lines (#20, #103), NSGC 2008 Fig. 1: "age, or year of birth /
+ * death", a year or an age rather than a full date, for privacy. The full
+ * dates stay in the data, the edit panel and the CSV.
+ *
+ *   - the free-text age when set ("d. 60s"), alone, as it always was;
+ *   - deceased with full dates of birth and death: the age at death alone,
+ *     "d. 72y" ("d. 4 mo", "d. 5 d" under a year or a month);
+ *   - otherwise "b. 1935" and "d. 2007", each when known, on two lines when
+ *     both are (one line, "b. 1935, d. 2007", is wider than a slot).
+ *
+ * A date of birth that does not start with a year (the age range a
+ * de-identified export puts there, #4) is shown as it is. A date of death
+ * counts only while the person is marked deceased, and only when it reads
+ * as a year, year-month or full date.
  */
-export function ageText(ind: Pick<Individual, "age" | "dob">): string | undefined {
+export function ageLines(ind: Pick<Individual, "age" | "dob" | "dod" | "deceased">): string[] {
   const age = ind.age?.trim();
-  if (age) return age;
-  const dob = ind.dob?.trim();
-  if (!dob) return undefined;
-  const year = /^(\d{4})(?:-|$)/.exec(dob);
-  return year ? `b. ${year[1]}` : dob;
+  if (age) return [age];
+  const dobText = ind.dob?.trim();
+  const birth = dobText ? parsePartialDate(dobText) : undefined;
+  const death = ind.deceased && ind.dod ? parsePartialDate(ind.dod.trim()) : undefined;
+  const atDeath = birth && death ? ageAtDeath(birth, death) : undefined;
+  if (atDeath) return [`d. ${atDeath}`];
+  const lines: string[] = [];
+  if (dobText) lines.push(birth ? `b. ${birth.y}` : dobText);
+  if (death) lines.push(`d. ${death.y}`);
+  return lines;
+}
+
+/** The age lines as one string ("b. 1935, d. 2007"), for the edit panel's hint. */
+export function ageText(ind: Pick<Individual, "age" | "dob" | "dod" | "deceased">): string | undefined {
+  const lines = ageLines(ind);
+  return lines.length ? lines.join(", ") : undefined;
+}
+
+export interface PartialDate { y: number; m?: number; d?: number }
+
+/** "2007", "2007-03" or "2007-03-14" (#103: often only the year of death is known); anything else is undefined. */
+export function parsePartialDate(text: string): PartialDate | undefined {
+  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(text);
+  if (!m) return undefined;
+  const y = +m[1]!, mo = m[2] ? +m[2] : undefined, d = m[3] ? +m[3] : undefined;
+  if (mo !== undefined && (mo < 1 || mo > 12)) return undefined;
+  if (d !== undefined && (d < 1 || d > 31)) return undefined;
+  return { y, ...(mo ? { m: mo } : {}), ...(d ? { d } : {}) };
+}
+
+/**
+ * Age at death from two full dates: "72y", or "4 mo" under a year, "5 d"
+ * under a month. Undefined when either date lacks a month or day (a year
+ * alone leaves the age a year out) or death comes before birth.
+ */
+export function ageAtDeath(birth: PartialDate, death: PartialDate): string | undefined {
+  if (birth.m === undefined || birth.d === undefined || death.m === undefined || death.d === undefined) return undefined;
+  const before = death.m < birth.m || (death.m === birth.m && death.d < birth.d);
+  const years = death.y - birth.y - (before ? 1 : 0);
+  if (years >= 1) return `${years}y`;
+  const months = (death.y - birth.y) * 12 + death.m - birth.m - (death.d < birth.d ? 1 : 0);
+  if (months >= 1) return `${months} mo`;
+  const days = Math.round((Date.UTC(death.y, death.m - 1, death.d) - Date.UTC(birth.y, birth.m - 1, birth.d)) / 86_400_000);
+  return days >= 0 ? `${days} d` : undefined;
 }
 
 /**

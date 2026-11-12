@@ -89,6 +89,7 @@
         "sibOrder": { "type": "number", "description": "0-indexed position within the sibling group." },
         "name": { "type": "string" },
         "dob": { "type": "string", "description": "ISO date, YYYY-MM-DD." },
+        "dod": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$", "description": "Date of death: YYYY-MM-DD, YYYY-MM or YYYY. Drawn only when deceased is true." },
         "age": { "type": "string", "description": "The individual's age as free text, e.g. \"50s\" or \"d. 72\", shown under the symbol in place of the DOB. Not an age of onset." },
         "notes": { "type": "string" },
         "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },

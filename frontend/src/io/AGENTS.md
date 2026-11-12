@@ -135,7 +135,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   de-identified export, blanks `chartTitle` and drops `clinicalDetails`
   entirely (reason and ancestry are free text that can name people); the export dialog also
   passes no title. Age ranges come from the DOB only: free text such as
-  "3 mo" cannot be bucketed safely. The names become the pedigree numbers
+  "3 mo" cannot be bucketed safely. The date of death (#103) is always
+  dropped; with age ranges, someone deceased with both dates gets the range
+  at death in `dob` ("d. 70s"), drawn as it is. The names become the pedigree numbers
   (`pedigreeNumbers`, #8), and the copy has `showNumbers` turned off so a
   numbered pedigree does not draw "II-3 II-3".
 - The chart title (#20) is `options.title`, resolved by the caller with
@@ -173,4 +175,5 @@ New columns go on the end so earlier positions never move: `consultand`
 symbol, " *" after a documented one).
 `gender_identity` (#26, `man` / `woman` / `nonbinary` or blank; blank for a
 pregnancy or loss). The `sex` column stays biological sex and decides
-father and mother.
+father and mother. `dod` (#103), the date of death as stored ("2007",
+"2007-03-14"), after the assisted reproduction columns (#45).

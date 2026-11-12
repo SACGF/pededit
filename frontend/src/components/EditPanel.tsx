@@ -12,7 +12,7 @@ import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedig
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { chartTitle, ageText } from "../pedigree/labels";
+import { chartTitle, ageText, parsePartialDate } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
@@ -62,7 +62,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
+  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
@@ -90,6 +90,32 @@ function IndividualForm({ individual }: { individual: Individual }) {
         />
       </Field>
 
+      {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
+      <Field label="Date of death">
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer shrink-0">
+            <input
+              type="checkbox"
+              name="deceased"
+              checked={!!individual.deceased}
+              onChange={e => setDeceased(individual.id, e.target.checked)}
+              className="accent-black"
+            />
+            <span>Deceased</span>
+          </label>
+          <Input
+            value={individual.dod ?? ""}
+            aria-label="Date of death"
+            onChange={e => setDateOfDeath(individual.id, e.target.value.trim() ? e.target.value : undefined)}
+            className="h-7 text-sm"
+            placeholder="YYYY or YYYY-MM-DD"
+          />
+        </div>
+        {individual.dod?.trim() && !parsePartialDate(individual.dod.trim()) && (
+          <p className="text-[10px] text-gray-500">Not drawn until it reads as a year (2007) or a date (2007-03-14).</p>
+        )}
+      </Field>
+
       <Field label="Age">
         <Input
           value={individual.age ?? ""}
@@ -98,9 +124,9 @@ function IndividualForm({ individual }: { individual: Individual }) {
           placeholder="e.g. 50s, d. 72"
           aria-label="Age"
         />
-        {individual.age?.trim() && individual.dob ? (
-          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the year of birth.</p>
-        ) : individual.dob ? (
+        {individual.age?.trim() && (individual.dob || (individual.deceased && individual.dod)) ? (
+          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the years of birth and death.</p>
+        ) : !individual.age?.trim() && ageText(individual) ? (
           <p className="text-[10px] text-gray-500">Shown under the symbol as "{ageText(individual)}" (NSGC prefers the year to the full date).</p>
         ) : null}
       </Field>
@@ -230,7 +256,6 @@ function IndividualForm({ individual }: { individual: Individual }) {
             />
             <span>Family history not known</span>
           </label>
-          {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
           {individual.consultand && <div className="font-medium">{individual.proband ? "Also the consultand" : "Consultand"}</div>}
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}

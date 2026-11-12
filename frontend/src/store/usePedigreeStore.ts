@@ -333,7 +333,10 @@ interface PedigreeState {
   // Individual property mutations
   updateIndividual: (id: string, updates: Partial<Individual>) => void;
   setAffected: (id: string, affected: boolean) => void;
+  /** Unticking deceased also clears the date of death (#103). */
   setDeceased: (id: string, deceased: boolean) => void;
+  /** Date of death (#103), "YYYY", "YYYY-MM" or "YYYY-MM-DD"; a non-empty one also ticks deceased, empty removes it. */
+  setDateOfDeath: (id: string, dod: string | undefined) => void;
   /** Carrier dot. Setting it clears `presymptomatic`: the two are one carrier status (#101). */
   setCarrier: (id: string, carrier: boolean) => void;
   /** Presymptomatic carrier, a vertical line through the symbol (#101). Setting it clears `carrier`. */
@@ -1018,7 +1021,18 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setDeceased: (id, deceased) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (ind) ind.deceased = deceased;
+        if (!ind) return;
+        ind.deceased = deceased;
+        if (!deceased) delete ind.dod;
+      });
+    },
+
+    setDateOfDeath: (id, dod) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (dod) { ind.dod = dod; ind.deceased = true; }
+        else delete ind.dod;
       });
     },
 

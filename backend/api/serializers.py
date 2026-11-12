@@ -62,6 +62,7 @@ class IndividualSerializer(serializers.Serializer):
     sibOrder = serializers.FloatField(required=False)
     name = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     dob = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    dod = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     age = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     notes = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     hpoTerms = _opt(serializers.ListField, child=serializers.CharField())
