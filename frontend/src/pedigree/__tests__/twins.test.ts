@@ -3,6 +3,7 @@ import { sibshipSegments, twinForkMarks } from "../sibshipPath";
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
+import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { renderExportKeySvg } from "../tags";
 import { twinSetProblem, twinMembership, zygositiesInUse } from "../twins";
@@ -54,6 +55,24 @@ describe("twin fork geometry (#11)", () => {
     const q = twinForkMarks(0, kids.map(k => (k.twinSet ? { ...k, zygosity: "unknown" as const } : k)));
     expect(q).toEqual([{ kind: "question", x: 40, y: 80 }]);
     expect(twinForkMarks(0, kids.map(k => (k.twinSet ? { ...k, zygosity: "dizygotic" as const } : k)))).toEqual([]);
+  });
+
+  it("the bar ends at the fork of twins at the end of the sibship, not over them (#104)", () => {
+    expect(sibshipSegments(80, 0, 0, kids)[1]).toEqual([40, 60, 160, 60]);
+    // Twins as the only children: no bar beyond the shared point.
+    expect(sibshipSegments(40, 0, 0, kids.slice(0, 2))[1]).toEqual([40, 60, 40, 60]);
+    const twinsOnly: Pedigree = {
+      individuals: [
+        { id: "f", sex: "male", affected: false, sibOrder: 0 },
+        { id: "m", sex: "female", affected: false, sibOrder: 0 },
+        { id: "a", sex: "female", affected: false, sibOrder: 0 },
+        { id: "b", sex: "male", affected: false, sibOrder: 1 },
+      ],
+      partnerships: [{ id: "p", individual1: "f", individual2: "m", twins: [{ members: ["a", "b"], zygosity: "unknown" }] }],
+      parentOf: { p: ["a", "b"] },
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    expect(lintExport(twinsOnly)).toEqual([]);
   });
 
   it("a lone member is not a fork", () => {

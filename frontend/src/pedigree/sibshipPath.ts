@@ -56,23 +56,24 @@ export function sibshipSegments(
   const half = NODE_SIZE / 2;
   const childRowY = Math.min(...children.map(c => c.y));
   const sibBarY = (coupleY + childRowY) / 2 + barOffset;
-  const xs = children.map(c => c.x);
+  const forks = forkXs(children);
+  // Twins: every member's drop starts at the set's shared point on the bar.
+  const fromXs = children.map(c => c.twinSet !== undefined ? (forks.get(c.twinSet) ?? c.x) : c.x);
   const segs: Segment[] = [
     // Drop from the couple line (raised when it hops) to the bar. Parents
     // who are not a couple (gamete donation, #45) each get a line to the
     // bar instead (`apart`).
     ...(apart ? donorDescentSegments(apart, coupleX, sibBarY) : [[coupleX, coupleY - hopHeight, coupleX, sibBarY] as Segment]),
-    [Math.min(coupleX, ...xs), sibBarY, Math.max(coupleX, ...xs), sibBarY],
+    // The bar ends where the outermost drops start: at a twin fork, not over
+    // the twin's own symbol (#104: twins at the end of a sibship left a stub).
+    [Math.min(coupleX, ...fromXs), sibBarY, Math.max(coupleX, ...fromXs), sibBarY],
   ];
-  const forks = forkXs(children);
-  for (const c of children) {
+  children.forEach((c, i) => {
     // To the top of the symbol, or its bottom if it was dragged above the bar.
     const top = c.y - half + (c.topInset ?? 0);
     const end = top >= sibBarY ? top : c.y + half;
-    // Twins: every member's drop starts at the set's shared point on the bar.
-    const fromX = c.twinSet !== undefined ? (forks.get(c.twinSet) ?? c.x) : c.x;
-    segs.push([fromX, sibBarY, c.x, end]);
-  }
+    segs.push([fromXs[i]!, sibBarY, c.x, end]);
+  });
   return segs;
 }
 

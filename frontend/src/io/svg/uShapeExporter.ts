@@ -1087,7 +1087,6 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       // Each sibship descends from the middle of its couple line, or from the
       // parent's symbol when the partner is not drawn.
       const uP = descentU(n, w, g);
-      const us = w.kids.map(c => c.u);
       if (donor) {
         const uA = memberU(n, w.a, g);
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
@@ -1095,7 +1094,14 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
       } else {
         out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
       }
-      const lo = Math.min(uP, ...us), hi = Math.max(uP, ...us);
+      // Twins share one fork point on the bar, at the mean of their positions (#11).
+      const forkU = new Map<string, number>();
+      for (const [key, members] of groupBy(w.kids, c => twins.get(c.blood)?.twinSet)) {
+        if (members.length >= 2) forkU.set(key, members.reduce((a, c) => a + c.u, 0) / members.length);
+      }
+      // The bar ends where the outermost drops start, at a twin fork rather than over the twin (#104).
+      const starts = w.kids.map(c => { const key = twins.get(c.blood)?.twinSet; return key !== undefined && forkU.has(key) ? forkU.get(key)! : c.u; });
+      const lo = Math.min(uP, ...starts), hi = Math.max(uP, ...starts);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
       for (const l of links) {
         if (linkDone.has(linkKey(l)) || l.child !== w.kids[0]!.blood) continue;
@@ -1107,12 +1113,7 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
         out.push(diagonalPath(from.u, from.depth * g.ringGap + HALF, uP, bar, g, linkAttrs(l.kind)));
       }
       // A loss triangle's apex sits below the top of the symbol box. An
-      // adopted-in child's drop is dashed (#12). Twins share one fork point
-      // on the bar, at the mean of their positions (#11).
-      const forkU = new Map<string, number>();
-      for (const [key, members] of groupBy(w.kids, c => twins.get(c.blood)?.twinSet)) {
-        if (members.length >= 2) forkU.set(key, members.reduce((a, c) => a + c.u, 0) / members.length);
-      }
+      // adopted-in child's drop is dashed (#12).
       w.kids.forEach(c => {
         const ind = byId.get(c.blood);
         const attrs = ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS;
