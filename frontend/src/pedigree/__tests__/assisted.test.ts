@@ -99,6 +99,45 @@ describe("assisted reproduction: editing (#45)", () => {
     expect(addDonorProblem(p, "c1", "egg")).toBeNull();
   });
 
+  it("an existing person can be the donor and the surrogate (#104, NSGC Fig. 3: the wife's sister)", () => {
+    const withSister = produce(family(), d => {
+      d.individuals.push({ id: "sis", sex: "female", affected: false, sibOrder: 1, name: "Sue" });
+      d.parentOf.g!.push("sis");
+    });
+    expect(addDonorProblem(withSister, "c1", "egg", "h")).toMatch(/already a genetic parent/);
+    expect(addDonorProblem(withSister, "c1", "sperm", "sis")).toMatch(/cannot be female/);
+    expect(addDonorProblem(withSister, "c1", "egg", "gm")).toBeNull();
+    expect(addDonorProblem(withSister, "c1", "egg", "c2")).toMatch(/An egg donor cannot be male/);
+    let p = produce(withSister, d => { applyAddDonor(d, "c1", "egg", "sis", "hs"); });
+    expect(p.individuals.length).toBe(withSister.individuals.length);
+    expect(parentsOf(p, "c1")).toEqual(["h", "sis"]);
+    expect(p.individuals.find(i => i.id === "sis")).toMatchObject({ name: "Sue", reproductiveRole: "donor" });
+    expect(p.individuals.find(i => i.id === "c1")!.carriedBy).toBe("w");
+    // The same donor for the second child: one donor pair, so c1 and c2 stay full siblings.
+    p = produce(p, d => { applyAddDonor(d, "c2", "egg", "sis", "hs2"); });
+    expect(p.partnerships.filter(x => x.donorConception).length).toBe(1);
+    expect(p.parentOf.hs).toEqual(["c1", "c2"]);
+    expect(kinshipCoefficients(p).kinship("c1", "c2")).toBe(0.25);
+    // She also carried c1: she is drawn as the donor only, and Wendy becomes a social parent.
+    expect(addSurrogateProblem(p, "c1", "sis")).toBeNull();
+    p = produce(p, d => { applyAddSurrogate(d, "c1", "sis"); });
+    const c1 = p.individuals.find(i => i.id === "c1")!;
+    expect(c1.carriedBy).toBe("sis");
+    expect(c1.socialParents).toEqual(["w"]);
+    expect(p.individuals.find(i => i.id === "sis")!.reproductiveRole).toBe("donor");
+    expect(assistedLinks(p).filter(l => l.child === "c1")).toEqual([{ from: "w", child: "c1", kind: "social" }]);
+  });
+
+  it("an existing woman as surrogate; refusals", () => {
+    const p0 = family();
+    expect(addSurrogateProblem(p0, "c1", "h")).toMatch(/male/);
+    expect(addSurrogateProblem(p0, "c1", "w")).toMatch(/genetic mother/);
+    const p = produce(p0, d => { applyAddSurrogate(d, "c1", "gm"); });
+    expect(p.individuals.length).toBe(p0.individuals.length);
+    expect(p.individuals.find(i => i.id === "c1")!.carriedBy).toBe("gm");
+    expect(p.individuals.find(i => i.id === "gm")!.reproductiveRole).toBe("surrogate");
+  });
+
   it("a surrogate carries the child; a previous carrier becomes a social parent", () => {
     let p = produce(family(), d => { applyAddDonor(d, "c2", "egg", "d", "hd"); });
     p = produce(p, d => { applyAddSurrogate(d, "c2", "s"); });

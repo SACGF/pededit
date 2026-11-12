@@ -61,11 +61,17 @@ stub so the app still builds without Google login.
   Export PED warns first. Assisted reproduction (#45, `pedigree/assisted.ts`):
   "Add sperm donor" / "Add egg donor" / "Add surrogate" in the more menu;
   the donor becomes the child's genetic parent (so kinship is right) and
-  the parent replaced stays linked as carrier or social parent. Twins (#11) live on the partnership as
+  the parent replaced stays linked as carrier or social parent. "Existing
+  sperm donor..." / "Existing egg donor..." / "Existing surrogate..." (#104,
+  `picking.kind` "donor" / "surrogate") make someone already on the tree the
+  donor or carrier, e.g. the wife's sister (NSGC Fig. 3); a second child of
+  the same donor and parent joins the same donor pair, so they are full
+  siblings, and an egg donor who also carried the child stays drawn as the
+  donor only, the previous carrier becoming a social parent. Twins (#11) live on the partnership as
   `Partnership.twins` sets with a zygosity (`pedigree/twins.ts`): the layout
   keeps a set side by side (autohint, as kinship2 does), the sibship edge
   draws the shared fork, and `setSex` on a monozygotic twin changes the whole
-  set. Not yet: assisted reproduction symbols.
+  set.
 - Visual style is black and white, minimal chrome. No colour except tags.
 
 ## Layout of src/

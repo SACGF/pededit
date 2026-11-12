@@ -2,6 +2,7 @@ import type { Individual, Partnership, Pedigree, ReproductiveRole } from "@pedig
 import { NODE_SIZE } from "./constants";
 import type { Segment } from "./sibshipPath";
 import { symbolTopInset } from "./lifeStatus";
+import { descendantsOf } from "./removal";
 
 /**
  * Assisted reproduction (NSGC 2008 Fig. 3, #45). Framework-free, shared by the
@@ -224,14 +225,27 @@ function replacedParent(pedigree: Pedigree, p: Partnership, gamete: Gamete): str
   return ids.find(id => sexOf(id) === want) ?? ids.find(id => sexOf(id) !== avoid);
 }
 
-/** Why a donor of this gamete cannot be added for the child, or null when one can. */
-export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gamete): string | null {
+/**
+ * Why a donor of this gamete cannot be added for the child, or null when one
+ * can. With `donorId`, the donor is someone already on the tree (#104), such
+ * as the mother's sister giving an egg: then also why that person cannot be
+ * the donor.
+ */
+export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gamete, donorId?: string): string | null {
   const p = pedigree.partnerships.find(x => (pedigree.parentOf[x.id] ?? []).includes(childId));
   if (!p) return "Add the parents first: the donor replaces one of them as the genetic parent.";
   const x = replacedParent(pedigree, p, gamete);
   if (!x) return `Neither parent could have given the ${gamete}.`;
   const xi = pedigree.individuals.find(i => i.id === x);
   if (xi?.reproductiveRole === "donor") return `${nameOf(pedigree, x)} is already a donor.`;
+  if (donorId === undefined) return null;
+  const donor = pedigree.individuals.find(i => i.id === donorId);
+  if (!donor) return "Unknown individual.";
+  if (donorId === childId) return "Someone cannot be their own donor.";
+  if (donorId === p.individual1 || donorId === p.individual2) return `${nameOf(pedigree, donorId)} is already a genetic parent of ${nameOf(pedigree, childId)}.`;
+  if (donor.lifeStatus) return `${nameOf(pedigree, donorId)} is a pregnancy or pregnancy loss and cannot be a donor.`;
+  if (donor.sex === (gamete === "sperm" ? "female" : "male")) return `${gamete === "egg" ? "An egg" : "A sperm"} donor cannot be ${donor.sex}.`;
+  if (descendantsOf(pedigree, [childId]).has(donorId)) return `${nameOf(pedigree, donorId)} is a descendant of ${nameOf(pedigree, childId)}, so cannot be their donor.`;
   return null;
 }
 
@@ -242,22 +256,40 @@ export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gam
  * woman who carried it for an egg donor (unless someone else is recorded as
  * carrying it), otherwise as a social parent. A donor partnership left with
  * no children is removed, since it is not a couple. Returns the donor's id.
+ * `donorId` is a new id, or the id of someone already on the tree (#104),
+ * who becomes the donor; an existing donor pair with the same other parent
+ * is reused, so two children of one donor are full siblings.
  */
 export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, donorId: string, partnershipId: string): string | null {
-  if (addDonorProblem(draft, childId, gamete)) return null;
+  const existing = draft.individuals.find(i => i.id === donorId);
+  if (addDonorProblem(draft, childId, gamete, existing ? donorId : undefined)) return null;
   const p = draft.partnerships.find(x => (draft.parentOf[x.id] ?? []).includes(childId))!;
   const replaced = replacedParent(draft, p, gamete)!;
   const other = p.individual1 === replaced ? p.individual2 : p.individual1;
   const child = draft.individuals.find(i => i.id === childId)!;
 
-  draft.individuals.push({
-    id: donorId, sex: gamete === "sperm" ? "male" : "female", affected: false, sibOrder: 0,
-    name: "", notes: "", reproductiveRole: "donor",
-  });
-  const [i1, i2] = gamete === "sperm" ? [donorId, other] : [other, donorId];
-  draft.partnerships.push({ id: partnershipId, individual1: i1, individual2: i2, donorConception: true });
-  draft.parentOf[partnershipId] = [childId];
-  child.sibOrder = 0;
+  if (existing) {
+    // Someone already on the tree (#104): they become a donor, keeping everything else.
+    existing.reproductiveRole = "donor";
+    if (existing.sex === "unknown") existing.sex = gamete === "sperm" ? "male" : "female";
+  } else {
+    draft.individuals.push({
+      id: donorId, sex: gamete === "sperm" ? "male" : "female", affected: false, sibOrder: 0,
+      name: "", notes: "", reproductiveRole: "donor",
+    });
+  }
+  // The same donor and parent for a second child share one donor pair, so the children are full siblings.
+  const shared = existing && draft.partnerships.find(x => x.donorConception
+    && ((x.individual1 === donorId && x.individual2 === other) || (x.individual1 === other && x.individual2 === donorId)));
+  if (shared) {
+    child.sibOrder = Math.max(-1, ...(draft.parentOf[shared.id] ?? []).map(id => draft.individuals.find(i => i.id === id)?.sibOrder ?? 0)) + 1;
+    draft.parentOf[shared.id] = [...(draft.parentOf[shared.id] ?? []), childId];
+  } else {
+    const [i1, i2] = gamete === "sperm" ? [donorId, other] : [other, donorId];
+    draft.partnerships.push({ id: partnershipId, individual1: i1, individual2: i2, donorConception: true });
+    draft.parentOf[partnershipId] = [childId];
+    child.sibOrder = 0;
+  }
 
   // Leave the old parents, and their twin sets.
   draft.parentOf[p.id] = (draft.parentOf[p.id] ?? []).filter(c => c !== childId);
@@ -281,30 +313,56 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
   return donorId;
 }
 
-/** Why a surrogate cannot be added for the child, or null when one can. */
-export function addSurrogateProblem(pedigree: Pedigree, childId: string): string | null {
+/**
+ * Why a surrogate cannot be added for the child, or null when one can. With
+ * `surrogateId`, the surrogate is someone already on the tree (#104), such
+ * as the mother's sister: then also why she cannot be.
+ */
+export function addSurrogateProblem(pedigree: Pedigree, childId: string, surrogateId?: string): string | null {
   const child = pedigree.individuals.find(i => i.id === childId);
   if (!child) return "Unknown individual.";
   const carrier = child.carriedBy && pedigree.individuals.find(i => i.id === child.carriedBy);
   if (carrier && carrier.reproductiveRole === "surrogate") return `${nameOf(pedigree, carrier.id)} is already recorded as the surrogate.`;
+  if (surrogateId === undefined) return null;
+  const s = pedigree.individuals.find(i => i.id === surrogateId);
+  if (!s) return "Unknown individual.";
+  if (surrogateId === childId) return "Someone cannot carry themselves.";
+  if (s.sex === "male") return `${nameOf(pedigree, surrogateId)} is male and cannot carry a pregnancy.`;
+  if (s.lifeStatus) return `${nameOf(pedigree, surrogateId)} is a pregnancy or pregnancy loss.`;
+  // An egg donor who also carried the child (NSGC Fig. 3, the sister as donor and carrier) is allowed:
+  // she is drawn as the donor only, and the previous carrier becomes a social parent.
+  if (geneticParents(pedigree, childId).includes(surrogateId) && s.reproductiveRole !== "donor") return `${nameOf(pedigree, surrogateId)} is the genetic mother of ${nameOf(pedigree, childId)}, not a surrogate.`;
+  if (descendantsOf(pedigree, [childId]).has(surrogateId)) return `${nameOf(pedigree, surrogateId)} is a descendant of ${nameOf(pedigree, childId)}.`;
   return null;
 }
 
 /**
  * Add a surrogate who carried this child, in place. A woman recorded as
  * carrying it before (the mother of a child from a donor egg) becomes a
- * social parent. Returns the surrogate's id.
+ * social parent. Returns the surrogate's id. `surrogateId` is a new id, or
+ * the id of a woman already on the tree (#104).
  */
 export function applyAddSurrogate(draft: Pedigree, childId: string, surrogateId: string): string | null {
-  if (addSurrogateProblem(draft, childId)) return null;
+  const existing = draft.individuals.find(i => i.id === surrogateId);
+  if (addSurrogateProblem(draft, childId, existing ? surrogateId : undefined)) return null;
   const child = draft.individuals.find(i => i.id === childId)!;
-  draft.individuals.push({
-    id: surrogateId, sex: "female", affected: false, sibOrder: 0,
-    name: "", notes: "", reproductiveRole: "surrogate",
-  });
+  if (existing) {
+    // Someone already on the tree (#104). A donor stays a donor (D wins over S).
+    if (existing.reproductiveRole !== "donor") existing.reproductiveRole = "surrogate";
+    if (existing.sex === "unknown") existing.sex = "female";
+  } else {
+    draft.individuals.push({
+      id: surrogateId, sex: "female", affected: false, sibOrder: 0,
+      name: "", notes: "", reproductiveRole: "surrogate",
+    });
+  }
   const before = child.carriedBy;
   child.carriedBy = surrogateId;
-  if (before && !child.socialParents?.includes(before)) child.socialParents = [...(child.socialParents ?? []), before];
+  if (child.socialParents?.includes(surrogateId)) {
+    child.socialParents = child.socialParents.filter(x => x !== surrogateId);
+    if (child.socialParents.length === 0) delete child.socialParents;
+  }
+  if (before && before !== surrogateId && !child.socialParents?.includes(before)) child.socialParents = [...(child.socialParents ?? []), before];
   return surrogateId;
 }
 

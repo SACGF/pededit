@@ -108,6 +108,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     startPickingParents,
     startPickingChild,
     startPickingPartner,
+    startPickingDonor,
+    startPickingSurrogate,
   } = usePedigreeStore();
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -329,26 +331,47 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           {([["sperm", "Add sperm donor"], ["egg", "Add egg donor"]] as const).map(([gamete, text]) => {
             const why = addDonorProblem(pedigree, individualId, gamete);
             return (
-              <MenuItem
-                key={gamete}
-                onClick={() => action(() => addDonor(individualId, gamete))}
-                disabled={!!why}
-                title={why ?? `This person was conceived with donor ${gamete}: the donor (D) becomes the genetic parent, and the parent they replace keeps a line to this person`}
-              >
-                {text}
-              </MenuItem>
+              <div key={gamete}>
+                <MenuItem
+                  onClick={() => action(() => addDonor(individualId, gamete))}
+                  disabled={!!why}
+                  title={why ?? `This person was conceived with donor ${gamete}: the donor (D) becomes the genetic parent, and the parent they replace keeps a line to this person`}
+                >
+                  {text}
+                </MenuItem>
+                {pedigree.individuals.length > 1 && (
+                  <MenuItem
+                    onClick={() => action(() => startPickingDonor(individualId, gamete))}
+                    disabled={!!why}
+                    title={why ?? `Click someone already on the tree who gave the ${gamete}, for example a relative`}
+                  >
+                    Existing {gamete} donor...
+                  </MenuItem>
+                )}
+              </div>
             );
           })}
           {(() => {
             const why = addSurrogateProblem(pedigree, individualId);
             return (
-              <MenuItem
-                onClick={() => action(() => addSurrogate(individualId))}
-                disabled={!!why}
-                title={why ?? "A surrogate (S) carried this pregnancy: drawn with a solid line to this person, not a parent for kinship"}
-              >
-                Add surrogate
-              </MenuItem>
+              <>
+                <MenuItem
+                  onClick={() => action(() => addSurrogate(individualId))}
+                  disabled={!!why}
+                  title={why ?? "A surrogate (S) carried this pregnancy: drawn with a solid line to this person, not a parent for kinship"}
+                >
+                  Add surrogate
+                </MenuItem>
+                {pedigree.individuals.length > 1 && (
+                  <MenuItem
+                    onClick={() => action(() => startPickingSurrogate(individualId))}
+                    disabled={!!why}
+                    title={why ?? "Click a woman already on the tree who carried this pregnancy, for example a relative"}
+                  >
+                    Existing surrogate...
+                  </MenuItem>
+                )}
+              </>
             );
           })()}
         </MenuSection>

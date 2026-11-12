@@ -24,12 +24,16 @@ export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
  * "partner" (#84) takes one click, the existing individual who becomes the
  * partner of individualId. "relatedness" (#90) takes one click and selects
  * that person with individualId, so the panel shows how the two are related.
+ * "donor" and "surrogate" (#104) take one click, an existing person who
+ * becomes the child's sperm or egg donor or the surrogate who carried them.
  */
 export type Picking =
   | { kind: "parents"; childId: string; picked: string[] }
   | { kind: "child"; partnershipId: string }
   | { kind: "partner"; individualId: string }
-  | { kind: "relatedness"; individualId: string };
+  | { kind: "relatedness"; individualId: string }
+  | { kind: "donor"; childId: string; gamete: Gamete }
+  | { kind: "surrogate"; childId: string };
 
 /** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
 export interface Notice {
@@ -241,6 +245,9 @@ interface PedigreeState {
   startPickingChild: (partnershipId: string) => void;
   startPickingPartner: (individualId: string) => void;
   startPickingRelatedness: (individualId: string) => void;
+  /** Pick an existing person as the child's sperm or egg donor, or as the surrogate (#104). */
+  startPickingDonor: (childId: string, gamete: Gamete) => void;
+  startPickingSurrogate: (childId: string) => void;
   cancelPicking: () => void;
   /**
    * Handle a click on an individual while picking. For parents: adds (or
@@ -358,9 +365,10 @@ interface PedigreeState {
    * child's genetic parent in place of one parent, who stays linked to the
    * child (see `applyAddDonor` in pedigree/assisted.ts); addSurrogate adds
    * the woman who carried the child. Both return a reason when refused.
+   * `existingId` makes someone already on the tree the donor or surrogate (#104).
    */
-  addDonor: (childId: string, gamete: Gamete) => string | null;
-  addSurrogate: (childId: string) => string | null;
+  addDonor: (childId: string, gamete: Gamete, existingId?: string) => string | null;
+  addSurrogate: (childId: string, existingId?: string) => string | null;
   setReproductiveRole: (id: string, role: ReproductiveRole | undefined) => void;
   /** The woman who carried the child when not its genetic mother; undefined clears it. */
   setCarriedBy: (childId: string, carrierId: string | undefined) => void;
@@ -509,6 +517,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
     startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, ...selectOnly(individualId) }),
     startPickingRelatedness: (individualId) => set({ picking: { kind: "relatedness", individualId }, ...selectOnly(individualId) }),
+    startPickingDonor: (childId, gamete) => set({ picking: { kind: "donor", childId, gamete }, ...selectOnly(childId) }),
+    startPickingSurrogate: (childId) => set({ picking: { kind: "surrogate", childId }, ...selectOnly(childId) }),
     cancelPicking: () => set({ picking: null }),
 
     pickIndividual: (id) => {
@@ -525,6 +535,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (picking.kind === "relatedness") {
         if (id === picking.individualId) return true;
         set({ picking: null, ...selectionOf([picking.individualId, id], id) });
+        return true;
+      }
+      if (picking.kind === "donor" || picking.kind === "surrogate") {
+        const problem = picking.kind === "donor" ? get().addDonor(picking.childId, picking.gamete, id) : get().addSurrogate(picking.childId, id);
+        if (problem) get().setNotice({ kind: "error", text: problem });
+        else set({ picking: null, ...selectOnly(picking.childId) });
         return true;
       }
       if (picking.kind === "partner") {
@@ -1154,17 +1170,17 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       });
     },
 
-    addDonor: (childId, gamete) => {
-      const problem = addDonorProblem(get().pedigree, childId, gamete);
+    addDonor: (childId, gamete, existingId) => {
+      const problem = addDonorProblem(get().pedigree, childId, gamete, existingId);
       if (problem) { console.warn(`Cannot add a donor: ${problem}`); return problem; }
-      mutate(draft => { applyAddDonor(draft, childId, gamete, newId(), newId()); });
+      mutate(draft => { applyAddDonor(draft, childId, gamete, existingId ?? newId(), newId()); });
       return null;
     },
 
-    addSurrogate: (childId) => {
-      const problem = addSurrogateProblem(get().pedigree, childId);
+    addSurrogate: (childId, existingId) => {
+      const problem = addSurrogateProblem(get().pedigree, childId, existingId);
       if (problem) { console.warn(`Cannot add a surrogate: ${problem}`); return problem; }
-      mutate(draft => { applyAddSurrogate(draft, childId, newId()); });
+      mutate(draft => { applyAddSurrogate(draft, childId, existingId ?? newId()); });
       return null;
     },
 

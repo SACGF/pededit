@@ -673,6 +673,9 @@ function AssistedForm({ individual }: { individual: Individual }) {
   const [expanded, setExpanded] = useState(false);
   const social = individual.socialParents ?? [];
   const carriers = candidates.filter(c => c.sex !== "male" || c.id === individual.carriedBy);
+  // An egg donor who also carried the child (#104) is a genetic parent, so not a candidate: keep her shown.
+  const carrierInd = pedigree.individuals.find(i => i.id === individual.carriedBy);
+  if (carrierInd && !carriers.some(c => c.id === carrierInd.id)) carriers.unshift(carrierInd);
   const addable = candidates.filter(c => !social.includes(c.id) && c.id !== individual.carriedBy);
   return (
     <div className="space-y-2" data-testid="assisted-form">

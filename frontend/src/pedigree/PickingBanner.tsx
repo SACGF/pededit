@@ -4,6 +4,7 @@ import { usePedigreeStore } from "../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { setParentsProblem } from "./parents";
 import { linkPartnerProblem } from "./partners";
+import { addDonorProblem, addSurrogateProblem } from "./assisted";
 
 function nameOf(pedigree: Pedigree, id: string): string {
   const ind = pedigree.individuals.find(i => i.id === id);
@@ -27,13 +28,16 @@ export function PickingBanner() {
   const picked = isParents ? picking.picked : [];
   const isPartner = picking.kind === "partner";
   const excluded = new Set(isParents ? [picking.childId, ...picked]
-    : picking.kind === "partner" || picking.kind === "relatedness" ? [picking.individualId] : []);
+    : picking.kind === "partner" || picking.kind === "relatedness" ? [picking.individualId]
+    : picking.kind === "donor" || picking.kind === "surrogate" ? [picking.childId] : []);
   const q = query.trim().toLowerCase();
   const matches = q
     ? pedigree.individuals
       .filter(i => !excluded.has(i.id) && ((i.name ?? "").toLowerCase().includes(q) || i.id.toLowerCase().includes(q)))
       .filter(i => !isParents || !setParentsProblem(pedigree, picking.childId, [...picked, i.id]))
       .filter(i => !isPartner || !linkPartnerProblem(pedigree, picking.individualId, i.id))
+      .filter(i => picking.kind !== "donor" || !addDonorProblem(pedigree, picking.childId, picking.gamete, i.id))
+      .filter(i => picking.kind !== "surrogate" || !addSurrogateProblem(pedigree, picking.childId, i.id))
       .slice(0, 8)
     : [];
 
@@ -42,6 +46,10 @@ export function PickingBanner() {
     ? `Click one or two people to be the parents of ${nameOf(pedigree, picking.childId)}`
     : isPartner
       ? `Click a person already on the tree to be the partner of ${nameOf(pedigree, picking.individualId)}`
+    : picking.kind === "donor"
+      ? `Click the person who gave the ${picking.gamete} for ${nameOf(pedigree, picking.childId)}`
+    : picking.kind === "surrogate"
+      ? `Click the woman who carried ${nameOf(pedigree, picking.childId)}`
     : picking.kind === "relatedness"
       ? `Click a person to see how they are related to ${nameOf(pedigree, picking.individualId)}`
     : partnership
