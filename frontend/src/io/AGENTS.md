@@ -95,6 +95,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   #68); `computeBounds` allows for the most lines any name takes. They wrap
   even when the pedigree's `canvasSettings.nameLabels` is "truncate": that
   setting is for the canvas, where hovering gives the full name.
+- `canvasSettings.layoutWidth` (#82) does apply to exports: it is read inside
+  `alignPedigreeByFamily`, so SVG, PNG, PDF and de-identification get the
+  same layout as the canvas with no code here. The U-shape has its own
+  layout and ignores it.
 - To look at an export without the dialog: bundle a scratch entry that
   imports `exportSvg` / `exportUShapeSvg` with
   `node_modules/.bin/esbuild entry.ts --bundle --platform=node --format=esm`,

@@ -9,6 +9,14 @@ import { alignPedigree, type AlignOptions } from "./alignPedigree.js";
 export const FAMILY_GAP = 2.5;
 
 /**
+ * Slots a family may be wider than its widest row when the pedigree's
+ * `canvasSettings.layoutWidth` is "relaxed" (#82). Two gets nearly all of the
+ * improvement: with no limit at all the optimiser never took more than about
+ * three on the examples and the PED corpus.
+ */
+export const RELAXED_WIDTH_SLACK = 2;
+
+/**
  * Split a pedigree into its families: sets of individuals joined by
  * partnerships or parent-child links. Families are ordered by the position of
  * their first member in `pedigree.individuals`, and members keep that order.
@@ -78,10 +86,14 @@ function subPedigree(pedigree: Pedigree, ids: Set<string>): Pedigree {
  *
  * A pedigree with at most one family is passed straight to `alignPedigree`,
  * with `improve` on; the R oracle comparisons call `alignPedigree` directly.
+ * Each family gets its own width slack (#82), since each is laid out alone.
  */
 export function alignPedigreeByFamily(pedigree: Pedigree, options: AlignOptions = {}): LayoutResult {
-  // The editor's path takes the improvements beyond kinship2 (#76) unless told not to.
-  options = { improve: true, ...options };
+  // The editor's path takes the improvements beyond kinship2 (#76) unless told
+  // not to, and the pedigree's own width setting (#82). Reading the setting
+  // here keeps the canvas, the exports and the lint on one layout.
+  const widthSlack = pedigree.canvasSettings?.layoutWidth === "relaxed" ? RELAXED_WIDTH_SLACK : 0;
+  options = { improve: true, widthSlack, ...options };
   const { families, isolated } = splitFamilies(pedigree);
   if (families.length <= 1) return alignPedigree(pedigree, options);
 

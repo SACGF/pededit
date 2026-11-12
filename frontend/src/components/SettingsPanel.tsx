@@ -153,6 +153,21 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                   <span className="text-xs text-gray-400">px</span>
                 </label>
               )}
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="minimiseWidth"
+                  checked={canvasSettings.layoutWidth !== "relaxed"}
+                  onChange={e => updateCanvasSettings({ layoutWidth: e.target.checked ? "minimal" : "relaxed" })}
+                />
+                <div>
+                  <div className="text-sm">Minimise width</div>
+                  <div className="text-xs text-gray-400">
+                    Keep a wide pedigree no wider than its widest generation (the kinship2 default). Turn off to let it grow up to two symbols wider, so children sit more directly under their parents. Nodes you have moved stay where they are.
+                  </div>
+                </div>
+              </label>
             </div>
           </div>
 

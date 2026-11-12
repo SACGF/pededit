@@ -26,7 +26,7 @@ const fullFeatured: Pedigree = {
   parentOf: { p: ["c"] },
   siblingOrder: { mode: "birthDate", affectedFirst: true },
   pinnedPositions: { c: { x: 120.5, y: 240 } },
-  canvasSettings: { nodesMoveable: true, snapToGrid: true, snapGridSize: 20, nameLabels: "truncate" },
+  canvasSettings: { nodesMoveable: true, snapToGrid: true, snapGridSize: 20, nameLabels: "truncate", layoutWidth: "relaxed" },
   unlockedIndividuals: ["a"],
   tags: [
     { id: "t1", label: "Breast cancer", color: "#c0392b", style: "quadrant" },
@@ -80,7 +80,7 @@ describe("JSON roundtrip", () => {
     const result = roundtrip(fullFeatured);
     const ped = result.pedigree!;
     expect(ped.pinnedPositions).toEqual({ c: { x: 120.5, y: 240 } });
-    expect(ped.canvasSettings).toEqual({ nodesMoveable: true, snapToGrid: true, snapGridSize: 20, nameLabels: "truncate" });
+    expect(ped.canvasSettings).toEqual({ nodesMoveable: true, snapToGrid: true, snapGridSize: 20, nameLabels: "truncate", layoutWidth: "relaxed" });
     expect(ped.unlockedIndividuals).toEqual(["a"]);
     expect(ped.individuals[1]!.hpoTerms).toEqual(["HP:0001250"]);
     expect(ped.siblingOrder).toEqual({ mode: "birthDate", affectedFirst: true });
@@ -297,6 +297,7 @@ describe("JSON import: rejected inputs", () => {
     expect(errorsOf(withPedigree(p => { p.pinnedPositions = { i1: { x: "1", y: 2 } }; }))).toContain(JsonIssueCode.WRONG_TYPE);
     expect(errorsOf(withPedigree(p => { p.canvasSettings = { nodesMoveable: true }; }))).toContain(JsonIssueCode.MISSING_FIELD);
     expect(errorsOf(withPedigree(p => { p.canvasSettings = { nodesMoveable: true, snapToGrid: false, snapGridSize: 20, nameLabels: "widen" }; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.canvasSettings = { nodesMoveable: true, snapToGrid: false, snapGridSize: 20, layoutWidth: "wide" }; }))).toContain(JsonIssueCode.WRONG_TYPE);
     expect(errorsOf(withPedigree(p => { p.unlockedIndividuals = "i1"; }))).toContain(JsonIssueCode.WRONG_TYPE);
   });
 

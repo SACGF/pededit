@@ -43,6 +43,24 @@ indexing convention inherited from R, and the three rendering rules.
   `buildPedigreeFromFlat`.
 - `quadprog.d.ts` — hand-written typings for the untyped quadprog package.
 
+## Width slack (#82)
+
+kinship2 caps the drawing at `max(width, widest row)` with `width` 10, so a
+pedigree narrower than 10 slots has room to centre sibships under their
+parents and a wider one has none: its widest row is packed solid and every
+other row must fit inside it. That is where sibships hanging to one side of
+their parents come from (and the overlapping sibship bars of #80).
+
+`AlignOptions.widthSlack` (default 0, as in R) adds slots to that cap in
+alignped4. `alignPedigreeByFamily` sets it to `RELAXED_WIDTH_SLACK` (2) when
+the pedigree's `canvasSettings.layoutWidth` is "relaxed", so the canvas, the
+exports and the lint all follow the pedigree's own setting; plain
+`alignPedigree` never reads the setting. Only positions move, never slots.
+The optimiser limits itself: with no cap at all it took at most about three
+extra slots on the examples and corpus, and two gets nearly all of the gain.
+The default stays "minimal" because pinned positions are absolute: widening
+an existing pedigree moves the auto-placed nodes relative to its pins.
+
 ## Faithful core, improvements on top (decided November 2026, #76)
 
 kinship2's layout code is effectively frozen upstream, so fidelity buys a

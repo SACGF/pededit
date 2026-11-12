@@ -58,6 +58,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `snapToGrid` | boolean | Snap dragged nodes to a grid. |
 | `snapGridSize` | number | Grid spacing in canvas pixels. |
 | `nameLabels` | `"wrap"` or `"truncate"` | Optional. How a name too long for its slot is shown on the canvas: wrapped onto two lines, or cut to one line. Absent means `"wrap"`. Exports always wrap. |
+| `layoutWidth` | `"minimal"` or `"relaxed"` | Optional. How wide the automatic layout may be: no wider than the widest generation, or up to two slots wider so children sit more directly under their parents. Absent means `"minimal"`. Applies to the canvas and to exports. |
 
 ## `Individual`
 
