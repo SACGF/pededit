@@ -330,6 +330,8 @@ interface PedigreeState {
   setProband: (id: string) => void;
   /** Consultand arrow without the "P" (#99). Several people may be consultands. */
   setConsultand: (id: string, consultand: boolean) => void;
+  /** "?" above the symbol: family history not known (#100). */
+  setFamilyHistoryUnknown: (id: string, unknown: boolean) => void;
   setSex: (id: string, sex: Sex) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
@@ -1001,6 +1003,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!ind) return;
         if (consultand) ind.consultand = true;
         else delete ind.consultand;
+      });
+    },
+
+    setFamilyHistoryUnknown: (id, unknown) => {
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (!ind) return;
+        if (unknown) ind.familyHistoryUnknown = true;
+        else delete ind.familyHistoryUnknown;
       });
     },
 

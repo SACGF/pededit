@@ -44,8 +44,8 @@ draws NSGC symbols.
   reach it for free. A scoped `<style>` makes black strokes (and the white
   slash over an affected fill) a 1px non-scaling hairline, since 2px scaled
   by about 0.2 vanishes. Left out on purpose, being unreadable at that size:
-  the "SB" / "ECT" caption (`caption={false}`), the annotation row, names
-  and the proband and consultand arrows. Its lines stay plain (no hops, twin marks, dashed
+  the "SB" / "ECT" caption (`caption={false}`), the annotation row, names,
+  the proband and consultand arrows and the family history "?". Its lines stay plain (no hops, twin marks, dashed
   adoption drops or childless marks).
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, tag quadrants and annotation row.
@@ -158,6 +158,14 @@ draws NSGC symbols.
   the tail so it clears the line of descent that drops half a slot gap left
   of a proband whose partner is on their left; a white box behind it gives
   any other line a gap instead of running through the letter.
+
+- `familyHistory.ts` — "family history not known" (#100, NSGC 2008 Fig. 2):
+  `Individual.familyHistoryUnknown` draws a bold "?" above the symbol,
+  centred, or 9px left of centre when a line of descent comes into the top
+  of the symbol (the person has parents drawn). Set from the edit panel
+  checkbox and the more / right-click menus. `FamilyHistoryMark` on the
+  canvas and legend, `renderFamilyHistorySvg` in both exporters (upright in
+  the U-shape). It reaches about 13px above the row, inside the title gap.
 
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected
   status and `Individual.tagOnset` per quadrant tag, both free text since

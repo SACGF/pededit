@@ -3,7 +3,8 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape, ProbandArrow } from "../pedigree/nodes/symbols";
+import { SymbolShape, ProbandArrow, FamilyHistoryMark } from "../pedigree/nodes/symbols";
+import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
 import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
@@ -76,6 +77,16 @@ function DeceasedSvg({ sex }: { sex: Sex }) {
         />
       )}
       <line x1={-4} y1={-4} x2={SZ + 4} y2={SZ + 4} stroke="black" strokeWidth={2} />
+    </svg>
+  );
+}
+
+/** Symbol with the "?" above it: family history not known (#100). */
+function FamilyHistorySvg({ sex }: { sex: Sex }) {
+  return (
+    <svg width="36" height="36" viewBox="-6 -14 36 42">
+      <SymbolShape individual={{ id: "legend", sex, affected: false, sibOrder: 0 }} size={SZ} />
+      <FamilyHistoryMark size={SZ} hasParents={false} />
     </svg>
   );
 }
@@ -302,6 +313,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
   if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
+  const historyInd = individuals.find(i => i.familyHistoryUnknown);
+  if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={historyInd.sex} />, label: FAMILY_HISTORY_LEGEND_LABEL });
   if (consultandInd) indRows.push({ icon: <ProbandSvg sex={consultandInd.sex} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);

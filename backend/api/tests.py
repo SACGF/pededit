@@ -18,7 +18,7 @@ FULL_PEDIGREE = {
         },
         {
             "id": "m", "sex": "female", "affected": False, "deceased": False,
-            "carrier": True, "proband": False, "consultand": True, "sibOrder": 0, "name": "Jane Smith",
+            "carrier": True, "proband": False, "consultand": True, "familyHistoryUnknown": True, "sibOrder": 0, "name": "Jane Smith",
         },
         {
             "id": "c1", "sex": "unknown", "affected": True, "deceased": False,

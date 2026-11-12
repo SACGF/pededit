@@ -14,6 +14,7 @@ import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ende
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { labelNumbers } from "../../pedigree/layoutToFlow";
+import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
 import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
@@ -1215,6 +1216,7 @@ function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): 
 
 function renderSymbols(pedigree: Pedigree, b: Built): string[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
+  const childIds = new Set(Object.values(pedigree.parentOf).flat());
   const out: string[] = [];
   let seq = 0;
   walk(b.root, n => {
@@ -1233,6 +1235,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         renderShape(ind, pedigree, clipId, pos.rotation) +
         (ind.deceased ? renderDeceasedSlash() : "") +
         (arrowKind(ind) ? renderProbandArrow(arrowKind(ind)!, pos.rotation) : "") +
+        (ind.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -HALF, -HALF, -pos.rotation) : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
         (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.children.length, NODE_SIZE)}</g>` : "") +
         `</g>`,

@@ -8,6 +8,7 @@ import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
 import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
+import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -473,6 +474,18 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     if (inds.some(i => arrowKind(i) === kind)) {
       rows.push({ label: ARROW_LEGEND_LABEL[kind], swatch: sy => renderArrowKeySwatchSvg(kind, x, sy, LEGEND_SWATCH) });
     }
+  }
+  // Family history not known (#100): a "?" over a small symbol.
+  const history = inds.find(i => i.familyHistoryUnknown);
+  if (history) {
+    rows.push({
+      label: FAMILY_HISTORY_LEGEND_LABEL,
+      swatch: sy => {
+        const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + LEGEND_SWATCH - s;
+        return `${swatchGeom(history.sex, ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
+          + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(oy - 1)}" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="black">?</text>`;
+      },
+    });
   }
   // Pregnancies and losses, in the in-app legend's order and wording.
   for (const o of LIFE_STATUS_OPTIONS) {

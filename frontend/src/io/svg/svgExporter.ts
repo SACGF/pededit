@@ -15,6 +15,7 @@ import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ende
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
+import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
 import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import type { SvgExportOptions } from "./types";
 import {
@@ -414,6 +415,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
   const elems: string[] = [];
   // Every drawn copy is numbered 1, 2, ... in the same order as on the canvas.
   const copyIndex = new Map(flow.nodes.map(n => [n.id, n.data.isDuplicate ? n.data.duplicateIndex : undefined]));
+  const childIds = new Set(Object.values(pedigree.parentOf).flat());
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
@@ -429,6 +431,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       if (ind.deceased) elems.push(renderDeceasedSlash());
       const arrow = arrowKind(ind);
       if (arrow) elems.push(renderProbandArrow(arrow));
+      if (ind.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -NODE_SIZE / 2, -NODE_SIZE / 2));
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
       const branch = branchOf(pedigree, ind.id);
       if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)

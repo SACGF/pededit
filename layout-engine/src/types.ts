@@ -25,6 +25,8 @@ export interface Individual {
   proband?: boolean;
   /** Consultand (#99): the person seeking counselling, drawn with an arrow without the proband's "P". */
   consultand?: boolean;
+  /** Family history not known (#100): a "?" above the symbol. */
+  familyHistoryUnknown?: boolean;
   sibOrder: number;      // 0-indexed position within sibling group
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"

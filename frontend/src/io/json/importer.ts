@@ -184,6 +184,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "carrier", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "proband", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "consultand", ip, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "familyHistoryUnknown", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "lifeStatus", ip, LIFE_STATUS_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && LIFE_STATUS_VALUES.includes(v));
     c.optional(raw, "adopted", ip, ADOPTION_VALUES.map(s => `"${s}"`).join(" | "),

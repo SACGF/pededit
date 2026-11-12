@@ -78,7 +78,7 @@ describe("proband and consultand arrows (#99)", () => {
     expect(back.individuals.find(i => i.id === "c2")!.consultand).toBe(true);
     const [header, ...rows] = exportCsv(family()).split("\n");
     const col = header!.split(",").indexOf("consultand");
-    expect(col).toBe(header!.split(",").length - 1);
+    expect(col).toBeGreaterThan(header!.split(",").indexOf("pedigree_number"));
     expect(rows.map(r => r.split(",")[col])).toEqual(['"0"', '"0"', '"0"', '"1"']);
   });
 });

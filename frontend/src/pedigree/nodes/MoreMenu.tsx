@@ -82,6 +82,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setCarrier,
     setProband,
     setConsultand,
+    setFamilyHistoryUnknown,
     setSex,
     setLifeStatus,
     moveSibLeft,
@@ -222,6 +223,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
             title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P."
           >
             {individual.consultand ? "Unmark consultand" : "Mark as consultand"}
+          </MenuItem>
+          <MenuItem
+            onClick={() => action(() => setFamilyHistoryUnknown(individualId, !individual.familyHistoryUnknown))}
+            title="Draws a ? above the symbol (NSGC)"
+            checked={!!individual.familyHistoryUnknown}
+          >
+            Family history not known
           </MenuItem>
         </MenuSection>
 

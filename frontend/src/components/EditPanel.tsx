@@ -57,7 +57,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setCarrier, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
+  const { pedigree, updateIndividual, setCarrier, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
 
@@ -177,6 +177,16 @@ function IndividualForm({ individual }: { individual: Individual }) {
               Not drawn: the affected fill replaces the carrier dot. Use a gene result tag to show it.
             </p>
           )}
+          <label className="flex items-center gap-2 cursor-pointer" title="Draws a ? above the symbol (NSGC)">
+            <input
+              type="checkbox"
+              name="familyHistoryUnknown"
+              checked={!!individual.familyHistoryUnknown}
+              onChange={e => setFamilyHistoryUnknown(individual.id, e.target.checked)}
+              className="accent-black"
+            />
+            <span>Family history not known</span>
+          </label>
           {individual.deceased && <div className="font-medium">Deceased</div>}
           {individual.proband && <div className="font-medium">Proband</div>}
           {individual.consultand && <div className="font-medium">{individual.proband ? "Also the consultand" : "Consultand"}</div>}

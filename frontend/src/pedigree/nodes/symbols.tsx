@@ -11,6 +11,7 @@ import {
 } from "../lifeStatus";
 import type { LifeStatus } from "@pedigree-editor/layout-engine";
 import { adoptionBracketSegments } from "../adoption";
+import { familyHistoryMarkAt, FAMILY_HISTORY_FONT_SIZE } from "../familyHistory";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
@@ -344,6 +345,21 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
         </text>
       )}
     </g>
+  );
+}
+
+/** "?" above the symbol: family history not known (#100). Placement in `familyHistory.ts`. */
+export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParents: boolean }) {
+  const p = familyHistoryMarkAt(size, hasParents);
+  return (
+    <text
+      data-family-history-unknown
+      x={p.x} y={p.y}
+      textAnchor="middle" fontFamily="sans-serif" fontSize={FAMILY_HISTORY_FONT_SIZE} fontWeight="bold" fill="black"
+      style={{ userSelect: "none" }}
+    >
+      ?
+    </text>
   );
 }
 

@@ -3,7 +3,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, DuplicateSuperscript, AnnotationRow } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
@@ -114,6 +114,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         <SymbolShape individual={individual} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
+        {individual.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 

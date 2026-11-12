@@ -49,6 +49,7 @@ class IndividualSerializer(serializers.Serializer):
     carrier = _opt(serializers.BooleanField)
     proband = _opt(serializers.BooleanField)
     consultand = _opt(serializers.BooleanField)
+    familyHistoryUnknown = _opt(serializers.BooleanField)
     sibOrder = serializers.FloatField(required=False)
     name = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     dob = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
