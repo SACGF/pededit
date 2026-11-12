@@ -10,6 +10,7 @@ import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
 import { evaluationKeyInfo, PRESYMPTOMATIC_LEGEND_LABEL, EVALUATION_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
+import { symbolSex, assignedAtBirthInUse } from "./gender";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -455,23 +456,25 @@ function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>
 export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
   const rows: { label: string; swatch: (sy: number) => string }[] = [];
   const inds = pedigree.individuals;
+  // Swatches use the shape drawn, the gender identity's when shown (#26).
+  const shape = (i: Individual) => symbolSex(i, pedigree);
   const affected = inds.find(i => i.affected);
   if (affected) {
-    rows.push({ label: "Affected", swatch: sy => renderStatusSwatchSvg("affected", affected.sex, false, x, sy) });
+    rows.push({ label: "Affected", swatch: sy => renderStatusSwatchSvg("affected", shape(affected), false, x, sy) });
     if (inds.some(i => needsAffectedCore(i, sectorsFor(i, pedigree)))) {
       rows.push({
         label: "Affected, with tags (black centre)",
-        swatch: sy => renderStatusSwatchSvg("affected", affected.sex, true, x, sy),
+        swatch: sy => renderStatusSwatchSvg("affected", shape(affected), true, x, sy),
       });
     }
   }
   // The dot is drawn on every unaffected carrier, pregnancies and losses included (#14).
   const carrier = inds.find(i => i.carrier && !i.affected);
-  if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", carrier.sex, false, x, sy) });
+  if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", shape(carrier), false, x, sy) });
   // Presymptomatic carrier and evaluation notation (#101).
   const ev = evaluationKeyInfo(inds);
   if (ev.presymptomatic) {
-    const sex = ev.presymptomatic.sex;
+    const sex = shape(ev.presymptomatic);
     rows.push({
       label: PRESYMPTOMATIC_LEGEND_LABEL,
       swatch: sy => `${swatchGeom(sex, x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
@@ -479,7 +482,14 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     });
   }
   const deceased = inds.find(i => i.deceased);
-  if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", deceased.sex, false, x, sy) });
+  if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", shape(deceased), false, x, sy) });
+  // Sex assigned at birth under a symbol drawn by gender identity (#26).
+  for (const { code, label } of assignedAtBirthInUse(pedigree)) {
+    rows.push({
+      label,
+      swatch: sy => `<text x="${fmt(x)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3)}" font-family="sans-serif" font-size="7" textLength="${LEGEND_SWATCH}" lengthAdjust="spacingAndGlyphs" fill="black">${code}</text>`,
+    });
+  }
   // Proband and consultand arrows (#99).
   for (const kind of ["proband", "consultand"] as const) {
     if (inds.some(i => arrowKind(i) === kind)) {
@@ -493,7 +503,7 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
       label: FAMILY_HISTORY_LEGEND_LABEL,
       swatch: sy => {
         const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + LEGEND_SWATCH - s;
-        return `${swatchGeom(history.sex, ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
+        return `${swatchGeom(shape(history), ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
           + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(oy - 1)}" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="black">?</text>`;
       },
     });
@@ -505,7 +515,7 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     });
   }
   if (ev.documented) {
-    const sex = ev.documented.sex;
+    const sex = shape(ev.documented);
     rows.push({
       label: DOCUMENTED_LEGEND_LABEL,
       swatch: sy => {
@@ -520,7 +530,7 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     const ind = inds.find(i => i.lifeStatus === o.value);
     if (!ind) continue;
     const label = o.value === "stillbirth" ? "Stillbirth (SB)" : o.value === "ectopic" ? "Ectopic pregnancy (ECT)" : o.label;
-    rows.push({ label, swatch: sy => renderLifeStatusSwatchSvg(o.value, ind.sex, x, sy) });
+    rows.push({ label, swatch: sy => renderLifeStatusSwatchSvg(o.value, shape(ind), x, sy) });
   }
   // Adoption brackets (#12), drawn a little smaller so they fit the swatch column.
   for (const o of ADOPTION_OPTIONS) {
@@ -530,7 +540,7 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
       label: adoptionLegendLabel(o.value),
       swatch: sy => {
         const s = LEGEND_SWATCH * 0.7, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + (LEGEND_SWATCH - s) / 2;
-        const geom = swatchGeom(ind.sex, ox, oy, s);
+        const geom = swatchGeom(shape(ind), ox, oy, s);
         const brackets = adoptionBracketSegments(s, ox, oy)
           .map(([x1, y1, x2, y2]) => `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`)
           .join("");

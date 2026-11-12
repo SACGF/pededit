@@ -129,11 +129,12 @@ describe("evaluation data (#101)", () => {
     expect(importJson(JSON.stringify(bad)).hasErrors).toBe(true);
   });
 
-  it("has presymptomatic and evaluations columns at the end of the CSV", () => {
+  it("has presymptomatic and evaluations columns after family_history_unknown in the CSV", () => {
     const [header, ...rows] = exportCsv(family()).split("\n");
     const cols = header!.split(",");
-    expect(cols.slice(-2)).toEqual(["presymptomatic", "evaluations"]);
-    expect(rows[0]).toMatch(/"1","E\+ \(BRCA1 c\.5266dupC\) \*"$/);
+    const at = cols.indexOf("family_history_unknown");
+    expect(cols.slice(at + 1, at + 3)).toEqual(["presymptomatic", "evaluations"]);
+    expect(rows[0]).toMatch(/"1","E\+ \(BRCA1 c\.5266dupC\) \*"(,|$)/);
     expect(evaluationsCsv(family().individuals[2]!)).toBe("E1-; E2u (echo); E3");
   });
 });

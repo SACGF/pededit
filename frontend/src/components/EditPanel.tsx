@@ -6,6 +6,7 @@ import { SelectionPanel } from "./SelectionPanel";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
+import { GENDER_IDENTITY_OPTIONS, assignedAtBirthText, drawsGender } from "../pedigree/gender";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
@@ -14,7 +15,7 @@ import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
+import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
 
@@ -147,12 +148,37 @@ function IndividualForm({ individual }: { individual: Individual }) {
         )}
       </Field>
 
+      {!individual.lifeStatus && (
+        <Field label="Gender identity">
+          <select
+            name="genderIdentity"
+            value={individual.genderIdentity ?? ""}
+            aria-label="Gender identity"
+            onChange={e => updateIndividual(individual.id, { genderIdentity: (e.target.value || undefined) as GenderIdentity | undefined })}
+            className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+          >
+            <option value="">Not recorded</option>
+            {GENDER_IDENTITY_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          {individual.genderIdentity && (
+            <p className="text-[10px] text-gray-500" data-testid="gender-identity-note">
+              {drawsGender(individual, pedigree)
+                ? `The symbol shows gender identity${assignedAtBirthText(individual, pedigree) ? `, with ${assignedAtBirthText(individual, pedigree)} under it` : ""}.`
+                : "Recorded only: symbols show biological sex (Settings)."}
+              {" "}Genetics always uses sex ({individual.sex}).
+            </p>
+          )}
+        </Field>
+      )}
+
       <div className="border-t pt-3 space-y-2">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
           Status
         </div>
         <div className="text-xs text-gray-600 space-y-1">
-          <div>Sex: <span className="font-medium">{individual.sex}</span></div>
+          <div>Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}: <span className="font-medium">{individual.sex}</span></div>
           <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
           {individual.affected && (
             <div className="flex items-center gap-2 pl-5">

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tagTakesOnset } from "@/pedigree/onset";
 import { clinicalDetailLines } from "@/pedigree/clinicalDetails";
+import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "@/pedigree/gender";
 import { Tags } from "lucide-react";
 
 /**
@@ -316,9 +317,12 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const { partnerships } = pedigree;
   const individuals = pedigree.individuals.filter(i => !isBranchPlaceholderId(i.id));
 
-  const hasMale    = individuals.some(i => i.sex === "male");
-  const hasFemale  = individuals.some(i => i.sex === "female");
-  const hasUnknown = individuals.some(i => i.sex === "unknown");
+  // Swatches use the shape drawn, which is the gender identity's when shown (#26).
+  const shape = (i: Individual) => symbolSex(i, pedigree);
+  const hasMale    = individuals.some(i => shape(i) === "male");
+  const hasFemale  = individuals.some(i => shape(i) === "female");
+  const hasUnknown = individuals.some(i => shape(i) === "unknown");
+  const byGender = anyDrawnByGender(pedigree);
 
   const affectedInd = individuals.find(i => i.affected);
   const carrierInd  = individuals.find(i => i.carrier && !i.affected);
@@ -332,31 +336,34 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const hasConsanguineous = partnerships.some(p => related(p.individual1, p.individual2));
 
   const indRows: { icon: React.ReactNode; label: string }[] = [];
-  if (hasMale)    indRows.push({ icon: <SymbolSvg sex="male" />,    label: "Male" });
-  if (hasFemale)  indRows.push({ icon: <SymbolSvg sex="female" />,  label: "Female" });
-  if (hasUnknown) indRows.push({ icon: <SymbolSvg sex="unknown" />, label: "Unknown sex" });
-  if (affectedInd) indRows.push({ icon: <SymbolSvg sex={affectedInd.sex} affected />, label: "Affected" });
+  if (hasMale)    indRows.push({ icon: <SymbolSvg sex="male" />,    label: byGender ? "Man / male" : "Male" });
+  if (hasFemale)  indRows.push({ icon: <SymbolSvg sex="female" />,  label: byGender ? "Woman / female" : "Female" });
+  if (hasUnknown) indRows.push({ icon: <SymbolSvg sex="unknown" />, label: byGender ? "Non-binary / unknown sex" : "Unknown sex" });
+  for (const { code, label } of assignedAtBirthInUse(pedigree)) {
+    indRows.push({ icon: <span className="text-[10px] text-black">{code}</span>, label });
+  }
+  if (affectedInd) indRows.push({ icon: <SymbolSvg sex={shape(affectedInd)} affected />, label: "Affected" });
   const coreInd = individuals.find(i => needsAffectedCore(i, sectorsFor(i, pedigree)));
   if (coreInd) {
-    indRows.push({ icon: <AffectedCoreSvg sex={coreInd.sex} />, label: "Affected, with tags (black centre)" });
+    indRows.push({ icon: <AffectedCoreSvg sex={shape(coreInd)} />, label: "Affected, with tags (black centre)" });
   }
-  if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={carrierInd.sex} carrier />,   label: "Carrier" });
+  if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={shape(carrierInd)} carrier />,   label: "Carrier" });
   const ev = evaluationKeyInfo(individuals);
-  if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={ev.presymptomatic.sex} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
-  if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={deceasedInd.sex} />,        label: "Deceased" });
-  if (probandInd)  indRows.push({ icon: <ProbandSvg sex={probandInd.sex} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
+  if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={shape(ev.presymptomatic)} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
+  if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={shape(deceasedInd)} />,        label: "Deceased" });
+  if (probandInd)  indRows.push({ icon: <ProbandSvg sex={shape(probandInd)} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
   const historyInd = individuals.find(i => i.familyHistoryUnknown);
-  if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={historyInd.sex} />, label: FAMILY_HISTORY_LEGEND_LABEL });
-  if (consultandInd) indRows.push({ icon: <ProbandSvg sex={consultandInd.sex} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
+  if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={shape(historyInd)} />, label: FAMILY_HISTORY_LEGEND_LABEL });
+  if (consultandInd) indRows.push({ icon: <ProbandSvg sex={shape(consultandInd)} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
   if (ev.evaluated) indRows.push({ icon: <EvaluationSvg />, label: EVALUATION_LEGEND_LABEL });
-  if (ev.documented) indRows.push({ icon: <DocumentedSvg sex={ev.documented.sex} />, label: DOCUMENTED_LEGEND_LABEL });
+  if (ev.documented) indRows.push({ icon: <DocumentedSvg sex={shape(ev.documented)} />, label: DOCUMENTED_LEGEND_LABEL });
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);
-    if (ind) indRows.push({ icon: <LifeStatusSvg sex={ind.sex} lifeStatus={o.value} />, label: o.label });
+    if (ind) indRows.push({ icon: <LifeStatusSvg sex={shape(ind)} lifeStatus={o.value} />, label: o.label });
   }
   for (const o of ADOPTION_OPTIONS) {
     const ind = individuals.find(i => i.adopted === o.value);
-    if (ind) indRows.push({ icon: <AdoptedSvg sex={ind.sex} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
+    if (ind) indRows.push({ icon: <AdoptedSvg sex={shape(ind)} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
   }
 
   if (placeholders.size > 0) indRows.push({ icon: <CollapsedBranchSvg />, label: COLLAPSED_BRANCH_LABEL });

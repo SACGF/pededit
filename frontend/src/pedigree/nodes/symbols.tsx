@@ -42,6 +42,11 @@ interface ShapeProps {
   clipId?: string;
   /** Draw the "SB" / "ECT" caption under the symbol (off in the minimap, where it is unreadable). */
   caption?: boolean;
+  /**
+   * The shape to draw, when it is not `individual.sex`: a symbol drawn by
+   * gender identity (#26, `symbolSex` in gender.ts).
+   */
+  shape?: Individual["sex"];
 }
 
 /**
@@ -240,10 +245,10 @@ function LifeStatusCaption({ size, text }: { size: number; text: string }) {
   );
 }
 
-function SexSymbol({ individual, size, fill, sectors, clipId }: {
-  individual: Individual; size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string;
+function SexSymbol({ shape, size, fill, sectors, clipId }: {
+  shape: Individual["sex"]; size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string;
 }) {
-  switch (individual.sex) {
+  switch (shape) {
     case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={clipId} />;
     case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={clipId} />;
     case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} clipId={clipId} />;
@@ -263,7 +268,7 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size, sectors = [], clipId, caption: showCaption = true }: ShapeProps) {
+export function SymbolShape({ individual, size, sectors = [], clipId, caption: showCaption = true, shape = individual.sex }: ShapeProps) {
   const fill = symbolFill(individual);
   const id = clipId ?? `symbol-clip-${individual.id}`;
   const status = individual.lifeStatus;
@@ -275,7 +280,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
         {brackets}
         {usesLossTriangle(status)
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
-          : <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />}
+          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} clipId={id} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
         {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
@@ -289,7 +294,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
   return (
     <g>
       {brackets}
-      <SexSymbol individual={individual} size={size} fill={fill} sectors={sectors} clipId={id} />
+      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
     </g>

@@ -43,7 +43,7 @@ The research phase is complete: `claude/search_report.md` contains a comprehensi
 
 - **No account is required.** Anonymous mode is the default: creating a pedigree while signed out stores it with `owner=None` and the UUID in the URL (`/p/<uuid>`) is the only key. Users bookmark or copy the link. Google/GitHub sign-in only adds the "Your pedigrees" list and the per-user tag library. Never describe PedEdit as requiring login.
 - The site is live at https://pededit.com and the code is public at https://github.com/SACGF/pededit.
-- Pedigree symbols encode biological sex, not gender (see below).
+- `sex` is biological sex and drives all genetics; symbols can show a recorded gender identity instead, with AMAB/AFAB/UAAB below (see below, #26).
 
 ## Directory Guides
 
@@ -107,7 +107,9 @@ A new open-source pedigree editor — a web-based tool for drawing, editing, and
 (22 features total — see report §9 Tier 3)
 
 ### Biological sex notation
-Pedigree symbols (square/circle/diamond) represent **biological sex**, not gender, because sex determines inheritance patterns, X-linkage, and sex-specific risk models. The NSGC 2022 "gender inclusivity" update conflates clinical communication with genetic notation. A trans man who is 46,XX still needs a circle on the pedigree. Gender is patient-facing clinical metadata, not a pedigree data requirement.
+`Individual.sex` is **biological sex** (sex assigned at birth) and is the only thing genetics uses: layout, kinship and X-linked kinship, twins, PED export and every other calculation, because sex determines inheritance patterns, X-linkage and sex-specific risk. Never make any of these read gender identity.
+
+Gender identity is optional (`Individual.genderIdentity`: man, woman, non-binary, #26) and only changes the drawing. The pedigree setting "Symbols show" (`canvasSettings.symbolsShow`) defaults to "gender identity where recorded": a person with a recorded gender identity is drawn with the NSGC 2022 symbol for that gender, and their sex assigned at birth is written under it as AMAB, AFAB or UAAB (unless gender and sex match). People with no gender identity recorded, pregnancies and losses draw by sex as before. "Biological sex" draws everyone by sex. So a trans man who is 46,XX keeps `sex: "female"` (and is treated as such by every calculation) and is drawn as a square with AFAB below by default, or as a circle in sex mode. All shape decisions go through `frontend/src/pedigree/gender.ts`.
 
 ## Tooling Preferences
 

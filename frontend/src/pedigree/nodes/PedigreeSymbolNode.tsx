@@ -24,7 +24,7 @@ function shortDevId(id: string): string {
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
-  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines } = data;
+  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines, shape } = data;
   const details = data.detailLines ?? [];
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
@@ -112,7 +112,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`}
         overflow="visible"
       >
-        <SymbolShape individual={individual} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
+        <SymbolShape individual={individual} shape={shape} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         {individual.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}

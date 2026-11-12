@@ -15,6 +15,7 @@ import { onsetsOf } from "./onset";
 import { tagCanvasText } from "./tags";
 import { branchOf } from "./collapse";
 import { evaluationsOf, evaluationParts } from "./evaluation";
+import { assignedAtBirthText } from "./gender";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -109,7 +110,8 @@ export function linesWidth(lines: string[]): number {
  *   1. `age`: the free-text age (#20) when set, otherwise the year of birth
  *      ("b. 1978"), as the standard prefers a year or age to a full date;
  *   2. `onset`: one line per age of onset (#93);
- *   3. (gender identity #26 goes here);
+ *   3. `gender`: the sex assigned at birth ("AMAB", "AFAB", "UAAB") under
+ *      a symbol drawn by gender identity (#26, NSGC 2022);
  *   4. `evaluation`: each evaluation (#101), "E1+ (BRCA1 ...)", up to two
  *      lines each;
  *   5. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
@@ -121,6 +123,7 @@ export function linesWidth(lines: string[]): number {
 export interface DetailSections {
   age: string[];
   onset: string[];
+  gender: string[];
   evaluation: string[];
   number: string[];
 }
@@ -128,10 +131,11 @@ export interface DetailSections {
 export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
   const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
   const branch = branchOf(pedigree, ind.id);
-  if (branch) return { age: [], onset: [], evaluation: [], number };
+  if (branch) return { age: [], onset: [], gender: [], evaluation: [], number };
   return {
     age: wrapLabel(ageText(ind), maxWidth, 1),
     onset: onsetLines(ind, pedigree, maxWidth),
+    gender: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1),
     evaluation: evaluationLines(ind, maxWidth),
     number,
   };
@@ -140,7 +144,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
 /** Every line under the name, top to bottom (see `detailSections`). */
 export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): string[] {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return [...s.age, ...s.onset, ...s.evaluation, ...s.number];
+  return [...s.age, ...s.onset, ...s.gender, ...s.evaluation, ...s.number];
 }
 
 /**
@@ -152,7 +156,7 @@ export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigre
  */
 export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return s.onset.length + s.evaluation.length + s.number.length > 0;
+  return s.onset.length + s.gender.length + s.evaluation.length + s.number.length > 0;
 }
 
 /**

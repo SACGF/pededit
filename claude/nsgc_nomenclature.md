@@ -110,11 +110,19 @@ means siblings, and affected people are drawn separately.
 
 ## Where we differ on purpose
 
-**Sex, not gender.** The 2022 revision makes the symbol show gender identity,
-with sex assigned at birth written below it (AMAB, AFAB, UAAB). PedEdit's
-symbols show biological sex, because inheritance, X-linkage and sex-specific
-risk depend on it (root `AGENTS.md`, "Biological sex notation"). This is a
-deliberate product decision, not an oversight. The 2022 diamond for
+**Sex is the data, gender is a drawing choice (#26).** The 2022 revision
+makes the symbol show gender identity, with sex assigned at birth written
+below it (AMAB, AFAB, UAAB). PedEdit stores biological sex on every person
+and uses it for layout, kinship, X-linked kinship, twins and PED export,
+because inheritance depends on it (root `AGENTS.md`, "Biological sex
+notation"). Gender identity is optional and only changes the drawing: with
+the pedigree setting "Symbols show: gender identity where recorded" (the
+default) such a person gets the 2022 symbol for their gender and the AMAB /
+AFAB / UAAB line under it, as the 2022 figure does; "biological sex" draws
+everyone by sex. Where we still differ: the code goes in the text block
+under the name (after age and onset, before the pedigree number) rather
+than directly under the symbol, and a person with no gender identity
+recorded draws by sex with no annotation. The 2022 diamond for
 "multiple people of unknown or mixed sex" with a number inside matches what we
 use for groups.
 

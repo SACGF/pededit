@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
-import type { SiblingOrderMode } from "@pedigree-editor/layout-engine";
+import type { SiblingOrderMode, SymbolsShowMode } from "@pedigree-editor/layout-engine";
 import { nameLabelMode } from "../pedigree/labels";
+import { symbolsShowMode } from "../pedigree/gender";
 
 interface SettingsPanelProps {
   open: boolean;
@@ -136,6 +137,22 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 </div>
               </div>
             </label>
+            <div className="mt-2">
+              <div className="text-sm">Symbols show</div>
+              <select
+                name="symbolsShow"
+                aria-label="Symbols show"
+                value={symbolsShowMode(pedigree)}
+                onChange={e => updateCanvasSettings({ symbolsShow: e.target.value as SymbolsShowMode })}
+                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+              >
+                <option value="gender">Gender identity where recorded</option>
+                <option value="sex">Biological sex</option>
+              </select>
+              <div className="text-xs text-gray-400 mt-1">
+                With gender identity, a person whose gender is recorded gets that gender's symbol with AMAB, AFAB or UAAB under it (NSGC 2022). Layout, kinship and PED export always use biological sex.
+              </div>
+            </div>
           </div>
 
           <div>

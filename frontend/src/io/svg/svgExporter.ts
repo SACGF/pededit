@@ -1,5 +1,6 @@
 import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
+import { symbolSex } from "../../pedigree/gender";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
 import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
@@ -304,9 +305,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   let geom: string;
   if (triangle) {
     geom = triangle;
-  } else if (ind.sex === "male") {
+  } else if (symbolSex(ind, pedigree) === "male") {
     geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (ind.sex === "female") {
+  } else if (symbolSex(ind, pedigree) === "female") {
     geom = `<circle cx="0" cy="0" r="${half - 1}"`;
   } else {
     const pts = `0,${-(half - 1)} ${half - 1},0 0,${half - 1} ${-(half - 1)},0`;

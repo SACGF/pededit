@@ -158,7 +158,7 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
         {/* Nodes, on top of the edges: the canvas symbols scaled down (#6) */}
         {nodes.map(node => {
           const { x, y } = node.position;
-          const { individual, branch } = node.data as RFNodeData;
+          const { individual, branch, shape } = node.data as RFNodeData;
           return (
             <g
               key={node.id}
@@ -167,6 +167,7 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
             >
               <SymbolShape
                 individual={individual}
+                shape={shape}
                 size={NODE_SIZE}
                 sectors={sectorsFor(individual, pedigree)}
                 clipId={`minimap-clip-${node.id}`}

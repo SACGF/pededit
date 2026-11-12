@@ -9,6 +9,8 @@ const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbir
 const CHILDLESS_VALUES = ["infertility", "byChoice"];
 const ADOPTION_VALUES = ["in", "out"];
 const NAME_LABEL_VALUES = ["wrap", "truncate"];
+const GENDER_IDENTITY_VALUES = ["man", "woman", "nonbinary"];
+const SYMBOLS_SHOW_VALUES = ["gender", "sex"];
 const LAYOUT_WIDTH_VALUES = ["minimal", "relaxed"];
 const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
@@ -179,6 +181,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     }
     c.required(raw, "sex", ip, SEX_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && SEX_VALUES.includes(v));
+    c.optional(raw, "genderIdentity", ip, GENDER_IDENTITY_VALUES.map(s => `"${s}"`).join(" | "),
+      v => typeof v === "string" && GENDER_IDENTITY_VALUES.includes(v));
     c.required(raw, "affected", ip, "a boolean", v => typeof v === "boolean");
     c.required(raw, "sibOrder", ip, "a number", isFiniteNumber);
     c.optional(raw, "deceased", ip, "a boolean", v => typeof v === "boolean");
@@ -370,6 +374,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         v => typeof v === "string" && LAYOUT_WIDTH_VALUES.includes(v));
       c.optional(cs, "showNumbers", cp, "a boolean", v => typeof v === "boolean");
       c.optional(cs, "relationshipLabels", cp, "a boolean", v => typeof v === "boolean");
+      c.optional(cs, "symbolsShow", cp, SYMBOLS_SHOW_VALUES.map(s => `"${s}"`).join(" | "),
+        v => typeof v === "string" && SYMBOLS_SHOW_VALUES.includes(v));
     }
   }
 

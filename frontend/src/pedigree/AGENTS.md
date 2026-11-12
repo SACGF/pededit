@@ -159,6 +159,19 @@ draws NSGC symbols.
   of a proband whose partner is on their left; a white box behind it gives
   any other line a gap instead of running through the letter.
 
+- `gender.ts` — gender identity on the symbol (#26, NSGC 2022).
+  `symbolSex(ind, pedigree)` is the one rule for which shape is drawn and
+  `assignedAtBirthText` for the AMAB / AFAB / UAAB line (a `gender` section
+  in `labels.ts` `detailSections`). Everything that draws a person's shape
+  must call it rather than read `ind.sex`: `layoutToFlow` puts it on the
+  node data as `shape` (canvas node and minimap pass it to `SymbolShape`),
+  both exporters' `renderShape`, the legend and the export key swatches.
+  Nothing genetic may call it: layout, kinship, twins, PED and the CSV
+  father/mother columns read `sex`. A non-binary person always gets the
+  code (the diamond alone does not say their sex); a man who is male or a
+  woman who is female gets none. Pregnancies and losses ignore any stored
+  gender identity, and the edit panel hides the field for them.
+
 - `familyHistory.ts` — "family history not known" (#100, NSGC 2008 Fig. 2):
   `Individual.familyHistoryUnknown` draws a bold "?" above the symbol,
   centred, or 9px left of centre when a line of descent comes into the top

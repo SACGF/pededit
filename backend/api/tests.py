@@ -19,6 +19,7 @@ FULL_PEDIGREE = {
         {
             "id": "m", "sex": "female", "affected": False, "deceased": False,
             "carrier": True, "proband": False, "consultand": True, "familyHistoryUnknown": True, "sibOrder": 0, "name": "Jane Smith",
+            "genderIdentity": "nonbinary",
         },
         {
             "id": "c1", "sex": "unknown", "affected": True, "deceased": False,
@@ -45,7 +46,7 @@ FULL_PEDIGREE = {
     "pinnedPositions": {"c1": {"x": 12.5, "y": -40.0}},
     "canvasSettings": {"nodesMoveable": True, "snapToGrid": True, "snapGridSize": 20,
                        "nameLabels": "truncate", "layoutWidth": "relaxed",
-                       "relationshipLabels": True},
+                       "relationshipLabels": True, "symbolsShow": "sex"},
     "unlockedIndividuals": ["f"],
     "tags": [
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant"},
@@ -133,6 +134,10 @@ class PedigreeRoundTripTests(APITestCase):
             {**base, "individuals": [{"id": "a", "sex": "robot", "affected": False}]},
             {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
                                       "evaluations": [{"result": "maybe"}]}]},
+            {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
+                                      "genderIdentity": "robot"}]},
+            {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
+                                        "snapGridSize": 20, "symbolsShow": "both"}},
             {**base, "individuals": [{"id": "a", "sex": "male"}]},
             {**base, "partnerships": [{"id": "p", "individual1": "a"}]},
             {"individuals": [], "partnerships": []},

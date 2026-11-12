@@ -50,6 +50,7 @@ class EvaluationSerializer(serializers.Serializer):
 class IndividualSerializer(serializers.Serializer):
     id = serializers.CharField()
     sex = serializers.ChoiceField(choices=["male", "female", "unknown"])
+    genderIdentity = _opt(serializers.ChoiceField, choices=["man", "woman", "nonbinary"])
     affected = serializers.BooleanField()
     deceased = _opt(serializers.BooleanField)
     carrier = _opt(serializers.BooleanField)
@@ -117,6 +118,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     layoutWidth = _opt(serializers.ChoiceField, choices=["minimal", "relaxed"])
     showNumbers = _opt(serializers.BooleanField)
     relationshipLabels = _opt(serializers.BooleanField)
+    symbolsShow = _opt(serializers.ChoiceField, choices=["gender", "sex"])
 
 
 class ClinicalDetailsSerializer(serializers.Serializer):

@@ -39,7 +39,9 @@ stub so the app still builds without Google login.
   `renamePedigree`, dropped by `deletePedigree` and by a 404 on open. It is
   per browser and never sent to the server. Signing in (Google or GitHub)
   only adds the "Your pedigrees" list and the per-user tag library.
-- Pedigree symbols encode biological sex, not gender (see root AGENTS.md).
+- `Individual.sex` is biological sex and drives every genetic calculation;
+  an optional `genderIdentity` can change only the symbol drawn (#26,
+  `pedigree/gender.ts`, see root AGENTS.md "Biological sex notation").
 - Structures that competitors refuse but we handle: partnerships with no
   children (`addPartner`; the layout engine feeds them to kinship2 as
   `childlessCouples`, which R has no way to express; `Partnership.childless`

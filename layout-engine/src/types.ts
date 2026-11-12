@@ -3,6 +3,13 @@
 export type Sex = "male" | "female" | "unknown";
 
 /**
+ * Gender identity (#26, NSGC 2022). Recorded alongside `Individual.sex`,
+ * never instead of it: sex stays what layout, kinship and every genetic
+ * calculation use. "nonbinary" covers non-binary and gender diverse.
+ */
+export type GenderIdentity = "man" | "woman" | "nonbinary";
+
+/**
  * Pregnancy and pregnancy-loss status (NSGC 2008, Bennett et al.). Absent means
  * a born individual, living or deceased. Layout treats these as ordinary sibs;
  * only the symbol changes.
@@ -18,7 +25,14 @@ export type Adoption = "in" | "out";
 
 export interface Individual {
   id: string;
+  /** Biological sex (sex assigned at birth). Drives layout, kinship, PED and twins. */
   sex: Sex;
+  /**
+   * Gender identity (#26). Only changes the symbol drawn, when
+   * `canvasSettings.symbolsShow` is "gender" (the default), with the sex
+   * assigned at birth written under it. Ignored for pregnancies and losses.
+   */
+  genderIdentity?: GenderIdentity;
   affected: boolean;
   deceased?: boolean;
   carrier?: boolean;
@@ -195,7 +209,16 @@ export interface CanvasSettings {
    * (#97). Absent means false.
    */
   relationshipLabels?: boolean;
+  /**
+   * What the symbol shapes show (#26): "gender" draws a person with a
+   * recorded gender identity with that gender's symbol and writes AMAB /
+   * AFAB / UAAB under it (NSGC 2022); "sex" draws biological sex for
+   * everyone. Absent means "gender".
+   */
+  symbolsShow?: SymbolsShowMode;
 }
+
+export type SymbolsShowMode = "gender" | "sex";
 
 export type NameLabelMode = "wrap" | "truncate";
 

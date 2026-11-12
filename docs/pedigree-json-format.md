@@ -76,13 +76,15 @@ What the NSGC nomenclature (2008, Fig. 1 instructions) asks a clinical pedigree'
 | `layoutWidth` | `"minimal"` or `"relaxed"` | Optional. How wide the automatic layout may be: no wider than the widest generation, or up to two slots wider so children sit more directly under their parents. Absent means `"minimal"`. Applies to the canvas and to exports. |
 | `showNumbers` | boolean | Optional. Draw each person's pedigree number (generation in Roman numerals, then place in the row, e.g. `"II-3"`) before their name, on the canvas and in figure exports. The numbers are computed from the layout, not stored. Absent means `false`. |
 | `relationshipLabels` | boolean | Optional. Write the relationship (for example `"first cousins"`) above every consanguineous couple's double line that can be named and has no `consanguinityLabel` of its own, on the canvas and in figure exports. Absent means `false`. |
+| `symbolsShow` | `"gender"` or `"sex"` | Optional. What symbol shapes show. `"gender"`: someone with a recorded `genderIdentity` is drawn with that gender's symbol (square for a man, circle for a woman, diamond for non-binary) and their sex assigned at birth is written below it as AMAB, AFAB or UAAB (NSGC 2022). `"sex"`: everyone is drawn by biological sex. Absent means `"gender"`. Layout and genetics always use `sex`. |
 
 ## `Individual`
 
 | Field | Type | Required | Meaning |
 | --- | --- | --- | --- |
 | `id` | string | yes | Unique within the pedigree. Any non-empty string; the editor generates UUIDs. |
-| `sex` | `"male"`, `"female"` or `"unknown"` | yes | Biological sex, drawn as square, circle or diamond. |
+| `sex` | `"male"`, `"female"` or `"unknown"` | yes | Biological sex (sex assigned at birth), drawn as square, circle or diamond unless a gender identity is drawn instead. Layout, kinship and PED export always use it. |
+| `genderIdentity` | `"man"`, `"woman"` or `"nonbinary"` | no | Gender identity (NSGC 2022); `"nonbinary"` covers non-binary and gender diverse. Changes only the symbol drawn, when `CanvasSettings.symbolsShow` is `"gender"` (the default). Ignored for pregnancies and losses. |
 | `affected` | boolean | yes | Filled symbol when `true`. |
 | `sibOrder` | number | yes | 0-indexed position within the sibling group (or among founders). |
 | `deceased` | boolean | no | Diagonal slash through the symbol. |

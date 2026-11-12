@@ -1,5 +1,6 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
+import { symbolSex } from "../../pedigree/gender";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
@@ -1146,9 +1147,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   let geom: string;
   if (triangle) {
     geom = triangle;
-  } else if (ind.sex === "male") {
+  } else if (symbolSex(ind, pedigree) === "male") {
     geom = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (ind.sex === "female") {
+  } else if (symbolSex(ind, pedigree) === "female") {
     geom = `<circle cx="0" cy="0" r="${HALF - 1}"`;
   } else {
     const h = HALF - 1;

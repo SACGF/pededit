@@ -1,6 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { hopGeometry } from "./couplePath";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
@@ -16,6 +16,7 @@ import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, detailsBacked, nameLabelText } from "./labels";
 import { numberFromLayout, showsNumbers } from "./numbering";
+import { symbolSex } from "./gender";
 
 // ── Output types ──────────────────────────────────────────────────────────────
 
@@ -34,6 +35,11 @@ export interface RFNodeData extends Record<string, unknown> {
   duplicateIndex?: number;
   /** True if individual has a parent partnership in the pedigree. */
   hasParents: boolean;
+  /**
+   * The symbol shape drawn (#26): the gender identity's when shown, else the
+   * sex (`symbolSex` in gender.ts). Never use it for genetics.
+   */
+  shape?: Sex;
   /**
    * True if this node sits at the individual's pinned (dragged) position. For
    * someone drawn more than once only the copy nearest the pin is moved.
@@ -357,6 +363,7 @@ function buildNodes(
           duplicateIndex: isDuplicate ? copies.indexOf(id) + 1 : undefined,
           hasParents: childIds.has(individual.id),
           isPinned,
+          shape: symbolSex(individual, pedigree),
           ...(twins.get(individual.id) ?? {}),
           nameLines: wrapLabel(nameLabelText(individual), labelMaxWidth(slotWidth), labelLines),
           detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree, numbers),

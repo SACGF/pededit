@@ -54,7 +54,11 @@
       "required": ["id", "sex", "affected", "sibOrder"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
-        "sex": { "enum": ["male", "female", "unknown"] },
+        "sex": { "enum": ["male", "female", "unknown"], "description": "Biological sex (sex assigned at birth). Used by the layout and every genetic calculation." },
+        "genderIdentity": {
+          "enum": ["man", "woman", "nonbinary"],
+          "description": "Gender identity (NSGC 2022). With CanvasSettings.symbolsShow \"gender\" (the default) the symbol shows it, with AMAB, AFAB or UAAB below. Ignored for pregnancies and losses."
+        },
         "affected": { "type": "boolean" },
         "deceased": { "type": "boolean" },
         "carrier": { "type": "boolean" },
@@ -188,6 +192,10 @@
         "relationshipLabels": {
           "type": "boolean",
           "description": "Write the relationship (e.g. \"first cousins\") above every consanguineous couple's double line that can be named and has no consanguinityLabel of its own. Absent means false."
+        },
+        "symbolsShow": {
+          "enum": ["gender", "sex"],
+          "description": "What symbol shapes show: \"gender\" draws someone with a recorded genderIdentity with that gender's symbol and their sex assigned at birth (AMAB, AFAB, UAAB) below it (NSGC 2022); \"sex\" draws biological sex for everyone. Absent means \"gender\"."
         }
       }
     }
