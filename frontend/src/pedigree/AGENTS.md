@@ -144,8 +144,12 @@ draws NSGC symbols.
   halving per degree, "between" when it lands in a gap) and `relatednessOf`.
   The numbers come from the layout engine's `kinshipCoefficients`, through
   `kinshipOf`, which caches the matrix per pedigree object (every edit makes
-  a new object, so the canvas, legend and panel share one computation). The
-  coefficients are never stored. The section appears for anyone who is
+  a new object, so the canvas, legend and panel share one computation), and
+  `kinshipXOf` for the X-linked values (#87). Those are NaN when they depend
+  on an unknown sex, and `formatCoefficient` writes NaN as "0", so the panel
+  checks for NaN first. The coefficients are never stored, and since they
+  are cached per object, a test that mutates a pedigree after reading it
+  must build a fresh one. The section appears for anyone who is
   inbred or has a partner, since each couple carries the double-line
   checkbox.
 - `consanguinity.ts` — `consanguinityTest`, the one rule for a double couple

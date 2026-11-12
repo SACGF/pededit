@@ -9,6 +9,7 @@ import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engi
  */
 
 const cache = new WeakMap<Pedigree, KinshipCoefficients>();
+const xCache = new WeakMap<Pedigree, KinshipCoefficients>();
 
 /**
  * The pedigree's kinship coefficients, computed once per pedigree object.
@@ -18,6 +19,13 @@ const cache = new WeakMap<Pedigree, KinshipCoefficients>();
 export function kinshipOf(pedigree: Pedigree): KinshipCoefficients {
   let coefficients = cache.get(pedigree);
   if (!coefficients) { coefficients = kinshipCoefficients(pedigree); cache.set(pedigree, coefficients); }
+  return coefficients;
+}
+
+/** The X-linked coefficients (#87), cached like `kinshipOf`. */
+export function kinshipXOf(pedigree: Pedigree): KinshipCoefficients {
+  let coefficients = xCache.get(pedigree);
+  if (!coefficients) { coefficients = kinshipCoefficients(pedigree, { chromosome: "X" }); xCache.set(pedigree, coefficients); }
   return coefficients;
 }
 
@@ -73,11 +81,15 @@ export interface CoupleRelatedness {
   partnerId: string;
   /** Kinship of the two partners, which is the inbreeding coefficient of their children. */
   kinship: number;
+  /** X-linked kinship of the partners: their daughters' X-linked F. NaN when it depends on an unknown sex. */
+  kinshipX: number;
 }
 
 export interface IndividualRelatedness {
   /** Inbreeding coefficient F of the individual. */
   inbreeding: number;
+  /** X-linked F (#87). NaN for a male, who has one X, and for unknown sex. */
+  inbreedingX: number;
   /** One entry per partnership of the individual, in pedigree order. */
   couples: CoupleRelatedness[];
 }
@@ -87,14 +99,21 @@ export function relatednessOf(
   pedigree: Pedigree,
   individualId: string,
   coefficients: KinshipCoefficients = kinshipOf(pedigree),
+  xCoefficients: KinshipCoefficients = kinshipXOf(pedigree),
 ): IndividualRelatedness {
   return {
     inbreeding: coefficients.inbreeding(individualId),
+    inbreedingX: xCoefficients.inbreeding(individualId),
     couples: pedigree.partnerships
       .filter(p => p.individual1 === individualId || p.individual2 === individualId)
       .map(p => {
         const partnerId = p.individual1 === individualId ? p.individual2 : p.individual1;
-        return { partnershipId: p.id, partnerId, kinship: coefficients.kinship(individualId, partnerId) };
+        return {
+          partnershipId: p.id,
+          partnerId,
+          kinship: coefficients.kinship(individualId, partnerId),
+          kinshipX: xCoefficients.kinship(individualId, partnerId),
+        };
       }),
   };
 }

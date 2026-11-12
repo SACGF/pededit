@@ -69,16 +69,16 @@ function pedigree(): Pedigree {
 describe("relatednessOf (#32)", () => {
   it("gives F and one entry per partnership, from either partner's side", () => {
     const p = pedigree();
-    expect(relatednessOf(p, "kid")).toEqual({ inbreeding: 1 / 16, couples: [] });
-    expect(relatednessOf(p, "a")).toEqual({
+    expect(relatednessOf(p, "kid")).toMatchObject({ inbreeding: 1 / 16, couples: [] });
+    expect(relatednessOf(p, "a")).toMatchObject({
       inbreeding: 0,
       couples: [
         { partnershipId: "ab", partnerId: "b", kinship: 1 / 16 },
         { partnershipId: "ao", partnerId: "other", kinship: 0 },
       ],
     });
-    expect(relatednessOf(p, "b").couples).toEqual([{ partnershipId: "ab", partnerId: "a", kinship: 1 / 16 }]);
-    expect(relatednessOf(p, "gf")).toEqual({ inbreeding: 0, couples: [{ partnershipId: "g", partnerId: "gm", kinship: 0 }] });
+    expect(relatednessOf(p, "b").couples).toMatchObject([{ partnershipId: "ab", partnerId: "a", kinship: 1 / 16 }]);
+    expect(relatednessOf(p, "gf")).toMatchObject({ inbreeding: 0, couples: [{ partnershipId: "g", partnerId: "gm", kinship: 0 }] });
   });
 
   it("follows adoption: an adopted-in cousin is not a blood relative", () => {
@@ -88,7 +88,22 @@ describe("relatednessOf (#32)", () => {
     expect(relatednessOf(p, "kid").inbreeding).toBe(0);
   });
 
+  it("gives the X-linked values beside the autosomal ones (#87)", () => {
+    const p = pedigree();
+    // a's father is the grandparents' son, so no X reaches a from them.
+    expect(relatednessOf(p, "a").couples[0]).toMatchObject({ kinship: 1 / 16, kinshipX: 0 });
+    expect(relatednessOf(p, "kid")).toMatchObject({ inbreeding: 1 / 16, inbreedingX: 0 });
+    expect(relatednessOf(p, "a").inbreedingX).toBeNaN(); // a male
+    // Through two sisters instead: a's mother and b's mother are sisters.
+    // (A fresh object, since the coefficients are cached per pedigree object.)
+    const q = pedigree();
+    q.individuals.find(i => i.id === "son")!.sex = "female";
+    q.individuals.find(i => i.id === "wife")!.sex = "male";
+    expect(relatednessOf(q, "a").couples[0]).toMatchObject({ kinship: 1 / 16, kinshipX: 3 / 16 });
+    expect(relatednessOf(q, "kid").inbreedingX).toBe(3 / 16);
+  });
+
   it("someone not in the pedigree has nothing", () => {
-    expect(relatednessOf(pedigree(), "nobody")).toEqual({ inbreeding: 0, couples: [] });
+    expect(relatednessOf(pedigree(), "nobody")).toEqual({ inbreeding: 0, inbreedingX: 0, couples: [] });
   });
 });

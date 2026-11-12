@@ -251,11 +251,17 @@ export function partnerLabel(pedigree: Pedigree, individualId: string, partnersh
   return name || `partner ${i + 1} (${sexLabel})`;
 }
 
+/** An X-linked coefficient, which is NaN when it turns on someone's unknown sex (#87). */
+function formatCoefficientX(x: number): string {
+  return Number.isNaN(x) ? "unknown (a sex is not recorded)" : formatCoefficient(x);
+}
+
 /**
  * Relatedness worked out from the drawn structure (#32): the person's
  * inbreeding coefficient, and for each partner the couple's kinship
  * coefficient, which is what their children's inbreeding coefficient will
- * be. The coefficients are read-only.
+ * be. Each has its X-linked value beside it (#87). The coefficients are
+ * read-only.
  *
  * Each couple also has the double-line checkbox (#85). When the pedigree
  * shows the two are related it is ticked and fixed, since the line follows
@@ -264,7 +270,7 @@ export function partnerLabel(pedigree: Pedigree, individualId: string, partnersh
  */
 function RelatednessSection({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipConsanguineous } = usePedigreeStore();
-  const { inbreeding, couples } = relatednessOf(pedigree, individual.id);
+  const { inbreeding, inbreedingX, couples } = relatednessOf(pedigree, individual.id);
   if (!(inbreeding > 0) && couples.length === 0) return null;
 
   return (
@@ -274,6 +280,9 @@ function RelatednessSection({ individual }: { individual: Individual }) {
         {inbreeding > 0 && (
           <div data-testid="inbreeding" title="The chance that this person's two copies of a gene are the same copy inherited through both parents. It equals the kinship coefficient of the parents.">
             Inbreeding coefficient (F): <span className="font-medium">{formatCoefficient(inbreeding)}</span>
+            <div data-testid="inbreeding-x" title="The same for the X chromosome, which matters for X-linked recessive conditions. A male has one X, so he cannot be inbred on it.">
+              X-linked F: <span className="font-medium">{individual.sex === "male" ? "not applicable (one X)" : formatCoefficientX(inbreedingX)}</span>
+            </div>
             <div className="text-[10px] text-gray-500">Parents {degreeOfRelationship(inbreeding)}.</div>
           </div>
         )}
@@ -301,8 +310,12 @@ function RelatednessSection({ individual }: { individual: Individual }) {
               {related && (
                 <div className="pl-5" title="The kinship coefficient of a couple is the inbreeding coefficient of their children.">
                   Kinship <span className="font-medium">{formatCoefficient(c.kinship)}</span>
+                  <div data-testid="couple-kinship-x" title="X-linked kinship of the couple: the X-linked inbreeding coefficient of their daughters. Sons have one X and are not inbred on it.">
+                    X-linked kinship <span className="font-medium">{formatCoefficientX(c.kinshipX)}</span>
+                  </div>
                   <div className="text-[10px] text-gray-500">
-                    {capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = {formatCoefficient(c.kinship)}.
+                    {capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = {formatCoefficient(c.kinship)}
+                    {Number.isNaN(c.kinshipX) ? "." : `, their daughters X-linked F = ${formatCoefficient(c.kinshipX)}.`}
                   </div>
                 </div>
               )}
