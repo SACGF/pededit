@@ -89,16 +89,9 @@ function truncate(lines: string[], maxChars: number, _dropped: string): string[]
   return [...lines.slice(0, -1), kept + ELLIPSIS];
 }
 
-/**
- * The text of the name label: the pedigree number (#8) before the name when
- * `numbers` (from `pedigreeNumbers`, only when the setting is on) has one,
- * so the two wrap together and the number is never the part cut off.
- */
-export function nameLabelText(ind: Individual, numbers?: Map<string, string>): string | undefined {
-  const number = numbers?.get(ind.id);
-  if (!number) return ind.name;
-  const name = ind.name?.trim();
-  return name ? `${number} ${name}` : number;
+/** The text of the name label: the name alone. The pedigree number (#8) has its own line, last in `detailLines`. */
+export function nameLabelText(ind: Individual): string | undefined {
+  return ind.name;
 }
 
 /** Width (px) of the widest of several label lines. */
@@ -107,19 +100,59 @@ export function linesWidth(lines: string[]): number {
 }
 
 /**
- * The lines under the name. First (#20) the free-text age when set,
- * otherwise the date of birth, cut to one line at `maxWidth` with an
- * ellipsis. Only one, so a two-line name plus this line still clears the
- * sibship bar halfway to the next row. Then one line per age of onset (#93),
- * which only people with a recorded onset have. Shared by the canvas, both
- * SVG exporters and the lints. A collapsed-branch diamond (#1) has instead
- * its affected count, when any of its people are affected.
+ * The text under the name, as sections in NSGC order (2008, Fig. 1
+ * instructions: age or year of birth or death, then evaluation, then the
+ * pedigree number), each cut to the label width:
+ *
+ *   1. `age`: the free-text age (#20) when set, otherwise the date of birth;
+ *   2. `onset`: one line per age of onset (#93);
+ *   3. (gender identity #26 and evaluation #101 go here, before the number);
+ *   4. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
+ *      which callers pass only when the pedigree shows numbers.
+ *
+ * A collapsed-branch diamond (#1) has instead its affected count, when any
+ * of its people are affected. Shared by the canvas, both SVG exporters and
+ * the lints through `detailLines`.
  */
-export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree): string[] {
+export interface DetailSections {
+  age: string[];
+  onset: string[];
+  number: string[];
+}
+
+export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
+  const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
   const branch = branchOf(pedigree, ind.id);
-  if (branch) return wrapLabel(branchNote(branch), maxWidth, 1);
+  if (branch) return { age: wrapLabel(branchNote(branch), maxWidth, 1), onset: [], number };
+  return {
+    age: wrapLabel(ageText(ind), maxWidth, 1),
+    onset: onsetLines(ind, pedigree, maxWidth),
+    number,
+  };
+}
+
+/** Every line under the name, top to bottom (see `detailSections`). */
+export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): string[] {
+  const s = detailSections(ind, maxWidth, pedigree, numbers);
+  return [...s.age, ...s.onset, ...s.number];
+}
+
+/**
+ * True when the detail block runs past the age line. A two-line name plus
+ * the age line clears the sibship bar of the person's children; anything
+ * more can reach it, so the block then gets a white backing (canvas div
+ * background, a `<rect>` in the exports) and the bar shows a gap under the
+ * text instead of running through it.
+ */
+export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
+  const s = detailSections(ind, maxWidth, pedigree, numbers);
+  return s.onset.length + s.number.length > 0;
+}
+
+/** The age line's text (#20): the free-text age when set, otherwise the date of birth. */
+export function ageText(ind: Individual): string | undefined {
   const age = ind.age?.trim();
-  return [...wrapLabel(age ? age : ind.dob, maxWidth, 1), ...onsetLines(ind, pedigree, maxWidth)];
+  return age ? age : ind.dob;
 }
 
 /**

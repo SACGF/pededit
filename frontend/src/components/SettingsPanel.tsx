@@ -118,7 +118,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               <div>
                 <div className="text-sm">Show pedigree numbers</div>
                 <div className="text-xs text-gray-400">
-                  Generation and position (II-3) before each name, on the canvas and in exports. Numbers follow the layout, so adding someone renumbers the people to their right.
+                  Generation and position (II-3) on its own line under each symbol, below the name and age, on the canvas and in exports. Numbers follow the layout, so adding someone renumbers the people to their right.
                 </div>
               </div>
             </label>

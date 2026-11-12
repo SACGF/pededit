@@ -9,7 +9,6 @@ import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
-import { onsetsOf } from "../onset";
 import { isPhantomId } from "../../io/ped/converter";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,15 +32,15 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
-  const nameCut = isLabelCut(nameLines, data.labelText ?? individual.name);
+  const nameCut = isLabelCut(nameLines, individual.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
   const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)
     || ((picking?.kind === "partner" || picking?.kind === "relatedness") && picking.individualId === individual.id);
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
-  const hasOnset = onsetsOf(individual, pedigree).length > 0;
-  // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, age or DOB.
+  // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
+  // name, then the detail lines in NSGC order (age, onset, pedigree number).
   const captionOffset = captionRowHeight(individual.lifeStatus);
   const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
 
@@ -141,9 +140,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         </div>
       )}
 
-      {/* The free-text age, or else the date of birth, under the name (#20),
-          then ages of onset (#93). Onset lines can reach the sibship bar of
-          the person's children, so the block gets a white backing then. */}
+      {/* Under the name in NSGC order: age or DOB (#20), ages of onset (#93),
+          pedigree number (#8). Past the age line the block can reach the
+          sibship bar of the person's children, so it gets a white backing. */}
       {details.length > 0 && (
         <div
           data-detail-label
@@ -158,7 +157,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: "none",
-            ...(hasOnset ? { background: "#fff", padding: "0 2px" } : {}),
+            ...(data.detailsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {details.map((line, i) => <div key={i}>{line}</div>)}

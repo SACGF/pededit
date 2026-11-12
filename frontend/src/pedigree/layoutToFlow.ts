@@ -12,7 +12,7 @@ import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
-import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, nameLabelText } from "./labels";
+import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, detailsBacked, nameLabelText } from "./labels";
 import { numberFromLayout, showsNumbers } from "./numbering";
 
 // ── Output types ──────────────────────────────────────────────────────────────
@@ -43,13 +43,15 @@ export interface RFNodeData extends Record<string, unknown> {
   /**
    * The name fitted to the slot width and cut with an ellipsis (#68): at most
    * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
-   * With pedigree numbers shown (#8) the number comes first, as `labelText`.
    */
   nameLines: string[];
-  /** The text `nameLines` was wrapped from: the name, after the pedigree number when shown (#8). */
-  labelText?: string;
-  /** The line under the name: free-text age, or else the DOB (#20). Empty when neither. */
+  /**
+   * The lines under the name, in NSGC order (`detailSections` in labels.ts):
+   * age or year of birth, ages of onset, then the pedigree number (#8) when shown.
+   */
   detailLines: string[];
+  /** The detail block runs past the age line, so it gets a white backing (`detailsBacked`). */
+  detailsBacked?: boolean;
   /**
    * Set on the diamond standing for a collapsed branch (#1), whose
    * `individual` is a stand-in that is not in the stored pedigree. Such a
@@ -205,7 +207,7 @@ export function pedigreeNumbers(full: Pedigree): Map<string, string> {
   return numbers;
 }
 
-/** The numbers to put before the names (#8), or undefined when the pedigree does not show them. */
+/** The numbers to draw under the symbols (#8), or undefined when the pedigree does not show them. */
 export function labelNumbers(pedigree: Pedigree): Map<string, string> | undefined {
   return showsNumbers(pedigree) ? pedigreeNumbers(pedigree) : undefined;
 }
@@ -348,9 +350,9 @@ function buildNodes(
           hasParents: childIds.has(individual.id),
           isPinned,
           ...(twins.get(individual.id) ?? {}),
-          nameLines: wrapLabel(nameLabelText(individual, numbers), labelMaxWidth(slotWidth), labelLines),
-          labelText: nameLabelText(individual, numbers),
-          detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree),
+          nameLines: wrapLabel(nameLabelText(individual), labelMaxWidth(slotWidth), labelLines),
+          detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree, numbers),
+          detailsBacked: detailsBacked(individual, labelMaxWidth(slotWidth), pedigree, numbers),
           ...(branch ? { branch } : {}),
         },
       });

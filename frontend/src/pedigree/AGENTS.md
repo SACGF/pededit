@@ -286,18 +286,27 @@ draws NSGC symbols.
   reason text shares the name-label row, so long reasons run into long names.
 
 Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
-(one or two lines), then one detail line: the free-text `Individual.age` when
-set, otherwise the DOB (`detailLines` in `labels.ts`, #20). Only one line, on
-purpose: a two-line name plus DOB plus age ran into the sibship bar halfway
-to the next row, so the age replaces the DOB under the symbol (the DOB stays
-in the data, the edit panel and CSV). After it, one line per age of onset
-(#93, `onsetLines`): these do reach the sibship bar of the person's own
-children, so when someone has an onset their detail block gets a white
-backing (canvas div background, a `<rect>` in the export's labels group,
-which `exportLint` ignores) and the bar shows a gap under the text rather
-than running through it. The canvas (`PedigreeSymbolNode`),
-`svgExporter` and `uShapeExporter` each offset these by hand, so change all
-three together.
+(one or two lines), then the detail lines in NSGC order (2008 Fig. 1: age,
+then evaluation, then pedigree number; `claude/nsgc_nomenclature.md`).
+`detailSections` in `labels.ts` is the one place that orders them; add new
+text under the symbol there as its own section, not by appending to a
+renderer:
+
+1. age: the free-text `Individual.age` when set, otherwise the DOB (#20).
+   Only one line, on purpose: a two-line name plus DOB plus age ran into the
+   sibship bar halfway to the next row, so the age replaces the DOB under the
+   symbol (the DOB stays in the data, the edit panel and CSV);
+2. one line per age of onset (#93, `onsetLines`);
+3. (gender identity #26 and evaluation #101 belong here, before the number);
+4. the pedigree number (#8), last, on its own line.
+
+A two-line name plus the age line clears the sibship bar of the person's own
+children; anything past the age line can reach it, so then the detail block
+gets a white backing (`detailsBacked`: canvas div background, a `<rect>` in
+the export's labels group, which `exportLint` ignores) and the bar shows a
+gap under the text rather than running through it. The canvas
+(`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter` each offset these
+by hand, so change all three together.
 
 - Chart title (#20): `chartTitle(pedigree, name)` in `labels.ts` is the one
   rule. `Pedigree.chartTitle` wins when set, `""` meaning no title; absent
@@ -316,10 +325,10 @@ three together.
   lineless copies the canvas leaves out. Pins do not renumber: a dragged
   person keeps their layout number. Hidden people (#94) get none, and a
   generation with nobody drawn is not counted, so there are no gaps. Never
-  stored. With `canvasSettings.showNumbers` the number goes before the name
-  (`nameLabelText`) and wraps with it, on the canvas, in both SVG exporters
-  and in the lints, so it adds no line of its own; `RFNodeData.labelText`
-  is the wrapped text, which `isLabelCut` compares against. The U-shape
+  stored. With `canvasSettings.showNumbers` the number is the last detail
+  line under the symbol (NSGC order, see above), on the canvas, in both SVG
+  exporters and in the lints. It was first put before the name on the same
+  line, which the standard does not do. The U-shape
   uses the standard figure's numbers so the two exports agree. Tests:
   `__tests__/numbering.test.ts`.
 

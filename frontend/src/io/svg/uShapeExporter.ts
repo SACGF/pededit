@@ -817,8 +817,8 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
       const ind = byId.get(id);
       if (!ind) continue;
       // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
-      const nameLines = wrapLabel(nameLabelText(ind, labelNumbers(pedigree)), labelMaxWidth(MAX_SLOT));
-      const details = detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree);
+      const nameLines = wrapLabel(nameLabelText(ind), labelMaxWidth(MAX_SLOT));
+      const details = detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree, labelNumbers(pedigree));
       labelLines = Math.max(labelLines, nameLines.length + details.length
         + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
       labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ...details.map(l => l.length));
@@ -1163,11 +1163,12 @@ function renderProbandArrow(): string {
  */
 function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): string {
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
-  // by renderShape, over the white backing), name, age or DOB.
+  // by renderShape, over the white backing), name, then the detail lines in
+  // NSGC order (age, onset, pedigree number).
   const caption = lifeStatusCaption(ind.lifeStatus);
   // The pedigree number (#8) is the one the standard figure shows, so the
   // two exports agree, even though it need not read left to right here.
-  const below = [...wrapLabel(nameLabelText(ind, labelNumbers(pedigree)), labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree)];
+  const below = [...wrapLabel(nameLabelText(ind), labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree, labelNumbers(pedigree))];
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { toRoman } from "../numbering";
 import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
-import { nameLabelText } from "../labels";
+import { nameLabelText, detailLines, detailsBacked } from "../labels";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -113,31 +113,43 @@ describe("pedigreeNumbers", () => {
 });
 
 describe("labels with numbers", () => {
-  it("puts the number before the name, or alone for an unnamed person", () => {
+  it("puts the number on its own line, last, after age and onset (NSGC order)", () => {
     const numbers = new Map([["x", "II-3"]]);
-    expect(nameLabelText(person("x", "male", 0, "Jo"), numbers)).toBe("II-3 Jo");
-    expect(nameLabelText(person("x", "male", 0), numbers)).toBe("II-3");
-    expect(nameLabelText(person("x", "male", 0, "Jo"), undefined)).toBe("Jo");
+    const p = family();
+    const jo: Individual = { ...person("x", "male", 0, "Jo"), age: "30y", affected: true, onset: "20s" };
+    expect(nameLabelText(jo)).toBe("Jo");
+    expect(detailLines(jo, 74, p, numbers)).toEqual(["30y", "onset 20s", "II-3"]);
+    expect(detailLines(jo, 74, p)).toEqual(["30y", "onset 20s"]);
+    expect(detailLines(person("x", "male", 0), 74, p, numbers)).toEqual(["II-3"]);
+    // Past the age line the block gets a white backing.
+    expect(detailsBacked({ ...person("x", "male", 0), age: "30y" }, 74, p)).toBe(false);
+    expect(detailsBacked({ ...person("x", "male", 0), age: "30y" }, 74, p, numbers)).toBe(true);
   });
 
   it("draws the number on the canvas only when the setting is on", () => {
     const off = layoutToFlow(family());
-    expect(off.nodes.find(n => n.data.individual.id === "gf")!.data.nameLines).toEqual(["Grandpa"]);
+    const gfOff = off.nodes.find(n => n.data.individual.id === "gf")!;
+    expect(gfOff.data.nameLines).toEqual(["Grandpa"]);
+    expect(gfOff.data.detailLines).toEqual([]);
     const on = layoutToFlow(withNumbers(family()));
     const gf = on.nodes.find(n => n.data.individual.id === "gf")!;
-    expect(gf.data.labelText).toBe("I-1 Grandpa");
-    expect(gf.data.nameLines.join(" ")).toBe("I-1 Grandpa");
+    expect(gf.data.nameLines).toEqual(["Grandpa"]);
+    expect(gf.data.detailLines).toEqual(["I-1"]);
+    expect(gf.data.detailsBacked).toBe(true);
     const a2 = on.nodes.find(n => n.data.individual.id === "a2")!;
-    expect(a2.data.nameLines).toEqual([pedigreeNumbers(family()).get("a2")]);
+    expect(a2.data.nameLines).toEqual([]);
+    expect(a2.data.detailLines).toEqual([pedigreeNumbers(family()).get("a2")]);
   });
 
   it("draws the numbers in the SVG and U-shape exports, and they lint clean", () => {
     const p = withNumbers(family());
     const svg = exportSvg(p);
-    expect(svg).toContain(">I-1 Grandpa<");
+    expect(svg).toContain(">Grandpa<");
+    expect(svg).toContain(">I-1<");
+    expect(svg.indexOf(">I-1<")).toBeGreaterThan(svg.indexOf(">Grandpa<"));
     expect(exportSvg(family())).not.toContain("I-1");
     expect(lintExport(p)).toEqual([]);
-    expect(exportUShapeSvg(p)).toContain(">I-1 Grandpa<");
+    expect(exportUShapeSvg(p)).toContain(">I-1<");
   });
 
   it("does not repeat the number in a de-identified export", () => {

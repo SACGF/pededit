@@ -5,8 +5,7 @@ import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from ".
 import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
 import type { SibshipChild } from "../../pedigree/sibshipPath";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { onsetsOf } from "../../pedigree/onset";
-import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
+import { wrapLabel, labelMaxWidth, detailLines, detailsBacked, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
@@ -98,12 +97,13 @@ function computeBounds(
 
   const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
   const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
-  // Names wrap to the slot width (#68), the age or DOB takes a line (#20) and
-  // so does each age of onset (#93), so allow for the most lines anyone takes.
+  // Names wrap to the slot width (#68), the age or DOB takes a line (#20), so
+  // does each age of onset (#93) and the pedigree number (#8), so allow for
+  // the most lines anyone takes.
   const labelMax = labelMaxWidth(layoutSpacing(options.compact).slotWidth);
   const numbers = labelNumbers(pedigree);
   const textLines = Math.max(1, ...pedigree.individuals.map(i =>
-    wrapLabel(nameLabelText(i, numbers), labelMax).length + detailLines(i, labelMax, pedigree).length));
+    wrapLabel(nameLabelText(i), labelMax).length + detailLines(i, labelMax, pedigree, numbers).length));
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
@@ -452,25 +452,25 @@ function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos
 
       const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = pos;
-      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name, age or DOB.
+      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
+      // row, name, then the detail lines in NSGC order (age, onset, number).
       const caption = lifeStatusCaption(ind.lifeStatus);
       if (caption) elems.push(renderLifeStatusCaption(caption, cx, cy + LABEL_OFFSET_Y));
       const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
         + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
 
-      // The name wraps to the slot width (#68), after the pedigree number
-      // when shown (#8); the full text is kept as a <title>.
-      const text = nameLabelText(ind, numbers);
+      // The name wraps to the slot width (#68); the full text is kept as a <title>.
+      const text = nameLabelText(ind);
       const lines = wrapLabel(text, labelMax);
       lines.forEach((line, k) => {
         const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
         elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
       });
-      // The free-text age, or else the date of birth (#20), then ages of onset
-      // (#93). Onset lines can reach the sibship bar of the person's children,
-      // so the block gets a white backing then, as on the canvas.
-      const details = detailLines(ind, labelMax, pedigree);
-      if (details.length > 0 && onsetsOf(ind, pedigree).length > 0) {
+      // Age or DOB (#20), ages of onset (#93), pedigree number (#8). Past the
+      // age line the block can reach the sibship bar of the person's
+      // children, so it gets a white backing then, as on the canvas.
+      const details = detailLines(ind, labelMax, pedigree, numbers);
+      if (details.length > 0 && detailsBacked(ind, labelMax, pedigree, numbers)) {
         const w = linesWidth(details) + 4;
         const top = labelBaseY + lines.length * LABEL_LINE_HEIGHT - LABEL_FONT_SIZE;
         elems.push(`<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${details.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
