@@ -109,9 +109,18 @@ export interface CanvasSettings {
    * onto two lines, or "truncate" to one line. Absent means "wrap".
    */
   nameLabels?: NameLabelMode;
+  /**
+   * How wide the automatic layout may be (#82): "minimal" keeps it to the
+   * widest generation (the kinship2 default), "relaxed" lets it use a little
+   * more so children sit more directly under their parents. Absent means
+   * "minimal".
+   */
+  layoutWidth?: LayoutWidthMode;
 }
 
 export type NameLabelMode = "wrap" | "truncate";
+
+export type LayoutWidthMode = "minimal" | "relaxed";
 
 export interface Pedigree {
   individuals: Individual[];

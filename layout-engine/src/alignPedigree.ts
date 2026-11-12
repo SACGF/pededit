@@ -16,6 +16,13 @@ export interface AlignOptions {
    * call matches R; `alignPedigreeByFamily` turns it on.
    */
   improve?: boolean;
+  /**
+   * Slots the drawing may be wider than its widest row (#82). Default 0, as
+   * in R, where the widest row is packed solid and the others must fit
+   * inside it. `alignPedigreeByFamily` sets it from the pedigree's
+   * `canvasSettings.layoutWidth`.
+   */
+  widthSlack?: number;
 }
 
 /**
@@ -33,7 +40,7 @@ export function alignPedigree(
   pedigree: Pedigree,
   options: AlignOptions = {},
 ): LayoutResult {
-  const { packed = true, width = 10, align = true, improve = false } = options;
+  const { packed = true, width = 10, align = true, improve = false, widthSlack = 0 } = options;
 
   // 1. Convert to LayoutInput (1-based)
   const input = pedigreeToLayoutInput(pedigree);
@@ -137,7 +144,7 @@ export function alignPedigree(
   // 8. QP optimisation (with NaN guard — ill-conditioned problems fall back to raw positions)
   let pos: Float64Array[];
   if (align && maxlev > 1) {
-    const qpPos = alignped4(rval, spouseMatrix, level, width, align);
+    const qpPos = alignped4(rval, spouseMatrix, level, width, align, widthSlack);
     let hasNaN = false;
     outerQP: for (let lev = 1; lev <= maxlev; lev++) {
       const ni = rval.n[lev] ?? 0;

@@ -95,6 +95,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     snapToGrid = serializers.BooleanField()
     snapGridSize = serializers.FloatField(min_value=0)
     nameLabels = _opt(serializers.ChoiceField, choices=["wrap", "truncate"])
+    layoutWidth = _opt(serializers.ChoiceField, choices=["minimal", "relaxed"])
 
 
 class PositionSerializer(serializers.Serializer):

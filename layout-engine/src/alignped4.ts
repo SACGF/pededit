@@ -10,6 +10,10 @@ import { solveQP } from "quadprog";
  * Falls back to the raw positions from alignped1-3 if quadprog is unavailable
  * or the solve fails.
  *
+ * widthSlack (#82): slots the drawing may be wider than its widest row. R has
+ * no such thing (0): past `width` slots the widest row is packed solid, so
+ * sibships under a narrower row of parents cannot centre.
+ *
  * align parameter:
  *   true  → use defaults [1.5, 2]
  *   [a,b] → penalty exponent and spouse weight
@@ -20,16 +24,17 @@ export function alignped4(
   _level: Int32Array,
   width: number,
   align: boolean | [number, number],
+  widthSlack = 0,
 ): Float64Array[] {
   const alignParams: [number, number] = align === true || align === false ? [1.5, 2] : align;
 
   const maxlev = rval.n.length - 1;
   const nTotal = Array.from(rval.n).slice(1).reduce((s, v) => s + v, 0);
 
-  // Ensure width is at least max row width + a tiny amount
+  // Ensure width is at least max row width + a tiny amount (plus any slack asked for)
   let maxN = 0;
   for (let i = 1; i <= maxlev; i++) maxN = Math.max(maxN, rval.n[i] ?? 0);
-  width = Math.max(width, maxN + 0.01);
+  width = Math.max(width, maxN + 0.01 + widthSlack);
 
   // Build myid: for each plotting position, its 1-based index in the flat parameter vector.
   // Each level gets its own Int32Array sized to that level's nid row — using a fixed size

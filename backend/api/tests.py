@@ -37,7 +37,7 @@ FULL_PEDIGREE = {
     "siblingOrder": {"mode": "manual", "affectedFirst": True},
     "pinnedPositions": {"c1": {"x": 12.5, "y": -40.0}},
     "canvasSettings": {"nodesMoveable": True, "snapToGrid": True, "snapGridSize": 20,
-                       "nameLabels": "truncate"},
+                       "nameLabels": "truncate", "layoutWidth": "relaxed"},
     "unlockedIndividuals": ["f"],
     "tags": [
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant"},
@@ -127,6 +127,8 @@ class PedigreeRoundTripTests(APITestCase):
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "stripe"}]},
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
                                         "snapGridSize": 20, "nameLabels": "widen"}},
+            {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
+                                        "snapGridSize": 20, "layoutWidth": "wide"}},
             [],
         ]
         for data in bad_cases:
