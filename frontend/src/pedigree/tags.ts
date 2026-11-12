@@ -1,5 +1,6 @@
 import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "./consanguinity";
+import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "./ended";
 import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
@@ -505,6 +506,20 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
         const cy = sy + LEGEND_SWATCH / 2;
         const line = (y: number) => `<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(x + LEGEND_SWATCH)}" y2="${fmt(y)}" stroke="black" stroke-width="1.5"/>`;
         return line(cy - 2) + line(cy + 2);
+      },
+    });
+  }
+
+  // Ended relationship (#98): a couple line with the two strokes across it.
+  if (hasEndedPartnership(pedigree)) {
+    rows.push({
+      label: ENDED_LABEL,
+      swatch: sy => {
+        const cy = sy + LEGEND_SWATCH / 2;
+        const line = (x1: number, y1: number, x2: number, y2: number) =>
+          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
+        return line(x, cy, x + LEGEND_SWATCH, cy)
+          + endedMarkSegments(x + LEGEND_SWATCH / 2, cy, 0.7).map(([x1, y1, x2, y2]) => line(x1, y1, x2, y2)).join("");
       },
     });
   }

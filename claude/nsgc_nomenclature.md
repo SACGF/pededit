@@ -65,7 +65,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Relationship, line of descent, sibship and individual's lines as defined. | Follows. |
 | Siblings left to right in birth order, oldest first. | Sibling order setting. |
 | Male partner on the left "if possible" (2008). Dropped as a rule in 2022 ("Both sides now"). | No rule enforced, which matches 2022. |
-| A break (two slashes) in the relationship line means the relationship has ended. | **Gap:** not supported. |
+| A break (two slashes) in the relationship line means the relationship has ended. | Follows (#98): `Partnership.ended`. |
 | Consanguinity: double relationship line. **If the degree of relationship is not obvious from the pedigree, write it above the line** (e.g. "third cousins"). | Double line follows (#85, #92). **Gap:** no degree label above the line. #90 can now name the relationship. |
 | Twins: monozygotic with a horizontal bar between the individual's lines, dizygotic without, "?" when unknown. | Follows (#11). |
 | No children by choice: one bar under the line of descent. Infertility: two bars. Reason written below. | Follows (#15). |
@@ -130,4 +130,4 @@ use for groups.
 5. **Proband arrow without "P".** Small fix.
 6. Not yet built: consultand arrow, presymptomatic carrier, evaluation (E)
    notation, assisted reproduction (D, S), "?" for unknown family history,
-   ended relationship (break in the line), and clinical key fields.
+   and clinical key fields. (Ended relationship: done in #98.)

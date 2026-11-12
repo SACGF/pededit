@@ -11,6 +11,8 @@ import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/
 import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
+import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "@/pedigree/ended";
+import { segmentsPathD } from "@/pedigree/sibshipPath";
 import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "@/pedigree/collapse";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -218,6 +220,16 @@ function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
   );
 }
 
+/** Couple line with the ended relationship break (#98). */
+function EndedSvg() {
+  return (
+    <svg width="48" height="20" viewBox="0 0 48 20">
+      <line x1={0} y1={10} x2={48} y2={10} stroke="black" strokeWidth={2} />
+      <path d={segmentsPathD(endedMarkSegments(24, 10))} stroke="black" strokeWidth={2} fill="none" />
+    </svg>
+  );
+}
+
 function ConsanguineousSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -306,6 +318,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const relRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });
   if (hasConsanguineous) relRows.push({ icon: <ConsanguineousSvg />, label: "Consanguineous couple" });
+  if (hasEndedPartnership(pedigree)) relRows.push({ icon: <EndedSvg />, label: ENDED_LABEL });
   const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
   for (const o of CHILDLESS_OPTIONS) {
     if (childless.has(o.value)) relRows.push({ icon: <ChildlessSvg status={o.value} />, label: o.label });

@@ -8,6 +8,7 @@ import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
+import { middleTaken } from "./ended";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
@@ -75,6 +76,10 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   /** Childless couple mark under the line (#15), when the partnership has one and no children. */
   childless?: ChildlessStatus;
   childlessReason?: string;
+  /** Ended relationship (#98): two strokes across the line. */
+  ended?: boolean;
+  /** A line of descent or a childless mark hangs from the middle of the line, so the break moves aside. */
+  middleTaken?: boolean;
 }
 
 /**
@@ -422,6 +427,7 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
           ...hopAt(result, partners, level, slot),
           partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
           ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
+          ...endedData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
         },
       });
     }
@@ -434,6 +440,12 @@ function buildCoupleEdges(pedigree: Pedigree, result: LayoutResult, partners: Pa
     const childless = partnership && activeChildless(partnership, pedigree);
     if (!childless) return {};
     return { childless, childlessReason: partnership!.childlessReason || undefined };
+  }
+
+  function endedData(a: string, b: string): Pick<CoupleEdgeData, "ended" | "middleTaken"> {
+    const partnership = partnershipOf.get(pairKey(a, b));
+    if (!partnership?.ended) return {};
+    return { ended: true, middleTaken: middleTaken(partnership, pedigree) };
   }
 }
 

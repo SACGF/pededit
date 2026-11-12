@@ -91,6 +91,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setIndividualTag,
     setPartnershipChildless,
     setPartnershipConsanguineous,
+    setPartnershipEnded,
     setAdopted,
     setTwins,
     removeTwin,
@@ -328,6 +329,25 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </MenuSection>
         )}
 
+        {ownPartnerships.length > 0 && (
+          <MenuSection label="Relationship">
+            {ownPartnerships.map(c => {
+              const ended = !!pedigree.partnerships.find(p => p.id === c.partnershipId)?.ended;
+              return (
+                <MenuItem
+                  key={c.partnershipId}
+                  onClick={() => action(() => setPartnershipEnded(c.partnershipId, !ended))}
+                  active={ended}
+                  checked={ended}
+                  title={ENDED_TITLE}
+                >
+                  {ownPartnerships.length > 1 ? `Ended with ${c.label}` : "Ended"}
+                </MenuItem>
+              );
+            })}
+          </MenuSection>
+        )}
+
         {childlessCouples.length > 0 && (
           <MenuSection label="Couple without children">
             {childlessCouples.map(c => (
@@ -400,6 +420,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   );
 }
 
+const ENDED_TITLE = "Separated or divorced: two short strokes across the couple line";
+
 /**
  * The consanguinity override for one couple (#92), as a toggle. A couple the
  * pedigree already shows to be related is ticked and disabled, as in the
@@ -434,7 +456,7 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, startPickingChild } = usePedigreeStore();
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, startPickingChild } = usePedigreeStore();
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
@@ -454,6 +476,14 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           label="Consanguineous"
           onToggle={on => action(() => setPartnershipConsanguineous(partnershipId, on))}
         />
+        <MenuItem
+          onClick={() => action(() => setPartnershipEnded(partnershipId, !partnership.ended))}
+          active={!!partnership.ended}
+          checked={!!partnership.ended}
+          title={ENDED_TITLE}
+        >
+          Relationship ended
+        </MenuItem>
         <MenuItem
           onClick={() => action(() => startPickingChild(partnershipId))}
           title="Click an existing person on the canvas to make them a child of this couple"

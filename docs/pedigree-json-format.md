@@ -100,6 +100,7 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `childless` | `"infertility"` or `"byChoice"` | no | Childless couple mark under the couple line (NSGC): a short vertical ending in two bars for infertility, one bar for no children by choice. Only meaningful when the partnership has no children in `parentOf`; the editor clears it when a child is added. |
 | `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
 | `twins` | `TwinSet[]` | no | Twin sets (twins, triplets, ...) among this partnership's children. PED has no field for this, so Export PED drops it and warns. |
+| `ended` | boolean | no | The relationship no longer exists (separated, divorced). Drawn as two short diagonal strokes across the couple line (NSGC). Absent means `false`. |
 
 Any other property on a partnership is preserved as-is.
 

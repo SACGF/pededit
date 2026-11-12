@@ -11,6 +11,7 @@ import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption"
 import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
+import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -181,8 +182,17 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
       } else {
         for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP, hopInset)) lines.push(path(d));
       }
-      // Childless couple mark (#15), hung from the middle of the line.
       const partnership = partnershipOf.get(pairKey(a, b));
+      // Ended relationship (#98): two strokes across the line, aside from
+      // anything hung from its middle.
+      if (partnership?.ended) {
+        // The export draws couple lines from symbol centre to centre.
+        const half = NODE_SIZE / 2;
+        const cx = endedBreakX(left.x + half, right.x - half, hop, Math.max(0, hopInset - half), middleTaken(partnership, pedigree));
+        const cy = (left.y + right.y) / 2 - hop + (consang && hop > 0 ? CONSANG_GAP / 2 : 0);
+        for (const [x1, y1, x2, y2] of endedMarkSegments(cx, cy)) lines.push(seg(x1, y1, x2, y2, false, true));
+      }
+      // Childless couple mark (#15), hung from the middle of the line.
       const childless = partnership && activeChildless(partnership, pedigree);
       if (partnership && childless) {
         const cx = (left.x + right.x) / 2;

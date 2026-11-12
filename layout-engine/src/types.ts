@@ -118,6 +118,11 @@ export interface Partnership {
   childlessReason?: string;
   /** Twin sets among this partnership's children. */
   twins?: TwinSet[];
+  /**
+   * The relationship no longer exists (separated, divorced): two short
+   * strokes across the couple line (NSGC 2008, #98). Absent means false.
+   */
+  ended?: boolean;
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

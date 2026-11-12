@@ -357,6 +357,8 @@ interface PedigreeState {
    * pedigree shows to be related keeps its double line either way.
    */
   setPartnershipConsanguineous: (partnershipId: string, related: boolean) => void;
+  /** Ended relationship (#98): two strokes across the couple line. False removes the flag. */
+  setPartnershipEnded: (partnershipId: string, ended: boolean) => void;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -1088,6 +1090,16 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const p = draft.partnerships.find(x => x.id === partnershipId)!;
         if (related) p.consanguineous = true;
         else delete p.consanguineous;
+      });
+    },
+
+    setPartnershipEnded: (partnershipId, ended) => {
+      const current = get().pedigree.partnerships.find(x => x.id === partnershipId);
+      if (!current || !!current.ended === ended) return;
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId)!;
+        if (ended) p.ended = true;
+        else delete p.ended;
       });
     },
 

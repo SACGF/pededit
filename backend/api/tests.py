@@ -31,7 +31,7 @@ FULL_PEDIGREE = {
         {"id": "p1", "individual1": "f", "individual2": "m", "consanguineous": True,
          "twins": [{"members": ["c1", "c2"], "zygosity": "monozygotic"}]},
         {"id": "p2", "individual1": "f", "individual2": "w2", "childless": "infertility",
-         "childlessReason": "azoospermia"},
+         "childlessReason": "azoospermia", "ended": True},
     ],
     "parentOf": {"p1": ["c1", "c2"]},
     "siblingOrder": {"mode": "manual", "affectedFirst": True},

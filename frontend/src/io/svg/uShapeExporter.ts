@@ -10,6 +10,7 @@ import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets } from "./svgExporter";
 import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { consanguinityTest } from "../../pedigree/consanguinity";
+import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { labelNumbers } from "../../pedigree/layoutToFlow";
@@ -979,6 +980,22 @@ function tangentSeg(u: number, offset: number, halfLen: number, g: Geom): string
   return `<line x1="${r(c.x - dx)}" y1="${r(c.y - dy)}" x2="${r(c.x + dx)}" y2="${r(c.y + dy)}" ${LINE_ATTRS}/>`;
 }
 
+/** The ended relationship strokes (#98) across the track at position u, leaning with the track. */
+function endedSegs(u: number, offset: number, g: Geom): string[] {
+  const eps = 0.01;
+  const a = trackPoint(u - eps, offset, g), b = trackPoint(u + eps, offset, g);
+  const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const tx = (b.x - a.x) / len, ty = (b.y - a.y) / len;
+  const c = trackPoint(u, offset, g);
+  // The canvas segments are in (along, down) coordinates; down is towards the
+  // children, which is outward on the U.
+  return endedMarkSegments(0, 0).map(([x1, y1, x2, y2]) => {
+    const px = (s: number, d: number) => r(c.x + s * tx + d * c.nx);
+    const py = (s: number, d: number) => r(c.y + s * ty + d * c.ny);
+    return `<line x1="${px(x1, y1)}" y1="${py(x1, y1)}" x2="${px(x2, y2)}" y2="${py(x2, y2)}" ${LINE_ATTRS}/>`;
+  });
+}
+
 /** A straight segment across the tracks at position u, from offset o1 to o2. */
 function normalSeg(u: number, o1: number, o2: number, g: Geom, attrs = LINE_ATTRS): string {
   const p1 = trackPoint(u, o1, g), p2 = trackPoint(u, o2, g);
@@ -1029,6 +1046,13 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
         if (w.consang) out.push(trackPath(uA, uB, track - CONSANG_GAP / 2, g), trackPath(uA, uB, track + CONSANG_GAP / 2, g));
         else out.push(trackPath(uA, uB, track, g));
+        // Ended relationship (#98): two strokes across the line, aside from
+        // the descent line or childless mark in its middle.
+        const partnership = w.pids.length === 1 ? partnershipById.get(w.pids[0]!) : undefined;
+        if (partnership?.ended) {
+          const lo = Math.min(uA, uB) + HALF, hi = Math.max(uA, uB) - HALF;
+          out.push(...endedSegs(endedBreakX(lo, hi, 0, 0, middleTaken(partnership, pedigree)), track, g));
+        }
       }
       if (!w.kids.length) {
         // Childless couple mark (#15): outward from the middle of the couple

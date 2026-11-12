@@ -182,6 +182,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
 
       <TwinsForm individual={individual} />
       <RelatednessSection individual={individual} />
+      <EndedForm individual={individual} />
       <CouplesForm individual={individual} />
     </div>
   );
@@ -378,6 +379,33 @@ function RelatednessSection({ individual }: { individual: Individual }) {
 
 function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/**
+ * Ended relationships (#98): one checkbox per partner. NSGC draws a
+ * relationship that no longer exists (separated, divorced) as two short
+ * strokes across the couple line.
+ */
+function EndedForm({ individual }: { individual: Individual }) {
+  const { pedigree, setPartnershipEnded } = usePedigreeStore();
+  const own = pedigree.partnerships.filter(p => p.individual1 === individual.id || p.individual2 === individual.id);
+  if (own.length === 0) return null;
+  return (
+    <div className="border-t pt-3 space-y-2" data-testid="ended-form">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relationship</div>
+      {own.map(p => (
+        <label key={p.id} className="flex items-center gap-2 cursor-pointer text-xs text-gray-600" title="Separated or divorced: two short strokes across the couple line">
+          <input
+            type="checkbox"
+            checked={!!p.ended}
+            onChange={e => setPartnershipEnded(p.id, e.target.checked)}
+            className="accent-black"
+          />
+          <span>Ended with {partnerLabel(pedigree, individual.id, p.id)}</span>
+        </label>
+      ))}
+    </div>
+  );
 }
 
 /**

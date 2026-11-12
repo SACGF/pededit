@@ -284,6 +284,20 @@ draws NSGC symbols.
   couple with children is never drawn; `edges/ChildlessMark.tsx` draws it on
   the canvas, `svgExporter` and `uShapeExporter` draw the same segments. The
   reason text shares the name-label row, so long reasons run into long names.
+- `ended.ts` — ended relationship (#98, NSGC "relationship no longer
+  exists"): `Partnership.ended` draws two short diagonal strokes across the
+  couple line (`endedMarkSegments`). They sit in the middle of the line
+  unless the line of descent or a childless mark hangs there
+  (`middleTaken`), then halfway between the left end of the line's run and
+  the middle (`endedBreakX`), so they never cross the drop. On a double line
+  they are tall enough to cross both lines. Drawn by `edges/EndedMark.tsx`,
+  `svgExporter` (as `class="mark"` lines, which the export lint skips), the
+  U-shape (`endedSegs`, along the track), the minimap (at no less than half
+  size; the minimap draws hopping lines straight, so on a hop the strokes
+  land over the partner in between) and the legend and export key
+  ("Relationship ended"). Set from the panel's "Relationship" section and
+  the "Relationship" / couple-line items of the more and right-click menus
+  (`setPartnershipEnded`). PED cannot carry it; Export PED warns.
 
 Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
 (one or two lines), then the detail lines in NSGC order (2008 Fig. 1: age,

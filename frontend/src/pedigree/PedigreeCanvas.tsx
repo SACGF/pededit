@@ -25,6 +25,7 @@ import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import type { RFNodeData, SibshipEdgeData, CoupleEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
+import { endedBreakX, endedMarkSegments } from "./ended";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
@@ -125,15 +126,31 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: Pedigre
           const lx = mx(src.x + half);
           const rx = mx(tgt.x - half);
           const ey = my(src.y);
+          // Ended relationship (#98): the strokes at no less than half size,
+          // or they vanish at minimap scale.
+          const data = edge.data as CoupleEdgeData | undefined;
+          const ended = data?.ended && (
+            <path
+              data-minimap-ended
+              d={segmentsPathD(endedMarkSegments(endedBreakX(lx, rx, 0, 0, !!data.middleTaken), ey, Math.max(scale, 0.5)))}
+              stroke="black" strokeWidth={1} fill="none"
+            />
+          );
           if (edge.type === "consanguineousEdge") {
             return (
               <g key={edge.id}>
                 <line x1={lx} y1={ey - 1.5} x2={rx} y2={ey - 1.5} stroke="black" strokeWidth={1} />
                 <line x1={lx} y1={ey + 1.5} x2={rx} y2={ey + 1.5} stroke="black" strokeWidth={1} />
+                {ended}
               </g>
             );
           }
-          return <line key={edge.id} x1={lx} y1={ey} x2={rx} y2={ey} stroke="black" strokeWidth={1} />;
+          return (
+            <g key={edge.id}>
+              <line x1={lx} y1={ey} x2={rx} y2={ey} stroke="black" strokeWidth={1} />
+              {ended}
+            </g>
+          );
         })}
 
         {/* Nodes, on top of the edges: the canvas symbols scaled down (#6) */}

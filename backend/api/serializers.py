@@ -90,6 +90,7 @@ class PartnershipSerializer(serializers.Serializer):
     childless = _opt(serializers.ChoiceField, choices=CHILDLESS_CHOICES)
     childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     twins = _opt(TwinSetSerializer, many=True)
+    ended = _opt(serializers.BooleanField)
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):

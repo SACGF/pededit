@@ -4,6 +4,7 @@ import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { couplePathD } from "../couplePath";
 import { ChildlessMark } from "./ChildlessMark";
+import { EndedMark } from "./EndedMark";
 
 export type CoupleEdgeType = Edge<CoupleEdgeData, "coupleEdge">;
 
@@ -33,6 +34,7 @@ export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) 
       {data?.childless && (
         <ChildlessMark cx={(sx + tx) / 2} topY={(sy + ty) / 2 - hop} status={data.childless} reason={data.childlessReason} />
       )}
+      {data?.ended && <EndedMark sx={sx} tx={tx} y={(sy + ty) / 2 - hop} data={data} />}
     </g>
   );
 }

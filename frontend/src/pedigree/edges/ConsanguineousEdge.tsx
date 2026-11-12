@@ -4,6 +4,7 @@ import type { CoupleEdgeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { consanguineousPathsD, couplePathD } from "../couplePath";
 import { ChildlessMark } from "./ChildlessMark";
+import { EndedMark } from "./EndedMark";
 
 export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
 
@@ -33,6 +34,7 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
       {data?.childless && (
         <ChildlessMark cx={(sx + tx) / 2} topY={(sy + ty) / 2 - hop + GAP / 2} status={data.childless} reason={data.childlessReason} />
       )}
+      {data?.ended && <EndedMark sx={sx} tx={tx} y={(sy + ty) / 2 - hop + (hop > 0 ? GAP / 2 : 0)} data={data} />}
     </g>
   );
 }

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins } from "../io/ped/exporter.js";
+import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
 import { childlessLabel } from "../pedigree/childless";
 import { adoptionLabel } from "../pedigree/adoption";
@@ -61,7 +61,8 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
     const lostCouples = pedLostChildless(pedigree);
     const lostAdopted = pedLostAdoption(pedigree);
     const lostTwins = pedLostTwins(pedigree);
-    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0) { handleExportPed(dialect); return; }
+    const lostEnded = pedLostEnded(pedigree);
+    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0) { handleExportPed(dialect); return; }
     const nameOf = (id: string) => { const i = pedigree.individuals.find(x => x.id === id); return i?.name || id; };
     setPedWarning({
       dialect,
@@ -70,6 +71,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
         ...lostAdopted.map(i => `${i.name || i.id}: ${adoptionLabel(i.adopted!)}`),
         ...lostTwins.map(t => `${t.members.map(nameOf).join(", ")}: ${twinLegendLabel(t.zygosity as "monozygotic" | "dizygotic" | "unknown")}`),
         ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
+        ...lostEnded.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: relationship ended`),
       ],
     });
   }

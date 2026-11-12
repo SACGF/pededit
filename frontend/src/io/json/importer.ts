@@ -224,6 +224,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "childless", pp, CHILDLESS_VALUES.map(s => `"${s}"`).join(" | "),
       v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
     c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
+    c.optional(raw, "ended", pp, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "twins", pp, "an array of twin sets", Array.isArray);
     if (Array.isArray(raw.twins)) {
       raw.twins.forEach((t, k) => {

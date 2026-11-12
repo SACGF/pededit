@@ -100,7 +100,8 @@
           "type": "array",
           "description": "Twin sets among this partnership's children. Each member is in at most one set.",
           "items": { "$ref": "#/$defs/TwinSet" }
-        }
+        },
+        "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." }
       },
       "additionalProperties": true
     },

@@ -130,6 +130,11 @@ export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partn
   return out;
 }
 
+/** Partnerships marked ended (#98), which PED cannot carry. */
+export function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
+  return pedigree.partnerships.filter(p => !!p.ended);
+}
+
 /** Partnerships whose childless mark (#15) PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);
