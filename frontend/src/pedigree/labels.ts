@@ -104,7 +104,8 @@ export function linesWidth(lines: string[]): number {
  * instructions: age or year of birth or death, then evaluation, then the
  * pedigree number), each cut to the label width:
  *
- *   1. `age`: the free-text age (#20) when set, otherwise the date of birth;
+ *   1. `age`: the free-text age (#20) when set, otherwise the year of birth
+ *      ("b. 1978"), as the standard prefers a year or age to a full date;
  *   2. `onset`: one line per age of onset (#93);
  *   3. (gender identity #26 and evaluation #101 go here, before the number);
  *   4. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
@@ -149,10 +150,21 @@ export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedig
   return s.onset.length + s.number.length > 0;
 }
 
-/** The age line's text (#20): the free-text age when set, otherwise the date of birth. */
-export function ageText(ind: Individual): string | undefined {
+/**
+ * The age line's text (#20): the free-text age when set, otherwise the year
+ * of birth as "b. 1978". NSGC prefers a year or an age to a full date, for
+ * privacy. A date of birth that does not start with a year (the age range a
+ * de-identified export puts there, #4) is shown as it is. The full date
+ * stays in the data, the edit panel and the CSV. There is no date of death
+ * field, so "d. 2007" or "d. 72" can only come from the free-text age.
+ */
+export function ageText(ind: Pick<Individual, "age" | "dob">): string | undefined {
   const age = ind.age?.trim();
-  return age ? age : ind.dob;
+  if (age) return age;
+  const dob = ind.dob?.trim();
+  if (!dob) return undefined;
+  const year = /^(\d{4})(?:-|$)/.exec(dob);
+  return year ? `b. ${year[1]}` : dob;
 }
 
 /**

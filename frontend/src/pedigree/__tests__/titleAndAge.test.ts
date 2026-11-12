@@ -32,9 +32,16 @@ function family(): Pedigree {
 describe("approximate age under the symbol (#20)", () => {
   it("the age takes the line under the name, in place of the DOB", () => {
     expect(detailLines({ dob: "1931-02-03", age: "d. 72" }, max)).toEqual(["d. 72"]);
-    expect(detailLines({ dob: "1931-02-03" }, max)).toEqual(["1931-02-03"]);
-    expect(detailLines({ dob: "1931-02-03", age: "  " }, max)).toEqual(["1931-02-03"]);
+    expect(detailLines({ dob: "1931-02-03" }, max)).toEqual(["b. 1931"]);
+    expect(detailLines({ dob: "1931-02-03", age: "  " }, max)).toEqual(["b. 1931"]);
     expect(detailLines({}, max)).toEqual([]);
+  });
+
+  it("shows the year of birth, not the full date (NSGC privacy)", () => {
+    expect(detailLines({ dob: "1978" }, max)).toEqual(["b. 1978"]);
+    // A de-identified export's age range is shown as it is.
+    expect(detailLines({ dob: "30s" }, max)).toEqual(["30s"]);
+    expect(exportSvg(family())).not.toContain("1962-07-04");
   });
 
   it("a long age is cut to one line within the slot", () => {
@@ -48,7 +55,7 @@ describe("approximate age under the symbol (#20)", () => {
     const flow = layoutToFlow(family());
     const data = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.data;
     expect(data("f").detailLines).toEqual(["d. 72"]);
-    expect(data("c2").detailLines).toEqual(["1962-07-04"]);
+    expect(data("c2").detailLines).toEqual(["b. 1962"]);
     expect(lintFlow(family(), flow)).toEqual([]);
   });
 
@@ -56,7 +63,7 @@ describe("approximate age under the symbol (#20)", () => {
     const svg = exportSvg(family());
     expect(svg).toContain(">d. 72</text>");
     expect(svg).toContain(">80s</text>");
-    expect(svg).toContain(">1962-07-04</text>");
+    expect(svg).toContain(">b. 1962</text>");
     expect(svg).not.toContain(">1931-02-03</text>");
     expect(lintExport(family())).toEqual([]);
   });

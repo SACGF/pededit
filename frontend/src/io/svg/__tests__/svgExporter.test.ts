@@ -314,12 +314,13 @@ describe("exportSvg — labels", () => {
     expect(svg).toContain("<text");
   });
 
-  it("individual with DOB → SVG contains <text> with DOB", () => {
+  it("individual with DOB → SVG contains <text> with the year of birth only", () => {
     const p = makePedigree({
       individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, dob: "1985-06-15" }],
     });
     const svg = exportSvg(p);
-    expect(svg).toContain("1985-06-15");
+    expect(svg).toContain(">b. 1985<");
+    expect(svg).not.toContain("1985-06-15");
   });
 
   it("XML-special characters in name → escaped correctly", () => {

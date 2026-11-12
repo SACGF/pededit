@@ -10,7 +10,7 @@ import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { chartTitle } from "../pedigree/labels";
+import { chartTitle, ageText } from "../pedigree/labels";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
@@ -90,9 +90,11 @@ function IndividualForm({ individual }: { individual: Individual }) {
           placeholder="e.g. 50s, d. 72"
           aria-label="Age"
         />
-        {individual.age?.trim() && individual.dob && (
-          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the date of birth.</p>
-        )}
+        {individual.age?.trim() && individual.dob ? (
+          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the year of birth.</p>
+        ) : individual.dob ? (
+          <p className="text-[10px] text-gray-500">Shown under the symbol as "{ageText(individual)}" (NSGC prefers the year to the full date).</p>
+        ) : null}
       </Field>
 
       <Field label="Notes">

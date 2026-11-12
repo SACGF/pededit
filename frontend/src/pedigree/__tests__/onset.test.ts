@@ -54,7 +54,7 @@ describe("onset under the symbol (#93)", () => {
   it("follows the age or DOB line", () => {
     const ped = pedigree();
     Object.assign(ped.individuals[0]!, { dob: "1950-01-01", tagOnset: { bc: "45y" } });
-    expect(detailLines(ped.individuals[0]!, 74, ped)).toEqual(["1950-01-01", "BC 45y"]);
+    expect(detailLines(ped.individuals[0]!, 74, ped)).toEqual(["b. 1950", "BC 45y"]);
   });
 
   it("cuts the tag text, not the age, when the line is too wide", () => {

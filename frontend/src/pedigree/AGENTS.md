@@ -292,10 +292,14 @@ then evaluation, then pedigree number; `claude/nsgc_nomenclature.md`).
 text under the symbol there as its own section, not by appending to a
 renderer:
 
-1. age: the free-text `Individual.age` when set, otherwise the DOB (#20).
-   Only one line, on purpose: a two-line name plus DOB plus age ran into the
-   sibship bar halfway to the next row, so the age replaces the DOB under the
-   symbol (the DOB stays in the data, the edit panel and CSV);
+1. age (`ageText`): the free-text `Individual.age` when set, otherwise the
+   year of birth, "b. 1978" (#20). NSGC prefers a year or an age to a full
+   date for privacy, so the full DOB is never drawn; it stays in the data,
+   the edit panel and CSV. A DOB not starting with a year (the age range a
+   de-identified export puts in `dob`) is drawn as it is. There is no date
+   of death field: "d. 72" comes from the free-text age. Only one line, on
+   purpose: a two-line name plus DOB plus age ran into the sibship bar
+   halfway to the next row, so the age replaces the year;
 2. one line per age of onset (#93, `onsetLines`);
 3. (gender identity #26 and evaluation #101 belong here, before the number);
 4. the pedigree number (#8), last, on its own line.
