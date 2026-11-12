@@ -1,0 +1,92 @@
+# Unit tests, type check and the agent page checks (#72) on every PR and push to main.
+# The page checks are frontend/scripts/browser/: see its README.md.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit tests and type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Layout engine tests
+        run: npm -w layout-engine run test
+      - name: Frontend type check
+        run: npm -w frontend run typecheck
+      - name: Frontend tests
+        run: npm -w frontend run test
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Site config (SQLite)
+        run: |
+          sudo mkdir -p /etc/pededit
+          echo '{"database_url": "sqlite:///${{ runner.temp }}/pededit.sqlite3", "debug": true}' | sudo tee /etc/pededit/pededit.json
+      - name: Install
+        working-directory: backend
+        run: |
+          uv venv --python 3.13 .venv
+          uv pip install --python .venv -r requirements.txt
+      - name: Test
+        working-directory: backend
+        run: .venv/bin/python manage.py test api
+
+  page-checks:
+    name: Page checks (render lint, export lint, console, persistence)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - uses: astral-sh/setup-uv@v10.3.3
+      - run: npm ci
+      - name: Install headless chromium
+        run: npx -w frontend playwright install --with-deps chromium-headless-shell
+      - name: Backend for --fixture-via-api
+        run: |
+          sudo mkdir -p /etc/pededit
+          echo '{"database_url": "sqlite:///${{ runner.temp }}/pededit.sqlite3", "debug": true, "cors_allowed_origins": ["http://localhost:5173"]}' | sudo tee /etc/pededit/pededit.json
+          cd backend
+          uv venv --python 3.13 .venv
+          uv pip install --python .venv -r requirements.txt
+          .venv/bin/python manage.py migrate --noinput
+      - name: Start Vite and Django
+        run: node frontend/scripts/browser/servers.mjs up
+      - name: Render and export lint, every example
+        run: node frontend/scripts/browser/lint.mjs --all-examples
+      - name: Render and export lint, every example, compact and de-identified
+        run: node frontend/scripts/browser/lint.mjs --all-examples --compact --deidentify
+      - name: Console sweep, every example saved and reloaded through the API
+        run: node frontend/scripts/browser/console.mjs --all-examples --fixture-via-api
+      - name: Server logs
+        if: failure()
+        run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true
+      - name: Stop servers
+        if: always()
+        run: node frontend/scripts/browser/servers.mjs down

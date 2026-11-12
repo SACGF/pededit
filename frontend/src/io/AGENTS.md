@@ -104,6 +104,14 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `node_modules/.bin/esbuild entry.ts --bundle --platform=node --format=esm`,
   run it to write the SVG, then `node frontend/scripts/browser/shot.mjs
   FILE.svg` renders it to PNG to read back.
+- `exportLint.ts` (#72) — render lint for the standard SVG export, run by
+  `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
+  example. It parses the SVG, so `svgExporter.ts` must keep writing its
+  group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
+  `symbols`, `labels`) and `class="mark"` on lines that join nobody
+  (childless and twin marks). It never writes ids into the SVG: symbols are
+  matched to people by position, because an id can be a name after a PED
+  import and must not leak from a de-identified export.
 - `pngExporter.ts` — rasterises the SVG via canvas.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
 - `deidentify.ts` — strips names, DOB and notes for de-identified export.

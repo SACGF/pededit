@@ -53,6 +53,7 @@ All four take a URL (a path like `/p/<id>` is resolved against
 node frontend/scripts/browser/console.mjs --fixture example:2
 node frontend/scripts/browser/console.mjs --fixture test-data/ped/consanguineous/first_cousin.ped \
     --click '[data-individual-id="3"]' --press Delete
+node frontend/scripts/browser/console.mjs --all-examples --fixture-via-api   # what CI runs
 ```
 
 ```
@@ -67,7 +68,8 @@ through Vite's source maps to the original `.tsx`. Reported: uncaught
 exceptions, `console.error`/`console.warn`, failed requests and responses
 with status 400 or more, steps that could not run (see below: a clean report
 after a failed click would mean nothing), import warnings from a `.ped` or
-`.json` fixture, render lint findings on editor pages, and with
+`.json` fixture, render and export lint findings on editor pages (export
+ones are prefixed `export`), and with
 `--fixture-via-api` anything that did not persist. Exit code 0 clean, 1
 findings, 2 usage error. `--verbose` prints full stacks, `--json` everything.
 
@@ -148,13 +150,41 @@ node that is not drawn, a couple line between non-partners or through
 another symbol, two couple lines overlapping on one row, a slanted couple
 line, a child off their siblings' row (the drop line misses), a partnership with
 no couple line, a child with no line from their parents or hanging from the
-wrong couple, two couples' sibship bars along one line, overlapping symbols. The kinship2 oracle tests check slots
+wrong couple, two couples' sibship bars along one line, overlapping symbols,
+labels on one row running into each other. The kinship2 oracle tests check slots
 against R; this checks what is drawn from them. `console.mjs` and `shot.mjs`
 run it on every editor page (`render lint clean` in the summary). The same
 checks run in vitest over every example
 (`src/pedigree/__tests__/renderLint.test.ts`), which lists the examples known
 to draw wrong: fixing one makes that test fail until it is removed from the
 list.
+
+The SVG export draws its couple and sibship lines itself, from the kinship2
+layout, so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
+`export` lines in the report, `--no-export` to skip, `--deidentify` for the
+de-identified export). It parses what the SVG draws and matches symbols to
+people by position against the canvas layout, since the export carries no
+ids: someone with no symbol, a symbol where the canvas has none, a line
+ending where nothing is drawn, couple lines between non-partners, through a
+symbol or overlapping, a missing couple line, a sibship line through a
+symbol, a child whose lines lead to no couple or the wrong one, overlapping
+labels. PNG and PDF are made from this SVG, so they are covered; the
+U-shape export is not. It relies on the group classes `exportSvg` writes
+(`couple-lines`, `sibship-lines`, `symbols`, `labels`) and `class="mark"`
+on childless and twin marks; keep them when changing the exporter. In vitest
+it is `src/io/svg/__tests__/exportLint.test.ts`; in a page,
+`__pededit.checkExport()`.
+
+## CI
+
+`.github/workflows/ci.yml` runs on every PR and push to main: layout engine
+and frontend vitest, `tsc -b`, the backend tests, and the page checks on
+headless chromium: `lint.mjs --all-examples` (normal, then compact and
+de-identified) and `console.mjs --all-examples --fixture-via-api` against a
+SQLite Django, so each example must load without JS errors, draw and export
+cleanly, and survive a save and reload. On failure the job prints the tail
+of the Vite and Django logs. Reproduce a failing step locally with the same
+command after `servers.mjs up`.
 
 ## Fixtures
 
@@ -192,7 +222,11 @@ looks fine. `--fixture-via-api` instead POSTs the fixture to
 Fields the backend added with an empty default (`deceased: false` where it
 was absent) are listed in one `note` line, not as findings. Use it for
 anything that must survive a save; `--no-persist-check` skips the reload.
-Each run leaves a pedigree in the local database.
+
+A clean run then deletes the pedigrees it POSTed (and the writes the page
+made to them). A run with findings keeps them and prints `/p/<id>` so you can
+open one. `--cleanup` deletes even then, `--keep` never deletes. Pedigrees
+created with `--as-agent` belong to `claude_agent` and are always kept.
 
 ```bash
 node frontend/scripts/browser/console.mjs --fixture example:0 --fixture-via-api \
@@ -211,6 +245,7 @@ Steps run in the order given, each followed by `--step-wait` ms (default 300):
 | `--press KEY` | a key or chord: `Delete`, `Control+z` |
 | `--fill 'SEL=>TEXT'` | replace an input's value |
 | `--select 'SEL=>VALUE'` | pick a native `<select>` option by value or label (lists the options when none matches) |
+| `--choose 'SEL=>TEXT'` | click a Radix popover or menu trigger, then the item in what opened whose text, first line or `title` is TEXT (case-insensitive; a unique substring also works). Fails, listing the items, when none matches; fails when several match (unless `--first`) or the item is disabled. The app's settings and edit-panel dropdowns are native, so use `--select` for those |
 | `--drag 'SEL=>DX,DY'` | press on the element's centre and drag by DX,DY screen pixels |
 | `--upload 'SEL=>FILE'` | set a file input, or click SEL and answer the file chooser |
 | `--download 'SEL[=>PATH]'` | click SEL and save the download (default `--out-dir`, else `frontend/test-output/browser/downloads/`, with the suggested name); the report prints where. Scope a common label to a dialog: `'role=dialog >> button:text-is("Download")'` |
@@ -257,7 +292,8 @@ another local port (for a second checkout's Vite, for example).
 - URLs must be on localhost; anything else is refused unless
   `--allow-remote` is given. Never point these at pededit.com.
 - Without `--fixture`, or with `--fixture-via-api`, the page talks to the
-  local backend and nothing is rolled back. Any POST/PATCH/PUT/DELETE that reached `/api/` is listed at the
+  local backend and nothing is rolled back, except that a clean
+  `--fixture-via-api` run deletes the pedigree it created. Any POST/PATCH/PUT/DELETE that reached `/api/` is listed at the
   end of the report ("not rolled back"). Local dev data is disposable.
 
 ## Writing your own script

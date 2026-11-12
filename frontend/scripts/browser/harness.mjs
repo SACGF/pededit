@@ -31,7 +31,7 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 /** Flags that become ordered interaction steps, run after the page settles. */
 const STEP_FLAGS = new Set([
   "click", "dblclick", "hover", "press", "fill", "wait-for",
-  "drag", "reload", "upload", "download", "sleep", "mouse-away", "select",
+  "drag", "reload", "upload", "download", "sleep", "mouse-away", "select", "choose",
 ]);
 /** Steps that take no value. */
 const BARE_STEPS = new Set(["reload", "mouse-away"]);
@@ -45,6 +45,8 @@ const COMMON_FLAGS = {
   fixture: "multi",
   "fixture-via-api": "bool",
   "no-persist-check": "bool",
+  cleanup: "bool",
+  keep: "bool",
   "local-storage": "multi",
   first: "bool",
   "out-dir": "string",
@@ -110,6 +112,11 @@ Common options:
                       persistence: what was POSTed against what loaded, and the
                       editor's pedigree before and after a reload. Turn the
                       reload check off with --no-persist-check.
+                      A clean run then deletes the pedigrees it POSTed; one
+                      with findings keeps them and prints /p/<id> to open.
+  --cleanup           With --fixture-via-api: delete them even with findings.
+  --keep              With --fixture-via-api: never delete them.
+                      Pedigrees owned by claude_agent (--as-agent) are kept.
   --local-storage K=V Seed localStorage before the first load (repeatable),
                       e.g. compactLayout=true. Reloads keep the app's own writes.
   --as-agent          Sign in as the claude_agent user (needs Django running).
@@ -119,6 +126,10 @@ disabled, or matches several visible elements is reported, not skipped):
   --press KEY         A key or chord, e.g. Delete, Control+z.
   --fill 'SEL=>TEXT'  Type into an input (replaces its value).
   --select 'SEL=>V'   Choose an option of a native <select> by value or label.
+  --choose 'SEL=>TEXT' Click SEL (a Radix popover or menu trigger, such as the
+                      more menu "···" or Export PED), then the item in the
+                      popover, menu or listbox it opened whose text (or first
+                      line, or title) is TEXT; a unique substring also works.
   --drag 'SEL=>DX,DY' Drag an element by DX,DY screen pixels.
   --upload 'SEL=>FILE' Set a file input, or click SEL and answer the file chooser.
   --download 'SEL[=>PATH]' Click SEL and save the download (default
@@ -470,6 +481,47 @@ async function target(page, selector, { timeout, first, mayBeHidden = false }) {
   return el;
 }
 
+/** Containers Radix renders in a portal: popovers, menus, select listboxes. */
+const POPUP = '[data-radix-popper-content-wrapper], [role="menu"], [role="listbox"]';
+const POPUP_ITEM = 'button, a[href], label, [role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
+
+/**
+ * After a trigger was clicked: click the item whose text matches in the
+ * popover, menu or listbox that opened. Exact text, first line or title wins
+ * over a substring; several matches fail unless --first, and so does a
+ * disabled item. Returns the text of what was clicked.
+ */
+async function chooseItem(page, text, { timeout, first }) {
+  const popup = page.locator(POPUP).filter({ visible: true });
+  try {
+    await popup.first().waitFor({ timeout });
+  } catch {
+    throw new StepError(`opened no popover, menu or listbox within ${timeout} ms`);
+  }
+  const items = popup.locator(POPUP_ITEM).filter({ visible: true });
+  const infos = await items.evaluateAll(els => els.map(e => ({
+    text: (e.innerText ?? "").trim().replace(/\s+\n/g, "\n"),
+    title: e.getAttribute("title") ?? "",
+    disabled: !!e.disabled || e.getAttribute("aria-disabled") === "true" || e.hasAttribute("data-disabled"),
+  })));
+  const want = text.trim().toLowerCase();
+  const norm = s => s.trim().toLowerCase();
+  const exact = infos.flatMap((it, i) =>
+    [it.text, it.text.split("\n")[0], it.title].some(s => norm(s) === want) ? [i] : []);
+  const loose = exact.length ? exact : infos.flatMap((it, i) => (norm(it.text).includes(want) ? [i] : []));
+  if (!loose.length) {
+    const shown = infos.map(it => JSON.stringify(it.text.split("\n")[0] || it.title)).filter(s => s !== '""');
+    throw new StepError(`opened a popup with no item ${JSON.stringify(text)}; items: ${shown.slice(0, 25).join(", ") || "(none)"}`);
+  }
+  if (loose.length > 1 && !first) {
+    throw new StepError(`matched ${loose.length} items (${loose.map(i => JSON.stringify(infos[i].text.split("\n")[0])).join(", ")}); make TEXT specific or pass --first`);
+  }
+  const i = loose[0];
+  if (infos[i].disabled) throw new StepError(`item ${JSON.stringify(infos[i].text.split("\n")[0])} is disabled${infos[i].title ? ` (${infos[i].title})` : ""}`);
+  await items.nth(i).click({ timeout });
+  return infos[i].text.split("\n")[0] || infos[i].title;
+}
+
 /** Auto-save is a 2 s debounce; wait for the editor to report a clean store. */
 export async function waitForSaved(page, timeout = 8000) {
   return page.waitForFunction(
@@ -515,6 +567,16 @@ export async function runSteps(page, steps, findings, { timeout = 5000, stepWait
           const hit = options.find(([v, l]) => v === value || l === value);
           if (!hit) throw new StepError(`has no option ${JSON.stringify(value)}; options: ${options.map(([v, l]) => (v === l ? v : `${v} (${l})`)).join(", ")}`);
           await el.selectOption(hit[0], { timeout });
+          break;
+        }
+        case "choose": {
+          const [sel, text] = splitArrow(step);
+          const trigger = await target(page, sel, opts);
+          if (await trigger.evaluate(e => e instanceof HTMLSelectElement).catch(() => false)) {
+            throw new StepError("is a native <select>; use --select instead");
+          }
+          await trigger.click({ timeout });
+          record.chose = await chooseItem(page, text, opts);
           break;
         }
         case "drag": {
@@ -572,10 +634,18 @@ export async function runSteps(page, steps, findings, { timeout = 5000, stepWait
 
 // ── Render lint and persistence ──────────────────────────────────────────────
 
-/** Run __pededit.check() (src/pedigree/renderLint.ts) on the editor's pedigree, if this is an editor page. */
+/**
+ * Run __pededit.check() (src/pedigree/renderLint.ts) and checkExport()
+ * (src/io/svg/exportLint.ts, codes prefixed "export ") on the editor's
+ * pedigree, if this is an editor page.
+ */
 export async function renderLint(page) {
-  return page.evaluate(() => (window.__pededit && window.__pededit.pedigree().individuals.length
-    ? window.__pededit.check() : null)).catch(() => null);
+  return page.evaluate(() => {
+    const h = window.__pededit;
+    if (!h || !h.pedigree().individuals.length) return null;
+    const exported = h.checkExport ? h.checkExport().map(f => ({ ...f, code: `export ${f.code}` })) : [];
+    return [...h.check(), ...exported];
+  }).catch(() => null);
 }
 
 /** Paths where b differs from a: dropped (in a, not b), added, changed. */
@@ -817,9 +887,18 @@ export function findingLines(f, { verbose = false } = {}) {
 
 /** The real backend cannot roll back what the page wrote, so say so. */
 export function writesLine(f) {
-  if (!f.writes.length) return null;
-  const uniq = [...new Set(f.writes)];
-  return `note: ${f.writes.length} write(s) reached the local backend and were not rolled back: ${uniq.slice(0, 5).join(", ")}${uniq.length > 5 ? ", ..." : ""}`;
+  const lines = [];
+  let writes = f.writes;
+  if (f.created) {
+    lines.push(`note: /p/${f.created.id} ${f.created.note ?? "kept"}`);
+    // Writes to a deleted pedigree went with it.
+    if (f.created.deleted) writes = writes.filter(w => !w.includes(`/api/pedigrees/${f.created.id}`));
+  }
+  if (writes.length) {
+    const uniq = [...new Set(writes)];
+    lines.push(`note: ${writes.length} write(s) reached the local backend and were not rolled back: ${uniq.slice(0, 5).join(", ")}${uniq.length > 5 ? ", ..." : ""}`);
+  }
+  return lines.length ? lines.join("\n") : null;
 }
 
 /** Repo-relative when inside the repo, absolute otherwise. */
@@ -902,6 +981,7 @@ export async function openPage(context, { url, fixture, steps = [], flags = {} }
     findings.fixtureWarnings.push(...(fixture.warnings ?? []));
     if (flags["fixture-via-api"]) {
       const created = await postFixture(fixture, url, context.agentTokens ?? null);
+      findings.created = { id: created.id, owned: !!context.agentTokens, deleted: false, note: null };
       url = new URL(`/p/${created.id}`, url).toString();
       sent = fixture.pedigree;
     } else {
@@ -931,6 +1011,30 @@ export async function finishPage(run, flags) {
   if (flags["fixture-via-api"] && run.fixture) {
     run.findings.persistChecked = true;
     await persistCheck(run.page, run.findings, { reload: !flags["no-persist-check"], wait: flags.wait ?? 1500 });
+  }
+  await cleanupFixture(run, flags);
+}
+
+/**
+ * Delete the pedigree --fixture-via-api POSTed, so the local database does
+ * not fill with anonymous copies: always with --cleanup, never with --keep,
+ * otherwise only when the run is clean (a failing run keeps it to open).
+ * Run last: the page is moved off the pedigree first, so a late auto-save
+ * cannot recreate or 404 on it.
+ */
+export async function cleanupFixture(run, flags) {
+  const c = run.findings.created;
+  if (!c) return;
+  if (c.owned) { c.note = "kept: owned by claude_agent (only anonymous pedigrees are deleted)"; return; }
+  if (flags.keep) { c.note = "kept (--keep)"; return; }
+  if (!flags.cleanup && hasFindings(run.findings)) { c.note = "kept so the findings can be looked at (--cleanup deletes it anyway)"; return; }
+  await run.page.goto("about:blank").catch(() => {});
+  try {
+    const res = await fetch(new URL(`/api/pedigrees/${c.id}/`, run.url), { method: "DELETE", signal: AbortSignal.timeout(10_000) });
+    if (res.ok || res.status === 404) { c.deleted = true; c.note = "deleted from the local backend"; }
+    else c.note = `could not delete: DELETE -> ${res.status}`;
+  } catch (e) {
+    c.note = `could not delete: ${e.message}`;
   }
 }
 
