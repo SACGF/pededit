@@ -95,7 +95,7 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
           if (!data?.childXs?.length) return null;
           const kids = data.childXs.map((x, i) => ({ x, y: data.childYs?.[i] ?? data.childY }));
           const d = segmentsPathD(
-            sibshipSegments(data.coupleX, data.coupleY, 0, kids),
+            sibshipSegments(data.coupleX, data.coupleY, 0, kids, data.barOffset ?? 0),
             (x, y) => [mx(x), my(y)],
           );
           return <path key={edge.id} d={d} stroke="black" strokeWidth={1} fill="none" />;

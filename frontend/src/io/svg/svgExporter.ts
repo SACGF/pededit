@@ -2,7 +2,8 @@ import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } fro
 import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
-import { sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
+import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
+import type { SibshipChild } from "../../pedigree/sibshipPath";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, LABEL_FONT_SIZE } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
@@ -205,6 +206,7 @@ export function renderAdoptionBrackets(ind: Individual): string {
 function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   const twins = twinMembership(pedigree);
+  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[] }[] = [];
 
   for (let level = 1; level < result.n.length; level++) {
     const groups = new Map<number, number[]>();
@@ -230,15 +232,23 @@ function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: 
           ...(child ? twins.get(child.id) ?? {} : {}),
         };
       });
-      const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children);
-      for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
-      for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
-      for (const m of twinForkMarks(coupleY, children)) {
-        if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3]));
-        else lines.push(`<text x="${m.x}" y="${m.y + TWIN_QUESTION_FONT_SIZE * 0.35}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
-      }
+      sibships.push({ coupleX, coupleY, hop, children });
     }
   }
+
+  // Bars that would run along the same line get a height each (#80), as on the canvas.
+  const offsets = sibshipBarOffsets(sibships.map(s => ({
+    coupleX: s.coupleX, coupleY: s.coupleY, childXs: s.children.map(c => c.x), childYs: s.children.map(c => c.y),
+  })));
+  sibships.forEach(({ coupleX, coupleY, hop, children }, i) => {
+    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i]);
+    for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
+    for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
+    for (const m of twinForkMarks(coupleY, children, offsets[i])) {
+      if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3]));
+      else lines.push(`<text x="${m.x}" y="${m.y + TWIN_QUESTION_FONT_SIZE * 0.35}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
+    }
+  });
   return lines;
 }
 

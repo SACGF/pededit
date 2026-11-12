@@ -13,6 +13,7 @@
  *   couple-line-slanted    partners sit on different rows (usually a pin moved vertically)
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
+ *   sibship-bars-overlap   two couples' sibship bars run along the same line, so they read as one sibship
  *   symbols-overlap        two symbols sit on top of each other, or touch
  *   labels-overlap         two name or date labels on one row run into each other
  *
@@ -35,6 +36,7 @@ export type LintCode =
   | "couple-line-slanted"
   | "child-without-parents"
   | "child-wrong-parents"
+  | "sibship-bars-overlap"
   | "symbols-overlap"
   | "labels-overlap";
 
@@ -52,6 +54,9 @@ const EPS = 1;
  * apart are 40px apart at normal spacing and 28px in compact mode.
  */
 const MIN_SYMBOL_GAP = 8;
+
+/** Two sibship bars closer than this (px) vertically read as one line where they overlap. */
+const MIN_BAR_GAP = 4;
 
 export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
   const out: LintFinding[] = [];
@@ -211,6 +216,27 @@ export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
         code: "child-without-parents",
         message: `${label(child)} has no line from their parents ${label(p.individual1)} = ${label(p.individual2)}`,
         individuals: [child, p.individual1, p.individual2],
+      });
+    }
+  }
+
+  // 3b. Sibship bars of different couples along the same line (#80). Bars
+  // that only meet end to end count too: they still read as one bar.
+  const bars = flow.sibshipEdges.flatMap(e => {
+    const d = e.data;
+    if (!d || d.childXs.length === 0) return [];
+    const kids = d.childIds.map(indOf).filter((x): x is string => !!x);
+    return [{ y: d.sibBarY, x1: Math.min(d.coupleX, ...d.childXs), x2: Math.max(d.coupleX, ...d.childXs), kids }];
+  });
+  for (let i = 0; i < bars.length; i++) {
+    for (let j = i + 1; j < bars.length; j++) {
+      const A = bars[i]!, B = bars[j]!;
+      if (Math.abs(A.y - B.y) >= MIN_BAR_GAP) continue;
+      if (Math.min(A.x2, B.x2) - Math.max(A.x1, B.x1) < -EPS) continue;
+      out.push({
+        code: "sibship-bars-overlap",
+        message: `the sibship bars above ${A.kids.map(label).join(", ")} and above ${B.kids.map(label).join(", ")} run along the same line, so they read as one sibship`,
+        individuals: [...A.kids, ...B.kids],
       });
     }
   }

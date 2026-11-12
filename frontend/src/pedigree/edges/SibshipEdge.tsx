@@ -38,9 +38,12 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
       zygosity: d?.zygosity,
     };
   });
-  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids);
+  // The bar's offset (#80) comes from the layout, so it is as of the last
+  // layout while a node is being dragged.
+  const barOffset = data.barOffset ?? 0;
+  const { solid, dashed } = sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset);
   // Twin forks (#11): a bar across monozygotic drops, "?" between unknown ones.
-  const marks = twinForkMarks(coupleY, kids);
+  const marks = twinForkMarks(coupleY, kids, barOffset);
 
   return (
     <g>

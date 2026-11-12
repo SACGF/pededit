@@ -181,7 +181,7 @@ For each level > 0, group all slots by their `fam` value (ignoring slots with `f
 
 1. **Find the couple midpoint** at the level above. The left parent is at 0-based slot `fam - 1`, the right parent at slot `fam`. Couple midpoint x = `(pos[level-1][fam-1] + pos[level-1][fam]) / 2 * SLOT_WIDTH`.
 
-2. **Sibship bar**: draw a horizontal line from the leftmost to the rightmost child in the group, at y = `(level - 0.5) * ROW_HEIGHT` (halfway between generations).
+2. **Sibship bar**: draw a horizontal line from the leftmost to the rightmost child in the group, at y = `(level - 0.5) * ROW_HEIGHT` (halfway between generations). When two couples' bars would run along the same stretch of that line, the renderer lowers one of them (`sibshipBarOffsets` in `frontend/src/pedigree/sibshipPath.ts`, #80).
 
 3. **Vertical drop from couple to bar**: draw a vertical line from the couple midpoint at `(level-1) * ROW_HEIGHT` down to the sibship bar.
 
