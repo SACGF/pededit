@@ -216,6 +216,10 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             type="button"
             data-descendants-hidden={individual.id}
             title={`${n} ${n === 1 ? "person" : "people"} hidden below. Click to show.`}
+            className="nodrag"
+            // Not a press on the symbol: neither selects nor starts a drag.
+            onPointerDown={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
             onClick={e => { e.stopPropagation(); setDescendantsHidden([individual.id], false); }}
             style={{ position: "absolute", left: box.x - 3, top: box.y - 3, width: box.size + 6, height: box.size + 6, padding: 3, border: 0, background: "transparent", cursor: "pointer" }}
           >
