@@ -27,6 +27,9 @@ import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
+import { SymbolShape, DeceasedSlash } from "./nodes/symbols";
+import { sectorsFor } from "./tags";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 const nodeTypes: NodeTypes = { pedigreeSymbol: PedigreeSymbolNode };
 
@@ -44,13 +47,18 @@ const MINI_W   = 180;
 const MINI_H   = 120;
 const MINI_PAD = 8;
 
+const MINIMAP_STROKE_CSS =
+  '.pedigree-minimap [stroke="black"], .pedigree-minimap line[stroke="white"]'
+  + " { vector-effect: non-scaling-stroke; stroke-width: 1px; }";
+
 interface PedigreeMinimapProps {
+  pedigree:     Pedigree;
   nodes:        Node<RFNodeData>[];
   coupleEdges:  Edge<CoupleEdgeData>[];
   sibshipEdges: Edge<SibshipEdgeData>[];
 }
 
-function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapProps) {
+function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges }: PedigreeMinimapProps) {
   if (nodes.length === 0) return null;
 
   // Bounding box over all node extents (nodes are centered at position with nodeOrigin=[0.5,0.5])
@@ -78,7 +86,6 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
 
   const mx  = (cx: number) => (cx - x0) * scale + offsetX;
   const my  = (cy: number) => (cy - y0) * scale + offsetY;
-  const ms  = (s: number)  => s * scale;
 
   const nodePos = new Map(nodes.map(n => [n.id, n.position]));
 
@@ -87,8 +94,12 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
       <svg
         width={MINI_W}
         height={MINI_H}
+        className="pedigree-minimap"
         style={{ display: "block", background: "white", border: "1px solid #d1d5db" }}
       >
+        {/* The symbols are drawn at canvas size and scaled down; keep their
+            outlines and slashes a hairline instead of scaling 2px to nothing. */}
+        <style>{MINIMAP_STROKE_CSS}</style>
         {/* Sibship edges — drawn first so nodes render on top */}
         {sibshipEdges.map(edge => {
           const data = edge.data as SibshipEdgeData;
@@ -120,30 +131,25 @@ function PedigreeMinimap({ nodes, coupleEdges, sibshipEdges }: PedigreeMinimapPr
           return <line key={edge.id} x1={lx} y1={ey} x2={rx} y2={ey} stroke="black" strokeWidth={1} />;
         })}
 
-        {/* Nodes — rendered on top of edges */}
+        {/* Nodes, on top of the edges: the canvas symbols scaled down (#6) */}
         {nodes.map(node => {
-          const { x, y }   = node.position;
+          const { x, y } = node.position;
           const { individual } = node.data as RFNodeData;
-          const sz   = ms(NODE_SIZE);
-          const nx   = mx(x - half);
-          const ny   = my(y - half);
-          const ncx  = nx + sz / 2;
-          const ncy  = ny + sz / 2;
-          const fill = individual.affected ? "black" : "white";
-          const sp   = { stroke: "black", strokeWidth: 1, vectorEffect: "non-scaling-stroke" } as const;
-
-          if (individual.sex === "male") {
-            return <rect key={node.id} x={nx} y={ny} width={sz} height={sz} fill={fill} {...sp} />;
-          }
-          if (individual.sex === "female") {
-            return <circle key={node.id} cx={ncx} cy={ncy} r={sz / 2} fill={fill} {...sp} />;
-          }
           return (
-            <polygon
+            <g
               key={node.id}
-              points={`${ncx},${ny} ${nx + sz},${ncy} ${ncx},${ny + sz} ${nx},${ncy}`}
-              fill={fill} {...sp}
-            />
+              data-minimap-individual={individual.id}
+              transform={`translate(${mx(x - half)} ${my(y - half)}) scale(${scale})`}
+            >
+              <SymbolShape
+                individual={individual}
+                size={NODE_SIZE}
+                sectors={sectorsFor(individual, pedigree)}
+                clipId={`minimap-clip-${node.id}`}
+                caption={false}
+              />
+              {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
+            </g>
           );
         })}
       </svg>
@@ -304,6 +310,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         <Controls />
         {showMinimap && (
           <PedigreeMinimap
+            pedigree={pedigree}
             nodes={rfNodes as Node<RFNodeData>[]}
             coupleEdges={coupleEdges as Edge<CoupleEdgeData>[]}
             sibshipEdges={sibshipEdges as Edge<SibshipEdgeData>[]}

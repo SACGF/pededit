@@ -34,6 +34,8 @@ interface ShapeProps {
   sectors?: Sector[];
   /** Unique id for this symbol's clipPath. Required when sectors are given. */
   clipId?: string;
+  /** Draw the "SB" / "ECT" caption under the symbol (off in the minimap, where it is unreadable). */
+  caption?: boolean;
 }
 
 /**
@@ -241,13 +243,13 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size, sectors = [], clipId }: ShapeProps) {
+export function SymbolShape({ individual, size, sectors = [], clipId, caption: showCaption = true }: ShapeProps) {
   const fill = symbolFill(individual);
   const id = clipId ?? `symbol-clip-${individual.id}`;
   const status = individual.lifeStatus;
   const brackets = individual.adopted ? <AdoptionBrackets size={size} /> : null;
   if (status) {
-    const caption = lifeStatusCaption(status);
+    const caption = showCaption ? lifeStatusCaption(status) : undefined;
     return (
       <g>
         {brackets}

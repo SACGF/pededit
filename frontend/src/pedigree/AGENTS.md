@@ -23,6 +23,14 @@ draws NSGC symbols.
   drag handling (drag end pins the node), click to select, pane click clears
   selection. New individuals are added from the Toolbar and hover pill, not by
   clicking the canvas.
+- The minimap (#6) draws each person with the canvas's own `SymbolShape` and
+  `DeceasedSlash`, at NODE_SIZE inside a scaled `<g>`, so new symbol features
+  reach it for free. A scoped `<style>` makes black strokes (and the white
+  slash over an affected fill) a 1px non-scaling hairline, since 2px scaled
+  by about 0.2 vanishes. Left out on purpose, being unreadable at that size:
+  the "SB" / "ECT" caption (`caption={false}`), the annotation row, names
+  and the proband arrow. Its lines stay plain (no hops, twin marks, dashed
+  adoption drops or childless marks).
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, tag quadrants and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
