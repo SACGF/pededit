@@ -81,13 +81,18 @@ function IndividualForm({ individual }: { individual: Individual }) {
         />
       </Field>
 
+      {/* Text, not the browser date picker, so a year alone can be entered (#104), as for death (#103). */}
       <Field label="Date of birth">
         <Input
-          type="date"
           value={individual.dob ?? ""}
-          onChange={e => updateIndividual(individual.id, { dob: e.target.value || undefined })}
+          aria-label="Date of birth"
+          onChange={e => updateIndividual(individual.id, { dob: e.target.value.trim() ? e.target.value : undefined })}
           className="h-7 text-sm"
+          placeholder="YYYY or YYYY-MM-DD"
         />
+        {individual.dob?.trim() && !parsePartialDate(individual.dob.trim()) && (
+          <p className="text-[10px] text-gray-500">Drawn as typed until it reads as a year (1935) or a date (1935-03-14).</p>
+        )}
       </Field>
 
       {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
