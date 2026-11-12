@@ -263,7 +263,8 @@ function formatCoefficientX(x: number): string {
  * be. Each has its X-linked value beside it (#87). The coefficients are
  * read-only.
  *
- * Each couple also has the double-line checkbox (#85). When the pedigree
+ * Each couple also has the double-line checkbox (#85), labelled
+ * "Consanguineous with" so it can be found (#92). When the pedigree
  * shows the two are related it is ticked and fixed, since the line follows
  * the kinship. Otherwise it is the override for a couple known to be related
  * whose common ancestors are not drawn.
@@ -305,8 +306,13 @@ function RelatednessSection({ individual }: { individual: Individual }) {
                   onChange={e => setPartnershipConsanguineous(c.partnershipId, e.target.checked)}
                   className="accent-black"
                 />
-                <span>Related to {partner}</span>
+                <span>Consanguineous with {partner}</span>
               </label>
+              {!related && !flagged && (
+                <p className="text-[10px] text-gray-500 pl-5">
+                  Tick for a couple known to be related when the pedigree does not show how. Draws a double line.
+                </p>
+              )}
               {related && (
                 <div className="pl-5" title="The kinship coefficient of a couple is the inbreeding coefficient of their children.">
                   Kinship <span className="font-medium">{formatCoefficient(c.kinship)}</span>

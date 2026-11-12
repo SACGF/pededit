@@ -27,3 +27,22 @@ export function consanguinityTest(pedigree: Pedigree): (id1: string, id2: string
   return (id1, id2) =>
     flagged.has(key(id1, id2)) || (coefficients ??= kinshipOf(pedigree)).kinship(id1, id2) > 0;
 }
+
+/**
+ * What the consanguinity override control shows for one couple (#92): the
+ * edit panel's checkbox and the "Consanguineous" entry of the more menu and
+ * right-click menus. `related` is the pedigree showing they are related
+ * (kinship above 0), when the control is ticked and fixed; `flagged` is the
+ * stored override. Null for an unknown partnership.
+ */
+export function coupleConsanguinity(
+  pedigree: Pedigree,
+  partnershipId: string,
+): { related: boolean; flagged: boolean } | null {
+  const p = pedigree.partnerships.find(x => x.id === partnershipId);
+  if (!p) return null;
+  return {
+    related: kinshipOf(pedigree).kinship(p.individual1, p.individual2) > 0,
+    flagged: !!p.consanguineous,
+  };
+}

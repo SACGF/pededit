@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { consanguinityTest } from "../consanguinity";
+import { consanguinityTest, coupleConsanguinity } from "../consanguinity";
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
@@ -104,6 +104,20 @@ describe("consanguinityTest (#85)", () => {
     expect(consanguinityTest(cousins())("gc1", "nobody")).toBe(false);
     const empty: Pedigree = { individuals: [], partnerships: [], parentOf: {}, siblingOrder: { mode: "insertion", affectedFirst: false } };
     expect(consanguinityTest(empty)("a", "b")).toBe(false);
+  });
+});
+
+describe("coupleConsanguinity, what the override controls show (#92)", () => {
+  it("is related and fixed for a couple the pedigree relates", () => {
+    expect(coupleConsanguinity(cousins(), "cc")).toEqual({ related: true, flagged: false });
+  });
+  it("is unrelated and editable for a couple who married in, and reports the stored flag", () => {
+    expect(coupleConsanguinity(cousins(), "sw")).toEqual({ related: false, flagged: false });
+    const flagged = withPartnership(cousins(), "sw", { consanguineous: true });
+    expect(coupleConsanguinity(flagged, "sw")).toEqual({ related: false, flagged: true });
+  });
+  it("is null for an unknown partnership", () => {
+    expect(coupleConsanguinity(cousins(), "nope")).toBeNull();
   });
 });
 
