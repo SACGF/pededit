@@ -54,6 +54,7 @@ FULL_PEDIGREE = {
     ],
     "chartTitle": "Smith family",
     "clinicalDetails": {"referralReason": "Breast cancer", "recordedOn": "2026-11-12"},
+    "filters": {"affectedOnly": True},
 }
 
 
@@ -146,6 +147,7 @@ class PedigreeRoundTripTests(APITestCase):
                                         "snapGridSize": 20, "nameLabels": "widen"}},
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
                                         "snapGridSize": 20, "layoutWidth": "wide"}},
+            {**base, "filters": {"affectedOnly": "maybe"}},
             [],
         ]
         for data in bad_cases:
@@ -173,6 +175,7 @@ class SerializerMatchesSchemaTests(APITestCase):
             "CanvasSettings": s.CanvasSettingsSerializer,
             "ClinicalDetails": s.ClinicalDetailsSerializer,
             "Evaluation": s.EvaluationSerializer,
+            "ViewFilters": s.ViewFiltersSerializer,
         }
         # sibOrder is required by the format but optional here so that
         # pedigrees saved before it existed still load.

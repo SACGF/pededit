@@ -32,6 +32,7 @@ For convenience the importer also accepts a bare `Pedigree` object (no envelope)
 | `tags` | `Tag[]` | no | Tag definitions (conditions, sample status, genotypes) in display order. Individuals reference them by id. |
 | `chartTitle` | string | no | Title drawn above the chart on the canvas and in SVG, PNG and PDF exports. Absent means the pedigree's name (the envelope `title`), unless that is still the default "Untitled pedigree"; an empty string means no title. De-identified exports never draw it. |
 | `clinicalDetails` | `ClinicalDetails` | no | Clinical key fields: reason for referral, recorder, date, historian, ancestry. |
+| `filters` | `ViewFilters` | no | View filters that simplify the drawing (canvas and SVG, PNG, PDF exports). JSON, PED and CSV still include everyone. Absent means no filter. |
 
 Any other property on the pedigree object is preserved as-is through import and export.
 
@@ -64,6 +65,14 @@ What the NSGC nomenclature (2008, Fig. 1 instructions) asks a clinical pedigree'
 | `historian` | string | Who gave the family history. |
 | `maternalAncestry` | string | Ancestry of the maternal side, relative to the proband. |
 | `paternalAncestry` | string | Ancestry of the paternal side, relative to the proband. |
+
+### `ViewFilters`
+
+Global switches that simplify the drawing without changing the data. The canvas, legend, pedigree numbers and SVG, PNG and PDF exports draw the filtered pedigree; JSON, PED and CSV keep everyone. Each filter is off when absent.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `affectedOnly` | boolean | Draw only affected people, carriers, people with a condition (quadrant) tag and the proband (and consultand), with every ancestor on their line of descent. Each drawn couple's other children are drawn as one symbol with their number inside (NSGC: a number inside a symbol means that many siblings); their partners and descendants are not drawn. Has no effect when nobody qualifies. |
 
 ### `CanvasSettings`
 

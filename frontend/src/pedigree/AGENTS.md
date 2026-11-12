@@ -345,6 +345,25 @@ draws NSGC symbols.
   The store's `mutate` reveals a branch when an edit would add or move
   someone into it (`rootsHidingNew`), so "add child" to a collapsed person
   never makes the child vanish; only `setDescendantsHidden` hides people.
+- `viewFilters.ts` — view filters (#4), saved in `Pedigree.filters`. A
+  filter only decides who is drawn (`filterHidden`); `collapseInfo` adds
+  those people to its hidden set, so they go exactly like a collapsed
+  branch, and every drawn partnership (not only collapsed couples) whose
+  children are not all drawn gets the #1 group symbol. A group made by the
+  filter alone has `roots: []`: clicking it does nothing (its tooltip says to
+  turn the filter off), unlike a collapsed one. The drawn copy drops
+  `filters`, so it is never filtered twice; `CollapseInfo.filtered` carries
+  the count for the canvas chip. A filter that would draw nobody (nobody
+  affected) has no effect. `rootsHidingNew` ignores filters (it runs on
+  `withoutFilters`), and the store turns the filters off when any other edit
+  would hide someone new (`filterHidingNew`), so an added unaffected child
+  never vanishes into a count. "Affected only" seeds are affected, carrier,
+  proband, consultand and quadrant-tag people; their ancestors are kept, and
+  a seed with no parents and no drawn children keeps their partners (an
+  affected person who married in would otherwise float). Half sibs by a
+  partner who is not kept are not drawn or counted. New filters: a field on
+  `ViewFilters`, a rule in `filterHidden`, a row in `VIEW_FILTERS` (the
+  toolbar `FilterMenu` lists them), and `filterBannerText`.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
   to a set key and zygosity; `layoutToFlow` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:

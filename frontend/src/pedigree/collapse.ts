@@ -1,5 +1,6 @@
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } from "./removal";
+import { filterHidden, withoutFilters } from "./viewFilters";
 
 /**
  * Hidden descendants (#94). `Individual.descendantsHidden` leaves everyone
@@ -39,6 +40,12 @@ import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } 
  * child of the couple, it is laid out, joined by the sibship line and drawn
  * by every renderer like anyone else; `CollapseInfo.placeholders` carries
  * what it stands for. It is never in the stored pedigree.
+ *
+ * View filters (#4, `viewFilters.ts`) hide people the same way. The people a
+ * filter leaves out are hidden along with any collapsed branch, and every
+ * drawn couple whose children are not all drawn gets the same group symbol
+ * for the ones that are not (their own partners and descendants not drawn).
+ * A collapsed person the filter leaves out hides nothing of their own.
  */
 
 export interface CollapseInfo {
@@ -54,11 +61,17 @@ export interface CollapseInfo {
   branches: Map<string, Set<string>>;
   /** The group symbols standing for hidden siblings (#1), by placeholder id. Their individuals are in `drawn`. */
   placeholders: Map<string, CollapsedBranch>;
+  /** How many people the view filters (#4) leave out, collapsed branches aside. 0 when no filter is on. */
+  filtered: number;
 }
 
 /** What one collapsed-branch group symbol stands for (#1). */
 export interface CollapsedBranch {
-  /** The collapsed partner (or both partners) whose flag hides these people; expanding clears it. */
+  /**
+   * The collapsed partner (or both partners) whose flag hides these people;
+   * expanding clears it. Empty for a group made by a view filter (#4) alone,
+   * which turning the filter off shows.
+   */
   roots: string[];
   /** The drawn partnership the symbol hangs from. */
   partnershipId: string;
@@ -121,8 +134,11 @@ function partnersOf(pedigree: Pedigree, id: string): string[] {
 export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   const cached = cache.get(pedigree);
   if (cached) return cached;
-  const roots = pedigree.individuals.filter(i => i.descendantsHidden).map(i => i.id);
-  if (roots.length === 0) return { drawn: pedigree, hidden: new Set(), branches: new Map(), placeholders: new Map() };
+  const filtered = filterHidden(pedigree);
+  const roots = pedigree.individuals.filter(i => i.descendantsHidden && !filtered.has(i.id)).map(i => i.id);
+  if (roots.length === 0 && filtered.size === 0) {
+    return { drawn: pedigree, hidden: new Set(), branches: new Map(), placeholders: new Map(), filtered: 0 };
+  }
 
   // One root at a time: descendantsOf leaves out the ids it starts from, and
   // a collapsed person below another one is hidden too.
@@ -143,6 +159,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
 
   const hidden = withMarriedInPartners(pedigree, below);
   for (const id of shown) hidden.delete(id);
+  for (const id of filtered) hidden.add(id);
   const branches = new Map<string, Set<string>>();
   for (const root of drawnRoots) {
     const branch = hiddenUnder(pedigree, descendantsOf(pedigree, [root]), hidden);
@@ -152,7 +169,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   // A copy for removeIndividuals to strip in place: it reassigns the arrays,
   // but writes into parentOf, pinnedPositions and the partnership objects.
   const drawn: Pedigree = {
-    ...pedigree,
+    ...withoutFilters(pedigree),
     partnerships: pedigree.partnerships.map(p => ({ ...p })),
     parentOf: { ...pedigree.parentOf },
     ...(pedigree.pinnedPositions ? { pinnedPositions: { ...pedigree.pinnedPositions } } : {}),
@@ -179,13 +196,15 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
     return rest as Individual;
   });
 
-  const placeholders = addPlaceholders(pedigree, drawn, hidden, couples.filter(p => !cut.has(p.id)), drawnRoots);
+  // Under a view filter every drawn couple may have children not drawn.
+  const grouping = filtered.size > 0 ? pedigree.partnerships : couples;
+  const placeholders = addPlaceholders(pedigree, drawn, hidden, grouping.filter(p => !cut.has(p.id)), drawnRoots);
 
-  const info: CollapseInfo = { drawn, hidden, branches, placeholders };
+  const info: CollapseInfo = { drawn, hidden, branches, placeholders, filtered: filtered.size };
   cache.set(pedigree, info);
   // The drawn copy is already drawn: asking again hands back the same answer,
   // with the branch counts, so callers can pass either object.
-  cache.set(drawn, { drawn, hidden: new Set(), branches, placeholders });
+  cache.set(drawn, { drawn, hidden: new Set(), branches, placeholders, filtered: filtered.size });
   return info;
 }
 
@@ -223,14 +242,18 @@ function addPlaceholders(
     const kept = new Set(drawn.parentOf[p.id] ?? []);
     const grouped = children.filter(c => !kept.has(c)).map(c => byId.get(c)!).filter(Boolean);
     if (grouped.length === 0) continue;
-    const set = hiddenUnder(full, [...children, ...descendantsOf(full, children)], hidden);
+    const roots = [p.individual1, p.individual2].filter(r => drawnRoots.has(r));
+    // A collapsed couple hides everything below it; a filter's group stands
+    // for the grouped children and what is below them only.
+    const under = roots.length > 0 ? children : grouped.map(i => i.id);
+    const set = hiddenUnder(full, [...under, ...descendantsOf(full, under)], hidden);
     const people = [...set].map(id => byId.get(id)!).filter(Boolean);
     const sexes = new Set(grouped.map(i => i.sex));
     const sex = sexes.size === 1 ? grouped[0]!.sex : "unknown";
     const first = [...grouped].sort((a, b) => orderKey(a) - orderKey(b))[0]!;
     const id = branchPlaceholderId(p.id);
     out.set(id, {
-      roots: [p.individual1, p.individual2].filter(r => drawnRoots.has(r)),
+      roots,
       partnershipId: p.id,
       children: grouped.map(i => i.id),
       hidden: set,
@@ -257,8 +280,8 @@ function addPlaceholders(
  * people and the collapsed people for childless ones. Returns `derived`.
  */
 export function asDrawn(derived: Pedigree, source: Pedigree): Pedigree {
-  const { branches, placeholders } = collapseInfo(source);
-  cache.set(derived, { drawn: derived, hidden: new Set(), branches, placeholders });
+  const { branches, placeholders, filtered } = collapseInfo(source);
+  cache.set(derived, { drawn: derived, hidden: new Set(), branches, placeholders, filtered });
   return derived;
 }
 
@@ -280,9 +303,10 @@ export function hasDescendants(pedigree: Pedigree, id: string): boolean {
  * people, and the store does not run this for it.
  */
 export function rootsHidingNew(before: Pedigree, after: Pedigree): string[] {
-  const now = collapseInfo(after).hidden;
+  // Collapsed branches only: whom a view filter hides is `filterHidingNew`'s.
+  const now = collapseInfo(withoutFilters(after)).hidden;
   if (now.size === 0) return [];
-  const was = collapseInfo(before).hidden;
+  const was = collapseInfo(withoutFilters(before)).hidden;
   const fresh = [...now].filter(id => !was.has(id));
   if (fresh.length === 0) return [];
   const near = new Set(fresh);
@@ -292,6 +316,19 @@ export function rootsHidingNew(before: Pedigree, after: Pedigree): string[] {
   }
   const line = new Set([...near, ...ancestorsOf(after, [...near])]);
   return after.individuals.filter(i => i.descendantsHidden && line.has(i.id)).map(i => i.id);
+}
+
+/**
+ * True when an edit (not switching a filter on) leaves someone out of the
+ * drawing who was drawn before or is new, because of a view filter (#4):
+ * a child added to an affected person, or someone made unaffected. The store
+ * then turns the filters off rather than let them vanish.
+ */
+export function filterHidingNew(before: Pedigree, after: Pedigree): boolean {
+  const now = collapseInfo(after).hidden;
+  if (now.size === 0 || !after.filters) return false;
+  const was = collapseInfo(before).hidden;
+  return [...now].some(id => !was.has(id));
 }
 
 // ── Diamond ───────────────────────────────────────────────────────────────────
@@ -318,7 +355,8 @@ export function branchTooltip(branch: CollapsedBranch): string {
   const all = n > k
     ? `. ${n} people not shown in all${branch.affected > 0 ? `, ${branch.affected} of them affected` : ""}`
     : "";
-  return `${head}${all}. Click to show.`;
+  const how = branch.roots.length > 0 ? "Click to show." : "Turn off \"Affected only\" to show them.";
+  return `${head}${all}. ${how}`;
 }
 
 /** SVG text of the count centred on (cx, cy), the centre of a group symbol of `symbolSize`. */

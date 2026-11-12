@@ -254,6 +254,23 @@ export interface Pedigree {
    * when filled; de-identified export drops all of it.
    */
   clinicalDetails?: ClinicalDetails;
+  /**
+   * View filters (#4): simplify what is drawn without changing the data. The
+   * canvas, legend, pedigree numbers and SVG / PNG / PDF exports draw the
+   * filtered pedigree; JSON, PED and CSV keep everyone. See the frontend's
+   * `pedigree/viewFilters.ts`. Absent means no filter.
+   */
+  filters?: ViewFilters;
+}
+
+/** View filters (#4). Each is off when absent. */
+export interface ViewFilters {
+  /**
+   * Draw only affected people, carriers, people with a condition tag and the
+   * proband (and consultand), with their ancestors. Each drawn sibship's other
+   * children become one numbered group symbol.
+   */
+  affectedOnly?: boolean;
 }
 
 /** Free-text clinical key fields (#102). Absent or empty means not recorded. */

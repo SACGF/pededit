@@ -381,6 +381,15 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
 
   c.optional(ped, "chartTitle", base, "a string", v => typeof v === "string");
 
+  if (ped.filters !== undefined && ped.filters !== null) {
+    const fp = p("filters");
+    if (!isObject(ped.filters)) {
+      c.error(JsonIssueCode.WRONG_TYPE, `${fp} must be an object`, fp);
+    } else {
+      c.optional(ped.filters, "affectedOnly", fp, "a boolean", v => typeof v === "boolean");
+    }
+  }
+
   if (ped.clinicalDetails !== undefined && ped.clinicalDetails !== null) {
     const kp = p("clinicalDetails");
     if (!isObject(ped.clinicalDetails)) {

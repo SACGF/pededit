@@ -31,6 +31,7 @@ import { highestConsanguinityLabel } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
+import { FilterBanner } from "./FilterBanner";
 import { SymbolShape, DeceasedSlash } from "./nodes/symbols";
 import { sectorsFor } from "./tags";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -208,7 +209,9 @@ function BranchCount({ count }: { count: number }) {
 function FitOnLayoutChange({ compact }: { compact: boolean }) {
   const { fitView } = useReactFlow();
   const resetCount = usePedigreeStore(s => s.layoutResetCount);
-  const key = `${compact}-${resetCount}`;
+  // Switching a view filter (#4) changes the drawing's size a lot.
+  const filtered = usePedigreeStore(s => JSON.stringify(s.pedigree.filters ?? {}));
+  const key = `${compact}-${resetCount}-${filtered}`;
   const prev = useRef(key);
   useEffect(() => {
     if (prev.current === key) return; // the initial fit comes from the fitView prop
@@ -443,6 +446,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
           </Panel>
         )}
         <PickingBanner />
+        <FilterBanner />
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
         <FitOnLayoutChange compact={compact} />
         <Controls />

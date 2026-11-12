@@ -45,7 +45,8 @@
           "type": "string",
           "description": "Title drawn above the chart and in exports. Absent means the pedigree's name; an empty string means no title."
         },
-        "clinicalDetails": { "$ref": "#/$defs/ClinicalDetails" }
+        "clinicalDetails": { "$ref": "#/$defs/ClinicalDetails" },
+        "filters": { "$ref": "#/$defs/ViewFilters" }
       },
       "additionalProperties": true
     },
@@ -167,6 +168,14 @@
         "historian": { "type": "string", "description": "Who gave the family history." },
         "maternalAncestry": { "type": "string", "description": "Ancestry of the maternal side, relative to the proband." },
         "paternalAncestry": { "type": "string", "description": "Ancestry of the paternal side, relative to the proband." }
+      },
+      "additionalProperties": true
+    },
+    "ViewFilters": {
+      "type": "object",
+      "description": "View filters: simplify what is drawn (canvas and SVG, PNG, PDF exports) without changing the data. Each is off when absent.",
+      "properties": {
+        "affectedOnly": { "type": "boolean", "description": "Draw only affected people, carriers, people with a condition tag and the proband (and consultand), with their ancestors. Each drawn couple's other children are drawn as one symbol with their number inside." }
       },
       "additionalProperties": true
     },

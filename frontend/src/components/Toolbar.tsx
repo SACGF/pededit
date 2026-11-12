@@ -12,6 +12,7 @@ import { adoptionLabel } from "../pedigree/adoption";
 import { twinLegendLabel } from "../pedigree/twins";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
+import { FilterMenu } from "./FilterMenu";
 import { exportJson } from "../io/json/index.js";
 
 // SVG icons matching NSGC pedigree symbols
@@ -212,6 +213,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
           Reset layout
         </Button>
       )}
+
+      {/* View filters (#4) */}
+      <FilterMenu disabled={!hasPedigree} />
 
       {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}
       <Popover open={pedMenuOpen} onOpenChange={setPedMenuOpen}>

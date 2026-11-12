@@ -107,6 +107,9 @@ and for consent, rather than alteration.
 This bears on collapsing branches and de-identified export (#1, #4). When a
 branch is collapsed it must still read correctly: a number inside a symbol
 means siblings, and affected people are drawn separately.
+The "affected only" view filter (#4) follows the same rule: it removes no one
+from the chart, it groups each drawn couple's unaffected children into one
+numbered symbol, and it keeps every ancestor so lines of descent stay whole.
 
 ## Where we differ on purpose
 

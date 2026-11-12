@@ -148,7 +148,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   symbols. They take no generation number and no name; the affected children
   drawn beside them are real people and are numbered. `exportSvg` and
   `exportUShapeSvg` start from `drawnPedigree()` the same way; CSV, PED and
-  JSON export everyone.
+  JSON export everyone. View filters (#4, "affected only") ride on the same
+  path, so figure exports draw whatever the canvas shows with no export
+  option of their own.
 - `types.ts` — `SvgExportOptions`.
 
 `__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render

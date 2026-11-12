@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
-  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity, ClinicalDetails
+  Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, Zygosity, ClinicalDetails, ViewFilters
 } from "@pedigree-editor/layout-engine";
 import type { Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
@@ -10,7 +10,7 @@ import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { linkPartnerProblem } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
-import { collapseInfo, rootsHidingNew } from "../pedigree/collapse";
+import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -313,6 +313,12 @@ interface PedigreeState {
    */
   setDescendantsHidden: (individualIds: string[], hidden: boolean) => void;
   /**
+   * Switch a view filter (#4) on or off; see `pedigree/viewFilters.ts`.
+   * Saved with the pedigree, one undo step. Hidden people are dropped from
+   * the selection.
+   */
+  setViewFilter: (key: keyof ViewFilters, on: boolean) => void;
+  /**
    * Make one or two existing individuals the parents of childId (#36). Uses
    * their existing partnership or creates one; a single parent gets a new
    * unknown-sex partner. A
@@ -422,8 +428,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
   /**
    * Mutate pedigree with an Immer recipe, after snapshotting. Only
-   * setDescendantsHidden may hide people (`hides`): after any other edit, a
-   * collapsed branch that would swallow someone added or moved is shown (#94).
+   * setDescendantsHidden and setViewFilter may hide people (`hides`): after
+   * any other edit, a collapsed branch that would swallow someone added or
+   * moved is shown (#94), and if a view filter would still leave someone new
+   * out of the drawing, the filters are turned off (#4).
    */
   function mutate(recipe: (draft: Pedigree) => void, hides = false) {
     snapshot();
@@ -431,6 +439,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       let next = produce(state.pedigree, recipe);
       const reveal = hides ? [] : rootsHidingNew(state.pedigree, next);
       if (reveal.length) next = produce(next, d => { for (const i of d.individuals) if (reveal.includes(i.id)) delete i.descendantsHidden; });
+      if (!hides && filterHidingNew(state.pedigree, next)) next = produce(next, d => { delete d.filters; });
       return { pedigree: next };
     });
     pruneSelection();
@@ -903,6 +912,20 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           else delete i.descendantsHidden;
         }
       }, hidden);
+      const gone = collapseInfo(get().pedigree).hidden;
+      const { selectedIds, selectedId } = get();
+      if (selectedIds.some(id => gone.has(id))) set(selectionOf(selectedIds.filter(id => !gone.has(id)), selectedId));
+    },
+
+    setViewFilter: (key, on) => {
+      if ((get().pedigree.filters?.[key] === true) === on) return;
+      mutate(draft => {
+        const filters = { ...draft.filters };
+        if (on) filters[key] = true;
+        else delete filters[key];
+        if (Object.keys(filters).length > 0) draft.filters = filters;
+        else delete draft.filters;
+      }, on);
       const gone = collapseInfo(get().pedigree).hidden;
       const { selectedIds, selectedId } = get();
       if (selectedIds.some(id => gone.has(id))) set(selectionOf(selectedIds.filter(id => !gone.has(id)), selectedId));

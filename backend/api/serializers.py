@@ -130,6 +130,10 @@ class ClinicalDetailsSerializer(serializers.Serializer):
     paternalAncestry = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
 
 
+class ViewFiltersSerializer(serializers.Serializer):
+    affectedOnly = _opt(serializers.BooleanField)
+
+
 class PositionSerializer(serializers.Serializer):
     x = serializers.FloatField()
     y = serializers.FloatField()
@@ -148,6 +152,7 @@ class PedigreeDataSerializer(serializers.Serializer):
     tags = _opt(TagSerializer, many=True)
     chartTitle = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     clinicalDetails = _opt(ClinicalDetailsSerializer)
+    filters = _opt(ViewFiltersSerializer)
 
 
 class PedigreeDataField(serializers.Field):
