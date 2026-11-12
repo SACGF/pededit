@@ -83,6 +83,11 @@ export interface Partnership {
   id: string;
   individual1: string;
   individual2: string;
+  /**
+   * Override: the couple are related although the pedigree does not show
+   * how, so their line is drawn double. A couple the pedigree does show to
+   * be related needs no flag (the editor tests kinship above 0, #85).
+   */
   consanguineous?: boolean;
   /** Childless couple mark. Cleared when a child is added. */
   childless?: ChildlessStatus;

@@ -3,6 +3,7 @@ import { linkPartnerProblem } from "../partners";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { lintFlow } from "../renderLint";
 import { layoutToFlow } from "../layoutToFlow";
+import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
@@ -60,16 +61,19 @@ describe("linkPartner (#84)", () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it("joins two relatives with a consanguineous, childless partnership and adds nobody", () => {
+  it("joins two relatives with a childless partnership drawn double, and adds nobody", () => {
     expect(store().linkPartner("gc2", "gc1")).toBeNull();
     expect(ped().individuals).toHaveLength(11);
     expect(ped().partnerships).toHaveLength(4);
     const p = ped().partnerships[3]!;
     // Father role first, whichever of the two the menu was opened on.
-    expect(p).toMatchObject({ individual1: "gc1", individual2: "gc2", consanguineous: true });
+    expect(p).toMatchObject({ individual1: "gc1", individual2: "gc2" });
+    // Nothing is stored: the double line comes from their kinship (#85).
+    expect(p.consanguineous).toBeUndefined();
+    expect(consanguinityTest(ped())("gc1", "gc2")).toBe(true);
     expect(ped().parentOf[p.id]).toEqual([]);
     expect(store().notice).toMatchObject({ kind: "info", undoable: true });
-    expect(store().notice!.text).toMatch(/Cousin B and Cousin A are now partners/);
+    expect(store().notice!.text).toMatch(/Cousin B and Cousin A are now partners \(related, so drawn with a double line\)/);
   });
 
   it("does not flag unrelated people", () => {
@@ -77,6 +81,8 @@ describe("linkPartner (#84)", () => {
     const p = ped().partnerships[3]!;
     expect(p).toMatchObject({ individual1: "gc1", individual2: "stranger" });
     expect(p.consanguineous).toBeUndefined();
+    expect(consanguinityTest(ped())("gc1", "stranger")).toBe(false);
+    expect(store().notice!.text).not.toMatch(/double line/);
   });
 
   it("puts a known male first when the other is of unknown sex", () => {

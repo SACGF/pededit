@@ -8,6 +8,19 @@ import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engi
  * `kinshipCoefficients`.
  */
 
+const cache = new WeakMap<Pedigree, KinshipCoefficients>();
+
+/**
+ * The pedigree's kinship coefficients, computed once per pedigree object.
+ * Every edit makes a new object (immer), so a cached matrix is never stale,
+ * and the canvas, legend and edit panel share one computation per edit.
+ */
+export function kinshipOf(pedigree: Pedigree): KinshipCoefficients {
+  let coefficients = cache.get(pedigree);
+  if (!coefficients) { coefficients = kinshipCoefficients(pedigree); cache.set(pedigree, coefficients); }
+  return coefficients;
+}
+
 /** Below this a float difference is rounding, not a different coefficient. */
 const EPS = 1e-9;
 
@@ -69,11 +82,11 @@ export interface IndividualRelatedness {
   couples: CoupleRelatedness[];
 }
 
-/** What the edit panel says about one person. Pass `coefficients` to reuse a computed matrix. */
+/** What the edit panel says about one person. */
 export function relatednessOf(
   pedigree: Pedigree,
   individualId: string,
-  coefficients: KinshipCoefficients = kinshipCoefficients(pedigree),
+  coefficients: KinshipCoefficients = kinshipOf(pedigree),
 ): IndividualRelatedness {
   return {
     inbreeding: coefficients.inbreeding(individualId),

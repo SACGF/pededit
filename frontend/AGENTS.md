@@ -87,8 +87,8 @@ stub so the app still builds without Google login.
   snapshot. Add new edits here, not in components.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
-- `components/` — Toolbar, EditPanel (individual form, the read-only
-  Relatedness section of #32, plus the always-visible `Legend`, #75),
+- `components/` — Toolbar, EditPanel (individual form, the
+  Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75),
   SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
@@ -103,8 +103,6 @@ stub so the app still builds without Google login.
   consume each other).
 - `data/examples.ts` — the example pedigrees on the landing page.
 - `fixtures/` — pedigrees used by tests and dev-only render scripts.
-- `utils/pedigreeRelationship.ts` — `shareAncestor` for auto-detecting
-  consanguinity when a partnership is created or edited.
 
 ## Conventions
 

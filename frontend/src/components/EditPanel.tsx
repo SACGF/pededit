@@ -6,10 +6,8 @@ import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
-import { consanguinityTest } from "../pedigree/consanguinity";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
-import { useMemo, useState } from "react";
-import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
+import { useState } from "react";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity } from "@pedigree-editor/layout-engine";
 
 interface EditPanelProps {
@@ -255,20 +253,19 @@ export function partnerLabel(pedigree: Pedigree, individualId: string, partnersh
 
 /**
  * Relatedness worked out from the drawn structure (#32): the person's
- * inbreeding coefficient, and for each partner they are related to the
- * couple's kinship coefficient, which is what their children's inbreeding
- * coefficient will be. Read-only, and absent when there is nothing to say:
- * most people are not inbred and not related to their partner.
+ * inbreeding coefficient, and for each partner the couple's kinship
+ * coefficient, which is what their children's inbreeding coefficient will
+ * be. The coefficients are read-only.
+ *
+ * Each couple also has the double-line checkbox (#85). When the pedigree
+ * shows the two are related it is ticked and fixed, since the line follows
+ * the kinship. Otherwise it is the override for a couple known to be related
+ * whose common ancestors are not drawn.
  */
 function RelatednessSection({ individual }: { individual: Individual }) {
-  const { pedigree } = usePedigreeStore();
-  const coefficients = useMemo(() => kinshipCoefficients(pedigree), [pedigree]);
-  const { inbreeding, couples } = relatednessOf(pedigree, individual.id, coefficients);
-  // A double line with no blood relationship behind it (an adopted-in
-  // partner, or a flag left from an earlier structure) is worth explaining.
-  const drawnDouble = consanguinityTest(pedigree);
-  const shown = couples.filter(c => c.kinship > 0 || drawnDouble(individual.id, c.partnerId));
-  if (!(inbreeding > 0) && shown.length === 0) return null;
+  const { pedigree, setPartnershipConsanguineous } = usePedigreeStore();
+  const { inbreeding, couples } = relatednessOf(pedigree, individual.id);
+  if (!(inbreeding > 0) && couples.length === 0) return null;
 
   return (
     <div className="border-t pt-3 space-y-2" data-testid="relatedness">
@@ -280,17 +277,43 @@ function RelatednessSection({ individual }: { individual: Individual }) {
             <div className="text-[10px] text-gray-500">Parents {degreeOfRelationship(inbreeding)}.</div>
           </div>
         )}
-        {shown.map(c => (
-          <div key={c.partnershipId} data-testid="couple-kinship" title="The kinship coefficient of a couple is the inbreeding coefficient of their children.">
-            With {partnerLabel(pedigree, individual.id, c.partnershipId)}: kinship{" "}
-            <span className="font-medium">{formatCoefficient(c.kinship)}</span>
-            <div className="text-[10px] text-gray-500">
-              {c.kinship > 0
-                ? `${capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = ${formatCoefficient(c.kinship)}.`
-                : "No blood relationship in this pedigree, although the couple line is double."}
+        {couples.map(c => {
+          const partner = partnerLabel(pedigree, individual.id, c.partnershipId);
+          const related = c.kinship > 0;
+          const flagged = !!pedigree.partnerships.find(p => p.id === c.partnershipId)?.consanguineous;
+          return (
+            <div key={c.partnershipId} data-testid="couple-kinship">
+              <label
+                className={`flex items-center gap-2 ${related ? "" : "cursor-pointer"}`}
+                title={related
+                  ? "The pedigree shows they are related, so the couple line is double."
+                  : "Draws the couple line double. For a couple known to be related when the pedigree does not show how."}
+              >
+                <input
+                  type="checkbox"
+                  checked={related || flagged}
+                  disabled={related}
+                  onChange={e => setPartnershipConsanguineous(c.partnershipId, e.target.checked)}
+                  className="accent-black"
+                />
+                <span>Related to {partner}</span>
+              </label>
+              {related && (
+                <div className="pl-5" title="The kinship coefficient of a couple is the inbreeding coefficient of their children.">
+                  Kinship <span className="font-medium">{formatCoefficient(c.kinship)}</span>
+                  <div className="text-[10px] text-gray-500">
+                    {capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = {formatCoefficient(c.kinship)}.
+                  </div>
+                </div>
+              )}
+              {!related && flagged && (
+                <p className="text-[10px] text-gray-500 pl-5">
+                  Double line. The pedigree does not show how they are related, so there is no coefficient.
+                </p>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -115,46 +115,17 @@ export function convertFamily(rows: PedRow[]): Pedigree {
     partnershipMap.get(key)!.children.push(row.iid);
   }
 
-  // Step 4: Detect consanguinity via ancestor reachability
-  const parentLookup = new Map<string, { father: string; mother: string }>();
-  for (const row of augmentedRows) {
-    parentLookup.set(row.iid, { father: row.fatherId, mother: row.motherId });
-  }
-
-  function getAncestors(iid: string, visited = new Set<string>()): Set<string> {
-    if (visited.has(iid)) return new Set(); // cycle guard
-    visited.add(iid);
-    const result = new Set<string>();
-    const parents = parentLookup.get(iid);
-    if (!parents) return result;
-    if (parents.father !== "0") {
-      result.add(parents.father);
-      for (const a of getAncestors(parents.father, visited)) result.add(a);
-    }
-    if (parents.mother !== "0") {
-      result.add(parents.mother);
-      for (const a of getAncestors(parents.mother, visited)) result.add(a);
-    }
-    return result;
-  }
-
+  // Step 4: partnerships. A related couple is not flagged: the double line
+  // is worked out from kinship when the pedigree is drawn (#85).
   const partnerships: Partnership[] = [];
   const parentOf: Record<string, string[]> = {};
 
   for (const [key, val] of partnershipMap.entries()) {
     const pId = `p_${key}`;
-    const anc1 = getAncestors(val.individual1);
-    const anc2 = getAncestors(val.individual2);
-    const isConsanguineous =
-      anc1.has(val.individual2) ||
-      anc2.has(val.individual1) ||
-      [...anc1].some(a => anc2.has(a));
-
     partnerships.push({
       id: pId,
       individual1: val.individual1,
       individual2: val.individual2,
-      consanguineous: isConsanguineous || undefined,
     });
     parentOf[pId] = val.children;
   }
