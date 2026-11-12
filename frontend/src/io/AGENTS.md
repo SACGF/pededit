@@ -133,6 +133,11 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   drawing is centred under it, in both exporters. It is a
   `<text class="chart-title">` outside the `labels` group, so the export
   lint ignores it.
+- Hidden descendants (#94): `deidentify` works on the drawn pedigree, so the
+  generation numbers count only people who are drawn, and returns its copy
+  through `asDrawn` so collapsed people keep their mark. `exportSvg` and
+  `exportUShapeSvg` start from `drawnPedigree()` the same way; CSV, PED and
+  JSON export everyone.
 - `types.ts` — `SvgExportOptions`.
 
 `__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render

@@ -9,6 +9,7 @@ import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from
 import { adjacentSibling } from "../../components/EditPanel";
 import { batchLockState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
+import { hasDescendants } from "../collapse";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -95,6 +96,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     removeTwin,
     removeWithDescendants,
     removeWithAncestors,
+    setDescendantsHidden,
     startPickingParents,
     startPickingChild,
     startPickingPartner,
@@ -348,6 +350,19 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               </div>
             ))}
           </MenuSection>
+        )}
+
+        {(individual.descendantsHidden || hasDescendants(pedigree, individualId)) && (
+          <div className="border-t mt-1 pt-1">
+            <MenuItem
+              onClick={() => action(() => setDescendantsHidden([individualId], !individual.descendantsHidden))}
+              title={individual.descendantsHidden
+                ? "Draw everyone below this person again"
+                : "Leave everyone below this person out of the drawing and exports, without deleting them"}
+            >
+              {individual.descendantsHidden ? "Show descendants" : "Hide descendants"}
+            </MenuItem>
+          </div>
         )}
 
         <div className="border-t mt-1 pt-1">

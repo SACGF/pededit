@@ -8,6 +8,7 @@ import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
+import { drawnPedigree } from "./collapse";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
 import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines } from "./labels";
@@ -172,7 +173,9 @@ function findLinelessCopies(result: LayoutResult): Set<string> {
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
-export function layoutToFlow(pedigree: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
+export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
+  // Hidden descendants (#94) are not laid out or drawn.
+  const pedigree = drawnPedigree(full);
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [] };
   }

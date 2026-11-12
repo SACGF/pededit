@@ -47,6 +47,13 @@ export interface Individual {
    * individual carries, to free text as for `onset`.
    */
   tagOnset?: Record<string, string>;
+  /**
+   * Everyone below this person is left out of the drawing (#94): the canvas,
+   * the layout and the exports all work from the drawn subset (see the
+   * frontend's `pedigree/collapse.ts`). Nothing is deleted; clearing the flag
+   * brings the branch back.
+   */
+  descendantsHidden?: boolean;
 }
 
 /**

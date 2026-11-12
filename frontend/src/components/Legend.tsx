@@ -3,7 +3,7 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape } from "../pedigree/nodes/symbols";
+import { SymbolShape, CollapsedMarkIcon } from "../pedigree/nodes/symbols";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel } from "../pedigree/adoption";
@@ -11,6 +11,7 @@ import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/
 import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "@/pedigree/consanguinity";
+import { drawnPedigree, COLLAPSED_MARK, COLLAPSED_MARK_LABEL } from "@/pedigree/collapse";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tagTakesOnset } from "@/pedigree/onset";
@@ -163,6 +164,15 @@ function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
   );
 }
 
+/** The hidden descendants mark (#94), as drawn beside a symbol. */
+function CollapsedMarkSvg() {
+  return (
+    <span style={{ width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+      <CollapsedMarkIcon size={COLLAPSED_MARK.size} />
+    </span>
+  );
+}
+
 /** Pregnancy / loss symbols reuse the canvas renderer so the legend matches exactly. */
 function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }) {
   // Extra room below for the "SB" / "ECT" caption and the stillbirth slash overhang.
@@ -247,7 +257,9 @@ interface LegendProps {
   onManageTags?: () => void;
 }
 
-export function Legend({ pedigree, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
+export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
+  // Only what is drawn: hidden descendants (#94) add no entries.
+  const pedigree = drawnPedigree(full);
   const { individuals, partnerships } = pedigree;
 
   const hasMale    = individuals.some(i => i.sex === "male");
@@ -284,6 +296,8 @@ export function Legend({ pedigree, individual, onToggleTag, onSetTagOnset, onMan
     const ind = individuals.find(i => i.adopted === o.value);
     if (ind) indRows.push({ icon: <AdoptedSvg sex={ind.sex} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
   }
+
+  if (individuals.some(i => i.descendantsHidden)) indRows.push({ icon: <CollapsedMarkSvg />, label: COLLAPSED_MARK_LABEL });
 
   const relRows: { icon: React.ReactNode; label: string }[] = [];
   if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });

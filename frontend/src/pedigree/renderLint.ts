@@ -22,6 +22,7 @@
  */
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
+import { drawnPedigree } from "./collapse";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { linesWidth } from "./labels";
@@ -58,7 +59,8 @@ const MIN_SYMBOL_GAP = 8;
 /** Two sibship bars closer than this (px) vertically read as one line where they overlap. */
 const MIN_BAR_GAP = 4;
 
-export function lintFlow(pedigree: Pedigree, flow: FlowData): LintFinding[] {
+export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
+  const pedigree = drawnPedigree(full); // hidden descendants (#94) are meant to be missing
   const out: LintFinding[] = [];
   const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
   const indOf = (nodeId: string) => nodeById.get(nodeId)?.data.individual.id;

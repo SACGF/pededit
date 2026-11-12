@@ -33,6 +33,7 @@ import type { FlowData } from "../../pedigree/layoutToFlow";
 import { textWidth } from "../../pedigree/labels";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
+import { drawnPedigree } from "../../pedigree/collapse";
 import type { SvgExportOptions } from "./types";
 
 export type ExportLintCode =
@@ -343,6 +344,6 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
 
 /** Export a pedigree as SVG (standard layout) and lint what it draws. */
 export function lintExport(pedigree: Pedigree, options: SvgExportOptions = {}): ExportLintFinding[] {
-  const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
+  const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
   return lintExportSvg(working, layoutToFlow(working, { compact: options.compact }), exportSvg(pedigree, { ...options, uShape: false }));
 }

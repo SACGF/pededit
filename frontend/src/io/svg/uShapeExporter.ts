@@ -1,5 +1,6 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
+import { drawnPedigree, renderCollapsedMarkSvg } from "../../pedigree/collapse";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
   needsAffectedCore, renderAffectedCoreSvg,
@@ -1202,6 +1203,7 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         renderShape(ind, pedigree, clipId, pos.rotation) +
         (ind.deceased ? renderDeceasedSlash() : "") +
         (ind.proband ? renderProbandArrow() : "") +
+        (ind.descendantsHidden ? renderCollapsedMarkSvg(NODE_SIZE, -NODE_SIZE / 2, -NODE_SIZE / 2) : "") +
         `</g>`,
       );
     });
@@ -1221,7 +1223,7 @@ function renderDebugTracks(b: Built, layout: UShapeLayout): string[] {
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = {}): string {
-  const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
+  const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
   const b = build(working, { partners: options.uShapePartners });
   if (!b) {
     return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">

@@ -14,6 +14,7 @@ import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
+import { drawnPedigree, renderCollapsedMarkSvg } from "../../pedigree/collapse";
 import type { SvgExportOptions } from "./types";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
@@ -417,6 +418,7 @@ function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPo
       if (ind.deceased) elems.push(renderDeceasedSlash());
       if (ind.proband)  elems.push(renderProbandArrow());
       if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
+      if (ind.descendantsHidden) elems.push(renderCollapsedMarkSvg(NODE_SIZE, -NODE_SIZE / 2, -NODE_SIZE / 2));
       elems.push(`</g>`);
     }
   }
@@ -486,7 +488,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 </svg>`;
   }
 
-  const working = options.deidentify ? deidentify(pedigree, options) : pedigree;
+  // What the canvas draws: hidden descendants (#94) left out.
+  const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
   const result  = alignPedigreeByFamily(working);
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);

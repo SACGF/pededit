@@ -45,28 +45,39 @@ export function ancestorsOf(pedigree: Pedigree, ids: string[]): Set<string> {
 }
 
 /**
+ * `people` plus the partners of those people who married in (no parents in
+ * the pedigree) and have no partnership with anyone outside the set, repeated
+ * until nothing changes. A partner who is a blood relative, or has a
+ * partnership with someone outside the set, is not added. Shared by branch
+ * removal (#34) and hiding descendants (#94, `collapse.ts`).
+ */
+export function withMarriedInPartners(pedigree: Pedigree, people: Iterable<string>): Set<string> {
+  const out = new Set<string>(people);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const id of [...out]) {
+      for (const p of partnershipsOf(pedigree, id)) {
+        const other = p.individual1 === id ? p.individual2 : p.individual1;
+        if (out.has(other)) continue;
+        const marriedIn = !parentPartnershipOf(pedigree, other);
+        const onlyWithOut = partnershipsOf(pedigree, other).every(q =>
+          out.has(q.individual1 === other ? q.individual2 : q.individual1));
+        if (marriedIn && onlyWithOut) { out.add(other); changed = true; }
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * The individuals removed by "remove with descendants": `ids`, everyone below
  * them, and the partners of those people who married in (no parents in the
  * pedigree) and have no partnership with anyone staying. A partner who is a
  * blood relative, or has children by someone outside the branch, stays.
  */
 export function removeWithDescendantsSet(pedigree: Pedigree, ids: string[]): Set<string> {
-  const gone = new Set<string>([...ids, ...descendantsOf(pedigree, ids)]);
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const id of [...gone]) {
-      for (const p of partnershipsOf(pedigree, id)) {
-        const other = p.individual1 === id ? p.individual2 : p.individual1;
-        if (gone.has(other)) continue;
-        const marriedIn = !parentPartnershipOf(pedigree, other);
-        const onlyWithGone = partnershipsOf(pedigree, other).every(q =>
-          gone.has(q.individual1 === other ? q.individual2 : q.individual1));
-        if (marriedIn && onlyWithGone) { gone.add(other); changed = true; }
-      }
-    }
-  }
-  return gone;
+  return withMarriedInPartners(pedigree, [...ids, ...descendantsOf(pedigree, ids)]);
 }
 
 /** The individuals removed by "remove with ancestors": `ids` and everyone above them. */

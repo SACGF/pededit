@@ -4,6 +4,7 @@ import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangl
 import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
+import { COLLAPSED_MARK, COLLAPSED_MARK_LABEL, collapsedMarkSvgAt, drawnPedigree } from "./collapse";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -486,6 +487,11 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
         return brackets + `${geom} fill="white" stroke="black" stroke-width="1.5"/>`;
       },
     });
+  }
+  // Hidden descendants mark (#94).
+  if (drawnPedigree(pedigree).individuals.some(i => i.descendantsHidden)) {
+    const s = COLLAPSED_MARK.size;
+    rows.push({ label: COLLAPSED_MARK_LABEL, swatch: sy => collapsedMarkSvgAt(x + (LEGEND_SWATCH - s) / 2, sy + (LEGEND_SWATCH - s) / 2) });
   }
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(pedigree);

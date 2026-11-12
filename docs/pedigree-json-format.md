@@ -82,6 +82,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `tags` | string[] | no | Ids of tags from `Pedigree.tags` applied to this individual. |
 | `onset` | string | no | Age of onset of the affected status, free text such as `"45y"`, `"40s"` or `"childhood"`. Ignored unless `affected` is `true`. |
 | `tagOnset` | object | no | Age of onset per condition: keys are ids of `quadrant` tags in this individual's `tags`, values are free text as for `onset`. Entries for other tags are ignored. |
+| `descendantsHidden` | boolean | no | Everyone below this individual is left out of the drawing and the exports, as are partners who married into that branch only. Nothing is removed from the data; clearing the flag shows them again. |
 
 Optional fields may be omitted or set to `null`; both are treated as absent. Any other property on an individual is preserved as-is, so a newer PedEdit (or another tool) can add fields without older versions discarding them.
 

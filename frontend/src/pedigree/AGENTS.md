@@ -213,6 +213,27 @@ draws NSGC symbols.
   routine that strips a set of people out of a draft (partnerships, parentOf,
   twin sets, pins, unlocks). The store's `removeWithDescendants` /
   `removeWithAncestors` refuse an empty result with an error notice.
+- `collapse.ts` — hidden descendants (#94). `Individual.descendantsHidden`
+  hides everyone below that person (by any line, so a child of the hidden
+  branch and a visible cousin goes too) and partners who married into the
+  hidden part only (`withMarriedInPartners` in `removal.ts`, shared with
+  remove with descendants). `drawnPedigree` / `collapseInfo` give the
+  stripped copy, cached per pedigree object and returning the input itself
+  when nothing is hidden. Everything that draws calls it at its entry point
+  (`layoutToFlow`, `lintFlow`, `Legend`, the export key, `exportSvg`,
+  `exportUShapeSvg`, `deidentify`), so the layout runs on drawn people only
+  and nothing downstream needs to know. A new drawing path must do the same.
+  Data exports (JSON, PED, CSV) keep everyone. `collapseInfo(...).branches`
+  maps each drawn collapsed person to the hidden people under them, the
+  count for a collapsed-branch node (#1). A stale flag on someone with no
+  descendants is dropped from the drawn copy, so the mark (a boxed "+" off
+  the symbol's lower right, `COLLAPSED_MARK`) only shows when something is
+  hidden; the flag on a drawn individual is the test for drawing it. A
+  derived copy of a drawn pedigree (de-identified names) must go through
+  `asDrawn`, or its collapsed people have no descendants left and lose the
+  mark. The store's `mutate` reveals a branch when an edit would add or move
+  someone into it (`rootsHidingNew`), so "add child" to a collapsed person
+  never makes the child vanish; only `setDescendantsHidden` hides people.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
   to a set key and zygosity; `layoutToFlow` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:

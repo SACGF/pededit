@@ -1,6 +1,7 @@
 import { alignPedigreeByFamily } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
 import type { SvgExportOptions } from "./types";
+import { asDrawn, drawnPedigree } from "../../pedigree/collapse";
 
 // Supports generations I–X (more than sufficient for clinical pedigrees)
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
@@ -40,13 +41,19 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
   return `${decade}s`;
 }
 
-export function deidentify(pedigree: Pedigree, options: SvgExportOptions = {}): Pedigree {
+/**
+ * The drawn pedigree (hidden descendants left out, #94) with names replaced by
+ * generation numbers, dates bucketed or dropped, and free-text age, notes
+ * and chart title dropped.
+ */
+export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
+  const pedigree = drawnPedigree(full);
   const result = alignPedigreeByFamily(pedigree);
   const notations = buildNotationMap(pedigree, result);
 
   // The chart title and the free-text age (#20) can name or date someone, so
   // both go; age ranges come from the DOB only.
-  return {
+  return asDrawn({
     ...pedigree,
     chartTitle: "",
     individuals: pedigree.individuals.map(ind => ({
@@ -56,5 +63,5 @@ export function deidentify(pedigree: Pedigree, options: SvgExportOptions = {}): 
       age:   undefined,
       notes: undefined,
     })),
-  };
+  }, pedigree);
 }

@@ -9,6 +9,7 @@ import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { linkPartnerProblem } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
+import { collapseInfo, rootsHidingNew } from "../pedigree/collapse";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -302,6 +303,12 @@ interface PedigreeState {
   /** Remove these individuals with everyone above them; their descendants become founders (#34). */
   removeWithAncestors: (individualIds: string[]) => number;
   /**
+   * Hide or show everyone below these individuals (#94); see
+   * `pedigree/collapse.ts` for who that takes. One undo step. Hidden people
+   * are dropped from the selection.
+   */
+  setDescendantsHidden: (individualIds: string[], hidden: boolean) => void;
+  /**
    * Make one or two existing individuals the parents of childId (#36). Uses
    * their existing partnership or creates one; a single parent gets a new
    * unknown-sex partner. A
@@ -394,10 +401,19 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     set({ past: [...past, structuredClone(pedigree)], future: [], isDirty: true });
   }
 
-  /** Mutate pedigree with an Immer recipe, after snapshotting. */
-  function mutate(recipe: (draft: Pedigree) => void) {
+  /**
+   * Mutate pedigree with an Immer recipe, after snapshotting. Only
+   * setDescendantsHidden may hide people (`hides`): after any other edit, a
+   * collapsed branch that would swallow someone added or moved is shown (#94).
+   */
+  function mutate(recipe: (draft: Pedigree) => void, hides = false) {
     snapshot();
-    set(state => ({ pedigree: produce(state.pedigree, recipe) }));
+    set(state => {
+      let next = produce(state.pedigree, recipe);
+      const reveal = hides ? [] : rootsHidingNew(state.pedigree, next);
+      if (reveal.length) next = produce(next, d => { for (const i of d.individuals) if (reveal.includes(i.id)) delete i.descendantsHidden; });
+      return { pedigree: next };
+    });
     pruneSelection();
   }
 
@@ -850,6 +866,22 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     removeWithDescendants: (individualIds) => removeBranch(individualIds, removeWithDescendantsSet, "descendants"),
     removeWithAncestors: (individualIds) => removeBranch(individualIds, removeWithAncestorsSet, "ancestors"),
+
+    setDescendantsHidden: (individualIds, hidden) => {
+      const ids = new Set(individualIds);
+      const changes = get().pedigree.individuals.some(i => ids.has(i.id) && !!i.descendantsHidden !== hidden);
+      if (!changes) return;
+      mutate(draft => {
+        for (const i of draft.individuals) {
+          if (!ids.has(i.id)) continue;
+          if (hidden) i.descendantsHidden = true;
+          else delete i.descendantsHidden;
+        }
+      }, hidden);
+      const gone = collapseInfo(get().pedigree).hidden;
+      const { selectedIds, selectedId } = get();
+      if (selectedIds.some(id => gone.has(id))) set(selectionOf(selectedIds.filter(id => !gone.has(id)), selectedId));
+    },
 
     /**
      * Move a sibling one position left within its sibling group.
