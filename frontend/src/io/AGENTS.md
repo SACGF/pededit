@@ -155,6 +155,17 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   at death in `dob` ("d. 70s"), drawn as it is. The names become the pedigree numbers
   (`pedigreeNumbers`, #8), and the copy has `showNumbers` turned off so a
   numbered pedigree does not draw "II-3 II-3".
+  Optional free text (#111) follows `options.deidentifyKeep`
+  (`DeidentifyKeep` in `types.ts`, defaults `DEIDENTIFY_KEEP_DEFAULTS`, the
+  maintainer's call on #111): evaluation detail and age of onset are dropped,
+  the result marks with the documented "*", the consanguinity text (own and
+  named, by turning `relationshipLabels` off on the copy) and text tags are
+  kept. Dropping the marks drops the evaluations entirely. Everything is
+  dropped from the data, not the drawing, so the key loses its rows with no
+  code of its own (it lists tags in use, evaluation rows from what is left).
+  The export dialog shows one checkbox per kind the drawn pedigree has
+  (`deidentifiableText`); the choices are dialog state for the page session,
+  like the de-identify box itself, and are never saved.
 - The chart title (#20) is `options.title`, resolved by the caller with
   `chartTitle()` from `pedigree/labels.ts`. Its width is estimated
   (`titleWidth`); a title wider than the drawing widens the figure and the

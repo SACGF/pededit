@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import {
   exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf,
   svgPixelSize, pngSizeForDpi, PNG_DPI_CHOICES, DEFAULT_PNG_DPI, CSS_PX_PER_INCH,
+  DEIDENTIFY_KEEP_DEFAULTS, deidentifiableText,
 } from "../io/svg/index";
+import type { DeidentifyKeep } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { chartTitle } from "../pedigree/labels";
 import { clinicalDetailLines } from "../pedigree/clinicalDetails";
@@ -32,6 +34,10 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
+  // Free text a de-identified export keeps (#111). Like the other choices
+  // here, they last while the page is open and are not saved.
+  const [keep, setKeep]             = useState<DeidentifyKeep>(DEIDENTIFY_KEEP_DEFAULTS);
+  const setKept = (key: keyof DeidentifyKeep, value: boolean) => setKeep(k => ({ ...k, [key]: value }));
   const [pngDpi, setPngDpi]         = useState<number>(DEFAULT_PNG_DPI);
   const [error, setError]           = useState<string | null>(null);
   const [uShape, setUShape]         = useState(false);
@@ -64,12 +70,27 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
     return exportFn(pedigree, {
       deidentify: deident,
       ageBuckets: deident && ageBuckets,
+      deidentifyKeep: keep,
       // The chart title (#20), as on the canvas. A de-identified export has none.
       title: deident ? undefined : chartTitle(pedigree, title) || undefined,
       uShapePartners: uPartners,
       compact,
     });
-  }, [open, useU, pedigree, deident, ageBuckets, title, uPartners, compact]);
+  }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact]);
+
+  // Which free-text choices this pedigree has anything for (#111).
+  const freeText = useMemo(() => (open && deident ? deidentifiableText(pedigree) : null), [open, deident, pedigree]);
+  const keepBox = (key: keyof DeidentifyKeep, label: string, indent = "ml-5") => (
+    <label className={`flex items-center gap-2 text-xs cursor-pointer ${indent}`}>
+      <input
+        type="checkbox"
+        data-testid={`deidentify-keep-${key}`}
+        checked={keep[key]}
+        onChange={e => setKept(key, e.target.checked)}
+      />
+      <span>{label}</span>
+    </label>
+  );
 
   const svgSize = svgString ? svgPixelSize(svgString) : null;
   const pngSize = svgSize ? pngSizeForDpi(svgSize.width, svgSize.height, pngDpi) : null;
@@ -175,6 +196,15 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
                 <span>Include age range (infant / child / 30s …)</span>
               </label>
             )}
+            {freeText?.evaluationDetail && (
+              <>
+                {keepBox("evaluationDetail", "Include evaluation details (BRCA1 c.5266dupC …)")}
+                {!keep.evaluationDetail && keepBox("evaluationMarks", "Keep the result (+ / - / u) without the detail", "ml-10")}
+              </>
+            )}
+            {freeText?.onset && keepBox("onset", "Include age of onset")}
+            {freeText?.consanguinityLabels && keepBox("consanguinityLabels", "Include the relationship text above double lines")}
+            {freeText?.textTags && keepBox("textTags", "Include text tags (genotypes …)")}
             {deident && clinicalDetailLines(pedigree).length > 0 && (
               <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
             )}

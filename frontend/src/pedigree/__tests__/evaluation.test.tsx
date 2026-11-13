@@ -152,10 +152,13 @@ describe("evaluation notation, NSGC 2008 setting (#101)", () => {
     expect(plain).not.toContain("Presymptomatic");
   });
 
-  it("keeps the evaluations in a de-identified export", () => {
-    const svg = exportSvg(family(), { deidentify: true });
+  it("keeps the evaluations in a de-identified export when asked, the result alone by default (#111)", () => {
+    const svg = exportSvg(family(), { deidentify: true, deidentifyKeep: { evaluationDetail: true } });
     expect(svg).toContain("c.5266dupC +");
     expect(svg.match(STAR)).toHaveLength(1);
+    const plain = exportSvg(family(), { deidentify: true });
+    expect(plain).not.toContain("c.5266dupC");
+    expect(plain.match(STAR)).toHaveLength(1);
   });
 });
 
