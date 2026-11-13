@@ -27,6 +27,12 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
 }
 
+
+/** Where the editor sends bug reports and feature requests (#113). */
+const NEW_ISSUE_URL = "https://github.com/SACGF/pededit/issues/new";
+/** How to run PedEdit on your own server, for clinical data (#113). */
+const INSTALL_URL = "https://github.com/SACGF/pededit/blob/main/INSTALL.md";
+
 export default function CanvasPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -223,6 +229,33 @@ export default function CanvasPage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Feedback and self-hosting (#113) */}
+        <div className="px-3 py-2 border-t text-[10px] text-gray-400 leading-relaxed" data-testid="feedback-links">
+          <p>
+            Found a bug or want a feature?{" "}
+            <a
+              href={NEW_ISSUE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black underline underline-offset-1"
+            >
+              Tell us on GitHub
+            </a>
+          </p>
+          <p className="mt-1">
+            PedEdit is open source. For clinical work you can{" "}
+            <a
+              href={INSTALL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-black underline underline-offset-1"
+            >
+              host your own copy
+            </a>
+            .
+          </p>
         </div>
 
         {/* Save button */}
