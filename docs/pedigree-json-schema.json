@@ -94,6 +94,7 @@
         "notes": { "type": "string" },
         "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },
         "descendantsHidden": { "type": "boolean", "description": "Everyone below this individual is left out of the drawing and exports (not removed from the data)." },
+        "placeholder": { "type": "boolean", "description": "Made automatically as the second parent of a child given only one; removed with its couple line when the couple loses its last child, while nothing else is recorded about them." },
         "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." },
         "onset": { "type": "string", "description": "Age of onset of the affected status, free text such as \"45y\" or \"40s\". Used only while affected is true." },
         "tagOnset": {

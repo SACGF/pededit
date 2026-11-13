@@ -192,6 +192,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     c.optional(raw, "proband", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "consultand", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "familyHistoryUnknown", ip, "a boolean", v => typeof v === "boolean");
+    c.optional(raw, "placeholder", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "presymptomatic", ip, "a boolean", v => typeof v === "boolean");
     c.optional(raw, "evaluations", ip, "an array of evaluations", Array.isArray);
     if (Array.isArray(raw.evaluations)) {

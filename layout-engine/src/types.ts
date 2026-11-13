@@ -118,6 +118,13 @@ export interface Individual {
    * brings the branch back.
    */
   descendantsHidden?: boolean;
+  /**
+   * Made automatically as the second parent when someone was given a single
+   * parent (#107, frontend `pedigree/placeholders.ts`). While nothing is
+   * recorded about them, they are removed with their couple line when the
+   * couple loses its last child. Cleared when the user sets their sex.
+   */
+  placeholder?: boolean;
 }
 
 /** Result of an evaluation (#101): "+", "-" or "u" after the detail. Absent: no result recorded. */

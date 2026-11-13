@@ -78,6 +78,7 @@ class IndividualSerializer(serializers.Serializer):
         child=serializers.CharField(allow_blank=True, trim_whitespace=False),
     )
     descendantsHidden = _opt(serializers.BooleanField)
+    placeholder = _opt(serializers.BooleanField)
 
 
 class TagSerializer(serializers.Serializer):

@@ -48,7 +48,12 @@ stub so the app still builds without Google login.
   adds the NSGC infertility / no-children-by-choice mark under the couple
   line, #15, set from the edit panel or more menu and cleared when a child is
   added), a single known parent (`addParent` inserts an
-  unknown-sex placeholder partner because kinship2 needs 0 or 2 parents),
+  unknown-sex placeholder partner because kinship2 needs 0 or 2 parents;
+  every auto partner is made with `placeholder: true`, and while nothing is
+  recorded about it, it is removed with its couple line when Replace
+  parents, Detach from parents, a delete or Remove partnership leaves it
+  childless or alone, #107, `pedigree/placeholders.ts`; `setSex` clears
+  the flag, and older saves without it are never cleaned up),
   disconnected individuals, cross-generation and consanguineous matings.
   "Set parents..." / "Replace parents..." and "Add existing child..." in the
   more menu link existing people (#36), which is how consanguinity loops

@@ -7,6 +7,7 @@ import type { Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals, dropAssistedLinks } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
+import { dropLeftoverPlaceholders, partnersIn } from "../pedigree/placeholders";
 import { linkPartnerProblem } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
@@ -133,6 +134,11 @@ function makeIndividual(sex: Sex, sibOrder: number): Individual {
   };
 }
 
+/** The automatic second parent of a single parent's child (#107, `pedigree/placeholders.ts`). */
+function makePlaceholder(sex: Sex): Individual {
+  return { ...makeIndividual(sex, 0), placeholder: true };
+}
+
 /**
  * Partnership to which a child of individualId should be added, creating one
  * (with an opposite-sex placeholder partner) if the individual has none.
@@ -147,7 +153,7 @@ function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferr
   const partnerSex: Sex =
     ind.sex === "male" ? "female" :
     ind.sex === "female" ? "male" : "unknown";
-  const placeholder = makeIndividual(partnerSex, 0);
+  const placeholder = makePlaceholder(partnerSex);
   const partnership: Partnership = {
     id: newId(),
     individual1: individualId,
@@ -505,9 +511,18 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       get().setNotice({ kind: "error", text: `Not removed: removing ${ids.length === 1 ? "this person" : "these people"}${what ? ` with their ${what}` : ""} would leave an empty pedigree. Delete individuals one at a time, or start a new pedigree.` });
       return 0;
     }
-    mutate(draft => removeIndividuals(draft, gone));
-    get().setNotice({ kind: "info", text: `Removed ${gone.size} ${gone.size === 1 ? "individual" : "individuals"}.`, undoable: true });
-    return gone.size;
+    // Couples losing a child here may leave a placeholder partner with none (#107).
+    // and partners of removed people may be left alone.
+    const candidates = partnersIn(pedigree, pedigree.partnerships
+      .filter(p => gone.has(p.individual1) || gone.has(p.individual2) || (pedigree.parentOf[p.id] ?? []).some(c => gone.has(c)))
+      .map(p => p.id)).filter(id => !gone.has(id));
+    let removed = gone.size;
+    mutate(draft => {
+      removeIndividuals(draft, gone);
+      removed += dropLeftoverPlaceholders(draft, candidates);
+    });
+    get().setNotice({ kind: "info", text: `Removed ${removed} ${removed === 1 ? "individual" : "individuals"}.`, undoable: true });
+    return removed;
   }
 
   return {
@@ -681,10 +696,13 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           const ind2 = draft.individuals.find(i => i.id === p.individual2)!;
 
           // If there's an unknown-sex placeholder, convert it
+          // The user has now asked for this parent, so it is no longer a placeholder (#107).
           if (ind1.sex === "unknown" && sex !== "unknown") {
             ind1.sex = sex;
+            delete ind1.placeholder;
           } else if (ind2.sex === "unknown" && sex !== "unknown") {
             ind2.sex = sex;
+            delete ind2.placeholder;
           }
           // If both are already filled, no-op
           return;
@@ -693,7 +711,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         // No parents yet — create a couple
         const newParent = makeIndividual(sex, 0);
         const oppositeSex: Sex = sex === "male" ? "female" : sex === "female" ? "male" : "unknown";
-        const placeholder = makeIndividual(oppositeSex, 0);
+        const placeholder = makePlaceholder(oppositeSex);
 
         const partnership: Partnership = {
           id: newId(),
@@ -731,7 +749,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           const partnerSex: Sex =
             ind.sex === "male" ? "female" :
             ind.sex === "female" ? "male" : "unknown";
-          const placeholder = makeIndividual(partnerSex, 0);
+          const placeholder = makePlaceholder(partnerSex);
           const partnership: Partnership = {
             id: newId(),
             individual1: individualId,
@@ -858,6 +876,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
      * - Remove from parentOf (as a child) in their parent partnership
      */
     deleteIndividual: (individualId) => {
+      // Placeholder partners of the couples this person is a child or partner of (#107).
+      const ped0 = get().pedigree;
+      const candidates = partnersIn(ped0, [
+        ...Object.keys(ped0.parentOf).filter(pid => ped0.parentOf[pid]!.includes(individualId)),
+        ...findOwnPartnerships(ped0, individualId),
+      ]);
       mutate(draft => {
         // Remove from parent partnership's child list
         for (const [pid, children] of Object.entries(draft.parentOf)) {
@@ -878,6 +902,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         draft.individuals = draft.individuals.filter(i => i.id !== individualId);
         removeFromTwinSets(draft, individualId);
         dropAssistedLinks(draft, new Set([individualId]));
+        // A placeholder left with no children, or alone, goes too (#107).
+        dropLeftoverPlaceholders(draft, candidates);
 
         // Drop their pin and unlock entries, which would otherwise dangle
         // (the JSON importer warns about them on every later load).
@@ -906,6 +932,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           draft.partnerships = draft.partnerships.filter(p => p.id !== old.id);
           delete draft.parentOf[old.id];
         }
+        dropLeftoverPlaceholders(draft, [old.individual1, old.individual2]);
         const child = draft.individuals.find(i => i.id === childId);
         if (child) child.sibOrder = nextRootSibOrder(draft);
       });
@@ -921,9 +948,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (kids.length > 0) {
         return `Not removed: this couple has ${kids.length === 1 ? "a child" : `${kids.length} children`}. Use Replace parents or Detach from parents on ${kids.length === 1 ? "the child" : "each child"} first.`;
       }
+      // An untouched placeholder partner would be left alone on the canvas, so it goes too (#107).
       mutate(draft => {
         draft.partnerships = draft.partnerships.filter(x => x.id !== partnershipId);
         delete draft.parentOf[partnershipId];
+        dropLeftoverPlaceholders(draft, [p.individual1, p.individual2]);
       });
       get().setNotice({ kind: "info", text: "Partnership removed; both people stay.", undoable: true });
       return null;
@@ -952,7 +981,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           if (!b) {
             const parent = draft.individuals.find(i => i.id === a)!;
             const partnerSex: Sex = parent.sex === "male" ? "female" : parent.sex === "female" ? "male" : "unknown";
-            const placeholder = makeIndividual(partnerSex, 0);
+            const placeholder = makePlaceholder(partnerSex);
             draft.individuals.push(placeholder);
             b = placeholder.id;
           }
@@ -968,6 +997,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         child.sibOrder = nextSibOrderInFamily(draft, partnership.id);
         draft.parentOf[partnership.id] = [...(draft.parentOf[partnership.id] ?? []), childId];
         clearChildless(draft, partnership.id);
+        // The previous couple's placeholder partner, if this was their last child (#107).
+        if (before) dropLeftoverPlaceholders(draft, [before.individual1, before.individual2]);
       });
       const after = currentParentsOf(get().pedigree, childId)!;
       const name = (id: string) => get().pedigree.individuals.find(i => i.id === id)?.name?.trim() || "an individual";
@@ -1166,6 +1197,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;
         ind.sex = sex;
+        delete ind.placeholder; // a sex the user chose is a recorded fact (#107)
         const twin = twinSetOf(draft as Pedigree, id);
         if (twin?.set.zygosity === "monozygotic") {
           for (const m of twin.set.members) {
