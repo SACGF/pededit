@@ -13,6 +13,7 @@ import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
+import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -22,7 +23,8 @@ export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
 /**
  * On-canvas picking (#36): clicks choose existing individuals instead of
  * selecting. "parents" collects one or two parents for a child; "child"
- * takes one click, the individual who becomes a child of the partnership.
+ * takes one click, the individual who becomes a child of the partnership
+ * (of `geneticParentId` and a donor, for a same-sex couple, #105).
  * "partner" (#84) takes one click, the existing individual who becomes the
  * partner of individualId. "relatedness" (#90) takes one click and selects
  * that person with individualId, so the panel shows how the two are related.
@@ -31,7 +33,7 @@ export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
  */
 export type Picking =
   | { kind: "parents"; childId: string; picked: string[] }
-  | { kind: "child"; partnershipId: string }
+  | { kind: "child"; partnershipId: string; geneticParentId?: string }
   | { kind: "partner"; individualId: string }
   | { kind: "relatedness"; individualId: string }
   | { kind: "donor"; childId: string; gamete: Gamete }
@@ -249,7 +251,7 @@ interface PedigreeState {
   /** Active on-canvas picking, or null. Not undoable. */
   picking: Picking | null;
   startPickingParents: (childId: string) => void;
-  startPickingChild: (partnershipId: string) => void;
+  startPickingChild: (partnershipId: string, geneticParentId?: string) => void;
   startPickingPartner: (individualId: string) => void;
   startPickingRelatedness: (individualId: string) => void;
   /** Pick an existing person as the child's sperm or egg donor, or as the surrogate (#104). */
@@ -346,6 +348,12 @@ interface PedigreeState {
    * and the parents stay, as a couple (a gamete donor pair left with no
    * children is removed, as it is not a couple).
    */
+  /**
+   * Make an existing person a child of a same-sex couple (#105): of
+   * `geneticParentId` and a donor, the other partner a social parent (see
+   * `applySameSexChildren`). Returns the reason when refused.
+   */
+  setSameSexChild: (childId: string, partnershipId: string, geneticParentId: string) => string | null;
   detachFromParents: (childId: string) => void;
   /**
    * Remove a partnership without removing either person (#104), for a
@@ -507,6 +515,23 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
   }
 
   /**
+   * Say what adding a child to a same-sex couple did (#105): the donor is
+   * new on the canvas, so the user should know where it came from.
+   */
+  function noticeDonorChildren(geneticParentId: string, pairId: string, n: number) {
+    const ped = get().pedigree;
+    const pair = ped.partnerships.find(p => p.id === pairId);
+    const donor = ped.individuals.find(i => i.id === (pair?.individual1 === geneticParentId ? pair?.individual2 : pair?.individual1));
+    const name = ped.individuals.find(i => i.id === geneticParentId)?.name?.trim() || "this person";
+    const kind = donor?.sex === "male" ? "sperm donor" : "egg donor";
+    get().setNotice({
+      kind: "info",
+      text: `Added ${n === 1 ? "a child" : `${n} children`} of ${name} and ${donor?.name?.trim() || `a ${kind}`}: partners of the same sex have no genetic children together, so the partner is recorded as a parent who is not genetic.`,
+      undoable: true,
+    });
+  }
+
+  /**
    * One undo step applying `apply` to each of `ids` that `changes` (#35),
    * then an undoable notice saying how many changed. Nothing happens when
    * nobody would change.
@@ -573,7 +598,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
 
     startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, ...selectOnly(childId) }),
-    startPickingChild: (partnershipId) => set({ picking: { kind: "child", partnershipId } }),
+    startPickingChild: (partnershipId, geneticParentId) => set({ picking: { kind: "child", partnershipId, geneticParentId } }),
     startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, ...selectOnly(individualId) }),
     startPickingRelatedness: (individualId) => set({ picking: { kind: "relatedness", individualId }, ...selectOnly(individualId) }),
     startPickingDonor: (childId, gamete) => set({ picking: { kind: "donor", childId, gamete }, ...selectOnly(childId) }),
@@ -586,7 +611,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (picking.kind === "child") {
         const p = pedigree.partnerships.find(x => x.id === picking.partnershipId);
         if (!p) { set({ picking: null }); return true; }
-        const problem = get().setParents(id, [p.individual1, p.individual2]);
+        const problem = isSameSexCouple(pedigree, p)
+          ? get().setSameSexChild(id, p.id, picking.geneticParentId ?? p.individual1)
+          : get().setParents(id, [p.individual1, p.individual2]);
         if (problem) get().setNotice({ kind: "error", text: problem });
         else set({ picking: null });
         return true;
@@ -769,6 +796,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         console.warn("Cannot add a child to a pregnancy or pregnancy loss");
         return;
       }
+      let viaDonor: string | undefined;
       mutate(draft => {
         let partnershipId: string;
         const ownPs = findOwnPartnerships(draft, individualId);
@@ -795,9 +823,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         const child = makeIndividual(sex, nextSibOrderInFamily(draft, partnershipId));
         draft.individuals.push(child);
+        // A same-sex couple's child is this person's and a donor's (#105).
+        if (isSameSexCouple(draft, draft.partnerships.find(p => p.id === partnershipId))) {
+          viaDonor = applySameSexChildren(draft, partnershipId, individualId, [child.id], { donor: newId(), pair: newId() }) ?? undefined;
+          return;
+        }
         draft.parentOf[partnershipId] = [...(draft.parentOf[partnershipId] ?? []), child.id];
         clearChildless(draft, partnershipId);
       });
+      if (viaDonor) noticeDonorChildren(individualId, viaDonor, 1);
     },
 
     /**
@@ -817,9 +851,17 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         console.warn("Cannot add a child to a pregnancy or pregnancy loss");
         return;
       }
+      let viaDonor: string | undefined;
       mutate(draft => {
         if (!draft.individuals.some(i => i.id === individualId)) return;
         const pid = ensureChildPartnershipId(draft, individualId, partnershipId);
+        // A same-sex couple's children are this person's and a donor's (#105).
+        if (isSameSexCouple(draft, draft.partnerships.find(p => p.id === pid))) {
+          const kids = Array.from({ length: n }, () => makeIndividual(sex, 0));
+          draft.individuals.push(...kids);
+          viaDonor = applySameSexChildren(draft, pid, individualId, kids.map(k => k.id), { donor: newId(), pair: newId() }) ?? undefined;
+          return;
+        }
         let sibOrder = nextSibOrderInFamily(draft, pid);
         for (let k = 0; k < n; k++) {
           const child = makeIndividual(sex, sibOrder++);
@@ -828,6 +870,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         }
         clearChildless(draft, pid);
       });
+      if (viaDonor) noticeDonorChildren(individualId, viaDonor, n);
     },
 
     /**
@@ -948,6 +991,41 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           if (draft.unlockedIndividuals.length === 0) delete draft.unlockedIndividuals;
         }
       });
+    },
+
+    setSameSexChild: (childId, partnershipId, geneticParentId) => {
+      const ped = get().pedigree;
+      const couple = ped.partnerships.find(p => p.id === partnershipId);
+      const partner = couple && (couple.individual1 === geneticParentId ? couple.individual2 : couple.individual1);
+      const problem = sameSexChildProblem(ped, partnershipId, geneticParentId)
+        ?? setParentsProblem(ped, childId, [geneticParentId])
+        ?? setParentsProblem(ped, childId, [partner!]);
+      if (problem) { console.warn(`Cannot set parents: ${problem}`); return problem; }
+      const before = currentParentsOf(ped, childId);
+      mutate(draft => {
+        if (before) {
+          draft.parentOf[before.id] = (draft.parentOf[before.id] ?? []).filter(c => c !== childId);
+          const old = draft.partnerships.find(p => p.id === before.id);
+          if (old?.twins) {
+            old.twins = old.twins.map(t => ({ ...t, members: t.members.filter(m => m !== childId) })).filter(t => t.members.length >= 2);
+            if (old.twins.length === 0) delete old.twins;
+          }
+        }
+        applySameSexChildren(draft, partnershipId, geneticParentId, [childId], { donor: newId(), pair: newId() });
+        // An empty donor pair left behind is not a couple; nor is a placeholder left alone (#107).
+        if (before?.donorConception && (draft.parentOf[before.id] ?? []).length === 0) {
+          draft.partnerships = draft.partnerships.filter(p => p.id !== before.id);
+          delete draft.parentOf[before.id];
+        }
+        if (before) dropLeftoverPlaceholders(draft, [before.individual1, before.individual2]);
+      });
+      const name = (id: string) => get().pedigree.individuals.find(i => i.id === id)?.name?.trim() || "an individual";
+      get().setNotice({
+        kind: "info",
+        text: `${name(childId)} is now a child of ${name(geneticParentId)} and a donor, with ${name(partner!)} as a parent who is not genetic.`,
+        undoable: true,
+      });
+      return null;
     },
 
     detachFromParents: (childId) => {
@@ -1225,6 +1303,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     /** Monozygotic twins share a sex, so changing one changes the whole set (#11). */
     setSex: (id, sex) => {
+      const problem = batchSexProblem(get().pedigree, [id], sex);
+      if (problem) { get().setNotice({ kind: "error", text: problem }); return; }
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;

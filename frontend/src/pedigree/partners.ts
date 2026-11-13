@@ -15,8 +15,9 @@ function label(pedigree: Pedigree, id: string): string {
 /**
  * Why `aId` and `bId` cannot become partners, or null when they can.
  * Relatives are allowed, parent and child included: that is the point, and
- * the layout draws them. Unknown sex is always allowed; two of the same
- * known sex are not, as everywhere else in the editor.
+ * the layout draws them. Any sexes are allowed: a same-sex couple (#105)
+ * has no genetic children together, and adding a child to one goes through
+ * a donor (`sameSex.ts`).
  */
 export function linkPartnerProblem(pedigree: Pedigree, aId: string, bId: string): string | null {
   if (aId === bId) return "Someone cannot be their own partner.";
@@ -29,7 +30,6 @@ export function linkPartnerProblem(pedigree: Pedigree, aId: string, bId: string)
   const already = pedigree.partnerships.some(p =>
     (p.individual1 === aId && p.individual2 === bId) || (p.individual1 === bId && p.individual2 === aId));
   if (already) return "They are already partners.";
-  if (a.sex !== "unknown" && a.sex === b.sex) return `Two partners cannot both be ${a.sex}.`;
   return null;
 }
 

@@ -433,7 +433,7 @@ export const EXAMPLES: ExamplePedigree[] = [
   },
   {
     label: "Assisted reproduction",
-    description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate · egg donor who carries",
+    description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate · egg donor who carries · NSGC 2022 female couple",
     data: {
       siblingOrder,
       individuals: [
@@ -464,6 +464,13 @@ export const EXAMPLES: ExamplePedigree[] = [
         { id: "ar_h4", sex: "male",    affected: false, sibOrder: 0 },
         { id: "ar_w4", sex: "female",  affected: false, sibOrder: 0 },
         { id: "ar_c4", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", carriedBy: "ar_d4", socialParents: ["ar_w4"] },
+        // 5. NSGC 2022 Fig. 5 (1b), same-sex couple (#105): two women, one
+        // carrying a pregnancy by donor sperm. As in 1, the partner who is
+        // not a genetic parent is linked by the couple line only.
+        { id: "ar_m5", sex: "female",  affected: false, sibOrder: 0 },
+        { id: "ar_p5", sex: "female",  affected: false, sibOrder: 0, name: "Partner" },
+        { id: "ar_d5", sex: "male",    affected: false, sibOrder: 0, reproductiveRole: "donor" },
+        { id: "ar_c5", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", socialParents: ["ar_p5"] },
       ],
       partnerships: [
         { id: "ar_pp1", individual1: "ar_h1", individual2: "ar_w1" },
@@ -474,6 +481,8 @@ export const EXAMPLES: ExamplePedigree[] = [
         { id: "ar_pp3", individual1: "ar_h3", individual2: "ar_w3" },
         { id: "ar_pp4", individual1: "ar_h4", individual2: "ar_w4" },
         { id: "ar_pd4", individual1: "ar_h4", individual2: "ar_d4", donorConception: true },
+        { id: "ar_pp5", individual1: "ar_m5", individual2: "ar_p5" },
+        { id: "ar_pd5", individual1: "ar_d5", individual2: "ar_m5", donorConception: true },
       ],
       parentOf: {
         ar_pd1: ["ar_c1"],
@@ -481,6 +490,7 @@ export const EXAMPLES: ExamplePedigree[] = [
         ar_pg:  ["ar_w3"],
         ar_pp3: ["ar_c3"],
         ar_pd4: ["ar_c4"],
+        ar_pd5: ["ar_c5"],
       },
     },
   },

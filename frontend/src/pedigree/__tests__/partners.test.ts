@@ -43,7 +43,7 @@ describe("linkPartnerProblem (#84)", () => {
     expect(linkPartnerProblem(p, "gc1", "preg")).toMatch(/pregnancy/);
     expect(linkPartnerProblem(p, "preg", "gc1")).toMatch(/pregnancy/);
     expect(linkPartnerProblem(p, "wife", "son")).toMatch(/already partners/);
-    expect(linkPartnerProblem(p, "gc1", "son")).toMatch(/both be male/);
+    expect(linkPartnerProblem(p, "gc1", "son")).toBeNull(); // same sex (#105)
     expect(linkPartnerProblem(p, "gc1", "gc2")).toBeNull(); // cousins
     expect(linkPartnerProblem(p, "gf", "dau")).toBeNull(); // parent and child
     expect(linkPartnerProblem(p, "son", "dau")).toBeNull(); // siblings
@@ -92,7 +92,7 @@ describe("linkPartner (#84)", () => {
 
   it("refuses with the reason and changes nothing", () => {
     expect(store().linkPartner("son", "wife")).toMatch(/already partners/);
-    expect(store().linkPartner("gc1", "son")).toMatch(/both be male/);
+    expect(store().linkPartner("gc1", "preg")).toMatch(/pregnancy/);
     expect(ped()).toEqual(pedigree());
     expect(store().past).toHaveLength(0);
   });
@@ -148,8 +148,8 @@ describe("picking a partner (#84)", () => {
     store().pickIndividual("gc1");
     expect(store().notice).toMatchObject({ kind: "error" });
     expect(store().notice!.text).toMatch(/own partner/);
-    store().pickIndividual("son");
-    expect(store().notice!.text).toMatch(/both be male/);
+    store().pickIndividual("preg");
+    expect(store().notice!.text).toMatch(/pregnancy/);
     expect(store().picking).toMatchObject({ kind: "partner" });
     expect(store().pedigree.partnerships).toHaveLength(3);
     store().cancelPicking();

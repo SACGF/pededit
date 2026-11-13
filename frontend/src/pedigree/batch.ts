@@ -1,5 +1,6 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { twinSetOf } from "./twins";
+import { geneticParentsSexProblem } from "./sameSex";
 
 /**
  * Batch status changes on a multiple selection (#35): what the more menu's
@@ -64,10 +65,10 @@ export function batchSexTargets(pedigree: Pedigree, ids: string[]): Set<string> 
 }
 
 /**
- * Why `ids` cannot all be given `sex`, or null. The single-person Sex menu
- * greys out the sex of a partner of known sex; here the check is on the
- * result, so two selected partners cannot both be made male, while a couple
- * can still be swapped one at a time.
+ * Why `ids` cannot all be given `sex`, or null. Partners may be of the same
+ * sex (#105); the genetic parents of a child may not, so a change that
+ * would make two of them the same known sex is refused (see
+ * `geneticParentsSexProblem`). The single-person Sex menu uses this too.
  */
 export function batchSexProblem(pedigree: Pedigree, ids: string[], sex: Sex): string | null {
   const targets = batchSexTargets(pedigree, ids);
@@ -75,16 +76,5 @@ export function batchSexProblem(pedigree: Pedigree, ids: string[], sex: Sex): st
   if (sex === "unknown") return null;
   const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
   for (const id of targets) sexOf.set(id, sex);
-  const name = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
-  for (const p of pedigree.partnerships) {
-    if (!targets.has(p.individual1) && !targets.has(p.individual2)) continue;
-    const a = sexOf.get(p.individual1), b = sexOf.get(p.individual2);
-    if (a === sex && b === sex) {
-      const n1 = name(p.individual1), n2 = name(p.individual2);
-      return n1 && n2
-        ? `Not available: ${n1} and ${n2} are partners and would both be ${sex}.`
-        : `Not available: two partners would both be ${sex}.`;
-    }
-  }
-  return null;
+  return geneticParentsSexProblem(pedigree, targets, id => sexOf.get(id));
 }

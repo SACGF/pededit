@@ -458,6 +458,18 @@ draws NSGC symbols.
   Editing: `applyAddDonor` / `applyAddSurrogate` (store `addDonor`,
   `addSurrogate`, more menu "Assisted reproduction"); the edit panel's
   `AssistedForm` sets the letter, carrier and social parents.
+- `sameSex.ts`: same-sex couples (#105, NSGC 2022 Fig. 5). Partners may
+  share a sex; a child's genetic parents (its `parentOf` partnership) may
+  not. So a child added to a same-sex couple (`applySameSexChildren`, used
+  by the store's `addChild` / `addChildren` when the partnership is
+  same-sex and by `setSameSexChild` for "Existing child...") hangs from a
+  `donorConception` pair of the genetic parent and a donor of the other
+  sex, with the other partner as a social parent, who gets no line (their
+  partner has one, Fig. 5 example 1b). The next child by the same partner
+  reuses that donor pair (`donorPairFor`: the newest pair of that parent
+  with a donor whose child the partner raises), so they are full siblings.
+  The couple's own `parentOf` entry stays empty. No surrogate is added for
+  two men: the user adds one on the child if wanted.
 - `childless.ts` — childless couple marks (#15): segments hung from the
   middle of the couple line (raised by the hop when the line hops; on a
   consanguineous double line, from the lower line). `layoutToFlow` puts

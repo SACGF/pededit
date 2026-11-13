@@ -13,6 +13,7 @@ import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem } from "../batch";
+import { donorPairFor, sameSexCouple } from "../sameSex";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -148,18 +149,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
 
-  // Collect sexes that would create a same-sex pairing (grey them out)
-  const disabledSexes = new Set<string>();
-  for (const p of pedigree.partnerships) {
-    const partnerId =
-      p.individual1 === individualId ? p.individual2 :
-      p.individual2 === individualId ? p.individual1 : null;
-    if (!partnerId) continue;
-    const partner = pedigree.individuals.find(i => i.id === partnerId);
-    if (partner && partner.sex !== "unknown") {
-      disabledSexes.add(partner.sex);
-    }
-  }
+  // Partners may share a sex (#105); a child's two genetic parents may not.
+  const sexProblem = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individualId], sex);
 
   function action(fn: () => void) {
     fn();
@@ -218,7 +209,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           )}
           {ownPartnerships.length > 0 && !individual.lifeStatus && (
             <MenuItem
-              onClick={() => action(() => startPickingChild(ownPartnerships[0]!.partnershipId))}
+              onClick={() => action(() => startPickingChild(ownPartnerships[0]!.partnershipId, individualId))}
               title={ownPartnerships.length > 1
                 ? `Click an existing person on the canvas to make them a child of this couple (with ${ownPartnerships[0]!.label}; use Set parents on the child for another partner)`
                 : "Click an existing person on the canvas to make them a child of this couple"}
@@ -305,7 +296,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               key={sex}
               onClick={() => action(() => setSex(individualId, sex))}
               active={individual.sex === sex}
-              disabled={disabledSexes.has(sex)}
+              disabled={!!sexProblem(sex)}
+              title={sexProblem(sex) ?? undefined}
             >
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </MenuItem>
@@ -623,6 +615,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
   const childless = (pedigree.parentOf[partnershipId] ?? []).length === 0;
+  const sameSex = !!sameSexCouple(pedigree, partnershipId);
 
   function action(fn: () => void) {
     fn();
@@ -649,12 +642,16 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
         <MenuItem onClick={() => action(() => swapPartnerSides(partnershipId))} title={SWAP_SIDES_TITLE}>
           Swap sides
         </MenuItem>
-        <MenuItem
-          onClick={() => action(() => startPickingChild(partnershipId))}
-          title="Click an existing person on the canvas to make them a child of this couple"
-        >
-          Add existing child...
-        </MenuItem>
+        {sameSex ? (
+          <SameSexChildItems partnershipId={partnershipId} action={action} />
+        ) : (
+          <MenuItem
+            onClick={() => action(() => startPickingChild(partnershipId))}
+            title="Click an existing person on the canvas to make them a child of this couple"
+          >
+            Add existing child...
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() => action(() => removePartnership(partnershipId))}
           destructive
@@ -679,6 +676,71 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
             </MenuItem>
           ))}
         </MenuSection>
+      )}
+    </>
+  );
+}
+
+/**
+ * "Add child..." on a same-sex couple's line (#105): partners of the same
+ * sex have no genetic children together, so the menu asks which of them is
+ * the genetic parent and the child gets a donor of the other sex (see
+ * `applySameSexChildren`). Opposite-sex couples never see this.
+ */
+function SameSexChildItems({ partnershipId, action }: { partnershipId: string; action: (fn: () => void) => void }) {
+  const { pedigree, addChildren, startPickingChild } = usePedigreeStore();
+  const [open, setOpen] = useState(false);
+  const [parent, setParent] = useState<string | undefined>();
+  const p = pedigree.partnerships.find(x => x.id === partnershipId)!;
+  const ids = [p.individual1, p.individual2];
+  const nameOf = (id: string, k: number) => pedigree.individuals.find(i => i.id === id)?.name?.trim() || `Partner ${k + 1}`;
+  const sex = pedigree.individuals.find(i => i.id === p.individual1)?.sex;
+  const donorKind = sex === "female" ? "sperm donor" : "egg donor";
+  const other = parent && ids.find(id => id !== parent);
+  const pair = parent && other ? donorPairFor(pedigree, parent, other) : undefined;
+  const donorText = pair ? `the same ${donorKind} as before` : `a new ${donorKind}`;
+  const need = parent ? undefined : "Choose the genetic parent first";
+  return (
+    <>
+      <MenuItem
+        onClick={() => setOpen(v => !v)}
+        active={open}
+        title="Partners of the same sex have no genetic children together: choose which of them is the genetic parent, and a donor is added"
+      >
+        Add child...
+      </MenuItem>
+      {open && (
+        <div className="pl-2" data-same-sex-child>
+          <div className="px-2 pt-1 text-[10px] text-gray-400">Genetic parent</div>
+          <div className="flex">
+            {ids.map((id, k) => (
+              <MenuItem key={id} onClick={() => setParent(id)} active={parent === id} checked={parent === id}>
+                {nameOf(id, k)}
+              </MenuItem>
+            ))}
+          </div>
+          {parent && other && (
+            <div className="px-2 py-1 text-[10px] text-gray-500 leading-tight">
+              With {donorText}; {nameOf(other, ids.indexOf(other))} is a parent who is not genetic.
+            </div>
+          )}
+          <MenuItem disabled={!parent} title={need} onClick={() => action(() => addChildren(parent!, 1, "male", partnershipId))}>
+            Add son
+          </MenuItem>
+          <MenuItem disabled={!parent} title={need} onClick={() => action(() => addChildren(parent!, 1, "female", partnershipId))}>
+            Add daughter
+          </MenuItem>
+          <MenuItem disabled={!parent} title={need} onClick={() => action(() => addChildren(parent!, 1, "unknown", partnershipId))}>
+            Add child of unknown sex
+          </MenuItem>
+          <MenuItem
+            disabled={!parent}
+            title={need ?? "Click an existing person on the canvas to make them this child"}
+            onClick={() => action(() => startPickingChild(partnershipId, parent))}
+          >
+            Existing child...
+          </MenuItem>
+        </div>
       )}
     </>
   );
@@ -779,6 +841,11 @@ function AddChildrenPanel({ individualId, onAdd }: {
             ))}
           </select>
         </label>
+      )}
+      {sameSexCouple(pedigree, partnershipId) && (
+        <div className="px-2 py-1 text-[10px] text-gray-500 leading-tight" data-same-sex-hint>
+          Partners of the same sex: {shown === 1 ? "the child is" : "the children are"} this person's and a donor's.
+        </div>
       )}
       <MenuItem onClick={() => add("male")}>
         Add {shown} {shown === 1 ? "son" : "sons"}

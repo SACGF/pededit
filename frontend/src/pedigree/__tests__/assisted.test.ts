@@ -216,8 +216,9 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(couples).not.toContain("ar_d2=ar_h2");
     expect(couples).toContain("ar_h1=ar_w1");
     const apart = flow.sibshipEdges.filter(e => e.data?.apart).map(e => e.data!.childIds.map(ind).join());
-    expect(apart.sort()).toEqual(["ar_c1", "ar_c4"]);
-    expect(flow.sibshipEdges.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4"]);
+    expect(apart.sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
+    expect(flow.sibshipEdges.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
+    expect(couples).toContain("ar_m5=ar_p5"); // the female couple (#105)
     // Scenario 1: no line from the intended father; scenario 2: the child hangs
     // from the couple and the egg donor has her own line; scenario 4: none from the wife.
     const links = flow.assistedEdges.map(e => `${e.data!.kind}:${ind(e.source)}>${e.data!.children.join()}`).sort();
@@ -231,8 +232,9 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(at("ar_c2").x).toBeCloseTo((at("ar_h2").x + at("ar_w2").x) / 2, 3);
     expect(at("ar_c3").x).toBeCloseTo(at("ar_s3").x, 3);
     expect(at("ar_c4").x).toBeCloseTo(at("ar_d4").x, 3);
+    expect(at("ar_c5").x).toBeCloseTo(at("ar_m5").x, 3); // NSGC 2022 Fig. 5 1b (#105)
     // A line runs straight down through the labels of those carrying women: white backing.
-    expect(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_s3", "ar_w1"]);
+    expect(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_m5", "ar_s3", "ar_w1"]);
     // Kinship and PED still follow the genetic parents.
     const k = kinshipCoefficients(p);
     expect(k.kinship("ar_d2", "ar_c2")).toBe(1 / 4);
@@ -303,7 +305,7 @@ describe("assisted reproduction: files (#45)", () => {
     const row = (id: string) => rows.find(r => r[1] === id)!;
     expect(row("ar_c1").slice(2, 4)).toEqual(["ar_d1", "ar_w1"]);
     expect(row("ar_c2").slice(2, 4)).toEqual(["ar_h2", "ar_d2"]);
-    expect(pedLostAssisted(p).map(i => i.id).sort()).toEqual(["ar_c1", "ar_c2", "ar_c3", "ar_c4", "ar_d1", "ar_d2", "ar_d4", "ar_s3"]);
+    expect(pedLostAssisted(p).map(i => i.id).sort()).toEqual(["ar_c1", "ar_c2", "ar_c3", "ar_c4", "ar_c5", "ar_d1", "ar_d2", "ar_d4", "ar_d5", "ar_s3"]);
     const [header, ...lines] = exportCsv(p).split("\n");
     const cols = header!.split(",");
     const c1 = lines.find(l => l.includes('"ar_c1"'))!.split(",");

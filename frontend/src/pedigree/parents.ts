@@ -15,7 +15,8 @@ function label(pedigree: Pedigree, id: string): string {
  * Why `parentIds` (one or two existing individuals) cannot be the parents of
  * `childId`, or null when they can. A single parent gets a placeholder
  * partner. Unknown sex is always allowed; two parents of the same known sex
- * are not, since the partnership model pairs a father role with a mother role.
+ * are not: these are the genetic parents, and sex is biological sex. A
+ * same-sex couple's children are donor-conceived (`sameSex.ts`, #105).
  */
 export function setParentsProblem(pedigree: Pedigree, childId: string, parentIds: string[]): string | null {
   const unique = [...new Set(parentIds)];
@@ -35,7 +36,13 @@ export function setParentsProblem(pedigree: Pedigree, childId: string, parentIds
   }
   if (unique.length === 2) {
     const [a, b] = unique.map(id => pedigree.individuals.find(i => i.id === id)!);
-    if (a.sex !== "unknown" && a.sex === b.sex) return `Two parents cannot both be ${a.sex}.`;
+    if (a.sex !== "unknown" && a.sex === b.sex) {
+      const couple = pedigree.partnerships.some(p => !p.donorConception
+        && ((p.individual1 === a.id && p.individual2 === b.id) || (p.individual1 === b.id && p.individual2 === a.id)));
+      return couple
+        ? `Two genetic parents cannot both be ${a.sex}. For a child of this couple, right-click the couple line and use Add child, which asks for the genetic parent and adds a donor.`
+        : `Two parents cannot both be ${a.sex}.`;
+    }
   }
   return null;
 }

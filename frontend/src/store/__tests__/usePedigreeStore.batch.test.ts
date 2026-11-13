@@ -105,9 +105,9 @@ describe("batch status changes (#35)", () => {
     expect(["a", "b", "d"].map(id => ind(id).sex)).toEqual(["female", "female", "unknown"]);
   });
 
-  it("refuses a sex that would give two partners the same known sex", () => {
+  it("refuses a sex that would give a child two genetic parents of the same known sex", () => {
     const why = get().setSexMany(["f", "m"], "male");
-    expect(why).toMatch(/partners/);
+    expect(why).toMatch(/genetic parents/);
     expect(get().notice?.kind).toBe("error");
     expect(ind("m").sex).toBe("female");
     expect(get().past).toHaveLength(0);
@@ -167,5 +167,11 @@ describe("batchStatus / batchSexProblem", () => {
     expect(batchSexProblem(family(), ["f", "m"], "female")).not.toBeNull();
     expect(batchSexProblem(family(), ["a", "c"], "female")).toBeNull();
     expect(batchSexProblem(family(), ["gone"], "male")).toBe("Nobody selected.");
+  });
+
+  it("allows partners of the same sex when they have no genetic children together (#105)", () => {
+    const childless = { ...family(), parentOf: {} };
+    expect(batchSexProblem(childless, ["f"], "female")).toBeNull();
+    expect(batchSexProblem(childless, ["f", "m"], "male")).toBeNull();
   });
 });

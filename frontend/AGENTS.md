@@ -73,7 +73,15 @@ stub so the app still builds without Google login.
   about 1 couple in 9 across the examples, mostly inbred or partner-chain
   families. A pinned partner keeps its pin and the notice says so.
   "Add existing partner..." (#84, `linkPartner`) joins two people already
-  on the tree, relatives included; "Add partner" always makes a new person.
+  on the tree, relatives included, and of any sex; "Add partner" always
+  makes a new person. Same-sex couples (#105, `pedigree/sameSex.ts`) are
+  ordinary partnerships, but sex is biological sex, so they never have
+  genetic children together: "Add child" from one partner (hover pill or
+  "Add children...") makes the child that partner's and a donor's, and the
+  couple line's menu shows "Add child..." (only for a same-sex couple)
+  asking which partner is the genetic parent. The Sex menus refuse only a
+  change that would give a child two genetic parents of one sex
+  (`geneticParentsSexProblem`), not same-sex partners.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
   brackets (`Individual.adopted`, `pedigree/adoption.ts`, #12: "in" also
   dashes the line from the adoptive parents); PED cannot carry either, so

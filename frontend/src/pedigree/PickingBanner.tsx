@@ -5,6 +5,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { setParentsProblem } from "./parents";
 import { linkPartnerProblem } from "./partners";
 import { addDonorProblem, addSurrogateProblem } from "./assisted";
+import { isSameSexCouple } from "./sameSex";
 
 function nameOf(pedigree: Pedigree, id: string): string {
   const ind = pedigree.individuals.find(i => i.id === id);
@@ -63,6 +64,8 @@ export function PickingBanner() {
       ? `Click the woman who carried ${nameOf(pedigree, picking.childId)}`
     : picking.kind === "relatedness"
       ? `Click a person to see how they are related to ${nameOf(pedigree, picking.individualId)}`
+    : partnership && picking.kind === "child" && picking.geneticParentId && isSameSexCouple(pedigree, partnership)
+      ? `Click a person to make them a child of ${nameOf(pedigree, picking.geneticParentId)} and a donor`
     : partnership
       ? `Click a person to make them a child of ${nameOf(pedigree, partnership.individual1)} and ${nameOf(pedigree, partnership.individual2)}`
       : "Click a person";

@@ -254,7 +254,12 @@ recommendations stand except as below. No new symbols.
     lines from the egg donor partner and the sperm donor).
   The 2008 "planned adoption" scenario is not repeated.
 - Same-sex relationships were already recorded in 2008; the 2022 figures
-  draw same-sex and trans couples as ordinary couples (#105).
+  draw same-sex and trans couples as ordinary couples. Follows (#105): a
+  same-sex couple is an ordinary partnership with a couple line; their
+  child is one partner's and a donor's (the #45 donor pair), the other
+  partner a social parent linked by the couple line only, as example 1b
+  draws it (the "Assisted reproduction" example has one). Trans couples
+  need nothing: partners are paired by sex and drawn by gender (#26).
 - Frozen embryos: still no symbol (chart notes suffice for now).
 - Partners are no longer placed man left, woman right (Resta et al. 2022).
 
@@ -280,12 +285,11 @@ use for groups.
 ## Open gaps (November 2026)
 
 The 2008 gaps found in November 2026 (#1, #8, #20, #97, #99, #100, #101,
-#102, #45 and #98) are done. Still open:
+#102, #45 and #98) are done, as are same-sex couples (#105). Still open:
 
 1. Remaining assisted reproduction cases from Fig. 3 (#108).
 2. Fields NSGC uses that PedEdit lacks: gestational age, karyotype, proven
    zygosity, adoption by a relative, "n" groups (#112).
-3. Same-sex couples, which the 2022 figures draw (#105).
-4. 2022: carriers as a divided fill rather than a dot (#115). Results
+3. 2022: carriers as a divided fill rather than a dot (#115). Results
    without "E" are done (#114). The other 2022 questions are answered above (#110).
-5. What de-identified export should drop, given the masking guidance (#111).
+4. What de-identified export should drop, given the masking guidance (#111).
