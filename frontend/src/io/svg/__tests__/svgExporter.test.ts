@@ -497,7 +497,10 @@ describe("exportSvg: someone drawn twice", () => {
     const svg = exportSvg(dfc);
     const shapes = svg.match(/<g transform="translate\([^)]+\)">\n<(?:rect|circle|polygon)/g) ?? [];
     expect(shapes).toHaveLength(11);
-    expect(svg.match(/stroke-dasharray/g)).toHaveLength(1);
+    const arcs = svg.match(/<g class="duplicate-arcs">([\s\S]*?)<\/g>/)![1]!;
+    expect(arcs.match(/stroke-dasharray/g)).toHaveLength(1);
+    // The key explains the arc (#124).
+    expect(svg.match(/<g class="pedigree-key"[\s\S]*Same person drawn more than once/)).not.toBeNull();
   });
 });
 

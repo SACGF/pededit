@@ -6,6 +6,7 @@ import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "./assisted";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
+import { DUPLICATE_LEGEND_LABEL } from "./constants";
 import { COLLAPSED_BRANCH_LABEL, collapseInfo, drawnPedigree } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
@@ -803,7 +804,11 @@ export function renderPlainCarrierSwatchSvg(sex: Individual["sex"], x: number, y
  * `width` across. Each swatch uses the sex of the first person with the
  * status, as the in-app legend does.
  */
-export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
+export function renderExportKeySvg(
+  pedigree: Pedigree, x: number, y: number,
+  /** The drawing joins two copies of someone with a dashed arc (#124); the exporter knows from its layout. */
+  { duplicates = false }: { duplicates?: boolean } = {},
+): TagLegendBlock {
   const rows: { label: string; swatch: (sy: number) => string }[] = [];
   const inds = pedigree.individuals;
   // Swatches use the shape drawn, the gender identity's when shown (#26).
@@ -991,6 +996,14 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     rows.push({
       label: kind === "carrier" ? CARRIER_LINE_LEGEND : SOCIAL_LINE_LEGEND,
       swatch: sy => `<line x1="${fmt(x + 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + LEGEND_SWATCH - 2)}" y2="${fmt(sy + LEGEND_SWATCH - 1)}" stroke="black" stroke-width="1.5"${kind === "social" ? ` stroke-dasharray="4 2"` : ""}/>`,
+    });
+  }
+
+  // Someone drawn more than once (#124): a dashed arc, as between the copies.
+  if (duplicates) {
+    rows.push({
+      label: DUPLICATE_LEGEND_LABEL,
+      swatch: sy => `<path d="M ${fmt(x + 1)} ${fmt(sy + LEGEND_SWATCH - 2)} Q ${fmt(x + LEGEND_SWATCH / 2)} ${fmt(sy - 4)} ${fmt(x + LEGEND_SWATCH - 1)} ${fmt(sy + LEGEND_SWATCH - 2)}" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/>`,
     });
   }
 

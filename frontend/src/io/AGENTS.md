@@ -80,6 +80,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 - `svgExporter.ts` — standard layout as an SVG string, including the key
   (`renderExportKeySvg` in `pedigree/tags.ts`: Affected, Carrier, Deceased
   rows when present, then tags in use), in a `<g class="pedigree-key">`.
+  The "Same person drawn more than once" row (#124) cannot be read off the
+  pedigree: each exporter passes `{ duplicates }` from its own drawing
+  (`flow.duplicateEdges` here, `layout.duplicates` in the U-shape, which
+  draws different copies), and the in-app legend uses `drawsDuplicates`.
   Tests find symbols by `<g transform="translate(..)">` followed by a shape,
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.

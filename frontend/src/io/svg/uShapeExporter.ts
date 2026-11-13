@@ -1536,7 +1536,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
     minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
-  const legend = renderExportKeySvg(working, padding, 0);
+  const legend = renderExportKeySvg(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
   const titleW = options.title ? titleWidth(options.title) + 2 * padding : 0;
   const drawingW = Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding);

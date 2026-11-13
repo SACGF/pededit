@@ -28,6 +28,8 @@ import { tagTakesOnset } from "@/pedigree/onset";
 import { clinicalDetailLines } from "@/pedigree/clinicalDetails";
 import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "@/pedigree/gender";
 import { Tags } from "lucide-react";
+import { drawsDuplicates } from "@/pedigree/duplicates";
+import { DUPLICATE_LEGEND_LABEL } from "@/pedigree/constants";
 
 /**
  * The figure legend, always visible in the edit panel (#75). With an
@@ -303,6 +305,15 @@ function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
 }
 
 /** Couple line with the ended relationship break (#98). */
+/** The dashed arc joining two copies of someone drawn more than once (#124). */
+function DuplicateArcSvg() {
+  return (
+    <svg width="48" height="20" viewBox="0 0 48 20">
+      <path d="M 4 17 Q 24 -5 44 17" stroke="black" strokeWidth={2} strokeDasharray="6 4" fill="none" />
+    </svg>
+  );
+}
+
 function EndedSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -433,6 +444,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const linkKinds = new Set(assistedLinks(pedigree).map(l => l.kind));
   if (linkKinds.has("carrier")) relRows.push({ icon: <AssistedLineSvg dashed={false} />, label: CARRIER_LINE_LEGEND });
   if (linkKinds.has("social"))  relRows.push({ icon: <AssistedLineSvg dashed />,        label: SOCIAL_LINE_LEGEND });
+  if (drawsDuplicates(full))    relRows.push({ icon: <DuplicateArcSvg />,               label: DUPLICATE_LEGEND_LABEL });
 
   // Every defined tag is listed so an unused one can still be ticked; the
   // exported key lists only tags someone carries.

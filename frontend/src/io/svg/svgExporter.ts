@@ -86,6 +86,7 @@ function computeBounds(
   slotPos: SlotPos,
   options: SvgExportOptions,
   aboveTop = Infinity,
+  duplicates = false,
 ): CanvasBounds {
   const padding = options.padding ?? 40;
   // The title's baseline is at padding + 16, TITLE_GAP above the top row of
@@ -123,7 +124,7 @@ function computeBounds(
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
-  const legend = renderExportKeySvg(pedigree, 0, 0);
+  const legend = renderExportKeySvg(pedigree, 0, 0, { duplicates });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
 
   // A title wider than the drawing widens the figure; the drawing is then
@@ -577,7 +578,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const result  = alignPedigreeByFamily(working);
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
-  const bounds  = computeBounds(working, slotPos, options, highestConsanguinityLabel(flow));
+  const duplicates = flow.duplicateEdges.length > 0;
+  const bounds  = computeBounds(working, slotPos, options, highestConsanguinityLabel(flow), duplicates);
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [
@@ -609,7 +611,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;
-  const legend = renderExportKeySvg(working, padding, 0);
+  const legend = renderExportKeySvg(working, padding, 0, { duplicates });
   if (legend.height > 0) {
     lines.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`);
     lines.push(...legend.markup);
