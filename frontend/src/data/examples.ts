@@ -1,4 +1,5 @@
 import type { Pedigree, Individual, Partnership, Sex, Tag } from "@pedigree-editor/layout-engine";
+import { withCurrentNotation } from "../pedigree/notation";
 
 export interface ExamplePedigree {
   label: string;
@@ -12,7 +13,8 @@ export interface ExamplePedigree {
 
 const siblingOrder = { mode: "insertion" as const, affectedFirst: false };
 
-export const EXAMPLES: ExamplePedigree[] = [
+/** Built-in examples, all drawn in the current NSGC edition (#115): see the end of the list. */
+const EXAMPLE_LIST: ExamplePedigree[] = [
   {
     label: "Simple family",
     description: "2 generations · 4 individuals",
@@ -496,6 +498,13 @@ export const EXAMPLES: ExamplePedigree[] = [
   },
   ...historicAndClassicExamples(),
 ];
+
+/**
+ * The examples, each written with `canvasSettings.notation` "nsgc2022": a
+ * pedigree without the setting is drawn in NSGC 2008 (pedigrees saved before
+ * it existed), and an example opened now is new (#115).
+ */
+export const EXAMPLES: ExamplePedigree[] = EXAMPLE_LIST.map(e => ({ ...e, data: withCurrentNotation(e.data) }));
 
 /** Example picker headings in display order. "" is the ungrouped set above. */
 export const EXAMPLE_GROUPS: string[] = [...new Set(EXAMPLES.map(e => e.group ?? ""))];

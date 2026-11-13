@@ -1,4 +1,6 @@
 import axios from "axios";
+import { withCurrentNotation } from "../pedigree/notation";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export const apiClient = axios.create({
   baseURL: "/api",
@@ -123,7 +125,8 @@ export const pedigreeApi = {
   create: (title: string) =>
     apiClient.post<PedigreePayload>("/pedigrees/", {
       title,
-      data: { individuals: [], partnerships: [], parentOf: {} },
+      // A new pedigree is drawn in the current NSGC edition (#115); absent would mean 2008.
+      data: withCurrentNotation<Pick<Pedigree, "individuals" | "partnerships" | "parentOf" | "canvasSettings">>({ individuals: [], partnerships: [], parentOf: {} }),
     }),
 
   createWithData: (title: string, data: unknown) =>

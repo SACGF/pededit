@@ -27,6 +27,8 @@ function family(): Pedigree {
     partnerships: [{ id: "p", individual1: "f", individual2: "m" }],
     parentOf: { p: ["c1", "c2"] },
     siblingOrder: { mode: "insertion", affectedFirst: false },
+    // Written now, so in the current edition; absent would mean 2008 (#115).
+    canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, notation: "nsgc2022" },
   };
 }
 
@@ -39,7 +41,7 @@ const WIDTH = labelMaxWidth(80);
 const STAR = /<text class="documented-evaluation"[^>]*>\*<\/text>/g;
 const LINE = /<line class="presymptomatic"[^>]*stroke="black"/g;
 
-describe("evaluation results, NSGC 2022 default (#114)", () => {
+describe("evaluation results, NSGC 2022 (#114)", () => {
   it("writes the detail then the result, with no E and no numbering", () => {
     const [f, , c1] = family().individuals;
     expect(evaluationLines(f!, WIDTH)).toEqual(["BRCA1", "c.5266dupC +"]);
@@ -80,6 +82,12 @@ describe("evaluation results, NSGC 2022 default (#114)", () => {
     const detailOnly = { ...family(), individuals: family().individuals.map(i => ({ ...i, evaluations: i.evaluations && [{ detail: "echo" }] })) };
     expect(renderExportKeySvg(detailOnly, 0, 0).markup.join("")).not.toContain("Result:");
     expect(renderExportKeySvg({ ...detailOnly, canvasSettings: family2008().canvasSettings }, 0, 0).markup.join("")).toContain("Evaluation:");
+  });
+
+  it("a pedigree saved without the setting is drawn in NSGC 2008 (#115)", () => {
+    const { canvasSettings: _cs, ...old } = family();
+    expect(exportSvg(old)).toContain("E+ (BRCA1");
+    expect(exportSvg(family())).not.toContain("E+ (BRCA1");
   });
 
   it("writes the CSV in the same notation", () => {

@@ -4,6 +4,7 @@ import { convertFamily } from "./converter.js";
 import { exportPed, type ExportOptions } from "./exporter.js";
 import type { ImportResult } from "./types.js";
 import { ValidationIssueCode } from "./types.js";
+import { withCurrentNotation } from "../../pedigree/notation";
 
 export { exportPed };
 export type { ExportOptions, ImportResult };
@@ -34,7 +35,8 @@ export function importPed(text: string): ImportResult {
   const familyIds = [...new Set(rows.map(r => r.familyId))];
   const pedigrees = familyIds.map(fid => ({
     familyId: fid,
-    pedigree: convertFamily(rows.filter(r => r.familyId === fid)),
+    // A PED file has no settings: it is made now, so it gets the current NSGC edition (#115).
+    pedigree: withCurrentNotation(convertFamily(rows.filter(r => r.familyId === fid))),
   }));
 
   return { pedigrees, issues: allIssues, hasErrors: false };
