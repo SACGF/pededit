@@ -91,10 +91,36 @@ export default function CanvasPage() {
   // pedigree opened does not flash the last one first.
   useEffect(() => () => closePedigree(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Save at once when the tab is hidden or closed, rather than losing the
+  // last 2 s of edits (#123). The browser's own "Leave site?" prompt shows
+  // only when the edits may not reach the server: the last save failed, or
+  // the pedigree is too big for a keepalive request and the save is still
+  // running when the page unloads.
+  useEffect(() => {
+    const { flushActivePedigree } = useAppStore.getState();
+    const onHidden = () => { if (document.visibilityState === "hidden") flushActivePedigree(); };
+    const onPageHide = () => { flushActivePedigree(); };
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!usePedigreeStore.getState().isDirty) return;
+      const sent = useAppStore.getState().flushActivePedigree();
+      if (sent === "keepalive" && !useAppStore.getState().lastSaveFailed) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    document.addEventListener("visibilitychange", onHidden);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      document.removeEventListener("visibilitychange", onHidden);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, []);
+
   // Auto-save: debounce 2 s after the last mutation so changes survive a reload.
   useEffect(() => {
     if (!isDirty || !activePedigreeId) return;
-    const timer = setTimeout(() => { saveActivePedigree(); }, 2000);
+    const timer = setTimeout(() => { saveActivePedigree().catch(() => {}); }, 2000);
     return () => clearTimeout(timer);
   }, [pedigree]); // eslint-disable-line react-hooks/exhaustive-deps
 

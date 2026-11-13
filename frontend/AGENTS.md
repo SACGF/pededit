@@ -120,6 +120,12 @@ stub so the app still builds without Google login.
   `closePedigree` on unmount: it saves unsaved edits and empties
   `usePedigreeStore`, so the next pedigree opened never flashes the last one,
   and an open whose fetch returns after a close or a later open is dropped.
+  Unsaved edits are also flushed when the tab is hidden or unloads (#123,
+  `flushActivePedigree`): `fetch` keepalive when the JSON is under 60 KB
+  (browsers cap keepalive bodies at 64 KB; every example fits), an ordinary
+  request otherwise. The browser's "Leave site?" prompt shows only when the
+  last save failed or an over-limit save is still running. A save clears
+  `isDirty` only if the pedigree was not edited while it ran.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
   undo/redo stacks, selection, every structural edit
   (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with
