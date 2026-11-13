@@ -13,6 +13,7 @@ import {
   type OnNodeDrag,
   useReactFlow,
   useStore as useFlowStore,
+  useStoreApi,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
@@ -222,23 +223,53 @@ function BranchCount({ count }: { count: number }) {
 }
 
 /**
- * Refits the view, once the new layout has rendered, when compact mode is
- * toggled or Auto arrange / Reset layout clears the pins (#64: an auto
- * layout of several families is often wider than the hand-placed one).
+ * Refits the view, once the new layout has rendered, when a pedigree is
+ * loaded (#117), compact mode is toggled or Auto arrange / Reset layout
+ * clears the pins (#64: an auto layout of several families is often wider
+ * than the hand-placed one).
+ *
+ * React Flow's own fitView resolves on the first node measurement it sees,
+ * and the canvas mounts on the empty pedigree (only the chart title node)
+ * before the opened one arrives: fitting then zoomed to the title at the
+ * maximum zoom, showing a handful of people (#117). So the fit waits until
+ * every node of the current layout (`expected`, from the store, a render
+ * ahead of the canvas's own node state) is in React Flow at its new position
+ * and measured. Node ids are layout slots ("0-0") and a filter reuses them
+ * at other places, so matching ids alone is not enough.
  */
-function FitOnLayoutChange({ compact }: { compact: boolean }) {
+function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: Node[] }) {
   const { fitView } = useReactFlow();
+  const flowStore = useStoreApi();
   const resetCount = usePedigreeStore(s => s.layoutResetCount);
   // Switching a view filter (#4) changes the drawing's size a lot.
   const filtered = usePedigreeStore(s => JSON.stringify(s.pedigree.filters ?? {}));
   const key = `${compact}-${resetCount}-${filtered}`;
   const prev = useRef(key);
-  useEffect(() => {
-    if (prev.current === key) return; // the initial fit comes from the fitView prop
+  // Also pending on mount: the fitView prop alone has the race above.
+  const pending = useRef(true);
+  if (prev.current !== key) {
     prev.current = key;
-    const id = requestAnimationFrame(() => { void fitView(); });
-    return () => cancelAnimationFrame(id);
-  }, [key, fitView]);
+    pending.current = true;
+  }
+  const want = useRef(expected);
+  want.current = expected;
+
+  useEffect(() => {
+    const tryFit = () => {
+      if (!pending.current) return;
+      const { nodeLookup } = flowStore.getState();
+      const ready = want.current.length > 0 && want.current.every(e => {
+        const n = nodeLookup.get(e.id);
+        return !!n?.measured?.width && !!n.measured.height
+          && n.position.x === e.position.x && n.position.y === e.position.y;
+      });
+      if (!ready) return;
+      pending.current = false;
+      void fitView();
+    };
+    tryFit();
+    return flowStore.subscribe(tryFit);
+  }, [key, expected, flowStore, fitView]);
   return null;
 }
 
@@ -371,6 +402,10 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     [title, computedNodes, coupleEdges],
   );
   const flowNodes = titleNode ? [...rfNodes, titleNode as unknown as Node<RFNodeData>] : rfNodes;
+  const fitExpected = useMemo(
+    () => titleNode ? [...computedNodes, titleNode as unknown as Node] : computedNodes,
+    [computedNodes, titleNode],
+  );
 
   // Background dots follow the snap grid when snap is on (React Flow's
   // default of 20 otherwise). React Flow centres a dot in each pattern tile,
@@ -507,7 +542,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         <PickingBanner />
         <FilterBanner />
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
-        <FitOnLayoutChange compact={compact} />
+        <FitOnLayoutChange compact={compact} expected={fitExpected} />
         <RevealOnRequest />
         <Controls />
         {showMinimap && (
