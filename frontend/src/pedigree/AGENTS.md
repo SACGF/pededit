@@ -131,8 +131,14 @@ draws NSGC symbols.
   its pattern tile, so `PedigreeCanvas` offsets it by half a tile.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
-  within the pedigree's quadrant-style tags. Only the first four have a
-  fixed quarter; someone carrying a fifth or later quadrant tag gets equal
+  within the pedigree's quadrant-style tags. How many sections a symbol has
+  follows the number of condition tags defined in NSGC 2022
+  (`sectionLayout`): one is the whole symbol, two the left and right
+  halves, three or four the quarters; NSGC 2008 (and no notation saved)
+  always uses quarters so old pedigrees keep their look. Always go through
+  `sectorAngles(index, pedigree)`, never a quarter table, or a legend
+  swatch will disagree with the symbol. Only the first four have a
+  fixed section; someone carrying a fifth or later quadrant tag gets equal
   slices of just the quadrant tags they carry, so other people's symbols
   never gain empty wedges. An affected person with any quadrant sector keeps
   a black centre (the outline scaled by `AFFECTED_CORE_SCALE`, white rim),
@@ -222,7 +228,9 @@ draws NSGC symbols.
   one fix per condition (`Problem.moreFixes`). Drawing is decided once in
   `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
   `carrierPaint` from tagFills.ts, plus the 2022 dotted half for a plain
-  carrier as the `PLAIN_CARRIER_TAG` sector), black base, black centre,
+  carrier as the `PLAIN_CARRIER_TAG` sector, left off when the person's
+  affected conditions cover the right half, which the edit panel then
+  reports as not drawn), black base, black centre,
   2008 dot. Canvas, minimap, both exporters and the legends read it; never
   test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
   `keyTagRows` are the key rows for the app legend and the export key.

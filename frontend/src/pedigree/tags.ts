@@ -54,7 +54,7 @@ export function nextTagColor(existing: readonly Tag[]): string {
 }
 
 export const TAG_STYLE_LABELS: Record<TagStyle, string> = {
-  quadrant: "Fill a quarter of the symbol",
+  quadrant: "Fill a section of the symbol",
   dot: "Coloured dot under the symbol",
   text: "Short text under the symbol",
 };
@@ -127,6 +127,12 @@ export const PLAIN_CARRIER_ANGLES: readonly [number, number] = [0, 180];
  * Madeline's convention and the one in most published multi-condition
  * pedigrees.
  *
+ * In NSGC 2022 (`sectionLayout`) the number of sections follows the number
+ * of conditions, as NSGC partitions the symbol only for several conditions:
+ * one condition fills the whole symbol, two take the left and right halves
+ * (the 2022 paper's HEXA and CFTR carrier), three or four these quarters.
+ * NSGC 2008 and pedigrees with no notation saved keep the quarters (#3).
+ *
  * A fifth or later quadrant tag has no quarter of its own. Someone who carries
  * one gets equal pie slices for the quadrant tags they carry, from 12
  * o'clock, identified by colour. Everyone else keeps the fixed quarters, so
@@ -139,24 +145,57 @@ const QUADRANT_ANGLES: readonly [number, number][] = [
   [180, 270], // lower left
 ];
 
+/** NSGC 2022 with two conditions: left half, then right half. */
+const HALF_ANGLES: readonly [number, number][] = [
+  [180, 360], // left half
+  [0, 180],   // right half
+];
+
+const WHOLE: [number, number] = [0, 360];
+
 export const QUADRANT_NAMES = ["upper left", "upper right", "lower right", "lower left"] as const;
 
 /** Number of quadrant tags that have a fixed quarter. */
 export const FIXED_QUADRANTS = QUADRANT_ANGLES.length;
 
 /**
- * Angle range of the fixed quarter for the quadrant tag at `index` in the
- * pedigree's quadrant tags, or the whole symbol for a fifth or later tag
- * (which has no fixed position; legends show it as a full swatch).
+ * How a pedigree divides its symbols among conditions: "quarters" (#3, NSGC
+ * 2008, and NSGC 2022 with three or more conditions), "halves" (NSGC 2022,
+ * two conditions) or "whole" (NSGC 2022, one condition).
  */
-export function sectorAngles(index: number): [number, number] {
-  return QUADRANT_ANGLES[index] ?? [0, 360];
+export type SectionLayout = "whole" | "halves" | "quarters";
+
+export function sectionLayout(pedigree: Pick<Pedigree, "tags" | "canvasSettings">): SectionLayout {
+  if (notationOf(pedigree) === "nsgc2008") return "quarters";
+  const n = (pedigree.tags ?? []).filter(t => t.style === "quadrant").length;
+  return n === 1 ? "whole" : n === 2 ? "halves" : "quarters";
+}
+
+/**
+ * Angle range of the fixed section for the quadrant tag at `index` in the
+ * pedigree's quadrant tags (`sectionLayout`), or the whole symbol for a fifth
+ * or later tag (which has no fixed position; legends show it as a full
+ * swatch). Without a pedigree, the quarters.
+ */
+export function sectorAngles(index: number, pedigree?: Pick<Pedigree, "tags" | "canvasSettings">): [number, number] {
+  const layout = pedigree ? sectionLayout(pedigree) : "quarters";
+  const table = layout === "whole" ? [WHOLE] : layout === "halves" ? HALF_ANGLES : QUADRANT_ANGLES;
+  const a = table[index];
+  return a ? [a[0], a[1]] : [...WHOLE];
+}
+
+/** Where the quadrant tag at `index` is drawn, for the tags dialog. */
+export function sectionName(index: number, pedigree: Pick<Pedigree, "tags" | "canvasSettings">): string {
+  const layout = sectionLayout(pedigree);
+  if (layout === "whole") return index === 0 ? "whole symbol" : "shared slice";
+  if (layout === "halves") return index === 0 ? "left half" : index === 1 ? "right half" : "shared slice";
+  return QUADRANT_NAMES[index] ?? "shared slice";
 }
 
 /**
  * Condition sectors on an individual's symbol, in pedigree tag order:
  * affected conditions in the tag's paint, carrier conditions (#115) in its
- * carrier paint, each in the condition's own quarter.
+ * carrier paint, each in the condition's own section (`sectorAngles`).
  */
 export function conditionSectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
   const all = quadrantTags(pedigree);
@@ -171,12 +210,25 @@ export function conditionSectorsFor(individual: Individual, pedigree: Pedigree):
     carrier ? { ...carrierPaint(tag, pedigree), carrier: true } : tagPaint(tag, pedigree);
   if (carried.every(c => c.index < FIXED_QUADRANTS)) {
     return carried.map(({ tag, index, carrier }) => {
-      const [start, end] = QUADRANT_ANGLES[index]!;
+      const [start, end] = sectorAngles(index, pedigree);
       return { tag, start, end, ...paint(tag, carrier) };
     });
   }
   const span = 360 / carried.length;
   return carried.map(({ tag, carrier }, i) => ({ tag, start: i * span, end: (i + 1) * span, ...paint(tag, carrier) }));
+}
+
+/** True when the sectors together cover the angle range [start, end]. */
+function covers(sectors: readonly Sector[], start: number, end: number): boolean {
+  const spans = sectors.map(s => [Math.max(s.start, start), Math.min(s.end, end)] as const)
+    .filter(([a, b]) => b > a)
+    .sort((p, q) => p[0] - q[0]);
+  let reached = start;
+  for (const [a, b] of spans) {
+    if (a > reached) return false;
+    reached = Math.max(reached, b);
+  }
+  return reached >= end;
 }
 
 /**
@@ -197,7 +249,10 @@ export function conditionSectorsFor(individual: Individual, pedigree: Pedigree):
  * alone, so the person is not filled black. Affected with no condition
  * recorded is the black fill, or the black centre over any carrier sectors.
  * A carrier with no condition recorded is the right half dotted, unless the
- * symbol is filled black.
+ * symbol is filled black or the person's affected conditions cover that half
+ * (`sectionLayout`: one condition is the whole symbol, the second of two the
+ * right half). Condition sections follow the number of conditions
+ * (`sectorAngles`).
  */
 export interface SymbolPaint {
   sectors: Sector[];
@@ -221,7 +276,11 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
   const recordedAffected = conditions.some(s => !s.carrier);
   const plainAff = affected && !recordedAffected;
   const black = plainAff && conditions.length === 0;
-  const sectors = !black && plainCarrierFlag
+  // The dotted half goes under the conditions; where they cover it (one
+  // condition's whole symbol, or the right half) it is left off, as the 2008
+  // dot is on an affected fill, and the edit panel says so.
+  const [halfStart, halfEnd] = PLAIN_CARRIER_ANGLES;
+  const sectors = !black && plainCarrierFlag && !covers(conditions, halfStart, halfEnd)
     ? [{ tag: PLAIN_CARRIER_TAG, start: PLAIN_CARRIER_ANGLES[0], end: PLAIN_CARRIER_ANGLES[1], ...PLAIN_CARRIER_PAINT, carrier: true }, ...conditions]
     : conditions;
   return {
@@ -415,7 +474,7 @@ export function renderTagLegendRowSvg(
   const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = quadrantTags(pedigree).findIndex(t => t.id === tag.id);
-    const [start, end] = sectorAngles(Math.max(idx, 0));
+    const [start, end] = sectorAngles(Math.max(idx, 0), pedigree);
     const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);

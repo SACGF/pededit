@@ -4,7 +4,7 @@ import type { Individual, NotationEdition, Pedigree, Tag } from "@pedigree-edito
 import {
   applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isCarrier, plainAffected, plainCarrier,
 } from "../conditions";
-import { symbolPaint, renderExportKeySvg, keyTagRows, statusKeyRows, PLAIN_CARRIER_TAG } from "../tags";
+import { symbolPaint, renderExportKeySvg, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, PLAIN_CARRIER_TAG } from "../tags";
 import { carrierPaint, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape } from "../nodes/symbols";
@@ -159,13 +159,17 @@ describe("symbolPaint (#115)", () => {
     const p = family(undefined, "nsgc2022");
     const paint = (id: string) => symbolPaint(byId(p, id), p);
     expect(paint("a")).toMatchObject({ base: "white", core: false, dot: false });
-    expect(paint("b").sectors).toMatchObject([{ tag: CF, carrier: true, fill: "diagonal", start: 270, end: 360 }]);
+    // Two conditions: halves, CF on the left.
+    expect(paint("b").sectors).toMatchObject([{ tag: CF, carrier: true, fill: "diagonal", start: 180, end: 360 }]);
     expect(paint("d")).toMatchObject({ base: "black", core: false, sectors: [] });
     const e = paint("e");
     expect(e.dot).toBe(false);
     expect(e.sectors).toMatchObject([{ tag: PLAIN_CARRIER_TAG, start: 0, end: 180, fill: "dots" }]);
-    // affected with a recorded condition: the plain carrier half is drawn, under the condition.
-    expect(paint("f").sectors.map(s => s.tag.id)).toEqual([PLAIN_CARRIER_TAG.id, "ts"]);
+    // affected with Tay-Sachs, the right half: it covers the plain carrier half, which is left off.
+    expect(paint("f").sectors.map(s => s.tag.id)).toEqual(["ts"]);
+    // affected with CF, the left half: the plain carrier half is drawn beside it.
+    const h = { ...byId(p, "f"), tags: ["cf"] };
+    expect(symbolPaint(h, p).sectors.map(s => s.tag.id)).toEqual([PLAIN_CARRIER_TAG.id, "cf"]);
     // affected, condition not recorded, over a carrier sector: the black centre.
     expect(paint("g")).toMatchObject({ base: "white", core: true });
   });
@@ -189,6 +193,84 @@ describe("symbolPaint (#115)", () => {
     }
     const mono = family(undefined, "nsgc2022", "monochrome");
     expect(carrierPaint(CF, mono)).toEqual({ color: "#8c8c8c", fill: tagPaint(CF, mono).fill });
+  });
+});
+
+describe("sections follow the number of conditions (NSGC 2022)", () => {
+  const T3: Tag = { id: "t3", label: "Third", color: "#2ca02c", style: "quadrant" };
+  const T4: Tag = { id: "t4", label: "Fourth", color: "#f2c80f", style: "quadrant" };
+  const angles = (p: Pedigree, id: string) => symbolPaint(byId(p, id), p).sectors.map(s => [s.tag.id, s.start, s.end]);
+
+  it("one condition: the whole symbol, affected and carrier", () => {
+    const p = family([CF], "nsgc2022");
+    expect(sectionLayout(p)).toBe("whole");
+    expect(angles(p, "a")).toEqual([["cf", 0, 360]]);
+    expect(angles(p, "b")).toEqual([["cf", 0, 360]]);
+    expect(symbolPaint(byId(p, "b"), p).sectors[0]).toMatchObject({ carrier: true, fill: "diagonal" });
+    // A plain carrier still draws the dotted right half, told apart by its size and black dots.
+    expect(symbolPaint(byId(p, "e"), p).sectors).toMatchObject([{ tag: PLAIN_CARRIER_TAG, start: 0, end: 180, fill: "dots", color: "#000000" }]);
+    expect(sectorAngles(0, p)).toEqual([0, 360]);
+    expect(sectionName(0, p)).toBe("whole symbol");
+  });
+
+  it("two conditions: left and right halves", () => {
+    const p = family([CF, TS], "nsgc2022");
+    expect(sectionLayout(p)).toBe("halves");
+    expect(angles(p, "gm")).toEqual([["cf", 180, 360], ["ts", 0, 180]]);
+    expect(angles(p, "c")).toEqual([["ts", 0, 180], ["cf", 180, 360]].sort((x, y) => (x[0]! < y[0]! ? -1 : 1)));
+    expect([sectionName(0, p), sectionName(1, p)]).toEqual(["left half", "right half"]);
+  });
+
+  it("three or four conditions: the fixed quarters; five or more: slices for those with a fifth", () => {
+    const p3 = family([CF, TS, T3], "nsgc2022");
+    expect(sectionLayout(p3)).toBe("quarters");
+    expect(angles(p3, "gm")).toEqual([["cf", 270, 360], ["ts", 0, 90]]);
+    const T5: Tag = { id: "t5", label: "Fifth", color: "#ff7f0e", style: "quadrant" };
+    const p5 = family([CF, TS, T3, T4, T5], "nsgc2022");
+    expect(angles(p5, "gm")).toEqual([["cf", 270, 360], ["ts", 0, 90]]);
+    const five = { ...byId(p5, "gm"), tags: ["t5"] };
+    expect(symbolPaint(five, p5).sectors.map(s => [s.start, s.end])).toEqual([[0, 120], [120, 240], [240, 360]]);
+  });
+
+  it("NSGC 2008 and pedigrees with no notation keep the quarters", () => {
+    for (const notation of [undefined, "nsgc2008" as const]) {
+      const p = family([CF], notation);
+      expect(sectionLayout(p)).toBe("quarters");
+      expect(angles(p, "b")).toEqual([["cf", 270, 360]]);
+      expect(angles(family([CF, TS], notation), "gm")).toEqual([["cf", 270, 360], ["ts", 0, 90]]);
+    }
+  });
+
+  it("the affected core still sits over a whole-symbol carrier fill", () => {
+    const p = family([CF], "nsgc2022");
+    const g = { ...byId(p, "g"), carrierTags: ["cf"] };
+    expect(symbolPaint(g, p)).toMatchObject({ base: "white", core: true, sectors: [{ start: 0, end: 360, carrier: true }] });
+  });
+
+  it("every renderer draws the section: canvas, app legend, export key, SVG and U-shape", () => {
+    for (const [tags, start, end] of [[[CF], 0, 360], [[CF, TS], 180, 360]] as const) {
+      for (const tagFills of [undefined, "monochrome" as const]) {
+        const p = family([...tags], "nsgc2022", tagFills);
+        const a = byId(p, "a");
+        // The canvas symbol has its corner at 0 0; the exporters centre it on 0 0. Radius = size.
+        const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
+        expect(canvas).toContain(sectorPath(20, 20, 40, start, end));
+        const centred = sectorPath(0, 0, 40, start, end);
+        expect(renderSectorsSvg(a, p, 40, "x")).toContain(centred);
+        expect(exportSvg(p)).toContain(centred);
+        expect(exportUShapeSvg(p)).toContain(centred);
+      }
+    }
+    // Legend swatches: 16px, at 6 6 in the app legend and at the key's origin in exports.
+    for (const [tags, start, end] of [[[CF], 0, 360], [[CF, TS], 180, 360]] as const) {
+      const p = family([...tags], "nsgc2022");
+      expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(sectorPath(14, 14, 16, start, end));
+    }
+    // Export key: the CF swatch is a full circle path with one condition, a left half (vertical chord) with two.
+    const keyRow = (p: Pedigree) => renderExportKeySvg(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))!;
+    expect(keyRow(family([CF], "nsgc2022"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
+    expect(keyRow(family([CF, TS], "nsgc2022"))).toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
+    expect(keyRow(family([CF, TS]))).not.toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
   });
 });
 

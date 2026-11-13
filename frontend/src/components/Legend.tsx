@@ -170,7 +170,7 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
 }
 
 /**
- * How a tag looks on a symbol: a quarter of a square, a dot, or coloured
+ * How a tag looks on a symbol: its section of a square, a dot, or coloured
  * text. `carrier`: the condition's carrier fill (#115).
  */
 export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; pedigree: Pedigree; carrier?: boolean }) {
@@ -178,7 +178,7 @@ export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; ped
   const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
-    const [start, end] = sectorAngles(idx);
+    const [start, end] = sectorAngles(idx, pedigree);
     const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">

@@ -43,7 +43,7 @@ work in it.
 | Rule | PedEdit |
 |---|---|
 | Square, circle, diamond. Diamond for sex not specified. Do not write age inside the symbol. | Follows. Symbols encode biological sex: see "Where we differ" below. |
-| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3; per-condition affected and carrier, #115). |
+| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3; per-condition affected and carrier, #115): in NSGC 2022 one condition fills the whole symbol, two take halves, three or four quarters. NSGC 2008 mode keeps quarters. |
 | **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Follows, for collapsed branches (#1): a collapsed couple's unaffected children are one symbol with their number inside (square or circle when they share a sex, diamond otherwise), and affected or condition-tagged children are drawn as themselves beside it. |
 | Deceased: a slash through the symbol, extending past it. Do not use a cross. Cause of death below if known. | Follows. |
 | Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | Follows (#99): `Individual.consultand`; a proband who is also the consultand keeps the "P". |
@@ -134,19 +134,29 @@ Further Fig. 3 and Fig. 4 points:
   conditions", with the condition in the key. PedEdit follows this (#115,
   `symbolPaint` in `tags.ts`, `conditions.ts`): a condition (quadrant tag)
   has a per-person state, affected or carrier (`Individual.carrierTags`).
-  Affected fills the condition's quarter in its fill; carrier fills the
-  same quarter hatched in its colour (or, for a patterned condition, the
-  same pattern in a lighter tint), keyed "Cystic fibrosis carrier". A
-  carrier with no condition recorded (the plain Carrier control) is the
-  right half dotted, keyed "Carrier". Where we differ: quarters, not
-  halves, because each condition keeps a fixed quarter (#3), so a HEXA and
-  CFTR carrier is two patterned quarters. In 2022 an affected person with a
-  recorded condition is that condition's quarter only (no black fill);
-  affected with no condition recorded is the black fill. With the setting
-  "Notation: NSGC 2008" the plain carrier keeps the dot and an affected
-  person with condition tags the black fill with a black centre; a carrier
-  of a named condition is drawn as its patterned quarter in both, since a
-  dot cannot name a condition. Pedigrees saved before #115 have no
+  Affected fills the condition's section in its fill; carrier fills the
+  same section hatched in its colour (or, for a patterned condition, the
+  same pattern in a lighter tint), keyed "Cystic fibrosis carrier". As
+  NSGC partitions the symbol only for several conditions, the number of
+  sections follows the number of conditions defined in the pedigree: one
+  condition fills the whole symbol, two take the left and right halves
+  (the paper's HEXA and CFTR carrier), three or four the quarters, more
+  equal slices. Each condition keeps the same section on every symbol, so
+  position still names it. A carrier with no condition recorded (the
+  plain Carrier control) is the right half dotted in black, keyed
+  "Carrier": against a single condition's whole-symbol carrier fill it
+  differs in size (half against whole), pattern (dots against lines) and
+  colour (black against the condition's colour or, in black and white,
+  grey); it is left off when the person's affected conditions cover the
+  right half, as the 2008 dot is on a black fill. In 2022 an affected
+  person with a recorded condition is that condition's section only (no
+  black fill); affected with no condition recorded is the black fill. With
+  the setting "Notation: NSGC 2008" the plain carrier keeps the dot, an
+  affected person with condition tags the black fill with a black centre,
+  and conditions keep the fixed quarters of #3 whatever their number, so
+  pedigrees drawn before this change look the same; a carrier of a named
+  condition is drawn as its patterned section in both, since a dot cannot
+  name a condition. Pedigrees saved before #115 have no
   notation setting and are drawn as 2008; new pedigrees, PED imports and
   the built-in examples are 2022.
 - Linkage haplotypes go below the person with the haplotype of interest on
@@ -308,6 +318,6 @@ The 2008 gaps found in November 2026 (#1, #8, #20, #97, #99, #100, #101,
 1. Remaining assisted reproduction cases from Fig. 3 (#108).
 2. Fields NSGC uses that PedEdit lacks: gestational age, karyotype, proven
    zygosity, adoption by a relative, "n" groups (#112).
-3. 2022: carriers as a divided fill rather than a dot (#115). Results
-   without "E" are done (#114). The other 2022 questions are answered above (#110).
+3. 2022: carriers as a divided fill rather than a dot (#115) and results
+   without "E" (#114) are done. The other 2022 questions are answered above (#110).
 4. What de-identified export should drop, given the masking guidance (#111).

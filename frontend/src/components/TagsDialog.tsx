@@ -9,7 +9,7 @@ import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { tagPresetApi, type TagPresetPayload } from "../api/client";
 import {
-  TAG_PALETTE, TAG_STYLE_LABELS, QUADRANT_NAMES,
+  TAG_PALETTE, TAG_STYLE_LABELS, sectionName,
   pedigreeTags, quadrantTags, nextTagColor, unusedTagSuggestions,
 } from "../pedigree/tags";
 
@@ -159,10 +159,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
             <div className="border divide-y">
               {tags.map((tag, i) => {
                 const qIndex = quads.findIndex(q => q.id === tag.id);
-                const position =
-                  tag.style !== "quadrant" ? null
-                  : qIndex < QUADRANT_NAMES.length ? QUADRANT_NAMES[qIndex]
-                  : "shared slice";
+                const position = tag.style !== "quadrant" ? null : sectionName(qIndex, pedigree);
                 return (
                   <div key={tag.id} className="flex items-center gap-1.5 px-2 py-1.5 min-w-0">
                     <ColorPicker tag={tag} onChange={color => updateTag(tag.id, { color })} />
