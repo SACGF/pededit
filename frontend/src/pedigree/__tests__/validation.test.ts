@@ -85,6 +85,26 @@ describe("editor warnings (#116): starter rules", () => {
     expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
   });
 
+  it("consultand-deceased: fixed by unmarking the consultand or marking living", () => {
+    const p = ped([ind({ id: "a", consultand: true, deceased: true, dod: "2001" })]);
+    const problems = found(p);
+    expect(problems).toMatchObject([{ rule: "consultand-deceased", individualId: "a", field: "consultand", fix: { label: "Not the consultand" }, moreFixes: [{ label: "Mark living" }] }]);
+    usePedigreeStore.getState().initialize(p);
+    problems[0]!.moreFixes![0]!.apply(usePedigreeStore.getState());
+    expect(usePedigreeStore.getState().pedigree.individuals[0]).toMatchObject({ consultand: true, deceased: false });
+    expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
+    usePedigreeStore.getState().initialize(p);
+    problems[0]!.fix!.apply(usePedigreeStore.getState());
+    expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
+  });
+
+  it("consultand-deceased: a loss is flagged, a pregnancy is not", () => {
+    const loss = found(ped([ind({ id: "a", consultand: true, lifeStatus: "stillbirth" })]));
+    expect(loss).toMatchObject([{ rule: "consultand-deceased", fix: { label: "Not the consultand" } }]);
+    expect(loss[0]!.moreFixes).toBeUndefined();
+    expect(found(ped([ind({ id: "a", consultand: true, lifeStatus: "pregnancy" })]))).toEqual([]);
+  });
+
   it("every rule id is unique", () => {
     expect(new Set(RULES.map(r => r.id)).size).toBe(RULES.length);
   });

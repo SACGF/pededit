@@ -325,16 +325,18 @@ function IndividualForm({ individual }: { individual: Individual }) {
             />
             <span>Proband</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer" title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P.">
-            <input
-              type="checkbox"
-              name="consultand"
-              checked={!!individual.consultand}
-              onChange={e => setConsultand(individual.id, e.target.checked)}
-              className="accent-black"
-            />
-            <span>Consultand</span>
-          </label>
+          <ProblemHighlight {...problemsOn("consultand")}>
+            <label className="flex items-center gap-2 cursor-pointer" title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P.">
+              <input
+                type="checkbox"
+                name="consultand"
+                checked={!!individual.consultand}
+                onChange={e => setConsultand(individual.id, e.target.checked)}
+                className="accent-black"
+              />
+              <span>Consultand</span>
+            </label>
+          </ProblemHighlight>
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
         </div>
       </div>

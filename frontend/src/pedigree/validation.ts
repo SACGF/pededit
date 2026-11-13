@@ -32,7 +32,7 @@ export type Severity = "warning" | "error";
  */
 export type ProblemField =
   | "dob" | "dod" | "age" | "lifeStatus" | "affected" | "conditions" | "carrier" | "presymptomatic"
-  | "evaluations" | "reproductiveRole" | "carriedBy";
+  | "evaluations" | "reproductiveRole" | "carriedBy" | "consultand";
 
 /** The pedigree store setters a fix may call. `usePedigreeStore.getState()` satisfies it. */
 export interface FixActions {
@@ -297,6 +297,27 @@ export const RULES: Rule[] = [
       field: "affected",
       message: "The proband is not marked affected. NSGC: the proband is always affected; an unaffected person seeking advice is the consultand.",
       fix: { label: "Mark affected", apply: a => a.setAffected(ind.id, true) },
+    },
+  },
+  {
+    // The consultand is the person seeking counselling, so living. Someone
+    // asking about a relative who has died is the consultand; the relative
+    // is not. A pregnancy is left alone: some clinics mark the fetus.
+    id: "consultand-deceased",
+    individual: ind => {
+      if (!ind.consultand) return null;
+      const loss = !!ind.lifeStatus && ind.lifeStatus !== "pregnancy";
+      if (!ind.deceased && !loss) return null;
+      const notConsultand: ProblemFix = { label: "Not the consultand", apply: a => a.updateIndividual(ind.id, { consultand: false }) };
+      return {
+        severity: "warning",
+        field: "consultand",
+        message: loss
+          ? "The consultand is a pregnancy loss. The consultand is the person seeking counselling."
+          : "The consultand is marked deceased. The consultand is the person seeking counselling; for a relative who has died, mark the person asking instead.",
+        fix: notConsultand,
+        ...(loss ? {} : { moreFixes: [{ label: "Mark living", apply: (a: FixActions) => a.setDeceased(ind.id, false) }] }),
+      };
     },
   },
   {
