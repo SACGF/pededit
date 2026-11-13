@@ -87,7 +87,7 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `showNumbers` | boolean | Optional. Draw each person's pedigree number (generation in Roman numerals, then place in the row, e.g. `"II-3"`) before their name, on the canvas and in figure exports. The numbers are computed from the layout, not stored. Absent means `false`. |
 | `relationshipLabels` | boolean | Optional. Write the relationship (for example `"first cousins"`) above every consanguineous couple's double line that can be named and has no `consanguinityLabel` of its own, on the canvas and in figure exports. Absent means `false`. |
 | `symbolsShow` | `"gender"` or `"sex"` | Optional. What symbol shapes show. `"gender"`: someone with a recorded `genderIdentity` is drawn with that gender's symbol (square for a man, circle for a woman, diamond for non-binary) and their sex assigned at birth is written below it as AMAB, AFAB or UAAB (NSGC 2022). `"sex"`: everyone is drawn by biological sex. Absent means `"gender"`. Layout and genetics always use `sex`. |
-| `notation` | `"nsgc2022"` or `"nsgc2008"` | Optional. Edition of the NSGC nomenclature drawn. `"nsgc2022"`: evaluation results are written as the detail then the result (`"BRCA1 c.5266dupC +"`). `"nsgc2008"`: the E notation (`"E+ (BRCA1 c.5266dupC)"`, numbered E1, E2 when there are several). Absent means `"nsgc2022"`. |
+| `notation` | `"nsgc2022"` or `"nsgc2008"` | Optional. Edition of the NSGC nomenclature drawn. `"nsgc2022"`: evaluation results are written as the detail then the result (`"BRCA1 c.5266dupC +"`). `"nsgc2008"`: the E notation (`"E+ (BRCA1 c.5266dupC)"`, numbered E1, E2 when there are several), and a carrier with no condition recorded is the centre dot instead of the dotted right half; an affected person with condition tags keeps a black centre (#115). Absent means `"nsgc2008"`, so pedigrees saved before the setting existed keep their look; new pedigrees, PED imports and the built-in examples are written with `"nsgc2022"`. |
 | `tagFills` | `"color"` or `"monochrome"` | Optional. `"monochrome"` draws every tag in black, on the canvas and in figure exports, for print: each quadrant tag with a pattern, its own `fill` or, when that is solid, the first of diagonal, horizontal, dots, crosshatch, shade, vertical that no other quadrant tag has (cycling once all are taken). Absent means `"color"`. |
 
 ## `Individual`
@@ -100,7 +100,7 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `affected` | boolean | yes | Filled symbol when `true`. |
 | `sibOrder` | number | yes | 0-indexed position within the sibling group (or among founders). |
 | `deceased` | boolean | no | Diagonal slash through the symbol. Alone it means deceased, date of death unknown. |
-| `carrier` | boolean | no | Carrier dot in the symbol. |
+| `carrier` | boolean | no | Carrier with no condition recorded: the centre dot (`nsgc2008`) or the right half of the symbol dotted (`nsgc2022`). A carrier of a named condition is listed in `carrierTags` instead. |
 | `presymptomatic` | boolean | no | Asymptomatic or presymptomatic carrier (NSGC 2008 Fig. 4): clinically unaffected now but may develop the condition, a vertical line through the symbol. The editor offers it as one carrier status with `carrier`, so it never sets both. Not drawn on an affected symbol. |
 | `evaluations` | array of objects | no | Evaluations and test results (NSGC 2008 Fig. 4), one line each under the symbol: the detail then `+`, `-` or `u` for the result, e.g. "BRCA1 c.5266dupC +" (NSGC 2022). With `canvasSettings.notation` `"nsgc2008"`: `E`, the result, then the detail in parentheses, "E+ (BRCA1 c.5266dupC)", numbered E1, E2 when there are several. Each object has `result` (`"positive"`, `"negative"` or `"uninformative"`, absent for no result yet), `detail` (string) and `documented` (boolean: a "*" at the symbol's lower right). |
 | `proband` | boolean | no | Proband arrow, with a "P" at its tail (NSGC). Normally exactly one individual. |
@@ -117,7 +117,8 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `age` | string | no | The individual's age as free text, such as `"50s"`, `"d. 72"` or `"34 y"`, for an approximate age or one known without a date. Shown under the symbol in place of the date of birth, cut to one line. Not an age of onset. De-identified exports leave it out. |
 | `notes` | string | no | Free-text clinical notes. |
 | `hpoTerms` | string[] | no | HPO term codes, e.g. `["HP:0001250"]`. |
-| `tags` | string[] | no | Ids of tags from `Pedigree.tags` applied to this individual. |
+| `tags` | string[] | no | Ids of tags from `Pedigree.tags` applied to this individual. A `quadrant` (condition) tag here means affected with that condition. |
+| `carrierTags` | string[] | no | Ids of `quadrant` (condition) tags this individual is a carrier of. The condition's sector is drawn with its carrier pattern (hatched for a solid condition, a light shade for a patterned one) and keyed "Cystic fibrosis carrier". A tag is in `tags` or `carrierTags`, not both; in both it counts as affected. Ids of other tag styles are ignored. |
 | `onset` | string | no | Age of onset of the affected status, free text such as `"45y"`, `"40s"` or `"childhood"`. Ignored unless `affected` is `true`. |
 | `tagOnset` | object | no | Age of onset per condition: keys are ids of `quadrant` tags in this individual's `tags`, values are free text as for `onset`. Entries for other tags are ignored. |
 | `descendantsHidden` | boolean | no | Everyone below this individual is left out of the drawing and the exports, as are partners who married into that branch only. Nothing is removed from the data; clearing the flag shows them again. |
@@ -172,7 +173,7 @@ Warnings allow the import and are shown to the user:
 - `siblingOrder` was missing and the default was applied
 - the document `version` is newer than the editor's
 - `pinnedPositions` or `unlockedIndividuals` name an individual that does not exist
-- an individual's `tags` names a tag that is not in `Pedigree.tags`
+- an individual's `tags` or `carrierTags` names a tag that is not in `Pedigree.tags`
 - a twin set has fewer than two members, a member who is not a child of that partnership, or a member listed in two sets (the set is dropped)
 
 ## Worked example

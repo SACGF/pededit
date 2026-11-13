@@ -15,6 +15,7 @@ import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/colla
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
+import { applyAffected, applyCarrier, applyConditionState, type ConditionState } from "../pedigree/conditions";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -180,6 +181,11 @@ function removeFromTwinSets(draft: Pedigree, individualId: string): void {
 }
 
 /** Drop an individual's age of onset for one tag (#93), and the map when it empties. */
+/** Whether an in-place edit would change the person, tried on a copy (store state is frozen). */
+function dryRun(ind: Individual, edit: (copy: Individual) => boolean): boolean {
+  return edit(JSON.parse(JSON.stringify(ind)) as Individual);
+}
+
 function removeTagOnset(ind: Individual, tagId: string): void {
   if (!ind.tagOnset || !(tagId in ind.tagOnset)) return;
   delete ind.tagOnset[tagId];
@@ -366,12 +372,26 @@ interface PedigreeState {
 
   // Individual property mutations
   updateIndividual: (id: string, updates: Partial<Individual>) => void;
+  /**
+   * The plain Affected status. With exactly one condition tag it records that
+   * condition too; unticking clears every affected condition (#115,
+   * `applyAffected`).
+   */
   setAffected: (id: string, affected: boolean) => void;
+  /**
+   * One person's state for one condition (quadrant tag, #115): affected,
+   * carrier or neither (`applyConditionState`).
+   */
+  setConditionStatus: (id: string, tagId: string, state: ConditionState) => void;
   /** Unticking deceased also clears the date of death (#103). */
   setDeceased: (id: string, deceased: boolean) => void;
   /** Date of death (#103), "YYYY", "YYYY-MM" or "YYYY-MM-DD"; a non-empty one also ticks deceased, empty removes it. */
   setDateOfDeath: (id: string, dod: string | undefined) => void;
-  /** Carrier dot. Setting it clears `presymptomatic`: the two are one carrier status (#101). */
+  /**
+   * Carrier with no condition recorded (the dot in 2008, the dotted half in
+   * 2022); with exactly one condition tag, a carrier of it (#115). Setting it
+   * clears `presymptomatic`: the two are one carrier status (#101).
+   */
   setCarrier: (id: string, carrier: boolean) => void;
   /** Presymptomatic carrier, a vertical line through the symbol (#101). Setting it clears `carrier`. */
   setPresymptomatic: (id: string, presymptomatic: boolean) => void;
@@ -393,6 +413,8 @@ interface PedigreeState {
   /** Refused with the reason (see `batchSexProblem`); monozygotic twins follow. */
   setSexMany: (ids: string[], sex: Sex) => string | null;
   setIndividualTagMany: (ids: string[], tagId: string, on: boolean) => void;
+  /** `setConditionStatus` for several people, one undo step (#115). */
+  setConditionStatusMany: (ids: string[], tagId: string, state: ConditionState) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
   /** Adoption brackets (#12): "in", "out" or none. */
@@ -1215,12 +1237,23 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setAffected: (id, affected) => {
+      const current = get().pedigree.individuals.find(i => i.id === id);
+      if (!current || !dryRun(current, ind => applyAffected(ind, affected, get().pedigree))) return;
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (!ind) return;
-        ind.affected = affected;
-        // Onset belongs to the affected status (#93).
-        if (!affected) delete ind.onset;
+        // Onset belongs to the affected status (#93); conditions follow it (#115).
+        if (ind) applyAffected(ind, affected, draft);
+      });
+    },
+
+    setConditionStatus: (id, tagId, state) => {
+      const { pedigree } = get();
+      const current = pedigree.individuals.find(i => i.id === id);
+      if (!current || !pedigree.tags?.some(t => t.id === tagId && t.style === "quadrant")) return;
+      if (!dryRun(current, ind => applyConditionState(ind, tagId, state, pedigree))) return;
+      mutate(draft => {
+        const ind = draft.individuals.find(i => i.id === id);
+        if (ind) applyConditionState(ind, tagId, state, draft);
       });
     },
 
@@ -1245,9 +1278,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setCarrier: (id, carrier) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        if (!ind) return;
-        ind.carrier = carrier;
-        if (carrier) delete ind.presymptomatic;
+        if (ind) applyCarrier(ind, carrier, draft);
       });
     },
 
@@ -1255,8 +1286,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;
-        if (presymptomatic) { ind.presymptomatic = true; if (ind.carrier) ind.carrier = false; }
-        else delete ind.presymptomatic;
+        if (presymptomatic) {
+          // One carrier status (#101): with one condition, its carrier state goes too (#115).
+          applyCarrier(ind, false, draft);
+          ind.presymptomatic = true;
+        } else delete ind.presymptomatic;
       });
     },
 
@@ -1321,9 +1355,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setAffectedMany: (ids, affected) => {
-      mutateEach(ids, ind => !!ind.affected !== affected, ind => {
-        ind.affected = affected;
-        if (!affected) delete ind.onset;
+      const { pedigree } = get();
+      mutateEach(ids, ind => dryRun(ind, c => applyAffected(c, affected, pedigree)), ind => {
+        applyAffected(ind, affected, pedigree);
       }, n => `Marked ${n} ${affected ? "affected" : "unaffected"}.`);
     },
 
@@ -1335,10 +1369,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setCarrierStatusMany: (ids, status) => {
-      mutateEach(ids, ind => carrierStatusOf(ind) !== status, ind => {
-        if (status === "carrier") { ind.carrier = true; delete ind.presymptomatic; }
-        else if (status === "presymptomatic") { ind.presymptomatic = true; if (ind.carrier) ind.carrier = false; }
-        else { if (ind.carrier) ind.carrier = false; delete ind.presymptomatic; }
+      const { pedigree } = get();
+      mutateEach(ids, ind => carrierStatusOf(ind, pedigree) !== status, ind => {
+        // With one condition, carrier records it (#115, `applyCarrier`).
+        if (status === "carrier") applyCarrier(ind, true, pedigree);
+        else if (status === "presymptomatic") { applyCarrier(ind, false, pedigree); ind.presymptomatic = true; }
+        else { applyCarrier(ind, false, pedigree); delete ind.presymptomatic; }
       }, n => status === "none" ? `Cleared the carrier status of ${n}.`
         : `Marked ${n} ${status === "carrier" ? "carrier" : "presymptomatic carrier"}.`);
     },
@@ -1355,6 +1391,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setIndividualTagMany: (ids, tagId, on) => {
       const tag = get().pedigree.tags?.find(t => t.id === tagId);
       if (!tag) return;
+      // A condition tag is "affected with it" (#115): same rule as setConditionStatus.
+      if (tag.style === "quadrant") {
+        const { pedigree } = get();
+        const state: ConditionState = on ? "affected" : "none";
+        mutateEach(ids, ind => (ind.tags?.includes(tagId) ?? false) !== on, ind => {
+          applyConditionState(ind, tagId, state, pedigree);
+        }, n => `${on ? "Added" : "Removed"} ${tag.label} ${on ? "to" : "from"} ${n}.`);
+        return;
+      }
       const order = new Map((get().pedigree.tags ?? []).map((t, i) => [t.id, i]));
       mutateEach(ids, ind => (ind.tags?.includes(tagId) ?? false) !== on, ind => {
         if (on) {
@@ -1365,6 +1410,17 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           removeTagOnset(ind, tagId);
         }
       }, n => `${on ? "Added" : "Removed"} ${tag.label} ${on ? "to" : "from"} ${n}.`);
+    },
+
+    setConditionStatusMany: (ids, tagId, state) => {
+      const { pedigree } = get();
+      const tag = pedigree.tags?.find(t => t.id === tagId && t.style === "quadrant");
+      if (!tag) return;
+      mutateEach(ids, ind => dryRun(ind, c => applyConditionState(c, tagId, state, pedigree)), ind => {
+        applyConditionState(ind, tagId, state, pedigree);
+      }, n => state === "affected" ? `Marked ${n} affected with ${tag.label}.`
+        : state === "carrier" ? `Marked ${n} ${n === 1 ? "carrier" : "carriers"} of ${tag.label}.`
+          : `Cleared ${tag.label} from ${n}.`);
     },
 
     setTwins: (partnershipId, members, zygosity) => {
@@ -1661,6 +1717,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (draft.tags.length === 0) delete draft.tags;
         for (const ind of draft.individuals) {
           removeTagOnset(ind, id);
+          if (ind.carrierTags?.includes(id)) {
+            ind.carrierTags = ind.carrierTags.filter(t => t !== id);
+            if (ind.carrierTags.length === 0) delete ind.carrierTags;
+          }
           if (!ind.tags?.includes(id)) continue;
           ind.tags = ind.tags.filter(t => t !== id);
           if (ind.tags.length === 0) delete ind.tags;
@@ -1681,6 +1741,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setIndividualTag: (individualId, tagId, on) => {
+      // A condition tag means affected with it (#115): ticking sets affected, unticking the last clears it.
+      if (get().pedigree.tags?.some(t => t.id === tagId && t.style === "quadrant")) {
+        get().setConditionStatus(individualId, tagId, on ? "affected" : "none");
+        return;
+      }
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === individualId);
         if (!ind) return;

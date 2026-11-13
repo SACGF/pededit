@@ -43,7 +43,7 @@ work in it.
 | Rule | PedEdit |
 |---|---|
 | Square, circle, diamond. Diamond for sex not specified. Do not write age inside the symbol. | Follows. Symbols encode biological sex: see "Where we differ" below. |
-| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3). |
+| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3; per-condition affected and carrier, #115). |
 | **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Follows, for collapsed branches (#1): a collapsed couple's unaffected children are one symbol with their number inside (square or circle when they share a sex, diamond otherwise), and affected or condition-tagged children are drawn as themselves beside it. |
 | Deceased: a slash through the symbol, extending past it. Do not use a cross. Cause of death below if known. | Follows. |
 | Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | Follows (#99): `Individual.consultand`; a proband who is also the consultand keeps the "P". |
@@ -91,9 +91,11 @@ Use initials or first names rather than full names on clinical pedigrees.
 Donor "D", surrogate "S", evaluation "E" with results, documented evaluation
 "*", carrier dot, and a vertical line through the symbol for an asymptomatic
 or presymptomatic carrier. **The 2022 revision drops the "E" and the carrier
-dot** (see below); the "*", the vertical line, D and S stay. PedEdit has the carrier dot, the presymptomatic
+dot** (see below); the "*", the vertical line, D and S stay. PedEdit draws
+the 2022 divided carrier symbol, or the dot with "Notation: NSGC 2008"
+(#115), and has the presymptomatic
 line and evaluation results (#101, #114): written under the symbol as
-"detail +" (2022) by default, or with the pedigree setting "Notation: NSGC
+"detail +" (2022), or with the pedigree setting "Notation: NSGC
 2008" as "E+ (detail)", numbered E1, E2 when there are several, with the
 detail in parentheses standing in for a key entry per number; "*" at the
 lower right for a documented one. It has the assisted
@@ -129,8 +131,24 @@ Further Fig. 3 and Fig. 4 points:
   ATM carrier with breast cancer: one half each). Reason: carriers can have
   symptoms, a dot hides under a fill, and screening often finds several
   carrier results. The vertical line stays, "typically for dominant
-  conditions", with the condition in the key. PedEdit still draws the dot
-  (#115); quadrant tags (#3) can already draw the divided symbol.
+  conditions", with the condition in the key. PedEdit follows this (#115,
+  `symbolPaint` in `tags.ts`, `conditions.ts`): a condition (quadrant tag)
+  has a per-person state, affected or carrier (`Individual.carrierTags`).
+  Affected fills the condition's quarter in its fill; carrier fills the
+  same quarter hatched in its colour (or, for a patterned condition, the
+  same pattern in a lighter tint), keyed "Cystic fibrosis carrier". A
+  carrier with no condition recorded (the plain Carrier control) is the
+  right half dotted, keyed "Carrier". Where we differ: quarters, not
+  halves, because each condition keeps a fixed quarter (#3), so a HEXA and
+  CFTR carrier is two patterned quarters. In 2022 an affected person with a
+  recorded condition is that condition's quarter only (no black fill);
+  affected with no condition recorded is the black fill. With the setting
+  "Notation: NSGC 2008" the plain carrier keeps the dot and an affected
+  person with condition tags the black fill with a black centre; a carrier
+  of a named condition is drawn as its patterned quarter in both, since a
+  dot cannot name a condition. Pedigrees saved before #115 have no
+  notation setting and are drawn as 2008; new pedigrees, PED imports and
+  the built-in examples are 2022.
 - Linkage haplotypes go below the person with the haplotype of interest on
   the left; repeat sizes are written affected allele first in parentheses;
   a known variant goes in parentheses. PedEdit has no fields for these; the

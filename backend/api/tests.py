@@ -14,7 +14,7 @@ FULL_PEDIGREE = {
             "carrier": False, "proband": False, "sibOrder": 0,
             "name": "John Smith", "dob": "1950-03-01", "dod": "2022", "age": "d. 72",
             "notes": "Line one\nLine two ", "hpoTerms": ["HP:0001250"],
-            "tags": ["t1", "t2"], "onset": "40s", "tagOnset": {"t1": "52y"},
+            "tags": ["t1", "t2"], "carrierTags": ["t3"], "onset": "40s", "tagOnset": {"t1": "52y"},
         },
         {
             "id": "m", "sex": "female", "affected": False, "deceased": False,

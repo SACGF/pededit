@@ -21,6 +21,13 @@ import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation
 import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
 import { fieldProblems, worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
 import { ProblemIcon } from "./ProblemsMenu";
+import {
+  CONDITION_NOT_RECORDED, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
+  soleCondition, type ConditionState,
+} from "../pedigree/conditions";
+import { carrierStatusOf } from "../pedigree/batch";
+import { notationOf } from "../pedigree/notation";
+import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -67,6 +74,9 @@ function IndividualForm({ individual }: { individual: Individual }) {
   const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
+  // How affected and carrier are asked: plain, for the one condition, or per condition (#115).
+  const mode = conditionMode(pedigree);
+  const sole = soleCondition(pedigree);
   // Editor warnings (#116) on a field: highlighted, with the message under it.
   const problemsOn = (field: ProblemField) => ({ problemFor: individual.id, problemField: field, problems: fieldProblems(pedigree, individual.id, field) });
 
@@ -226,27 +236,52 @@ function IndividualForm({ individual }: { individual: Individual }) {
               />
             </div>
           )}
-          {/* One carrier status (#101): the dot, or the presymptomatic vertical line. */}
-          <div className="flex items-center gap-2">
-            <span className="shrink-0">Carrier</span>
-            <select
-              value={individual.presymptomatic ? "presymptomatic" : individual.carrier ? "carrier" : ""}
-              aria-label="Carrier status"
-              onChange={e => {
-                const v = e.target.value;
-                if (v === "carrier") setCarrier(individual.id, true);
-                else if (v === "presymptomatic") setPresymptomatic(individual.id, true);
-                else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
-                else setCarrier(individual.id, false);
-              }}
-              className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-            >
-              <option value="">No</option>
-              <option value="carrier">Carrier (dot)</option>
-              <option value="presymptomatic">Presymptomatic (vertical line)</option>
-            </select>
-          </div>
-          {(individual.carrier || individual.presymptomatic) && individual.affected && (
+          {mode === "per-condition" ? (
+            <ConditionsForm individual={individual} problems={problemsOn("conditions")} />
+          ) : (
+            // One carrier status (#101): the plain carrier, or the presymptomatic vertical line.
+            // With one condition, Carrier records it (#115).
+            <div className="flex items-center gap-2">
+              <span className="shrink-0">Carrier</span>
+              <select
+                value={carrierStatusOf(individual, pedigree) === "none" ? "" : carrierStatusOf(individual, pedigree)}
+                aria-label="Carrier status"
+                onChange={e => {
+                  const v = e.target.value;
+                  if (v === "carrier") setCarrier(individual.id, true);
+                  else if (v === "presymptomatic") setPresymptomatic(individual.id, true);
+                  else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
+                  else setCarrier(individual.id, false);
+                }}
+                className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+              >
+                <option value="">No</option>
+                <option value="carrier">
+                  {sole ? carrierLabel(sole) : notationOf(pedigree) === "nsgc2008" ? "Carrier (dot)" : "Carrier (half patterned)"}
+                </option>
+                <option value="presymptomatic">Presymptomatic (vertical line)</option>
+              </select>
+            </div>
+          )}
+          {mode === "per-condition" && (
+            <label className="flex items-center gap-2 cursor-pointer" title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)">
+              <input
+                type="checkbox"
+                name="presymptomatic"
+                checked={!!individual.presymptomatic}
+                onChange={e => setPresymptomatic(individual.id, e.target.checked)}
+                className="accent-black"
+              />
+              <span>Presymptomatic (vertical line)</span>
+            </label>
+          )}
+          {individual.presymptomatic && individual.affected && (
+            <p className="text-[10px] text-gray-500 pl-5">
+              Not drawn: the affected fill replaces the vertical line.
+            </p>
+          )}
+          {plainCarrier(individual, pedigree) && !symbolPaint(individual, pedigree).dot
+            && !symbolPaint(individual, pedigree).sectors.some(x => x.tag === PLAIN_CARRIER_TAG) && (
             <p className="text-[10px] text-gray-500 pl-5">
               Not drawn: the affected fill replaces the carrier mark. Use a gene result tag to show it.
             </p>
@@ -273,6 +308,51 @@ function IndividualForm({ individual }: { individual: Individual }) {
       <EndedForm individual={individual} />
       <CouplesForm individual={individual} />
     </div>
+  );
+}
+
+/**
+ * Status per condition (#115), shown when the pedigree has two or more
+ * condition (quadrant) tags: affected, carrier or neither for each. A plain
+ * Affected or Carrier flag with no condition is listed below with its
+ * warning and one-click fixes, and can be cleared; nothing is refused.
+ */
+function ConditionsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
+  const { pedigree, setConditionStatus, setAffected, setCarrier } = usePedigreeStore();
+  const conditions = conditionTags(pedigree);
+  return (
+    <ProblemHighlight {...problems}>
+      <div className="space-y-1" data-testid="conditions-form">
+        <div>Conditions</div>
+        {conditions.map(t => (
+          <div key={t.id} className="flex items-center gap-2 pl-2" data-condition-row={t.id}>
+            <span className="flex-1 min-w-0 truncate" title={t.label}>{t.label}</span>
+            <select
+              value={conditionStateOf(individual, t.id)}
+              aria-label={`${t.label} status`}
+              onChange={e => setConditionStatus(individual.id, t.id, e.target.value as ConditionState)}
+              className="w-24 shrink-0 h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+            >
+              <option value="none">No</option>
+              <option value="affected">Affected</option>
+              <option value="carrier">Carrier</option>
+            </select>
+          </div>
+        ))}
+        {plainAffected(individual, pedigree) && (
+          <label className="flex items-center gap-2 cursor-pointer pl-2">
+            <input type="checkbox" name="plainAffected" checked onChange={() => setAffected(individual.id, false)} className="accent-black" />
+            <span>Affected {CONDITION_NOT_RECORDED}</span>
+          </label>
+        )}
+        {plainCarrier(individual, pedigree) && (
+          <label className="flex items-center gap-2 cursor-pointer pl-2">
+            <input type="checkbox" name="plainCarrier" checked onChange={() => setCarrier(individual.id, false)} className="accent-black" />
+            <span>Carrier {CONDITION_NOT_RECORDED}</span>
+          </label>
+        )}
+      </div>
+    </ProblemHighlight>
   );
 }
 
@@ -787,18 +867,19 @@ function ProblemHighlight({ children, problemFor, problemField, problems = [] }:
           <span className="mt-px"><ProblemIcon severity={p.severity} size={10} /></span>
           <span>
             {p.message}
-            {p.fix && (
-              <>
+            {[p.fix, ...(p.moreFixes ?? [])].filter(f => f !== undefined).map((f, i) => (
+              <span key={i}>
                 {" "}
                 <button
                   type="button"
+                  data-problem-fix={f.label}
                   className="underline underline-offset-2 hover:text-black"
-                  onClick={() => p.fix!.apply(usePedigreeStore.getState())}
+                  onClick={() => f.apply(usePedigreeStore.getState())}
                 >
-                  {p.fix.label}
+                  {f.label}
                 </button>
-              </>
-            )}
+              </span>
+            ))}
           </span>
         </p>
       ))}

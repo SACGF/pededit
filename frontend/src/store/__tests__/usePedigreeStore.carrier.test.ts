@@ -72,6 +72,6 @@ describe("usePedigreeStore setCarrier", () => {
     get().undo();
     get().setCarrier("a", false);
     expect(get().future).toHaveLength(0);
-    expect(ind("a").carrier).toBe(false);
+    expect(ind("a").carrier).toBeFalsy();
   });
 });

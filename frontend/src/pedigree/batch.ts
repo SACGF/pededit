@@ -1,6 +1,7 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { twinSetOf } from "./twins";
 import { geneticParentsSexProblem } from "./sameSex";
+import { conditionStateOf, conditionTags, soleCondition, type ConditionState } from "./conditions";
 
 /**
  * Batch status changes on a multiple selection (#35): what the more menu's
@@ -11,8 +12,15 @@ import { geneticParentsSexProblem } from "./sameSex";
 /** Carrier status is one choice (#101): a carrier dot, the presymptomatic line, or neither. */
 export type CarrierStatus = "carrier" | "presymptomatic" | "none";
 
-export function carrierStatusOf(ind: { carrier?: boolean; presymptomatic?: boolean }): CarrierStatus {
-  return ind.presymptomatic ? "presymptomatic" : ind.carrier ? "carrier" : "none";
+export function carrierStatusOf(
+  ind: { carrier?: boolean; presymptomatic?: boolean; tags?: string[]; carrierTags?: string[] },
+  pedigree?: Pick<Pedigree, "tags">,
+): CarrierStatus {
+  if (ind.presymptomatic) return "presymptomatic";
+  if (ind.carrier) return "carrier";
+  // With one condition the Carrier control records it (#115), so a carrier of it counts.
+  const sole = pedigree && soleCondition(pedigree);
+  return sole && conditionStateOf(ind, sole.id) === "carrier" ? "carrier" : "none";
 }
 
 /** How many of the selected people have each status, for the menu labels. */
@@ -25,6 +33,8 @@ export interface BatchStatus {
   sex: Record<Sex, number>;
   /** Tag id to how many of the selected carry it. */
   tags: Record<string, number>;
+  /** Condition (quadrant tag) id to how many of the selected are in each state (#115). */
+  conditions: Record<string, Record<ConditionState, number>>;
 }
 
 export function batchStatus(pedigree: Pedigree, ids: string[]): BatchStatus {
@@ -37,11 +47,15 @@ export function batchStatus(pedigree: Pedigree, ids: string[]): BatchStatus {
     carrier: { carrier: 0, presymptomatic: 0, none: 0 },
     sex: { male: 0, female: 0, unknown: 0 },
     tags: {},
+    conditions: {},
   };
+  const conditions = conditionTags(pedigree);
+  for (const t of conditions) out.conditions[t.id] = { affected: 0, carrier: 0, none: 0 };
   for (const ind of people) {
     if (ind.affected) out.affected++;
     if (ind.deceased) out.deceased++;
-    out.carrier[carrierStatusOf(ind)]++;
+    out.carrier[carrierStatusOf(ind, pedigree)]++;
+    for (const t of conditions) out.conditions[t.id]![conditionStateOf(ind, t.id)]++;
     out.sex[ind.sex]++;
     for (const t of ind.tags ?? []) out.tags[t] = (out.tags[t] ?? 0) + 1;
   }

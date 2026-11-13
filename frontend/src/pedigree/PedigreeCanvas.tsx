@@ -36,7 +36,7 @@ import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
 import { FilterBanner } from "./FilterBanner";
 import { SymbolShape, DeceasedSlash } from "./nodes/symbols";
-import { sectorsFor } from "./tags";
+import { symbolPaint } from "./tags";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { ChartTitleNode, chartTitleNode } from "./nodes/ChartTitleNode";
 import { chartTitle } from "./labels";
@@ -189,7 +189,7 @@ function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges, assistedE
                 individual={individual}
                 shape={shape}
                 size={NODE_SIZE}
-                sectors={sectorsFor(individual, pedigree)}
+                paint={symbolPaint(individual, pedigree)}
                 clipId={`minimap-clip-${node.id}`}
                 caption={false}
               />

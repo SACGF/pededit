@@ -4,7 +4,7 @@ import {
   sectorPath, tagCanvasText, AFFECTED_CORE_SCALE, AFFECTED_CORE_RIM,
   ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../tags";
-import type { Sector, AnnotationItem } from "../tags";
+import type { Sector, AnnotationItem, SymbolPaint } from "../tags";
 import { fillLayers, type FillBox } from "../tagFills";
 import type { TagFill } from "@pedigree-editor/layout-engine";
 import {
@@ -28,10 +28,18 @@ type FillDescriptor =
   | { type: "empty" }
   | { type: "carrier-dot" };
 
-function symbolFill(individual: Individual): FillDescriptor {
-  if (individual.affected) return { type: "solid" };
-  if (individual.carrier)  return { type: "carrier-dot" };
+function symbolFill(paint: SymbolPaint): FillDescriptor {
+  if (paint.base === "black") return { type: "solid" };
+  if (paint.dot) return { type: "carrier-dot" };
   return { type: "empty" };
+}
+
+/**
+ * The paint of a symbol drawn without its pedigree (legend swatches):
+ * the 2008 rules on the person alone. Canvas symbols pass `symbolPaint`.
+ */
+export function standalonePaint(individual: Individual): SymbolPaint {
+  return { sectors: [], base: individual.affected ? "black" : "white", core: false, dot: !!individual.carrier && !individual.affected };
 }
 
 // ── Shape props ────────────────────────────────────────────────────────────────
@@ -39,9 +47,12 @@ function symbolFill(individual: Individual): FillDescriptor {
 interface ShapeProps {
   individual: Individual;
   size: number;
-  /** Quadrant-tag sectors to paint over the base fill. */
-  sectors?: Sector[];
-  /** Unique id for this symbol's clipPath. Required when sectors are given. */
+  /**
+   * What fills the symbol (`symbolPaint` in tags.ts: sectors, black fill,
+   * black centre, carrier dot). Defaults to `standalonePaint`.
+   */
+  paint?: SymbolPaint;
+  /** Unique id for this symbol's clipPath. Required when the paint has sectors. */
   clipId?: string;
   /** Draw the "SB" / "ECT" caption under the symbol (off in the minimap, where it is unreadable). */
   caption?: boolean;
@@ -64,10 +75,13 @@ function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; c
   return (
     <g clipPath={`url(#${clipId})`}>
       {sectors.map((s, i) => (
-        <RegionFill
-          key={s.tag.id} fill={s.fill ?? "solid"} color={s.color ?? s.tag.color} box={box}
-          d={sectorPath(c, c, size, s.start, s.end)} clipId={`${clipId}-s${i}`}
-        />
+        // data-carrier-sector (#115): which condition's carrier fill this is, for page checks.
+        <g key={s.tag.id} data-carrier-sector={s.carrier ? s.tag.id : undefined}>
+          <RegionFill
+            fill={s.fill ?? "solid"} color={s.color ?? s.tag.color} box={box}
+            d={sectorPath(c, c, size, s.start, s.end)} clipId={`${clipId}-s${i}`}
+          />
+        </g>
       ))}
     </g>
   );
@@ -114,7 +128,7 @@ function AffectedCore({ size, show, outline }: { size: number; show: boolean; ou
 
 // ── Male (square) ──────────────────────────────────────────────────────────────
 
-function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
+function MaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
   const padding = 1;
   const outline = { x: padding, y: padding, width: size - 2 * padding, height: size - 2 * padding };
   return (
@@ -126,7 +140,7 @@ function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillD
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
-      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<rect {...outline} />} />
+      <AffectedCore size={size} show={core} outline={<rect {...outline} />} />
       {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -134,7 +148,7 @@ function MaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillD
 
 // ── Female (circle) ────────────────────────────────────────────────────────────
 
-function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
+function FemaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 1;
   return (
     <g>
@@ -145,7 +159,7 @@ function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fil
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
-      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<circle cx={cx} cy={cy} r={r} />} />
+      <AffectedCore size={size} show={core} outline={<circle cx={cx} cy={cy} r={r} />} />
       {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -153,7 +167,7 @@ function FemaleSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fil
 
 // ── Unknown sex (diamond) ──────────────────────────────────────────────────────
 
-function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string }) {
+function UnknownSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
   const cx = size / 2, cy = size / 2;
   const points = [
     `${cx},1`,
@@ -170,7 +184,7 @@ function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fi
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
-      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<polygon points={points} />} />
+      <AffectedCore size={size} show={core} outline={<polygon points={points} />} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
     </g>
   );
@@ -179,8 +193,8 @@ function UnknownSymbol({ size, fill, sectors, clipId }: { size: number; fill: Fi
 // ── Pregnancy and pregnancy loss (NSGC 2008) ───────────────────────────────────
 
 /** Small triangle for miscarriage, termination (with slash) and ectopic pregnancy. */
-function LossTriangle({ size, fill, slash, sectors, clipId }: {
-  size: number; fill: FillDescriptor; slash: boolean; sectors: Sector[]; clipId: string;
+function LossTriangle({ size, fill, slash, sectors, core, clipId }: {
+  size: number; fill: FillDescriptor; slash: boolean; sectors: Sector[]; core: boolean; clipId: string;
 }) {
   const s = lossSlashEnds(size);
   const points = lossTrianglePoints(size);
@@ -193,7 +207,7 @@ function LossTriangle({ size, fill, slash, sectors, clipId }: {
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
-      <AffectedCore size={size} show={fill.type === "solid" && sectors.length > 0} outline={<polygon points={points} />} />
+      <AffectedCore size={size} show={core} outline={<polygon points={points} />} />
       {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
       {slash && <SlashOverFill {...s} fill={fill} clipId={clipId} />}
     </g>
@@ -273,13 +287,13 @@ function LifeStatusCaption({ size, text }: { size: number; text: string }) {
   );
 }
 
-function SexSymbol({ shape, size, fill, sectors, clipId }: {
-  shape: Individual["sex"]; size: number; fill: FillDescriptor; sectors: Sector[]; clipId: string;
+function SexSymbol({ shape, size, fill, sectors, core, clipId }: {
+  shape: Individual["sex"]; size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string;
 }) {
   switch (shape) {
-    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} clipId={clipId} />;
-    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} clipId={clipId} />;
-    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} clipId={clipId} />;
+    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
+    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
+    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
   }
 }
 
@@ -296,8 +310,9 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size, sectors = [], clipId, caption: showCaption = true, shape = individual.sex }: ShapeProps) {
-  const fill = symbolFill(individual);
+export function SymbolShape({ individual, size, paint = standalonePaint(individual), clipId, caption: showCaption = true, shape = individual.sex }: ShapeProps) {
+  const fill = symbolFill(paint);
+  const { sectors, core } = paint;
   const id = clipId ?? `symbol-clip-${individual.id}`;
   const status = individual.lifeStatus;
   const brackets = individual.adopted ? <AdoptionBrackets size={size} /> : null;
@@ -307,8 +322,8 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
       <g>
         {brackets}
         {usesLossTriangle(status)
-          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} clipId={id} />
-          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} clipId={id} />}
+          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} />
+          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
         {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
@@ -322,7 +337,7 @@ export function SymbolShape({ individual, size, sectors = [], clipId, caption: s
   return (
     <g>
       {brackets}
-      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} clipId={id} />
+      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
       <RoleLetter individual={individual} size={size} halo={sectors.length > 0} />

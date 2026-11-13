@@ -151,7 +151,7 @@ draws NSGC symbols.
   them (checked by rendering an exported PDF with Ghostscript).
   `fillLayers` is the geometry, `renderRegionFillSvg` (exporters, export
   key) and `RegionFill` in `symbols.tsx` (canvas, minimap, app legend) its
-  two renderers; per-condition carrier fills (#115) should use them. Black
+  two renderers; per-condition carrier fills (#115) use them. Black
   pattern strokes are written as `#000000`, never `"black"`, or the
   minimap's hairline CSS would turn a fine pattern into solid black.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
@@ -165,9 +165,9 @@ draws NSGC symbols.
   `symbolTopInset` (sibship drops end at a triangle's apex, not the box top).
   On an affected symbol the termination / stillbirth slash is redrawn in
   white clipped to the symbol outline, so it stays visible over the fill.
-  The carrier dot is never drawn on an affected symbol (the edit panel says
-  so); a gene result text tag ("+/-" built-in suggestion in `tags.ts`) is the
-  way to show it.
+  The carrier dot (NSGC 2008 only, #115) is never drawn on an affected
+  symbol (the edit panel says so); a carrier condition (#115) or a gene
+  result text tag ("+/-" built-in suggestion in `tags.ts`) shows it.
 
 - `proband.ts` — proband and consultand arrows (#99, NSGC 2008 Fig. 1):
   the proband's arrow has a bold "P" below-left of its tail, a consultand's
@@ -202,8 +202,30 @@ draws NSGC symbols.
   the U-shape). It reaches about 13px above the row, inside the title gap.
 
 - `notation.ts`: `canvasSettings.notation`, which NSGC edition is drawn.
-  Absent means "nsgc2022": default to the latest standard, keep the older
-  style as a setting (maintainer's rule). Read it through `notationOf`.
+  Absent means "nsgc2008" (#115): pedigrees saved before the setting keep
+  their look. Everything made now gets "nsgc2022" through
+  `withCurrentNotation`: `pedigreeApi.create`, `importPed` and `EXAMPLES`
+  (JSON import keeps the file's). A new way of making a pedigree must call
+  it too. Read the setting through `notationOf`; test pedigrees without
+  `canvasSettings` are 2008.
+- `conditions.ts` — affected and carrier per condition (#115). A quadrant
+  tag in `Individual.tags` is affected with that condition (and sets
+  `affected`), in `Individual.carrierTags` a carrier of it; the plain
+  `carrier` flag is a carrier with no condition recorded. Every editor path
+  (panel, more menu, batch, legend checkbox, "A" shortcut, warning fixes)
+  goes through `applyConditionState` / `applyAffected` / `applyCarrier`, so
+  the rules live in one place: the last affected condition removed clears
+  `affected`; recording a carrier condition clears the plain flag; with
+  exactly one condition the plain Affected and Carrier controls record it;
+  with two or more the panel (`ConditionsForm`) and menus ask per
+  condition, and plain flags get the "condition-not-recorded" warning with
+  one fix per condition (`Problem.moreFixes`). Drawing is decided once in
+  `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
+  `carrierPaint` from tagFills.ts, plus the 2022 dotted half for a plain
+  carrier as the `PLAIN_CARRIER_TAG` sector), black base, black centre,
+  2008 dot. Canvas, minimap, both exporters and the legends read it; never
+  test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
+  `keyTagRows` are the key rows for the app legend and the export key.
 - `evaluation.ts` — evaluation results and presymptomatic carrier (#101,
   #114). `Individual.evaluations` is a list of `{ result, detail,
   documented }`; `labels.ts` writes each as a detail section between onset
@@ -416,7 +438,8 @@ draws NSGC symbols.
   affected) has no effect. `rootsHidingNew` ignores filters (it runs on
   `withoutFilters`), and the store turns the filters off when any other edit
   would hide someone new (`filterHidingNew`), so an added unaffected child
-  never vanishes into a count. "Affected only" seeds are affected, carrier,
+  never vanishes into a count. "Affected only" seeds are affected, carrier
+  (plain or of a condition, #115),
   proband, consultand and quadrant-tag people; their ancestors are kept, and
   a seed with no parents and no drawn children keeps their partners (an
   affected person who married in would otherwise float). Half sibs by a

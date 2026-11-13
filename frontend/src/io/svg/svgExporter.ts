@@ -27,8 +27,8 @@ import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowK
 import type { SvgExportOptions } from "./types";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
-  needsAffectedCore, renderAffectedCoreSvg,
-  hasAnnotationRow, sectorsFor,
+  renderAffectedCoreSvg, symbolPaint,
+  hasAnnotationRow, type SymbolPaint,
 } from "../../pedigree/tags";
 import {
   usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
@@ -334,7 +334,9 @@ export function renderRoleLetterSvg(ind: Individual, halo = false): string {
 
 function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
   const half = NODE_SIZE / 2;
-  const fill = ind.affected ? "black" : "white";
+  // What fills the symbol, by the notation (#115), shared with the canvas.
+  const paint = symbolPaint(ind, pedigree);
+  const fill = paint.base;
 
   // Geometry without paint, reused for the clipPath, the filled base and the
   // re-stroked outline that keeps the border crisp over tag sectors.
@@ -353,16 +355,16 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   const stroke = `stroke="black" stroke-width="${STROKE}"`;
 
   let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  const sectors = sectorsFor(ind, pedigree);
+  const sectors = paint.sectors;
   if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
-      + (needsAffectedCore(ind, sectors) ? renderAffectedCoreSvg(geom) : "")
+      + (paint.core ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0) + renderRoleLetterSvg(ind, sectors.length > 0)
-    + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId)
+  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0)
+    + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId, paint)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 
@@ -372,12 +374,13 @@ function captionShift(ind: Individual): number {
 }
 
 /**
- * Carrier dot, centred on the origin's symbol. Not drawn on an affected
- * (filled) symbol. Shared with the U-shape exporter.
+ * Carrier dot (NSGC 2008), centred on the origin's symbol; `show` is
+ * `symbolPaint(...).dot`, which leaves it off an affected fill and off a
+ * carrier whose condition is recorded (#115). With `rim` (tag colours behind
+ * it) it gets a white rim, as on the canvas. Shared with the U-shape exporter.
  */
-/** Carrier dot; with `rim` (tag colours behind it) it gets a white rim, as on the canvas. */
-export function renderCarrierDot(ind: Individual, rim = false): string {
-  if (!ind.carrier || ind.affected) return "";
+export function renderCarrierDot(ind: Individual, rim: boolean, show: boolean): string {
+  if (!show) return "";
   const half = NODE_SIZE / 2;
   const d = carrierDot(ind.lifeStatus, NODE_SIZE, -half, -half);
   return rim
@@ -417,14 +420,15 @@ export function lossTriangleGeom(ind: Individual): string | null {
  * on an affected symbol the part of a slash inside it is redrawn in white,
  * clipped to that outline, so the slash does not vanish into the fill.
  */
-export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: string): string {
+export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: string, paint: Pick<SymbolPaint, "base" | "dot">): string {
   const status = ind.lifeStatus;
   if (!status) return "";
+  const filled = paint.base === "black";
   const half = NODE_SIZE / 2;
   const slash = (s: { x1: number; y1: number; x2: number; y2: number }) => {
     const attrs = `x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke-width="${STROKE}"`;
     let out = `<line ${attrs} stroke="black"/>`;
-    if (ind.affected) {
+    if (filled) {
       const id = `${clipId}-slash`;
       out += `<clipPath id="${id}">${geom}/></clipPath><line ${attrs} stroke="white" clip-path="url(#${id})"/>`;
     }
@@ -432,8 +436,8 @@ export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: str
   };
   if (status === "termination") return slash(lossSlashEnds(NODE_SIZE, -half, -half));
   if (status === "pregnancy") {
-    const textFill = ind.affected ? "white" : "black";
-    const carrier = !!ind.carrier && !ind.affected;
+    const textFill = filled ? "white" : "black";
+    const carrier = paint.dot;
     return `<text x="0" y="${pregnancyBaselineY(NODE_SIZE, -half, carrier)}" text-anchor="middle" font-family="sans-serif" font-size="${pregnancyFontSize(NODE_SIZE, carrier)}" font-weight="bold" fill="${textFill}">P</text>`;
   }
   if (status === "stillbirth") {

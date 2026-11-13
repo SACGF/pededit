@@ -4,8 +4,8 @@ import { symbolSex } from "../../pedigree/gender";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
-  needsAffectedCore, renderAffectedCoreSvg,
-  hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
+  renderAffectedCoreSvg, symbolPaint,
+  hasAnnotationRow, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets, renderRoleLetterSvg } from "./svgExporter";
@@ -1389,7 +1389,9 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
  * like the deceased slash does.
  */
 function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotation: number): string {
-  const fill = ind.affected ? "black" : "white";
+  // What fills the symbol, by the notation (#115), as on the canvas.
+  const paint = symbolPaint(ind, pedigree);
+  const fill = paint.base;
   const triangle = lossTriangleGeom(ind);
   let geom: string;
   if (triangle) {
@@ -1404,21 +1406,21 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   }
   const stroke = `stroke="black" stroke-width="${STROKE}"`;
   let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  const sectors = sectorsFor(ind, pedigree);
+  const sectors = paint.sectors;
   if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
       + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
-      + (needsAffectedCore(ind, sectors) ? renderAffectedCoreSvg(geom) : "")
+      + (paint.core ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
-  shape += renderCarrierDot(ind, sectors.length > 0);
+  shape += renderCarrierDot(ind, sectors.length > 0, paint.dot);
   shape += renderPresymptomaticSvg(ind, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
   // "D" or "S" (#45) is text, kept upright like the "P".
   const letter = renderRoleLetterSvg(ind, sectors.length > 0);
   shape += letter && rotation !== 0 ? `<g transform="rotate(${r(-rotation)})">${letter}</g>` : letter;
-  let marks = renderLifeStatusMarks(ind, geom, clipId);
+  let marks = renderLifeStatusMarks(ind, geom, clipId, paint);
   if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
     marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;
   }

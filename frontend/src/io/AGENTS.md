@@ -204,3 +204,6 @@ New columns go on the end so earlier positions never move: `consultand`
 pregnancy or loss). The `sex` column stays biological sex and decides
 father and mother. `dod` (#103), the date of death as stored ("2007",
 "2007-03-14"), after the assisted reproduction columns (#45).
+`carrier_of` (#115): the conditions (quadrant tags) the person carries, by
+label like `tags`. Since #115 the `carrier` column is 1 for any carrier,
+condition recorded or not.

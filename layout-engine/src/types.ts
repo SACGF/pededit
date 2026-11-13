@@ -43,6 +43,12 @@ export interface Individual {
   genderIdentity?: GenderIdentity;
   affected: boolean;
   deceased?: boolean;
+  /**
+   * Carrier with no condition recorded: the centre dot (NSGC 2008) or half
+   * the symbol patterned (NSGC 2022, #115). A carrier of a named condition
+   * is in `carrierTags` instead, and the editor clears this flag when one is
+   * recorded.
+   */
   carrier?: boolean;
   /**
    * Asymptomatic or presymptomatic carrier (#101, NSGC 2008 Fig. 4):
@@ -101,6 +107,14 @@ export interface Individual {
    */
   socialParents?: string[];
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
+  /**
+   * Conditions (quadrant tags) this person is a carrier of (#115): the
+   * condition's sector is drawn with its carrier pattern, keyed "<condition>
+   * carrier". A quadrant tag in `tags` means affected with that condition;
+   * the editor keeps a tag in at most one of the two lists. Ids of other
+   * tag styles are ignored. Absent means none.
+   */
+  carrierTags?: string[];
   /**
    * Age of onset of the affected status (#93), free text such as "45y",
    * "40s" or "childhood". Used only while `affected` is true.
@@ -289,8 +303,12 @@ export interface CanvasSettings {
   symbolsShow?: SymbolsShowMode;
   /**
    * Edition of the NSGC nomenclature drawn: "nsgc2008" writes evaluation
-   * results as "E+ (detail)", numbered E1, E2; "nsgc2022" as "detail +"
-   * (#114). Absent means "nsgc2022", the latest.
+   * results as "E+ (detail)", numbered E1, E2, and draws a carrier with no
+   * condition as the centre dot; "nsgc2022" writes "detail +" (#114) and
+   * draws that carrier as half the symbol patterned (#115). Absent means
+   * "nsgc2008", so pedigrees saved before the setting existed keep their
+   * look; every new pedigree, PED import and built-in example is written
+   * with "nsgc2022".
    */
   notation?: NotationEdition;
   /**

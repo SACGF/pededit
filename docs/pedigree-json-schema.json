@@ -62,7 +62,7 @@
         },
         "affected": { "type": "boolean" },
         "deceased": { "type": "boolean" },
-        "carrier": { "type": "boolean" },
+        "carrier": { "type": "boolean", "description": "Carrier with no condition recorded: the centre dot (nsgc2008) or the right half of the symbol dotted (nsgc2022). A carrier of a named condition is in carrierTags instead." },
         "presymptomatic": { "type": "boolean", "description": "Asymptomatic or presymptomatic carrier (NSGC): a vertical line through the symbol. The editor never sets it together with carrier." },
         "evaluations": {
           "type": "array",
@@ -95,7 +95,8 @@
         "hpoTerms": { "type": "array", "items": { "type": "string", "pattern": "^HP:[0-9]{7}$" } },
         "descendantsHidden": { "type": "boolean", "description": "Everyone below this individual is left out of the drawing and exports (not removed from the data)." },
         "placeholder": { "type": "boolean", "description": "Made automatically as the second parent of a child given only one; removed with its couple line when the couple loses its last child, while nothing else is recorded about them." },
-        "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual." },
+        "tags": { "type": "array", "items": { "type": "string" }, "description": "Ids of tags from Pedigree.tags applied to this individual. A quadrant (condition) tag here means affected with that condition." },
+        "carrierTags": { "type": "array", "items": { "type": "string" }, "description": "Ids of quadrant (condition) tags this individual is a carrier of: the condition's sector is drawn with its carrier pattern and keyed \"<condition> carrier\". A tag is in tags or carrierTags, not both (both counts as affected). Ids of other tag styles are ignored." },
         "onset": { "type": "string", "description": "Age of onset of the affected status, free text such as \"45y\" or \"40s\". Used only while affected is true." },
         "tagOnset": {
           "type": "object",
@@ -222,7 +223,7 @@
         },
         "notation": {
           "enum": ["nsgc2022", "nsgc2008"],
-          "description": "Edition of the NSGC pedigree nomenclature drawn. \"nsgc2022\" writes evaluation results under the symbol as the detail then the result (\"BRCA1 c.5266dupC +\"); \"nsgc2008\" uses the E notation (\"E+ (BRCA1 c.5266dupC)\", numbered E1, E2 when there are several). Absent means \"nsgc2022\"."
+          "description": "Edition of the NSGC pedigree nomenclature drawn. \"nsgc2022\" writes evaluation results under the symbol as the detail then the result (\"BRCA1 c.5266dupC +\"); \"nsgc2008\" uses the E notation (\"E+ (BRCA1 c.5266dupC)\", numbered E1, E2 when there are several), and draws a carrier with no condition recorded as the centre dot instead of the dotted right half. Absent means \"nsgc2008\", so pedigrees saved before the setting existed keep their look; new pedigrees, PED imports and the built-in examples are written with \"nsgc2022\"."
         },
         "tagFills": {
           "enum": ["color", "monochrome"],

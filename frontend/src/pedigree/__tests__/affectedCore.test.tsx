@@ -15,7 +15,9 @@ const ALL_FOUR: Sector[] = [
 
 function render(ind: Partial<Individual>, sectors: Sector[]): string {
   const individual: Individual = { id: "i1", sex: "male", affected: false, sibOrder: 0, ...ind };
-  return renderToStaticMarkup(<svg><SymbolShape individual={individual} size={SIZE} sectors={sectors} clipId="c" /></svg>);
+  // The NSGC 2008 paint (`symbolPaint`): black fill, and the black centre over sectors.
+  const paint = { sectors, base: individual.affected ? "black" as const : "white" as const, core: individual.affected && sectors.length > 0, dot: false };
+  return renderToStaticMarkup(<svg><SymbolShape individual={individual} size={SIZE} paint={paint} clipId="c" /></svg>);
 }
 
 describe("affected core on tagged symbols", () => {

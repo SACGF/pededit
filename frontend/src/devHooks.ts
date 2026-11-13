@@ -88,7 +88,9 @@ const hooks = {
   },
   /** Editor warnings (#116, pedigree/validation.ts), without the fix functions so they print as JSON. */
   problems: (pedigree?: Pedigree) =>
-    problemsOf(pedigree ?? usePedigreeStore.getState().getPedigree()).all.map(({ fix, ...p }) => ({ ...p, ...(fix ? { fix: fix.label } : {}) })),
+    problemsOf(pedigree ?? usePedigreeStore.getState().getPedigree()).all.map(({ fix, moreFixes, ...p }) => ({
+      ...p, ...(fix ? { fix: fix.label } : {}), ...(moreFixes ? { moreFixes: moreFixes.map(f => f.label) } : {}),
+    })),
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),
 };

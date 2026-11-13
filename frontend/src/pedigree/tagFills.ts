@@ -114,6 +114,29 @@ export function tagPaint(tag: Tag, pedigree: Pedigree): TagPaint {
     ?? { color: tagFillMode(pedigree) === "monochrome" ? MONOCHROME_COLOR : tag.color, fill: tag.style === "quadrant" ? (tag.fill ?? "solid") : "solid" };
 }
 
+/**
+ * How a condition's carriers are drawn (#115): the condition's sector, in a
+ * fill that differs from the affected one. A condition drawn solid (the usual
+ * colour case) or shaded has hatched carriers in its colour. One already
+ * drawn with a pattern (its own, or every condition in black and white) keeps
+ * that pattern for its carriers, in a lighter tint of its colour (mid grey
+ * for black), so in black and white each condition is still told by its
+ * pattern and the carrier by the lighter lines. Both are defined in the key.
+ */
+export const CARRIER_TINT = 0.45;
+
+export function carrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
+  const affected = tagPaint(tag, pedigree);
+  if (affected.fill === "solid" || affected.fill === "shade") return { color: affected.color, fill: "diagonal" };
+  return { color: tint(affected.color, CARRIER_TINT), fill: affected.fill };
+}
+
+/**
+ * The fill of a carrier with no condition recorded in NSGC 2022 (#115): half
+ * the symbol dotted in black, the dots a reminder of the 2008 carrier dot.
+ */
+export const PLAIN_CARRIER_PAINT: TagPaint = { color: MONOCHROME_COLOR, fill: "dots" };
+
 // ── Geometry ──────────────────────────────────────────────────────────────────
 
 /** Square area a pattern covers: the symbol's bounding box. Patterns line up across its sectors. */

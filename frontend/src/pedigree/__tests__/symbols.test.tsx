@@ -108,7 +108,7 @@ describe("SymbolShape, tags on pregnancy and pregnancy loss", () => {
 
   it("clips quadrant sectors to the loss triangle", () => {
     const html = renderToStaticMarkup(
-      <svg><SymbolShape individual={{ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "ectopic" }} size={SIZE} sectors={[sector]} clipId="c1" /></svg>,
+      <svg><SymbolShape individual={{ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "ectopic" }} size={SIZE} paint={{ sectors: [sector], base: "white", core: false, dot: false }} clipId="c1" /></svg>,
     );
     expect(html).toMatch(new RegExp(`<clipPath id="c1"><polygon ${TRIANGLE.replace(/[.*+?^$()|[\]\\]/g, "\\$&")}`));
     expect(html).toContain('fill="#d62728"');
@@ -117,7 +117,7 @@ describe("SymbolShape, tags on pregnancy and pregnancy loss", () => {
 
   it("keeps sectors on the sex symbol of a pregnancy", () => {
     const html = renderToStaticMarkup(
-      <svg><SymbolShape individual={{ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "pregnancy" }} size={SIZE} sectors={[sector]} clipId="c2" /></svg>,
+      <svg><SymbolShape individual={{ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "pregnancy" }} size={SIZE} paint={{ sectors: [sector], base: "white", core: false, dot: false }} clipId="c2" /></svg>,
     );
     expect(html).toMatch(/<clipPath id="c2"><rect/);
     expect(html).toContain('fill="#d62728"');

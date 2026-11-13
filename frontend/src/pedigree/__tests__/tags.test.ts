@@ -191,12 +191,12 @@ describe("affected core", () => {
   it("is drawn only for affected people with quadrant sectors", () => {
     const p = makePedigree([tremor, seizure, myoclonic, focal], { a: ["t1", "t2", "t3", "t4"], b: ["t1"] });
     const [a, b] = p.individuals as [Pedigree["individuals"][0], Pedigree["individuals"][0]];
-    expect(needsAffectedCore(a, sectorsFor(a, p))).toBe(false);
+    expect(needsAffectedCore(a, p)).toBe(false);
     a.affected = true;
-    expect(needsAffectedCore(a, sectorsFor(a, p))).toBe(true);
+    expect(needsAffectedCore(a, p)).toBe(true);
     b.affected = true;
     b.tags = [];
-    expect(needsAffectedCore(b, sectorsFor(b, p))).toBe(false);
+    expect(needsAffectedCore(b, p)).toBe(false);
   });
 
   it("renders a scaled black copy of the outline", () => {

@@ -5,7 +5,7 @@ import {
   tagPaint, tagFillMode, fillLayers, renderRegionFillSvg, patternLinesD, patternDotsD, tint,
   MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR, TAG_FILL_OPTIONS, isTagFill,
 } from "../tagFills";
-import { sectorsFor, renderSectorsSvg, renderTagLegendSvg, renderExportKeySvg, annotationRow, renderAnnotationRowSvg, sectorPath } from "../tags";
+import { sectorsFor, symbolPaint, renderSectorsSvg, renderTagLegendSvg, renderExportKeySvg, annotationRow, renderAnnotationRowSvg, sectorPath } from "../tags";
 import { SymbolShape } from "../nodes/symbols";
 import { TagSwatchSvg } from "../../components/Legend";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -139,7 +139,7 @@ describe("renderers draw the pattern (#67)", () => {
   it("canvas symbol (and so the minimap) draws the same layers", () => {
     const p = ped(tags);
     const ind = p.individuals[0]!;
-    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} sectors={sectorsFor(ind, p)} clipId="k" /></svg>);
+    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} paint={symbolPaint(ind, p)} clipId="k" /></svg>);
     expect(html).toContain(`data-tag-fill="diagonal"`);
     expect(html).toContain(`data-tag-fill="dots"`);
     expect(html).toContain(`stroke="#d62728"`);
@@ -150,7 +150,7 @@ describe("renderers draw the pattern (#67)", () => {
   it("an affected patterned symbol keeps its black centre over a white pattern base", () => {
     const p = ped([q("a", "#000000", "horizontal")], false, ["a"], true);
     const ind = p.individuals[0]!;
-    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} sectors={sectorsFor(ind, p)} clipId="k" /></svg>);
+    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} paint={symbolPaint(ind, p)} clipId="k" /></svg>);
     const base = html.indexOf(`fill="white"></path>`);
     const core = html.indexOf(`scale(0.55)`);
     expect(base).toBeGreaterThan(0);

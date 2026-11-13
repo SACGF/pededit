@@ -16,7 +16,9 @@
  * setters (`FixActions` lists the ones fixes may use; the store satisfies it).
  */
 import type { Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
+import type { Tag } from "@pedigree-editor/layout-engine";
 import { parsePartialDate, type PartialDate } from "./labels";
+import { carrierLabel, conditionTags, plainAffected, plainCarrier, type ConditionState } from "./conditions";
 
 export type Severity = "warning" | "error";
 
@@ -25,12 +27,14 @@ export type Severity = "warning" | "error";
  * `data-problem-field` in `EditPanel`, which is what the problems list
  * focuses. Add a value here and wrap its field when a rule needs a new one.
  */
-export type ProblemField = "dob" | "dod" | "affected";
+export type ProblemField = "dob" | "dod" | "affected" | "conditions";
 
 /** The pedigree store setters a fix may call. `usePedigreeStore.getState()` satisfies it. */
 export interface FixActions {
   setAffected: (id: string, affected: boolean) => void;
   setDeceased: (id: string, deceased: boolean) => void;
+  /** Record a condition's state (#115). */
+  setConditionStatus: (id: string, tagId: string, state: ConditionState) => void;
 }
 
 export interface ProblemFix {
@@ -49,14 +53,24 @@ export interface Problem {
   field?: ProblemField;
   message: string;
   fix?: ProblemFix;
+  /** Further one-click fixes when there is a choice, offered after `fix` (one per condition, #115). */
+  moreFixes?: ProblemFix[];
 }
 
 /** What a rule returns for one person or couple; `problemsOf` fills in the rest. */
-export type ProblemDraft = Pick<Problem, "severity" | "message"> & { field?: ProblemField; fix?: ProblemFix };
+export type ProblemDraft = Pick<Problem, "severity" | "message"> & { field?: ProblemField; fix?: ProblemFix; moreFixes?: ProblemFix[] };
 
 /** Facts about the whole pedigree, worked out once per pass for rules that need them. */
 export interface RuleContext {
   pedigree: Pedigree;
+  /** The pedigree's conditions (quadrant tags, #115), in order. */
+  conditions: Tag[];
+}
+
+/** One fix per condition, the first as `fix` and the rest as `moreFixes`. */
+function perCondition(conditions: Tag[], make: (t: Tag) => ProblemFix): Pick<ProblemDraft, "fix" | "moreFixes"> {
+  const [first, ...rest] = conditions.map(make);
+  return { fix: first, ...(rest.length ? { moreFixes: rest } : {}) };
 }
 
 type Drafts = ProblemDraft | ProblemDraft[] | undefined | null | false;
@@ -140,6 +154,32 @@ export const RULES: Rule[] = [
       fix: { label: "Mark affected", apply: a => a.setAffected(ind.id, true) },
     },
   },
+  {
+    // #115: with two or more conditions, a plain flag does not say which one.
+    // With one, the editor records it; with none there is nothing to choose.
+    id: "condition-not-recorded",
+    individual: (ind, ctx) => {
+      if (ctx.conditions.length < 2) return null;
+      const out: ProblemDraft[] = [];
+      if (plainAffected(ind, ctx.pedigree)) {
+        out.push({
+          severity: "warning",
+          field: "conditions",
+          message: "Affected, but with which condition? The key shows it as \"Affected (condition not recorded)\".",
+          ...perCondition(ctx.conditions, t => ({ label: `Record as ${t.label}`, apply: a => a.setConditionStatus(ind.id, t.id, "affected") })),
+        });
+      }
+      if (plainCarrier(ind, ctx.pedigree)) {
+        out.push({
+          severity: "warning",
+          field: "conditions",
+          message: "A carrier, but of which condition? The key shows it as \"Carrier (condition not recorded)\".",
+          ...perCondition(ctx.conditions, t => ({ label: `Record as ${carrierLabel(t)}`, apply: a => a.setConditionStatus(ind.id, t.id, "carrier") })),
+        });
+      }
+      return out;
+    },
+  },
 ];
 
 function asList(d: Drafts): ProblemDraft[] {
@@ -149,7 +189,7 @@ function asList(d: Drafts): ProblemDraft[] {
 
 /** Every problem the rules find, people in pedigree order then couples. Not memoised: see `problemsOf`. */
 export function findProblems(pedigree: Pedigree, rules: Rule[] = RULES): Problem[] {
-  const ctx: RuleContext = { pedigree };
+  const ctx: RuleContext = { pedigree, conditions: conditionTags(pedigree) };
   const out: Problem[] = [];
   for (const ind of pedigree.individuals) {
     for (const rule of rules) {

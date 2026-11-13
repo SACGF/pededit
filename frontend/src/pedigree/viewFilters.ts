@@ -22,15 +22,16 @@ function hasConditionTag(individual: Individual, conditions: Set<string>): boole
 
 /**
  * The people "affected only" starts from: affected, carrying a condition
- * (quadrant) tag, carriers (dot or presymptomatic line), the proband and the
- * consultand.
+ * (quadrant) tag, carriers (plain, of a condition, #115, or presymptomatic),
+ * the proband and the consultand.
  */
 export function affectedOnlySeeds(pedigree: Pedigree): Set<string> {
   const conditions = new Set((pedigree.tags ?? []).filter(t => t.style === "quadrant").map(t => t.id));
   return new Set(pedigree.individuals
     .filter(i => i.affected || i.carrier || i.presymptomatic || i.proband
       || i.consultand
-      || hasConditionTag(i, conditions))
+      || hasConditionTag(i, conditions)
+      || (i.carrierTags ?? []).some(t => conditions.has(t)))
     .map(i => i.id));
 }
 

@@ -72,6 +72,8 @@ class IndividualSerializer(serializers.Serializer):
     carriedBy = _opt(serializers.CharField)
     socialParents = _opt(serializers.ListField, child=serializers.CharField())
     tags = _opt(serializers.ListField, child=serializers.CharField())
+    # Conditions (quadrant tags) carried (#115).
+    carrierTags = _opt(serializers.ListField, child=serializers.CharField())
     onset = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     tagOnset = _opt(
         serializers.DictField,

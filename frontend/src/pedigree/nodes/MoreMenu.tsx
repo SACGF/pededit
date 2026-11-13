@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Sex } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Sex, Tag } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
@@ -12,7 +12,8 @@ import { batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
-import { batchStatus, batchSexProblem } from "../batch";
+import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
+import { CONDITION_NOT_RECORDED, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { donorPairFor, sameSexCouple } from "../sameSex";
 
 function clampCount(n: number): number {
@@ -96,6 +97,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setSelectedId,
     unpinIndividual,
     setIndividualTag,
+    setConditionStatus,
     setPartnershipChildless,
     setPartnershipConsanguineous,
     setPartnershipEnded,
@@ -237,9 +239,18 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           <MenuItem onClick={() => action(() => setDeceased(individualId, !individual.deceased))}>
             {individual.deceased ? "Mark living" : "Mark deceased"}
           </MenuItem>
-          <MenuItem onClick={() => action(() => setCarrier(individualId, !individual.carrier))}>
-            {individual.carrier ? "Unmark carrier" : "Mark carrier"}
-          </MenuItem>
+          {/* With one condition, carrier is a carrier of it; with several, a plain flag the Conditions section replaces (#115). */}
+          {(() => {
+            const isCarrierNow = carrierStatusOf(individual, pedigree) === "carrier";
+            const sole = soleCondition(pedigree);
+            const what = sole ? `carrier of ${sole.label}` : conditionMode(pedigree) === "per-condition" ? `carrier ${CONDITION_NOT_RECORDED}` : "carrier";
+            if (conditionMode(pedigree) === "per-condition" && !individual.carrier) return null;
+            return (
+              <MenuItem onClick={() => action(() => setCarrier(individualId, !isCarrierNow))}>
+                {isCarrierNow ? `Unmark ${what}` : `Mark ${what}`}
+              </MenuItem>
+            );
+          })()}
           <MenuItem
             onClick={() => action(() => setPresymptomatic(individualId, !individual.presymptomatic))}
             title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)"
@@ -265,9 +276,31 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </MenuItem>
         </MenuSection>
 
-        {(pedigree.tags?.length ?? 0) > 0 && (
+        {conditionMode(pedigree) === "per-condition" && (
+          <MenuSection label="Conditions">
+            {conditionTags(pedigree).flatMap(tag => {
+              const state = conditionStateOf(individual, tag.id);
+              return [
+                <MenuItem
+                  key={`${tag.id}-a`} checked={state === "affected"}
+                  onClick={() => action(() => setConditionStatus(individualId, tag.id, state === "affected" ? "none" : "affected"))}
+                >
+                  <ConditionItemLabel tag={tag} text={`Affected with ${tag.label}`} on={state === "affected"} />
+                </MenuItem>,
+                <MenuItem
+                  key={`${tag.id}-c`} checked={state === "carrier"}
+                  onClick={() => action(() => setConditionStatus(individualId, tag.id, state === "carrier" ? "none" : "carrier"))}
+                >
+                  <ConditionItemLabel tag={tag} text={`Carrier of ${tag.label}`} on={state === "carrier"} />
+                </MenuItem>,
+              ];
+            })}
+          </MenuSection>
+        )}
+
+        {menuTags(pedigree).length > 0 && (
           <MenuSection label="Tags">
-            {pedigree.tags!.map(tag => {
+            {menuTags(pedigree).map(tag => {
               const on = individual.tags?.includes(tag.id) ?? false;
               return (
                 <MenuItem
@@ -923,7 +956,7 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
  */
 function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => void) => void }) {
   const {
-    pedigree, setAffectedMany, setDeceasedMany, setCarrierStatusMany, setSexMany, setIndividualTagMany,
+    pedigree, setAffectedMany, setDeceasedMany, setCarrierStatusMany, setSexMany, setIndividualTagMany, setConditionStatusMany,
     deleteIndividuals, removeWithDescendants, removeWithAncestors,
   } = usePedigreeStore();
   const st = batchStatus(pedigree, ids);
@@ -937,15 +970,31 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
         {item(st.affected > 0, `Mark ${n} unaffected`, () => setAffectedMany(st.ids, false), "Shortcut: A")}
         {item(st.deceased < n, `Mark ${n} deceased`, () => setDeceasedMany(st.ids, true), "Shortcut: D")}
         {item(st.deceased > 0, `Mark ${n} living`, () => setDeceasedMany(st.ids, false), "Shortcut: D. Also clears their dates of death")}
-        {item(st.carrier.carrier < n, `Mark ${n} carrier`, () => setCarrierStatusMany(st.ids, "carrier"))}
+        {/* With several conditions, carriers are marked per condition below (#115). */}
+        {conditionMode(pedigree) !== "per-condition"
+          && item(st.carrier.carrier < n, soleCondition(pedigree) ? `Mark ${n} ${n === 1 ? "carrier" : "carriers"} of ${soleCondition(pedigree)!.label}` : `Mark ${n} carrier`,
+            () => setCarrierStatusMany(st.ids, "carrier"))}
         {item(st.carrier.presymptomatic < n, `Mark ${n} presymptomatic`, () => setCarrierStatusMany(st.ids, "presymptomatic"),
           "Presymptomatic carrier: a vertical line through the symbol (NSGC). Replaces a carrier dot")}
         {item(st.carrier.none < n, `Clear carrier status of ${n}`, () => setCarrierStatusMany(st.ids, "none"))}
       </MenuSection>
 
-      {(pedigree.tags?.length ?? 0) > 0 && (
+      {conditionMode(pedigree) === "per-condition" && (
+        <MenuSection label={`Conditions of ${n}`}>
+          {conditionTags(pedigree).flatMap(tag => {
+            const c = st.conditions[tag.id]!;
+            return [
+              item(c.affected < n, `Mark ${n} affected with ${tag.label}`, () => setConditionStatusMany(st.ids, tag.id, "affected")),
+              item(c.carrier < n, `Mark ${n} ${n === 1 ? "carrier" : "carriers"} of ${tag.label}`, () => setConditionStatusMany(st.ids, tag.id, "carrier")),
+              item(c.none < n, `Clear ${tag.label} from ${n}`, () => setConditionStatusMany(st.ids, tag.id, "none")),
+            ];
+          })}
+        </MenuSection>
+      )}
+
+      {menuTags(pedigree).length > 0 && (
         <MenuSection label={`Tags of ${n}`}>
-          {pedigree.tags!.map(tag => {
+          {menuTags(pedigree).map(tag => {
             const count = st.tags[tag.id] ?? 0;
             const all = count === n;
             return (
@@ -1008,6 +1057,25 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
         </MenuItem>
       </div>
     </>
+  );
+}
+
+/**
+ * Tags listed in the menus' Tags sections: all of them, except that with two
+ * or more conditions the condition tags have their own section (#115).
+ */
+function menuTags(pedigree: Pedigree): Tag[] {
+  const tags = pedigree.tags ?? [];
+  return conditionMode(pedigree) === "per-condition" ? tags.filter(t => t.style !== "quadrant") : tags;
+}
+
+function ConditionItemLabel({ tag, text, on }: { tag: Tag; text: string; on: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span className="inline-block w-2 h-2 border border-black/20" style={{ background: tag.color }} />
+      {text}
+      {on && <span className="text-gray-400">✓</span>}
+    </span>
   );
 }
 

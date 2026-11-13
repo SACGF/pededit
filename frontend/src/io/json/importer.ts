@@ -225,6 +225,11 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     if (isStringArray(raw.tags)) {
       for (const tagId of raw.tags) tagRefs.push({ tagId, path: `${ip}.tags` });
     }
+    // Conditions carried (#115): ids of quadrant tags, checked like `tags`.
+    c.optional(raw, "carrierTags", ip, "an array of tag ids", isStringArray);
+    if (isStringArray(raw.carrierTags)) {
+      for (const tagId of raw.carrierTags) tagRefs.push({ tagId, path: `${ip}.carrierTags` });
+    }
     c.optional(raw, "onset", ip, "a string", v => typeof v === "string");
     c.optional(raw, "tagOnset", ip, "an object of tag id to string",
       v => isObject(v) && Object.values(v).every(x => typeof x === "string"));

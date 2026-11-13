@@ -13,7 +13,8 @@ import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
-import { tagPaint, renderRegionFillSvg } from "./tagFills";
+import { tagPaint, carrierPaint, renderRegionFillSvg, PLAIN_CARRIER_PAINT } from "./tagFills";
+import { carrierConditions, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
 import type { TagFill } from "@pedigree-editor/layout-engine";
 
 /**
@@ -100,10 +101,22 @@ export interface Sector {
   tag: Tag;
   start: number;
   end: number;
-  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`). */
+  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`, or `carrierPaint`). */
   color: string;
   fill: TagFill;
+  /** A carrier of this condition (#115), drawn with the carrier pattern; or the plain carrier half (`PLAIN_CARRIER_TAG`). */
+  carrier?: boolean;
 }
+
+/**
+ * Stand-in tag for the half symbol of a carrier with no condition recorded
+ * in NSGC 2022 (#115), so it goes through the same sector renderers. Never
+ * stored in a pedigree.
+ */
+export const PLAIN_CARRIER_TAG: Tag = { id: "__plain-carrier", label: "Carrier", color: PLAIN_CARRIER_PAINT.color, style: "quadrant" };
+
+/** Right half, so a condition in the upper or lower left quarter stays clear of it. */
+export const PLAIN_CARRIER_ANGLES: readonly [number, number] = [0, 180];
 
 /**
  * Fixed quarter positions for the first four quadrant tags. Each tag owns a
@@ -140,23 +153,88 @@ export function sectorAngles(index: number): [number, number] {
   return QUADRANT_ANGLES[index] ?? [0, 360];
 }
 
-/** Sectors to paint on an individual's symbol, in pedigree tag order. */
-export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
+/**
+ * Condition sectors on an individual's symbol, in pedigree tag order:
+ * affected conditions in the tag's paint, carrier conditions (#115) in its
+ * carrier paint, each in the condition's own quarter.
+ */
+export function conditionSectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
   const all = quadrantTags(pedigree);
   if (all.length === 0) return [];
   const mine = new Set(individual.tags ?? []);
+  const carrierOf = new Set(carrierConditions(individual, pedigree).map(t => t.id));
   const carried = all
-    .map((tag, index) => ({ tag, index }))
-    .filter(({ tag }) => mine.has(tag.id));
+    .map((tag, index) => ({ tag, index, carrier: !mine.has(tag.id) && carrierOf.has(tag.id) }))
+    .filter(({ tag, carrier }) => mine.has(tag.id) || carrier);
   if (carried.length === 0) return [];
+  const paint = (tag: Tag, carrier: boolean) =>
+    carrier ? { ...carrierPaint(tag, pedigree), carrier: true } : tagPaint(tag, pedigree);
   if (carried.every(c => c.index < FIXED_QUADRANTS)) {
-    return carried.map(({ tag, index }) => {
+    return carried.map(({ tag, index, carrier }) => {
       const [start, end] = QUADRANT_ANGLES[index]!;
-      return { tag, start, end, ...tagPaint(tag, pedigree) };
+      return { tag, start, end, ...paint(tag, carrier) };
     });
   }
   const span = 360 / carried.length;
-  return carried.map(({ tag }, i) => ({ tag, start: i * span, end: (i + 1) * span, ...tagPaint(tag, pedigree) }));
+  return carried.map(({ tag, carrier }, i) => ({ tag, start: i * span, end: (i + 1) * span, ...paint(tag, carrier) }));
+}
+
+/**
+ * Everything filled on a symbol beyond its outline (#3, #115), decided once
+ * so the canvas, minimap, legend and both exporters agree:
+ * - `sectors`: condition sectors, under them (NSGC 2022) the plain carrier's
+ *   dotted right half;
+ * - `base`: "black" for a solid affected fill, else white;
+ * - `core`: the black centre over the sectors;
+ * - `dot`: the 2008 carrier dot.
+ *
+ * NSGC 2008 (and pedigrees saved before the setting, `notation.ts`), as
+ * before: affected is a black fill, with the black centre when there are
+ * sectors; a carrier with no condition recorded has the dot, not drawn on an
+ * affected fill.
+ *
+ * NSGC 2022: there is no dot. A recorded affected condition is its sector
+ * alone, so the person is not filled black. Affected with no condition
+ * recorded is the black fill, or the black centre over any carrier sectors.
+ * A carrier with no condition recorded is the right half dotted, unless the
+ * symbol is filled black.
+ */
+export interface SymbolPaint {
+  sectors: Sector[];
+  base: "black" | "white";
+  core: boolean;
+  dot: boolean;
+}
+
+export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolPaint {
+  const conditions = conditionSectorsFor(individual, pedigree);
+  const affected = !!individual.affected;
+  const plainCarrierFlag = plainCarrier(individual, pedigree);
+  if (notationOf(pedigree) === "nsgc2008") {
+    return {
+      sectors: conditions,
+      base: affected ? "black" : "white",
+      core: affected && conditions.length > 0,
+      dot: plainCarrierFlag && !affected,
+    };
+  }
+  const recordedAffected = conditions.some(s => !s.carrier);
+  const plainAff = affected && !recordedAffected;
+  const black = plainAff && conditions.length === 0;
+  const sectors = !black && plainCarrierFlag
+    ? [{ tag: PLAIN_CARRIER_TAG, start: PLAIN_CARRIER_ANGLES[0], end: PLAIN_CARRIER_ANGLES[1], ...PLAIN_CARRIER_PAINT, carrier: true }, ...conditions]
+    : conditions;
+  return {
+    sectors,
+    base: black ? "black" : "white",
+    core: plainAff && sectors.length > 0,
+    dot: false,
+  };
+}
+
+/** Sectors to paint on an individual's symbol (see `symbolPaint`). */
+export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
+  return symbolPaint(individual, pedigree).sectors;
 }
 
 // ── Affected core ─────────────────────────────────────────────────────────────
@@ -172,9 +250,9 @@ export const AFFECTED_CORE_SCALE = 0.55;
 /** White rim around the core, in symbol pixels (after scaling). */
 export const AFFECTED_CORE_RIM = 1.5;
 
-/** True when the symbol needs the black centre described above. */
-export function needsAffectedCore(individual: Individual, sectors: readonly Sector[]): boolean {
-  return !!individual.affected && sectors.length > 0;
+/** True when the symbol needs the black centre described above (`symbolPaint`). */
+export function needsAffectedCore(individual: Individual, pedigree: Pedigree): boolean {
+  return symbolPaint(individual, pedigree).core;
 }
 
 /**
@@ -275,7 +353,7 @@ function escapeXml(s: string): string {
  * that the caller has already emitted.
  */
 export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, size: number, clipId: string): string {
-  const sectors = sectorsFor(individual, pedigree);
+  const sectors = symbolPaint(individual, pedigree).sectors;
   if (sectors.length === 0) return "";
   const r = size; // beyond the half-diagonal, so the clip does the shaping
   const box = { x: -size / 2, y: -size / 2, size };
@@ -329,15 +407,16 @@ function swatchColumnWidth(tags: readonly Tag[]): number {
 export function renderTagLegendRowSvg(
   tag: Tag, pedigree: Pedigree, x: number, y: number,
   labelOffset = swatchColumnWidth([tag]) + LEGEND_LABEL_GAP,
+  carrier = false,
 ): string {
   const s = LEGEND_SWATCH;
   const cx = x + s / 2, cy = y + s / 2;
   const parts: string[] = [];
-  const paint = tagPaint(tag, pedigree);
+  const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = quadrantTags(pedigree).findIndex(t => t.id === tag.id);
     const [start, end] = sectorAngles(Math.max(idx, 0));
-    const clipId = `legend-clip-${tag.id}`;
+    const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);
     parts.push(renderRegionFillSvg(paint.fill, paint.color, sectorPath(cx, cy, s, start, end), { x, y, size: s }, `${clipId}-fill`, clipId));
@@ -347,8 +426,32 @@ export function renderTagLegendRowSvg(
   } else {
     parts.push(`<text x="${x}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(paint.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
   }
-  parts.push(legendLabelSvg(tag.label, x + labelOffset, cy));
+  parts.push(legendLabelSvg(carrier ? carrierLabel(tag) : tag.label, x + labelOffset, cy));
   return parts.join("");
+}
+
+/** One key row for a tag: the tag itself, or (#115) a condition's carriers. */
+export interface KeyTagRow {
+  tag: Tag;
+  carrier: boolean;
+  label: string;
+}
+
+/**
+ * The tag rows of a key, in pedigree tag order: each tag someone has, and
+ * right after a condition the "<condition> carrier" row when someone is a
+ * carrier of it (#115). A condition with carriers only lists just that row.
+ */
+export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
+  const affected = new Set(tagsInUse(pedigree).map(t => t.id));
+  const carriers = new Set<string>();
+  for (const ind of pedigree.individuals) for (const t of carrierConditions(ind, pedigree)) carriers.add(t.id);
+  const rows: KeyTagRow[] = [];
+  for (const tag of pedigreeTags(pedigree)) {
+    if (affected.has(tag.id)) rows.push({ tag, carrier: false, label: tag.label });
+    if (carriers.has(tag.id)) rows.push({ tag, carrier: true, label: carrierLabel(tag) });
+  }
+  return rows;
 }
 
 function legendLabelSvg(label: string, x: number, cy: number): string {
@@ -356,8 +459,8 @@ function legendLabelSvg(label: string, x: number, cy: number): string {
 }
 
 /** Width needed by the widest legend row, for sizing the export canvas. */
-export function tagLegendWidth(tags: readonly Tag[]): number {
-  const longest = Math.max(0, ...tags.map(t => t.label.length));
+export function tagLegendWidth(tags: readonly Tag[], labels: readonly string[] = tags.map(t => t.label)): number {
+  const longest = Math.max(0, ...labels.map(l => l.length));
   return swatchColumnWidth(tags) + LEGEND_LABEL_GAP + longest * LEGEND_CHAR_WIDTH;
 }
 
@@ -374,13 +477,14 @@ export interface TagLegendBlock {
  * adds status rows above these.
  */
 export function renderTagLegendSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
-  const tags = tagsInUse(pedigree);
-  if (tags.length === 0) return { markup: [], width: 0, height: 0 };
+  const rows = keyTagRows(pedigree);
+  if (rows.length === 0) return { markup: [], width: 0, height: 0 };
+  const tags = rows.map(r => r.tag);
   const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
-  const markup = tags.map((tag, i) =>
-    renderTagLegendRowSvg(tag, pedigree, x, y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2, labelOffset),
+  const markup = rows.map((r, i) =>
+    renderTagLegendRowSvg(r.tag, pedigree, x, y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2, labelOffset, r.carrier),
   );
-  return { markup, width: tagLegendWidth(tags), height: tags.length * LEGEND_ROW_HEIGHT };
+  return { markup, width: tagLegendWidth(tags, rows.map(r => r.label)), height: rows.length * LEGEND_ROW_HEIGHT };
 }
 
 // ── Built-in suggestions ──────────────────────────────────────────────────────
@@ -457,6 +561,67 @@ function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>
 }
 
 /**
+ * The Affected / Carrier rows of a key (#115), shared by the in-app legend
+ * and the export key: who each row's swatch is drawn for (its shape), and its
+ * label. Follows what is drawn (`symbolPaint`):
+ * - NSGC 2008: "Affected" for anyone affected, "Affected, with tags (black
+ *   centre)", "Carrier" for the dot, as before;
+ * - NSGC 2022: "Affected" only for a solid black fill (affected with no
+ *   condition recorded), "Affected, condition not recorded (black centre)"
+ *   over carrier sectors, "Carrier" for the dotted half.
+ * With two or more conditions a plain flag's label adds "(condition not
+ * recorded)" (`plainStatusLabel`).
+ */
+export interface StatusKeyRows {
+  affected?: Individual;
+  affectedLabel: string;
+  core?: Individual;
+  coreLabel: string;
+  carrier?: Individual;
+  carrierLabel: string;
+  /** The carrier row is the 2022 dotted half, not the dot. */
+  carrierHalf: boolean;
+}
+
+export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = pedigree.individuals): StatusKeyRows {
+  const paints = inds.map(i => ({ i, p: symbolPaint(i, pedigree) }));
+  const y2008 = notationOf(pedigree) === "nsgc2008";
+  const anyPlainAffected = inds.some(i => plainAffected(i, pedigree));
+  if (y2008) {
+    return {
+      affected: inds.find(i => i.affected),
+      affectedLabel: anyPlainAffected ? plainStatusLabel("Affected", pedigree) : "Affected",
+      core: paints.find(({ p }) => p.core)?.i,
+      coreLabel: "Affected, with tags (black centre)",
+      carrier: paints.find(({ p }) => p.dot)?.i,
+      carrierLabel: plainStatusLabel("Carrier", pedigree),
+      carrierHalf: false,
+    };
+  }
+  return {
+    affected: paints.find(({ p }) => p.base === "black")?.i,
+    affectedLabel: plainStatusLabel("Affected", pedigree),
+    core: paints.find(({ p }) => p.core)?.i,
+    coreLabel: "Affected, condition not recorded (black centre)",
+    carrier: paints.find(({ p }) => p.sectors.some(s => s.tag === PLAIN_CARRIER_TAG))?.i,
+    carrierLabel: plainStatusLabel("Carrier", pedigree),
+    carrierHalf: true,
+  };
+}
+
+/** Key swatch for the NSGC 2022 carrier with no condition recorded: the right half dotted. */
+export function renderPlainCarrierSwatchSvg(sex: Individual["sex"], x: number, y: number): string {
+  const s = LEGEND_SWATCH;
+  const geom = swatchGeom(sex, x, y, s);
+  const clipId = `legend-plain-carrier-${sex}`;
+  const [start, end] = PLAIN_CARRIER_ANGLES;
+  return `<clipPath id="${clipId}">${geom}/></clipPath>`
+    + `${geom} fill="white" stroke="none"/>`
+    + renderRegionFillSvg(PLAIN_CARRIER_PAINT.fill, PLAIN_CARRIER_PAINT.color, sectorPath(x + s / 2, y + s / 2, s, start, end), { x, y, size: s }, `${clipId}-fill`, clipId)
+    + `${geom} fill="none" stroke="black" stroke-width="1.5"/>`;
+}
+
+/**
  * The full export key: Affected, Carrier and Deceased rows when anyone in the
  * pedigree has that status, then one row per tag in use. Same contract as
  * renderTagLegendSvg (top-left at (x, y), empty when there is nothing to
@@ -469,19 +634,23 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   const inds = pedigree.individuals;
   // Swatches use the shape drawn, the gender identity's when shown (#26).
   const shape = (i: Individual) => symbolSex(i, pedigree);
-  const affected = inds.find(i => i.affected);
-  if (affected) {
-    rows.push({ label: "Affected", swatch: sy => renderStatusSwatchSvg("affected", shape(affected), false, x, sy) });
-    if (inds.some(i => needsAffectedCore(i, sectorsFor(i, pedigree)))) {
-      rows.push({
-        label: "Affected, with tags (black centre)",
-        swatch: sy => renderStatusSwatchSvg("affected", shape(affected), true, x, sy),
-      });
-    }
+  // Affected and carrier with no condition recorded, as drawn (`symbolPaint`, #115).
+  const st = statusKeyRows(pedigree, inds);
+  if (st.affected) {
+    const ind = st.affected;
+    rows.push({ label: st.affectedLabel, swatch: sy => renderStatusSwatchSvg("affected", shape(ind), false, x, sy) });
   }
-  // The dot is drawn on every unaffected carrier, pregnancies and losses included (#14).
-  const carrier = inds.find(i => i.carrier && !i.affected);
-  if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", shape(carrier), false, x, sy) });
+  if (st.core) {
+    const ind = st.core;
+    rows.push({ label: st.coreLabel, swatch: sy => renderStatusSwatchSvg("affected", shape(ind), true, x, sy) });
+  }
+  if (st.carrier) {
+    const ind = st.carrier;
+    rows.push({
+      label: st.carrierLabel,
+      swatch: sy => st.carrierHalf ? renderPlainCarrierSwatchSvg(shape(ind), x, sy) : renderStatusSwatchSvg("carrier", shape(ind), false, x, sy),
+    });
+  }
   // Presymptomatic carrier and evaluation notation (#101).
   const ev = evaluationKeyInfo(inds, notationOf(pedigree));
   const evLegend = evaluationLegend(notationOf(pedigree));
@@ -651,19 +820,20 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
     });
   }
 
-  const tags = tagsInUse(pedigree);
+  const tagRows = keyTagRows(pedigree);
+  const tags = tagRows.map(r => r.tag);
   const details = renderClinicalDetailsSvg(pedigree, x, 0);
-  if (rows.length === 0 && tags.length === 0 && details.height === 0) return { markup: [], width: 0, height: 0 };
+  if (rows.length === 0 && tagRows.length === 0 && details.height === 0) return { markup: [], width: 0, height: 0 };
 
   const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
   const rowY = (i: number) => y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2;
   const markup = rows.map((r, i) =>
     r.swatch(rowY(i)) + legendLabelSvg(r.label, x + labelOffset, rowY(i) + LEGEND_SWATCH / 2),
   );
-  tags.forEach((tag, j) => markup.push(renderTagLegendRowSvg(tag, pedigree, x, rowY(rows.length + j), labelOffset)));
+  tagRows.forEach((r, j) => markup.push(renderTagLegendRowSvg(r.tag, pedigree, x, rowY(rows.length + j), labelOffset, r.carrier)));
 
-  const longest = Math.max(0, ...rows.map(r => r.label.length), ...tags.map(t => t.label.length));
-  const symbolsHeight = (rows.length + tags.length) * LEGEND_ROW_HEIGHT;
+  const longest = Math.max(0, ...rows.map(r => r.label.length), ...tagRows.map(r => r.label.length));
+  const symbolsHeight = (rows.length + tagRows.length) * LEGEND_ROW_HEIGHT;
   // The clinical details (#102) go under the symbol rows, a half row apart.
   const gap = symbolsHeight > 0 && details.height > 0 ? LEGEND_ROW_HEIGHT / 2 : 0;
   if (details.height > 0) {

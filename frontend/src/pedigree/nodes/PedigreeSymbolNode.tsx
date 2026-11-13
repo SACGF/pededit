@@ -9,7 +9,7 @@ import { HoverPill } from "./HoverPill";
 import { captionRowHeight } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
+import { symbolPaint, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 import { arrowKind } from "../proband";
 import { problemsOf, worstSeverity } from "../validation";
@@ -41,7 +41,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
   const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)
     || ((picking?.kind === "partner" || picking?.kind === "relatedness") && picking.individualId === individual.id);
-  const sectors = sectorsFor(individual, pedigree);
+  const paint = symbolPaint(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
   const arrow = arrowKind(individual);
   // Editor warnings (#116), memoised per pedigree so every node shares one pass.
@@ -117,7 +117,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`}
         overflow="visible"
       >
-        <SymbolShape individual={individual} shape={shape} size={NODE_SIZE} sectors={sectors} clipId={`symbol-clip-${nodeId}`} />
+        <SymbolShape individual={individual} shape={shape} size={NODE_SIZE} paint={paint} clipId={`symbol-clip-${nodeId}`} />
         {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         {individual.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}

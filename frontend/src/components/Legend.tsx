@@ -1,10 +1,12 @@
 import type { Individual, Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import {
-  pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
+  pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, statusKeyRows, keyTagRows,
+  PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
+import { carrierLabel, conditionStateOf } from "../pedigree/conditions";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
-import { tagPaint } from "../pedigree/tagFills";
+import { tagPaint, carrierPaint, PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
 import { notationOf } from "../pedigree/notation";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
@@ -96,6 +98,21 @@ function FamilyHistorySvg({ sex }: { sex: Sex }) {
   );
 }
 
+/** Carrier with no condition recorded in NSGC 2022 (#115): the canvas's own dotted right half. */
+function PlainCarrierSvg({ sex }: { sex: Sex }) {
+  const [start, end] = PLAIN_CARRIER_ANGLES;
+  return (
+    <svg width="28" height="28" viewBox="-2 -2 28 28">
+      <SymbolShape
+        individual={{ id: "legend", sex, affected: false, sibOrder: 0 }}
+        size={SZ}
+        paint={{ sectors: [{ tag: PLAIN_CARRIER_TAG, start, end, ...PLAIN_CARRIER_PAINT, carrier: true }], base: "white", core: false, dot: false }}
+        clipId={`legend-plain-carrier-${sex}`}
+      />
+    </svg>
+  );
+}
+
 /** Presymptomatic carrier (#101): the canvas's own symbol with its vertical line. */
 function PresymptomaticSvg({ sex }: { sex: Sex }) {
   return (
@@ -152,14 +169,17 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
   );
 }
 
-/** How a tag looks on a symbol: a quarter of a square, a dot, or coloured text. */
-export function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
+/**
+ * How a tag looks on a symbol: a quarter of a square, a dot, or coloured
+ * text. `carrier`: the condition's carrier fill (#115).
+ */
+export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; pedigree: Pedigree; carrier?: boolean }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
-  const paint = tagPaint(tag, pedigree);
+  const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
     const [start, end] = sectorAngles(idx);
-    const clipId = `legend-clip-${tag.id}`;
+    const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">
         <clipPath id={clipId}><rect x={x} y={y} width={s} height={s} /></clipPath>
@@ -195,7 +215,7 @@ function AffectedCoreSvg({ sex }: { sex: Sex }) {
       <SymbolShape
         individual={{ id: "", sex, affected: true, sibOrder: 0 }}
         size={SZ}
-        sectors={[{ tag: sample, start: 0, end: 360, color: sample.color, fill: "solid" }]}
+        paint={{ sectors: [{ tag: sample, start: 0, end: 360, color: sample.color, fill: "solid" }], base: "white", core: true, dot: false }}
         clipId="legend-affected-core"
       />
     </svg>
@@ -348,8 +368,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const hasUnknown = individuals.some(i => shape(i) === "unknown");
   const byGender = anyDrawnByGender(pedigree);
 
-  const affectedInd = individuals.find(i => i.affected);
-  const carrierInd  = individuals.find(i => i.carrier && !i.affected);
+  // Affected and carrier with no condition recorded, as drawn (#115, `statusKeyRows`).
+  const status = statusKeyRows(pedigree, individuals);
   const deceasedInd = individuals.find(i => i.deceased);
   const probandInd  = individuals.find(i => arrowKind(i) === "proband");
   const consultandInd = individuals.find(i => arrowKind(i) === "consultand");
@@ -366,12 +386,14 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   for (const { code, label } of assignedAtBirthInUse(pedigree)) {
     indRows.push({ icon: <span className="text-[10px] text-black">{code}</span>, label });
   }
-  if (affectedInd) indRows.push({ icon: <SymbolSvg sex={shape(affectedInd)} affected />, label: "Affected" });
-  const coreInd = individuals.find(i => needsAffectedCore(i, sectorsFor(i, pedigree)));
-  if (coreInd) {
-    indRows.push({ icon: <AffectedCoreSvg sex={shape(coreInd)} />, label: "Affected, with tags (black centre)" });
+  if (status.affected) indRows.push({ icon: <SymbolSvg sex={shape(status.affected)} affected />, label: status.affectedLabel });
+  if (status.core) indRows.push({ icon: <AffectedCoreSvg sex={shape(status.core)} />, label: status.coreLabel });
+  if (status.carrier) {
+    indRows.push({
+      icon: status.carrierHalf ? <PlainCarrierSvg sex={shape(status.carrier)} /> : <SymbolSvg sex={shape(status.carrier)} carrier />,
+      label: status.carrierLabel,
+    });
   }
-  if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={shape(carrierInd)} carrier />,   label: "Carrier" });
   const ev = evaluationKeyInfo(individuals, notationOf(pedigree));
   const evLegend = evaluationLegend(notationOf(pedigree));
   if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={shape(ev.presymptomatic)} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
@@ -418,6 +440,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   const tags = pedigreeTags(pedigree);
   const details = clinicalDetailLines(full);
   const used = new Set(tagsInUse(pedigree).map(t => t.id));
+  // Conditions with carriers get a "<condition> carrier" row after their own (#115).
+  const carriersOf = new Set(keyTagRows(pedigree).filter(r => r.carrier).map(r => r.tag.id));
 
   const manage = onManageTags && (
     <Button
@@ -456,6 +480,8 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
               );
               if (individual && onToggleTag) {
                 const on = individual.tags?.includes(tag.id) ?? false;
+                // A condition the person carries (#115): set in the Status section, noted here.
+                const carrierOfIt = tag.style === "quadrant" && conditionStateOf(individual, tag.id) === "carrier";
                 return (
                   <div key={tag.id}>
                     <label className="flex items-center gap-1.5 cursor-pointer min-w-0">
@@ -465,8 +491,13 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
                         onChange={e => onToggleTag(tag.id, e.target.checked)}
                         className="accent-black shrink-0"
                       />
-                      {swatch}
+                      {carrierOfIt ? (
+                        <div className="flex items-center justify-center w-10 h-7 shrink-0">
+                          <TagSwatchSvg tag={tag} pedigree={pedigree} carrier />
+                        </div>
+                      ) : swatch}
                       {text}
+                      {carrierOfIt && <span className="text-[10px] text-gray-500 shrink-0" data-carrier-of={tag.id}>carrier</span>}
                     </label>
                     {on && onSetTagOnset && tagTakesOnset(tag) && (
                       <div className="flex items-center gap-2 pl-5 pb-1 text-xs text-gray-600">
@@ -484,9 +515,19 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
                 );
               }
               return (
-                <div key={tag.id} className="flex items-center gap-1.5 min-w-0">
-                  {swatch}
-                  {text}
+                <div key={tag.id}>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {swatch}
+                    {text}
+                  </div>
+                  {carriersOf.has(tag.id) && (
+                    <div className="flex items-center gap-1.5 min-w-0" data-legend-carrier-row={tag.id}>
+                      <div className="flex items-center justify-center w-10 h-7 shrink-0">
+                        <TagSwatchSvg tag={tag} pedigree={pedigree} carrier />
+                      </div>
+                      <span className="text-xs truncate text-gray-800">{carrierLabel(tag)}</span>
+                    </div>
+                  )}
                 </div>
               );
             })}
