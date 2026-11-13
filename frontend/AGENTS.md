@@ -154,6 +154,10 @@ stub so the app still builds without Google login.
   deceased on every selected person (#35: a mixed selection is all marked,
   an all-marked one all cleared; not while typing in a field), Escape cancels picking, else
   clears the selection, and returns to the select tool.
+- Editor warnings (#116): data that looks wrong is reported by
+  `pedigree/validation.ts`, never refused; see `src/pedigree/AGENTS.md`.
+  The panel's date hints moved there. Use a rule for "this data is probably
+  a mistake" and a notice for "this edit did X / could not be done".
 - Notices: the pedigree store's `notice` / `setNotice` (not undoable) is how
   an edit reports what it did or why it was refused; `CanvasPage` shows it
   under the canvas with an Undo button when `undoable` and clears it after a

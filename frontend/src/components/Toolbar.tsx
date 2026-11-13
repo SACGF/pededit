@@ -14,6 +14,7 @@ import { twinLegendLabel } from "../pedigree/twins";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
 import { FilterMenu } from "./FilterMenu";
+import { ProblemsMenu } from "./ProblemsMenu";
 import { exportJson } from "../io/json/index.js";
 
 // SVG icons matching NSGC pedigree symbols
@@ -216,6 +217,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
           Reset layout
         </Button>
       )}
+
+      {/* Editor warnings (#116): shown only while there are some */}
+      {hasPedigree && <ProblemsMenu />}
 
       {/* View filters (#4) */}
       <FilterMenu disabled={!hasPedigree} />

@@ -10,6 +10,7 @@
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
  *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
+ *   __pededit.problems()       // editor warnings (#116): [] when nothing looks wrong
  *   __pededit.exportSvg({ uShape: true })   // the export as an SVG string, for shot.mjs FILE.svg
  *   __pededit.align().pos      // raw kinship2 LayoutResult
  *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
@@ -24,6 +25,7 @@ import { lintExport } from "./io/svg/exportLint";
 import { exportSvg } from "./io/svg/svgExporter";
 import { exportUShapeSvg } from "./io/svg/uShapeExporter";
 import { chartTitle } from "./pedigree/labels";
+import { problemsOf } from "./pedigree/validation";
 import type { SvgExportOptions } from "./io/svg/types";
 import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import { importPed, exportPed } from "./io/ped";
@@ -84,6 +86,9 @@ const hooks = {
     const p = usePedigreeStore.getState().getPedigree();
     return (options?.uShape ? exportUShapeSvg : exportSvg)(p, { ...canvasOptions(), ...options });
   },
+  /** Editor warnings (#116, pedigree/validation.ts), without the fix functions so they print as JSON. */
+  problems: (pedigree?: Pedigree) =>
+    problemsOf(pedigree ?? usePedigreeStore.getState().getPedigree()).all.map(({ fix, ...p }) => ({ ...p, ...(fix ? { fix: fix.label } : {}) })),
   /** Replace the editor's pedigree (clears undo history). */
   load: (pedigree: Pedigree) => usePedigreeStore.getState().initialize(pedigree),
 };

@@ -133,6 +133,10 @@ include it):
 - `kinship(pedigree?)`: kinship and inbreeding coefficients (#32), as
   `.kinship(idA, idB)` and `.inbreeding(id)`.
 - `check(pedigree?, options?)`: the render lint, `[]` when clean.
+- `problems(pedigree?)`: the editor warnings (#116), with each fix as its
+  label. The toolbar list is `[data-testid="problems-menu"]`, its items
+  `[data-problem-id="rule:id"]`, panel fields `[data-problem-field]` and
+  canvas markers `[data-problem-marker]`.
 - `load(pedigree)`: replace the editor's pedigree (clears undo history).
 
 ### lint.mjs: does the drawing make sense?

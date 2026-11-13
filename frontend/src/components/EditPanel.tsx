@@ -12,13 +12,15 @@ import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedig
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
-import { chartTitle, ageText, parsePartialDate } from "../pedigree/labels";
+import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
 import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
+import { fieldProblems, worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
+import { ProblemIcon } from "./ProblemsMenu";
 
 interface EditPanelProps {
   onManageTags?: () => void;
@@ -65,6 +67,8 @@ function IndividualForm({ individual }: { individual: Individual }) {
   const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
+  // Editor warnings (#116) on a field: highlighted, with the message under it.
+  const problemsOn = (field: ProblemField) => ({ problemFor: individual.id, problemField: field, problems: fieldProblems(pedigree, individual.id, field) });
 
   return (
     <div className="space-y-4">
@@ -82,7 +86,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
       </Field>
 
       {/* Text, not the browser date picker, so a year alone can be entered (#104), as for death (#103). */}
-      <Field label="Date of birth">
+      <Field label="Date of birth" {...problemsOn("dob")}>
         <Input
           value={individual.dob ?? ""}
           aria-label="Date of birth"
@@ -90,13 +94,10 @@ function IndividualForm({ individual }: { individual: Individual }) {
           className="h-7 text-sm"
           placeholder="YYYY or YYYY-MM-DD"
         />
-        {individual.dob?.trim() && !parsePartialDate(individual.dob.trim()) && (
-          <p className="text-[10px] text-gray-500">Drawn as typed until it reads as a year (1935) or a date (1935-03-14).</p>
-        )}
       </Field>
 
       {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
-      <Field label="Date of death">
+      <Field label="Date of death" {...problemsOn("dod")}>
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer shrink-0">
             <input
@@ -116,9 +117,6 @@ function IndividualForm({ individual }: { individual: Individual }) {
             placeholder="YYYY or YYYY-MM-DD"
           />
         </div>
-        {individual.dod?.trim() && !parsePartialDate(individual.dod.trim()) && (
-          <p className="text-[10px] text-gray-500">Not drawn until it reads as a year (2007) or a date (2007-03-14).</p>
-        )}
       </Field>
 
       <Field label="Age">
@@ -213,7 +211,9 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
         <div className="text-xs text-gray-600 space-y-1">
           <div>Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}: <span className="font-medium">{individual.sex}</span></div>
-          <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
+          <ProblemHighlight {...problemsOn("affected")}>
+            <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
+          </ProblemHighlight>
           {individual.affected && (
             <div className="flex items-center gap-2 pl-5">
               <span className="shrink-0">Age of onset</span>
@@ -751,11 +751,57 @@ function AssistedForm({ individual }: { individual: Individual }) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+interface ProblemProps {
+  /** The person the problems are about, and the field (`data-problem-field`, which the problems list focuses). */
+  problemFor?: string;
+  problemField?: ProblemField;
+  problems?: Problem[];
+}
+
+function Field({ label, children, ...problem }: { label: string; children: React.ReactNode } & ProblemProps) {
   return (
     <div className="space-y-1">
       <Label className="text-xs text-gray-600">{label}</Label>
+      <ProblemHighlight {...problem}>{children}</ProblemHighlight>
+    </div>
+  );
+}
+
+/**
+ * Editor warnings (#116): a thin outline round the field (black for a
+ * warning, red for an error, as notices are) and each message under it,
+ * with its one-click fix when the rule has one. Nothing when there are none.
+ */
+function ProblemHighlight({ children, problemFor, problemField, problems = [] }: { children: React.ReactNode } & ProblemProps) {
+  const severity = worstSeverity(problems);
+  return (
+    <div
+      data-problem-for={problemField ? problemFor : undefined}
+      data-problem-field={problemField}
+      data-problem-severity={severity}
+      className={`space-y-1${severity ? ` rounded-sm outline outline-1 outline-offset-2 ${severity === "error" ? "outline-red-600" : "outline-gray-500"}` : ""}`}
+    >
       {children}
+      {problems.map(p => (
+        <p key={p.id} data-problem-message={p.id} className={`flex items-start gap-1 text-[10px] ${p.severity === "error" ? "text-red-700" : "text-gray-700"}`}>
+          <span className="mt-px"><ProblemIcon severity={p.severity} size={10} /></span>
+          <span>
+            {p.message}
+            {p.fix && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  className="underline underline-offset-2 hover:text-black"
+                  onClick={() => p.fix!.apply(usePedigreeStore.getState())}
+                >
+                  {p.fix.label}
+                </button>
+              </>
+            )}
+          </span>
+        </p>
+      ))}
     </div>
   );
 }

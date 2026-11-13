@@ -12,6 +12,8 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { sectorsFor, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 import { arrowKind } from "../proband";
+import { problemsOf, worstSeverity } from "../validation";
+import { ProblemIcon } from "../../components/ProblemsMenu";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -42,6 +44,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const sectors = sectorsFor(individual, pedigree);
   const annotations = annotationRow(individual, pedigree);
   const arrow = arrowKind(individual);
+  // Editor warnings (#116), memoised per pedigree so every node shares one pass.
+  const problems = problemsOf(pedigree).byIndividual.get(individual.id) ?? [];
+  const problemSeverity = worstSeverity(problems);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
   // name, then the detail lines in NSGC order (age, onset, pedigree number).
   const captionOffset = captionRowHeight(individual.lifeStatus);
@@ -210,6 +215,17 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             pointerEvents: "none",
           }}
         />
+      )}
+
+      {/* Editor warning marker (#116): top left, canvas only (not the minimap or exports). */}
+      {problemSeverity && (
+        <div
+          data-problem-marker={problemSeverity}
+          title={problems.map(p => p.message).join("\n")}
+          style={{ position: "absolute", top: -7, left: -7, width: 10, height: 10, lineHeight: 0 }}
+        >
+          <ProblemIcon severity={problemSeverity} size={10} />
+        </div>
       )}
 
       {/* Duplicate superscript */}

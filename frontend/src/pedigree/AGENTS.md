@@ -232,6 +232,27 @@ draws NSGC symbols.
   under each ticked quadrant tag row of the legend. Drawn under the symbol
   as "onset 40s" or "BC 45y" (tag abbrev, cut before the age is).
 
+- `validation.ts` — editor warnings (#116). `problemsOf(pedigree)` runs
+  `RULES` once per pedigree object (WeakMap, so every canvas node can ask)
+  and gives `{ id, rule, severity, individualId | partnershipId, field,
+  message, fix? }`. A new check is one `Rule` with an `individual` or
+  `partnership` function returning a draft; `RuleContext` is the place for
+  facts worked out once per pass (e.g. the condition tag count #115 needs).
+  `field` must be a `ProblemField` that the edit panel wraps in
+  `data-problem-field` (via `Field`'s `problemField` or `ProblemHighlight`),
+  or the list cannot focus it. `fix.apply` gets the store as `FixActions`;
+  add the setter a new fix needs to that interface. Problems only advise:
+  nothing may refuse a save or an edit because of one. Shown three ways:
+  the field outline and message in `EditPanel`, the toolbar's
+  `ProblemsMenu` (hidden at zero; a click selects the person, or a couple's
+  first partner, and focuses the field), and a small "!" circle at the
+  top left of the canvas node (`data-problem-marker`, filled for an
+  error). The marker is drawn by `PedigreeSymbolNode` only, so the
+  minimap and exports never get it. Kept here, not as warnings: action
+  refusals (picking, twins, swap sides notices), the PED export loss
+  dialog, and display notes such as "carrier mark not drawn on an
+  affected fill". Ages and dates are checked only where they parse.
+
 - `parents.ts` and `PickingBanner.tsx` — linking a child to existing
   parents (#36). The store's `picking` state turns node clicks into picks
   (`PedigreeSymbolNode` calls `pickIndividual` first and only selects when
