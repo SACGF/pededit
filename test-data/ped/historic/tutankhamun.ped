@@ -2,14 +2,15 @@
 # doi:10.1001/jama.2010.121, Figure 2. KV55 (most probably Akhenaten) and KV35YL are
 # full siblings, children of Amenhotep III and Tiye (KV35EL), and the parents of
 # Tutankhamun. KV21A as the mother of the two fetuses from KV62 is the paper's
-# tentative assignment. PHENO is left missing (0): this is a consanguinity example.
+# tentative assignment. PHENO is missing (0) except Tutankhamun, affected (2): the
+# paper reports Koehler disease II and clubfoot. Mainly a consanguinity example.
 TUT	Yuya	0	0	1	0
 TUT	Thuya	0	0	2	0
 TUT	Amenhotep_III	0	0	1	0
 TUT	Tiye	Yuya	Thuya	2	0
 TUT	KV55	Amenhotep_III	Tiye	1	0
 TUT	KV35YL	Amenhotep_III	Tiye	2	0
-TUT	Tutankhamun	KV55	KV35YL	1	0
+TUT	Tutankhamun	KV55	KV35YL	1	2
 TUT	KV21A	0	0	2	0
 TUT	Fetus_1	Tutankhamun	KV21A	2	0
 TUT	Fetus_2	Tutankhamun	KV21A	2	0

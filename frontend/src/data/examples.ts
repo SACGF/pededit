@@ -711,7 +711,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Tiye",          F, "Yuya", "Thuya", { name: "Tiye (KV35EL)" }],
     ["KV55",          M, "Amenhotep_III", "Tiye", { name: "KV55", notes: "Most probably Akhenaten" }],
     ["KV35YL",        F, "Amenhotep_III", "Tiye", { name: "KV35YL", notes: "The Younger Lady, full sister of KV55" }],
-    ["Tutankhamun",   M, "KV55", "KV35YL", { name: "Tutankhamun", proband: true }],
+    ["Tutankhamun",   M, "KV55", "KV35YL", { name: "Tutankhamun", proband: true, affected: true, notes: "Köhler disease II and clubfoot (Hawass et al. 2010)" }],
     ["KV21A",         F, null, null, { name: "KV21A", notes: "Tentatively the mother of the two fetuses" }],
     ["Fetus_1",       F, "Tutankhamun", "KV21A", { name: "Fetus 1" }],
     ["Fetus_2",       F, "Tutankhamun", "KV21A", { name: "Fetus 2" }],
@@ -922,6 +922,8 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   ];
 
   const buendiaTags = [
+    { id: "pig_tail", label: "Pig's tail", color: "#e377c2", style: "quadrant" as const,
+      members: ["Pig_tail_cousin", "Aureliano_last"] },
     { id: "aureliano", label: "Aureliano temperament: withdrawn, lucid", color: "#1f77b4", style: "quadrant" as const,
       members: ["Colonel_Aureliano", "Jose_Arcadio_Segundo", "Aureliano_Babilonia"] },
     { id: "jose_arcadio", label: "José Arcadio temperament: impulsive, enterprising", color: "#ff7f0e", style: "quadrant" as const,
@@ -944,6 +946,8 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     Jon_Snow: "Rhaegal, in the TV series",
   };
   const targaryenTags = [
+    { id: "madness", label: "Madness", color: "#000000", style: "quadrant" as const,
+      members: ["Aerion_Brightflame", "Aerys_II"] },
     { id: "dragonrider", label: "Dragonrider", color: "#d62728", style: "quadrant" as const, members: Object.keys(dragons) },
     { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "quadrant" as const,
       members: ["Viserys_I", "Helaena", "Daeron_Drunken", "Daenerys"] },

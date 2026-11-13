@@ -303,7 +303,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </div>
 
-      <EvaluationsForm individual={individual} problems={problemsOn("evaluations")} />
+      <EvaluationsForm key={`evaluations-${individual.id}`} individual={individual} problems={problemsOn("evaluations")} />
       <TwinsForm individual={individual} />
       <RelatednessSection individual={individual} />
       <EndedForm individual={individual} />
@@ -362,18 +362,34 @@ function ConditionsForm({ individual, problems }: { individual: Individual; prob
  * "detail +" (NSGC 2022, no "E", #114); a documented one
  * adds a "*" at the symbol's lower right.
  */
+/**
+ * "Add evaluation" opens a draft row that lives only here until something is
+ * entered, so a row just added and not yet typed into is not saved empty and
+ * does not raise the empty evaluation warning (#116). Keyed by person at the
+ * call site, so the draft goes when the selection changes.
+ */
 function EvaluationsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
   const { setEvaluations } = usePedigreeStore();
-  const evs = evaluationsOf(individual);
+  const [draft, setDraft] = useState(false);
+  const saved = evaluationsOf(individual);
+  const evs: Evaluation[] = draft ? [...saved, {}] : saved;
   const change = (i: number, patch: Partial<Evaluation>) => {
-    setEvaluations(individual.id, evs.map((e, k) => {
-      if (k !== i) return e;
-      const next: Evaluation = { ...e, ...patch };
-      if (!next.result) delete next.result;
-      if (!next.detail) delete next.detail;
-      if (!next.documented) delete next.documented;
-      return next;
-    }));
+    const next: Evaluation = { ...evs[i], ...patch };
+    if (!next.result) delete next.result;
+    if (!next.detail) delete next.detail;
+    if (!next.documented) delete next.documented;
+    if (i === saved.length) {
+      // The draft row: saved once it holds something, and then it is an ordinary row.
+      if (Object.keys(next).length === 0) return;
+      setDraft(false);
+      setEvaluations(individual.id, [...saved, next]);
+      return;
+    }
+    setEvaluations(individual.id, saved.map((e, k) => (k === i ? next : e)));
+  };
+  const remove = (i: number) => {
+    if (i === saved.length) setDraft(false);
+    else setEvaluations(individual.id, saved.filter((_, k) => k !== i));
   };
   return (
     <div className="border-t pt-3 space-y-2" data-testid="evaluations-form">
@@ -395,7 +411,7 @@ function EvaluationsForm({ individual, problems }: { individual: Individual; pro
               type="button"
               aria-label={`Remove evaluation ${i + 1}`}
               title="Remove this evaluation"
-              onClick={() => setEvaluations(individual.id, evs.filter((_, k) => k !== i))}
+              onClick={() => remove(i)}
               className="px-1 text-gray-500 hover:text-black"
             >
               ×
@@ -424,7 +440,8 @@ function EvaluationsForm({ individual, problems }: { individual: Individual; pro
       <button
         type="button"
         data-testid="add-evaluation"
-        onClick={() => setEvaluations(individual.id, [...evs, {}])}
+        onClick={() => setDraft(true)}
+        disabled={draft}
         className="text-xs underline text-gray-600 hover:text-black"
       >
         Add evaluation

@@ -60,7 +60,8 @@ Hawass Z et al. (2010). Ancestry and Pathology in King Tutankhamun's Family. JAM
 - 10 individuals, 5 generations. KV55 (most probably Akhenaten) and KV35YL are full
   siblings, both children of Amenhotep III and Tiye, and the parents of Tutankhamun.
   KV21A as mother of the two KV62 fetuses is the paper's tentative assignment.
-- PHENO is missing (0) throughout; this is a full-sib consanguinity example.
+- PHENO is missing (0) except Tutankhamun, affected (2): the paper reports Köhler
+  disease II and clubfoot. Mainly a full-sib consanguinity example.
 
 ### `fiction/targaryen.ped`
 House Targaryen from George R. R. Martin's A Song of Ice and Fire, as set out in Fire &
