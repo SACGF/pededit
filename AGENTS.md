@@ -47,6 +47,8 @@ The research phase is complete: `claude/search_report.md` contains a comprehensi
 
 ## Product Facts Every Agent Must Know
 
+- **NSGC nomenclature is the spec.** Every symbol, line, fill and piece of text on the chart follows the NSGC pedigree nomenclature (Bennett et al. 2008 and the 2022 focused revision), summarised in our own words in `claude/nsgc_nomenclature.md`. When a drawing choice is open, do what NSGC does; when NSGC is silent, follow common practice in published pedigrees. Deliberate differences (biological sex drives genetics, gender is a display choice) are listed in that file, and new ones need the maintainer's agreement.
+- **Default to the latest edition, keep the older style as an option.** Where the 2022 revision changed the drawing, 2022 is the default for new pedigrees and the 2008 form stays available through Settings > Notation (`canvasSettings.notation`, `frontend/src/pedigree/notation.ts`). A pedigree saved with no notation setting predates this and is drawn as 2008, so existing work keeps its look.
 - **No account is required.** Anonymous mode is the default: creating a pedigree while signed out stores it with `owner=None` and the UUID in the URL (`/p/<uuid>`) is the only key. Users bookmark or copy the link. Google/GitHub sign-in only adds the "Your pedigrees" list and the per-user tag library. Never describe PedEdit as requiring login.
 - The site is live at https://pededit.com and the code is public at https://github.com/SACGF/pededit.
 - `sex` is biological sex and drives all genetics; symbols can show a recorded gender identity instead, with AMAB/AFAB/UAAB below (see below, #26).
