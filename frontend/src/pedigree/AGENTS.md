@@ -281,7 +281,36 @@ draws NSGC symbols.
   minimap and exports never get it. Kept here, not as warnings: action
   refusals (picking, twins, swap sides notices), the PED export loss
   dialog, and display notes such as "carrier mark not drawn on an
-  affected fill". Ages and dates are checked only where they parse.
+  affected fill" (for a plain carrier that is also affected it is now the
+  `affected-and-carrier` warning instead). Ages and dates are checked only
+  where they parse.
+  Dates are partial ("1950", "1950-03"), so date checks ask what is
+  certain over every day a date could be (`dateRanges.ts`: `certainlyBefore`,
+  `ageRange`, `minDaysApart`); a year of birth leaves an age a year either
+  way. "Today" is a `findProblems` argument so tests pin it. Parent checks
+  use genetic parents only: the child's partnership in `parentOf` (a donor
+  is one, #45; a same-sex couple's child has one partner and a donor,
+  #105), nobody for someone adopted in (#12), and the woman who carried the
+  pregnancy (`carriedBy`) for "born after the mother died". A sperm donor's
+  death is not checked against the birth. Free-text ages (#20) are checked
+  only when they read as whole years (`ageInYears`: "34", "34y", "d. 72"),
+  against the age at death, else on `clinicalDetails.recordedOn`, else
+  today. The sibling order check runs only in "insertion" mode ("manual" is
+  chosen on purpose, "birthDate" is already that order) and places siblings
+  as `autohint` does (affected first, twin sets at their mean). New fields
+  for the follow-up checks: `age`, `lifeStatus`, `carrier` (the carrier
+  select; per-condition mode uses `conditions` and `presymptomatic`),
+  `evaluations`, `reproductiveRole`, `carriedBy`.
+  Fixes are drawn by one component, `components/ProblemFixes.tsx`, in the
+  panel and the list alike. "Fix all like this" groups problems of the same
+  rule offering a fix with the same label (`problemsLike`) and applies each
+  one's own fix inside the store's `groupEdits`, which folds the undo
+  snapshots into one. The list names people by pedigree number
+  (`problemSubject`, "II-2, unnamed female"); hovering an item sets the
+  store's `problemHighlightId`, a dashed outline on that node. F8 /
+  Shift+F8 (`stepProblem`, `adjacentProblem`) go to the next / previous
+  problem from the last one gone to, or from where it was when it has
+  since been fixed.
 
 - `parents.ts` and `PickingBanner.tsx` — linking a child to existing
   parents (#36). The store's `picking` state turns node clicks into picks

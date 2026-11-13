@@ -21,6 +21,7 @@ import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation
 import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
 import { fieldProblems, worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
 import { ProblemIcon } from "./ProblemsMenu";
+import { ProblemFixes } from "./ProblemFixes";
 import {
   CONDITION_NOT_RECORDED, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
   soleCondition, type ConditionState,
@@ -129,7 +130,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </Field>
 
-      <Field label="Age">
+      <Field label="Age" {...problemsOn("age")}>
         <Input
           value={individual.age ?? ""}
           onChange={e => updateIndividual(individual.id, { age: e.target.value || undefined })}
@@ -153,7 +154,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
         />
       </Field>
 
-      <Field label="Pregnancy / loss">
+      <Field label="Pregnancy / loss" {...problemsOn("lifeStatus")}>
         <select
           value={individual.lifeStatus ?? ""}
           disabled={isLifeStatusLocked}
@@ -213,7 +214,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </Field>
       )}
 
-      <AssistedForm key={individual.id} individual={individual} />
+      <AssistedForm key={individual.id} individual={individual} problemsOn={problemsOn} />
 
       <div className="border-t pt-3 space-y-2">
         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
@@ -241,6 +242,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
           ) : (
             // One carrier status (#101): the plain carrier, or the presymptomatic vertical line.
             // With one condition, Carrier records it (#115).
+            <ProblemHighlight {...problemsOn("carrier")}>
             <div className="flex items-center gap-2">
               <span className="shrink-0">Carrier</span>
               <select
@@ -262,8 +264,10 @@ function IndividualForm({ individual }: { individual: Individual }) {
                 <option value="presymptomatic">Presymptomatic (vertical line)</option>
               </select>
             </div>
+            </ProblemHighlight>
           )}
           {mode === "per-condition" && (
+            <ProblemHighlight {...problemsOn("presymptomatic")}>
             <label className="flex items-center gap-2 cursor-pointer" title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)">
               <input
                 type="checkbox"
@@ -274,13 +278,10 @@ function IndividualForm({ individual }: { individual: Individual }) {
               />
               <span>Presymptomatic (vertical line)</span>
             </label>
+            </ProblemHighlight>
           )}
-          {individual.presymptomatic && individual.affected && (
-            <p className="text-[10px] text-gray-500 pl-5">
-              Not drawn: the affected fill replaces the vertical line.
-            </p>
-          )}
-          {plainCarrier(individual, pedigree) && !symbolPaint(individual, pedigree).dot
+          {/* Affected and a plain carrier is a warning (#116), which says the mark is hidden. */}
+          {plainCarrier(individual, pedigree) && !problemsOn("carrier").problems.concat(problemsOn("conditions").problems).some(p => p.rule === "affected-and-carrier") && !symbolPaint(individual, pedigree).dot
             && !symbolPaint(individual, pedigree).sectors.some(x => x.tag === PLAIN_CARRIER_TAG) && (
             <p className="text-[10px] text-gray-500 pl-5">
               Not drawn: the affected fill replaces the carrier mark. Use a gene result tag to show it.
@@ -302,7 +303,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </div>
 
-      <EvaluationsForm individual={individual} />
+      <EvaluationsForm individual={individual} problems={problemsOn("evaluations")} />
       <TwinsForm individual={individual} />
       <RelatednessSection individual={individual} />
       <EndedForm individual={individual} />
@@ -361,7 +362,7 @@ function ConditionsForm({ individual, problems }: { individual: Individual; prob
  * "detail +" (NSGC 2022, no "E", #114); a documented one
  * adds a "*" at the symbol's lower right.
  */
-function EvaluationsForm({ individual }: { individual: Individual }) {
+function EvaluationsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
   const { setEvaluations } = usePedigreeStore();
   const evs = evaluationsOf(individual);
   const change = (i: number, patch: Partial<Evaluation>) => {
@@ -377,6 +378,7 @@ function EvaluationsForm({ individual }: { individual: Individual }) {
   return (
     <div className="border-t pt-3 space-y-2" data-testid="evaluations-form">
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Evaluations</div>
+      <ProblemHighlight {...problems}>
       {evs.map((ev, i) => (
         <div key={i} className="space-y-1" data-evaluation-row={i}>
           <div className="flex items-center gap-1 text-xs">
@@ -418,6 +420,7 @@ function EvaluationsForm({ individual }: { individual: Individual }) {
           </label>
         </div>
       ))}
+      </ProblemHighlight>
       <button
         type="button"
         data-testid="add-evaluation"
@@ -743,7 +746,7 @@ function CouplesForm({ individual }: { individual: Individual }) {
  * a child, who carried them and who are their social parents. Donors and
  * surrogates are added from the more menu.
  */
-function AssistedForm({ individual }: { individual: Individual }) {
+function AssistedForm({ individual, problemsOn }: { individual: Individual; problemsOn: (field: ProblemField) => ProblemProps }) {
   const { pedigree, setReproductiveRole, setCarriedBy, setSocialParents } = usePedigreeStore();
   const candidates = assistedCandidates(pedigree, individual.id);
   const label = (id: string) => {
@@ -763,7 +766,7 @@ function AssistedForm({ individual }: { individual: Individual }) {
   const addable = candidates.filter(c => !social.includes(c.id) && c.id !== individual.carriedBy);
   return (
     <div className="space-y-2" data-testid="assisted-form">
-      <Field label="Donor / surrogate">
+      <Field label="Donor / surrogate" {...problemsOn("reproductiveRole")}>
         <select
           value={individual.reproductiveRole ?? ""}
           aria-label="Donor or surrogate"
@@ -783,7 +786,7 @@ function AssistedForm({ individual }: { individual: Individual }) {
       )}
       {(linked || expanded) && (
         <>
-          <Field label="Carried by">
+          <Field label="Carried by" {...problemsOn("carriedBy")}>
             <select
               value={individual.carriedBy ?? ""}
               aria-label="Carried by"
@@ -867,19 +870,7 @@ function ProblemHighlight({ children, problemFor, problemField, problems = [] }:
           <span className="mt-px"><ProblemIcon severity={p.severity} size={10} /></span>
           <span>
             {p.message}
-            {[p.fix, ...(p.moreFixes ?? [])].filter(f => f !== undefined).map((f, i) => (
-              <span key={i}>
-                {" "}
-                <button
-                  type="button"
-                  data-problem-fix={f.label}
-                  className="underline underline-offset-2 hover:text-black"
-                  onClick={() => f.apply(usePedigreeStore.getState())}
-                >
-                  {f.label}
-                </button>
-              </span>
-            ))}
+            <ProblemFixes problem={p} />
           </span>
         </p>
       ))}

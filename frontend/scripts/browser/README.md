@@ -136,7 +136,11 @@ include it):
 - `problems(pedigree?)`: the editor warnings (#116), with each fix as its
   label. The toolbar list is `[data-testid="problems-menu"]`, its items
   `[data-problem-id="rule:id"]`, panel fields `[data-problem-field]` and
-  canvas markers `[data-problem-marker]`.
+  canvas markers `[data-problem-marker]`. In the list, `[data-problem-item="rule:id"]`
+  holds the item, `[data-problem-subject]` the "II-2, unnamed female" text,
+  `[data-problem-fix="Label"]` a fix and `[data-problem-fix-all="Label"]` its
+  "Fix all like this"; the hovered person's node gets `[data-problem-highlight]`.
+  `--press F8` / `--press Shift+F8` step through the problems.
 - `load(pedigree)`: replace the editor's pedigree (clears undo history).
 
 ### lint.mjs: does the drawing make sense?

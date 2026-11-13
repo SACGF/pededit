@@ -152,7 +152,10 @@ stub so the app still builds without Google login.
   redo, Delete/Backspace removes every selected person (Shift: with
   descendants, Alt: with ancestors, #34), A and D toggle affected and
   deceased on every selected person (#35: a mixed selection is all marked,
-  an all-marked one all cleared; not while typing in a field), Escape cancels picking, else
+  an all-marked one all cleared; not while typing in a field), F8 and
+  Shift+F8 go to the next and previous editor warning (#116; F8 because it
+  works while typing in the field the last one focused and clashes with
+  nothing; VS Code uses it the same way), Escape cancels picking, else
   clears the selection, and returns to the select tool.
 - Editor warnings (#116): data that looks wrong is reported by
   `pedigree/validation.ts`, never refused; see `src/pedigree/AGENTS.md`.

@@ -20,7 +20,9 @@ function ped(individuals: Individual[], extra: Partial<Pedigree> = {}): Pedigree
   };
 }
 
-const rulesOf = (p: Pedigree) => findProblems(p).map(x => x.rule);
+/** The problems, less "not connected" (#116 follow-up): these tests use lone people. */
+const found = (p: Pedigree) => findProblems(p).filter(x => x.rule !== "not-connected");
+const rulesOf = (p: Pedigree) => found(p).map(x => x.rule);
 
 describe("editor warnings (#116): starter rules", () => {
   it("a clean pedigree has no problems", () => {
@@ -29,18 +31,18 @@ describe("editor warnings (#116): starter rules", () => {
       ind({ id: "b", proband: true, affected: true, dob: "1960" }),
       ind({ id: "c", deceased: true }), // deceased, date unknown: fine
     ]);
-    expect(findProblems(p)).toEqual([]);
+    expect(found(p)).toEqual([]);
   });
 
   it("dob-unparseable: a date of birth that does not read as a date", () => {
-    const [prob] = findProblems(ped([ind({ id: "a", dob: "June 1935" })]));
+    const [prob] = found(ped([ind({ id: "a", dob: "June 1935" })]));
     expect(prob).toMatchObject({ rule: "dob-unparseable", id: "dob-unparseable:a", severity: "warning", individualId: "a", field: "dob" });
     expect(rulesOf(ped([ind({ id: "a", dob: "  " })]))).toEqual([]);
     expect(rulesOf(ped([ind({ id: "a", dob: "1935-03" })]))).toEqual([]);
   });
 
   it("dod-unparseable: a date of death that does not read as a date", () => {
-    expect(findProblems(ped([ind({ id: "a", dod: "2007-13", deceased: true })]))).toMatchObject([
+    expect(found(ped([ind({ id: "a", dod: "2007-13", deceased: true })]))).toMatchObject([
       { rule: "dod-unparseable", field: "dod", severity: "warning" },
     ]);
   });
@@ -53,7 +55,7 @@ describe("editor warnings (#116): starter rules", () => {
     expect(at("1960-05-10", "1960")).toEqual([]);
     expect(at("1960", "1960-01-01")).toEqual([]);
     expect(at("1960-05-10", "1960-05-10")).toEqual([]);
-    const [prob] = findProblems(ped([ind({ id: "a", dob: "1960", dod: "1959", deceased: true })]));
+    const [prob] = found(ped([ind({ id: "a", dob: "1960", dod: "1959", deceased: true })]));
     expect(prob).toMatchObject({ severity: "error", field: "dod" });
   });
 
@@ -65,22 +67,22 @@ describe("editor warnings (#116): starter rules", () => {
 
   it("dod-not-deceased: a date of death on someone not marked deceased, fixed by marking them", () => {
     const p = ped([ind({ id: "a", dod: "2007" })]);
-    const [prob] = findProblems(p);
+    const [prob] = found(p);
     expect(prob).toMatchObject({ rule: "dod-not-deceased", field: "dod", fix: { label: "Mark deceased" } });
     usePedigreeStore.getState().initialize(p);
     prob!.fix!.apply(usePedigreeStore.getState());
     const after = usePedigreeStore.getState().pedigree;
     expect(after.individuals[0]).toMatchObject({ deceased: true, dod: "2007" });
-    expect(findProblems(after)).toEqual([]);
+    expect(found(after)).toEqual([]);
   });
 
   it("proband-unaffected (NSGC 2022), fixed by marking affected", () => {
     const p = ped([ind({ id: "a", proband: true }), ind({ id: "b", consultand: true })]);
-    const problems = findProblems(p);
+    const problems = found(p);
     expect(problems).toMatchObject([{ rule: "proband-unaffected", individualId: "a", field: "affected", fix: { label: "Mark affected" } }]);
     usePedigreeStore.getState().initialize(p);
     problems[0]!.fix!.apply(usePedigreeStore.getState());
-    expect(findProblems(usePedigreeStore.getState().pedigree)).toEqual([]);
+    expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
   });
 
   it("every rule id is unique", () => {
@@ -107,9 +109,9 @@ describe("editor warnings (#116): the module", () => {
   it("indexes by person and counts by severity", () => {
     const p = ped([
       ind({ id: "a", dob: "1960", dod: "1950", deceased: true }),
-      ind({ id: "b", dob: "soon" }),
+      ind({ id: "b", dob: "soon", sex: "female" }),
       ind({ id: "c" }),
-    ]);
+    ], { partnerships: [{ id: "p", individual1: "a", individual2: "b" }], parentOf: { p: ["c"] } });
     const idx = problemsOf(p);
     expect(idx.errors).toBe(1);
     expect(idx.warnings).toBe(1);
@@ -131,7 +133,8 @@ describe("editor warnings (#116): the module", () => {
     });
     const [prob] = findProblems(p, [coupleRule]);
     expect(prob).toMatchObject({ id: "test-couple:p1", partnershipId: "p1" });
-    expect(problemSubject(p, prob!)).toBe("Al and Unnamed female");
+    expect(problemSubject(p, prob!)).toBe("I-1, Al and I-2, unnamed female");
+    expect(problemSubject(p, prob!, new Map())).toBe("Al and Unnamed female");
     expect(problemTarget(p, prob!)).toBe("a");
   });
 

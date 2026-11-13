@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
+import { stepProblem } from "../components/ProblemsMenu";
 
 /** Focus is in a text field, where letters and Delete are typing, not shortcuts. */
 function typing(): boolean {
@@ -40,6 +41,11 @@ export function useKeyboardShortcuts() {
           if (letter === "a") setAffectedMany(selectedIds, !people.every(i => i.affected));
           else setDeceasedMany(selectedIds, !people.every(i => i.deceased));
         }
+      }
+      // F8 / Shift+F8 (#116): next / previous problem, also while typing in the
+      // field the last one focused, so the list can be worked through there.
+      if (e.key === "F8" && !meta && !e.altKey && !picking) {
+        if (stepProblem(e.shiftKey ? -1 : 1)) e.preventDefault();
       }
       if (e.key === "Escape") {
         if (picking) cancelPicking();

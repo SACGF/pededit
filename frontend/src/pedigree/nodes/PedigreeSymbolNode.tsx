@@ -32,7 +32,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual } = usePedigreeStore();
+  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual, problemHighlightId } = usePedigreeStore();
+  // Hovering a problem in the toolbar's list outlines its person (#116).
+  const isProblemHighlight = problemHighlightId === individual.id;
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
@@ -88,8 +90,11 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         position: "relative",
         boxShadow: isPicked ? "0 0 0 3px #2563eb" : isPickTarget ? "0 0 0 2px #9ca3af" : isSelected ? "0 0 0 2px #ef4444" : undefined,
         cursor: picking ? "crosshair" : undefined,
+        outline: isProblemHighlight ? "2px dashed black" : undefined,
+        outlineOffset: isProblemHighlight ? 6 : undefined,
       }}
       data-picked={isPicked ? "true" : undefined}
+      data-problem-highlight={isProblemHighlight ? "true" : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseMove={e => { if (!isPillVisible || hideTimeout.current) handleMouseEnter(e); }}
       onMouseLeave={handleMouseLeave}

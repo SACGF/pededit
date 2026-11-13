@@ -247,6 +247,8 @@ interface PedigreeState {
   selectedId: string | null;
   selectedIds: string[];
   hoveredId: string | null;
+  /** The person outlined on the canvas while a problem is hovered in the problems list (#116). Not undoable. */
+  problemHighlightId: string | null;
   isDirty: boolean;
   /** Bumped by resetLayout so the canvas can refit the view (#64). Not undoable. */
   layoutResetCount: number;
@@ -294,10 +296,17 @@ interface PedigreeState {
    */
   selectDescendants: (id: string) => number;
   setHoveredId: (id: string | null) => void;
+  setProblemHighlightId: (id: string | null) => void;
 
   // Undo/redo
   undo: () => void;
   redo: () => void;
+  /**
+   * Run several edits as one undo step ("Fix all like this", #116): the
+   * snapshots they push are folded into the first, so one undo restores
+   * the pedigree as it was before all of them.
+   */
+  groupEdits: (run: () => void) => void;
 
   // Structural mutations (each snapshots before mutating)
   addIndividual: (sex: Sex) => void;
@@ -612,6 +621,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     selectedId: null,
     selectedIds: [],
     hoveredId: null,
+    problemHighlightId: null,
     isDirty: false,
     layoutResetCount: 0,
     notice: null,
@@ -719,6 +729,14 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       return ids.length;
     },
     setHoveredId: (id) => set({ hoveredId: id }),
+    setProblemHighlightId: (id) => set({ problemHighlightId: id }),
+
+    groupEdits: (run) => {
+      const before = get().past.length;
+      run();
+      const { past } = get();
+      if (past.length > before + 1) set({ past: past.slice(0, before + 1) });
+    },
 
     undo: () => {
       const { past, pedigree, future } = get();
