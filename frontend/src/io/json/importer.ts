@@ -12,6 +12,7 @@ const REPRODUCTIVE_ROLE_VALUES = ["donor", "surrogate"];
 const NAME_LABEL_VALUES = ["wrap", "truncate"];
 const GENDER_IDENTITY_VALUES = ["man", "woman", "nonbinary"];
 const SYMBOLS_SHOW_VALUES = ["gender", "sex"];
+const NOTATION_VALUES = ["nsgc2022", "nsgc2008"];
 const LAYOUT_WIDTH_VALUES = ["minimal", "relaxed"];
 const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
@@ -402,6 +403,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       c.optional(cs, "relationshipLabels", cp, "a boolean", v => typeof v === "boolean");
       c.optional(cs, "symbolsShow", cp, SYMBOLS_SHOW_VALUES.map(s => `"${s}"`).join(" | "),
         v => typeof v === "string" && SYMBOLS_SHOW_VALUES.includes(v));
+      c.optional(cs, "notation", cp, NOTATION_VALUES.map(s => `"${s}"`).join(" | "),
+        v => typeof v === "string" && NOTATION_VALUES.includes(v));
     }
   }
 

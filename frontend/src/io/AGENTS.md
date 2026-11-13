@@ -171,8 +171,9 @@ the figure shows numbers), blank for people hidden under a collapsed branch.
 It is how the numbers link back to the ids. PED stays six columns (#31).
 New columns go on the end so earlier positions never move: `consultand`
 (#99, 1/0), `family_history_unknown` (#100, 1/0), `presymptomatic` (#101,
-1/0), `evaluations` (#101: "E1+ (BRCA1 c.5266dupC) *; E2-", as under the
-symbol, " *" after a documented one).
+1/0), `evaluations` (#101, #114: as under the symbol in the pedigree's notation,
+"BRCA1 c.5266dupC + *; echo -" or in 2008 "E1+ (BRCA1 c.5266dupC) *; E2-",
+" *" after a documented one).
 `gender_identity` (#26, `man` / `woman` / `nonbinary` or blank; blank for a
 pregnancy or loss). The `sex` column stays biological sex and decides
 father and mother. `dod` (#103), the date of death as stored ("2007",

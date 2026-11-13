@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
-import type { SiblingOrderMode, SymbolsShowMode } from "@pedigree-editor/layout-engine";
+import type { NotationEdition, SiblingOrderMode, SymbolsShowMode } from "@pedigree-editor/layout-engine";
 import { nameLabelMode } from "../pedigree/labels";
 import { symbolsShowMode } from "../pedigree/gender";
+import { NOTATION_OPTIONS, notationOf } from "../pedigree/notation";
 
 interface SettingsPanelProps {
   open: boolean;
@@ -151,6 +152,21 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               </select>
               <div className="text-xs text-gray-400 mt-1">
                 With gender identity, a person whose gender is recorded gets that gender's symbol with AMAB, AFAB or UAAB under it (NSGC 2022). Layout, kinship and PED export always use biological sex.
+              </div>
+            </div>
+            <div className="mt-2">
+              <div className="text-sm">Notation</div>
+              <select
+                name="notation"
+                aria-label="Notation"
+                value={notationOf(pedigree)}
+                onChange={e => updateCanvasSettings({ notation: e.target.value as NotationEdition })}
+                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+              >
+                {NOTATION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <div className="text-xs text-gray-400 mt-1">
+                Edition of the NSGC pedigree nomenclature. 2022 writes test results under the symbol as "BRCA1 +"; 2008 uses the E notation, "E+ (BRCA1)".
               </div>
             </div>
           </div>

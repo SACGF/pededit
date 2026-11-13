@@ -33,6 +33,11 @@ unclear.
 Section numbers refer to the 2008 figures. Where the 2022 revision changed a
 rule, the rule below says so; see also "The 2022 revision".
 
+PedEdit draws the latest edition by default. Where 2022 changed the drawing,
+the 2008 form stays available through the pedigree setting "Notation"
+(`canvasSettings.notation`, `pedigree/notation.ts`) for people who still
+work in it.
+
 ### Symbols (Fig. 1)
 
 | Rule | PedEdit |
@@ -87,10 +92,11 @@ Donor "D", surrogate "S", evaluation "E" with results, documented evaluation
 "*", carrier dot, and a vertical line through the symbol for an asymptomatic
 or presymptomatic carrier. **The 2022 revision drops the "E" and the carrier
 dot** (see below); the "*", the vertical line, D and S stay. PedEdit has the carrier dot, the presymptomatic
-line and the evaluation notation (#101): per-person evaluations written
-under the symbol as "E+ (detail)", numbered E1, E2 when there are several,
-with the detail in parentheses standing in for a key entry per number, and
-"*" at the lower right for a documented one. It has the assisted
+line and evaluation results (#101, #114): written under the symbol as
+"detail +" (2022) by default, or with the pedigree setting "Notation: NSGC
+2008" as "E+ (detail)", numbered E1, E2 when there are several, with the
+detail in parentheses standing in for a key entry per number; "*" at the
+lower right for a documented one. It has the assisted
 reproduction symbols (#45):
 
 | Rule (Fig. 3) | PedEdit |
@@ -112,7 +118,8 @@ Further Fig. 3 and Fig. 4 points:
 - 2008: "E" must be defined in the key. Several evaluations take subscripts
   (E1, E2) defined in the key. Results go in parentheses or in the key: "+",
   "-", or "u" for uninformative. 2022: no "E"; results (sequencing, panel,
-  karyotype, ultrasound) are simply written under the symbol (#114).
+  karyotype, ultrasound) are simply written under the symbol. PedEdit
+  follows 2022 by default, 2008 as a setting (#114).
 - Shade a symbol only when the person is clinically symptomatic.
 - 2008: carrier status follows how the disease shows, not the inheritance
   pattern: a dot for a carrier unlikely to be affected, a vertical line for
@@ -188,7 +195,8 @@ recommendations stand except as below. No new symbols.
 - Grouped symbols follow gender: a numbered diamond for non-binary people
   carries their code(s) under it ("AMAB/AFAB"); a numbered diamond with no
   code is a group of unknown or mixed sex and gender.
-- **No "E".** Results go under the symbol without it (#114). The order under
+- **No "E".** Results go under the symbol without it. PedEdit: default,
+  with the 2008 form as a setting (#114). The order under
   the symbol stays age, then results, then pedigree number (numbers
   "typically used in research or publication").
 - **No carrier dot**; divided symbol with fills instead (see Fig. 4 above,
@@ -255,6 +263,6 @@ The 2008 gaps found in November 2026 (#1, #8, #20, #97, #99, #100, #101,
 2. Fields NSGC uses that PedEdit lacks: gestational age, karyotype, proven
    zygosity, adoption by a relative, "n" groups (#112).
 3. Same-sex couples, which the 2022 figures draw (#105).
-4. 2022: results without "E" (#114), carriers as a divided fill rather
-   than a dot (#115). The other 2022 questions are answered above (#110).
+4. 2022: carriers as a divided fill rather than a dot (#115). Results
+   without "E" are done (#114). The other 2022 questions are answered above (#110).
 5. What de-identified export should drop, given the masking guidance (#111).

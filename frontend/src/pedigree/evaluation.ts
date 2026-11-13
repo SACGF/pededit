@@ -1,14 +1,16 @@
 /**
- * Genetic evaluation notation and the presymptomatic carrier symbol (#101,
- * NSGC 2008 Fig. 4). Framework-free: the canvas (`nodes/symbols.tsx`), both
+ * Evaluation results and the presymptomatic carrier symbol (#101, NSGC 2008
+ * Fig. 4 as revised in 2022, #114). Framework-free: the canvas (`nodes/symbols.tsx`), both
  * SVG exporters, the legends, the CSV and the label stack (`labels.ts`) share
  * it.
  *
  *  - Evaluations: `Individual.evaluations`, written under the symbol, one
- *    line each, as "E" then the result ("+", "-", "u") then the detail in
- *    parentheses: "E+ (BRCA1 c.5266dupC)". Several are numbered E1, E2 in
- *    list order. The numbers are per person: the detail beside each says
- *    what it was, so the key explains only the notation.
+ *    line each. NSGC 2022 (the default, `notation.ts`): the detail then the
+ *    result ("+", "-", "u"), "BRCA1 c.5266dupC +"; the space keeps the
+ *    result apart from a variant name with "+" or "-" in it (c.123+1G>A).
+ *    NSGC 2008: "E", the result, the detail in parentheses,
+ *    "E+ (BRCA1 c.5266dupC)", numbered E1, E2 in list order when there are
+ *    several (per person: the detail says what each was).
  *  - Documented evaluation: a "*" at the symbol's lower right when any of
  *    the person's evaluations is marked documented.
  *  - Presymptomatic carrier: `Individual.presymptomatic`, a vertical line
@@ -16,7 +18,7 @@
  *    (filled) symbol.
  */
 
-import type { Evaluation, EvaluationResult, Individual, LifeStatus } from "@pedigree-editor/layout-engine";
+import type { Evaluation, EvaluationResult, Individual, LifeStatus, NotationEdition } from "@pedigree-editor/layout-engine";
 import { usesLossTriangle, symbolTopInset } from "./lifeStatus";
 import { ADOPTION_BRACKET_GAP } from "./adoption";
 
@@ -35,30 +37,44 @@ export function evaluationsOf(ind: Pick<Individual, "evaluations">): Evaluation[
   return ind.evaluations ?? [];
 }
 
-/**
- * The parts of one evaluation's line: `head` is "E", "E+" or "E2-" (numbered
- * only when the person has several), `detail` the trimmed detail text.
- */
-export function evaluationParts(ev: Evaluation, index: number, count: number): { head: string; detail: string } {
+/** The parts of one evaluation's line: the trimmed detail text and the result mark ("" for none). */
+export function evaluationParts(ev: Evaluation): { detail: string; mark: string } {
   return {
-    head: `E${count > 1 ? index + 1 : ""}${evaluationResultMark(ev.result)}`,
     detail: (ev.detail ?? "").trim().replace(/\s+/g, " "),
+    mark: evaluationResultMark(ev.result),
   };
 }
 
-/** One evaluation as text, "E1+ (BRCA1 c.5266dupC)", uncut. */
-export function evaluationText(ev: Evaluation, index: number, count: number): string {
-  const { head, detail } = evaluationParts(ev, index, count);
-  return detail ? `${head} (${detail})` : head;
+/** The 2008 head, "E", "E+" or "E2-": numbered only when the person has several. */
+export function evaluationHead2008(ev: Evaluation, index: number, count: number): string {
+  return `E${count > 1 ? index + 1 : ""}${evaluationResultMark(ev.result)}`;
 }
 
 /**
- * Every evaluation as one string for the CSV: "E1+ (BRCA1 c.5266dupC) *; E2-",
- * with " *" after a documented one.
+ * One evaluation as text, uncut. 2022: "BRCA1 c.5266dupC +", "echo", "-",
+ * or "" when nothing is recorded. 2008: "E1+ (BRCA1 c.5266dupC)", "E".
  */
-export function evaluationsCsv(ind: Pick<Individual, "evaluations">): string {
+export function evaluationText(ev: Evaluation, notation: NotationEdition, index = 0, count = 1): string {
+  const { detail, mark } = evaluationParts(ev);
+  if (notation === "nsgc2008") {
+    const head = evaluationHead2008(ev, index, count);
+    return detail ? `${head} (${detail})` : head;
+  }
+  return [detail, mark].filter(Boolean).join(" ");
+}
+
+/**
+ * Every evaluation as one string for the CSV, written as under the symbol,
+ * with " *" after a documented one: "BRCA1 c.5266dupC + *; echo -" (2022),
+ * "E1+ (BRCA1 c.5266dupC) *; E2-" (2008). In 2022 an empty one shows as "*"
+ * alone when documented and is skipped otherwise.
+ */
+export function evaluationsCsv(ind: Pick<Individual, "evaluations">, notation: NotationEdition): string {
   const evs = evaluationsOf(ind);
-  return evs.map((e, i) => evaluationText(e, i, evs.length) + (e.documented ? " *" : "")).join("; ");
+  return evs
+    .map((e, i) => [evaluationText(e, notation, i, evs.length), e.documented ? "*" : ""].filter(Boolean).join(" "))
+    .filter(Boolean)
+    .join("; ");
 }
 
 /** True when the "*" for a documented evaluation is drawn. */
@@ -126,13 +142,25 @@ export function renderPresymptomaticSvg(ind: Individual, size: number, ox: numbe
 // ── Key wording ─────────────────────────────────────────────────────────────
 
 export const PRESYMPTOMATIC_LEGEND_LABEL = "Presymptomatic carrier";
-export const EVALUATION_LEGEND_LABEL = "Evaluation: + positive, - negative, u uninformative";
+/** The key row for the result marks: its swatch text and label. */
+export function evaluationLegend(notation: NotationEdition): { mark: string; label: string } {
+  return notation === "nsgc2008"
+    ? { mark: "E", label: "Evaluation: + positive, - negative, u uninformative" }
+    : { mark: "+/-", label: "Result: + positive, - negative, u uninformative" };
+}
 export const DOCUMENTED_LEGEND_LABEL = "Documented evaluation";
 
-/** Someone with evaluations, someone with a documented one, someone presymptomatic: what the key needs rows for. */
-export function evaluationKeyInfo(inds: Individual[]): { evaluated?: Individual; documented?: Individual; presymptomatic?: Individual } {
+/**
+ * Someone the results row explains, someone with a documented evaluation,
+ * someone presymptomatic: what the key needs rows for. 2008: anyone with an
+ * evaluation (the "E" needs defining). 2022: anyone with a result mark;
+ * detail text alone ("echo") explains itself.
+ */
+export function evaluationKeyInfo(inds: Individual[], notation: NotationEdition): { evaluated?: Individual; documented?: Individual; presymptomatic?: Individual } {
   return {
-    evaluated: inds.find(i => evaluationsOf(i).length > 0),
+    evaluated: notation === "nsgc2008"
+      ? inds.find(i => evaluationsOf(i).length > 0)
+      : inds.find(i => evaluationsOf(i).some(e => evaluationResultMark(e.result) !== "")),
     documented: inds.find(hasDocumentedEvaluation),
     presymptomatic: inds.find(drawsPresymptomatic),
   };

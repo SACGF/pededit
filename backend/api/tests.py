@@ -51,7 +51,7 @@ FULL_PEDIGREE = {
     "pinnedPositions": {"c1": {"x": 12.5, "y": -40.0}},
     "canvasSettings": {"nodesMoveable": True, "snapToGrid": True, "snapGridSize": 20,
                        "nameLabels": "truncate", "layoutWidth": "relaxed",
-                       "relationshipLabels": True, "symbolsShow": "sex"},
+                       "relationshipLabels": True, "symbolsShow": "sex", "notation": "nsgc2008"},
     "unlockedIndividuals": ["f"],
     "tags": [
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant"},

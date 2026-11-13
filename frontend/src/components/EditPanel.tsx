@@ -278,7 +278,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
 
 /**
  * Evaluations and test results (#101, NSGC): each drawn under the symbol as
- * "E+ (detail)", numbered E1, E2 when there are several; a documented one
+ * "detail +" (NSGC 2022, no "E", #114); a documented one
  * adds a "*" at the symbol's lower right.
  */
 function EvaluationsForm({ individual }: { individual: Individual }) {
@@ -300,7 +300,6 @@ function EvaluationsForm({ individual }: { individual: Individual }) {
       {evs.map((ev, i) => (
         <div key={i} className="space-y-1" data-evaluation-row={i}>
           <div className="flex items-center gap-1 text-xs">
-            <span className="w-5 shrink-0 text-gray-600">E{evs.length > 1 ? i + 1 : ""}</span>
             <select
               value={ev.result ?? ""}
               aria-label={`Evaluation ${i + 1} result`}
@@ -327,7 +326,7 @@ function EvaluationsForm({ individual }: { individual: Individual }) {
             className="h-6 text-xs"
             placeholder="e.g. BRCA1 c.5266dupC, echo"
           />
-          <label className="flex items-center gap-1 cursor-pointer text-xs pl-6" title="Documented: examined by your team, or an outside result reviewed and verified. Draws a * at the symbol's lower right (NSGC).">
+          <label className="flex items-center gap-1 cursor-pointer text-xs" title="Documented: examined by your team, or an outside result reviewed and verified. Draws a * at the symbol's lower right (NSGC).">
             <input
               type="checkbox"
               checked={!!ev.documented}

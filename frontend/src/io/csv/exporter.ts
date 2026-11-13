@@ -3,6 +3,7 @@ import { twinMembership, twinSetOf } from "../../pedigree/twins";
 import { onsetsOf, onsetSubject } from "../../pedigree/onset";
 import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 import { evaluationsCsv } from "../../pedigree/evaluation";
+import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
@@ -56,8 +57,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.consultand ? "1" : "0",
       ind.familyHistoryUnknown ? "1" : "0",
       ind.presymptomatic ? "1" : "0",
-      // "E1+ (BRCA1 c.5266dupC) *; E2-" (#101), as under the symbol, " *" for documented.
-      evaluationsCsv(ind),
+      // "BRCA1 c.5266dupC + *; echo -" (#101, #114), as under the symbol, " *" for documented.
+      evaluationsCsv(ind, notationOf(pedigree)),
       // Gender identity (#26); sex stays in its own column and drives father/mother.
       genderIdentityOf(ind) ?? "",
       // Assisted reproduction (#45); father_id and mother_id are the genetic parents.

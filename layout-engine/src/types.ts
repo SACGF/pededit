@@ -53,8 +53,8 @@ export interface Individual {
   presymptomatic?: boolean;
   /**
    * Evaluations and test results (#101, NSGC 2008 Fig. 4), written under
-   * the symbol as "E+ (BRCA1 c.5266dupC)", numbered E1, E2 when there are
-   * several. A documented one puts a "*" at the symbol's lower right.
+   * the symbol as "BRCA1 c.5266dupC +" (NSGC 2022 dropped the "E", #114).
+   * A documented one puts a "*" at the symbol's lower right.
    */
   evaluations?: Evaluation[];
   proband?: boolean;
@@ -120,12 +120,12 @@ export interface Individual {
   descendantsHidden?: boolean;
 }
 
-/** Result of an evaluation (#101): "+", "-" or "u" after the E. Absent: no result recorded. */
+/** Result of an evaluation (#101): "+", "-" or "u" after the detail. Absent: no result recorded. */
 export type EvaluationResult = "positive" | "negative" | "uninformative";
 
 export interface Evaluation {
   result?: EvaluationResult;
-  /** Short text shown in parentheses after the E, e.g. "BRCA1 c.5266dupC" or "echo". */
+  /** Short text shown before the result, e.g. "BRCA1 c.5266dupC" or "echo". */
   detail?: string;
   /** Examined by your team, or an outside result reviewed and verified: "*" by the symbol. */
   documented?: boolean;
@@ -257,9 +257,16 @@ export interface CanvasSettings {
    * everyone. Absent means "gender".
    */
   symbolsShow?: SymbolsShowMode;
+  /**
+   * Edition of the NSGC nomenclature drawn: "nsgc2008" writes evaluation
+   * results as "E+ (detail)", numbered E1, E2; "nsgc2022" as "detail +"
+   * (#114). Absent means "nsgc2022", the latest.
+   */
+  notation?: NotationEdition;
 }
 
 export type SymbolsShowMode = "gender" | "sex";
+export type NotationEdition = "nsgc2022" | "nsgc2008";
 
 export type NameLabelMode = "wrap" | "truncate";
 

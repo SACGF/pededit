@@ -10,7 +10,8 @@ import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
-import { evaluationKeyInfo, PRESYMPTOMATIC_LEGEND_LABEL, EVALUATION_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
+import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
+import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
 
 /**
@@ -473,7 +474,8 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   const carrier = inds.find(i => i.carrier && !i.affected);
   if (carrier) rows.push({ label: "Carrier", swatch: sy => renderStatusSwatchSvg("carrier", shape(carrier), false, x, sy) });
   // Presymptomatic carrier and evaluation notation (#101).
-  const ev = evaluationKeyInfo(inds);
+  const ev = evaluationKeyInfo(inds, notationOf(pedigree));
+  const evLegend = evaluationLegend(notationOf(pedigree));
   if (ev.presymptomatic) {
     const sex = shape(ev.presymptomatic);
     rows.push({
@@ -511,8 +513,8 @@ export function renderExportKeySvg(pedigree: Pedigree, x: number, y: number): Ta
   }
   if (ev.evaluated) {
     rows.push({
-      label: EVALUATION_LEGEND_LABEL,
-      swatch: sy => `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">E</text>`,
+      label: evLegend.label,
+      swatch: sy => `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">${evLegend.mark}</text>`,
     });
   }
   if (ev.documented) {

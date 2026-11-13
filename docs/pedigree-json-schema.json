@@ -66,7 +66,7 @@
         "presymptomatic": { "type": "boolean", "description": "Asymptomatic or presymptomatic carrier (NSGC): a vertical line through the symbol. The editor never sets it together with carrier." },
         "evaluations": {
           "type": "array",
-          "description": "Evaluations and test results (NSGC), written under the symbol as E+ (detail), numbered E1, E2 when there are several.",
+          "description": "Evaluations and test results (NSGC), written under the symbol as the detail then the result (\"BRCA1 c.5266dupC +\"), or with CanvasSettings.notation \"nsgc2008\" as E+ (detail), numbered E1, E2 when there are several.",
           "items": { "$ref": "#/$defs/Evaluation" }
         },
         "proband": { "type": "boolean", "description": "Proband arrow with a P (NSGC). Normally exactly one individual." },
@@ -213,6 +213,10 @@
         "symbolsShow": {
           "enum": ["gender", "sex"],
           "description": "What symbol shapes show: \"gender\" draws someone with a recorded genderIdentity with that gender's symbol and their sex assigned at birth (AMAB, AFAB, UAAB) below it (NSGC 2022); \"sex\" draws biological sex for everyone. Absent means \"gender\"."
+        },
+        "notation": {
+          "enum": ["nsgc2022", "nsgc2008"],
+          "description": "Edition of the NSGC pedigree nomenclature drawn. \"nsgc2022\" writes evaluation results under the symbol as the detail then the result (\"BRCA1 c.5266dupC +\"); \"nsgc2008\" uses the E notation (\"E+ (BRCA1 c.5266dupC)\", numbered E1, E2 when there are several). Absent means \"nsgc2022\"."
         }
       }
     }

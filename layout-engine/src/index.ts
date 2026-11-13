@@ -7,7 +7,7 @@ export type { KinshipCoefficients, KinshipOptions } from "./kinship.js";
 export { autohint } from "./autohint.js";
 export type { AutohintOptions } from "./autohint.js";
 export type { AlignOptions } from "./alignPedigree.js";
-export type { LayoutResult, Pedigree, Individual, Partnership, Sex, GenderIdentity, SymbolsShowMode, LifeStatus, Adoption, ReproductiveRole, ChildlessStatus, Zygosity, TwinSet, Hints, LayoutInput, SiblingOrderMode, SiblingOrderSettings, CanvasSettings, NameLabelMode, LayoutWidthMode, Tag, TagStyle, ClinicalDetails } from "./types.js";
+export type { LayoutResult, Pedigree, Individual, Partnership, Sex, GenderIdentity, SymbolsShowMode, NotationEdition, LifeStatus, Adoption, ReproductiveRole, ChildlessStatus, Zygosity, TwinSet, Hints, LayoutInput, SiblingOrderMode, SiblingOrderSettings, CanvasSettings, NameLabelMode, LayoutWidthMode, Tag, TagStyle, ClinicalDetails } from "./types.js";
 export type { Evaluation, EvaluationResult } from "./types.js";
 export type { ViewFilters } from "./types.js";
 export { buildLayoutInput, buildPedigreeFromFlat } from "./utils.js";

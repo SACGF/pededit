@@ -14,7 +14,9 @@ import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layou
 import { onsetsOf } from "./onset";
 import { tagCanvasText } from "./tags";
 import { branchOf } from "./collapse";
-import { evaluationsOf, evaluationParts } from "./evaluation";
+import { evaluationsOf, evaluationParts, evaluationText } from "./evaluation";
+import { notationOf } from "./notation";
+import type { NotationEdition } from "@pedigree-editor/layout-engine";
 import { assignedAtBirthText } from "./gender";
 
 export const LABEL_FONT_SIZE = 10;
@@ -113,7 +115,7 @@ export function linesWidth(lines: string[]): number {
  *   2. `onset`: one line per age of onset (#93);
  *   3. `gender`: the sex assigned at birth ("AMAB", "AFAB", "UAAB") under
  *      a symbol drawn by gender identity (#26, NSGC 2022);
- *   4. `evaluation`: each evaluation (#101), "E1+ (BRCA1 ...)", up to two
+ *   4. `evaluation`: each evaluation (#101, #114), "BRCA1 ... +", up to two
  *      lines each;
  *   5. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
@@ -137,7 +139,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
     age: ageLines(ind).flatMap(l => wrapLabel(l, maxWidth, 1)),
     onset: onsetLines(ind, pedigree, maxWidth),
     gender: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1),
-    evaluation: evaluationLines(ind, maxWidth),
+    evaluation: evaluationLines(ind, maxWidth, notationOf(pedigree)),
     number,
   };
 }
@@ -241,17 +243,35 @@ export function onsetLines(ind: Individual, pedigree: Pedigree, maxWidth: number
 }
 
 /**
- * Evaluation lines (#101): "E+ (BRCA1 c.5266dupC)", or "E1+", "E2-" when
- * there are several. A variant name rarely fits one slot, so each evaluation
- * may wrap onto a second line ("E+ (BRCA1" / "c.5266dupC)") and is cut with
- * an ellipsis beyond that. The E and its result come first, so they always
- * show.
+ * Evaluation lines (#101, #114). A variant name rarely fits one slot, so
+ * each evaluation may wrap onto a second line and is cut with an ellipsis
+ * beyond that, never losing the result:
+ *
+ *  - NSGC 2022 (default): "BRCA1 c.5266dupC +", the detail then the result
+ *    ("BRCA1" / "c.5266dupC +"); a cut keeps the mark at the end of the
+ *    last line. Nothing recorded: no line.
+ *  - NSGC 2008: "E+ (BRCA1 c.5266dupC)", "E1+", "E2-" when there are
+ *    several; the E and its result come first, so they always show.
  */
-export function evaluationLines(ind: Individual, maxWidth: number): string[] {
+export function evaluationLines(ind: Individual, maxWidth: number, notation: NotationEdition = "nsgc2022"): string[] {
   const evs = evaluationsOf(ind);
-  return evs.flatMap((ev, i) => {
-    const { head, detail } = evaluationParts(ev, i, evs.length);
-    return detail ? wrapLabel(`${head} (${detail})`, maxWidth, EVALUATION_LINES).slice(0, EVALUATION_LINES) : [head];
+  if (notation === "nsgc2008") {
+    return evs.flatMap((ev, i) => wrapLabel(evaluationText(ev, notation, i, evs.length), maxWidth, EVALUATION_LINES).slice(0, EVALUATION_LINES));
+  }
+  return evs.flatMap(ev => {
+    const { detail, mark } = evaluationParts(ev);
+    if (!detail) return mark ? [mark] : [];
+    const whole = mark ? `${detail} ${mark}` : detail;
+    const lines = wrapLabel(whole, maxWidth, EVALUATION_LINES);
+    if (!mark || lines.join(" ") === whole) return lines;
+    // Too long: cut the detail, keeping room for " +" on the last line.
+    const cut = wrapLabel(detail, maxWidth, EVALUATION_LINES);
+    const lastChars = Math.max(1, Math.floor((maxWidth - textWidth(` ${mark}`)) / LABEL_CHAR_WIDTH));
+    let last = cut[cut.length - 1]!;
+    if (last.length > lastChars) {
+      last = `${last.replace(/\u2026$/, "").slice(0, Math.max(1, lastChars - 1)).trimEnd()}${ELLIPSIS}`;
+    }
+    return [...cut.slice(0, -1), `${last} ${mark}`];
   });
 }
 

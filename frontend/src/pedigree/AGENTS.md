@@ -180,14 +180,18 @@ draws NSGC symbols.
   canvas and legend, `renderFamilyHistorySvg` in both exporters (upright in
   the U-shape). It reaches about 13px above the row, inside the title gap.
 
-- `evaluation.ts` — evaluation notation and presymptomatic carrier (#101,
-  NSGC 2008 Fig. 4). `Individual.evaluations` is a list of `{ result,
-  detail, documented }`; `labels.ts` writes each as a detail section
-  between onset and the pedigree number ("E+ (BRCA1 c.5266dupC)", numbered
-  E1, E2 per person only when there are several), up to two lines each
-  because variant names rarely fit a slot. The numbers are per person, not
-  pedigree-wide: the detail beside each says what it was, so the key only
-  explains the notation. Any documented evaluation puts a "*" just right of
+- `notation.ts`: `canvasSettings.notation`, which NSGC edition is drawn.
+  Absent means "nsgc2022": default to the latest standard, keep the older
+  style as a setting (maintainer's rule). Read it through `notationOf`.
+- `evaluation.ts` — evaluation results and presymptomatic carrier (#101,
+  #114). `Individual.evaluations` is a list of `{ result, detail,
+  documented }`; `labels.ts` writes each as a detail section between onset
+  and the pedigree number, up to two lines each because variant names
+  rarely fit a slot. NSGC 2022 (default): "BRCA1 c.5266dupC +", detail then
+  result, a cut keeps the result; an empty evaluation writes nothing.
+  NSGC 2008: "E+ (BRCA1 c.5266dupC)", numbered E1, E2 per person only when
+  there are several. The key row is "+/-" in 2022 (only when a result is
+  recorded) and "E" in 2008. Any documented evaluation puts a "*" just right of
   the symbol's lower right corner (outside adoption brackets), canvas and
   both exporters, not the minimap. `Individual.presymptomatic` is a
   vertical line through the symbol, drawn inside `SymbolShape` (so the

@@ -4,7 +4,8 @@ import {
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark } from "../pedigree/nodes/symbols";
-import { evaluationKeyInfo, PRESYMPTOMATIC_LEGEND_LABEL, EVALUATION_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
+import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
+import { notationOf } from "../pedigree/notation";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
 import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
@@ -103,11 +104,11 @@ function PresymptomaticSvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** "E" for the evaluation notation row (#101). */
-function EvaluationSvg() {
+/** "+/-" (2022) or "E" (2008) for the result marks row (#101, #114). */
+function EvaluationSvg({ mark }: { mark: string }) {
   return (
     <svg width="28" height="28" viewBox="0 0 28 28">
-      <text x={14} y={18} textAnchor="middle" fontFamily="sans-serif" fontSize={12} fill="black">E</text>
+      <text x={14} y={18} textAnchor="middle" fontFamily="sans-serif" fontSize={12} fill="black">{mark}</text>
     </svg>
   );
 }
@@ -367,14 +368,15 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
     indRows.push({ icon: <AffectedCoreSvg sex={shape(coreInd)} />, label: "Affected, with tags (black centre)" });
   }
   if (carrierInd)  indRows.push({ icon: <SymbolSvg sex={shape(carrierInd)} carrier />,   label: "Carrier" });
-  const ev = evaluationKeyInfo(individuals);
+  const ev = evaluationKeyInfo(individuals, notationOf(pedigree));
+  const evLegend = evaluationLegend(notationOf(pedigree));
   if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={shape(ev.presymptomatic)} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={shape(deceasedInd)} />,        label: "Deceased" });
   if (probandInd)  indRows.push({ icon: <ProbandSvg sex={shape(probandInd)} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
   const historyInd = individuals.find(i => i.familyHistoryUnknown);
   if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={shape(historyInd)} />, label: FAMILY_HISTORY_LEGEND_LABEL });
   if (consultandInd) indRows.push({ icon: <ProbandSvg sex={shape(consultandInd)} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
-  if (ev.evaluated) indRows.push({ icon: <EvaluationSvg />, label: EVALUATION_LEGEND_LABEL });
+  if (ev.evaluated) indRows.push({ icon: <EvaluationSvg mark={evLegend.mark} />, label: evLegend.label });
   if (ev.documented) indRows.push({ icon: <DocumentedSvg sex={shape(ev.documented)} />, label: DOCUMENTED_LEGEND_LABEL });
   for (const o of LIFE_STATUS_OPTIONS) {
     const ind = individuals.find(i => i.lifeStatus === o.value);
