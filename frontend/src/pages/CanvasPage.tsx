@@ -39,7 +39,7 @@ export default function CanvasPage() {
   const {
     isAuthenticated, pedigrees, activePedigreeId,
     loadPedigrees, createPedigree, createPedigreeFromData, openPedigree,
-    logout, saveActivePedigree, renamePedigree,
+    logout, saveActivePedigree, renamePedigree, closePedigree,
   } = useAppStore();
   const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -86,6 +86,10 @@ export default function CanvasPage() {
       if (status === 404) forgetRecentPedigree(id);
     });
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Leaving the editor (back to the landing page) empties it, so the next
+  // pedigree opened does not flash the last one first.
+  useEffect(() => () => closePedigree(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-save: debounce 2 s after the last mutation so changes survive a reload.
   useEffect(() => {

@@ -116,7 +116,10 @@ stub so the app still builds without Google login.
   `backend/AGENTS.md` (health check).
 - `store/useAppStore.ts` — auth tokens (localStorage `access_token` /
   `refresh_token`), pedigree list, open/create/save/rename/delete. Saving
-  reads the pedigree from `usePedigreeStore`.
+  reads the pedigree from `usePedigreeStore`. `CanvasPage` calls
+  `closePedigree` on unmount: it saves unsaved edits and empties
+  `usePedigreeStore`, so the next pedigree opened never flashes the last one,
+  and an open whose fetch returns after a close or a later open is dropped.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
   undo/redo stacks, selection, every structural edit
   (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with

@@ -25,12 +25,25 @@ interface AppState {
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
+  /**
+   * Leave the editor: save unsaved edits, then empty the editing store, so
+   * the next pedigree opened starts from a blank canvas instead of flashing
+   * the last one.
+   */
+  closePedigree: () => void;
   createPedigree: (title: string) => Promise<string>;
   createPedigreeFromData: (title: string, data: Pedigree) => Promise<string>;
   deletePedigree: (id: string) => Promise<void>;
   saveActivePedigree: () => Promise<void>;
   renamePedigree: (id: string, title: string) => Promise<void>;
 }
+
+/**
+ * Bumped by every open and close: an open whose fetch returns after a later
+ * open or a close (the user went back to the landing page) is dropped, so it
+ * cannot put an old pedigree back in the editor.
+ */
+let openSeq = 0;
 
 export const useAppStore = create<AppState>()((set, get) => ({
   user: null,
@@ -90,7 +103,9 @@ export const useAppStore = create<AppState>()((set, get) => ({
     if (activePedigreeId && activePedigreeId !== id && usePedigreeStore.getState().isDirty) {
       await get().saveActivePedigree();
     }
+    const seq = ++openSeq;
     const { data } = await pedigreeApi.get(id);
+    if (seq !== openSeq) return;
     const pedigree = data.data as Pedigree;
     // Ensure siblingOrder is present (backwards compat)
     if (!pedigree.siblingOrder) {
@@ -103,6 +118,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
     usePedigreeStore.getState().initialize(pedigree);
     set({ activePedigreeId: id, activeTitle: data.title ?? null });
     recordRecentPedigree(id, data.title ?? "Untitled pedigree");
+  },
+
+  closePedigree: () => {
+    openSeq++;
+    if (get().activePedigreeId && usePedigreeStore.getState().isDirty) {
+      // Reads the pedigree before the reset below; the request carries on.
+      void get().saveActivePedigree().catch(() => {});
+    }
+    usePedigreeStore.getState().reset();
+    set({ activePedigreeId: null, activeTitle: null });
   },
 
   createPedigree: async (title) => {
