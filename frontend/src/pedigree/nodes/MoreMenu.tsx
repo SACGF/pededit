@@ -12,6 +12,7 @@ import { batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
+import { batchStatus, batchSexProblem } from "../batch";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -113,9 +114,22 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     detachFromParents,
     removePartnership,
   } = usePedigreeStore();
+  const selectedIds = usePedigreeStore(s => s.selectedIds);
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
+
+  // Several selected, this person among them (#35): the menu acts on all of
+  // them, and only offers what applies to a group.
+  if (selectedIds.length > 1 && selectedIds.includes(individualId)) {
+    const act = (fn: () => void) => { fn(); onDone(); };
+    return (
+      <>
+        <SelectionMenuSection individualId={individualId} action={act} />
+        <BatchMenuItems ids={selectedIds} action={act} />
+      </>
+    );
+  }
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
   const hasParentsAlready = Object.values(pedigree.parentOf).some(kids => kids.includes(individualId));
@@ -816,6 +830,103 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
         </MenuItem>
       )}
     </MenuSection>
+  );
+}
+
+/**
+ * The status items for a multiple selection (#35): each applies to every
+ * selected person as one undo step, and is left out when it would change
+ * nobody. Items that only make sense for one person (proband, add, twins,
+ * sibling order, adoption, pregnancy, assisted reproduction, couples) are
+ * not offered; click one person to get them.
+ */
+function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => void) => void }) {
+  const {
+    pedigree, setAffectedMany, setDeceasedMany, setCarrierStatusMany, setSexMany, setIndividualTagMany,
+    deleteIndividuals, removeWithDescendants, removeWithAncestors,
+  } = usePedigreeStore();
+  const st = batchStatus(pedigree, ids);
+  const n = st.ids.length;
+  const item = (show: boolean, text: string, fn: () => void, title?: string) =>
+    show ? <MenuItem key={text} onClick={() => action(fn)} title={title}>{text}</MenuItem> : null;
+  return (
+    <>
+      <MenuSection label="Status">
+        {item(st.affected < n, `Mark ${n} affected`, () => setAffectedMany(st.ids, true), "Shortcut: A")}
+        {item(st.affected > 0, `Mark ${n} unaffected`, () => setAffectedMany(st.ids, false), "Shortcut: A")}
+        {item(st.deceased < n, `Mark ${n} deceased`, () => setDeceasedMany(st.ids, true), "Shortcut: D")}
+        {item(st.deceased > 0, `Mark ${n} living`, () => setDeceasedMany(st.ids, false), "Shortcut: D. Also clears their dates of death")}
+        {item(st.carrier.carrier < n, `Mark ${n} carrier`, () => setCarrierStatusMany(st.ids, "carrier"))}
+        {item(st.carrier.presymptomatic < n, `Mark ${n} presymptomatic`, () => setCarrierStatusMany(st.ids, "presymptomatic"),
+          "Presymptomatic carrier: a vertical line through the symbol (NSGC). Replaces a carrier dot")}
+        {item(st.carrier.none < n, `Clear carrier status of ${n}`, () => setCarrierStatusMany(st.ids, "none"))}
+      </MenuSection>
+
+      {(pedigree.tags?.length ?? 0) > 0 && (
+        <MenuSection label={`Tags of ${n}`}>
+          {pedigree.tags!.map(tag => {
+            const count = st.tags[tag.id] ?? 0;
+            const all = count === n;
+            return (
+              <MenuItem
+                key={tag.id}
+                onClick={() => action(() => setIndividualTagMany(st.ids, tag.id, !all))}
+                active={all}
+                title={all ? `Remove ${tag.label} from all ${n}` : `Add ${tag.label} to all ${n}`}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <span
+                    className="inline-block w-2 h-2 border border-black/20"
+                    style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
+                  />
+                  {tag.label}
+                  {all ? <span className="text-gray-400">✓</span> : count > 0 ? <span className="text-gray-400">{count}/{n}</span> : null}
+                </span>
+              </MenuItem>
+            );
+          })}
+        </MenuSection>
+      )}
+
+      <MenuSection label={`Sex of ${n}`}>
+        <div className="flex">
+          {(["male", "female", "unknown"] as const).map(sex => {
+            const why = batchSexProblem(pedigree, st.ids, sex);
+            return (
+              <MenuItem
+                key={sex}
+                onClick={() => action(() => setSexMany(st.ids, sex))}
+                active={st.sex[sex] === n}
+                disabled={!!why || st.sex[sex] === n}
+                title={why ?? (st.sex[sex] === n ? `All ${n} are already ${sex === "unknown" ? "of unknown sex" : sex}` : undefined)}
+              >
+                {sex.charAt(0).toUpperCase() + sex.slice(1)}
+              </MenuItem>
+            );
+          })}
+        </div>
+      </MenuSection>
+
+      <div className="border-t mt-1 pt-1">
+        <MenuItem onClick={() => action(() => deleteIndividuals(st.ids))} destructive title="Delete. Children stay, as founders">
+          Delete {n}
+        </MenuItem>
+        <MenuItem
+          onClick={() => action(() => removeWithDescendants(st.ids))}
+          destructive
+          title="Shift+Delete. Also removes everyone below and partners who married in"
+        >
+          Remove {n} with descendants
+        </MenuItem>
+        <MenuItem
+          onClick={() => action(() => removeWithAncestors(st.ids))}
+          destructive
+          title="Alt+Delete. Also removes everyone above; descendants become founders"
+        >
+          Remove {n} with ancestors
+        </MenuItem>
+      </div>
+    </>
   );
 }
 

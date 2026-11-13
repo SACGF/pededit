@@ -13,6 +13,7 @@ import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
+import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -374,6 +375,16 @@ interface PedigreeState {
   /** "?" above the symbol: family history not known (#100). */
   setFamilyHistoryUnknown: (id: string, unknown: boolean) => void;
   setSex: (id: string, sex: Sex) => void;
+  // Batch status changes on a multiple selection (#35). Each is one undo step
+  // and a no-op (no undo step) when nobody would change; the rules are the
+  // single-person setters' applied to each person.
+  setAffectedMany: (ids: string[], affected: boolean) => void;
+  setDeceasedMany: (ids: string[], deceased: boolean) => void;
+  /** Carrier dot, presymptomatic line or neither, kept exclusive as `setCarrier` / `setPresymptomatic` do. */
+  setCarrierStatusMany: (ids: string[], status: CarrierStatus) => void;
+  /** Refused with the reason (see `batchSexProblem`); monozygotic twins follow. */
+  setSexMany: (ids: string[], sex: Sex) => string | null;
+  setIndividualTagMany: (ids: string[], tagId: string, on: boolean) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
   /** Adoption brackets (#12): "in", "out" or none. */
@@ -486,6 +497,20 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       return { pedigree: next };
     });
     pruneSelection();
+  }
+
+  /**
+   * One undo step applying `apply` to each of `ids` that `changes` (#35),
+   * then an undoable notice saying how many changed. Nothing happens when
+   * nobody would change.
+   */
+  function mutateEach(ids: string[], changes: (ind: Individual) => boolean, apply: (ind: Individual) => void, text: (n: number) => string) {
+    const wanted = new Set(ids);
+    const changing = get().pedigree.individuals.filter(i => wanted.has(i.id) && changes(i)).map(i => i.id);
+    if (changing.length === 0) return;
+    const targets = new Set(changing);
+    mutate(draft => { for (const ind of draft.individuals) if (targets.has(ind.id)) apply(ind); });
+    get().setNotice({ kind: "info", text: text(changing.length), undoable: true });
   }
 
   /** Drop selected ids that are no longer in the pedigree (after a removal, undo or redo). */
@@ -1206,6 +1231,53 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           }
         }
       });
+    },
+
+    setAffectedMany: (ids, affected) => {
+      mutateEach(ids, ind => !!ind.affected !== affected, ind => {
+        ind.affected = affected;
+        if (!affected) delete ind.onset;
+      }, n => `Marked ${n} ${affected ? "affected" : "unaffected"}.`);
+    },
+
+    setDeceasedMany: (ids, deceased) => {
+      mutateEach(ids, ind => !!ind.deceased !== deceased, ind => {
+        ind.deceased = deceased;
+        if (!deceased) delete ind.dod;
+      }, n => `Marked ${n} ${deceased ? "deceased" : "living"}.`);
+    },
+
+    setCarrierStatusMany: (ids, status) => {
+      mutateEach(ids, ind => carrierStatusOf(ind) !== status, ind => {
+        if (status === "carrier") { ind.carrier = true; delete ind.presymptomatic; }
+        else if (status === "presymptomatic") { ind.presymptomatic = true; if (ind.carrier) ind.carrier = false; }
+        else { if (ind.carrier) ind.carrier = false; delete ind.presymptomatic; }
+      }, n => status === "none" ? `Cleared the carrier status of ${n}.`
+        : `Marked ${n} ${status === "carrier" ? "carrier" : "presymptomatic carrier"}.`);
+    },
+
+    setSexMany: (ids, sex) => {
+      const { pedigree } = get();
+      const problem = batchSexProblem(pedigree, ids, sex);
+      if (problem) { get().setNotice({ kind: "error", text: problem }); return problem; }
+      mutateEach([...batchSexTargets(pedigree, ids)], ind => ind.sex !== sex, ind => { ind.sex = sex; },
+        n => `Set ${n} to ${sex === "unknown" ? "unknown sex" : sex}.`);
+      return null;
+    },
+
+    setIndividualTagMany: (ids, tagId, on) => {
+      const tag = get().pedigree.tags?.find(t => t.id === tagId);
+      if (!tag) return;
+      const order = new Map((get().pedigree.tags ?? []).map((t, i) => [t.id, i]));
+      mutateEach(ids, ind => (ind.tags?.includes(tagId) ?? false) !== on, ind => {
+        if (on) {
+          ind.tags = [...(ind.tags ?? []), tagId].sort((a, b) => (order.get(a) ?? Infinity) - (order.get(b) ?? Infinity));
+        } else {
+          ind.tags = ind.tags!.filter(t => t !== tagId);
+          if (ind.tags.length === 0) delete ind.tags;
+          removeTagOnset(ind, tagId);
+        }
+      }, n => `${on ? "Added" : "Removed"} ${tag.label} ${on ? "to" : "from"} ${n}.`);
     },
 
     setTwins: (partnershipId, members, zygosity) => {

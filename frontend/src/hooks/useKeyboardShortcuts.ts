@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 
+/** Focus is in a text field, where letters and Delete are typing, not shortcuts. */
+function typing(): boolean {
+  const el = document.activeElement as HTMLElement | null;
+  return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
+}
+
 export function useKeyboardShortcuts() {
   const { undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, setActiveTool, picking, cancelPicking } = usePedigreeStore();
 
@@ -21,6 +27,19 @@ export function useKeyboardShortcuts() {
         else if (e.altKey) removeWithAncestors(selectedIds);
         else if (selectedIds.length === 1) deleteIndividual(selectedIds[0]!);
         else deleteIndividuals(selectedIds);
+      }
+      // A and D (#35): toggle affected / deceased on everyone selected, as one
+      // undo step. Mixed selections are all marked; all marked are all cleared.
+      const letter = e.key.toLowerCase();
+      if ((letter === "a" || letter === "d") && !meta && !e.altKey && !e.repeat && selectedIds.length > 0 && !typing()) {
+        const { pedigree, setAffectedMany, setDeceasedMany } = usePedigreeStore.getState();
+        const wanted = new Set(selectedIds);
+        const people = pedigree.individuals.filter(i => wanted.has(i.id));
+        if (people.length > 0) {
+          e.preventDefault();
+          if (letter === "a") setAffectedMany(selectedIds, !people.every(i => i.affected));
+          else setDeceasedMany(selectedIds, !people.every(i => i.deceased));
+        }
       }
       if (e.key === "Escape") {
         if (picking) cancelPicking();

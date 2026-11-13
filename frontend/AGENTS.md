@@ -116,7 +116,13 @@ stub so the app still builds without Google login.
   "Relatedness to..." is a pick mode (`picking.kind === "relatedness"`) that
   only selects the pair, with no edit. Batch edits
   (`pinIndividuals`, `lockIndividuals`, `unlockIndividuals`,
-  `deleteIndividuals`) are one undo step each.
+  `deleteIndividuals`, and the #35 status setters `setAffectedMany`,
+  `setDeceasedMany`, `setCarrierStatusMany`, `setSexMany`,
+  `setIndividualTagMany`) are one undo step each. The #35 setters go
+  through `mutateEach`, which skips people already in the target state,
+  pushes no undo step when nobody changes, and posts an undoable notice
+  ("Marked 3 affected."). Their rules and menu counts are in
+  `pedigree/batch.ts`.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
 - `components/` — Toolbar, EditPanel (the chart title field when nothing is
@@ -127,7 +133,9 @@ stub so the app still builds without Google login.
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
   redo, Delete/Backspace removes every selected person (Shift: with
-  descendants, Alt: with ancestors, #34), Escape cancels picking, else
+  descendants, Alt: with ancestors, #34), A and D toggle affected and
+  deceased on every selected person (#35: a mixed selection is all marked,
+  an all-marked one all cleared; not while typing in a field), Escape cancels picking, else
   clears the selection, and returns to the select tool.
 - Notices: the pedigree store's `notice` / `setNotice` (not undoable) is how
   an edit reports what it did or why it was refused; `CanvasPage` shows it

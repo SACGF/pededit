@@ -62,6 +62,12 @@ draws NSGC symbols.
   menu calls `onClose` and the pill schedules its own hide.
   The items are `MoreMenuItems`, so the right-click menu shows the same list:
   add new items there, not in `MoreMenu`.
+  With several people selected and the menu opened on one of them (#35),
+  `MoreMenuItems` shows only the "N selected" section and `BatchMenuItems`
+  (status, carrier status, tags, sex, delete, each acting on all of them);
+  single-person items (add, proband, twins, adoption, couples...) are left
+  out until one person is clicked. A new person item that is safe to apply
+  to a group belongs in `BatchMenuItems` too.
 - `CanvasContextMenu.tsx` — the right-click menu (#95), opened by
   `PedigreeCanvas`'s `onNodeContextMenu` / `onEdgeContextMenu` at the cursor
   (a Radix `PopoverAnchor` on a fixed zero-size span). A person gets
