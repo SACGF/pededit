@@ -323,6 +323,20 @@ sex" mode nothing on the chart shows that a gender identity is recorded. The 202
 "multiple people of unknown or mixed sex" with a number inside matches what we
 use for groups.
 
+**Trait sections (#118, opt-in, agreed with the maintainer).** NSGC shading
+always means a condition or phenotype, defined in the key. PedEdit's quadrant
+tags are conditions by default and follow that. A quadrant tag can instead be
+set to "trait" in the Tags dialog (`Tag.kind`): a coloured section for
+something that is not a condition (a cohort, a biobank sample, a family
+trait), named in the key like any section, and ignored by everything that
+asks who is affected (PED, CSV, the Affected only filter, the proband
+warning). A pedigree that uses no traits is drawn exactly as NSGC says. In
+black and white a trait is never the solid black of NSGC shading. Someone
+marked affected who also has trait sections is drawn with the black fill
+under the sections and a black centre on top; the black centre is PedEdit's
+own (the 2008 rendering already used it for affected people with sections),
+so the person still reads as affected when sections cover the symbol.
+
 ## Open gaps (November 2026)
 
 The 2008 gaps found in November 2026 (#1, #8, #20, #97, #99, #100, #101,

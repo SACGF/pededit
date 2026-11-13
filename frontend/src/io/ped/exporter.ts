@@ -1,4 +1,4 @@
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { isAffected, type Pedigree } from "@pedigree-editor/layout-engine";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
@@ -52,7 +52,7 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
     const pat = parents ? pedId.get(parents.father)! : "0";
     const mat = parents ? pedId.get(parents.mother)! : "0";
     const sex = ind.sex === "male" ? "1" : ind.sex === "female" ? "2" : "0";
-    const pheno = ind.affected ? "2" : "1";
+    const pheno = isAffected(ind, pedigree) ? "2" : "1";
     const cells = [...(withFamily ? [fid] : []), pedId.get(ind.id)!, pat, mat, sex, ...(withAffection ? [pheno] : [])];
     lines.push(cells.join("\t"));
   }

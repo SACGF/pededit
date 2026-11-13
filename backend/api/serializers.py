@@ -93,6 +93,7 @@ class TagSerializer(serializers.Serializer):
     style = serializers.ChoiceField(choices=["quadrant", "dot", "text"])
     abbrev = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
     fill = _opt(serializers.ChoiceField, choices=TAG_FILL_CHOICES)
+    kind = _opt(serializers.ChoiceField, choices=["condition", "trait"])
 
 
 CHILDLESS_CHOICES = ["infertility", "byChoice"]

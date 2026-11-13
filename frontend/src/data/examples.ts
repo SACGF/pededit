@@ -803,7 +803,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Dyanna_Dayne",       F, null, null, { name: "Dyanna Dayne" }],
     // Children of Maekar I
     ["Daeron_Drunken",     M, "Maekar_I", "Dyanna_Dayne", { name: "Daeron", notes: "The Drunken" }],
-    ["Aerion_Brightflame", M, "Maekar_I", "Dyanna_Dayne", { name: "Aerion", affected: true, notes: "Brightflame. Drank wildfire believing it would turn him into a dragon" }],
+    ["Aerion_Brightflame", M, "Maekar_I", "Dyanna_Dayne", { name: "Aerion", notes: "Brightflame. Drank wildfire believing it would turn him into a dragon" }],
     ["Maester_Aemon",      M, "Maekar_I", "Dyanna_Dayne", { name: "Aemon", notes: "Maester of the Night's Watch" }],
     ["Daella_MD",          F, "Maekar_I", "Dyanna_Dayne", { name: "Daella" }],
     ["Aegon_V",            M, "Maekar_I", "Dyanna_Dayne", { name: "Aegon V", notes: "The Unlikely, called Egg" }],
@@ -815,7 +815,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Daeron_AB",          M, "Aegon_V", "Betha_Blackwood", { name: "Daeron" }],
     ["Rhaelle",            F, "Aegon_V", "Betha_Blackwood", { name: "Rhaelle" }],
     // Children of the sibling marriage of Jaehaerys II and Shaera
-    ["Aerys_II",           M, "Jaehaerys_II", "Shaera", { name: "Aerys II", affected: true, notes: "The Mad King" }],
+    ["Aerys_II",           M, "Jaehaerys_II", "Shaera", { name: "Aerys II", notes: "The Mad King" }],
     ["Rhaella",            F, "Jaehaerys_II", "Shaera", { name: "Rhaella" }],
     ["Rhaegar",            M, "Aerys_II", "Rhaella", { name: "Rhaegar" }],
     ["Viserys",            M, "Aerys_II", "Rhaella", { name: "Viserys" }],
@@ -824,7 +824,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Lyanna_Stark",       F, null, null, { name: "Lyanna Stark" }],
     ["Rhaenys_RE",         F, "Rhaegar", "Elia_Martell", { name: "Rhaenys" }],
     ["Aegon_RE",           M, "Rhaegar", "Elia_Martell", { name: "Aegon", notes: "Killed in the Sack of King's Landing, or smuggled to safety, depending on whom you believe" }],
-    ["Jon_Snow",           M, "Rhaegar", "Lyanna_Stark", { name: "Jon Snow", proband: true, deceased: false, notes: "Born Aegon. Raised as Eddard Stark's bastard; Rhaegar's son by Lyanna" }],
+    ["Jon_Snow",           M, "Rhaegar", "Lyanna_Stark", { name: "Jon Snow", consultand: true, deceased: false, notes: "Born Aegon. Raised as Eddard Stark's bastard; Rhaegar's son by Lyanna" }],
   ];
 
   // Fiction: test-data/ped/fiction/buendia.ped. Affected = born with a pig's tail.
@@ -840,7 +840,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Ursula_father",        M, "Iguaran_grandfather", "Iguaran_grandmother", { name: "Father", notes: "Unnamed; father of Úrsula" }],
     ["Pig_tail_aunt",        F, "Iguaran_grandfather", "Iguaran_grandmother", { name: "Aunt", notes: "Unnamed; Úrsula's aunt" }],
     ["Ursula_mother",        F, null, null, { name: "Mother", notes: "Unnamed; Úrsula's mother" }],
-    ["Pig_tail_cousin",      M, "Pig_tail_uncle", "Pig_tail_aunt", { name: "Cousin", affected: true, notes: "Son of the uncle and aunt, born with a pig's tail. Lived 42 years a virgin and bled to death when a butcher cut it off" }],
+    ["Pig_tail_cousin",      M, "Pig_tail_uncle", "Pig_tail_aunt", { name: "Cousin", notes: "Son of the uncle and aunt, born with a pig's tail. Lived 42 years a virgin and bled to death when a butcher cut it off" }],
     ["Jose_Arcadio_Buendia", M, "JAB_father", "JAB_mother", { name: "José Arcadio B.", notes: "José Arcadio Buendía, founder of Macondo" }],
     ["Ursula_Iguaran",       F, "Ursula_father", "Ursula_mother", { name: "Úrsula", notes: "Úrsula Iguarán. Feared the cousin marriage would bring a child with a pig's tail" }],
     // Second generation
@@ -865,7 +865,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     // Sixth generation: Meme's son falls in love with her sister, his aunt
     ["Aureliano_Babilonia",  M, "Mauricio_Babilonia", "Meme", { name: "Aureliano B.", notes: "Aureliano Babilonia. Deciphered Melquíades's parchments as Macondo was wiped out" }],
     // Seventh generation
-    ["Aureliano_last",       M, "Aureliano_Babilonia", "Amaranta_Ursula", { name: "Aureliano", affected: true, proband: true, notes: "Born with a pig's tail; the last of the line" }],
+    ["Aureliano_last",       M, "Aureliano_Babilonia", "Amaranta_Ursula", { name: "Aureliano", proband: true, notes: "Born with a pig's tail; the last of the line" }],
   ];
 
   // Fiction: test-data/ped/fiction/atreides.ped. Affected = Kwisatz Haderach.
@@ -911,7 +911,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Atreides_line",    U, "Farad_n", "Ghanima", { name: "Their descendants", notes: "The Atreides line of Ghanima and Farad'n, through Moneo to Siona (God Emperor of Dune), not shown individually" }],
   ];
   const atreidesTags = [
-    { id: "preborn", label: "Pre-born (ancestral memory before birth)", color: "#9467bd", style: "quadrant" as const,
+    { id: "preborn", label: "Pre-born (ancestral memory before birth)", color: "#9467bd", style: "quadrant" as const, kind: "trait" as const,
       members: ["Alia", "Leto_II", "Ghanima"] },
     { id: "agony", label: "Survived the spice agony", color: "#1f77b4", style: "dot" as const,
       members: ["Mohiam", "Anirul", "Jessica", "Paul"] },
@@ -924,9 +924,9 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   const buendiaTags = [
     { id: "pig_tail", label: "Pig's tail", color: "#e377c2", style: "quadrant" as const,
       members: ["Pig_tail_cousin", "Aureliano_last"] },
-    { id: "aureliano", label: "Aureliano temperament: withdrawn, lucid", color: "#1f77b4", style: "quadrant" as const,
+    { id: "aureliano", label: "Aureliano temperament: withdrawn, lucid", color: "#1f77b4", style: "quadrant" as const, kind: "trait" as const,
       members: ["Colonel_Aureliano", "Jose_Arcadio_Segundo", "Aureliano_Babilonia"] },
-    { id: "jose_arcadio", label: "José Arcadio temperament: impulsive, enterprising", color: "#ff7f0e", style: "quadrant" as const,
+    { id: "jose_arcadio", label: "José Arcadio temperament: impulsive, enterprising", color: "#ff7f0e", style: "quadrant" as const, kind: "trait" as const,
       members: ["Jose_Arcadio_Buendia", "Jose_Arcadio", "Arcadio", "Aureliano_Segundo", "Jose_Arcadio_V"] },
     { id: "parchments", label: "Studied Melquíades's parchments", color: "#2ca02c", style: "dot" as const,
       members: ["Aureliano_Segundo", "Jose_Arcadio_Segundo", "Aureliano_Babilonia"] },
@@ -948,8 +948,8 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   const targaryenTags = [
     { id: "madness", label: "Madness", color: "#000000", style: "quadrant" as const,
       members: ["Aerion_Brightflame", "Aerys_II"] },
-    { id: "dragonrider", label: "Dragonrider", color: "#d62728", style: "quadrant" as const, members: Object.keys(dragons) },
-    { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "quadrant" as const,
+    { id: "dragonrider", label: "Dragonrider", color: "#d62728", style: "quadrant" as const, kind: "trait" as const, members: Object.keys(dragons) },
+    { id: "dreams", label: "Prophetic dreams", color: "#9467bd", style: "quadrant" as const, kind: "trait" as const,
       members: ["Viserys_I", "Helaena", "Daeron_Drunken", "Daenerys"] },
     { id: "throne", label: "Sat the Iron Throne", color: "#000000", style: "text" as const, abbrev: "Throne",
       members: ["Aegon_I", "Aenys_I", "Maegor_I", "Jaehaerys_I", "Viserys_I", "Aegon_II", "Rhaenyra", "Aegon_III",

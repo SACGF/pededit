@@ -191,7 +191,18 @@ export interface Tag {
   abbrev?: string;
   /** Fill of a quadrant tag's sector (#67). Absent means "solid". Ignored for dot and text tags. */
   fill?: TagFill;
+  /**
+   * What a quadrant tag means (#118). Absent or "condition": a condition,
+   * affected with it (`Individual.tags`) or a carrier (`carrierTags`), #115.
+   * "trait": only a coloured section, saying nothing about affected status
+   * (a biobank sample, a cohort, a trait of the family); PED, CSV, filters
+   * and warnings ignore it. Opt-in, beyond NSGC, where shading is a
+   * condition; the key names it. Ignored for dot and text tags.
+   */
+  kind?: TagKind;
 }
+
+export type TagKind = "condition" | "trait";
 
 /**
  * Why a couple has no children (NSGC 2008): drawn under the couple line as a

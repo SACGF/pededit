@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { stepProblem } from "../components/ProblemsMenu";
+import { affectedControlOn } from "../pedigree/conditions";
 
 /** Focus is in a text field, where letters and Delete are typing, not shortcuts. */
 function typing(): boolean {
@@ -38,7 +39,7 @@ export function useKeyboardShortcuts() {
         const people = pedigree.individuals.filter(i => wanted.has(i.id));
         if (people.length > 0) {
           e.preventDefault();
-          if (letter === "a") setAffectedMany(selectedIds, !people.every(i => i.affected));
+          if (letter === "a") setAffectedMany(selectedIds, !people.every(i => affectedControlOn(i, pedigree)));
           else setDeceasedMany(selectedIds, !people.every(i => i.deceased));
         }
       }

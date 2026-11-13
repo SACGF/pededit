@@ -161,6 +161,10 @@
         "fill": {
           "enum": ["solid", "horizontal", "vertical", "diagonal", "crosshatch", "dots", "shade"],
           "description": "How a quadrant tag fills its sector: solid in the tag's colour, or a pattern drawn in the tag's colour on white (horizontal or vertical lines, diagonal hatching, cross-hatching, dots), or a light tint of the colour (shade). Absent means \"solid\". Ignored for dot and text tags."
+        },
+        "kind": {
+          "enum": ["condition", "trait"],
+          "description": "What a quadrant tag means. Absent or \"condition\": a condition, the people with it affected with it (or carriers, carrierTags). \"trait\": a coloured section only, saying nothing about affected status. Ignored for dot and text tags."
         }
       },
       "additionalProperties": true

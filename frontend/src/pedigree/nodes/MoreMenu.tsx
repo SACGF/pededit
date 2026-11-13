@@ -13,7 +13,7 @@ import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
-import { CONDITION_NOT_RECORDED, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
+import { CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { donorPairFor, sameSexCouple } from "../sameSex";
 
 function clampCount(n: number): number {
@@ -233,8 +233,8 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
         </MenuSection>
 
         <MenuSection label="Status">
-          <MenuItem onClick={() => action(() => setAffected(individualId, !individual.affected))}>
-            {individual.affected ? "Mark unaffected" : "Mark affected"}
+          <MenuItem onClick={() => action(() => setAffected(individualId, !affectedControlOn(individual, pedigree)))}>
+            {affectedControlOn(individual, pedigree) ? "Mark unaffected" : "Mark affected"}
           </MenuItem>
           <MenuItem onClick={() => action(() => setDeceased(individualId, !individual.deceased))}>
             {individual.deceased ? "Mark living" : "Mark deceased"}
@@ -1063,10 +1063,11 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
 /**
  * Tags listed in the menus' Tags sections: all of them, except that with two
  * or more conditions the condition tags have their own section (#115).
+ * Traits (#118) stay here: they are plain tags.
  */
 function menuTags(pedigree: Pedigree): Tag[] {
   const tags = pedigree.tags ?? [];
-  return conditionMode(pedigree) === "per-condition" ? tags.filter(t => t.style !== "quadrant") : tags;
+  return conditionMode(pedigree) === "per-condition" ? tags.filter(t => !isConditionTag(t)) : tags;
 }
 
 function ConditionItemLabel({ tag, text, on }: { tag: Tag; text: string; on: boolean }) {

@@ -53,9 +53,9 @@ export function roleLetterBaselineY(size: number, oy = 0): number {
   return oy + size / 2 + roleLetterFontSize(size) * 0.36;
 }
 
-/** The letter is drawn in white on a filled (affected) symbol. */
-export function roleLetterFill(ind: Pick<Individual, "affected">): string {
-  return ind.affected ? "white" : "black";
+/** The letter is drawn in white on a black-filled symbol (`SymbolPaint.base`). */
+export function roleLetterFill(base: "black" | "white"): string {
+  return base === "black" ? "white" : "black";
 }
 
 /** The letter for this individual, or undefined. A pregnancy's "P" wins. */

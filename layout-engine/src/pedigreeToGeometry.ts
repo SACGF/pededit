@@ -11,6 +11,7 @@
 
 import { alignPedigree } from "./alignPedigree.js";
 import { buildPartnerSetFromPedigree, resolveCouple } from "./couples.js";
+import { isAffected } from "./affected.js";
 import type { Pedigree, Individual, LayoutResult } from "./types.js";
 
 // ── Rendering constants (match frontend/src/pedigree/constants.ts) ────────────
@@ -182,7 +183,7 @@ export function pedigreeToGeometry(
         cy,
         half,
         sex:         ind.sex,
-        affected:    ind.affected,
+        affected:    isAffected(ind, pedigree),
         carrier:     ind.carrier  ?? false,
         deceased:    ind.deceased ?? false,
         proband:     ind.proband  ?? false,

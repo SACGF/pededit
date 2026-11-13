@@ -5,7 +5,7 @@ import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
 import { evaluationsCsv } from "../../pedigree/evaluation";
 import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";
-import { carrierConditions, isCarrier } from "../../pedigree/conditions";
+import { carrierConditions, isAffected, isCarrier } from "../../pedigree/conditions";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
   const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids,dod,carrier_of";
@@ -38,7 +38,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.sex,
       ind.dob ?? "",
       ind.age ?? "",
-      ind.affected ? "1" : "0",
+      isAffected(ind, pedigree) ? "1" : "0",
       ind.deceased ? "1" : "0",
       // Any carrier (#115): no condition recorded, or the conditions in carrier_of.
       isCarrier(ind, pedigree) ? "1" : "0",

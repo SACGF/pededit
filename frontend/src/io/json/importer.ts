@@ -479,6 +479,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         c.optional(raw, "abbrev", tip, "a string", v => typeof v === "string");
         c.optional(raw, "fill", tip, TAG_FILL_VALUES.map(s => `"${s}"`).join(" | "),
           v => typeof v === "string" && TAG_FILL_VALUES.includes(v));
+        c.optional(raw, "kind", tip, `"condition" | "trait"`, v => v === "condition" || v === "trait");
       });
     }
   }

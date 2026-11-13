@@ -15,7 +15,7 @@ import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
 import { tagPaint, carrierPaintFrom, renderRegionFillSvg, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
 import type { TagPaint } from "./tagFills";
-import { affectedConditions, carrierConditions, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
+import { affectedControlOn, carrierConditions, isConditionTag, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
 import type { TagFill } from "@pedigree-editor/layout-engine";
 
 /**
@@ -181,7 +181,8 @@ const sectionCache = new WeakMap<Pedigree, SectionInfo>();
  * The conditions that own a section of the symbol (#115). NSGC 2008 (and no
  * notation saved): every quadrant tag defined, as #3 always did, so old
  * pedigrees keep their look. NSGC 2022: only the conditions in use, that is
- * someone on the chart is affected with or a carrier of them, counted on the
+ * someone on the chart is affected with or a carrier of them, or has the
+ * trait (#118: a trait takes a section like a condition), counted on the
  * drawn pedigree (`drawnPedigree`: people in a collapsed branch, #94, or
  * left out by a view filter, #4, do not count), since NSGC divides the
  * symbol by what the chart shows. Defining a second condition no one has yet
@@ -200,7 +201,8 @@ function sectionInfo(pedigree: Pedigree): SectionInfo {
     const used = new Set<string>();
     let plainBlack = false;
     for (const i of drawn.individuals) {
-      for (const t of affectedConditions(i, drawn)) used.add(t.id);
+      // Affected conditions and traits alike (#118); `all` keeps only quadrant tags.
+      for (const id of i.tags ?? []) used.add(id);
       const carried = carrierConditions(i, drawn);
       for (const t of carried) used.add(t.id);
       if (plainAffected(i, drawn) && carried.length === 0) plainBlack = true;
@@ -286,7 +288,8 @@ export function sectionName(tag: Tag, pedigree: Pedigree): { name: string; title
  */
 export function conditionPaint(tag: Tag, pedigree: Pedigree): TagPaint {
   const paint = tagPaint(tag, pedigree);
-  if (tag.style !== "quadrant" || tagFillMode(pedigree) !== "monochrome" || notationOf(pedigree) === "nsgc2008") return paint;
+  // A trait (#118) is never the solid black of NSGC affected shading.
+  if (!isConditionTag(tag) || tagFillMode(pedigree) !== "monochrome" || notationOf(pedigree) === "nsgc2008") return paint;
   if (tag.fill && tag.fill !== "solid") return paint;
   const { layout } = conditionSection(tag, pedigree);
   if (layout !== "whole" || sectionInfo(pedigree).plainBlack) return paint;
@@ -349,14 +352,18 @@ function covers(sectors: readonly Sector[], start: number, end: number): boolean
  * - `core`: the black centre over the sectors;
  * - `dot`: the 2008 carrier dot.
  *
- * NSGC 2008 (and pedigrees saved before the setting, `notation.ts`), as
- * before: affected is a black fill, with the black centre when there are
- * sectors; a carrier with no condition recorded has the dot, not drawn on an
- * affected fill.
+ * NSGC 2008 (and pedigrees saved before the setting, `notation.ts`): the
+ * plain Affected control (`affectedControlOn`: the flag, or the one
+ * condition) is a black fill, with the black centre over any sectors. With
+ * two or more conditions, someone affected only with recorded conditions has
+ * their quarters on white, as NSGC 2008 shades a quadrant per condition. A
+ * carrier with no condition recorded has the dot, not drawn on a black fill.
  *
  * NSGC 2022: there is no dot. A recorded affected condition is its sector
- * alone, so the person is not filled black. Affected with no condition
- * recorded is the black fill, or the black centre over any carrier sectors.
+ * alone, so the person is not filled black. The plain flag
+ * (`plainAffected`: affected with something not recorded, #118) is the black
+ * fill with any sectors drawn over it and the black centre on top, so it
+ * still reads as affected when the sectors cover the symbol or are black.
  * A carrier with no condition recorded is the right half dotted, unless the
  * symbol is filled black or the person's affected conditions cover that half
  * (`sectionLayout`: one condition in use is the whole symbol, the second of
@@ -373,19 +380,17 @@ export interface SymbolPaint {
 
 export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolPaint {
   const conditions = conditionSectorsFor(individual, pedigree);
-  const affected = !!individual.affected;
   const plainCarrierFlag = plainCarrier(individual, pedigree);
   if (notationOf(pedigree) === "nsgc2008") {
+    const black = affectedControlOn(individual, pedigree);
     return {
       sectors: conditions,
-      base: affected ? "black" : "white",
-      core: affected && conditions.length > 0,
-      dot: plainCarrierFlag && !affected,
+      base: black ? "black" : "white",
+      core: black && conditions.length > 0,
+      dot: plainCarrierFlag && !black,
     };
   }
-  const recordedAffected = conditions.some(s => !s.carrier);
-  const plainAff = affected && !recordedAffected;
-  const black = plainAff && conditions.length === 0;
+  const black = plainAffected(individual, pedigree);
   // The dotted half goes under the conditions; where they cover it (one
   // condition's whole symbol, or the right half) it is left off, as the 2008
   // dot is on an affected fill, and the edit panel says so.
@@ -396,7 +401,7 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
   return {
     sectors,
     base: black ? "black" : "white",
-    core: plainAff && sectors.length > 0,
+    core: black && sectors.length > 0,
     dot: false,
   };
 }
@@ -409,11 +414,12 @@ export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[]
 // ── Affected core ─────────────────────────────────────────────────────────────
 
 /**
- * An affected person whose symbol carries quadrant tags keeps a solid black
- * centre: the symbol's own outline scaled by this factor, drawn over the
- * sectors with a white rim. Without it, four tagged quarters (or a pie of
- * tags) would cover the black fill and the person would read as unaffected.
- * An affected person with no quadrant tags is filled black as usual.
+ * A black-filled symbol (`symbolPaint`) that also carries sectors keeps a
+ * solid black centre: the symbol's own outline scaled by this factor, drawn
+ * over the sectors with a white rim. Without it, four quarters (or one
+ * section covering the whole symbol) would hide the black fill and the
+ * person would read as unaffected (#118). A black symbol with no sectors is
+ * filled black as usual.
  */
 export const AFFECTED_CORE_SCALE = 0.55;
 /** White rim around the core, in symbol pixels (after scaling). */
@@ -732,11 +738,11 @@ function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>
  * The Affected / Carrier rows of a key (#115), shared by the in-app legend
  * and the export key: who each row's swatch is drawn for (its shape), and its
  * label. Follows what is drawn (`symbolPaint`):
- * - NSGC 2008: "Affected" for anyone affected, "Affected, with tags (black
+ * - NSGC 2008: "Affected" for a black fill, "Affected, with tags (black
  *   centre)", "Carrier" for the dot, as before;
  * - NSGC 2022: "Affected" only for a solid black fill (affected with no
  *   condition recorded), "Affected, condition not recorded (black centre)"
- *   over carrier sectors, "Carrier" for the dotted half.
+ *   for the black fill under sectors (#118), "Carrier" for the dotted half.
  * With two or more conditions a plain flag's label adds "(condition not
  * recorded)" (`plainStatusLabel`).
  */
@@ -757,7 +763,7 @@ export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = 
   const anyPlainAffected = inds.some(i => plainAffected(i, pedigree));
   if (y2008) {
     return {
-      affected: inds.find(i => i.affected),
+      affected: paints.find(({ p }) => p.base === "black")?.i,
       affectedLabel: anyPlainAffected ? plainStatusLabel("Affected", pedigree) : "Affected",
       core: paints.find(({ p }) => p.core)?.i,
       coreLabel: "Affected, with tags (black centre)",
@@ -767,7 +773,7 @@ export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = 
     };
   }
   return {
-    affected: paints.find(({ p }) => p.base === "black")?.i,
+    affected: paints.find(({ p }) => p.base === "black" && p.sectors.length === 0)?.i,
     affectedLabel: plainStatusLabel("Affected", pedigree),
     core: paints.find(({ p }) => p.core)?.i,
     coreLabel: "Affected, condition not recorded (black centre)",

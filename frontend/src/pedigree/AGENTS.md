@@ -225,24 +225,43 @@ draws NSGC symbols.
   (JSON import keeps the file's). A new way of making a pedigree must call
   it too. Read the setting through `notationOf`; test pedigrees without
   `canvasSettings` are 2008.
-- `conditions.ts` — affected and carrier per condition (#115). A quadrant
-  tag in `Individual.tags` is affected with that condition (and sets
-  `affected`), in `Individual.carrierTags` a carrier of it; the plain
-  `carrier` flag is a carrier with no condition recorded. Every editor path
+- `conditions.ts` — affected and carrier per condition (#115). A condition
+  is a quadrant tag that is not a trait (`isConditionTag`; `Tag.kind:
+  "trait"`, #118, is a coloured section only: it takes a section in
+  `sectionInfo` like a condition, is a plain tag in the store and menus,
+  never affected, never solid black in monochrome). Test conditions with
+  `isConditionTag` / `conditionTags`, never `style === "quadrant"`. A
+  condition tag in `Individual.tags` is affected with that condition, in
+  `Individual.carrierTags` a carrier of it. The plain flags are what the
+  conditions do not say: `affected` is affected with something not
+  recorded, `carrier` a carrier with no condition recorded. Recording or
+  clearing a condition never sets or clears `affected` (#118: the old
+  coupling made the flag beside a condition ambiguous, so marking someone
+  with a quadrant tag affected drew nothing). "Is this person affected?"
+  is `isAffected` (layout-engine, re-exported here: the flag or any
+  affected condition), used by PED/CSV, filters, sibling order, collapse
+  and warnings; never read `ind.affected` for that. The plain Affected
+  control's state (A, more menu, batch counts) is `affectedControlOn`: the
+  flag, or with one condition, that condition. Every editor path
   (panel, more menu, batch, legend checkbox, "A" shortcut, warning fixes)
   goes through `applyConditionState` / `applyAffected` / `applyCarrier`, so
-  the rules live in one place: the last affected condition removed clears
-  `affected`; recording a carrier condition clears the plain flag; with
-  exactly one condition the plain Affected and Carrier controls record it;
-  with two or more the panel (`ConditionsForm`) and menus ask per
-  condition, and plain flags get the "condition-not-recorded" warning with
-  one fix per condition (`Problem.moreFixes`). Drawing is decided once in
+  the rules live in one place: recording a carrier condition clears the
+  plain carrier flag; with exactly one condition the plain Affected and
+  Carrier controls record it; with two or more the panel
+  (`ConditionsForm`) and menus ask per condition, and a plain flag (alone,
+  or beside recorded conditions) gets the "condition-not-recorded" warning
+  with one fix per condition (`Problem.moreFixes`), built with
+  `resolvePlainAffected` as one `updateIndividual` so a click is one undo
+  step. Drawing is decided once in
   `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
   `carrierPaint` from tagFills.ts, plus the 2022 dotted half for a plain
   carrier as the `PLAIN_CARRIER_TAG` sector, left off when the person's
   affected conditions cover the right half, which the edit panel then
   reports as not drawn), black base, black centre,
-  2008 dot. Canvas, minimap, both exporters and the legends read it; never
+  2008 dot. The black base is `plainAffected` in 2022 (sectors over it, the
+  black centre on top) and `affectedControlOn` in 2008, so with two
+  conditions a 2008 person affected only with recorded ones has quarters on
+  white, as NSGC 2008 shades a quadrant per condition. Canvas, minimap, both exporters and the legends read it; never
   test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
   `keyTagRows` are the key rows for the app legend and the export key.
 - `evaluation.ts` — evaluation results and presymptomatic carrier (#101,

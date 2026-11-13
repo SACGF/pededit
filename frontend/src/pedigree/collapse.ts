@@ -1,4 +1,4 @@
-import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
+import { isAffected, type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
 import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } from "./removal";
 import { filterHidden, withoutFilters } from "./viewFilters";
 
@@ -114,9 +114,7 @@ export function branchOf(drawn: Pedigree, id: string): CollapsedBranch | undefin
  * quadrant fill). NSGC: affected people are not grouped.
  */
 export function drawnIndividually(individual: Individual, pedigree: Pedigree): boolean {
-  if (individual.affected) return true;
-  const conditions = new Set((pedigree.tags ?? []).filter(t => t.style === "quadrant").map(t => t.id));
-  return (individual.tags ?? []).some(t => conditions.has(t));
+  return isAffected(individual, pedigree);
 }
 
 const cache = new WeakMap<Pedigree, CollapseInfo>();
@@ -257,7 +255,7 @@ function addPlaceholders(
       partnershipId: p.id,
       children: grouped.map(i => i.id),
       hidden: set,
-      affected: people.filter(i => i.affected).length,
+      affected: people.filter(i => isAffected(i, full)).length,
       male: grouped.filter(i => i.sex === "male").length,
       female: grouped.filter(i => i.sex === "female").length,
       unknownSex: grouped.filter(i => i.sex === "unknown").length,

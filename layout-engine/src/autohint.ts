@@ -3,6 +3,7 @@ import { kindepth } from "./kindepth.js";
 import { alignPedigree } from "./alignPedigree.js";
 import { buildPartnerSet, isPartnerPair } from "./couples.js";
 import { preferPartnerLineages } from "./partnerSides.js";
+import { isAffected } from "./affected.js";
 
 /**
  * Port of R kinship2 autohint().
@@ -105,8 +106,8 @@ function initialOrder(input: LayoutInput, pedigree: Pedigree, twins: TwinInfo): 
       .filter(s => s.idx > 0 && s.ind);
 
     siblings.sort((a, b) => {
-      const [ap, as_] = effectiveSibOrder(a.ind, mode, affectedFirst);
-      const [bp, bs]  = effectiveSibOrder(b.ind, mode, affectedFirst);
+      const [ap, as_] = effectiveSibOrder(a.ind, pedigree, mode, affectedFirst);
+      const [bp, bs]  = effectiveSibOrder(b.ind, pedigree, mode, affectedFirst);
       if (ap !== bp) return ap - bp;
       return as_ - bs;
     });
@@ -159,10 +160,11 @@ function initialOrder(input: LayoutInput, pedigree: Pedigree, twins: TwinInfo): 
 
 function effectiveSibOrder(
   individual: Individual,
+  pedigree: Pedigree,
   mode: SiblingOrderMode,
   affectedFirst: boolean,
 ): [number, number] {
-  const affectedKey = affectedFirst ? (individual.affected ? 0 : 1) : 0;
+  const affectedKey = affectedFirst ? (isAffected(individual, pedigree) ? 0 : 1) : 0;
   let orderKey: number;
   if (mode === "birthDate" && individual.dob) {
     orderKey = new Date(individual.dob).getTime();

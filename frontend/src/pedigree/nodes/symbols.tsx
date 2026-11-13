@@ -340,7 +340,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
       <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
-      <RoleLetter individual={individual} size={size} halo={sectors.length > 0} />
+      <RoleLetter individual={individual} size={size} halo={sectors.length > 0} base={paint.base} />
     </g>
   );
 }
@@ -349,7 +349,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
  * "D" (gamete donor) or "S" (surrogate) inside the symbol (#45). White on a
  * filled symbol; with a white halo over tag colours so it stays legible.
  */
-export function RoleLetter({ individual, size, halo = false }: { individual: Individual; size: number; halo?: boolean }) {
+export function RoleLetter({ individual, size, halo = false, base = "white" }: { individual: Individual; size: number; halo?: boolean; base?: "black" | "white" }) {
   const letter = symbolLetter(individual);
   if (!letter) return null;
   return (
@@ -357,7 +357,7 @@ export function RoleLetter({ individual, size, halo = false }: { individual: Ind
       data-role-letter={letter}
       x={size / 2} y={roleLetterBaselineY(size)}
       textAnchor="middle" fontFamily="sans-serif" fontSize={roleLetterFontSize(size)} fontWeight="bold"
-      fill={roleLetterFill(individual)}
+      fill={roleLetterFill(base)}
       {...(halo ? { stroke: "white", strokeWidth: 3, paintOrder: "stroke" } : {})}
       style={{ pointerEvents: "none", userSelect: "none" }}
     >

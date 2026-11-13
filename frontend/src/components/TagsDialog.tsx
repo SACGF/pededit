@@ -145,6 +145,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
             Tags mark individuals with a condition, a genotype or a sample status.
             A quadrant tag fills a quarter of the symbol; the order below sets which quarter.
             Its fill can be solid or a pattern (hatched, lines, dotted) drawn in the tag's colour.
+            A quadrant is a condition (the person is affected with it) unless set to trait: a coloured
+            section that says nothing about affected status, such as a cohort or a sample.
           </p>
           {tagFillMode(pedigree) === "monochrome" && (
             <p className="text-[10px] text-gray-500">
@@ -192,6 +194,20 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                         className="h-6 w-28 shrink-0 text-xs border rounded px-1 bg-white"
                       >
                         {TAG_FILL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    )}
+
+                    {tag.style === "quadrant" && (
+                      <select
+                        name="tag-kind"
+                        aria-label="Meaning"
+                        value={tag.kind ?? "condition"}
+                        onChange={e => updateTag(tag.id, { kind: e.target.value === "trait" ? "trait" : undefined })}
+                        title="Condition: the person is affected with it (NSGC shading). Trait: a coloured section only, not affected status (#118)."
+                        className="h-6 w-24 shrink-0 text-xs border rounded px-1 bg-white"
+                      >
+                        <option value="condition">Condition</option>
+                        <option value="trait">Trait</option>
                       </select>
                     )}
 

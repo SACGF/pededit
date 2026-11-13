@@ -23,8 +23,8 @@ import { fieldProblems, worstSeverity, type Problem, type ProblemField } from ".
 import { ProblemIcon } from "./ProblemsMenu";
 import { ProblemFixes } from "./ProblemFixes";
 import {
-  CONDITION_NOT_RECORDED, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
-  soleCondition, type ConditionState,
+  CONDITION_NOT_RECORDED, affectedControlOn, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
+  isAffected, resolvePlainAffected, soleCondition, type ConditionState,
 } from "../pedigree/conditions";
 import { carrierStatusOf } from "../pedigree/batch";
 import { notationOf } from "../pedigree/notation";
@@ -223,9 +223,9 @@ function IndividualForm({ individual }: { individual: Individual }) {
         <div className="text-xs text-gray-600 space-y-1">
           <div>Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}: <span className="font-medium">{individual.sex}</span></div>
           <ProblemHighlight {...problemsOn("affected")}>
-            <div>Affected: <span className="font-medium">{individual.affected ? "yes" : "no"}</span></div>
+            <div>Affected: <span className="font-medium">{isAffected(individual, pedigree) ? "yes" : "no"}</span></div>
           </ProblemHighlight>
-          {individual.affected && (
+          {affectedControlOn(individual, pedigree) && (
             <div className="flex items-center gap-2 pl-5">
               <span className="shrink-0">Age of onset</span>
               <Input
@@ -319,7 +319,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
  * warning and one-click fixes, and can be cleared; nothing is refused.
  */
 function ConditionsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
-  const { pedigree, setConditionStatus, setAffected, setCarrier } = usePedigreeStore();
+  const { pedigree, setConditionStatus, updateIndividual, setCarrier } = usePedigreeStore();
   const conditions = conditionTags(pedigree);
   return (
     <ProblemHighlight {...problems}>
@@ -342,7 +342,8 @@ function ConditionsForm({ individual, problems }: { individual: Individual; prob
         ))}
         {plainAffected(individual, pedigree) && (
           <label className="flex items-center gap-2 cursor-pointer pl-2">
-            <input type="checkbox" name="plainAffected" checked onChange={() => setAffected(individual.id, false)} className="accent-black" />
+            {/* Only the flag: recorded conditions stay (#118). */}
+            <input type="checkbox" name="plainAffected" checked onChange={() => updateIndividual(individual.id, resolvePlainAffected(individual, null, pedigree))} className="accent-black" />
             <span>Affected {CONDITION_NOT_RECORDED}</span>
           </label>
         )}

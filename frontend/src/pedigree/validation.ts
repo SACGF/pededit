@@ -19,7 +19,7 @@ import type {
   Evaluation, Individual, Partnership, Pedigree, ReproductiveRole, SiblingOrderSettings, Tag,
 } from "@pedigree-editor/layout-engine";
 import { parsePartialDate, type PartialDate } from "./labels";
-import { carrierLabel, conditionMode, conditionTags, plainAffected, plainCarrier, type ConditionState } from "./conditions";
+import { affectedConditions, affectedControlOn, carrierLabel, conditionMode, conditionTags, isAffected, plainAffected, plainCarrier, resolvePlainAffected, type ConditionState } from "./conditions";
 import { addYears, ageRange, certainlyBefore, minDaysApart, partialDateOf } from "./dateRanges";
 import { pedigreeNumbers } from "./layoutToFlow";
 
@@ -178,7 +178,7 @@ function siblingsOutOfOrder(pedigree: Pedigree, byId: Map<string, Individual>): 
   const out = new Map<string, Individual>();
   const { mode, affectedFirst } = pedigree.siblingOrder ?? { mode: "insertion", affectedFirst: false };
   if (mode !== "insertion") return out;
-  const group = (i: Individual) => affectedFirst && i.affected ? 0 : affectedFirst ? 1 : 0;
+  const group = (i: Individual) => affectedFirst && isAffected(i, pedigree) ? 0 : affectedFirst ? 1 : 0;
   for (const p of pedigree.partnerships) {
     const kids = (pedigree.parentOf[p.id] ?? []).map(id => byId.get(id)).filter((x): x is Individual => !!x);
     if (kids.length < 2) continue;
@@ -292,7 +292,7 @@ export const RULES: Rule[] = [
     // NSGC 2022: the proband is the affected person through whom the family comes to attention.
     id: "proband-unaffected",
     // Affected with a condition (#115) counts, as the drawing fills its sector.
-    individual: (ind, ctx) => !!ind.proband && !ind.affected && !ctx.conditions.some(t => ind.tags?.includes(t.id)) && {
+    individual: (ind, ctx) => !!ind.proband && !isAffected(ind, ctx.pedigree) && {
       severity: "warning",
       field: "affected",
       message: "The proband is not marked affected. NSGC: the proband is always affected; an unaffected person seeking advice is the consultand.",
@@ -307,12 +307,27 @@ export const RULES: Rule[] = [
       if (ctx.conditions.length < 2) return null;
       const out: ProblemDraft[] = [];
       if (plainAffected(ind, ctx.pedigree)) {
-        out.push({
-          severity: "warning",
-          field: "conditions",
-          message: "Affected, but with which condition? The key shows it as \"Affected (condition not recorded)\".",
-          ...perCondition(ctx.conditions, t => ({ label: `Record as ${t.label}`, apply: a => a.setConditionStatus(ind.id, t.id, "affected") })),
-        });
+        // #118: the flag beside recorded conditions is drawn black under them, so say what it adds.
+        const recorded = affectedConditions(ind, ctx.pedigree);
+        const others = ctx.conditions.filter(t => !recorded.includes(t));
+        const record = (t: Tag): ProblemFix => ({ label: `Record as ${t.label}`, apply: a => a.updateIndividual(ind.id, resolvePlainAffected(ind, t.id, ctx.pedigree)) });
+        if (recorded.length === 0) {
+          out.push({
+            severity: "warning",
+            field: "conditions",
+            message: "Affected, but with which condition? The key shows it as \"Affected (condition not recorded)\".",
+            ...perCondition(ctx.conditions, record),
+          });
+        } else {
+          const names = recorded.map(t => t.label).join(" and ");
+          out.push({
+            severity: "warning",
+            field: "conditions",
+            message: `Marked affected as well as affected with ${names}: affected with what else? Drawn filled black under the ${names} section${recorded.length > 1 ? "s" : ""}.`,
+            fix: { label: `Only ${names}`, apply: a => a.updateIndividual(ind.id, resolvePlainAffected(ind, null, ctx.pedigree)) },
+            ...(others.length ? { moreFixes: others.map(record) } : {}),
+          });
+        }
       }
       if (plainCarrier(ind, ctx.pedigree)) {
         out.push({
@@ -485,7 +500,7 @@ export const RULES: Rule[] = [
     individual: (ind, ctx) => {
       const out: ProblemDraft[] = [];
       const perCondition = conditionMode(ctx.pedigree) === "per-condition";
-      if (ind.affected && plainCarrier(ind, ctx.pedigree) && (!perCondition || plainAffected(ind, ctx.pedigree))) {
+      if (isAffected(ind, ctx.pedigree) && plainCarrier(ind, ctx.pedigree) && (!perCondition || plainAffected(ind, ctx.pedigree))) {
         out.push({
           severity: "warning",
           field: perCondition ? "conditions" : "carrier",
@@ -509,7 +524,7 @@ export const RULES: Rule[] = [
   {
     // 10. Presymptomatic means clinically unaffected now (#101).
     id: "presymptomatic-affected",
-    individual: (ind, ctx) => !!ind.presymptomatic && ind.affected && {
+    individual: (ind, ctx) => !!ind.presymptomatic && isAffected(ind, ctx.pedigree) && {
       severity: "warning",
       field: conditionMode(ctx.pedigree) === "per-condition" ? "presymptomatic" : "carrier",
       message: "Presymptomatic means not affected now, and the affected fill hides the vertical line.",
@@ -521,11 +536,14 @@ export const RULES: Rule[] = [
     id: "onset-unaffected",
     individual: (ind, ctx) => {
       const out: ProblemDraft[] = [];
-      if (ind.onset?.trim() && !ind.affected) {
+      // The affected status's own onset goes with the plain Affected control (#118).
+      if (ind.onset?.trim() && !affectedControlOn(ind, ctx.pedigree)) {
         out.push({
           severity: "warning",
           field: "affected",
-          message: `An age of onset (${ind.onset.trim()}) on someone not affected. It is not drawn.`,
+          message: isAffected(ind, ctx.pedigree)
+            ? `An age of onset (${ind.onset.trim()}) for "affected", but they are affected only with a recorded condition. It is not drawn.`
+            : `An age of onset (${ind.onset.trim()}) on someone not affected. It is not drawn.`,
           fix: { label: "Clear age of onset", apply: a => a.setOnset(ind.id, null, "") },
         });
       }

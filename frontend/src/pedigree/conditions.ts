@@ -1,4 +1,7 @@
+import { isAffected, isConditionTag } from "@pedigree-editor/layout-engine";
 import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
+
+export { isAffected, isConditionTag };
 
 /**
  * Affected and carrier status per condition (#115).
@@ -6,10 +9,12 @@ import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
  * A condition is a quadrant tag (#3). Each person has one state per
  * condition: affected (the tag id is in `Individual.tags`), carrier (in
  * `Individual.carrierTags`) or neither. The plain flags stay:
- * `Individual.affected` is "affected" overall (PED export, the Affected only
- * filter and the evaluations depend on it) and is set whenever a condition is
- * recorded as affected; `Individual.carrier` is a carrier whose condition is
- * not recorded, and recording a carrier condition clears it.
+ * `Individual.affected` is affected with something not recorded (#118), and
+ * recording or clearing a condition never touches it. "Affected" overall
+ * (PED export, the Affected only filter, sibling order, the warnings) is the
+ * flag or any affected condition: `isAffected`. `Individual.carrier` is a
+ * carrier whose condition is not recorded, and recording a carrier condition
+ * clears it.
  *
  * How the editor asks depends on how many conditions the pedigree defines
  * (`conditionMode`), not how many are in use, so every defined condition can
@@ -31,9 +36,9 @@ export type ConditionState = "affected" | "carrier" | "none";
 
 export type ConditionMode = "plain" | "single" | "per-condition";
 
-/** The pedigree's conditions (quadrant tags), in order. */
+/** The pedigree's conditions (quadrant tags that are not traits, #118), in order. */
 export function conditionTags(pedigree: Pick<Pedigree, "tags">): Tag[] {
-  return (pedigree.tags ?? []).filter(t => t.style === "quadrant");
+  return (pedigree.tags ?? []).filter(isConditionTag);
 }
 
 export function conditionMode(pedigree: Pick<Pedigree, "tags">): ConditionMode {
@@ -69,9 +74,29 @@ export function carrierConditions(ind: Pick<Individual, "tags" | "carrierTags">,
   return conditionTags(pedigree).filter(t => mine.has(t.id) && !affected.has(t.id));
 }
 
-/** Affected with no condition recorded: the plain flag alone. */
+/**
+ * The plain flag says something the recorded conditions do not: affected with
+ * something not recorded (#118), drawn as the black fill (under any condition
+ * sections in NSGC 2022). With two or more conditions that is so even beside
+ * a recorded condition, and the editor warns ("condition-not-recorded"). With
+ * one condition, the flag beside that condition adds nothing.
+ */
 export function plainAffected(ind: Individual, pedigree: Pick<Pedigree, "tags">): boolean {
-  return !!ind.affected && affectedConditions(ind, pedigree).length === 0;
+  if (!ind.affected) return false;
+  const sole = soleCondition(pedigree);
+  return !(sole && ind.tags?.includes(sole.id));
+}
+
+/**
+ * The state of the plain Affected control (A, the more menu, batch): the
+ * flag, or with one condition, that condition. With two or more conditions
+ * someone affected only with a recorded condition shows "Mark affected",
+ * which sets the flag (#118).
+ */
+export function affectedControlOn(ind: Individual, pedigree: Pick<Pedigree, "tags">): boolean {
+  if (ind.affected) return true;
+  const sole = soleCondition(pedigree);
+  return !!sole && !!ind.tags?.includes(sole.id);
 }
 
 /** A carrier with no condition recorded: the plain flag alone. */
@@ -112,29 +137,25 @@ function remove(ind: Individual, key: "tags" | "carrierTags", id: string): boole
 /**
  * Set one person's state for one condition, in place (an immer draft or a
  * copy). The rules, shared by every editor path:
- * - affected: the tag joins `tags` (pedigree order) and `affected` is set;
- *   a plain affected flag is now this condition.
+ * - affected: the tag joins `tags` (pedigree order). The plain `affected`
+ *   flag is left alone (#118): it means something not recorded.
  * - carrier: the tag joins `carrierTags` and the plain `carrier` flag is
  *   cleared (it is now this condition). Presymptomatic is left alone: it is
  *   a separate mark, usually for a dominant condition.
  * - none: the tag leaves both lists.
- * Leaving affected drops that condition's onset, and when the last affected
- * condition goes, `affected` (and its onset) goes too, so the person does
- * not turn into "affected, condition not recorded".
+ * Leaving affected drops that condition's onset, and the affected status's
+ * own onset (`Individual.onset`) when the plain control is now off.
  * Returns whether anything changed.
  */
 export function applyConditionState(
   ind: Individual, tagId: string, state: ConditionState, pedigree: Pick<Pedigree, "tags">,
 ): boolean {
-  if (conditionStateOf(ind, tagId) === state && (state !== "affected" || ind.affected)
-    && (state !== "carrier" || !ind.carrier)) return false;
+  if (conditionStateOf(ind, tagId) === state && (state !== "carrier" || !ind.carrier)) return false;
   const order = new Map((pedigree.tags ?? []).map((t, i) => [t.id, i]));
-  const conditionIds = new Set(conditionTags(pedigree).map(t => t.id));
   const wasAffectedWithIt = !!ind.tags?.includes(tagId);
   remove(ind, "carrierTags", tagId);
   if (state === "affected") {
     ind.tags = sortedInsert(ind.tags, tagId, order);
-    ind.affected = true;
     return true;
   }
   remove(ind, "tags", tagId);
@@ -146,18 +167,34 @@ export function applyConditionState(
     ind.carrierTags = sortedInsert(ind.carrierTags, tagId, order);
     if (ind.carrier) ind.carrier = false;
   }
-  if (wasAffectedWithIt && !(ind.tags ?? []).some(t => conditionIds.has(t))) {
-    ind.affected = false;
-    delete ind.onset;
-  }
+  if (wasAffectedWithIt && ind.onset !== undefined && !affectedControlOn(ind, pedigree)) delete ind.onset;
   return true;
 }
 
 /**
+ * The update that resolves a plain flag the conditions do not explain (#118),
+ * for a warning's one-click fix (one `updateIndividual`, so one undo step):
+ * record it as condition `tagId`, or with `tagId` null drop the flag because
+ * the recorded conditions say it all. The affected status's own onset moves
+ * to the condition it becomes (or the only recorded one) when that has none.
+ */
+export function resolvePlainAffected(ind: Individual, tagId: string | null, pedigree: Pick<Pedigree, "tags">): Partial<Individual> {
+  const copy = structuredClone(ind);
+  if (tagId) applyConditionState(copy, tagId, "affected", pedigree);
+  const recorded = affectedConditions(copy, pedigree);
+  const target = tagId ?? (recorded.length === 1 ? recorded[0]!.id : undefined);
+  const onset = copy.onset?.trim();
+  let tagOnset = copy.tagOnset;
+  if (onset && target && !tagOnset?.[target]?.trim()) tagOnset = { ...tagOnset, [target]: onset };
+  return { affected: false, onset: undefined, tags: copy.tags, carrierTags: copy.carrierTags, tagOnset };
+}
+
+/**
  * The plain Affected control (checkbox, more menu, "A" shortcut, batch). With
- * one condition it records that condition too; unticking removes every
- * affected condition, since a condition sector on an unaffected person would
- * contradict the box. Returns whether anything changed.
+ * one condition it records that condition; otherwise it sets the plain flag
+ * (#118). Unticking removes the flag and every affected condition, since a
+ * condition section on an unaffected person would contradict the box.
+ * Returns whether anything changed.
  */
 export function applyAffected(ind: Individual, affected: boolean, pedigree: Pick<Pedigree, "tags">): boolean {
   const sole = soleCondition(pedigree);

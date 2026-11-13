@@ -20,7 +20,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { alignPedigree } from "@pedigree-editor/layout-engine";
+import { alignPedigree, isAffected } from "@pedigree-editor/layout-engine";
 import type { LayoutResult, Pedigree } from "@pedigree-editor/layout-engine";
 import { importPed } from "../ped/index.js";
 import { EXAMPLES } from "../../data/examples.js";
@@ -295,7 +295,8 @@ describe("in-app historic and classic examples", () => {
       const fixture = importPed(readFileSync(join(TEST_DATA, FIXTURES[name]!), "utf-8")).pedigrees[0]!.pedigree;
       const fromPed = alignPedigree(fixture);
       expect(ours.pos).toEqual(fromPed.pos);
-      expect(ex.data.individuals.map(i => i.affected)).toEqual(fixture.individuals.map(i => i.affected));
+      // PED carries affected overall (#118): the flag or a condition; traits are not affected.
+      expect(ex.data.individuals.map(i => isAffected(i, ex.data))).toEqual(fixture.individuals.map(i => i.affected));
     });
   }
 });

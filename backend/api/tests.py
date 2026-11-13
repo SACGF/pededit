@@ -57,6 +57,7 @@ FULL_PEDIGREE = {
     "unlockedIndividuals": ["f"],
     "tags": [
         {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant", "fill": "diagonal"},
+        {"id": "t3", "label": "Cohort", "color": "#2ca02c", "style": "quadrant", "kind": "trait"},
         {"id": "t2", "label": "Sequenced", "color": "#1f77b4", "style": "dot", "abbrev": "WGS"},
     ],
     "chartTitle": "Smith family",
@@ -151,6 +152,7 @@ class PedigreeRoundTripTests(APITestCase):
             {"individuals": [], "partnerships": []},
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "stripe"}]},
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "quadrant", "fill": "plaid"}]},
+            {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "quadrant", "kind": "maybe"}]},
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False, "snapGridSize": 20,
                                         "tagFills": "sepia"}},
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,

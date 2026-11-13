@@ -1,4 +1,4 @@
-import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
+import { isConditionTag, type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
 import { ancestorsOf } from "./removal";
 
 /**
@@ -15,7 +15,7 @@ import { ancestorsOf } from "./removal";
  * joined in `filterHidden`, and a row in `VIEW_FILTERS` for the controls.
  */
 
-/** True when the person carries a condition (quadrant) tag. */
+/** True when the person is affected with a condition (a quadrant tag that is not a trait, #118). */
 function hasConditionTag(individual: Individual, conditions: Set<string>): boolean {
   return (individual.tags ?? []).some(t => conditions.has(t));
 }
@@ -26,7 +26,7 @@ function hasConditionTag(individual: Individual, conditions: Set<string>): boole
  * the proband and the consultand.
  */
 export function affectedOnlySeeds(pedigree: Pedigree): Set<string> {
-  const conditions = new Set((pedigree.tags ?? []).filter(t => t.style === "quadrant").map(t => t.id));
+  const conditions = new Set((pedigree.tags ?? []).filter(isConditionTag).map(t => t.id));
   return new Set(pedigree.individuals
     .filter(i => i.affected || i.carrier || i.presymptomatic || i.proband
       || i.consultand

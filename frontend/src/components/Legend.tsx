@@ -4,7 +4,7 @@ import {
   PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { carrierLabel, conditionStateOf } from "../pedigree/conditions";
+import { carrierLabel, conditionStateOf, isConditionTag } from "../pedigree/conditions";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
@@ -480,7 +480,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
               if (individual && onToggleTag) {
                 const on = individual.tags?.includes(tag.id) ?? false;
                 // A condition the person carries (#115): set in the Status section, noted here.
-                const carrierOfIt = tag.style === "quadrant" && conditionStateOf(individual, tag.id) === "carrier";
+                const carrierOfIt = isConditionTag(tag) && conditionStateOf(individual, tag.id) === "carrier";
                 return (
                   <div key={tag.id}>
                     <label className="flex items-center gap-1.5 cursor-pointer min-w-0">

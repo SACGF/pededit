@@ -1,7 +1,7 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { twinSetOf } from "./twins";
 import { geneticParentsSexProblem } from "./sameSex";
-import { conditionStateOf, conditionTags, soleCondition, type ConditionState } from "./conditions";
+import { affectedControlOn, conditionStateOf, conditionTags, soleCondition, type ConditionState } from "./conditions";
 
 /**
  * Batch status changes on a multiple selection (#35): what the more menu's
@@ -52,7 +52,7 @@ export function batchStatus(pedigree: Pedigree, ids: string[]): BatchStatus {
   const conditions = conditionTags(pedigree);
   for (const t of conditions) out.conditions[t.id] = { affected: 0, carrier: 0, none: 0 };
   for (const ind of people) {
-    if (ind.affected) out.affected++;
+    if (affectedControlOn(ind, pedigree)) out.affected++;
     if (ind.deceased) out.deceased++;
     out.carrier[carrierStatusOf(ind, pedigree)]++;
     for (const t of conditions) out.conditions[t.id]![conditionStateOf(ind, t.id)]++;

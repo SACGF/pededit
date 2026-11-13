@@ -15,7 +15,7 @@ import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/colla
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
-import { applyAffected, applyCarrier, applyConditionState, type ConditionState } from "../pedigree/conditions";
+import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type ConditionState } from "../pedigree/conditions";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -1273,7 +1273,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setConditionStatus: (id, tagId, state) => {
       const { pedigree } = get();
       const current = pedigree.individuals.find(i => i.id === id);
-      if (!current || !pedigree.tags?.some(t => t.id === tagId && t.style === "quadrant")) return;
+      if (!current || !pedigree.tags?.some(t => t.id === tagId && isConditionTag(t))) return;
       if (!dryRun(current, ind => applyConditionState(ind, tagId, state, pedigree))) return;
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
@@ -1415,8 +1415,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setIndividualTagMany: (ids, tagId, on) => {
       const tag = get().pedigree.tags?.find(t => t.id === tagId);
       if (!tag) return;
-      // A condition tag is "affected with it" (#115): same rule as setConditionStatus.
-      if (tag.style === "quadrant") {
+      // A condition tag is "affected with it" (#115): same rule as setConditionStatus. A trait (#118) is a plain tag.
+      if (isConditionTag(tag)) {
         const { pedigree } = get();
         const state: ConditionState = on ? "affected" : "none";
         mutateEach(ids, ind => (ind.tags?.includes(tagId) ?? false) !== on, ind => {
@@ -1438,7 +1438,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     setConditionStatusMany: (ids, tagId, state) => {
       const { pedigree } = get();
-      const tag = pedigree.tags?.find(t => t.id === tagId && t.style === "quadrant");
+      const tag = pedigree.tags?.find(t => t.id === tagId && isConditionTag(t));
       if (!tag) return;
       mutateEach(ids, ind => dryRun(ind, c => applyConditionState(c, tagId, state, pedigree)), ind => {
         applyConditionState(ind, tagId, state, pedigree);
@@ -1766,7 +1766,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     setIndividualTag: (individualId, tagId, on) => {
       // A condition tag means affected with it (#115): ticking sets affected, unticking the last clears it.
-      if (get().pedigree.tags?.some(t => t.id === tagId && t.style === "quadrant")) {
+      if (get().pedigree.tags?.some(t => t.id === tagId && isConditionTag(t))) {
         get().setConditionStatus(individualId, tagId, on ? "affected" : "none");
         return;
       }

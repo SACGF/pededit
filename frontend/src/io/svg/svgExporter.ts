@@ -322,12 +322,12 @@ function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
 }
 
 /** "D" or "S" inside the symbol (#45), centred on the origin. Shared with the U-shape exporter. */
-export function renderRoleLetterSvg(ind: Individual, halo = false): string {
+export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black" | "white" = "white"): string {
   const letter = symbolLetter(ind);
   if (!letter) return "";
   const half = NODE_SIZE / 2;
   const h = halo ? ` stroke="white" stroke-width="3" paint-order="stroke"` : "";
-  return `<text x="0" y="${roleLetterBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${roleLetterFontSize(NODE_SIZE)}" font-weight="bold" fill="${roleLetterFill(ind)}"${h}>${letter}</text>`;
+  return `<text x="0" y="${roleLetterBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${roleLetterFontSize(NODE_SIZE)}" font-weight="bold" fill="${roleLetterFill(base)}"${h}>${letter}</text>`;
 }
 
 // ── Symbols ───────────────────────────────────────────────────────────────────
@@ -363,7 +363,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
       + `${geom} ${stroke} fill="none"/>`;
   }
 
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0)
+  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0, paint.base)
     + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId, paint)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }

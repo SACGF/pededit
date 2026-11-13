@@ -1,4 +1,4 @@
-import { placementParentOf, type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
+import { isAffected, placementParentOf, type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
 import { symbolSex } from "../../pedigree/gender";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -386,7 +386,7 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const orderKey = (id: string): [number, number] => {
     const ind = byId.get(id);
     if (!ind) return [0, 0];
-    const a = affectedFirst ? (ind.affected ? 0 : 1) : 0;
+    const a = affectedFirst ? (isAffected(ind, pedigree) ? 0 : 1) : 0;
     const o = mode === "birthDate" && ind.dob ? new Date(ind.dob).getTime() : ind.sibOrder ?? 0;
     return [a, o];
   };
@@ -1418,7 +1418,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
   // "D" or "S" (#45) is text, kept upright like the "P".
-  const letter = renderRoleLetterSvg(ind, sectors.length > 0);
+  const letter = renderRoleLetterSvg(ind, sectors.length > 0, paint.base);
   shape += letter && rotation !== 0 ? `<g transform="rotate(${r(-rotation)})">${letter}</g>` : letter;
   let marks = renderLifeStatusMarks(ind, geom, clipId, paint);
   if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {

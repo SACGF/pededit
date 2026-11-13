@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Individual, NotationEdition, Pedigree, Tag } from "@pedigree-editor/layout-engine";
 import {
-  applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isCarrier, plainAffected, plainCarrier,
+  affectedControlOn, applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isAffected, isCarrier,
+  plainAffected, plainCarrier, resolvePlainAffected,
 } from "../conditions";
 import { symbolPaint, renderExportKeySvg, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
 import { carrierPaint, tagPaint } from "../tagFills";
@@ -17,7 +18,7 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
-import { importPed } from "../../io/ped";
+import { exportPed, importPed } from "../../io/ped";
 import { EXAMPLES } from "../../data/examples";
 import { affectedOnlySeeds } from "../viewFilters";
 import { batchStatus } from "../batch";
@@ -32,18 +33,22 @@ function ind(id: string, extra: Partial<Individual> = {}): Individual {
   return { id, sex: "female", affected: false, sibOrder: 0, name: id, ...extra };
 }
 
-/** Parents and seven children covering every combination (#115). */
+/**
+ * Parents and seven children covering every combination (#115). Recording a
+ * condition does not set the plain flag (#118), so `affected` here is only
+ * on d and g, affected with nothing recorded.
+ */
 function family(tags: Tag[] = [CF, TS], notation?: NotationEdition, tagFills?: "monochrome"): Pedigree {
   return {
     individuals: [
       ind("gf", { sex: "male", carrierTags: ["cf"] }),
       ind("gm", { carrierTags: ["cf", "ts"] }),
-      ind("a", { sex: "male", affected: true, tags: ["cf"] }),
+      ind("a", { sex: "male", tags: ["cf"] }),
       ind("b", { carrierTags: ["cf"], sibOrder: 1 }),
-      ind("c", { sex: "male", affected: true, tags: ["ts"], carrierTags: ["cf"], sibOrder: 2 }),
+      ind("c", { sex: "male", tags: ["ts"], carrierTags: ["cf"], sibOrder: 2 }),
       ind("d", { affected: true, sibOrder: 3 }),
       ind("e", { sex: "male", carrier: true, sibOrder: 4 }),
-      ind("f", { carrier: true, affected: true, tags: ["ts"], sibOrder: 5 }),
+      ind("f", { carrier: true, tags: ["ts"], sibOrder: 5 }),
       ind("g", { sex: "male", affected: true, carrierTags: ["ts"], sibOrder: 6, lifeStatus: undefined }),
     ],
     partnerships: [{ id: "p", individual1: "gf", individual2: "gm" }],
@@ -114,7 +119,8 @@ describe("condition state helpers", () => {
     expect(x).toMatchObject({ carrierTags: ["cf"], carrier: false });
     expect(applyConditionState(x, "cf", "carrier", p)).toBe(false);
     applyConditionState(x, "ts", "affected", p);
-    expect(x).toMatchObject({ affected: true, tags: ["ts"], carrierTags: ["cf"] });
+    // Recording a condition leaves the plain flag alone (#118).
+    expect(x).toMatchObject({ affected: false, tags: ["ts"], carrierTags: ["cf"] });
     x.tagOnset = { ts: "5y" };
     applyConditionState(x, "ts", "carrier", p);
     expect(x.affected).toBe(false);
@@ -125,13 +131,44 @@ describe("condition state helpers", () => {
     applyConditionState(x, "cf", "none", p);
     applyConditionState(x, "ts", "none", p);
     expect(x.carrierTags).toBeUndefined();
+    // Nor does clearing one (#118): the flag is affected with something not recorded.
+    const y = ind("y", { affected: true, onset: "30s" });
+    applyConditionState(y, "cf", "affected", p);
+    applyConditionState(y, "cf", "none", p);
+    expect(y).toMatchObject({ affected: true, onset: "30s" });
+    expect(y.tags).toBeUndefined();
+  });
+
+  it("isAffected is the flag or an affected condition; the control state follows the mode (#118)", () => {
+    const p = family();
+    expect(["a", "c", "d", "f", "g"].every(id => isAffected(byId(p, id), p))).toBe(true);
+    expect(["b", "e", "gf"].some(id => isAffected(byId(p, id), p))).toBe(false);
+    // Two conditions: the control is the flag, so "a" (CF only) can still be marked affected.
+    expect(affectedControlOn(byId(p, "a"), p)).toBe(false);
+    expect(affectedControlOn(byId(p, "d"), p)).toBe(true);
+    // The flag beside a recorded condition is plain with two conditions, not with one.
+    const both = { ...byId(p, "a"), affected: true };
+    expect(plainAffected(both, p)).toBe(true);
+    const one = family([CF]);
+    expect(plainAffected(both, one)).toBe(false);
+    expect(affectedControlOn(byId(one, "a"), one)).toBe(true);
+  });
+
+  it("resolvePlainAffected records the flag as a condition or drops it, moving its onset", () => {
+    const p = family();
+    const x = ind("x", { affected: true, onset: "40s" });
+    expect(resolvePlainAffected(x, "cf", p)).toMatchObject({ affected: false, onset: undefined, tags: ["cf"], tagOnset: { cf: "40s" } });
+    const y = ind("y", { affected: true, onset: "40s", tags: ["ts"], tagOnset: { ts: "5y" } });
+    expect(resolvePlainAffected(y, null, p)).toMatchObject({ affected: false, onset: undefined, tags: ["ts"], tagOnset: { ts: "5y" } });
+    const z = ind("z", { affected: true, onset: "40s", tags: ["ts"] });
+    expect(resolvePlainAffected(z, null, p)).toMatchObject({ tagOnset: { ts: "40s" } });
   });
 
   it("with one condition the plain controls record it", () => {
     const p = family([CF]);
     const x = ind("x");
     applyAffected(x, true, p);
-    expect(x).toMatchObject({ affected: true, tags: ["cf"] });
+    expect(x).toMatchObject({ affected: false, tags: ["cf"] });
     applyCarrier(x, true, p);
     expect(x).toMatchObject({ affected: false, carrierTags: ["cf"] });
     expect(x.tags).toBeUndefined();
@@ -170,16 +207,30 @@ describe("symbolPaint (#115)", () => {
     // affected with CF, the left half: the plain carrier half is drawn beside it.
     const h = { ...byId(p, "f"), tags: ["cf"] };
     expect(symbolPaint(h, p).sectors.map(s => s.tag.id)).toEqual([PLAIN_CARRIER_TAG.id, "cf"]);
-    // affected, condition not recorded, over a carrier sector: the black centre.
-    expect(paint("g")).toMatchObject({ base: "white", core: true });
+    // affected, condition not recorded, beside a carrier sector: black under it, the black centre on top (#118).
+    expect(paint("g")).toMatchObject({ base: "black", core: true });
+    // The flag beside a recorded condition is drawn the same way, the condition's section over black.
+    const flagged = { ...byId(p, "a"), affected: true };
+    expect(symbolPaint(flagged, p)).toMatchObject({ base: "black", core: true, sectors: [{ tag: CF, start: 180, end: 360 }] });
+    // With one condition the flag beside it adds nothing: the whole-symbol section alone.
+    const one = family([CF], "nsgc2022");
+    expect(symbolPaint(flagged, one)).toMatchObject({ base: "white", core: false, sectors: [{ tag: CF, start: 0, end: 360 }] });
   });
 
   it("NSGC 2008: as before for the plain flags, carrier conditions as sectors", () => {
     const p = family();
     const paint = (id: string) => symbolPaint(byId(p, id), p);
-    expect(paint("a")).toMatchObject({ base: "black", core: true });
+    // Two conditions: a quarter per condition on white; the flag is black under them (#118).
+    expect(paint("a")).toMatchObject({ base: "white", core: false });
+    expect(symbolPaint({ ...byId(p, "a"), affected: true }, p)).toMatchObject({ base: "black", core: true });
+    expect(paint("d")).toMatchObject({ base: "black", core: false });
+    // One condition: affected with it is the black fill, as before.
+    const one = family([CF]);
+    expect(symbolPaint(byId(one, "a"), one)).toMatchObject({ base: "black", core: true });
     expect(paint("e")).toMatchObject({ dot: true, sectors: [] });
-    expect(paint("f").dot).toBe(false);
+    // Affected only with Tay-Sachs: its quarter on white, so the plain carrier's dot shows (#118).
+    expect(paint("f")).toMatchObject({ dot: true, base: "white" });
+    expect(paint("g").dot).toBe(false);
     expect(paint("b")).toMatchObject({ dot: false, base: "white" });
     expect(paint("b").sectors[0]!.carrier).toBe(true);
   });
@@ -308,7 +359,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
   it("the affected core still sits over a whole-symbol carrier fill", () => {
     const p = family([CF], "nsgc2022");
     const g = { ...byId(p, "g"), carrierTags: ["cf"] };
-    expect(symbolPaint(g, p)).toMatchObject({ base: "white", core: true, sectors: [{ start: 0, end: 360, carrier: true }] });
+    expect(symbolPaint(g, p)).toMatchObject({ base: "black", core: true, sectors: [{ start: 0, end: 360, carrier: true }] });
   });
 
   it("every renderer draws the section: canvas, app legend, export key, SVG and U-shape", () => {
@@ -533,6 +584,66 @@ describe("condition-not-recorded warning (#115)", () => {
   });
 });
 
+describe("trait quadrants (#118)", () => {
+  const COHORT: Tag = { id: "cohort", label: "Cohort", color: "#2ca02c", style: "quadrant", kind: "trait" };
+  /** One condition (CF) and one trait: x has the trait only, y the trait and the plain flag. */
+  function withTrait(notation: NotationEdition = "nsgc2022", tagFills?: "monochrome"): Pedigree {
+    const p = family([CF, COHORT], notation, tagFills);
+    p.individuals.push(ind("x", { tags: ["cohort"], sibOrder: 7 }), ind("y", { affected: true, tags: ["cohort"], sibOrder: 8 }));
+    p.parentOf.p!.push("x", "y");
+    return p;
+  }
+
+  it("is not a condition: modes, affected, PED and CSV, the Affected only filter", () => {
+    const p = withTrait();
+    expect(conditionMode(p)).toBe("single");
+    expect(isAffected(byId(p, "x"), p)).toBe(false);
+    expect(affectedOnlySeeds(p).has("x")).toBe(false);
+    // PED rows follow the individuals; the sixth column is affection (1 unaffected).
+    const rows = exportPed(p).split("\n").filter(l => l.trim() && !l.startsWith("#"));
+    const row = rows[rows.length - p.individuals.length + p.individuals.findIndex(i => i.id === "x")]!;
+    expect(row.split("\t")[5]).toBe("1");
+    const csv = exportCsv(p).split("\n");
+    const col = csv[0]!.split(",").indexOf("affected");
+    expect(csv.find(l => l.split(",")[1] === '"x"')!.split(",")[col]).toBe('"0"');
+  });
+
+  it("takes a section like a condition, and never the solid black of NSGC shading", () => {
+    const p = withTrait();
+    expect(sectionLayout(p)).toBe("halves");
+    expect(symbolPaint(byId(p, "x"), p)).toMatchObject({ base: "white", core: false, sectors: [{ tag: COHORT }] });
+    const alone = family([COHORT], "nsgc2022", "monochrome");
+    alone.individuals.push(ind("x", { tags: ["cohort"] }));
+    alone.parentOf.p!.push("x");
+    expect(conditionPaint(COHORT, alone).fill).not.toBe("solid");
+  });
+
+  it("affected with a trait: black under its section, the black centre on top, no warning with one condition", () => {
+    for (const notation of ["nsgc2022", "nsgc2008"] as const) {
+      const p = withTrait(notation);
+      expect(symbolPaint(byId(p, "y"), p), notation).toMatchObject({ base: "black", core: true });
+      expect(findProblems(p).filter(x => x.individualId === "y" && x.rule === "condition-not-recorded")).toEqual([]);
+    }
+  });
+
+  it("the store and the menus treat a trait as a plain tag", () => {
+    usePedigreeStore.getState().initialize(withTrait());
+    usePedigreeStore.getState().setIndividualTag("b", "cohort", true);
+    const b = usePedigreeStore.getState().pedigree.individuals.find(i => i.id === "b")!;
+    expect(b.tags).toEqual(["cohort"]);
+    expect(b.carrierTags).toEqual(["cf"]);
+    expect(batchStatus(usePedigreeStore.getState().pedigree, ["b"]).conditions).toEqual({ cf: { affected: 0, carrier: 1, none: 0 } });
+  });
+
+  it("survives JSON export and import; an unknown kind is reported", () => {
+    const p = withTrait();
+    expect(importJson(exportJson(p)).pedigree!.tags!.find(t => t.id === "cohort")!.kind).toBe("trait");
+    const bad = JSON.parse(exportJson(p));
+    bad.pedigree.tags[1].kind = "maybe";
+    expect(importJson(JSON.stringify(bad)).issues.some(i => i.path.includes("kind"))).toBe(true);
+  });
+});
+
 describe("store actions (#115)", () => {
   const get = () => usePedigreeStore.getState();
   const who = (id: string) => get().pedigree.individuals.find(i => i.id === id)!;
@@ -557,7 +668,7 @@ describe("store actions (#115)", () => {
 
   it("ticking a condition tag records affected; deleting a tag drops it from carrierTags", () => {
     get().setIndividualTag("b", "ts", true);
-    expect(who("b")).toMatchObject({ affected: true, tags: ["ts"] });
+    expect(who("b")).toMatchObject({ affected: false, tags: ["ts"] });
     get().deleteTag("cf");
     expect(who("gm").carrierTags).toEqual(["ts"]);
     expect(who("gf").carrierTags).toBeUndefined();
@@ -569,8 +680,9 @@ describe("store actions (#115)", () => {
     get().setCarrier("e", true);
     get().setAffectedMany(["b"], true);
     get().setCarrierStatusMany(["gf", "a"], "carrier");
-    expect(who("b")).toMatchObject({ affected: true, tags: ["cf"] });
-    expect(who("a")).toMatchObject({ affected: false, carrierTags: ["cf"] });
+    expect(who("b")).toMatchObject({ affected: false, tags: ["cf"] });
+    expect(who("a")).toMatchObject({ carrierTags: ["cf"] });
+    expect(who("a").tags).toBeUndefined();
     get().setPresymptomatic("a", true);
     expect(who("a").carrierTags).toBeUndefined();
   });

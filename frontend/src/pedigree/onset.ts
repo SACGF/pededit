@@ -1,5 +1,6 @@
 import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
 import { tagsOf } from "./tags";
+import { affectedControlOn, isConditionTag } from "./conditions";
 
 /**
  * Age of onset (#93). An individual records it for the affected status
@@ -12,9 +13,9 @@ import { tagsOf } from "./tags";
  * so every reader (edit panel, canvas, exports, CSV) agrees on what is shown.
  */
 
-/** Only condition tags (drawn as a quarter of the symbol) take an age of onset. */
+/** Only condition tags (quadrant tags that are not traits, #118) take an age of onset. */
 export function tagTakesOnset(tag: Tag): boolean {
-  return tag.style === "quadrant";
+  return isConditionTag(tag);
 }
 
 export interface OnsetItem {
@@ -27,7 +28,8 @@ export interface OnsetItem {
 export function onsetsOf(individual: Individual, pedigree: Pedigree): OnsetItem[] {
   const items: OnsetItem[] = [];
   const own = individual.onset?.trim();
-  if (individual.affected && own) items.push({ onset: own });
+  // The affected status's own onset goes with the plain Affected control (#118).
+  if (own && affectedControlOn(individual, pedigree)) items.push({ onset: own });
   const byTag = individual.tagOnset;
   if (byTag) {
     for (const tag of tagsOf(individual, pedigree)) {
