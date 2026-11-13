@@ -132,12 +132,23 @@ draws NSGC symbols.
 - `tags.ts` — framework-free tag geometry and palette shared with the
   exporters and the legend. Quadrant sector is determined by the tag's order
   within the pedigree's quadrant-style tags. How many sections a symbol has
-  follows the number of condition tags defined in NSGC 2022
-  (`sectionLayout`): one is the whole symbol, two the left and right
-  halves, three or four the quarters; NSGC 2008 (and no notation saved)
-  always uses quarters so old pedigrees keep their look. Always go through
-  `sectorAngles(index, pedigree)`, never a quarter table, or a legend
-  swatch will disagree with the symbol. Only the first four have a
+  follows the number of conditions in use in NSGC 2022 (`sectionConditions`,
+  `sectionLayout`): someone on the drawn pedigree (`drawnPedigree`, so not
+  a collapsed branch) is affected with or a carrier of it. One is the whole
+  symbol, two the left and right halves, three or four the quarters, in tag
+  order among those in use. NSGC 2008 (and no notation saved) gives every
+  defined condition its quarter so old pedigrees keep their look. Always go
+  through `sectionConditions` / `sectorAngles`, or `conditionSection(tag)`
+  for a swatch (it previews where an unused condition would go), never a
+  quarter table or an index into `quadrantTags`, or a legend swatch will
+  disagree with the symbol. Paint condition sections with `conditionPaint`
+  / `conditionCarrierPaint`, not `tagPaint`: in 2022 black and white a
+  single condition in use is solid black (NSGC shading), unless the tag
+  has its own pattern or someone drawn is a plain black "affected,
+  condition not recorded". The cache is per pedigree object, and the
+  canvas (full pedigree) and exporters (drawn copy) get the same answer.
+  The editor's per-condition controls (`conditionMode`) still count the
+  conditions defined, so every defined condition can be recorded. Only the first four have a
   fixed section; someone carrying a fifth or later quadrant tag gets equal
   slices of just the quadrant tags they carry, so other people's symbols
   never gain empty wedges. An affected person with any quadrant sector keeps

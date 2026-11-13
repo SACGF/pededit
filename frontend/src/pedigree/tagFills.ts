@@ -126,7 +126,11 @@ export function tagPaint(tag: Tag, pedigree: Pedigree): TagPaint {
 export const CARRIER_TINT = 0.45;
 
 export function carrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
-  const affected = tagPaint(tag, pedigree);
+  return carrierPaintFrom(tagPaint(tag, pedigree));
+}
+
+/** The carrier paint for a condition whose affected section is drawn with `affected`. */
+export function carrierPaintFrom(affected: TagPaint): TagPaint {
   if (affected.fill === "solid" || affected.fill === "shade") return { color: affected.color, fill: "diagonal" };
   return { color: tint(affected.color, CARRIER_TINT), fill: affected.fill };
 }

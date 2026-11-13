@@ -158,8 +158,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
           ) : (
             <div className="border divide-y">
               {tags.map((tag, i) => {
-                const qIndex = quads.findIndex(q => q.id === tag.id);
-                const position = tag.style !== "quadrant" ? null : sectionName(qIndex, pedigree);
+                const position = tag.style !== "quadrant" ? null : sectionName(tag, pedigree);
                 return (
                   <div key={tag.id} className="flex items-center gap-1.5 px-2 py-1.5 min-w-0">
                     <ColorPicker tag={tag} onChange={color => updateTag(tag.id, { color })} />
@@ -206,8 +205,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                       />
                     )}
 
-                    <span className="w-16 shrink-0 text-[10px] text-gray-400 truncate" title={position ?? undefined}>
-                      {position}
+                    <span className="w-16 shrink-0 text-[10px] text-gray-400 truncate" title={position?.title} data-tag-section={position?.name}>
+                      {position?.name}
                     </span>
 
                     <span className="w-5 shrink-0 text-[10px] text-gray-400 text-right" title="Individuals with this tag">

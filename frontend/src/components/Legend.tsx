@@ -1,12 +1,12 @@
 import type { Individual, Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import {
-  pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, statusKeyRows, keyTagRows,
+  pedigreeTags, tagsInUse, conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, statusKeyRows, keyTagRows,
   PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
 import { carrierLabel, conditionStateOf } from "../pedigree/conditions";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
-import { tagPaint, carrierPaint, PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
+import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
 import { notationOf } from "../pedigree/notation";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
@@ -175,10 +175,9 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
  */
 export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; pedigree: Pedigree; carrier?: boolean }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
-  const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
+  const paint = carrier ? conditionCarrierPaint(tag, pedigree) : conditionPaint(tag, pedigree);
   if (tag.style === "quadrant") {
-    const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
-    const [start, end] = sectorAngles(idx, pedigree);
+    const [start, end] = conditionSection(tag, pedigree).angles;
     const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">

@@ -12,7 +12,9 @@ import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
  * not recorded, and recording a carrier condition clears it.
  *
  * How the editor asks depends on how many conditions the pedigree defines
- * (`conditionMode`):
+ * (`conditionMode`), not how many are in use, so every defined condition can
+ * be recorded (the drawing divides the symbol by those in use,
+ * `sectionConditions` in tags.ts):
  * - none: the Affected and Carrier controls set the plain flags, as before;
  * - one ("single"): the same controls also record that condition, so ticking
  *   Affected adds the tag and Carrier adds it to `carrierTags`;

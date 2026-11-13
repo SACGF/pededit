@@ -4,7 +4,7 @@ import type { Individual, NotationEdition, Pedigree, Tag } from "@pedigree-edito
 import {
   applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isCarrier, plainAffected, plainCarrier,
 } from "../conditions";
-import { symbolPaint, renderExportKeySvg, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, PLAIN_CARRIER_TAG } from "../tags";
+import { symbolPaint, renderExportKeySvg, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
 import { carrierPaint, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape } from "../nodes/symbols";
@@ -196,7 +196,7 @@ describe("symbolPaint (#115)", () => {
   });
 });
 
-describe("sections follow the number of conditions (NSGC 2022)", () => {
+describe("sections follow the number of conditions in use (NSGC 2022)", () => {
   const T3: Tag = { id: "t3", label: "Third", color: "#2ca02c", style: "quadrant" };
   const T4: Tag = { id: "t4", label: "Fourth", color: "#f2c80f", style: "quadrant" };
   const angles = (p: Pedigree, id: string) => symbolPaint(byId(p, id), p).sectors.map(s => [s.tag.id, s.start, s.end]);
@@ -210,7 +210,7 @@ describe("sections follow the number of conditions (NSGC 2022)", () => {
     // A plain carrier still draws the dotted right half, told apart by its size and black dots.
     expect(symbolPaint(byId(p, "e"), p).sectors).toMatchObject([{ tag: PLAIN_CARRIER_TAG, start: 0, end: 180, fill: "dots", color: "#000000" }]);
     expect(sectorAngles(0, p)).toEqual([0, 360]);
-    expect(sectionName(0, p)).toBe("whole symbol");
+    expect(sectionName(CF, p).name).toBe("whole symbol");
   });
 
   it("two conditions: left and right halves", () => {
@@ -218,18 +218,82 @@ describe("sections follow the number of conditions (NSGC 2022)", () => {
     expect(sectionLayout(p)).toBe("halves");
     expect(angles(p, "gm")).toEqual([["cf", 180, 360], ["ts", 0, 180]]);
     expect(angles(p, "c")).toEqual([["ts", 0, 180], ["cf", 180, 360]].sort((x, y) => (x[0]! < y[0]! ? -1 : 1)));
-    expect([sectionName(0, p), sectionName(1, p)]).toEqual(["left half", "right half"]);
+    expect([sectionName(CF, p).name, sectionName(TS, p).name]).toEqual(["left half", "right half"]);
   });
 
-  it("three or four conditions: the fixed quarters; five or more: slices for those with a fifth", () => {
-    const p3 = family([CF, TS, T3], "nsgc2022");
+  /** `family(tags)` plus one person with each of `extra` (so those conditions are in use). */
+  const using = (tags: Tag[], extra: string[], mono?: "monochrome") => {
+    const p = family(tags, "nsgc2022", mono);
+    p.individuals.push(...extra.map((t, i) => ind(`x${i}`, { affected: true, tags: [t], sibOrder: 7 + i })));
+    p.parentOf.p = [...p.parentOf.p!, ...extra.map((_, i) => `x${i}`)];
+    return p;
+  };
+
+  it("three or four conditions in use: the fixed quarters; five or more: slices for those with a fifth", () => {
+    const p3 = using([CF, TS, T3], ["t3"]);
     expect(sectionLayout(p3)).toBe("quarters");
     expect(angles(p3, "gm")).toEqual([["cf", 270, 360], ["ts", 0, 90]]);
+    expect(angles(p3, "x0")).toEqual([["t3", 90, 180]]);
     const T5: Tag = { id: "t5", label: "Fifth", color: "#ff7f0e", style: "quadrant" };
-    const p5 = family([CF, TS, T3, T4, T5], "nsgc2022");
+    const p5 = using([CF, TS, T3, T4, T5], ["t3", "t4", "t5"]);
     expect(angles(p5, "gm")).toEqual([["cf", 270, 360], ["ts", 0, 90]]);
     const five = { ...byId(p5, "gm"), tags: ["t5"] };
     expect(symbolPaint(five, p5).sectors.map(s => [s.start, s.end])).toEqual([[0, 120], [120, 240], [240, 360]]);
+    // Four in use out of five defined: everyone has a fixed quarter, the fifth defined one is unused.
+    const p4 = using([CF, TS, T3, T4, T5], ["t5", "t4"]);
+    expect(angles(p4, "x0")).toEqual([["t5", 180, 270]]);
+  });
+
+  it("a condition defined but not in use changes nothing", () => {
+    // Nobody has Tay-Sachs: the CF fill stays the whole symbol.
+    const strip = (p: Pedigree) => {
+      for (const i of p.individuals) {
+        if (i.tags) i.tags = i.tags.filter(t => t !== "ts");
+        if (i.carrierTags) i.carrierTags = i.carrierTags.filter(t => t !== "ts");
+      }
+      return p;
+    };
+    const p = strip(family([CF, TS], "nsgc2022"));
+    expect(sectionLayout(p)).toBe("whole");
+    expect(angles(p, "a")).toEqual([["cf", 0, 360]]);
+    expect(angles(p, "gm")).toEqual([["cf", 0, 360]]);
+    // The unused one is shown where it would go once someone has it.
+    expect(conditionSection(TS, p)).toMatchObject({ inUse: false, layout: "halves", angles: [0, 180] });
+    expect(sectionName(TS, p)).toMatchObject({ name: "right half", title: expect.stringContaining("No one has it yet") });
+    expect(sectionName(CF, p)).toMatchObject({ name: "whole symbol" });
+    // Positions follow tag order among the conditions in use: an unused first tag leaves the left half to CF.
+    const q = family([T3, CF, TS], "nsgc2022");
+    expect(sectionLayout(q)).toBe("halves");
+    expect(angles(q, "gm")).toEqual([["cf", 180, 360], ["ts", 0, 180]]);
+    // Exports, the export key and the app legend agree.
+    const centred = sectorPath(0, 0, 40, 0, 360);
+    expect(exportSvg(p)).toContain(centred);
+    expect(exportUShapeSvg(p)).toContain(centred);
+    expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(sectorPath(14, 14, 16, 0, 360));
+    expect(renderExportKeySvg(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
+    // NSGC 2008 keeps a quarter per defined condition.
+    const old = strip(family([CF, TS]));
+    expect(sectionLayout(old)).toBe("quarters");
+    expect(angles(old, "gm")).toEqual([["cf", 270, 360]]);
+  });
+
+  it("people in a collapsed branch do not count (drawn pedigree)", () => {
+    // gm's only Tay-Sachs relatives are her carrier children; collapse hides the
+    // unaffected ones, but she carries it herself, so take hers off.
+    const p = family([CF, TS], "nsgc2022");
+    byId(p, "gm").carrierTags = ["cf"];
+    for (const id of ["c", "f", "g"]) p.individuals = p.individuals.filter(i => i.id !== id);
+    p.parentOf.p = ["a", "b", "d", "e"];
+    byId(p, "b").carrierTags = ["ts"];
+    expect(sectionLayout(p)).toBe("halves");
+    byId(p, "gf").descendantsHidden = true;
+    const hidden = { ...p };
+    expect(sectionLayout(hidden)).toBe("whole");
+    expect(angles(hidden, "a")).toEqual([["cf", 0, 360]]);
+    const centred = sectorPath(0, 0, 40, 0, 360);
+    expect(exportSvg(hidden)).toContain(centred);
+    expect(exportSvg(hidden)).not.toContain("Tay-Sachs");
+    expect(renderToStaticMarkup(<Legend pedigree={hidden} />)).toContain(sectorPath(14, 14, 16, 0, 360));
   });
 
   it("NSGC 2008 and pedigrees with no notation keep the quarters", () => {
@@ -271,6 +335,71 @@ describe("sections follow the number of conditions (NSGC 2022)", () => {
     expect(keyRow(family([CF], "nsgc2022"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
     expect(keyRow(family([CF, TS], "nsgc2022"))).toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
     expect(keyRow(family([CF, TS]))).not.toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
+  });
+});
+
+describe("one condition in black and white is solid black (NSGC 2022)", () => {
+  /** One condition, no one affected without it recorded (d, f and g would be a plain black fill). */
+  const single = (tagFills?: "monochrome", notation: NotationEdition | "none" = "nsgc2022", tags: Tag[] = [CF]) => {
+    const p = family(tags, notation === "none" ? undefined : notation, tagFills);
+    const drop = new Set(["d", "f", "g"]);
+    p.individuals = p.individuals.filter(i => !drop.has(i.id));
+    p.parentOf.p = p.parentOf.p!.filter(id => !drop.has(id));
+    return p;
+  };
+  const paint = (p: Pedigree, id: string) => symbolPaint(byId(p, id), p);
+
+  it("affected is solid black, its carrier black hatch, the plain carrier a dotted half", () => {
+    const p = single("monochrome");
+    expect(paint(p, "a")).toMatchObject({ base: "white", core: false, sectors: [{ tag: CF, start: 0, end: 360, fill: "solid", color: "#000000" }] });
+    expect(paint(p, "b").sectors).toMatchObject([{ tag: CF, start: 0, end: 360, fill: "diagonal", color: "#000000", carrier: true }]);
+    expect(paint(p, "e").sectors).toMatchObject([{ tag: PLAIN_CARRIER_TAG, start: 0, end: 180, fill: "dots" }]);
+    expect(conditionPaint(CF, p)).toEqual({ color: "#000000", fill: "solid" });
+    expect(conditionCarrierPaint(CF, p)).toEqual({ color: "#000000", fill: "diagonal" });
+    // A second condition defined but unused keeps it solid black.
+    const two = single("monochrome", "nsgc2022", [CF, TS]);
+    two.individuals = two.individuals.map(i => ({ ...i, tags: i.tags?.filter(t => t !== "ts"), carrierTags: i.carrierTags?.filter(t => t !== "ts") }));
+    expect(paint(two, "a").sectors).toMatchObject([{ start: 0, end: 360, fill: "solid", color: "#000000" }]);
+  });
+
+  it("colour keeps the tag colour; 2008, a chosen pattern, two conditions and a plain black fill keep the pattern", () => {
+    expect(paint(single(), "a").sectors).toMatchObject([{ fill: "solid", color: CF.color }]);
+    expect(paint(single(), "b").sectors).toMatchObject([{ fill: "diagonal", color: CF.color }]);
+    for (const notation of ["none", "nsgc2008"] as const) {
+      const p = single("monochrome", notation);
+      expect(paint(p, "a").sectors).toMatchObject([{ start: 270, end: 360, fill: tagPaint(CF, p).fill }]);
+      expect(tagPaint(CF, p).fill).not.toBe("solid");
+    }
+    const own = single("monochrome", "nsgc2022", [{ ...CF, fill: "crosshatch" }]);
+    expect(paint(own, "a").sectors).toMatchObject([{ fill: "crosshatch" }]);
+    const both = family([CF, TS], "nsgc2022", "monochrome");
+    expect(paint(both, "a").sectors[0]!.fill).not.toBe("solid");
+    // Someone affected with no condition recorded is solid black: the condition keeps its hatch.
+    const plain = family([CF], "nsgc2022", "monochrome");
+    expect(paint(plain, "d").base).toBe("black");
+    expect(paint(plain, "a").sectors[0]!.fill).toBe("diagonal");
+  });
+
+  it("every renderer and both keys draw it: canvas, minimap shape, app legend, export key, SVG, U-shape", () => {
+    const p = single("monochrome");
+    const a = byId(p, "a");
+    const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
+    expect(canvas).toContain(`<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`);
+    const centred = `<path d="${sectorPath(0, 0, 40, 0, 360)}" fill="#000000"`;
+    expect(renderSectorsSvg(a, p, 40, "x")).toContain(centred);
+    expect(exportSvg(p)).toContain(centred);
+    expect(exportUShapeSvg(p)).toContain(centred);
+    // Keys: the condition's own row, a solid black whole swatch named for it; then its carriers, hatched.
+    const key = renderExportKeySvg(p, 0, 0).markup;
+    const row = key.find(m => m.includes(">Cystic fibrosis<"))!;
+    expect(row).toMatch(/<path d="M \S+ \S+ A 16 16 0 1 1 [^"]+" fill="#000000"/);
+    expect(key.find(m => m.includes(">Cystic fibrosis carrier<"))).toContain(`stroke="#000000"`);
+    expect(key.some(m => m.includes(">Affected<"))).toBe(false);
+    const legend = renderToStaticMarkup(<Legend pedigree={p} />);
+    expect(legend).toContain(`<path d="${sectorPath(14, 14, 16, 0, 360)}" fill="#000000"`);
+    expect(lintExport(p)).toEqual([]);
+    expect(lintUShape(p)).toEqual([]);
+    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
   });
 });
 

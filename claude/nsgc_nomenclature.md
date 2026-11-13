@@ -43,7 +43,7 @@ work in it.
 | Rule | PedEdit |
 |---|---|
 | Square, circle, diamond. Diamond for sex not specified. Do not write age inside the symbol. | Follows. Symbols encode biological sex: see "Where we differ" below. |
-| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3; per-condition affected and carrier, #115): in NSGC 2022 one condition fills the whole symbol, two take halves, three or four quarters. NSGC 2008 mode keeps quarters. |
+| Affected: shaded. Two or more conditions: partition the symbol, one fill per condition, defined in the key. | Follows (tags, #3; per-condition affected and carrier, #115): in NSGC 2022 one condition in use fills the whole symbol (solid black in black and white), two take halves, three or four quarters. NSGC 2008 mode keeps quarters. |
 | **Several people as one symbol:** the number of siblings is written inside the symbol, "n" when unknown. **Affected people are not grouped.** | Follows, for collapsed branches (#1): a collapsed couple's unaffected children are one symbol with their number inside (square or circle when they share a sex, diamond otherwise), and affected or condition-tagged children are drawn as themselves beside it. |
 | Deceased: a slash through the symbol, extending past it. Do not use a cross. Cause of death below if known. | Follows. |
 | Proband: arrow with "P" at the lower left. Consultand: arrow without "P". | Follows (#99): `Individual.consultand`; a proband who is also the consultand keeps the "P". |
@@ -138,17 +138,30 @@ Further Fig. 3 and Fig. 4 points:
   same section hatched in its colour (or, for a patterned condition, the
   same pattern in a lighter tint), keyed "Cystic fibrosis carrier". As
   NSGC partitions the symbol only for several conditions, the number of
-  sections follows the number of conditions defined in the pedigree: one
-  condition fills the whole symbol, two take the left and right halves
-  (the paper's HEXA and CFTR carrier), three or four the quarters, more
-  equal slices. Each condition keeps the same section on every symbol, so
-  position still names it. A carrier with no condition recorded (the
-  plain Carrier control) is the right half dotted in black, keyed
-  "Carrier": against a single condition's whole-symbol carrier fill it
-  differs in size (half against whole), pattern (dots against lines) and
-  colour (black against the condition's colour or, in black and white,
-  grey); it is left off when the person's affected conditions cover the
-  right half, as the 2008 dot is on a black fill. In 2022 an affected
+  sections follows the number of conditions **in use**, that is someone
+  drawn on the chart is affected with or a carrier of them
+  (`sectionConditions`): one fills the whole symbol, two take the left and
+  right halves (the paper's HEXA and CFTR carrier), three or four the
+  quarters, more equal slices. A condition defined but not yet given to
+  anyone changes nothing, and people left out of the drawing (a collapsed
+  branch, #94) do not count, since NSGC divides what the chart shows; the
+  Affected only filter (#4) keeps everyone with a condition, so it never
+  changes the count. Sections go to the conditions in use in the order of
+  the tags dialog, so each keeps the same section on every symbol and
+  position still names it; they move only when a condition comes into or
+  goes out of use. NSGC shades the symbol for a single condition, so in
+  black and white mode the one condition in use is solid black, keyed with
+  its name ("Cystic fibrosis"), not a hatch; in colour it keeps its colour.
+  Its carriers are the whole symbol hatched in black (in colour, hatched in
+  its colour). The exceptions keep the hatch: a pattern chosen for the tag
+  itself, and a chart where someone is affected with no condition recorded
+  (their plain black fill would look the same). A carrier with no
+  condition recorded (the plain Carrier control) is the right half dotted
+  in black, keyed "Carrier": against a single condition's whole-symbol
+  carrier fill it differs in size (half against whole) and pattern (dots
+  against lines), and against the solid black affected fill in both; it is
+  left off when the person's affected conditions cover the right half, as
+  the 2008 dot is on a black fill. In 2022 an affected
   person with a recorded condition is that condition's section only (no
   black fill); affected with no condition recorded is the black fill. With
   the setting "Notation: NSGC 2008" the plain carrier keeps the dot, an

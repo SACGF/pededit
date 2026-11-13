@@ -6,15 +6,16 @@ import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
 import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "./assisted";
 import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
 import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
-import { COLLAPSED_BRANCH_LABEL, collapseInfo } from "./collapse";
+import { COLLAPSED_BRANCH_LABEL, collapseInfo, drawnPedigree } from "./collapse";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
-import { tagPaint, carrierPaint, renderRegionFillSvg, PLAIN_CARRIER_PAINT } from "./tagFills";
-import { carrierConditions, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
+import { tagPaint, carrierPaintFrom, renderRegionFillSvg, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
+import type { TagPaint } from "./tagFills";
+import { affectedConditions, carrierConditions, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
 import type { TagFill } from "@pedigree-editor/layout-engine";
 
 /**
@@ -128,10 +129,12 @@ export const PLAIN_CARRIER_ANGLES: readonly [number, number] = [0, 180];
  * pedigrees.
  *
  * In NSGC 2022 (`sectionLayout`) the number of sections follows the number
- * of conditions, as NSGC partitions the symbol only for several conditions:
- * one condition fills the whole symbol, two take the left and right halves
- * (the 2022 paper's HEXA and CFTR carrier), three or four these quarters.
- * NSGC 2008 and pedigrees with no notation saved keep the quarters (#3).
+ * of conditions in use (`sectionConditions`), as NSGC partitions the symbol
+ * only for several conditions: one fills the whole symbol, two take the left
+ * and right halves (the 2022 paper's HEXA and CFTR carrier), three or four
+ * these quarters, each in pedigree tag order among the conditions in use.
+ * NSGC 2008 and pedigrees with no notation saved keep a quarter per defined
+ * condition (#3).
  *
  * A fifth or later quadrant tag has no quarter of its own. Someone who carries
  * one gets equal pie slices for the quadrant tags they carry, from 12
@@ -160,55 +163,161 @@ export const FIXED_QUADRANTS = QUADRANT_ANGLES.length;
 
 /**
  * How a pedigree divides its symbols among conditions: "quarters" (#3, NSGC
- * 2008, and NSGC 2022 with three or more conditions), "halves" (NSGC 2022,
- * two conditions) or "whole" (NSGC 2022, one condition).
+ * 2008, and NSGC 2022 with three or more conditions in use), "halves" (NSGC
+ * 2022, two in use) or "whole" (NSGC 2022, one in use).
  */
 export type SectionLayout = "whole" | "halves" | "quarters";
 
-export function sectionLayout(pedigree: Pick<Pedigree, "tags" | "canvasSettings">): SectionLayout {
-  if (notationOf(pedigree) === "nsgc2008") return "quarters";
-  const n = (pedigree.tags ?? []).filter(t => t.style === "quadrant").length;
-  return n === 1 ? "whole" : n === 2 ? "halves" : "quarters";
+interface SectionInfo {
+  /** Conditions that own a section, in pedigree tag order. */
+  conditions: Tag[];
+  /** Someone drawn is affected with no condition recorded (a solid black fill). */
+  plainBlack: boolean;
 }
 
+const sectionCache = new WeakMap<Pedigree, SectionInfo>();
+
 /**
- * Angle range of the fixed section for the quadrant tag at `index` in the
- * pedigree's quadrant tags (`sectionLayout`), or the whole symbol for a fifth
- * or later tag (which has no fixed position; legends show it as a full
- * swatch). Without a pedigree, the quarters.
+ * The conditions that own a section of the symbol (#115). NSGC 2008 (and no
+ * notation saved): every quadrant tag defined, as #3 always did, so old
+ * pedigrees keep their look. NSGC 2022: only the conditions in use, that is
+ * someone on the chart is affected with or a carrier of them, counted on the
+ * drawn pedigree (`drawnPedigree`: people in a collapsed branch, #94, or
+ * left out by a view filter, #4, do not count), since NSGC divides the
+ * symbol by what the chart shows. Defining a second condition no one has yet
+ * changes nothing. Cached per pedigree object; the full pedigree and its
+ * drawn copy give the same answer.
  */
-export function sectorAngles(index: number, pedigree?: Pick<Pedigree, "tags" | "canvasSettings">): [number, number] {
-  const layout = pedigree ? sectionLayout(pedigree) : "quarters";
+function sectionInfo(pedigree: Pedigree): SectionInfo {
+  const cached = sectionCache.get(pedigree);
+  if (cached) return cached;
+  const all = quadrantTags(pedigree);
+  let info: SectionInfo;
+  if (notationOf(pedigree) === "nsgc2008" || all.length === 0) {
+    info = { conditions: all, plainBlack: false };
+  } else {
+    const drawn = drawnPedigree(pedigree);
+    const used = new Set<string>();
+    let plainBlack = false;
+    for (const i of drawn.individuals) {
+      for (const t of affectedConditions(i, drawn)) used.add(t.id);
+      const carried = carrierConditions(i, drawn);
+      for (const t of carried) used.add(t.id);
+      if (plainAffected(i, drawn) && carried.length === 0) plainBlack = true;
+    }
+    info = { conditions: all.filter(t => used.has(t.id)), plainBlack };
+  }
+  sectionCache.set(pedigree, info);
+  return info;
+}
+
+/** The conditions that own a section (see `sectionInfo`), in pedigree tag order. */
+export function sectionConditions(pedigree: Pedigree): Tag[] {
+  return sectionInfo(pedigree).conditions;
+}
+
+function layoutFor(pedigree: Pedigree, count: number): SectionLayout {
+  if (notationOf(pedigree) === "nsgc2008") return "quarters";
+  return count === 1 ? "whole" : count === 2 ? "halves" : "quarters";
+}
+
+export function sectionLayout(pedigree: Pedigree): SectionLayout {
+  return layoutFor(pedigree, sectionConditions(pedigree).length);
+}
+
+function anglesIn(layout: SectionLayout, index: number): [number, number] {
   const table = layout === "whole" ? [WHOLE] : layout === "halves" ? HALF_ANGLES : QUADRANT_ANGLES;
-  const a = table[index];
+  const a = index >= 0 ? table[index] : undefined;
   return a ? [a[0], a[1]] : [...WHOLE];
 }
 
-/** Where the quadrant tag at `index` is drawn, for the tags dialog. */
-export function sectionName(index: number, pedigree: Pick<Pedigree, "tags" | "canvasSettings">): string {
-  const layout = sectionLayout(pedigree);
-  if (layout === "whole") return index === 0 ? "whole symbol" : "shared slice";
-  if (layout === "halves") return index === 0 ? "left half" : index === 1 ? "right half" : "shared slice";
-  return QUADRANT_NAMES[index] ?? "shared slice";
+/**
+ * Angle range of the fixed section for the condition at `index` in
+ * `sectionConditions(pedigree)` (`sectionLayout`), or the whole symbol for a
+ * fifth or later one (which has no fixed position; legends show it as a full
+ * swatch). Without a pedigree, the quarters.
+ */
+export function sectorAngles(index: number, pedigree?: Pedigree): [number, number] {
+  return anglesIn(pedigree ? sectionLayout(pedigree) : "quarters", index);
+}
+
+/**
+ * Where a condition is drawn. A condition not in use yet (NSGC 2022) has no
+ * section; this gives the one it would take once someone has it, for its
+ * legend swatch and the tags dialog. `index` is its place among the
+ * sectioned conditions, -1 for a non-quadrant tag.
+ */
+export interface ConditionSection {
+  index: number;
+  angles: [number, number];
+  layout: SectionLayout;
+  inUse: boolean;
+}
+
+export function conditionSection(tag: Tag, pedigree: Pedigree): ConditionSection {
+  const used = sectionConditions(pedigree);
+  const inUse = used.some(t => t.id === tag.id);
+  const list = inUse || tag.style !== "quadrant" ? used : quadrantTags(pedigree).filter(t => t.id === tag.id || used.includes(t));
+  const index = list.findIndex(t => t.id === tag.id);
+  const layout = layoutFor(pedigree, list.length);
+  return { index, angles: anglesIn(layout, index), layout, inUse };
+}
+
+/** Where a quadrant tag is drawn, for the tags dialog: "left half", and a note when no one has it yet. */
+export function sectionName(tag: Tag, pedigree: Pedigree): { name: string; title: string } {
+  const { index, layout, inUse } = conditionSection(tag, pedigree);
+  const name = layout === "whole" ? (index === 0 ? "whole symbol" : "shared slice")
+    : layout === "halves" ? (index === 0 ? "left half" : index === 1 ? "right half" : "shared slice")
+    : QUADRANT_NAMES[index] ?? "shared slice";
+  return {
+    name,
+    title: inUse ? `Drawn as the ${name}` : `No one has it yet: drawn as the ${name} once someone does`,
+  };
+}
+
+/**
+ * The paint of a condition's affected section (#67, #115): `tagPaint`,
+ * except that in NSGC 2022 black and white mode a pedigree with a single
+ * condition in use draws it solid black, the classic NSGC shading, keyed
+ * with the condition's name. A pattern chosen for the tag itself is kept,
+ * and so is the hatch when someone drawn is affected with no condition
+ * recorded, whose solid black fill would otherwise look the same. A tag not
+ * in use is painted as it would be once someone has it.
+ */
+export function conditionPaint(tag: Tag, pedigree: Pedigree): TagPaint {
+  const paint = tagPaint(tag, pedigree);
+  if (tag.style !== "quadrant" || tagFillMode(pedigree) !== "monochrome" || notationOf(pedigree) === "nsgc2008") return paint;
+  if (tag.fill && tag.fill !== "solid") return paint;
+  const { layout } = conditionSection(tag, pedigree);
+  if (layout !== "whole" || sectionInfo(pedigree).plainBlack) return paint;
+  return { color: MONOCHROME_COLOR, fill: "solid" };
+}
+
+/** The paint of a condition's carrier section (`carrierPaintFrom` of `conditionPaint`). */
+export function conditionCarrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
+  return carrierPaintFrom(conditionPaint(tag, pedigree));
 }
 
 /**
  * Condition sectors on an individual's symbol, in pedigree tag order:
- * affected conditions in the tag's paint, carrier conditions (#115) in its
- * carrier paint, each in the condition's own section (`sectorAngles`).
+ * affected conditions in `conditionPaint`, carrier conditions (#115) in
+ * `conditionCarrierPaint`, each in the condition's own section
+ * (`sectionConditions`, `sectorAngles`).
  */
 export function conditionSectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
   const all = quadrantTags(pedigree);
   if (all.length === 0) return [];
   const mine = new Set(individual.tags ?? []);
   const carrierOf = new Set(carrierConditions(individual, pedigree).map(t => t.id));
+  const sectioned = sectionConditions(pedigree);
   const carried = all
-    .map((tag, index) => ({ tag, index, carrier: !mine.has(tag.id) && carrierOf.has(tag.id) }))
+    .map(tag => ({ tag, index: sectioned.indexOf(tag), carrier: !mine.has(tag.id) && carrierOf.has(tag.id) }))
     .filter(({ tag, carrier }) => mine.has(tag.id) || carrier);
   if (carried.length === 0) return [];
   const paint = (tag: Tag, carrier: boolean) =>
-    carrier ? { ...carrierPaint(tag, pedigree), carrier: true } : tagPaint(tag, pedigree);
-  if (carried.every(c => c.index < FIXED_QUADRANTS)) {
+    carrier ? { ...conditionCarrierPaint(tag, pedigree), carrier: true } : conditionPaint(tag, pedigree);
+  // A person left out of the drawing may have a condition no one drawn has (index -1).
+  if (carried.every(c => c.index >= 0 && c.index < FIXED_QUADRANTS)) {
     return carried.map(({ tag, index, carrier }) => {
       const [start, end] = sectorAngles(index, pedigree);
       return { tag, start, end, ...paint(tag, carrier) };
@@ -250,9 +359,10 @@ function covers(sectors: readonly Sector[], start: number, end: number): boolean
  * recorded is the black fill, or the black centre over any carrier sectors.
  * A carrier with no condition recorded is the right half dotted, unless the
  * symbol is filled black or the person's affected conditions cover that half
- * (`sectionLayout`: one condition is the whole symbol, the second of two the
- * right half). Condition sections follow the number of conditions
- * (`sectorAngles`).
+ * (`sectionLayout`: one condition in use is the whole symbol, the second of
+ * two the right half). Condition sections follow the number of conditions in
+ * use (`sectionConditions`), and a single one in black and white is solid
+ * black (`conditionPaint`).
  */
 export interface SymbolPaint {
   sectors: Sector[];
@@ -471,10 +581,9 @@ export function renderTagLegendRowSvg(
   const s = LEGEND_SWATCH;
   const cx = x + s / 2, cy = y + s / 2;
   const parts: string[] = [];
-  const paint = carrier ? carrierPaint(tag, pedigree) : tagPaint(tag, pedigree);
+  const paint = carrier ? conditionCarrierPaint(tag, pedigree) : conditionPaint(tag, pedigree);
   if (tag.style === "quadrant") {
-    const idx = quadrantTags(pedigree).findIndex(t => t.id === tag.id);
-    const [start, end] = sectorAngles(Math.max(idx, 0), pedigree);
+    const [start, end] = conditionSection(tag, pedigree).angles;
     const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
     parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);
