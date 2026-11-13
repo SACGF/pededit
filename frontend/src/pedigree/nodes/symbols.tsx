@@ -5,6 +5,8 @@ import {
   ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../tags";
 import type { Sector, AnnotationItem } from "../tags";
+import { fillLayers, type FillBox } from "../tagFills";
+import type { TagFill } from "@pedigree-editor/layout-engine";
 import {
   usesLossTriangle, lifeStatusCaption, captionBaselineY, CAPTION_FONT_SIZE,
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY, carrierDot, CARRIER_RIM,
@@ -58,10 +60,35 @@ interface ShapeProps {
 function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; clipId: string }) {
   if (sectors.length === 0) return null;
   const c = size / 2;
+  const box = { x: 0, y: 0, size };
   return (
     <g clipPath={`url(#${clipId})`}>
-      {sectors.map(s => (
-        <path key={s.tag.id} d={sectorPath(c, c, size, s.start, s.end)} fill={s.tag.color} />
+      {sectors.map((s, i) => (
+        <RegionFill
+          key={s.tag.id} fill={s.fill ?? "solid"} color={s.color ?? s.tag.color} box={box}
+          d={sectorPath(c, c, size, s.start, s.end)} clipId={`${clipId}-s${i}`}
+        />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * Fill the region `d` with pattern `fill` in `color` (#67): the React twin of
+ * `renderRegionFillSvg` in tagFills.ts, from the same `fillLayers`. `clipId`
+ * must be unique on the page; it clips the pattern marks to the region.
+ * Clip to a symbol outline by wrapping this in a clipped <g>.
+ */
+export function RegionFill({ fill, color, d, box, clipId }: { fill: TagFill; color: string; d: string; box: FillBox; clipId: string }) {
+  const layers = fillLayers(fill, color, d, box);
+  return (
+    <g data-tag-fill={fill}>
+      {layers.some(l => l.clip) && <clipPath id={clipId}><path d={d} /></clipPath>}
+      {layers.map((l, i) => (
+        <path
+          key={i} d={l.d} fill={l.fill} stroke={l.stroke} strokeWidth={l.strokeWidth}
+          clipPath={l.clip ? `url(#${clipId})` : undefined}
+        />
       ))}
     </g>
   );
@@ -334,16 +361,16 @@ export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationI
   const cy = size + ANNOTATION_Y + offsetY;
   return (
     <g>
-      {items.map(({ tag, x }) =>
+      {items.map(({ tag, x, color }) =>
         tag.style === "dot" ? (
-          <circle key={tag.id} cx={cx + x} cy={cy} r={ANNOTATION_DOT_RADIUS} fill={tag.color} />
+          <circle key={tag.id} cx={cx + x} cy={cy} r={ANNOTATION_DOT_RADIUS} fill={color} />
         ) : (
           <text
             key={tag.id}
             x={cx + x} y={cy + ANNOTATION_FONT_SIZE / 2 - 1}
             textAnchor="middle"
             fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold"
-            fill={tag.color}
+            fill={color}
           >
             {tagCanvasText(tag)}
           </text>

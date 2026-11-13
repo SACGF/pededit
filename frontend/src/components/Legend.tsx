@@ -3,7 +3,8 @@ import {
   pedigreeTags, tagsInUse, quadrantTags, sectorAngles, sectorPath, tagCanvasText, sectorsFor, needsAffectedCore,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark } from "../pedigree/nodes/symbols";
+import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
+import { tagPaint } from "../pedigree/tagFills";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
 import { notationOf } from "../pedigree/notation";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
@@ -154,6 +155,7 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
 /** How a tag looks on a symbol: a quarter of a square, a dot, or coloured text. */
 export function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
+  const paint = tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = Math.max(0, quadrantTags(pedigree).findIndex(t => t.id === tag.id));
     const [start, end] = sectorAngles(idx);
@@ -162,7 +164,9 @@ export function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }
       <svg width="28" height="28" viewBox="0 0 28 28">
         <clipPath id={clipId}><rect x={x} y={y} width={s} height={s} /></clipPath>
         <rect x={x} y={y} width={s} height={s} fill="white" stroke="black" strokeWidth={1.5} />
-        <path d={sectorPath(cx, cy, s, start, end)} fill={tag.color} clipPath={`url(#${clipId})`} />
+        <g clipPath={`url(#${clipId})`}>
+          <RegionFill fill={paint.fill} color={paint.color} d={sectorPath(cx, cy, s, start, end)} box={{ x, y, size: s }} clipId={`${clipId}-fill`} />
+        </g>
         <rect x={x} y={y} width={s} height={s} fill="none" stroke="black" strokeWidth={1.5} />
       </svg>
     );
@@ -170,13 +174,13 @@ export function TagSwatchSvg({ tag, pedigree }: { tag: Tag; pedigree: Pedigree }
   if (tag.style === "dot") {
     return (
       <svg width="28" height="28" viewBox="0 0 28 28">
-        <circle cx={14} cy={14} r={ANNOTATION_DOT_RADIUS} fill={tag.color} />
+        <circle cx={14} cy={14} r={ANNOTATION_DOT_RADIUS} fill={paint.color} />
       </svg>
     );
   }
   return (
     <svg width="40" height="28" viewBox="0 0 40 28">
-      <text x={20} y={14 + ANNOTATION_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold" fill={tag.color}>
+      <text x={20} y={14 + ANNOTATION_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold" fill={paint.color}>
         {tagCanvasText(tag)}
       </text>
     </svg>
@@ -191,7 +195,7 @@ function AffectedCoreSvg({ sex }: { sex: Sex }) {
       <SymbolShape
         individual={{ id: "", sex, affected: true, sibOrder: 0 }}
         size={SZ}
-        sectors={[{ tag: sample, start: 0, end: 360 }]}
+        sectors={[{ tag: sample, start: 0, end: 360, color: sample.color, fill: "solid" }]}
         clipId="legend-affected-core"
       />
     </svg>

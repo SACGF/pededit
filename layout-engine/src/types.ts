@@ -152,6 +152,20 @@ export interface Evaluation {
  */
 export type TagStyle = "quadrant" | "dot" | "text";
 
+/**
+ * How a quadrant tag fills its sector (#67): "solid" in the tag's colour, or a
+ * pattern drawn in the tag's colour on white (a black pattern is monochrome).
+ * "shade" is a light tint of the colour (light grey for black).
+ */
+export type TagFill = "solid" | "horizontal" | "vertical" | "diagonal" | "crosshatch" | "dots" | "shade";
+
+/**
+ * Tag fills for the whole pedigree (#67): "color" draws each tag as set;
+ * "monochrome" draws every tag in black, each quadrant tag with a pattern
+ * (its own, or one assigned automatically when its fill is solid).
+ */
+export type TagFillMode = "color" | "monochrome";
+
 export interface Tag {
   id: string;
   /** Full name shown in the legend and tag manager. */
@@ -161,6 +175,8 @@ export interface Tag {
   style: TagStyle;
   /** Short canvas text for "text" style tags. Defaults to label. */
   abbrev?: string;
+  /** Fill of a quadrant tag's sector (#67). Absent means "solid". Ignored for dot and text tags. */
+  fill?: TagFill;
 }
 
 /**
@@ -277,6 +293,12 @@ export interface CanvasSettings {
    * (#114). Absent means "nsgc2022", the latest.
    */
   notation?: NotationEdition;
+  /**
+   * Tag fills (#67): "monochrome" draws every tag in black, quadrant tags
+   * with patterns, on the canvas and in exports, for print and journals.
+   * Absent means "color".
+   */
+  tagFills?: TagFillMode;
 }
 
 export type SymbolsShowMode = "gender" | "sex";

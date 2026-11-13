@@ -156,7 +156,11 @@
         "label": { "type": "string", "description": "Full name shown in the legend." },
         "color": { "type": "string", "description": "CSS colour, normally #rrggbb." },
         "style": { "enum": ["quadrant", "dot", "text"] },
-        "abbrev": { "type": "string", "description": "Short canvas text for text-style tags. Defaults to label." }
+        "abbrev": { "type": "string", "description": "Short canvas text for text-style tags. Defaults to label." },
+        "fill": {
+          "enum": ["solid", "horizontal", "vertical", "diagonal", "crosshatch", "dots", "shade"],
+          "description": "How a quadrant tag fills its sector: solid in the tag's colour, or a pattern drawn in the tag's colour on white (horizontal or vertical lines, diagonal hatching, cross-hatching, dots), or a light tint of the colour (shade). Absent means \"solid\". Ignored for dot and text tags."
+        }
       },
       "additionalProperties": true
     },
@@ -219,6 +223,10 @@
         "notation": {
           "enum": ["nsgc2022", "nsgc2008"],
           "description": "Edition of the NSGC pedigree nomenclature drawn. \"nsgc2022\" writes evaluation results under the symbol as the detail then the result (\"BRCA1 c.5266dupC +\"); \"nsgc2008\" uses the E notation (\"E+ (BRCA1 c.5266dupC)\", numbered E1, E2 when there are several). Absent means \"nsgc2022\"."
+        },
+        "tagFills": {
+          "enum": ["color", "monochrome"],
+          "description": "\"monochrome\" draws every tag in black, on the canvas and in figure exports, and each quadrant tag with a pattern: its own fill, or, when that is solid, the first of diagonal, horizontal, dots, crosshatch, shade, vertical that no other quadrant tag has. Absent means \"color\"."
         }
       }
     }

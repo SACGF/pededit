@@ -13,6 +13,8 @@ const NAME_LABEL_VALUES = ["wrap", "truncate"];
 const GENDER_IDENTITY_VALUES = ["man", "woman", "nonbinary"];
 const SYMBOLS_SHOW_VALUES = ["gender", "sex"];
 const NOTATION_VALUES = ["nsgc2022", "nsgc2008"];
+const TAG_FILL_VALUES = ["solid", "horizontal", "vertical", "diagonal", "crosshatch", "dots", "shade"];
+const TAG_FILL_MODE_VALUES = ["color", "monochrome"];
 const LAYOUT_WIDTH_VALUES = ["minimal", "relaxed"];
 const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
 const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
@@ -408,6 +410,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         v => typeof v === "string" && SYMBOLS_SHOW_VALUES.includes(v));
       c.optional(cs, "notation", cp, NOTATION_VALUES.map(s => `"${s}"`).join(" | "),
         v => typeof v === "string" && NOTATION_VALUES.includes(v));
+      c.optional(cs, "tagFills", cp, TAG_FILL_MODE_VALUES.map(s => `"${s}"`).join(" | "),
+        v => typeof v === "string" && TAG_FILL_MODE_VALUES.includes(v));
     }
   }
 
@@ -468,6 +472,8 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
         c.required(raw, "style", tip, TAG_STYLES.map(s => `"${s}"`).join(" | "),
           v => typeof v === "string" && TAG_STYLES.includes(v));
         c.optional(raw, "abbrev", tip, "a string", v => typeof v === "string");
+        c.optional(raw, "fill", tip, TAG_FILL_VALUES.map(s => `"${s}"`).join(" | "),
+          v => typeof v === "string" && TAG_FILL_VALUES.includes(v));
       });
     }
   }

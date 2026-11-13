@@ -45,6 +45,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `color` | string | yes | CSS colour, normally `#rrggbb`. |
 | `style` | `"quadrant"`, `"dot"` or `"text"` | yes | `quadrant` fills a sector of the symbol (NSGC multi-condition shading, sector taken from the tag's position among quadrant tags). `dot` draws a small coloured dot below the symbol. `text` draws short coloured text below the symbol. |
 | `abbrev` | string | no | Short canvas text for `text` tags. Defaults to `label`. |
+| `fill` | `"solid"`, `"horizontal"`, `"vertical"`, `"diagonal"`, `"crosshatch"`, `"dots"` or `"shade"` | no | How a `quadrant` tag fills its sector: solid in its colour, or a pattern in its colour on white (horizontal or vertical lines, diagonal hatching, cross-hatching, dots), or `shade`, a light tint of the colour (light grey for black). Absent means `"solid"`. Ignored for `dot` and `text` tags. |
 
 ### `SiblingOrderSettings`
 
@@ -87,6 +88,7 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | `relationshipLabels` | boolean | Optional. Write the relationship (for example `"first cousins"`) above every consanguineous couple's double line that can be named and has no `consanguinityLabel` of its own, on the canvas and in figure exports. Absent means `false`. |
 | `symbolsShow` | `"gender"` or `"sex"` | Optional. What symbol shapes show. `"gender"`: someone with a recorded `genderIdentity` is drawn with that gender's symbol (square for a man, circle for a woman, diamond for non-binary) and their sex assigned at birth is written below it as AMAB, AFAB or UAAB (NSGC 2022). `"sex"`: everyone is drawn by biological sex. Absent means `"gender"`. Layout and genetics always use `sex`. |
 | `notation` | `"nsgc2022"` or `"nsgc2008"` | Optional. Edition of the NSGC nomenclature drawn. `"nsgc2022"`: evaluation results are written as the detail then the result (`"BRCA1 c.5266dupC +"`). `"nsgc2008"`: the E notation (`"E+ (BRCA1 c.5266dupC)"`, numbered E1, E2 when there are several). Absent means `"nsgc2022"`. |
+| `tagFills` | `"color"` or `"monochrome"` | Optional. `"monochrome"` draws every tag in black, on the canvas and in figure exports, for print: each quadrant tag with a pattern, its own `fill` or, when that is solid, the first of diagonal, horizontal, dots, crosshatch, shade, vertical that no other quadrant tag has (cycling once all are taken). Absent means `"color"`. |
 
 ## `Individual`
 

@@ -149,6 +149,29 @@ history, the reason for referral and the ancestry of both sides.
 | Key defines every fill and symbol | Auto legend (#3). |
 | Reason for referral, recorder, date, historian, ancestry | Follows (#102): pedigree-level fields, listed in the legend and the export key, dropped by de-identified export. The proband is marked on the chart, not in these fields. |
 
+**Fills other than solid shading (#67).** NSGC asks only that every fill be
+defined in the key and names the kinds: shading, "hatches, dots, etc." (1995,
+kept in 2008). The 2022 revision's carrier example divides the symbol and
+fills each part with a different line pattern (horizontal lines in one half,
+vertical in the other), so patterns, not only colour, are expected to tell
+conditions apart. Other tools: kinship2's `plot.pedigree` fills the first
+affection column solid and further columns with line hatching at different
+angles; Madeline 2.0 prints a single condition in black and white and several
+in colour, and offers sixteen quadrant shading patterns instead of colours;
+pedigreejs and Schematex use coloured pie slices or quadrants with a key.
+Journals that print in black and white need the pattern form.
+
+PedEdit: each quadrant tag can be solid, diagonal hatch, horizontal lines,
+vertical lines, cross-hatch, dots, or a light shade, drawn in the tag's
+colour on white (`Tag.fill`), and the pedigree setting "Tag fills: black and
+white patterns" (`canvasSettings.tagFills`) draws every tag in black with a
+pattern each, on the canvas and in exports. To keep them apart from marks
+with a meaning of their own, the textures are fine (lines 4px apart on a
+40px symbol): a single vertical line is the presymptomatic carrier, a single
+centre dot the 2008 carrier, and the "\" slash deceased, so the diagonal
+hatch runs "/". The carrier dot and presymptomatic line keep their white rim
+over any fill.
+
 ### Publication and masking (2008, pp. 425-426)
 
 The 2008 paper **discourages masking or altering published pedigrees**.

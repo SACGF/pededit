@@ -17,6 +17,10 @@ describe("export lint over every example", () => {
       const numbered = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, showNumbers: true } };
       expect(summary(numbered)).toEqual([]);
       expect(summary(numbered, { compact: true })).toEqual([]);
+      // Black and white tag patterns (#67).
+      const mono = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, tagFills: "monochrome" as const } };
+      expect(summary(mono)).toEqual([]);
+      expect(summary(mono, { deidentify: true })).toEqual([]);
       // Named relationships above every double line (#97).
       const named = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, relationshipLabels: true } };
       expect(summary(named, { title: "T" })).toEqual([]);

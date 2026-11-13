@@ -20,6 +20,13 @@ describe("U-shape consanguinity labels (#109)", () => {
     });
   }
 
+  it("examples with tags, in black and white patterns (#67): still clear", () => {
+    for (const ex of EXAMPLES.filter(e => (e.data.tags ?? []).length > 0)) {
+      const mono = named(ex.data);
+      expect(messages({ ...mono, canvasSettings: { ...mono.canvasSettings!, tagFills: "monochrome" } }, true), ex.label).toEqual([]);
+    }
+  }, 30000);
+
   it("test-data/ped/consanguineous: drawn, and clear", () => {
     const dir = join(__dirname, "../../../../../test-data/ped/consanguineous");
     let drawn = 0;

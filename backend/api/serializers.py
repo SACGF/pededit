@@ -81,12 +81,16 @@ class IndividualSerializer(serializers.Serializer):
     placeholder = _opt(serializers.BooleanField)
 
 
+TAG_FILL_CHOICES = ["solid", "horizontal", "vertical", "diagonal", "crosshatch", "dots", "shade"]
+
+
 class TagSerializer(serializers.Serializer):
     id = serializers.CharField()
     label = serializers.CharField(allow_blank=True, trim_whitespace=False)
     color = serializers.CharField()
     style = serializers.ChoiceField(choices=["quadrant", "dot", "text"])
     abbrev = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    fill = _opt(serializers.ChoiceField, choices=TAG_FILL_CHOICES)
 
 
 CHILDLESS_CHOICES = ["infertility", "byChoice"]
@@ -127,6 +131,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     relationshipLabels = _opt(serializers.BooleanField)
     symbolsShow = _opt(serializers.ChoiceField, choices=["gender", "sex"])
     notation = _opt(serializers.ChoiceField, choices=["nsgc2022", "nsgc2008"])
+    tagFills = _opt(serializers.ChoiceField, choices=["color", "monochrome"])
 
 
 class ClinicalDetailsSerializer(serializers.Serializer):

@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ArrowUp, ArrowDown, Trash2, Plus, BookmarkPlus } from "lucide-react";
-import type { Tag, TagStyle } from "@pedigree-editor/layout-engine";
+import type { Tag, TagFill, TagStyle } from "@pedigree-editor/layout-engine";
+import { TAG_FILL_OPTIONS, fillLayers, tagFillMode } from "../pedigree/tagFills";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { tagPresetApi, type TagPresetPayload } from "../api/client";
@@ -21,7 +22,19 @@ const STYLES: TagStyle[] = ["quadrant", "dot", "text"];
 
 // ── Colour picker ─────────────────────────────────────────────────────────────
 
-function ColorSwatch({ color, style, size = 14 }: { color: string; style: TagStyle; size?: number }) {
+function ColorSwatch({ color, style, fill, size = 14 }: { color: string; style: TagStyle; fill?: TagFill; size?: number }) {
+  if (style === "quadrant" && fill && fill !== "solid") {
+    // A whole-swatch sample of the pattern, from the same geometry as the symbols.
+    const box = { x: 0, y: 0, size };
+    const d = `M0 0H${size}V${size}H0Z`;
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="inline-block shrink-0 border border-black/20" data-fill-swatch={fill}>
+        {fillLayers(fill, color, d, box).map((l, i) => (
+          <path key={i} d={l.d} fill={l.fill} stroke={l.stroke} strokeWidth={l.strokeWidth} />
+        ))}
+      </svg>
+    );
+  }
   return (
     <span
       className="inline-block shrink-0 border border-black/20"
@@ -35,7 +48,7 @@ function ColorPicker({ tag, onChange }: { tag: Tag; onChange: (color: string) =>
     <Popover>
       <PopoverTrigger asChild>
         <button type="button" title="Colour" className="p-0.5 rounded hover:bg-gray-100">
-          <ColorSwatch color={tag.color} style={tag.style} />
+          <ColorSwatch color={tag.color} style={tag.style} fill={tag.fill} />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-2" side="bottom" align="start">
@@ -131,7 +144,14 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
           <p className="text-xs text-gray-500">
             Tags mark individuals with a condition, a genotype or a sample status.
             A quadrant tag fills a quarter of the symbol; the order below sets which quarter.
+            Its fill can be solid or a pattern (hatched, lines, dotted) drawn in the tag's colour.
           </p>
+          {tagFillMode(pedigree) === "monochrome" && (
+            <p className="text-[10px] text-gray-500">
+              Settings has tag fills set to black and white: every tag is drawn in black, and quadrant tags
+              with a solid fill get a pattern of their own.
+            </p>
+          )}
 
           {tags.length === 0 ? (
             <p className="text-xs text-gray-400">No tags yet.</p>
@@ -162,6 +182,22 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                     >
                       {STYLES.map(st => <option key={st} value={st}>{st}</option>)}
                     </select>
+
+                    {tag.style === "quadrant" && (
+                      <select
+                        name="tag-fill"
+                        aria-label="Fill"
+                        value={tag.fill ?? "solid"}
+                        onChange={e => {
+                          const fill = e.target.value as TagFill;
+                          updateTag(tag.id, { fill: fill === "solid" ? undefined : fill });
+                        }}
+                        title="How the tag fills its part of the symbol, in the tag's colour"
+                        className="h-6 w-28 shrink-0 text-xs border rounded px-1 bg-white"
+                      >
+                        {TAG_FILL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    )}
 
                     {tag.style === "text" && (
                       <input

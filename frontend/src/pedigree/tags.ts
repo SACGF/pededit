@@ -13,6 +13,8 @@ import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
+import { tagPaint, renderRegionFillSvg } from "./tagFills";
+import type { TagFill } from "@pedigree-editor/layout-engine";
 
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
@@ -98,6 +100,9 @@ export interface Sector {
   tag: Tag;
   start: number;
   end: number;
+  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`). */
+  color: string;
+  fill: TagFill;
 }
 
 /**
@@ -147,11 +152,11 @@ export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[]
   if (carried.every(c => c.index < FIXED_QUADRANTS)) {
     return carried.map(({ tag, index }) => {
       const [start, end] = QUADRANT_ANGLES[index]!;
-      return { tag, start, end };
+      return { tag, start, end, ...tagPaint(tag, pedigree) };
     });
   }
   const span = 360 / carried.length;
-  return carried.map(({ tag }, i) => ({ tag, start: i * span, end: (i + 1) * span }));
+  return carried.map(({ tag }, i) => ({ tag, start: i * span, end: (i + 1) * span, ...tagPaint(tag, pedigree) }));
 }
 
 // ── Affected core ─────────────────────────────────────────────────────────────
@@ -220,6 +225,8 @@ const ANNOTATION_GAP = 4;
 
 export interface AnnotationItem {
   tag: Tag;
+  /** Colour drawn, after the monochrome setting (#67). */
+  color: string;
   /** x of the item's centre relative to the symbol's horizontal centre. */
   x: number;
   width: number;
@@ -241,7 +248,7 @@ export function annotationRow(individual: Individual, pedigree: Pedigree, size =
   let x = individual.proband ? Math.max(-total / 2, -size / 2 + 2) : -total / 2;
   return tags.map((tag, i) => {
     const width = widths[i]!;
-    const item = { tag, x: x + width / 2, width };
+    const item = { tag, x: x + width / 2, width, color: tagPaint(tag, pedigree).color };
     x += width + ANNOTATION_GAP;
     return item;
   });
@@ -271,8 +278,9 @@ export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, siz
   const sectors = sectorsFor(individual, pedigree);
   if (sectors.length === 0) return "";
   const r = size; // beyond the half-diagonal, so the clip does the shaping
+  const box = { x: -size / 2, y: -size / 2, size };
   return sectors
-    .map(s => `<path d="${sectorPath(0, 0, r, s.start, s.end)}" fill="${escapeXml(s.tag.color)}" clip-path="url(#${clipId})"/>`)
+    .map((s, i) => renderRegionFillSvg(s.fill, s.color, sectorPath(0, 0, r, s.start, s.end), box, `${clipId}-s${i}`, clipId))
     .join("");
 }
 
@@ -285,10 +293,10 @@ export function renderAnnotationRowSvg(individual: Individual, pedigree: Pedigre
   if (items.length === 0) return "";
   const cy = size / 2 + ANNOTATION_Y + offsetY;
   return items
-    .map(({ tag, x }) =>
+    .map(({ tag, x, color }) =>
       tag.style === "dot"
-        ? `<circle cx="${fmt(x)}" cy="${fmt(cy)}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(tag.color)}"/>`
-        : `<text x="${fmt(x)}" y="${fmt(cy + ANNOTATION_FONT_SIZE / 2 - 1)}" text-anchor="middle" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(tag.color)}">${escapeXml(tagCanvasText(tag))}</text>`,
+        ? `<circle cx="${fmt(x)}" cy="${fmt(cy)}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(color)}"/>`
+        : `<text x="${fmt(x)}" y="${fmt(cy + ANNOTATION_FONT_SIZE / 2 - 1)}" text-anchor="middle" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(color)}">${escapeXml(tagCanvasText(tag))}</text>`,
     )
     .join("");
 }
@@ -325,18 +333,19 @@ export function renderTagLegendRowSvg(
   const s = LEGEND_SWATCH;
   const cx = x + s / 2, cy = y + s / 2;
   const parts: string[] = [];
+  const paint = tagPaint(tag, pedigree);
   if (tag.style === "quadrant") {
     const idx = quadrantTags(pedigree).findIndex(t => t.id === tag.id);
     const [start, end] = sectorAngles(Math.max(idx, 0));
     const clipId = `legend-clip-${tag.id}`;
     parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);
-    parts.push(`<path d="${sectorPath(cx, cy, s, start, end)}" fill="${escapeXml(tag.color)}" clip-path="url(#${clipId})"/>`);
+    parts.push(renderRegionFillSvg(paint.fill, paint.color, sectorPath(cx, cy, s, start, end), { x, y, size: s }, `${clipId}-fill`, clipId));
     parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="none" stroke="black" stroke-width="1.5"/>`);
   } else if (tag.style === "dot") {
-    parts.push(`<circle cx="${cx}" cy="${cy}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(tag.color)}"/>`);
+    parts.push(`<circle cx="${cx}" cy="${cy}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(paint.color)}"/>`);
   } else {
-    parts.push(`<text x="${x}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(tag.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
+    parts.push(`<text x="${x}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(paint.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
   }
   parts.push(legendLabelSvg(tag.label, x + labelOffset, cy));
   return parts.join("");

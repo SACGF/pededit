@@ -139,6 +139,21 @@ draws NSGC symbols.
   otherwise four tagged quarters hide the affected fill. `symbols.tsx`
   (`AffectedCore`) and `renderAffectedCoreSvg` draw it; keep them in step.
   Black is last in `TAG_PALETTE` so a new tag never defaults to it.
+- `tagFills.ts` — pattern fills and the monochrome setting (#67). A
+  quadrant tag's `fill` (solid, diagonal, horizontal, vertical, crosshatch,
+  dots, shade) is drawn in its colour on white; `canvasSettings.tagFills`
+  "monochrome" draws every tag black, quadrant tags each with a pattern
+  (their own, else the first free one in `MONOCHROME_PATTERN_ORDER`).
+  Renderers never read `tag.color` directly: `sectorsFor` puts the resolved
+  `color` / `fill` on each `Sector`, `annotationRow` on each item, and the
+  legends call `tagPaint` (cached per pedigree object, like `kinshipOf`).
+  Patterns are plain clipped paths, not SVG `<pattern>`, so svg2pdf draws
+  them (checked by rendering an exported PDF with Ghostscript).
+  `fillLayers` is the geometry, `renderRegionFillSvg` (exporters, export
+  key) and `RegionFill` in `symbols.tsx` (canvas, minimap, app legend) its
+  two renderers; per-condition carrier fills (#115) should use them. Black
+  pattern strokes are written as `#000000`, never `"black"`, or the
+  minimap's hairline CSS would turn a fine pattern into solid black.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
   symbol with a small triangle; quadrant tags are clipped to that triangle.

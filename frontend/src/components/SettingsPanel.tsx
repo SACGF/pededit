@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
-import type { NotationEdition, SiblingOrderMode, SymbolsShowMode } from "@pedigree-editor/layout-engine";
+import type { NotationEdition, SiblingOrderMode, SymbolsShowMode, TagFillMode } from "@pedigree-editor/layout-engine";
+import { TAG_FILL_MODE_OPTIONS, tagFillMode } from "../pedigree/tagFills";
 import { nameLabelMode } from "../pedigree/labels";
 import { symbolsShowMode } from "../pedigree/gender";
 import { NOTATION_OPTIONS, notationOf } from "../pedigree/notation";
@@ -167,6 +168,21 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               </select>
               <div className="text-xs text-gray-400 mt-1">
                 Edition of the NSGC pedigree nomenclature. 2022 writes test results under the symbol as "BRCA1 +"; 2008 uses the E notation, "E+ (BRCA1)".
+              </div>
+            </div>
+            <div className="mt-2">
+              <div className="text-sm">Tag fills</div>
+              <select
+                name="tagFills"
+                aria-label="Tag fills"
+                value={tagFillMode(pedigree)}
+                onChange={e => updateCanvasSettings({ tagFills: e.target.value as TagFillMode })}
+                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+              >
+                {TAG_FILL_MODE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <div className="text-xs text-gray-400 mt-1">
+                Black and white draws every tag in black and gives each quadrant tag a pattern (its own, or one chosen for it), on the canvas and in exports, for print and journals.
               </div>
             </div>
           </div>

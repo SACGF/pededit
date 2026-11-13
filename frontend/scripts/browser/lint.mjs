@@ -30,6 +30,9 @@ const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--
                       Turn on "Name consanguineous relationships" first, so
                       every double line the pedigree can name has text above
                       it (#97, #109). Examples and fixtures only.
+  --monochrome        Turn on "Tag fills: black and white patterns" first
+                      (#67), so every quadrant tag is drawn as a pattern.
+                      Examples and fixtures only.
 
 Prints one line per pedigree, then one line per finding. Exits 0 when every
 pedigree draws cleanly, 1 when any has findings.
@@ -40,8 +43,12 @@ ${COMMON_HELP}`;
 const isBad = r => r.findings.length + r.exportFindings.length > 0;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool" });
-  const named = !!flags["relationship-labels"];
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool", monochrome: "bool" });
+  // Settings forced on before linting: names above double lines, monochrome tag fills.
+  const named = {
+    ...(flags["relationship-labels"] ? { relationshipLabels: true } : {}),
+    ...(flags.monochrome ? { tagFills: "monochrome" } : {}),
+  };
   const exportOpts = flags["no-export"] ? null : { compact: !!flags.compact, deidentify: !!flags.deidentify, uShape: !!flags["u-shape"] };
   if (flags.help) { console.log(HELP); return 0; }
   const specs = [...(flags["all-examples"] ? ["__all__"] : []), ...(flags.fixture ?? [])];
@@ -65,7 +72,7 @@ await main(async () => {
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
-          const withNames = p => (named ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, relationshipLabels: true } } : p);
+          const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
           return EXAMPLES.map((e, i) => ({
             name: `example:${i} ${e.label}`,
             findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact })),
@@ -75,7 +82,7 @@ await main(async () => {
       } else {
         const fixture = await loadFixture(spec, context, base);
         const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named }) => {
-          const pedigree = named ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, relationshipLabels: true } } : raw;
+          const pedigree = Object.keys(named).length ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, ...named } } : raw;
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
