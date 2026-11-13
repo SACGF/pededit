@@ -202,13 +202,16 @@ describe("U-shape layout", () => {
     expect(h / w).toBeLessThan(1.6);
   });
 
-  it("lays out 1500 individuals in well under a second or two", () => {
+  // About 1.5 s alone, but three times that while the full suite runs in
+  // parallel. The limit is there to catch a blowup (quadratic or worse), not
+  // to time it, so it is loose; the test timeout must sit above it.
+  it("lays out 1500 individuals without blowing up", () => {
     const p = makeSyntheticFamily({ seed: 5, generations: 7, minChildren: 2, maxChildren: 5, partnerRate: 0.7 });
     expect(p.individuals.length).toBeGreaterThan(1000);
     const t = performance.now();
     layoutUShape(p);
-    expect(performance.now() - t).toBeLessThan(4000);
-  });
+    expect(performance.now() - t).toBeLessThan(10_000);
+  }, 20_000);
 });
 
 describe("U-shape SVG", () => {
