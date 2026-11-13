@@ -250,7 +250,12 @@ interface PedigreeState {
   /** The person outlined on the canvas while a problem is hovered in the problems list (#116). Not undoable. */
   problemHighlightId: string | null;
   isDirty: boolean;
-  /** Bumped by resetLayout so the canvas can refit the view (#64). Not undoable. */
+  /**
+   * Bumped by resetLayout (#64) and by initialize so the canvas refits the
+   * view. React Flow's fitView prop fits only once, on mount, and the canvas
+   * mounts while the previous pedigree is still here: opening an example
+   * after another pedigree was fitted to the old one. Not undoable.
+   */
   layoutResetCount: number;
   /** The latest notice for the page to show, or null. */
   notice: Notice | null;
@@ -691,15 +696,16 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       else set({ picking: null, ...selectOnly(picking.childId) });
     },
 
-    initialize: (p) => set({
+    initialize: (p) => set(s => ({
       pedigree: p,
+      layoutResetCount: s.layoutResetCount + 1,
       past: [],
       future: [],
       activeTool: "select",
       ...selectOnly(null),
       isDirty: false,
       picking: null,
-    }),
+    })),
 
     reset: () => set({
       pedigree: EMPTY_PEDIGREE,
