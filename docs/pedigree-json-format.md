@@ -138,6 +138,7 @@ Children attach to a partnership, not to a parent. A single parent is modelled b
 | `childlessReason` | string | no | Optional reason drawn under the mark, for example `"vasectomy"`. |
 | `twins` | `TwinSet[]` | no | Twin sets (twins, triplets, ...) among this partnership's children. PED has no field for this, so Export PED drops it and warns. |
 | `ended` | boolean | no | The relationship no longer exists (separated, divorced). Drawn as two short diagonal strokes across the couple line (NSGC). Absent means `false`. |
+| `leftPartner` | string | no | The id of the partner drawn on the left of this couple, `individual1` or `individual2`. Partner order is a free choice under NSGC 2022. Absent means the layout chooses (kinship2: the man on the left, unless placing someone with several partners needs otherwise). Set by "Swap sides"; never pins anyone. |
 | `donorConception` | boolean | no | The children were conceived with a donated sperm or egg (NSGC 2008 Fig. 3). The partners are the children's genetic parents, and kinship and PED treat them as such, but they are not a couple: no couple line is drawn, and a line runs from each of them to the children instead. Absent means `false`. |
 
 Any other property on a partnership is preserved as-is.

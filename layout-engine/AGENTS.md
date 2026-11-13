@@ -51,6 +51,21 @@ indexing convention inherited from R, and the three rendering rules.
   `shiftUnderCarrier` moves an only child with no partner under
   `carrierAbove` after `appendIsolated`, as far as its row neighbours
   allow. PED input never has them.
+- `partnerSides.ts` — which side a partner is drawn on (#106).
+  `Partnership.leftPartner` reaches kinship2 as its own input, a spouse hint
+  row `[left, right, anchor]` (`applyPartnerSides`, run in `alignPedigree`
+  on whatever hints it has, including autohint's trial runs, so the
+  duplicate fixup works around the choice). A row autohint already wrote
+  for the couple keeps its anchor, flipped with the row. A hint alone
+  cannot swap two partners who both have parents drawn (each is drawn by
+  their own sibship, so the moved one would be drawn twice), so
+  `preferPartnerLineages` (called from `autohint`) also gives the left
+  partner's ancestors the earlier ranks among the slots the two lines hold
+  at each generation; the same for two partners drawn either side of one
+  person. Nothing changes when no partnership has `leftPartner`, so the R
+  oracle is unaffected. `drawnLeftPartner` reads the side back from a
+  layout. Where kinship2 still cannot draw a chosen side without a
+  duplicate, the editor refuses the swap (`frontend/src/pedigree/partners.ts`).
 - `kinship.ts` — `kinshipCoefficients` (#32): kinship of any two people and
   the inbreeding coefficient, by the same parents-first recursion as
   kinship2's `kinship()`. Not part of the layout. It follows blood rather

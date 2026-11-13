@@ -98,6 +98,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     setPartnershipChildless,
     setPartnershipConsanguineous,
     setPartnershipEnded,
+    swapPartnerSides,
     setAdopted,
     addDonor,
     addSurrogate,
@@ -449,6 +450,15 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                 </MenuItem>
               );
             })}
+            {couples.map(c => (
+              <MenuItem
+                key={`swap:${c.partnershipId}`}
+                onClick={() => action(() => swapPartnerSides(c.partnershipId))}
+                title={SWAP_SIDES_TITLE}
+              >
+                {couples.length > 1 ? `Swap sides with ${c.label}` : "Swap sides"}
+              </MenuItem>
+            ))}
           </MenuSection>
         )}
 
@@ -607,7 +617,7 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, startPickingChild, removePartnership } = usePedigreeStore();
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeStore();
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
@@ -635,6 +645,9 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           title={ENDED_TITLE}
         >
           Relationship ended
+        </MenuItem>
+        <MenuItem onClick={() => action(() => swapPartnerSides(partnershipId))} title={SWAP_SIDES_TITLE}>
+          Swap sides
         </MenuItem>
         <MenuItem
           onClick={() => action(() => startPickingChild(partnershipId))}
@@ -671,6 +684,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
   );
 }
 
+const SWAP_SIDES_TITLE = "Draw the partners the other way round. Partner order is free under NSGC 2022; nobody is pinned";
 const REMOVE_PARTNERSHIP_TITLE = "Remove the couple line, keeping both people (for a partner linked by mistake)";
 
 /** Partners of individualId, one per partnership, in partnership order. */

@@ -2,6 +2,7 @@ import type { LayoutInput, Hints, Pedigree, Individual, SiblingOrderMode, Layout
 import { kindepth } from "./kindepth.js";
 import { alignPedigree } from "./alignPedigree.js";
 import { buildPartnerSet, isPartnerPair } from "./couples.js";
+import { preferPartnerLineages } from "./partnerSides.js";
 
 /**
  * Port of R kinship2 autohint().
@@ -37,6 +38,8 @@ export interface AutohintOptions {
 export function autohint(input: LayoutInput, pedigree: Pedigree, options: AutohintOptions = {}): Hints {
   const twins = twinSets(input, pedigree);
   const horder = initialOrder(input, pedigree, twins);
+  // Chosen partner sides (#106) where both partners have parents swap families.
+  if (pedigree.partnerships.some(p => p.leftPartner)) preferPartnerLineages(horder, input, pedigree, kindepth(input, true));
   try {
     // fixupDuplicates shifts sibling ranks in place, so give it a copy.
     return fixupDuplicates(pedigree, input, horder.slice(), twins, options);

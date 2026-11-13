@@ -219,6 +219,13 @@ export interface Partnership {
    * and the layout treat them as ordinary parents.
    */
   donorConception?: boolean;
+  /**
+   * The partner drawn on the left of this couple (#106): the id of
+   * `individual1` or `individual2`. Absent means the layout chooses (kinship2:
+   * the man on the left unless merging someone's copies needs otherwise).
+   * Fed to kinship2 as a spouse hint, so it never pins anyone.
+   */
+  leftPartner?: string;
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

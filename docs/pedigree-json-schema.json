@@ -125,6 +125,7 @@
           "items": { "$ref": "#/$defs/TwinSet" }
         },
         "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." },
+        "leftPartner": { "type": "string", "description": "Id of the partner drawn on the left of this couple: individual1 or individual2. Absent means the layout chooses." },
         "donorConception": { "type": "boolean", "description": "The children were conceived with a donated sperm or egg: the partners are the genetic parents but not a couple, so no couple line is drawn and each partner's line runs to the children (NSGC)." }
       },
       "additionalProperties": true

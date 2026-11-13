@@ -63,6 +63,15 @@ stub so the app still builds without Google login.
   childless couple's section of the person menu, #104) drops a couple line
   while keeping both people; it refuses a couple with children, who would
   silently lose a parent.
+  "Swap sides" (#106, `swapPartnerSides`, couple line menu and the person
+  menu's Relationship section) sets `Partnership.leftPartner` from the side
+  the canvas currently draws, so it is a toggle and never pins anyone. When
+  one partner has exactly two partners drawn either side of them, the other
+  couple's side is set too, so the two trade places. `swapSidesPlan` lays the
+  result out first and refuses (notice, no undo step) a swap kinship2 can
+  only draw by adding a duplicate, ignoring, or moving another chosen side:
+  about 1 couple in 9 across the examples, mostly inbred or partner-chain
+  families. A pinned partner keeps its pin and the notice says so.
   "Add existing partner..." (#84, `linkPartner`) joins two people already
   on the tree, relatives included; "Add partner" always makes a new person.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption

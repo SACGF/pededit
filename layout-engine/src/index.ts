@@ -1,5 +1,6 @@
 export { alignPedigree } from "./alignPedigree.js";
 export { alignPedigreeByFamily, splitFamilies, FAMILY_GAP, RELAXED_WIDTH_SLACK } from "./families.js";
+export { applyPartnerSides, drawnLeftPartner } from "./partnerSides.js";
 export { placementParentOf, carrierAbove } from "./assisted.js";
 export { kindepth } from "./kindepth.js";
 export { kinshipCoefficients } from "./kinship.js";

@@ -109,6 +109,7 @@ class PartnershipSerializer(serializers.Serializer):
     twins = _opt(TwinSetSerializer, many=True)
     ended = _opt(serializers.BooleanField)
     donorConception = _opt(serializers.BooleanField)
+    leftPartner = _opt(serializers.CharField)
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):

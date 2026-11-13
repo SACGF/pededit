@@ -5,6 +5,7 @@ import { alignped1 } from "./alignped1.js";
 import { alignped3 } from "./alignped3.js";
 import { alignped4 } from "./alignped4.js";
 import { placementParentOf, carrierAbove } from "./assisted.js";
+import { applyPartnerSides } from "./partnerSides.js";
 
 export interface AlignOptions {
   packed?: boolean;   // default true
@@ -62,7 +63,9 @@ export function alignPedigree(
   for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
 
   // 3. Get ordering hints
-  const hints = options.hints ?? autohint(input, pedigree, { balancePartners: improve });
+  // The sides the user chose for couples (#106) override kinship2's own,
+  // also inside autohint's trial runs, so its fixup works around them.
+  const hints = applyPartnerSides(options.hints ?? autohint(input, pedigree, { balancePartners: improve }), pedigree);
 
   // 4. Build spouselist
   const { spouselist, spouselistRows } = buildSpouseList(input, hints, pedigree);

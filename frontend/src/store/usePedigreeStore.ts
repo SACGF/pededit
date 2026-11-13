@@ -8,7 +8,7 @@ import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals, dropAssistedLinks } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../pedigree/placeholders";
-import { linkPartnerProblem } from "../pedigree/partners";
+import { linkPartnerProblem, swapSidesPlan } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
@@ -431,6 +431,13 @@ interface PedigreeState {
   setPartnershipConsanguinityLabel: (partnershipId: string, label: string) => void;
   /** Ended relationship (#98): two strokes across the couple line. False removes the flag. */
   setPartnershipEnded: (partnershipId: string, ended: boolean) => void;
+  /**
+   * Draw the couple's partners the other way round (#106), by setting
+   * `Partnership.leftPartner` (and the partner's other couple's, when they
+   * have exactly two partners). One undo step, nobody pinned. Returns the
+   * reason when refused, also shown as a notice.
+   */
+  swapPartnerSides: (partnershipId: string) => string | null;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -1426,6 +1433,25 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (ended) p.ended = true;
         else delete p.ended;
       });
+    },
+
+    swapPartnerSides: (partnershipId) => {
+      const { pedigree } = get();
+      const plan = swapSidesPlan(pedigree, partnershipId);
+      if ("problem" in plan) {
+        get().setNotice({ kind: "error", text: plan.problem });
+        return plan.problem;
+      }
+      mutate(draft => {
+        for (const p of draft.partnerships) if (plan.sides[p.id]) p.leftPartner = plan.sides[p.id];
+      });
+      const p = pedigree.partnerships.find(x => x.id === partnershipId)!;
+      const pinned = [p.individual1, p.individual2].filter(id => pedigree.pinnedPositions?.[id]);
+      if (pinned.length > 0) {
+        const name = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim() || "a partner";
+        get().setNotice({ kind: "info", text: `Sides swapped, but ${pinned.map(name).join(" and ")} ${pinned.length === 1 ? "is" : "are"} pinned and stay${pinned.length === 1 ? "s" : ""} where dragged: unpin to see the swap.`, undoable: true });
+      }
+      return null;
     },
 
     // ── Pedigree-level settings ──────────────────────────────────────────────
