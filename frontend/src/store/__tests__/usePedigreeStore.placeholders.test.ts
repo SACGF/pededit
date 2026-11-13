@@ -170,7 +170,7 @@ describe("placeholder partners (#107)", () => {
   it("never removes a person without the flag (older saves, Add partner)", () => {
     get().addPartner("m");
     const partner = get().pedigree.individuals.find(i => !["c", "m", "f", "g"].includes(i.id))!;
-    const pid = get().pedigree.partnerships.find(p => p.individual2 === partner.id)!.id;
+    const pid = get().pedigree.partnerships.find(p => p.individual1 === partner.id || p.individual2 === partner.id)!.id;
     expect(get().removePartnership(pid)).toBeNull();
     expect(ind(partner.id)).toBeDefined();
   });

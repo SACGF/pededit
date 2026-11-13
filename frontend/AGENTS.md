@@ -74,7 +74,8 @@ stub so the app still builds without Google login.
   families. A pinned partner keeps its pin and the notice says so.
   "Add existing partner..." (#84, `linkPartner`) joins two people already
   on the tree, relatives included, and of any sex; "Add partner" always
-  makes a new person. Same-sex couples (#105, `pedigree/sameSex.ts`) are
+  makes a new person, of the opposite sex (unknown for an unknown-sex
+  person, #119), father role first in the `Partnership`. Same-sex couples (#105, `pedigree/sameSex.ts`) are
   ordinary partnerships, but sex is biological sex, so they never have
   genetic children together: "Add child" from one partner (hover pill or
   "Add children...") makes the child that partner's and a donor's, and the
@@ -117,7 +118,7 @@ stub so the app still builds without Google login.
   `refresh_token`), pedigree list, open/create/save/rename/delete. Saving
   reads the pedigree from `usePedigreeStore`.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
-  undo/redo stacks, active tool, selection, every structural edit
+  undo/redo stacks, selection, every structural edit
   (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with
   descendants or ancestors, setParents and linkPartner with on-canvas
   picking), flags, pinning,
@@ -145,7 +146,13 @@ stub so the app still builds without Google login.
 - `components/` — Toolbar, EditPanel (the chart title field when nothing is
   selected, #20, and under it the folded "Clinical details" section, #102,
   whose fields, order and labels come from `pedigree/clinicalDetails.ts`; individual form with name, DOB, free-text age, the
-  Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75),
+  Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75).
+  The Status section edits sex, affected, proband and consultand with the
+  more menu's store actions and rules (#120: refused sexes disabled with
+  `batchSexProblem`'s reason written out); keep the two in step when a rule
+  changes. A toolbar add selects the new person and sets `revealRequest`,
+  which `RevealOnRequest` in `PedigreeCanvas.tsx` turns into a pan (never a
+  zoom or a pin) when their node is off-screen (#121),
   SettingsPanel, TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
@@ -156,7 +163,9 @@ stub so the app still builds without Google login.
   Shift+F8 go to the next and previous editor warning (#116; F8 because it
   works while typing in the field the last one focused and clashes with
   nothing; VS Code uses it the same way), Escape cancels picking, else
-  clears the selection, and returns to the select tool.
+  clears the selection. There is no select tool or mode (#122): plain drag
+  on the background pans, Shift+drag draws the rubber band, and the edit
+  panel says so when nothing is selected.
 - Editor warnings (#116): data that looks wrong is reported by
   `pedigree/validation.ts`, never refused; see `src/pedigree/AGENTS.md`.
   The panel's date hints moved there. Use a rule for "this data is probably

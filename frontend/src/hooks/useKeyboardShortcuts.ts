@@ -10,7 +10,7 @@ function typing(): boolean {
 }
 
 export function useKeyboardShortcuts() {
-  const { undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, setActiveTool, picking, cancelPicking } = usePedigreeStore();
+  const { undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, picking, cancelPicking } = usePedigreeStore();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -51,11 +51,10 @@ export function useKeyboardShortcuts() {
       if (e.key === "Escape") {
         if (picking) cancelPicking();
         else setSelectedId(null);
-        setActiveTool("select");
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, setActiveTool, picking, cancelPicking]);
+  }, [undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, picking, cancelPicking]);
 }

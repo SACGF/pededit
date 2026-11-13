@@ -46,7 +46,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
-  const { activeTool, setActiveTool, addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
+  const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
   const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
@@ -139,20 +139,6 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Select mode */}
-      <Button
-        variant={activeTool === "select" ? "secondary" : "ghost"}
-        size="sm"
-        title="Select"
-        disabled={!hasPedigree}
-        onClick={() => setActiveTool("select")}
-        className="h-7 w-7 p-0"
-      >
-        ↖
-      </Button>
-
-      <div className="w-px h-5 bg-gray-200 mx-0.5" />
-
       {/* Add individual — action buttons, not mode toggles */}
       <Button
         variant="ghost" size="sm"

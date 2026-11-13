@@ -15,7 +15,7 @@ import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { Individual, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
+import type { Individual, Sex, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
 import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
@@ -24,9 +24,9 @@ import { ProblemIcon } from "./ProblemsMenu";
 import { ProblemFixes } from "./ProblemFixes";
 import {
   CONDITION_NOT_RECORDED, affectedControlOn, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
-  isAffected, resolvePlainAffected, soleCondition, type ConditionState,
+  resolvePlainAffected, soleCondition, type ConditionState,
 } from "../pedigree/conditions";
-import { carrierStatusOf } from "../pedigree/batch";
+import { batchSexProblem, carrierStatusOf } from "../pedigree/batch";
 import { notationOf } from "../pedigree/notation";
 import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
 
@@ -55,7 +55,13 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
         <>
           <ChartTitleField />
           <ClinicalDetailsSection />
-          <p className="text-xs text-gray-400">Select an individual to edit</p>
+          <div className="space-y-1" data-testid="selection-help">
+            <p className="text-xs text-gray-400">Select an individual to edit</p>
+            {/* There is no select mode (#122): say how selecting works. */}
+            <p className="text-[10px] text-gray-400">
+              Click to select, Shift+click to add or remove, Shift+drag to select an area. Drag the background to pan.
+            </p>
+          </div>
         </>
       )}
       <div className="border-t pt-3">
@@ -72,7 +78,7 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
 }
 
 function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset } = usePedigreeStore();
+  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
   // How affected and carrier are asked: plain, for the one condition, or per condition (#115).
@@ -221,10 +227,22 @@ function IndividualForm({ individual }: { individual: Individual }) {
           Status
         </div>
         <div className="text-xs text-gray-600 space-y-1">
-          <div>Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}: <span className="font-medium">{individual.sex}</span></div>
-          <ProblemHighlight {...problemsOn("affected")}>
-            <div>Affected: <span className="font-medium">{isAffected(individual, pedigree) ? "yes" : "no"}</span></div>
-          </ProblemHighlight>
+          <SexControl individual={individual} />
+          {/* Same rule as A and the more menu (#120): the flag, or the one condition (#118). */}
+          {mode !== "per-condition" && (
+            <ProblemHighlight {...problemsOn("affected")}>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="affected"
+                  checked={affectedControlOn(individual, pedigree)}
+                  onChange={e => setAffected(individual.id, e.target.checked)}
+                  className="accent-black"
+                />
+                <span>{sole ? `Affected with ${sole.label}` : "Affected"}</span>
+              </label>
+            </ProblemHighlight>
+          )}
           {affectedControlOn(individual, pedigree) && (
             <div className="flex items-center gap-2 pl-5">
               <span className="shrink-0">Age of onset</span>
@@ -297,8 +315,26 @@ function IndividualForm({ individual }: { individual: Individual }) {
             />
             <span>Family history not known</span>
           </label>
-          {individual.proband && <div className="font-medium">Proband</div>}
-          {individual.consultand && <div className="font-medium">{individual.proband ? "Also the consultand" : "Consultand"}</div>}
+          <label className="flex items-center gap-2 cursor-pointer" title={probandTitle(pedigree, individual)}>
+            <input
+              type="checkbox"
+              name="proband"
+              checked={!!individual.proband}
+              onChange={() => setProband(individual.id)}
+              className="accent-black"
+            />
+            <span>Proband</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer" title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P.">
+            <input
+              type="checkbox"
+              name="consultand"
+              checked={!!individual.consultand}
+              onChange={e => setConsultand(individual.id, e.target.checked)}
+              className="accent-black"
+            />
+            <span>Consultand</span>
+          </label>
           {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
         </div>
       </div>
@@ -319,7 +355,7 @@ function IndividualForm({ individual }: { individual: Individual }) {
  * warning and one-click fixes, and can be cleared; nothing is refused.
  */
 function ConditionsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
-  const { pedigree, setConditionStatus, updateIndividual, setCarrier } = usePedigreeStore();
+  const { pedigree, setConditionStatus, updateIndividual, setCarrier, setAffected } = usePedigreeStore();
   const conditions = conditionTags(pedigree);
   return (
     <ProblemHighlight {...problems}>
@@ -340,13 +376,20 @@ function ConditionsForm({ individual, problems }: { individual: Individual; prob
             </select>
           </div>
         ))}
-        {plainAffected(individual, pedigree) && (
-          <label className="flex items-center gap-2 cursor-pointer pl-2">
-            {/* Only the flag: recorded conditions stay (#118). */}
-            <input type="checkbox" name="plainAffected" checked onChange={() => updateIndividual(individual.id, resolvePlainAffected(individual, null, pedigree))} className="accent-black" />
-            <span>Affected {CONDITION_NOT_RECORDED}</span>
-          </label>
-        )}
+        {/* Always offered, as the more menu's Mark affected is (#120); the flag means affected with something not recorded (#118). */}
+        <label className="flex items-center gap-2 cursor-pointer pl-2">
+          <input
+            type="checkbox"
+            name="plainAffected"
+            checked={plainAffected(individual, pedigree)}
+            onChange={e => e.target.checked
+              ? setAffected(individual.id, true)
+              // Only the flag: recorded conditions stay (#118).
+              : updateIndividual(individual.id, resolvePlainAffected(individual, null, pedigree))}
+            className="accent-black"
+          />
+          <span>Affected {CONDITION_NOT_RECORDED}</span>
+        </label>
         {plainCarrier(individual, pedigree) && (
           <label className="flex items-center gap-2 cursor-pointer pl-2">
             <input type="checkbox" name="plainCarrier" checked onChange={() => setCarrier(individual.id, false)} className="accent-black" />
@@ -857,6 +900,48 @@ interface ProblemProps {
   problemFor?: string;
   problemField?: ProblemField;
   problems?: Problem[];
+}
+
+/** Proband checkbox tooltip: one per pedigree, so say whose arrow moves. */
+function probandTitle(pedigree: Pedigree, individual: Individual): string {
+  const other = pedigree.individuals.find(i => i.proband && i.id !== individual.id);
+  if (!other) return "The affected person through whom the family came to attention: an arrow with a P. One per pedigree.";
+  return `One per pedigree: ticking this moves the proband arrow from ${other.name?.trim() || "another person"}.`;
+}
+
+/**
+ * Sex (#120), with the more menu's rules: a choice `batchSexProblem` refuses
+ * is disabled and the reason is written under the buttons.
+ */
+function SexControl({ individual }: { individual: Individual }) {
+  const { pedigree, setSex } = usePedigreeStore();
+  const sexes = ["male", "female", "unknown"] as const;
+  const problemOf = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individual.id], sex);
+  const reasons = [...new Set(sexes.map(problemOf).filter((p): p is string => !!p))];
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2">
+        <span className="shrink-0">Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}</span>
+        <div className="flex border rounded overflow-hidden" role="group" aria-label="Sex">
+          {sexes.map(sex => (
+            <button
+              key={sex}
+              type="button"
+              data-sex={sex}
+              aria-pressed={individual.sex === sex}
+              disabled={!!problemOf(sex)}
+              title={problemOf(sex) ?? undefined}
+              onClick={() => { if (individual.sex !== sex) setSex(individual.id, sex); }}
+              className={`px-2 h-6 text-xs border-l first:border-l-0 ${individual.sex === sex ? "bg-black text-white" : "bg-white hover:bg-gray-100"} disabled:text-gray-300 disabled:hover:bg-white disabled:cursor-not-allowed`}
+            >
+              {sex.charAt(0).toUpperCase() + sex.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+      {reasons.map(r => <p key={r} className="text-[10px] text-gray-500">{r}</p>)}
+    </div>
+  );
 }
 
 function Field({ label, children, ...problem }: { label: string; children: React.ReactNode } & ProblemProps) {

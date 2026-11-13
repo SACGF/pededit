@@ -520,7 +520,7 @@ type Row = [
   sex: Sex,
   father: string | null,
   mother: string | null,
-  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "notes">>,
+  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "consultand" | "notes">>,
 ];
 
 function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree {

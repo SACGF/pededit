@@ -19,7 +19,6 @@ import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type 
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-export type ActiveTool = "select" | "addMale" | "addFemale" | "addUnknown";
 
 /**
  * On-canvas picking (#36): clicks choose existing individuals instead of
@@ -236,7 +235,6 @@ interface PedigreeState {
   past: Pedigree[];    // undo stack, newest last
   future: Pedigree[];  // redo stack, newest last
 
-  activeTool: ActiveTool;
   /**
    * Selection (#21). `selectedIds` holds every selected individual id;
    * `selectedId` is the primary one (the last clicked), which the edit
@@ -257,6 +255,12 @@ interface PedigreeState {
    * after another pedigree was fitted to the old one. Not undoable.
    */
   layoutResetCount: number;
+  /**
+   * A person the canvas should bring into view, panning but not zooming,
+   * if their node is off-screen: set by a toolbar add (#121). `n` changes on
+   * every request so the same id can be asked for twice. Not undoable.
+   */
+  revealRequest: { id: string; n: number } | null;
   /** The latest notice for the page to show, or null. */
   notice: Notice | null;
   setNotice: (notice: Omit<Notice, "id"> | null) => void;
@@ -287,7 +291,6 @@ interface PedigreeState {
   getPedigree: () => Pedigree;  // used by useAppStore to read for save
 
   // Tool + selection
-  setActiveTool: (tool: ActiveTool) => void;
   /** Select only this individual, or clear the selection with null. */
   setSelectedId: (id: string | null) => void;
   /** Shift / Ctrl / Cmd+click: add id to the selection (as primary) or take it out. */
@@ -622,13 +625,13 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     pedigree: EMPTY_PEDIGREE,
     past: [],
     future: [],
-    activeTool: "select",
     selectedId: null,
     selectedIds: [],
     hoveredId: null,
     problemHighlightId: null,
     isDirty: false,
     layoutResetCount: 0,
+    revealRequest: null,
     notice: null,
     picking: null,
 
@@ -701,7 +704,6 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       layoutResetCount: s.layoutResetCount + 1,
       past: [],
       future: [],
-      activeTool: "select",
       ...selectOnly(null),
       isDirty: false,
       picking: null,
@@ -711,7 +713,6 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       pedigree: EMPTY_PEDIGREE,
       past: [],
       future: [],
-      activeTool: "select",
       ...selectOnly(null),
       isDirty: false,
       picking: null,
@@ -719,7 +720,6 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     getPedigree: () => get().pedigree,
 
-    setActiveTool: (tool) => set({ activeTool: tool }),
     setSelectedId: (id) => set(selectOnly(id)),
     toggleSelected: (id) => {
       const { selectedIds, selectedId } = get();
@@ -772,10 +772,15 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     // ── Structural mutations ─────────────────────────────────────────────────
 
+    /** Selects the new person and asks the canvas to show them (#121): the layout puts them at the end of the top generation. */
     addIndividual: (sex) => {
+      let id = "";
       mutate(draft => {
-        draft.individuals.push(makeIndividual(sex, nextRootSibOrder(draft)));
+        const ind = makeIndividual(sex, nextRootSibOrder(draft));
+        id = ind.id;
+        draft.individuals.push(ind);
       });
+      set(s => ({ ...selectOnly(id), revealRequest: { id, n: (s.revealRequest?.n ?? 0) + 1 } }));
     },
 
     /**
@@ -939,21 +944,25 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     /**
      * Add a partner to individualId.
      *
-     * Creates a new unknown-sex individual and a new Partnership.
+     * Creates a new individual of the opposite sex (unknown stays unknown,
+     * #119) and a new Partnership, father role first as linkPartner does.
      * If individual already has a partnership, this creates a second one
-     * (multiple partnerships are valid — e.g. second marriage).
+     * (multiple partnerships are valid, e.g. second marriage).
      */
     addPartner: (individualId) => {
-      if (get().pedigree.individuals.find(i => i.id === individualId)?.lifeStatus) {
+      const ind = get().pedigree.individuals.find(i => i.id === individualId);
+      if (ind?.lifeStatus) {
         console.warn("Cannot add a partner to a pregnancy or pregnancy loss");
         return;
       }
+      const sex: Sex = ind?.sex === "male" ? "female" : ind?.sex === "female" ? "male" : "unknown";
       mutate(draft => {
-        const partner = makeIndividual("unknown", 0);
+        const partner = makeIndividual(sex, 0);
+        const partnerFirst = sex === "male";
         const partnership: Partnership = {
           id: newId(),
-          individual1: individualId,
-          individual2: partner.id,
+          individual1: partnerFirst ? partner.id : individualId,
+          individual2: partnerFirst ? individualId : partner.id,
         };
         draft.individuals.push(partner);
         draft.partnerships.push(partnership);

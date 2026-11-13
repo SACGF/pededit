@@ -12,6 +12,7 @@ import {
   type NodeChange,
   type OnNodeDrag,
   useReactFlow,
+  useStore as useFlowStore,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
@@ -238,6 +239,45 @@ function FitOnLayoutChange({ compact }: { compact: boolean }) {
     const id = requestAnimationFrame(() => { void fitView(); });
     return () => cancelAnimationFrame(id);
   }, [key, fitView]);
+  return null;
+}
+
+/**
+ * Pans, keeping the zoom, to bring a person into view when the store asks
+ * (`revealRequest`, a toolbar add, #121) and their node is off-screen. Waits
+ * a few frames for the new layout to render the node.
+ */
+function RevealOnRequest() {
+  const { getNodes, getViewport, setViewport } = useReactFlow();
+  const request = usePedigreeStore(s => s.revealRequest);
+  const width = useFlowStore(s => s.width);
+  const height = useFlowStore(s => s.height);
+  const size = useRef({ width, height });
+  size.current = { width, height };
+  useEffect(() => {
+    if (!request) return;
+    let frame = 0;
+    let tries = 0;
+    const attempt = () => {
+      const node = getNodes().find(n => (n.data as Partial<RFNodeData>)?.individual?.id === request.id);
+      if (!node) {
+        if (++tries < 10) frame = requestAnimationFrame(attempt);
+        return;
+      }
+      const { x, y, zoom } = getViewport();
+      const { width: w, height: h } = size.current;
+      const margin = 40;
+      const nodeW = (node.width ?? NODE_SIZE) * zoom;
+      const nodeH = (node.height ?? NODE_SIZE) * zoom;
+      const left = node.position.x * zoom + x;
+      const top = node.position.y * zoom + y;
+      if (left >= margin && top >= margin && left + nodeW <= w - margin && top + nodeH <= h - margin) return;
+      // Centre the node, as the user's eye goes to the middle of the canvas.
+      void setViewport({ x: w / 2 - (node.position.x * zoom + nodeW / 2), y: h / 2 - (node.position.y * zoom + nodeH / 2), zoom }, { duration: 200 });
+    };
+    frame = requestAnimationFrame(attempt);
+    return () => cancelAnimationFrame(frame);
+  }, [request, getNodes, getViewport, setViewport]);
   return null;
 }
 
@@ -468,6 +508,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         <FilterBanner />
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
         <FitOnLayoutChange compact={compact} />
+        <RevealOnRequest />
         <Controls />
         {showMinimap && (
           <PedigreeMinimap
