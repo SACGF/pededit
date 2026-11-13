@@ -28,8 +28,8 @@ function formatDate(iso: string): string {
 }
 
 
-/** Where the editor sends bug reports and feature requests (#113). */
-const NEW_ISSUE_URL = "https://github.com/SACGF/pededit/issues/new";
+/** The issue tracker, not the new-issue form, so people can search for an existing report first (#113). */
+const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
 /** How to run PedEdit on your own server, for clinical data (#113). */
 const INSTALL_URL = "https://github.com/SACGF/pededit/blob/main/INSTALL.md";
 
@@ -236,7 +236,7 @@ export default function CanvasPage() {
           <p>
             Found a bug or want a feature?{" "}
             <a
-              href={NEW_ISSUE_URL}
+              href={ISSUES_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black underline underline-offset-1"
