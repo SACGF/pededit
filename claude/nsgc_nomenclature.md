@@ -17,20 +17,21 @@ programmes use it. PedEdit follows it unless this file says otherwise.
 - Bennett RL, French KS, Resta RG, Austin J (2022). Practice resource-focused
   revision: standardized pedigree nomenclature update centered on sex and
   gender inclusivity. J Genet Couns 31:1238-1248. doi:10.1002/jgc4.1621.
-  Paywalled. What we know of it comes from Bennett's December 2022 teaching
-  slides, summarised under "The 2022 revision, from the slides" below.
+  Paywalled. It keeps the 2008 nomenclature except where it says otherwise;
+  its changes are summarised under "The 2022 revision" below.
 - Resta RG et al. (2022). Both sides now: changing a long-standing pedigree
   tradition of men on the left and women on the right. J Genet Couns.
   doi:10.1002/jgc4.1662.
 
-We keep no copies of the papers or slides, here or in the private repo,
+We keep no copies of the papers, here or in the private repo,
 because they are copyrighted. This file states the rules in our own words so
 that nothing depends on them; go back to the sources by DOI when a rule is
 unclear.
 
 ## Rules, in our words, with where PedEdit stands
 
-Section numbers refer to the 2008 figures.
+Section numbers refer to the 2008 figures. Where the 2022 revision changed a
+rule, the rule below says so; see also "The 2022 revision".
 
 ### Symbols (Fig. 1)
 
@@ -84,7 +85,8 @@ Use initials or first names rather than full names on clinical pedigrees.
 
 Donor "D", surrogate "S", evaluation "E" with results, documented evaluation
 "*", carrier dot, and a vertical line through the symbol for an asymptomatic
-or presymptomatic carrier. PedEdit has the carrier dot, the presymptomatic
+or presymptomatic carrier. **The 2022 revision drops the "E" and the carrier
+dot** (see below); the "*", the vertical line, D and S stay. PedEdit has the carrier dot, the presymptomatic
 line and the evaluation notation (#101): per-person evaluations written
 under the symbol as "E+ (detail)", numbered E1, E2 when there are several,
 with the detail in parentheses standing in for a key entry per number, and
@@ -107,22 +109,27 @@ Further Fig. 3 and Fig. 4 points:
 - Record what family history is known for a donor or gestational carrier.
 - The 2008 paper notes the nomenclature has no way to show frozen or
   transferred embryos; "E" could track embryo testing.
-- "E" must be defined in the key. Several evaluations take subscripts (E1,
-  E2) defined in the key. Results go in parentheses or in the key: "+",
-  "-", or "u" for uninformative.
+- 2008: "E" must be defined in the key. Several evaluations take subscripts
+  (E1, E2) defined in the key. Results go in parentheses or in the key: "+",
+  "-", or "u" for uninformative. 2022: no "E"; results (sequencing, panel,
+  karyotype, ultrasound) are simply written under the symbol (#114).
 - Shade a symbol only when the person is clinically symptomatic.
-- Carrier status follows how the disease shows, not the inheritance pattern:
-  a dot for a carrier unlikely to be affected (whatever the mode of
-  inheritance), a vertical line for someone unaffected now who may become so.
-  Half shading for recessive carriers is a common habit the standard does not
-  endorse. PedEdit follows this.
+- 2008: carrier status follows how the disease shows, not the inheritance
+  pattern: a dot for a carrier unlikely to be affected, a vertical line for
+  someone unaffected now who may become so. 2022: **no dot**. A carrier's
+  symbol is divided, one fill pattern per carrier result or condition,
+  defined in the key (a HEXA and CFTR carrier: two halves, two patterns; an
+  ATM carrier with breast cancer: one half each). Reason: carriers can have
+  symptoms, a dot hides under a fill, and screening often finds several
+  carrier results. The vertical line stays, "typically for dominant
+  conditions", with the condition in the key. PedEdit still draws the dot
+  (#115); quadrant tags (#3) can already draw the divided symbol.
 - Linkage haplotypes go below the person with the haplotype of interest on
   the left; repeat sizes are written affected allele first in parentheses;
   a known variant goes in parentheses. PedEdit has no fields for these; the
   evaluation detail text (#101) carries them.
 
-The 2022 revision is reported to change how carrier status is shown. The
-slides do not cover it, so this is unconfirmed.
+
 
 ### Key and chart
 
@@ -153,33 +160,71 @@ The "affected only" view filter (#4) follows the same rule: it removes no one
 from the chart, it groups each drawn couple's unaffected children into one
 numbered symbol, and it keeps every ancestor so lines of descent stay whole.
 
-## The 2022 revision, from the slides
+## The 2022 revision
 
-From Bennett's teaching slides (December 2022), which reproduce the revision's
-figures. Not checked against the paper itself.
+Bennett et al. 2022 (doi:10.1002/jgc4.1621), a "focused revision": the 2008
+recommendations stand except as below. No new symbols.
 
-- **Gender first.** The symbol shows self-identified gender: square for a man
-  or boy, circle for a woman or girl, diamond for non-binary or gender
-  diverse. Sex assigned at birth is written as AMAB, AFAB or UAAB **directly
-  under the symbol, above the age**, and left out when it matches the
-  gender shown (a cis man is a square with only his age under it).
-  Karyotype only if known.
-- **Diamond** with a code under it: non-binary. Diamond with no code: sex
-  or gender unknown or not relevant. Diamond with a number and no code:
-  several people of unknown or mixed sex and gender. A grouped diamond for
-  non-binary people carries their code(s) under it (e.g. "AMAB/AFAB").
-- Deceased and grouped symbols follow the same scheme ("d. 1981", "d. 4 mo"
-  under the symbol, the code under that).
-- **Same-sex couples** are drawn as ordinary couples. Examples: two women,
-  one carrying a pregnancy from a sperm donor; two men with an egg donor
-  and a surrogate; a trans man (square, AFAB) carrying a pregnancy, with a
-  line from his symbol to it.
-- **Donor embryo** (adoption in vitro): the pregnancy in brackets with a
-  dashed line from the couple, since neither is a genetic parent.
-- In the slides' surrogate and egg donor examples the line from a
-  gestational carrier who is not the genetic mother is **dashed**. The 2008
-  Fig. 3 draws it solid (biological effect on the fetus, e.g. teratogens).
-  Unconfirmed until we read the paper; PedEdit draws it solid.
+- **The symbol shows gender, not sex.** Square for a man or boy, circle for
+  a woman or girl, diamond for non-binary or gender diverse. Sex assigned
+  at birth is written under the symbol as AMAB, AFAB or UAAB, and left out
+  when it matches the gender shown (a square with no code is a cis man).
+  A diamond with no code: sex or gender unknown or not stated. Gender is
+  established by asking the proband or consultand.
+- **Where the code goes is not consistent in the figures.** The sex and
+  gender table puts it directly under the symbol, above the age; the
+  symbols table puts it under the age or "d." line (deceased, stillbirth,
+  consultand). PedEdit's placement, after the age lines, matches the
+  second.
+- For children who have not yet expressed a gender, pregnancies,
+  stillbirths, and relatives, sex and gender are assumed to match unless
+  known otherwise. PedEdit draws pregnancies and losses by sex.
+- Do not use a circle inside a square or a square inside a circle (the NCCN
+  scheme), or an inverted triangle, for gender diverse people.
+- Variations in sex characteristics (VSC, intersex): the symbol for the
+  person's gender, with shading defined in the key and a note under it
+  (VSC, karyotype if known, or the condition). Karyotype only if known;
+  never assume it from sex at birth.
+- Grouped symbols follow gender: a numbered diamond for non-binary people
+  carries their code(s) under it ("AMAB/AFAB"); a numbered diamond with no
+  code is a group of unknown or mixed sex and gender.
+- **No "E".** Results go under the symbol without it (#114). The order under
+  the symbol stays age, then results, then pedigree number (numbers
+  "typically used in research or publication").
+- **No carrier dot**; divided symbol with fills instead (see Fig. 4 above,
+  #115). The presymptomatic vertical line and the documented "*" stay.
+- The relationship line stays solid. The task force considered a dotted
+  line to match non-biological lines and decided against it.
+- Proband: always affected, arrow with "P". Consultand: arrow without "P",
+  shaded if affected.
+- Twins: with no "?" and no bar, a twin set is dizygotic. Triplets drawn
+  the same way.
+- Adoption by a relative: brackets, solid lines from the biological parents,
+  a dashed line from the relative who adopted.
+- Pregnancy with a known fetal sex: square or circle with "P" inside, and
+  how the sex was found ("female by US", or a karyotype). Gestational age
+  under every pregnancy, miscarriage and termination.
+- Ancestry: of both sets of grandparents, when clinically relevant.
+- Assisted reproduction (Fig. 5): symbols unchanged; the gestational
+  carrier's line is solid even when she is not the genetic mother (as in
+  2008). New worked examples:
+  - two women, one carrying a pregnancy from a sperm donor;
+  - an unpartnered woman with a son and a pregnancy by the same donor (the
+    donor and she share a sibship line, no relationship line);
+  - a trans man (square, AFAB) carrying a pregnancy from a sperm donor; a
+    non-binary person (diamond, AFAB) likewise, partnered with a trans woman;
+  - a donated embryo (egg donor and sperm donor), carried by the female
+    partner: lines from both donors and from her, none from the male partner;
+  - a surrogate carrying for a trans man and cis man couple;
+  - a sister of a trans woman as egg donor and carrier for her and her
+    partner;
+  - "double gamete donor": a female couple, one partner's egg with donor
+    sperm, the other partner carrying (her vertical line to the pregnancy,
+    lines from the egg donor partner and the sperm donor).
+  The 2008 "planned adoption" scenario is not repeated.
+- Same-sex relationships were already recorded in 2008; the 2022 figures
+  draw same-sex and trans couples as ordinary couples (#105).
+- Frozen embryos: still no symbol (chart notes suffice for now).
 - Partners are no longer placed man left, woman right (Resta et al. 2022).
 
 ## Where we differ on purpose
@@ -194,9 +239,9 @@ the pedigree setting "Symbols show: gender identity where recorded" (the
 default) such a person gets the 2022 symbol for their gender and the AMAB /
 AFAB / UAAB line under it, as the 2022 figure does; "biological sex" draws
 everyone by sex. Where we still differ: the code goes in the text block
-under the name (after age and onset, before the pedigree number) rather
-than directly under the symbol and above the age, and a person with no
-gender identity recorded draws by sex with no annotation. In "biological
+under the name (after age and onset, before the pedigree number), which
+matches some of the 2022 figures but not the sex and gender table, and a
+person with no gender identity recorded draws by sex with no annotation. In "biological
 sex" mode nothing on the chart shows that a gender identity is recorded. The 2022 diamond for
 "multiple people of unknown or mixed sex" with a number inside matches what we
 use for groups.
@@ -210,6 +255,6 @@ The 2008 gaps found in November 2026 (#1, #8, #20, #97, #99, #100, #101,
 2. Fields NSGC uses that PedEdit lacks: gestational age, karyotype, proven
    zygosity, adoption by a relative, "n" groups (#112).
 3. Same-sex couples, which the 2022 figures draw (#105).
-4. Points to check against the 2022 paper: where the AMAB / AFAB / UAAB
-   code goes, the gestational carrier's line, carrier status (#110).
+4. 2022: results without "E" (#114), carriers as a divided fill rather
+   than a dot (#115). The other 2022 questions are answered above (#110).
 5. What de-identified export should drop, given the masking guidance (#111).
