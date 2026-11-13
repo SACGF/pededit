@@ -471,6 +471,7 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
     if (!role.has(mom)) role.set(mom, 2);
     resolved.push({ p, dad, mom });
   }
+  resolveRoleConflicts(resolved, sex);
 
   const childless: number[] = [];
   const seenCouple = new Set<number>();
@@ -503,6 +504,67 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
   }
 
   return { n, findex, mindex, sex, childlessCouples: Int32Array.from(childlessCouples) };
+}
+
+/**
+ * Same-sex couples (#105) can leave someone in the father role of one couple
+ * and the mother role of another: two women who each have a child by a man,
+ * or a woman whose partner is a woman and whose child is by a sperm donor
+ * (the chain donor - woman - woman - donor). alignped1 then sees only half
+ * of that person's marriages, and a couple is drawn apart. Where that
+ * happens, the roles of the people connected by partnerships are recoloured
+ * so every couple has one of each (a two-colouring of the partnership
+ * graph), choosing of the two colourings the one that keeps the most
+ * partners in the role of their sex. Nothing changes when there is no
+ * conflict, so pedigrees of opposite-sex couples lay out as kinship2 does.
+ * A component with an odd cycle of partnerships has no such colouring and
+ * is left as it was.
+ */
+function resolveRoleConflicts(resolved: Array<{ dad: number; mom: number }>, sex: Uint8Array): void {
+  const roles = new Map<number, number>(); // bit 1 = father role, bit 2 = mother role
+  for (const r of resolved) {
+    if (r.dad === r.mom) continue;
+    roles.set(r.dad, (roles.get(r.dad) ?? 0) | 1);
+    roles.set(r.mom, (roles.get(r.mom) ?? 0) | 2);
+  }
+  const conflicted = [...roles].filter(([, v]) => v === 3).map(([k]) => k);
+  if (conflicted.length === 0) return;
+
+  const adj = new Map<number, number[]>();
+  const link = (a: number, b: number) => { adj.set(a, [...(adj.get(a) ?? []), b]); };
+  for (const r of resolved) if (r.dad !== r.mom) { link(r.dad, r.mom); link(r.mom, r.dad); }
+
+  const done = new Set<number>();
+  for (const start of conflicted) {
+    if (done.has(start)) continue;
+    // Two-colour the component, starting from the father role.
+    const colour = new Map<number, 1 | 2>([[start, 1]]);
+    const queue = [start];
+    let bipartite = true;
+    while (queue.length) {
+      const x = queue.shift()!;
+      for (const y of adj.get(x) ?? []) {
+        const want = colour.get(x) === 1 ? 2 : 1;
+        if (!colour.has(y)) { colour.set(y, want); queue.push(y); }
+        else if (colour.get(y) !== want) bipartite = false;
+      }
+    }
+    for (const x of colour.keys()) done.add(x);
+    if (!bipartite) continue;
+    // Of the colouring and its flip, keep the one with more people in the role of their sex.
+    let agree = 0, disagree = 0;
+    for (const [x, c] of colour) {
+      const s = sex[x];
+      if (s !== 1 && s !== 2) continue;
+      if (s === c) agree++; else disagree++;
+    }
+    const flip = disagree > agree;
+    for (const r of resolved) {
+      if (!colour.has(r.dad) || r.dad === r.mom) continue;
+      const dadIsFather = (colour.get(r.dad) === 1) !== flip;
+      if (!dadIsFather) [r.dad, r.mom] = [r.mom, r.dad];
+    }
+  }
 }
 
 /**

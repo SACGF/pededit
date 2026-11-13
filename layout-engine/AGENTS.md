@@ -51,6 +51,15 @@ indexing convention inherited from R, and the three rendering rules.
   `shiftUnderCarrier` moves an only child with no partner under
   `carrierAbove` after `appendIsolated`, as far as its row neighbours
   allow. PED input never has them.
+- Same-sex couples (#105): `pedigreeToLayoutInput` gives every couple a
+  father role and a mother role, a male taking the father role. Two women
+  who each have a child by a man (or a donor) would then hold the mother
+  role in one couple and the father role in their own, and alignped1 sees
+  only half of such a person's marriages (a donor pair drawn apart, a
+  child with no line). `resolveRoleConflicts` recolours the roles of that
+  partnership component (two-colouring, keeping the most people in the role
+  of their sex) only when such a conflict exists, so opposite-sex pedigrees
+  and the oracle are unchanged. Roles, not sex, are what alignped1 reads.
 - `partnerSides.ts` — which side a partner is drawn on (#106).
   `Partnership.leftPartner` reaches kinship2 as its own input, a spouse hint
   row `[left, right, anchor]` (`applyPartnerSides`, run in `alignPedigree`
