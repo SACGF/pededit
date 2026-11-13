@@ -61,6 +61,19 @@ export function duplicateArcD(
   return `M ${sx} ${uy} Q ${cx} ${uy} ${lx} ${ly - half}`;
 }
 
+/** Points along `duplicateArcD`'s curve, for keeping text off it (#109). */
+export function duplicateArcPoints(
+  x1: number, y1: number, x2: number, y2: number,
+  bulge: number, half: number, steps = 12,
+): [number, number][] {
+  const [x0, y0, cx, cy, xe, ye] = duplicateArcD(x1, y1, x2, y2, bulge, half).match(/-?[\d.]+(?:e[-+]?\d+)?/g)!.map(Number) as
+    [number, number, number, number, number, number];
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps, u = 1 - t;
+    return [u * u * x0 + 2 * u * t * cx + t * t * xe, u * u * y0 + 2 * u * t * cy + t * t * ye];
+  });
+}
+
 /**
  * The two paths of a consanguineous (double) couple line, drawn GAP px apart.
  * For a hopping line the two paths are concentric so they stay parallel around

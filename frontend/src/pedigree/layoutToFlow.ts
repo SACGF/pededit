@@ -2,14 +2,16 @@ import type { Node, Edge } from "@xyflow/react";
 import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
-import { hopGeometry } from "./couplePath";
+import { duplicateArcPoints, hopGeometry } from "./couplePath";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
 import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { middleTaken } from "./ended";
-import { consanguinityLabelRoom, consanguinityLabelText, wrapConsanguinityLabel } from "./consanguinityLabel";
+import { consanguinityLabelLimits, consanguinityLabelRoom, consanguinityLabelText, placeConsanguinityLabel, wrapConsanguinityLabel } from "./consanguinityLabel";
+import type { ConsanguinityLabelOffset, TextBlock } from "./consanguinityLabel";
+import { copyNumberBlock, textBlockUnder } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
@@ -97,6 +99,8 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   middleTaken?: boolean;
   /** Degree of relationship written above a double line (#97), wrapped. */
   consanguinityLabel?: string[];
+  /** Where the label goes when its usual place is taken by text above (#109). */
+  consanguinityLabelOffset?: ConsanguinityLabelOffset;
 }
 
 /**
@@ -301,11 +305,13 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
     if (n) n.data.labelsBacked = true;
   }
 
+  const duplicateEdges = buildDuplicateEdges(nodes, spacing);
+  const blocks = [...textBlocks(pedigree, nodes, spacing), ...duplicateArcBlocks(duplicateEdges, slotPos), ...sibshipBlocks(sibshipEdges)];
   return {
     nodes,
-    coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight),
+    coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, blocks),
     sibshipEdges,
-    duplicateEdges: buildDuplicateEdges(nodes, spacing),
+    duplicateEdges,
     assistedEdges,
   };
 }
@@ -550,6 +556,47 @@ function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing):
   return edges;
 }
 
+/**
+ * The text under every drawn symbol, as the export writes it, and the copy
+ * number beside the top of a symbol drawn twice, for placing couple labels
+ * (#109).
+ */
+function textBlocks(pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: LayoutSpacing): TextBlock[] {
+  const labelMax = labelMaxWidth(spacing.slotWidth);
+  const numbers = labelNumbers(pedigree);
+  return nodes.flatMap(n => [
+    ...[textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, labelMax, numbers) ?? []].flat(),
+    ...(n.data.isDuplicate && n.data.duplicateIndex !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.data.duplicateIndex)] : []),
+  ]);
+}
+
+/** The dashed arcs between copies of someone, as a thin box per stretch, for placing couple labels (#109). */
+function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<string, { x: number; y: number }>): TextBlock[] {
+  return edges.flatMap(e => {
+    const a = slotPos.get(e.source), b = slotPos.get(e.target);
+    if (!a || !b) return [];
+    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? DUPLICATE_ARC_BULGE, NODE_SIZE / 2);
+    return pts.slice(1).map(([x, y], i) => {
+      const [px, py] = pts[i]!;
+      return { x: (x + px) / 2, halfWidth: Math.abs(x - px) / 2 + 1, top: Math.min(y, py) - 2, bottom: Math.max(y, py) + 2, arc: true };
+    });
+  });
+}
+
+/** Sibship bars and the drops from them, as thin boxes, so a raised couple label stays under them (#109). */
+function sibshipBlocks(edges: Edge<SibshipEdgeData>[]): TextBlock[] {
+  return edges.flatMap(e => {
+    const d = e.data;
+    if (!d) return [];
+    const xs = [d.coupleX, ...d.childXs];
+    const lo = Math.min(...xs), hi = Math.max(...xs);
+    return [
+      { x: (lo + hi) / 2, halfWidth: (hi - lo) / 2 + 1, top: d.sibBarY - 2, bottom: d.sibBarY + 2 },
+      ...d.childXs.map((x, i) => ({ x, halfWidth: 1, top: d.sibBarY, bottom: (d.childYs[i] ?? d.childY) - NODE_SIZE / 2 })),
+    ];
+  });
+}
+
 // ── Couple edges ──────────────────────────────────────────────────────────────
 
 function buildCoupleEdges(
@@ -558,6 +605,7 @@ function buildCoupleEdges(
   partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
   rowHeight: number,
+  blocks: TextBlock[],
 ): Edge<CoupleEdgeData>[] {
   const edges: Edge<CoupleEdgeData>[] = [];
   const related = consanguinityTest(pedigree);
@@ -594,7 +642,7 @@ function buildCoupleEdges(
           partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
           ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
           ...endedData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
-          ...(double ? labelData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot), `${level}-${rc.leftSlot}`, `${level}-${rc.rightSlot}`) : {}),
+          ...(double ? labelData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot), `${level}-${rc.leftSlot}`, `${level}-${rc.rightSlot}`, hopAt(result, partners, level, slot).hopHeight ?? 0) : {}),
         },
       });
     }
@@ -609,7 +657,7 @@ function buildCoupleEdges(
     return { childless, childlessReason: partnership!.childlessReason || undefined };
   }
 
-  function labelData(a: string, b: string, left: string, right: string): Pick<CoupleEdgeData, "consanguinityLabel"> {
+  function labelData(a: string, b: string, left: string, right: string, hop: number): Pick<CoupleEdgeData, "consanguinityLabel" | "consanguinityLabelOffset"> {
     const partnership = partnershipOf.get(pairKey(a, b));
     const text = partnership && consanguinityLabelText(pedigree, partnership);
     const l = slotPos.get(left), r = slotPos.get(right);
@@ -620,7 +668,15 @@ function buildCoupleEdges(
     });
     const [lx, rx] = l.x <= r.x ? [l.x, r.x] : [r.x, l.x];
     const [lt, rt] = l.x <= r.x ? [top(a), top(b)] : [top(b), top(a)];
-    return { consanguinityLabel: wrapConsanguinityLabel(text, consanguinityLabelRoom(lx, rx, lt, rt), rowHeight) };
+    const lines = wrapConsanguinityLabel(text, consanguinityLabelRoom(lx, rx, lt, rt), rowHeight);
+    // Out of the way of the text under the people above (#109); not drawn
+    // when there is no room for it anywhere near the line.
+    const offset = placeConsanguinityLabel({
+      lx, rx, cy: (l.y + r.y) / 2, hop, lines, blocks,
+      limits: consanguinityLabelLimits(lx, rx, lt, rt), ended: !!partnership.ended,
+    });
+    if (!offset) return {};
+    return { consanguinityLabel: lines, ...(offset.dx || offset.dy || offset.backed ? { consanguinityLabelOffset: offset } : {}) };
   }
 
   function endedData(a: string, b: string): Pick<CoupleEdgeData, "ended" | "middleTaken"> {

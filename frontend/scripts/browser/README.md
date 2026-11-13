@@ -140,6 +140,8 @@ include it):
 ```bash
 node frontend/scripts/browser/lint.mjs --all-examples
 node frontend/scripts/browser/lint.mjs --all-examples --compact
+node frontend/scripts/browser/lint.mjs --all-examples --relationship-labels --compact   # text above every nameable double line (#97, #109)
+node frontend/scripts/browser/lint.mjs --all-examples --relationship-labels --u-shape   # the U-shape export's labels instead
 node frontend/scripts/browser/lint.mjs --fixture test-data/ped/historic/habsburg.ped
 node frontend/scripts/browser/lint.mjs /p/<id> --click ... # the editor's pedigree after steps
 ```

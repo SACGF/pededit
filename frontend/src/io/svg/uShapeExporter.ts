@@ -21,6 +21,10 @@ import { renderPresymptomaticSvg, renderDocumentedMarkSvg, hasDocumentedEvaluati
 import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { lifeStatusCaption } from "../../pedigree/lifeStatus";
+import {
+  consanguinityLabelText, consanguinityLabelWidth, CONSANGUINITY_LABEL_FONT_SIZE,
+} from "../../pedigree/consanguinityLabel";
+import { ENDED_STROKE_DY } from "../../pedigree/ended";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // U-shape (horseshoe) pedigree export. Issue #2.
@@ -74,6 +78,20 @@ const MIN_ASPECT = 0.5;         // a fan flatter than this is no better than the
 const MAX_PLACE_ATTEMPTS = 4;
 const FAN_MAX_WIDTH = 1200;     // a fan wider than this is no longer a page-sized figure
 const MAX_FLAT = 260;           // longest half flat bottom that generation 1 may claim
+// Consanguinity label (#97, #109): written along the double line between the
+// two symbols, on the inward side ("above" the line, as the symbols see it).
+const CLABEL_PAD = 7;           // between the label and either symbol (clears a deceased slash and adoption brackets)
+const CLABEL_BASELINE = CONSANG_GAP / 2 + 4;            // bottom line's baseline, inward of the track
+const CLABEL_ENDED_BASELINE = ENDED_STROKE_DY + 4;      // above the strokes of an ended relationship (#98)
+const CLABEL_CAP = 9;           // from the baseline to above the cap height, with a pixel to spare
+const CLABEL_REACH = 3;         // past the text's ends that the label keeps clear of the line
+// Smallest founder-track radius build() ever uses: 1.4 ringGaps of at least one label line.
+const MIN_LABEL_RADIUS = 1.4 * (NODE_SIZE + 8 + LABEL_LINE_HEIGHT + BAR_CLEARANCE + 6);
+
+/** How far a label may be lifted off a curve before it reaches the dashed links just inside the symbols. */
+function maxLabelSag(w: Union): number {
+  return HALF + DUP_LINK_INSET - 1.5 - CLABEL_CAP - (w.ended ? CLABEL_ENDED_BASELINE : CLABEL_BASELINE);
+}
 
 type Partnership = Pedigree["partnerships"][number];
 
@@ -111,6 +129,34 @@ interface Union {
   joinNode: TNode | null;
   /** Which side the partner is on, for join. For dup, which side is preferred. */
   joinSide: -1 | 1;
+  /** Degree of relationship written along a double line (#97), wrapped, and how wide it is. */
+  label?: string[];
+  labelWidth?: number;
+  /** The relationship has ended (#98): its strokes cross the line under the label. */
+  ended?: boolean;
+}
+
+/**
+ * Centre-to-centre distance of a couple drawn side by side: COUPLE_GAP, or
+ * more when the label between them needs it (#109). Joined couples get the
+ * same room from the packing. On a curve each symbol is turned towards the
+ * label by the angle between them, which brings its inner top corner closer
+ * by about HALF times that angle; the radius is at least `labelRadius`.
+ */
+function coupleGap(w: Union | undefined): number {
+  if (!w?.labelWidth) return COUPLE_GAP;
+  const turn = (w.labelWidth / 2 + CLABEL_PAD + HALF) / labelRadius(w);
+  return Math.max(COUPLE_GAP, NODE_SIZE + w.labelWidth + 2 * (CLABEL_PAD + HALF * turn + 1));
+}
+
+/**
+ * The tightest curve a labelled line can lie on: gentle enough to lift the
+ * straight label clear of the line at its ends (`maxLabelSag`, enforced in
+ * `build` through r0), and never tighter than the founder track can be.
+ */
+function labelRadius(w: Union): number {
+  const reach = w.labelWidth! / 2 + CLABEL_REACH;
+  return Math.max((reach * reach) / (2 * maxLabelSag(w)), MIN_LABEL_RADIUS);
 }
 
 interface TNode {
@@ -134,6 +180,8 @@ interface TNode {
   side: -1 | 0 | 1;
   /** Signed position of the reference point along the U. */
   u: number;
+  /** Joined to a neighbour by a labelled double line (#109): their centre-to-centre distance. */
+  joinGap?: number;
 }
 
 const kidsOf = (n: TNode): TNode[] => (n.unions.length === 1 ? n.unions[0].kids : n.unions.flatMap(w => w.kids));
@@ -187,10 +235,10 @@ function arrange(n: TNode, sexOf: (id: string) => string | undefined): boolean {
     if (s < 0) left = w; else right = w;
   }
   const members: Member[] = [];
-  if (left && left.kind !== "join") members.push({ id: left.partner!, dx: -COUPLE_GAP, dup: left.kind === "dup" });
+  if (left && left.kind !== "join") members.push({ id: left.partner!, dx: -coupleGap(left), dup: left.kind === "dup" });
   const me = members.length;
   members.push({ id: n.blood, dx: 0, dup: false });
-  if (right && right.kind !== "join") members.push({ id: right.partner!, dx: COUPLE_GAP, dup: right.kind === "dup" });
+  if (right && right.kind !== "join") members.push({ id: right.partner!, dx: coupleGap(right), dup: right.kind === "dup" });
   if (left) { left.a = me; left.b = left.kind === "join" ? null : 0; }
   if (right) { right.a = me; right.b = right.kind === "join" ? null : members.length - 1; }
   const solo = n.unions.find(w => w.kind === "solo");
@@ -251,8 +299,22 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const isDouble = (p: Partnership) => drawnDouble(p.individual1, p.individual2);
 
   let nextOrder = 0;
-  const mkUnion = (kind: Union["kind"], pids: string[], partner: string | null, consang: boolean): Union =>
-    ({ kind, order: nextOrder++, pids, partner, consang, kids: [], a: 0, b: null, joinNode: null, joinSide: 1 });
+  const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
+  const mkUnion = (kind: Union["kind"], pids: string[], partner: string | null, consang: boolean): Union => {
+    const w: Union = { kind, order: nextOrder++, pids, partner, consang, kids: [], a: 0, b: null, joinNode: null, joinSide: 1 };
+    // The label between the partners (#109), on one line: the couple moves
+    // apart for it when the usual gap is too narrow. A second line would
+    // reach the dashed links and sibship bars that run along the track just
+    // inside the symbols.
+    const p = consang && pids.length === 1 ? partnershipById.get(pids[0]!) : undefined;
+    const text = p && consanguinityLabelText(pedigree, p);
+    if (text) {
+      w.ended = !!p!.ended;
+      w.label = [text];
+      w.labelWidth = Math.max(...w.label.map(consanguinityLabelWidth));
+    }
+    return w;
+  };
   const mkNode = (blood: string, depth: number, parent: TNode | null, parentUnion: Union | null): TNode => ({
     blood, isRoot: parent === null, members: [{ id: blood, dx: 0, dup: false }], unions: [], depth, parent, parentUnion,
     reservedL: false, reservedR: false, v: 0, side: 0, u: 0,
@@ -263,8 +325,9 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const p = pedigree.partnerships[0];
     if (!p) return mkNode(pedigree.individuals[0].id, 0, null, null);
     const root = mkNode(p.individual1, 0, null, null);
-    root.members = [{ id: p.individual1, dx: -COUPLE_GAP / 2, dup: false }, { id: p.individual2, dx: COUPLE_GAP / 2, dup: false }];
-    root.unions = [{ ...mkUnion("spouse", [p.id], p.individual2, isDouble(p)), a: 0, b: 1 }];
+    const w = { ...mkUnion("spouse", [p.id], p.individual2, isDouble(p)), a: 0, b: 1 };
+    root.members = [{ id: p.individual1, dx: -coupleGap(w) / 2, dup: false }, { id: p.individual2, dx: coupleGap(w) / 2, dup: false }];
+    root.unions = [w];
     return root;
   }
 
@@ -297,8 +360,9 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const first = sexOf(rootP.individual1) === "female" ? rootP.individual2 : rootP.individual1;
     const second = otherOf(rootP, first);
     root = mkNode(first, 0, null, null);
-    root.members = [{ id: first, dx: -COUPLE_GAP / 2, dup: false }, { id: second, dx: COUPLE_GAP / 2, dup: false }];
-    root.unions = [{ ...mkUnion("spouse", [rootP.id], second, isDouble(rootP)), a: 0, b: 1 }];
+    const w = { ...mkUnion("spouse", [rootP.id], second, isDouble(rootP)), a: 0, b: 1 };
+    root.members = [{ id: first, dx: -coupleGap(w) / 2, dup: false }, { id: second, dx: coupleGap(w) / 2, dup: false }];
+    root.unions = [w];
   } else {
     // Earlier partnership on the left, the shared parent in the middle.
     consumed.add(extraP.id);
@@ -306,15 +370,15 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const hub = pl.individual1 === pr.individual1 || pl.individual1 === pr.individual2 ? pl.individual1 : pl.individual2;
     root = mkNode(hub, 0, null, null);
     const isDup = (p: Partnership) => p === extraP && bloodLine.has(otherOf(p, hub));
-    root.members = [
-      { id: otherOf(pl, hub), dx: -COUPLE_GAP, dup: isDup(pl) },
-      { id: hub, dx: 0, dup: false },
-      { id: otherOf(pr, hub), dx: COUPLE_GAP, dup: isDup(pr) },
-    ];
     root.unions = [pl, pr].map((p, i) => ({
       ...mkUnion(isDup(p) ? "dup" : "spouse", [p.id], otherOf(p, hub), isDouble(p)),
       a: 1, b: i === 0 ? 0 : 2,
     }));
+    root.members = [
+      { id: otherOf(pl, hub), dx: -coupleGap(root.unions[0]), dup: isDup(pl) },
+      { id: hub, dx: 0, dup: false },
+      { id: otherOf(pr, hub), dx: coupleGap(root.unions[1]), dup: isDup(pr) },
+    ];
   }
   for (const m of root.members) if (!m.dup) drawn.add(m.id);
 
@@ -424,6 +488,12 @@ function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       if (tryJoin(root, host, w, other, sexOf, joins)) joins.push({ host, w });
     }
   }
+  // Room for the label between joined partners (#109), wherever the packing
+  // puts them: side by side, or either side of the centre.
+  for (const { host, w } of joins) {
+    if (w.kind !== "join" || !w.labelWidth) continue;
+    for (const n of [host, w.joinNode!]) n.joinGap = Math.max(n.joinGap ?? 0, coupleGap(w));
+  }
 
   return root;
 }
@@ -520,6 +590,14 @@ function advance(u: number, dir: -1 | 1, offset: number, dist: number, g: Geom):
   return (t + dist) * dir;
 }
 
+/** Real pixels along the track `offset` px outside the founder track from u1 to u2 (u1 <= u2). */
+function trackDistance(u1: number, u2: number, offset: number, g: Geom): number {
+  const curve = (g.r0 + offset) / g.r0;
+  const overlap = (a: number, b: number) => Math.max(0, Math.min(u2, b) - Math.max(u1, a));
+  const onCurve = overlap(-g.flat - g.vb, -g.flat) + overlap(g.flat, g.flat + g.vb);
+  return (u2 - u1 - onCurve) + onCurve * curve;
+}
+
 interface TrackPoint { x: number; y: number; nx: number; ny: number; theta: number; }
 
 /** Point at signed position u on the track `offset` px outside the founder track. */
@@ -575,7 +653,7 @@ function packSide(tops: TNode[], side: -1 | 1, g: Geom, uC: number, firstMin = -
     let inward = 0, outward = 0;
     for (const m of n.members) { inward = Math.max(inward, -side * m.dx); outward = Math.max(outward, side * m.dx); }
     const floor = last[n.depth] === undefined
-      ? step(0, offset, (g.slot + FAMILY_GAP) / 2 + inward)
+      ? step(0, offset, Math.max((g.slot + FAMILY_GAP) / 2, (n.joinGap ?? 0) / 2) + inward)
       : step(last[n.depth], offset, (lastNode[n.depth].parent === n.parent ? g.slot : g.slot + FAMILY_GAP) + inward);
     let need = Math.max(hint, floor);
 
@@ -588,6 +666,10 @@ function packSide(tops: TNode[], side: -1 | 1, g: Geom, uC: number, firstMin = -
     const prevJoins = !!prev && prev.unions.some(w => w.kind === "join" && w.joinNode === n);
     const clear = BAR_CLEARANCE;
     if (prev && joinsPrev && last[n.depth + 1] !== undefined) need = Math.max(need, 2 * (last[n.depth + 1] + clear) - prev.v);
+    // Room for the label between joined partners (#109).
+    const joinUnion = !prev ? undefined
+      : n.unions.find(w => w.kind === "join" && w.joinNode === prev) ?? prev.unions.find(w => w.kind === "join" && w.joinNode === n);
+    if (joinUnion?.labelWidth) need = Math.max(need, step(prev!.v, offset, coupleGap(joinUnion)));
 
     const groups = inOrder(n.unions.filter(w => w.kids.length));
     if (groups.length === 0) {
@@ -677,7 +759,7 @@ function packTree(root: TNode, g: Geom, slide: boolean): number {
     splits.push(i);
   }
   if (splits.length === 0 && groups.length === 1) splits.push(kids.length);
-  const firstMin = groups.length > 1 ? COUPLE_GAP / 2 : -Infinity;
+  const firstMin = groups.length > 1 ? Math.max(...groups.map(coupleGap)) / 2 : -Infinity;
 
   // Two ways to even out the arms: choose where the sibship is split between
   // them, and slide the founders along the U. A family that fits on the curve
@@ -795,6 +877,30 @@ export interface UShapeLayout {
   founders: string[];
   /** Individuals in the pedigree that are not drawn. */
   omitted: string[];
+  /** Consanguinity labels (#97, #109), see `UShapeCoupleLabel`. */
+  coupleLabels: UShapeCoupleLabel[];
+}
+
+/**
+ * Text along a double couple line, between the partners' symbols, on the
+ * inward side (above the line, as the symbols stand). (x, y) is the point
+ * on the line under the middle of the label and `rotation` the line's angle
+ * there, as for the symbols. In that rotated frame the text is centred on
+ * x = 0 with its baseline at y = baselines[0] (negative: inward). One line
+ * for now; `lines` and `baselines` leave room for more.
+ * The text is straight, so on the curve it is lifted by the sagitta of its
+ * half width, the most the line bends up towards it at its ends.
+ */
+export interface UShapeCoupleLabel {
+  partnershipId: string;
+  lines: string[];
+  width: number;
+  x: number;
+  y: number;
+  rotation: number;
+  baselines: number[];
+  /** On a white backing, which a dashed link between two copies of someone passes behind. */
+  backed: boolean;
 }
 
 interface Extent { minX: number; maxX: number; minY: number; maxY: number; }
@@ -838,7 +944,15 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
   // the track when labels are long.
   const ringGap = NODE_SIZE + 8 + labelLines * LABEL_LINE_HEIGHT + BAR_CLEARANCE + 6;
   const slot = Math.min(MAX_SLOT, Math.max(MIN_SLOT, labelChars * LABEL_CHAR_WIDTH + 12));
-  const minR0 = Math.max(1.4 * ringGap, (root.members.length - 1) * COUPLE_GAP + NODE_SIZE);
+  let minR0 = Math.max(1.4 * ringGap, Math.max(...root.members.map(m => m.dx)) - Math.min(...root.members.map(m => m.dx)) + NODE_SIZE);
+  // A straight label on a curve is lifted clear of the line at its ends
+  // (coupleLabels); the curve must be gentle enough for that lift (#109).
+  walk(root, n => {
+    for (const w of n.unions) {
+      if (!w.labelWidth) continue;
+      minR0 = Math.max(minR0, labelRadius(w) + CONSANG_GAP / 2 - n.depth * ringGap);
+    }
+  });
 
   // The founders stand upright on the flat bottom, and so do their children
   // if there are only a few of them. A small family then reads like an
@@ -924,7 +1038,102 @@ function toLayout(pedigree: Pedigree, b: Built): UShapeLayout {
     maxDepth: b.maxDepth,
     founders: b.root.members.map(m => m.id),
     omitted: pedigree.individuals.filter(i => !nodes.has(i.id)).map(i => i.id),
+    coupleLabels: coupleLabels(b, { nodes, duplicates }),
   };
+}
+
+/**
+ * Where each couple label goes (`UShapeCoupleLabel`): half way along the
+ * line, or slid along it to clear the dashed link between two copies of
+ * someone that runs straight across the tracks (renderConnectors). Where
+ * such a link crosses every place between the partners (often the link from
+ * one of the partners themselves, heading inward), the label is written half
+ * way on a white backing and the dashed link passes behind it.
+ */
+function coupleLabels(b: Built, layout: Pick<UShapeLayout, "nodes" | "duplicates">): UShapeCoupleLabel[] {
+  const g = b.geom;
+  const placed: UShapeCoupleLabel[] = [];
+  const chords: Array<[number, number, number, number]> = [];
+  for (const dup of layout.duplicates) {
+    const orig = layout.nodes.get(dup.id);
+    if (orig && orig.depth !== dup.depth) chords.push([dup.x, dup.y, orig.x, orig.y]);
+  }
+  walk(b.root, n => {
+    for (const w of n.unions) {
+      if (!w.label || !w.labelWidth || w.kind === "solo") continue;
+      const track = n.depth * g.ringGap;
+      const uA = memberU(n, w.a, g);
+      const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
+      const [lo0, hi0] = uA < uB ? [uA, uB] : [uB, uA];
+      // Distances are real pixels along the line, which on the curve are
+      // not units of u.
+      const length = trackDistance(lo0, hi0, track, g);
+      const half = w.labelWidth / 2;
+      const at = (d: number): UShapeCoupleLabel => {
+        const mid = advance(lo0, 1, track, d, g);
+        // Any of it over the curve: lift it by the sagitta at its ends. The
+        // radius is never tighter than labelRadius (build), so the lift
+        // keeps it under the dashed links along the track (maxLabelSag).
+        const lo = Math.abs(mid) - half, hi = Math.abs(mid) + half;
+        const onCurve = hi > g.flat && lo < g.flat + g.vb;
+        const reach = half + CLABEL_REACH;
+        const sag = onCurve ? (reach * reach) / (2 * (g.r0 + track - CONSANG_GAP / 2)) : 0;
+        const bottom = (w.ended ? CLABEL_ENDED_BASELINE : CLABEL_BASELINE) + sag;
+        const p = trackPoint(mid, track, g);
+        return {
+          partnershipId: w.pids[0]!,
+          lines: w.label!,
+          width: w.labelWidth!,
+          x: p.x, y: p.y,
+          rotation: (-p.theta * 180) / Math.PI,
+          baselines: [-bottom],
+          backed: false,
+        };
+      };
+      const clear = (l: UShapeCoupleLabel): boolean => {
+        const a = (-l.rotation * Math.PI) / 180, cos = Math.cos(a), sin = Math.sin(a);
+        const local = (x: number, y: number): [number, number] => [(x - l.x) * cos - (y - l.y) * sin, (x - l.x) * sin + (y - l.y) * cos];
+        const box: [number, number, number, number] = [-half - 2, Math.min(...l.baselines) - CLABEL_CAP, half + 2, Math.max(...l.baselines) + 4];
+        return chords.every(([x1, y1, x2, y2]) => !segmentMeetsBox(local(x1, y1), local(x2, y2), box));
+      };
+      // Half way, then further and further either side while the label
+      // stays clear of both symbols.
+      const room = length / 2 - HALF - CLABEL_PAD - half;
+      let found: UShapeCoupleLabel | undefined;
+      for (let k = 0; !found && k * 4 <= Math.max(0, room); k++) {
+        for (const d of k === 0 ? [0] : [-k * 4, k * 4]) {
+          const l = at(length / 2 + d);
+          if (clear(l)) { found = l; break; }
+        }
+      }
+      placed.push(found ?? { ...at(length / 2), backed: true });
+    }
+  });
+  return placed;
+}
+
+/** Does the segment a-b cross the box [x1, y1, x2, y2]? (Liang-Barsky) */
+function segmentMeetsBox(a: [number, number], b: [number, number], box: [number, number, number, number]): boolean {
+  let t0 = 0, t1 = 1;
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  for (const [p, q] of [[-dx, a[0] - box[0]], [dx, box[2] - a[0]], [-dy, a[1] - box[1]], [dy, box[3] - a[1]]] as const) {
+    if (p === 0) { if (q < 0) return false; continue; }
+    const t = q / p;
+    if (p < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; }
+  }
+  return true;
+}
+
+function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
+  return labels.map(l =>
+    `<g transform="translate(${r(l.x)} ${r(l.y)}) rotate(${r(l.rotation)})">` +
+    (l.backed
+      // Just the text's box (cap height to descenders), so it hides nothing but the link.
+      ? `<rect x="${r(-l.width / 2 - 1)}" y="${r(Math.min(...l.baselines) - 8)}" width="${r(l.width + 2)}" height="${r(Math.max(...l.baselines) - Math.min(...l.baselines) + 10.5)}" fill="white"/>`
+      : "") +
+    l.lines.map((line, i) =>
+      `<text x="0" y="${r(l.baselines[i]!)}" text-anchor="middle" font-family="sans-serif" font-size="${CONSANGUINITY_LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`).join("") +
+    `</g>`);
 }
 
 /** Positions only, no SVG. Origin is the centre of the curve, y grows downward. */
@@ -1354,6 +1563,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout, working));
   out.push(...renderSymbols(working, b));
+  out.push(`<g class="consanguinity-labels">`, ...renderCoupleLabels(layout.coupleLabels), `</g>`);
   out.push(`</g>`);
   if (legend.height > 0) {
     out.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);

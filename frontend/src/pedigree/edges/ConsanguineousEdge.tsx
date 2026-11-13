@@ -36,7 +36,7 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
         <ChildlessMark cx={(sx + tx) / 2} topY={(sy + ty) / 2 - hop + GAP / 2} status={data.childless} reason={data.childlessReason} />
       )}
       {data?.consanguinityLabel && (
-        <ConsanguinityLabel cx={(sx + tx) / 2} cy={(sy + ty) / 2} hop={hop} lines={data.consanguinityLabel} />
+        <ConsanguinityLabel cx={(sx + tx) / 2} cy={(sy + ty) / 2} hop={hop} lines={data.consanguinityLabel} offset={data.consanguinityLabelOffset} />
       )}
       {data?.ended && <EndedMark sx={sx} tx={tx} y={(sy + ty) / 2 - hop + (hop > 0 ? GAP / 2 : 0)} data={data} />}
     </g>

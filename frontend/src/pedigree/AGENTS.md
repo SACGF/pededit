@@ -295,11 +295,24 @@ draws NSGC symbols.
   `ConsanguineousEdge` and `svgExporter` (group `consanguinity-labels`)
   draw it from `consanguinityLabelBaselines`; both raise the chart title
   over a top-row label (`highestConsanguinityLabel`, `chartTitleNode`'s
-  `aboveTop`). The export lint's `consanguinity-label-collides` checks it
-  against symbols, lines and other text. Known: in compact rows a label over
-  a sibling couple can touch the name of a parent drawn straight above
-  (House Targaryen with the setting on). The U-shape export leaves the
-  label out: on its tracks it ran into names and dashed arcs. Edited in the
+  `aboveTop`). Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
+  hands it every obstacle near a label as a box (`TextBlock`): the text
+  under each symbol as the export writes it (`labelBlock.ts`, lower and
+  taller than the canvas's, so clear there means clear on the canvas too),
+  copy numbers, sibship bars and drops, and the dashed arcs between copies.
+  It tries the usual place, then slid along the line, then raised up to
+  12px, then low between wide-apart symbols; then the same with the arcs
+  allowed to pass behind a white backing (`backed`); otherwise the label is
+  not drawn. That last fallback happens in compact rows, where a parent's
+  two or more lines of text hang down to the symbol tops of the row below:
+  siblings side by side under such a parent have no room anywhere
+  (House Targaryen's Aegon and Shaera, the Habsburg uncle and niece). The
+  result is `CoupleEdgeData.consanguinityLabelOffset`; the canvas, the
+  export and `highestConsanguinityLabel` all read it. The export lint's
+  `consanguinity-label-collides` checks the label against symbols, lines,
+  other text, copy numbers and dashed arcs (unless backed), compact rows
+  included. The U-shape export has its own rule (`claude/export_u_plan.md`).
+  Edited in the
   panel under the "Consanguineous with" checkbox (with a "Write <name>"
   button when the pedigree names the relationship) and "Text above line..."
   in the couple line's right-click menu.

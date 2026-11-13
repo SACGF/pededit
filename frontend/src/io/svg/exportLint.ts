@@ -18,7 +18,9 @@
  *   assisted-not-drawn     a carrier or social parent (#45) has no line to the child
  *   labels-overlap         two label lines on one row run into each other
  *   consanguinity-label-collides  the degree of relationship over a double line (#97)
- *                          runs into a symbol, a line or other text
+ *                          runs into a symbol, a line, other text, a copy number
+ *                          or a dashed arc between two copies (unless the label
+ *                          is on a white backing, #109)
  *
  * PNG and PDF are rasterised from this SVG, so the lint covers them too. The
  * U-shape export has its own geometry and is not checked here.
@@ -81,6 +83,12 @@ interface Parsed {
   coupleTexts: { x: number; y: number; text: string }[];
   /** Baselines of the "?" marks over symbols (#100). */
   questionMarks: Pt[];
+  /** The dashed arcs between two copies of someone, as polylines (group `duplicate-arcs`). */
+  duplicateArcs: Pt[][];
+  /** Copy numbers beside a symbol drawn twice: where the text starts, on its baseline, and the text. */
+  copyNumbers: { x: number; y: number; text: string }[];
+  /** White backings behind consanguinity labels on a dashed arc (#109), as [x1, y1, x2, y2]. */
+  coupleBackings: [number, number, number, number][];
   /** False when the SVG has none of the groups exportSvg writes. */
   structured: boolean;
   /** Offset of the pedigree group: canvas coordinates plus this give SVG coordinates. */
@@ -101,7 +109,7 @@ function polyline(d: string): Pt[] | null {
 
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
-  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], structured: false, origin: [0, 0] };
+  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], duplicateArcs: [], copyNumbers: [], coupleBackings: [], structured: false, origin: [0, 0] };
   type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
@@ -145,6 +153,26 @@ export function parseExportSvg(svg: string): Parsed {
     }
     if (name === "text" && attrs.class === "family-history-unknown" && !skipped()) {
       out.questionMarks.push([Number(attrs.x) + ox, Number(attrs.y) + oy]);
+    }
+    // The copy number of someone drawn twice: plain digits at the symbol's top right.
+    if (name === "text" && inSymbol() && !skipped() && !attrs["text-anchor"] && !attrs.class) {
+      textStart = m.index + m[0].length;
+      textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
+      textInto = out.copyNumbers;
+    }
+    if (name === "rect" && g === "consanguinity-labels" && !skipped()) {
+      const n = (k: string) => Number(attrs[k]);
+      out.coupleBackings.push([n("x") + ox, n("y") + oy, n("x") + n("width") + ox, n("y") + n("height") + oy]);
+    }
+    if (name === "path" && g === "duplicate-arcs" && !skipped()) {
+      const q = /^M\s*([-\d.e+]+)[\s,]+([-\d.e+]+)\s*Q\s*([-\d.e+]+)[\s,]+([-\d.e+]+)[\s,]+([-\d.e+]+)[\s,]+([-\d.e+]+)\s*$/.exec(attrs.d ?? "");
+      if (q) {
+        const [x0, y0, cx, cy, x1, y1] = q.slice(1).map(Number) as [number, number, number, number, number, number];
+        out.duplicateArcs.push(Array.from({ length: 13 }, (_, i) => {
+          const t = i / 12, u = 1 - t;
+          return [u * u * x0 + 2 * u * t * cx + t * t * x1 + ox, u * u * y0 + 2 * u * t * cy + t * t * y1 + oy] as Pt;
+        }));
+      }
     }
     if (skipped() || inSymbol()) continue;
     if (attrs.class === "mark") continue;
@@ -416,6 +444,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   const textBox = (t: { x: number; y: number }, w: number, cap: number): Box => [t.x - w / 2 - 1, t.y - cap - 1, t.x + w / 2 + 1, t.y + 3];
   const segBox = ([x1, y1, x2, y2]: Seg): Box => [Math.min(x1, x2) - 1, Math.min(y1, y2) - 1, Math.max(x1, x2) + 1, Math.max(y1, y2) + 1];
   const lineSegs: Seg[] = [...parsed.sibs, ...parsed.couples.flatMap(segsOf)];
+  const arcSegs: Seg[] = parsed.duplicateArcs.flatMap(segsOf);
   const coupleBoxes = parsed.coupleTexts.map(t => ({ t, box: textBox(t, consanguinityLabelWidth(t.text), 7) }));
   coupleBoxes.forEach(({ t, box }, i) => {
     const hit = (what: string) => out.push({
@@ -428,8 +457,13 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     const q = parsed.questionMarks.find(([x, y]) => overlaps(box, [x - 4, y - 10, x + 4, y + 1]));
     if (q) { hit(`the "?" at ${at(toCanvas(q))}`); return; }
     if (lineSegs.some(s => overlaps(box, segBox(s)))) { hit("a line"); return; }
+    // A label on a white backing may have a dashed arc pass behind it.
+    const backed = parsed.coupleBackings.some(([x1, y1, x2, y2]) => x1 <= t.x && t.x <= x2 && y1 <= t.y && t.y <= y2);
+    if (!backed && arcSegs.some(s => overlaps(box, segBox(s)))) { hit("a dashed arc between two copies"); return; }
     const other = texts.find(o => o.w && overlaps(box, textBox(o, o.w, 8)));
     if (other) { hit(`the label "${other.text}"`); return; }
+    const copy = parsed.copyNumbers.find(c => /^\d+$/.test(c.text) && overlaps(box, [c.x - 1, c.y - 8, c.x + textWidth(c.text) + 1, c.y + 3]));
+    if (copy) { hit(`the copy number "${copy.text}"`); return; }
     const twin = coupleBoxes.find((o, j) => j !== i && overlaps(box, o.box));
     if (twin) hit(`the label "${twin.t.text}"`);
   });

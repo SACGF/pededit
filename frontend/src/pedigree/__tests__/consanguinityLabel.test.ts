@@ -5,8 +5,9 @@ import { layoutToFlow } from "../layoutToFlow";
 import { nameCoupleRelationship } from "../relationship";
 import {
   consanguinityLabelText, consanguinityLabelRoom, wrapConsanguinityLabel, consanguinityLabelBaseline, consanguinityLabelTop,
-  highestConsanguinityLabel,
+  highestConsanguinityLabel, placeConsanguinityLabel, consanguinityLabelPlacements,
 } from "../consanguinityLabel";
+import { EXAMPLES } from "../../data/examples";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, ROW_HEIGHT } from "../constants";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -157,6 +158,48 @@ describe("the label in exports and over the title (#97)", () => {
     const svg = exportSvg(p).replace('<g class="consanguinity-labels">',
       `<g class="consanguinity-labels"><text x="${node.position.x}" y="${node.position.y}" font-size="9">third cousins</text>`);
     expect(lintExportSvg(p, flow, svg).map(f => f.code)).toContain("consanguinity-label-collides");
+  });
+});
+
+describe("keeping the label off the text above (#109)", () => {
+  // Partners at 0 and 68 (compact spacing), couple line at y 84, lines of
+  // descent on both tops: the label may use 4..64.
+  const base = { lx: 0, rx: 68, cy: 84, hop: 0, lines: ["siblings"], limits: [4, 64] as [number, number] };
+  const top = consanguinityLabelTop(84, 0, 1);
+  const block = (x: number, halfWidth: number, bottom = top + 2) => ({ x, top: 20, bottom, halfWidth });
+
+  it("stays put when nothing above reaches it", () => {
+    expect(placeConsanguinityLabel({ ...base, blocks: [block(34, 20, top - 1)] })).toEqual({ dx: 0, dy: 0 });
+  });
+
+  it("slides along the line, as little as clears a narrow name above", () => {
+    const o = placeConsanguinityLabel({ ...base, blocks: [block(58, 4)] })!;
+    expect(o.dy).toBe(0);
+    expect(o.dx).toBeLessThan(0);
+    // Still inside the room between the lines of descent.
+    expect(34 + o.dx - 21).toBeGreaterThanOrEqual(4 - 0.01);
+  });
+
+  it("drops to just above the line between partners far enough apart", () => {
+    const o = placeConsanguinityLabel({ ...base, rx: 160, limits: [4, 156], blocks: [block(80, 60)] })!;
+    expect(o.dx).toBe(0);
+    expect(o.dy).toBeGreaterThan(0);
+    expect(consanguinityLabelBaseline(84, 0) + o.dy).toBeLessThan(84);
+    // Not when the relationship has ended: its strokes cross the line there.
+    expect(placeConsanguinityLabel({ ...base, rx: 160, limits: [4, 156], blocks: [block(80, 60)], ended: true })).toBeNull();
+  });
+
+  it("is left out when the text above fills the only room", () => {
+    expect(placeConsanguinityLabel({ ...base, blocks: [block(34, 20)] })).toBeNull();
+  });
+
+  it("House Targaryen in compact rows: no label touches a name, and the normal layout keeps every one", () => {
+    const ex = EXAMPLES.find(e => e.label === "House Targaryen")!;
+    const p = withSetting(ex.data);
+    const count = (compact: boolean) => consanguinityLabelPlacements(layoutToFlow(p, { compact })).length;
+    expect(lintExport(p, { compact: true })).toEqual([]);
+    expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && layoutToFlow(p).coupleEdges.some(e => e.data?.partnershipId === x.id && e.type === "consanguineousEdge")).length);
+    expect(count(true)).toBe(count(false) - 1);
   });
 });
 

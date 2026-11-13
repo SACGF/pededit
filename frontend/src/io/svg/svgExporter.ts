@@ -15,8 +15,9 @@ import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
 import {
-  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
+  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
 } from "../../pedigree/consanguinityLabel";
+import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT } from "../../pedigree/labelBlock";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -27,26 +28,25 @@ import type { SvgExportOptions } from "./types";
 import {
   renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
   needsAffectedCore, renderAffectedCoreSvg,
-  hasAnnotationRow, sectorsFor, ANNOTATION_ROW_HEIGHT,
+  hasAnnotationRow, sectorsFor,
 } from "../../pedigree/tags";
 import {
   usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
-  carrierDot, symbolTopInset, CAPTION_ROW_HEIGHT, CARRIER_RIM,
+  carrierDot, symbolTopInset, CARRIER_RIM,
 } from "../../pedigree/lifeStatus";
 
 const STROKE = 2;
 const CONSANG_GAP = 4;       // px gap between consanguineous double lines
 const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
 const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
-const LABEL_LINE_HEIGHT = 13;
-// Baseline of the first line under the symbol, below its centre. Leaves a gap
-// between the symbol edge and the cap height of a 10px label.
-const LABEL_OFFSET_Y = NODE_SIZE / 2 + 12;
-// Extra drop for the name when a tag annotation row sits between it and the symbol.
-const ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
-// Extra drop for everything under a symbol with an "SB" / "ECT" caption.
-const CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
+// Where the text under a symbol goes (pedigree/labelBlock.ts, shared with
+// the couple label placement, #109). The first baseline leaves a gap between
+// the symbol edge and the cap height of a 10px label.
+const LABEL_LINE_HEIGHT = EXPORT_LABEL_LINE_HEIGHT;
+const LABEL_OFFSET_Y = EXPORT_LABEL_OFFSET_Y;
+const ANNOTATION_SHIFT = EXPORT_ANNOTATION_SHIFT;
+const CAPTION_SHIFT = EXPORT_CAPTION_SHIFT;
 
 // ── Slot positions ────────────────────────────────────────────────────────────
 
@@ -222,10 +222,12 @@ function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: P
 
 /** Degree of relationship above double couple lines (#97), placed as on the canvas. */
 function renderConsanguinityLabels(flow: FlowData): string[] {
-  return consanguinityLabelPlacements(flow).flatMap(({ x, cy, hop, lines }) => {
-    const baselines = consanguinityLabelBaselines(cy, hop, lines.length);
-    return lines.map((line, i) =>
-      `<text x="${x}" y="${baselines[i]}" text-anchor="middle" font-family="sans-serif" font-size="${CONSANGUINITY_LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
+  return consanguinityLabelPlacements(flow).flatMap(({ x, cy, hop, dy, lines, backed }) => {
+    const baselines = consanguinityLabelBaselines(cy, hop, lines.length, dy);
+    // On a dashed arc between two copies (#109): the arc passes behind it.
+    const b = backed ? consanguinityLabelBacking(x, baselines, lines) : null;
+    return [...(b ? [`<rect x="${b.x}" y="${b.y}" width="${b.width}" height="${b.height}" fill="white"/>`] : []), ...lines.map((line, i) =>
+      `<text x="${x}" y="${baselines[i]}" text-anchor="middle" font-family="sans-serif" font-size="${CONSANGUINITY_LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`)];
   });
 }
 

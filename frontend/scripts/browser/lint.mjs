@@ -22,6 +22,14 @@ const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--
   --no-export         Skip the SVG export lint (on by default; it also
                       covers PNG and PDF, which are made from the SVG).
   --deidentify        Lint the de-identified export instead of the plain one.
+  --u-shape           Lint the U-shape export instead of the standard one:
+                      its consanguinity labels against every line, symbol
+                      and text (src/io/svg/uShapeLint.ts). Examples and
+                      fixtures only.
+  --relationship-labels
+                      Turn on "Name consanguineous relationships" first, so
+                      every double line the pedigree can name has text above
+                      it (#97, #109). Examples and fixtures only.
 
 Prints one line per pedigree, then one line per finding. Exits 0 when every
 pedigree draws cleanly, 1 when any has findings.
@@ -32,8 +40,9 @@ ${COMMON_HELP}`;
 const isBad = r => r.findings.length + r.exportFindings.length > 0;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", compact: "bool", "no-export": "bool", deidentify: "bool" });
-  const exportOpts = flags["no-export"] ? null : { compact: !!flags.compact, deidentify: !!flags.deidentify };
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool" });
+  const named = !!flags["relationship-labels"];
+  const exportOpts = flags["no-export"] ? null : { compact: !!flags.compact, deidentify: !!flags.deidentify, uShape: !!flags["u-shape"] };
   if (flags.help) { console.log(HELP); return 0; }
   const specs = [...(flags["all-examples"] ? ["__all__"] : []), ...(flags.fixture ?? [])];
   if (!specs.length && !positional.length) throw new UsageError("usage: give --all-examples, --fixture SPEC or a URL");
@@ -49,28 +58,34 @@ await main(async () => {
     for (const spec of specs) {
       let items;
       if (spec === "__all__") {
-        items = await inApp(context, base, async ({ compact, exportOpts }) => {
+        items = await inApp(context, base, async ({ compact, exportOpts, named }) => {
           const { EXAMPLES } = await import("/src/data/examples.ts");
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
-          const { lintExport } = await import("/src/io/svg/exportLint.ts");
+          const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
+          const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
+          const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
+          const withNames = p => (named ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, relationshipLabels: true } } : p);
           return EXAMPLES.map((e, i) => ({
             name: `example:${i} ${e.label}`,
-            findings: lintFlow(e.data, layoutToFlow(e.data, { compact })),
-            exportFindings: exportOpts ? lintExport(e.data, exportOpts) : [],
+            findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact })),
+            exportFindings: exportOpts ? lintExport(withNames(e.data), exportOpts) : [],
           }));
-        }, { compact: !!flags.compact, exportOpts });
+        }, { compact: !!flags.compact, exportOpts, named });
       } else {
         const fixture = await loadFixture(spec, context, base);
-        const [one] = await inApp(context, base, async ({ pedigree, compact, exportOpts }) => {
+        const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named }) => {
+          const pedigree = named ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, relationshipLabels: true } } : raw;
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
-          const { lintExport } = await import("/src/io/svg/exportLint.ts");
+          const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
+          const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
+          const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
           return [{
             findings: lintFlow(pedigree, layoutToFlow(pedigree, { compact })),
             exportFindings: exportOpts ? lintExport(pedigree, exportOpts) : [],
           }];
-        }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts });
+        }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts, named });
         items = [{ name: spec, findings: one.findings, exportFindings: one.exportFindings, warnings: fixture.warnings }];
       }
       results.push(...items);

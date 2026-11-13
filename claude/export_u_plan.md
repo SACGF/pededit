@@ -132,6 +132,34 @@ the outer one. The founders' children are not split between two joined
 partners if that would run the couple's sibship into another one. If there is
 no clean split the whole family goes on one side.
 
+## Consanguinity labels (#97, #109)
+
+The text above a double line (`consanguinityLabelText`: the couple's own
+text, or the named relationship with "Name consanguineous relationships"
+on) is written along the line, between the two symbols, on the inward
+side, rotated with the track like the names. Above the symbols there is no
+room: the parents' sibship bar is 12px above the symbol tops and a dashed
+link between copies runs 6px above them, so the label goes into the gap
+between the partners instead, which is otherwise empty on the inward side.
+
+- One line. The couple moves apart until it fits (`coupleGap`; a join gets
+  the room from the packing, and `joinGap` when the two partners stand
+  either side of the centre). A second line would reach the dashed link.
+- On a curve the straight text is lifted by the sagitta of its half width,
+  so its ends clear the line where it bends up towards them. `build` keeps
+  the radius large enough (`labelRadius`) that the lifted label still
+  stays under the dashed link along the track, and `coupleGap` leaves room
+  for each symbol's inner top corner, which turns in on a curve.
+- A dashed link straight across the tracks (a copy on another track) can
+  cut through the gap, most often the link from one of the partners
+  themselves. The label slides along the line to clear it; where no place
+  is clear it is drawn on a white backing and the link passes behind it.
+
+`uShapeLint.ts` checks every label against everything drawn, in the label's
+rotated frame (`lint.mjs --u-shape`, `uShapeLint.test.ts` over every
+example, `test-data/ped/consanguineous` and random matings with long
+labels).
+
 ## Founders with two partners
 
 If a founder has children with a second partner, the founder is drawn between

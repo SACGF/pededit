@@ -20,10 +20,9 @@ describe("export lint over every example", () => {
       // Named relationships above every double line (#97).
       const named = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, relationshipLabels: true } };
       expect(summary(named, { title: "T" })).toEqual([]);
-      // Compact rows leave 84px, and a label over a sibling couple can then
-      // touch the name of the parent drawn straight above (House Targaryen).
-      // Known and accepted; it must still clear every symbol and line.
-      expect(summary(named, { compact: true }).filter(s => !/runs into the label/.test(s))).toEqual([]);
+      // Compact rows leave 84px: a label moves aside, or is left out, rather
+      // than touch the text of someone drawn above (#109, House Targaryen).
+      expect(summary(named, { compact: true })).toEqual([]);
     });
   }
 

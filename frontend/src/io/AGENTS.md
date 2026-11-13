@@ -93,6 +93,20 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
   in track coordinates, since a straight chord between twins far apart along
   the U would cut across the tracks.
+- U-shape consanguinity labels (#97, #109): one line along the double
+  line, between the two symbols, on the inward side. The couple moves apart
+  for it (`coupleGap`, joins through the packing, `joinGap` for a join
+  across the centre), with room for each symbol's top corner turning in on
+  a curve. Straight text on a curve is lifted by the sagitta of its half
+  width; `build` keeps r0 large enough (`labelRadius`) that the lift stays
+  under the dashed links along the track (`maxLabelSag`). It slides along
+  the line to clear a dashed link that runs straight across the tracks;
+  where none is clear it goes on a white backing and the link passes
+  behind. `UShapeLayout.coupleLabels` has the placements. Checked by
+  `uShapeLint.ts` (`lintUShape`, `lint.mjs --u-shape`), which parses the SVG
+  with its group transforms and tests every line, arc, shape and text
+  against each label box in the label's rotated frame; it relies on the
+  `consanguinity-labels` group with one `<g transform>` per label.
 - Names in both SVG exporters wrap like the canvas (`pedigree/labels.ts`,
   #68); `computeBounds` allows for the most lines any name takes. They wrap
   even when the pedigree's `canvasSettings.nameLabels` is "truncate": that
@@ -110,7 +124,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
   example. It parses the SVG, so `svgExporter.ts` must keep writing its
   group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
-  `symbols`, `labels`) and `class="mark"` on lines that join nobody
+  `symbols`, `labels`, `consanguinity-labels`, whose white `<rect>` marks a
+  label the dashed arcs may pass behind, #109) and `class="mark"` on lines that join nobody
   (childless and twin marks). It never writes ids into the SVG: symbols are
   matched to people by position, because an id can be a name after a PED
   import and must not leak from a de-identified export.
