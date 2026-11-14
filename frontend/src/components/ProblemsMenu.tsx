@@ -11,16 +11,17 @@ import { ProblemFixes } from "./ProblemFixes";
 let lastProblem: { id: string; index: number } | null = null;
 
 /**
- * Select the person a problem is about and focus its field in the edit
- * panel (#116). The panel renders after the selection changes, so this
- * waits a few frames for the field to appear.
+ * Select the person a problem is about, pan the canvas to them if they
+ * are off-screen, and focus their field in the edit panel (#116). The
+ * panel renders after the selection changes, so this waits a few frames
+ * for the field to appear.
  */
 export function focusProblem(problem: Problem): void {
   const store = usePedigreeStore.getState();
   const target = problemTarget(store.pedigree, problem);
   if (!target) return;
   lastProblem = { id: problem.id, index: Math.max(0, problemsOf(store.pedigree).all.findIndex(p => p.id === problem.id)) };
-  store.setSelectedId(target);
+  store.selectAndReveal(target);
   if (typeof document === "undefined") return;
   // No field to focus: leave the last one, which now belongs to someone else.
   if (!problem.field) { (document.activeElement as HTMLElement | null)?.blur?.(); return; }

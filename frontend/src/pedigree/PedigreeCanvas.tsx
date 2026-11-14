@@ -229,7 +229,8 @@ function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: 
 
 /**
  * Pans, keeping the zoom, to bring a person into view when the store asks
- * (`revealRequest`, a toolbar add, #121) and their node is off-screen. Waits
+ * (`revealRequest`: a toolbar add, #121, or going to a problem, #116) and
+ * their node is off-screen. Waits
  * a few frames for the new layout to render the node.
  */
 function RevealOnRequest() {

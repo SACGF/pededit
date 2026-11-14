@@ -258,7 +258,8 @@ interface PedigreeState {
   layoutResetCount: number;
   /**
    * A person the canvas should bring into view, panning but not zooming,
-   * if their node is off-screen: set by a toolbar add (#121). `n` changes on
+   * if their node is off-screen: set by a toolbar add (#121) and by going to
+   * a problem (#116). `n` changes on
    * every request so the same id can be asked for twice. Not undoable.
    */
   revealRequest: { id: string; n: number } | null;
@@ -294,6 +295,8 @@ interface PedigreeState {
   // Tool + selection
   /** Select only this individual, or clear the selection with null. */
   setSelectedId: (id: string | null) => void;
+  /** Select one person and pan to them if their node is off-screen (`revealRequest`): going to a problem (#116). */
+  selectAndReveal: (id: string) => void;
   /** Shift / Ctrl / Cmd+click: add id to the selection (as primary) or take it out. */
   toggleSelected: (id: string) => void;
   /** Replace the selection (rubber band, select descendants). Primary defaults to the last id. */
@@ -728,6 +731,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     getPedigree: () => get().pedigree,
 
     setSelectedId: (id) => set(selectOnly(id)),
+    selectAndReveal: (id) => set(s => ({ ...selectOnly(id), revealRequest: { id, n: (s.revealRequest?.n ?? 0) + 1 } })),
     toggleSelected: (id) => {
       const { selectedIds, selectedId } = get();
       if (selectedIds.includes(id)) set(selectionOf(selectedIds.filter(x => x !== id), selectedId));
@@ -791,7 +795,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         id = ind.id;
         draft.individuals.push(ind);
       });
-      set(s => ({ ...selectOnly(id), revealRequest: { id, n: (s.revealRequest?.n ?? 0) + 1 } }));
+      get().selectAndReveal(id);
     },
 
     /**
