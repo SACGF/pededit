@@ -85,7 +85,7 @@ export interface RuleContext {
   parentsOf: Map<string, Partnership>;
   /** Everyone linked to someone else: a partner, a parent or child, or a carrier or social parent line. */
   connected: Set<string>;
-  /** Siblings drawn out of birth order (check 8): the person to report, with the younger sibling drawn left of them. */
+  /** Siblings drawn out of birth order (`siblings-out-of-order`): the person to report, with the younger sibling drawn left of them. */
   outOfOrder: Map<string, Individual>;
 }
 
@@ -166,7 +166,7 @@ export function ageInYears(text: string | undefined): { years: number; atDeath: 
 }
 
 /**
- * Siblings drawn out of birth order (check 8), one report per sibship: the
+ * Siblings drawn out of birth order (`siblings-out-of-order`), one report per sibship: the
  * first sibling, left to right, born certainly before someone drawn to
  * their left. Only in "insertion order", the default: "manual" is an order
  * chosen on purpose and "by birth date" is this order already. Siblings are

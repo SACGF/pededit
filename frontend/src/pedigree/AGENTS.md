@@ -327,10 +327,8 @@ draws NSGC symbols.
   against the age at death, else on `clinicalDetails.recordedOn`, else
   today. The sibling order check runs only in "insertion" mode ("manual" is
   chosen on purpose, "birthDate" is already that order) and places siblings
-  as `autohint` does (affected first, twin sets at their mean). New fields
-  for the follow-up checks: `age`, `lifeStatus`, `carrier` (the carrier
-  select; per-condition mode uses `conditions` and `presymptomatic`),
-  `evaluations`, `reproductiveRole`, `carriedBy`.
+  as `autohint` does (affected first, twin sets at their mean). Do not list
+  the rules or fields here: `RULES` and `ProblemField` are the list.
   Fixes are drawn by one component, `components/ProblemFixes.tsx`, in the
   panel and the list alike. "Fix all like this" groups problems of the same
   rule offering a fix with the same label (`problemsLike`) and applies each
