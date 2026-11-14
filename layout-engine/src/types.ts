@@ -384,6 +384,24 @@ export interface ViewFilters {
    * children become one numbered group symbol.
    */
   affectedOnly?: boolean;
+  /**
+   * With `affectedOnly`: start from people affected with, or carrying, this
+   * condition tag (its id) only, plus the proband and consultand. Ignored
+   * when it names no condition tag.
+   */
+  affectedCondition?: string;
+  /**
+   * Draw the proband's (or consultand's) blood relatives and their partners
+   * only: the families of people who married in (their parents, siblings and
+   * children by other partners) are not drawn.
+   */
+  bloodRelativesOnly?: boolean;
+  /**
+   * Draw one side of the proband's (or consultand's) family: their mother's
+   * or father's blood relatives and those relatives' partners. The other
+   * parent is drawn, their family is not.
+   */
+  side?: "maternal" | "paternal";
 }
 
 /** Free-text clinical key fields (#102). Absent or empty means not recorded. */

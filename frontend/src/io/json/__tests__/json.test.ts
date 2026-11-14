@@ -293,6 +293,17 @@ describe("JSON import: rejected inputs", () => {
     expect(errorsOf(cyclic)).toContain(JsonIssueCode.CIRCULAR_ANCESTRY);
   });
 
+  it("rejects badly typed view filters (#4)", () => {
+    expect(errorsOf(withPedigree(p => { p.filters = { side: "both" }; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.filters = { bloodRelativesOnly: "yes" }; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.filters = { affectedOnly: true, affectedCondition: 3 }; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    const ok = importJson(JSON.stringify(withPedigree(p => {
+      p.filters = { affectedOnly: true, affectedCondition: "t1", bloodRelativesOnly: true, side: "paternal" };
+    })));
+    expect(ok.hasErrors).toBe(false);
+    expect(ok.pedigree!.filters).toEqual({ affectedOnly: true, affectedCondition: "t1", bloodRelativesOnly: true, side: "paternal" });
+  });
+
   it("rejects badly typed pinnedPositions and canvasSettings", () => {
     expect(errorsOf(withPedigree(p => { p.pinnedPositions = { i1: { x: "1", y: 2 } }; }))).toContain(JsonIssueCode.WRONG_TYPE);
     expect(errorsOf(withPedigree(p => { p.canvasSettings = { nodesMoveable: true }; }))).toContain(JsonIssueCode.MISSING_FIELD);

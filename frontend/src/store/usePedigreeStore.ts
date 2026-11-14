@@ -12,6 +12,7 @@ import { linkPartnerProblem, swapSidesPlan } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
+import type { ViewFilterPatch } from "../pedigree/viewFilters";
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
@@ -353,11 +354,17 @@ interface PedigreeState {
    */
   setDescendantsHidden: (individualIds: string[], hidden: boolean) => void;
   /**
-   * Switch a view filter (#4) on or off; see `pedigree/viewFilters.ts`.
+   * Set a view filter field (#4), see `pedigree/viewFilters.ts`; `false` or
+   * `undefined` removes it, and switching off `affectedOnly` drops its
+   * `affectedCondition` too.
    * Saved with the pedigree, one undo step. Hidden people are dropped from
    * the selection.
    */
-  setViewFilter: (key: keyof ViewFilters, on: boolean) => void;
+  setViewFilter: <K extends keyof ViewFilters>(key: K, value: ViewFilters[K] | false | undefined) => void;
+  /** Write several view filter fields at once (`undefined` removes one), one undo step. */
+  updateViewFilters: (patch: ViewFilterPatch) => void;
+  /** Switch every view filter off, one undo step. */
+  clearViewFilters: () => void;
   /**
    * Make one or two existing individuals the parents of childId (#36). Uses
    * their existing partnership or creates one; a single parent gets a new
@@ -1196,18 +1203,35 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (selectedIds.some(id => gone.has(id))) set(selectionOf(selectedIds.filter(id => !gone.has(id)), selectedId));
     },
 
-    setViewFilter: (key, on) => {
-      if ((get().pedigree.filters?.[key] === true) === on) return;
+    setViewFilter: (key, value) => {
+      const patch: ViewFilterPatch = { [key]: value === false ? undefined : value };
+      if (key === "affectedOnly" && !value) patch.affectedCondition = undefined;
+      get().updateViewFilters(patch);
+    },
+
+    updateViewFilters: (patch) => {
+      const current: ViewFilters = get().pedigree.filters ?? {};
+      const next: Record<string, unknown> = { ...current };
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === undefined) delete next[k];
+        else next[k] = v;
+      }
+      const same = Object.keys(next).length === Object.keys(current).length
+        && Object.entries(next).every(([k, v]) => (current as Record<string, unknown>)[k] === v);
+      if (same) return;
+      // Filter changes are the edits meant to hide people.
       mutate(draft => {
-        const filters = { ...draft.filters };
-        if (on) filters[key] = true;
-        else delete filters[key];
-        if (Object.keys(filters).length > 0) draft.filters = filters;
+        if (Object.keys(next).length > 0) draft.filters = next as ViewFilters;
         else delete draft.filters;
-      }, on);
+      }, true);
       const gone = collapseInfo(get().pedigree).hidden;
       const { selectedIds, selectedId } = get();
       if (selectedIds.some(id => gone.has(id))) set(selectionOf(selectedIds.filter(id => !gone.has(id)), selectedId));
+    },
+
+    clearViewFilters: () => {
+      if (!get().pedigree.filters) return;
+      mutate(draft => { delete draft.filters; });
     },
 
     /**

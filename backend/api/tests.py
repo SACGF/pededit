@@ -62,7 +62,7 @@ FULL_PEDIGREE = {
     ],
     "chartTitle": "Smith family",
     "clinicalDetails": {"referralReason": "Breast cancer", "recordedOn": "2026-11-12"},
-    "filters": {"affectedOnly": True},
+    "filters": {"affectedOnly": True, "affectedCondition": "t1", "bloodRelativesOnly": True, "side": "maternal"},
 }
 
 
@@ -160,6 +160,7 @@ class PedigreeRoundTripTests(APITestCase):
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False,
                                         "snapGridSize": 20, "layoutWidth": "wide"}},
             {**base, "filters": {"affectedOnly": "maybe"}},
+            {**base, "filters": {"side": "both"}},
             {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,
                                       "reproductiveRole": "father"}]},
             {**base, "individuals": [{"id": "a", "sex": "male", "affected": False,

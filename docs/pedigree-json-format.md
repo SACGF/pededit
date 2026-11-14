@@ -74,6 +74,11 @@ Global switches that simplify the drawing without changing the data. The canvas,
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `affectedOnly` | boolean | Draw only affected people, carriers, people with a condition (quadrant) tag and the proband (and consultand), with every ancestor on their line of descent. Each drawn couple's other children are drawn as one symbol with their number inside (NSGC: a number inside a symbol means that many siblings); their partners and descendants are not drawn. Has no effect when nobody qualifies. |
+| `affectedCondition` | string | With `affectedOnly`: the id of a condition tag. Only people affected with or carrying that condition (and the proband and consultand) start the filter. Ignored when it names no condition tag. |
+| `bloodRelativesOnly` | boolean | Draw only the proband's blood relatives (their ancestors and everyone descended from those ancestors) and the partners of blood relatives. The families of people who married in (their parents, siblings and children by other partners) are not drawn. Uses the consultand when nobody is marked proband; has no effect when neither is. |
+| `side` | `"maternal"` or `"paternal"` | Draw only one side of the proband's family: the proband, their mother's (or father's) blood relatives and those relatives' partners. The other parent is drawn, their family is not. Has no effect when the proband has no parents in the pedigree. |
+
+With several filters on, only the people every one of them keeps are drawn.
 
 ### `CanvasSettings`
 

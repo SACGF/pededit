@@ -148,6 +148,9 @@ class ClinicalDetailsSerializer(serializers.Serializer):
 
 class ViewFiltersSerializer(serializers.Serializer):
     affectedOnly = _opt(serializers.BooleanField)
+    affectedCondition = _opt(serializers.CharField)
+    bloodRelativesOnly = _opt(serializers.BooleanField)
+    side = _opt(serializers.ChoiceField, choices=["maternal", "paternal"])
 
 
 class PositionSerializer(serializers.Serializer):

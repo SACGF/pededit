@@ -194,7 +194,10 @@
       "type": "object",
       "description": "View filters: simplify what is drawn (canvas and SVG, PNG, PDF exports) without changing the data. Each is off when absent.",
       "properties": {
-        "affectedOnly": { "type": "boolean", "description": "Draw only affected people, carriers, people with a condition tag and the proband (and consultand), with their ancestors. Each drawn couple's other children are drawn as one symbol with their number inside." }
+        "affectedOnly": { "type": "boolean", "description": "Draw only affected people, carriers, people with a condition tag and the proband (and consultand), with their ancestors. Each drawn couple's other children are drawn as one symbol with their number inside." },
+        "affectedCondition": { "type": "string", "description": "With affectedOnly: the id of a condition tag; only people affected with or carrying it (and the proband and consultand) start the filter. Ignored when it names no condition tag." },
+        "bloodRelativesOnly": { "type": "boolean", "description": "Draw only the proband's (or consultand's) blood relatives and their partners. The families of people who married in are not drawn." },
+        "side": { "enum": ["maternal", "paternal"], "description": "Draw only the proband's (or consultand's) mother's or father's blood relatives and their partners, and the proband. The other parent is drawn, their family is not." }
       },
       "additionalProperties": true
     },

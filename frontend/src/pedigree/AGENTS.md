@@ -510,9 +510,22 @@ draws NSGC symbols.
   proband, consultand and quadrant-tag people; their ancestors are kept, and
   a seed with no parents and no drawn children keeps their partners (an
   affected person who married in would otherwise float). Half sibs by a
-  partner who is not kept are not drawn or counted. New filters: a field on
-  `ViewFilters`, a rule in `filterHidden`, a row in `VIEW_FILTERS` (the
-  toolbar `FilterMenu` lists them), and `filterBannerText`.
+  partner who is not kept are not drawn or counted. `affectedCondition`
+  narrows the seeds to one condition (the menu offers it with two or more
+  conditions; a stale id means any). "Blood relatives only" and "Mother's /
+  Father's side only" (`side`) keep `bloodRelativesKept(roots)`: the roots,
+  their ancestors, everyone descended from those, and every partner of
+  one of them, so a married-in partner's own family goes with no group
+  symbol (their parents' couple is not drawn at all). Roots are the
+  probands, else the consultands (`referencePeople`); the side filters
+  root at that parent, so the other parent is kept as a partner. With
+  several filters on, anyone one of them leaves out is hidden. A filter
+  with nothing to work from (nobody affected, no proband, proband without
+  parents) is skipped and the banner says why. Changing the proband can
+  hide people, so under these filters it turns them off like any other
+  edit that hides someone. New filters: a field on `ViewFilters`, a row in
+  `VIEW_FILTERS` (whether it is on, its patch, its `result`); the toolbar
+  `FilterMenu` and the banner read that list.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
   to a set key and zygosity; `layoutToFlow` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:

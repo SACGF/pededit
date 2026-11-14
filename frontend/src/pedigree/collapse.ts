@@ -353,7 +353,7 @@ export function branchTooltip(branch: CollapsedBranch): string {
   const all = n > k
     ? `. ${n} people not shown in all${branch.affected > 0 ? `, ${branch.affected} of them affected` : ""}`
     : "";
-  const how = branch.roots.length > 0 ? "Click to show." : "Turn off \"Affected only\" to show them.";
+  const how = branch.roots.length > 0 ? "Click to show." : "Turn the filter off to show them.";
   return `${head}${all}. ${how}`;
 }
 

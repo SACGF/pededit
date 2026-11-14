@@ -428,6 +428,9 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
       c.error(JsonIssueCode.WRONG_TYPE, `${fp} must be an object`, fp);
     } else {
       c.optional(ped.filters, "affectedOnly", fp, "a boolean", v => typeof v === "boolean");
+      c.optional(ped.filters, "affectedCondition", fp, "a string", v => typeof v === "string");
+      c.optional(ped.filters, "bloodRelativesOnly", fp, "a boolean", v => typeof v === "boolean");
+      c.optional(ped.filters, "side", fp, '"maternal" or "paternal"', v => v === "maternal" || v === "paternal");
     }
   }
 
