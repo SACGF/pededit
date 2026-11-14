@@ -20,6 +20,7 @@ import {
   useStoreApi,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useDismissableLayerSurface } from "@radix-ui/react-dismissable-layer";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
@@ -408,12 +409,20 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   // React Flow stops the mouse events it waits for. Close the menu on any
   // press or scroll in the canvas outside it (the menu is portalled but a
   // React child here, so its own presses arrive too and are let through).
+  // React Flow's pan and zoom stop mousedown from reaching the document, and
+  // Radix takes a stopped outside click to mean the element handled it, so
+  // an open toolbar popover (Filter, Problems, Export PED) stayed open on a
+  // canvas click. Registering the canvas as a dismissable surface makes a
+  // click anywhere on it close them, as it does on the sidebars.
+  const dismissSurfaceRef = useDismissableLayerSurface();
+
   const closeContextMenuOutside = useCallback((e: React.SyntheticEvent) => {
     if (!(e.target as Element).closest?.("[data-context-menu]")) setContextMenu(null);
   }, []);
 
   return (
     <div
+      ref={dismissSurfaceRef}
       style={{ width: "100%", height: "100%", position: "relative" }}
       onPointerDownCapture={contextMenu ? closeContextMenuOutside : undefined}
       onWheelCapture={contextMenu ? closeContextMenuOutside : undefined}

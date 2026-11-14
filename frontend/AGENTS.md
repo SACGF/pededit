@@ -101,6 +101,13 @@ stub so the app still builds without Google login.
   draws the shared fork, and `setSex` on a monozygotic twin changes the whole
   set.
 - Visual style is black and white, minimal chrome. No colour except tags.
+- Toolbar popovers (Radix) close on a canvas click only because
+  `PedigreeCanvas` registers its wrapper with `useDismissableLayerSurface`:
+  React Flow's pan/zoom stops `mousedown` from reaching the document, and
+  Radix (dismissable-layer 1.2) treats a stopped outside click as handled
+  and keeps the popover open. A new surface that stops mouse events needs
+  the same. Keep `@radix-ui/react-dismissable-layer` at the version the
+  popover uses, so there is one copy of its context.
 
 ## Layout of src/
 
