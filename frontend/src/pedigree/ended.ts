@@ -6,7 +6,7 @@ import { activeChildless } from "./childless";
  * Ended relationship (#98, NSGC 2008 Fig. 2.2a): two short parallel
  * diagonal strokes across the couple line mean the relationship no longer
  * exists (separated, divorced). The geometry is shared by the canvas edges,
- * `svgExporter`, the minimap and the legend. Framework-free.
+ * `svgExporter` and the legend. Framework-free.
  */
 
 /** Legend and export key row. */

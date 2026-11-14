@@ -346,7 +346,7 @@ function covers(sectors: readonly Sector[], start: number, end: number): boolean
 
 /**
  * Everything filled on a symbol beyond its outline (#3, #115), decided once
- * so the canvas, minimap, legend and both exporters agree:
+ * so the canvas, legend and both exporters agree:
  * - `sectors`: condition sectors, under them (NSGC 2022) the plain carrier's
  *   dotted right half;
  * - `base`: "black" for a solid affected fill, else white;

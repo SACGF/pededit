@@ -11,7 +11,7 @@
  * AMAB, AFAB or UAAB (unknown). Everyone else draws as before. Pregnancies
  * and losses have no gender identity. "sex" draws biological sex throughout.
  *
- * Framework-free and shared by the canvas, the minimap, the legend, both SVG
+ * Framework-free and shared by the canvas, the legend, both SVG
  * exporters and the lints.
  */
 

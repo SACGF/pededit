@@ -19,7 +19,7 @@ draws NSGC symbols.
 - `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40. The layout
   engine's `pedigreeToGeometry` and the SVG exporters use the same numbers;
   change them together.
-- `PedigreeCanvas.tsx` — the React Flow instance, custom always-fit minimap,
+- `PedigreeCanvas.tsx` — the React Flow instance, minimap,
   drag handling (drag end pins every dragged node, one undo step), pane
   click clears selection. New individuals are added from the Toolbar and
   hover pill, not by clicking the canvas.
@@ -39,14 +39,16 @@ draws NSGC symbols.
   `index.css`, and its delete key is off (the store deletes).
   `selection.ts` has the batch lock counts used by the more menu's
   "N selected" section and the edit panel's `SelectionPanel`.
-- The minimap (#6) draws each person with the canvas's own `SymbolShape` and
-  `DeceasedSlash`, at NODE_SIZE inside a scaled `<g>`, so new symbol features
-  reach it for free. A scoped `<style>` makes black strokes (and the white
-  slash over an affected fill) a 1px non-scaling hairline, since 2px scaled
-  by about 0.2 vanishes. Left out on purpose, being unreadable at that size:
-  the "SB" / "ECT" caption (`caption={false}`), the annotation row, names,
-  the proband and consultand arrows and the family history "?". Its lines stay plain (no hops, twin marks, dashed
-  adoption drops or childless marks).
+- The minimap (#6, #125) is React Flow's `<MiniMap pannable>`: always the
+  whole pedigree with the viewport as a rectangle; dragging pans the main
+  view and a click centres it (a press that moved is a drag, not a click).
+  It is only for a sense of where you are, so `MinimapNode` draws each
+  person as a plain square, circle or diamond (`RFNodeData.shape`), black
+  when `isAffected`, and no lines. An earlier custom minimap drew the real
+  symbols and lines scaled down; it was too small to read and on a wide
+  pedigree its 1px outlines covered sub-pixel symbols, so people looked
+  black. Its strokes are in flow units (4 on a 40px symbol) so they shrink
+  with the symbol. The chart title node is in its bounds but not drawn.
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, tag quadrants and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
@@ -103,7 +105,7 @@ draws NSGC symbols.
   #68 shipped a tooltip that never appeared.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. The lines come from
-  `sibshipPath.ts`, shared with the minimap and `svgExporter`: the bar sits
+  `sibshipPath.ts`, shared with `svgExporter`: the bar sits
   halfway to the highest child and every child gets its own drop, so a child
   pinned off its siblings' row is still reached. Bars of different couples
   that would run along one line each get their own height (#80,
@@ -167,10 +169,8 @@ draws NSGC symbols.
   Patterns are plain clipped paths, not SVG `<pattern>`, so svg2pdf draws
   them (checked by rendering an exported PDF with Ghostscript).
   `fillLayers` is the geometry, `renderRegionFillSvg` (exporters, export
-  key) and `RegionFill` in `symbols.tsx` (canvas, minimap, app legend) its
-  two renderers; per-condition carrier fills (#115) use them. Black
-  pattern strokes are written as `#000000`, never `"black"`, or the
-  minimap's hairline CSS would turn a fine pattern into solid black.
+  key) and `RegionFill` in `symbols.tsx` (canvas, app legend) its
+  two renderers; per-condition carrier fills (#115) use them.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
   symbol with a small triangle; quadrant tags are clipped to that triangle.
@@ -202,7 +202,7 @@ draws NSGC symbols.
   `assignedAtBirthText` for the AMAB / AFAB / UAAB line (a `gender` section
   in `labels.ts` `detailSections`). Everything that draws a person's shape
   must call it rather than read `ind.sex`: `layoutToFlow` puts it on the
-  node data as `shape` (canvas node and minimap pass it to `SymbolShape`),
+  node data as `shape` (the canvas node passes it to `SymbolShape`, the minimap picks its shape by it),
   both exporters' `renderShape`, the legend and the export key swatches.
   Nothing genetic may call it: layout, kinship, twins, PED and the CSV
   father/mother columns read `sex`. A non-binary person always gets the
@@ -261,7 +261,7 @@ draws NSGC symbols.
   2008 dot. The black base is `plainAffected` in 2022 (sectors over it, the
   black centre on top) and `affectedControlOn` in 2008, so with two
   conditions a 2008 person affected only with recorded ones has quarters on
-  white, as NSGC 2008 shades a quadrant per condition. Canvas, minimap, both exporters and the legends read it; never
+  white, as NSGC 2008 shades a quadrant per condition. Canvas, both exporters and the legends read it; never
   test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
   `keyTagRows` are the key rows for the app legend and the export key.
 - `evaluation.ts` — evaluation results and presymptomatic carrier (#101,
@@ -274,9 +274,8 @@ draws NSGC symbols.
   there are several. The key row is "+/-" in 2022 (only when a result is
   recorded) and "E" in 2008. Any documented evaluation puts a "*" just right of
   the symbol's lower right corner (outside adoption brackets), canvas and
-  both exporters, not the minimap. `Individual.presymptomatic` is a
-  vertical line through the symbol, drawn inside `SymbolShape` (so the
-  minimap gets it) and by `renderPresymptomaticSvg`; like the carrier dot
+  both exporters. `Individual.presymptomatic` is a
+  vertical line through the symbol, drawn inside `SymbolShape` and by `renderPresymptomaticSvg`; like the carrier dot
   it is not drawn on an affected fill. The editor offers carrier and
   presymptomatic as one "Carrier" select, and the store setters keep them
   exclusive; old data with only `carrier` loads unchanged. De-identified
@@ -307,8 +306,8 @@ draws NSGC symbols.
   `ProblemsMenu` (hidden at zero; a click selects the person, or a couple's
   first partner, and focuses the field), and a small "!" circle at the
   top left of the canvas node (`data-problem-marker`, filled for an
-  error). The marker is drawn by `PedigreeSymbolNode` only, so the
-  minimap and exports never get it. Kept here, not as warnings: action
+  error). The marker is drawn by `PedigreeSymbolNode` only, so
+  exports never get it. Kept here, not as warnings: action
   refusals (picking, twins, swap sides notices), the PED export loss
   dialog, and display notes such as "carrier mark not drawn on an
   affected fill" (for a plain carrier that is also affected it is now the
@@ -475,8 +474,7 @@ draws NSGC symbols.
   `branchOf` say what it stands for (`children` is the number drawn inside,
   `hidden` everyone hidden under the couple for the tooltip, the collapsed
   partner or partners whose flag it clears). Each renderer adds only the
-  count inside (`renderBranchCountSvg`, `CollapsedBranchNode`, the minimap's
-  `BranchCount`). On the canvas it is its own node type
+  count inside (`renderBranchCountSvg`, `CollapsedBranchNode`). On the canvas it is its own node type
   (`collapsedBranch`), not selectable or draggable, so it needs
   `style.pointerEvents: "all"` or React Flow makes it click-through. Code
   that walks the drawn pedigree's people as people (legend sex rows,
@@ -517,7 +515,7 @@ draws NSGC symbols.
   in `sibshipPath.ts` every member's drop starts at the set's shared point
   on the bar (the mean of their x), and `twinForkMarks` gives the bar across
   monozygotic drops and the "?" for unknown zygosity, both at the points
-  halfway down the drops as R's plot.pedigree does. The minimap stays plain.
+  halfway down the drops as R's plot.pedigree does.
   `twinSetProblem` is the one rule list (two members, same couple, same sex
   for monozygotic); the store's `setTwins` returns its message when refused.
 - `adoption.ts` — adoption brackets (#12): the six bracket segments round
@@ -527,7 +525,7 @@ draws NSGC symbols.
   adopted-in child's drop from the sibship bar is dashed: `sibshipPath.ts`
   gained `sibshipPaths`, which splits `sibshipSegments` into solid and dashed
   by the children's `dashed` flag, keeping the per-child order (couple drop,
-  bar, then one drop per child). The minimap keeps everything solid.
+  bar, then one drop per child).
 - `assisted.ts` — assisted reproduction (#45, NSGC 2008 Fig. 3). The model
   keeps genetics in the ordinary structure so kinship, X-linked kinship,
   relationship names, the double line and PED need nothing special: the
@@ -558,7 +556,7 @@ draws NSGC symbols.
   sibship when the person is linked the same way to every child of it (the
   line then ends where the sibship's descent meets the bar, so siblings do
   not each get a crossing line). `assistedEdgeSegment` is the one geometry,
-  for the canvas, the minimap and `svgExporter` (group `assisted-lines`,
+  for the canvas and `svgExporter` (group `assisted-lines`,
   read by the export lint); the U-shape draws its own along the tracks.
   Lines leave the symbol from a lower corner (`symbolExitPoint`) so they
   clear the name under it. A surrogate with no partner of her own would be
@@ -595,9 +593,7 @@ draws NSGC symbols.
   the middle (`endedBreakX`), so they never cross the drop. On a double line
   they are tall enough to cross both lines. Drawn by `edges/EndedMark.tsx`,
   `svgExporter` (as `class="mark"` lines, which the export lint skips), the
-  U-shape (`endedSegs`, along the track), the minimap (at no less than half
-  size; the minimap draws hopping lines straight, so on a hop the strokes
-  land over the partner in between) and the legend and export key
+  U-shape (`endedSegs`, along the track), and the legend and export key
   ("Relationship ended"). Set from the panel's "Relationship" section and
   the "Relationship" / couple-line items of the more and right-click menus
   (`setPartnershipEnded`). PED cannot carry it; Export PED warns.
@@ -641,7 +637,7 @@ by hand, so change all three together.
   default "Untitled pedigree". On the canvas it is an extra React Flow node
   (`nodes/ChartTitleNode.tsx`, id `__chart-title`, not selectable, no
   pointer events) added in `PedigreeCanvas` beside `rfNodes`, not by
-  `layoutToFlow`, so lints and the minimap never see it; being a node keeps
+  `layoutToFlow`, so lints never see it; being a node keeps
   it in fit view. It sits `TITLE_GAP` above the highest symbol, as in the
   SVG export. The export dialog and `__pededit.checkExport()` pass the same
   string as `SvgExportOptions.title`.

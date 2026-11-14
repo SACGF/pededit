@@ -107,8 +107,8 @@ export interface CoupleEdgeData extends Record<string, unknown> {
  * All geometry for a sibship connection. The SibshipEdge renderer uses
  * leftParentId/rightParentId/childIds to look up current node positions
  * dynamically (via useNodes), so edges stay correct as nodes are dragged.
- * The pre-computed coupleX/Y/sibBarY/childXs/childY values are kept for
- * the minimap renderer which doesn't need real-time updates.
+ * The pre-computed coupleX/Y/sibBarY/childXs/childY values are the layout's
+ * own geometry, read by `renderLint`.
  */
 export interface SibshipEdgeData extends Record<string, unknown> {
   /** React Flow node ID of the left parent. */
@@ -117,7 +117,7 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   rightParentId: string;
   /** React Flow node IDs of the children, in slot order. */
   childIds: string[];
-  // Pre-computed geometry used by the minimap:
+  // Pre-computed geometry (the layout's, not the live node positions):
   /** x (canvas px) of the midpoint of the couple line above this family. */
   coupleX: number;
   /** y (canvas px) of the parent generation centre = (level-1) * ROW_HEIGHT. */
@@ -137,8 +137,8 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   /**
    * The parents are not a couple (`Partnership.donorConception`, #45): no
    * couple line, and a line from each parent's symbol down to the bar in
-   * place of the drop from the couple line. The parents' positions, for the
-   * minimap; the canvas edge reads the live node positions.
+   * place of the drop from the couple line. The parents' positions as laid
+   * out; the canvas edge reads the live node positions.
    */
   apart?: LinePoint[];
   /**

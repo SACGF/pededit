@@ -6,7 +6,7 @@ import { descendantsOf } from "./removal";
 
 /**
  * Assisted reproduction (NSGC 2008 Fig. 3, #45). Framework-free, shared by the
- * canvas, the minimap, the SVG and U-shape exporters, the legends and the store.
+ * canvas, the SVG and U-shape exporters, the legends and the store.
  *
  * The model keeps genetics in the ordinary structure, so kinship, X-linked
  * kinship, relationship names and PED need nothing special:
@@ -215,7 +215,7 @@ export interface AssistedEdgeLike {
  * The segment an assisted edge draws, from the nodes' current positions: to
  * the top of the child, or to the sibship's join point when it stands for
  * the whole sibship. Null when a node it needs is not drawn. Shared by the
- * canvas edge, the minimap and the SVG export.
+ * canvas edge and the SVG export.
  */
 export function assistedEdgeSegment(
   edge: AssistedEdgeLike,

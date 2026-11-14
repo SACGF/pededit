@@ -76,13 +76,6 @@ describe("SymbolShape, pregnancy and pregnancy loss (NSGC 2008)", () => {
     expect(svg).not.toContain(TRIANGLE);
   });
 
-  it("caption={false} (the minimap) keeps the stillbirth slash and drops the SB caption", () => {
-    const individual: Individual = { id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "stillbirth" };
-    const svg = renderToStaticMarkup(<svg><SymbolShape individual={individual} size={SIZE} caption={false} /></svg>);
-    expect(svg).toContain("<line");
-    expect(svg).not.toContain("<text");
-  });
-
   it("stillbirth keeps the sex symbol: female is a circle, unknown a diamond", () => {
     expect(render({ sex: "female",  lifeStatus: "stillbirth" })).toContain("<circle");
     expect(render({ sex: "unknown", lifeStatus: "stillbirth" })).toContain("<polygon");

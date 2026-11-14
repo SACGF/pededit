@@ -431,7 +431,7 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
     expect(paint(plain, "a").sectors[0]!.fill).toBe("diagonal");
   });
 
-  it("every renderer and both keys draw it: canvas, minimap shape, app legend, export key, SVG, U-shape", () => {
+  it("every renderer and both keys draw it: canvas, app legend, export key, SVG, U-shape", () => {
     const p = single("monochrome");
     const a = byId(p, "a");
     const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);

@@ -136,7 +136,7 @@ describe("renderers draw the pattern (#67)", () => {
     expect(svg).toContain(`fill="#2ca02c" clip-path="url(#clip)"`);
   });
 
-  it("canvas symbol (and so the minimap) draws the same layers", () => {
+  it("canvas symbol draws the same layers", () => {
     const p = ped(tags);
     const ind = p.individuals[0]!;
     const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} paint={symbolPaint(ind, p)} clipId="k" /></svg>);

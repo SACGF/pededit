@@ -52,7 +52,7 @@ export const MONOCHROME_PATTERN_ORDER: readonly TagFill[] = [
   "diagonal", "horizontal", "dots", "crosshatch", "shade", "vertical",
 ];
 
-/** Colour of every tag in monochrome mode. Not "black": see `PedigreeCanvas`'s minimap CSS. */
+/** Colour of every tag in monochrome mode. */
 export const MONOCHROME_COLOR = "#000000";
 
 export const TAG_FILL_MODE_OPTIONS: { value: TagFillMode; label: string }[] = [

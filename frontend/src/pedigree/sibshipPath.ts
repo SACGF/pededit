@@ -5,8 +5,8 @@ import { donorDescentSegments, type LinePoint } from "./assisted";
 export type Segment = [number, number, number, number];
 
 /**
- * Lines joining a couple to their children, shared by `SibshipEdge`, the
- * minimap and `svgExporter`. Framework-free.
+ * Lines joining a couple to their children, shared by `SibshipEdge` and
+ * `svgExporter`. Framework-free.
  *
  * The sibship bar sits halfway between the couple line and the highest child
  * row, lowered by `barOffset` when it would otherwise run into another

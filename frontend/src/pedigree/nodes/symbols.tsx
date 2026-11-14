@@ -54,8 +54,6 @@ interface ShapeProps {
   paint?: SymbolPaint;
   /** Unique id for this symbol's clipPath. Required when the paint has sectors. */
   clipId?: string;
-  /** Draw the "SB" / "ECT" caption under the symbol (off in the minimap, where it is unreadable). */
-  caption?: boolean;
   /**
    * The shape to draw, when it is not `individual.sex`: a symbol drawn by
    * gender identity (#26, `symbolSex` in gender.ts).
@@ -310,14 +308,14 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size, paint = standalonePaint(individual), clipId, caption: showCaption = true, shape = individual.sex }: ShapeProps) {
+export function SymbolShape({ individual, size, paint = standalonePaint(individual), clipId, shape = individual.sex }: ShapeProps) {
   const fill = symbolFill(paint);
   const { sectors, core } = paint;
   const id = clipId ?? `symbol-clip-${individual.id}`;
   const status = individual.lifeStatus;
   const brackets = individual.adopted ? <AdoptionBrackets size={size} /> : null;
   if (status) {
-    const caption = showCaption ? lifeStatusCaption(status) : undefined;
+    const caption = lifeStatusCaption(status);
     return (
       <g>
         {brackets}

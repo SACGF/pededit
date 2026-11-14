@@ -3,6 +3,8 @@ import {
   ReactFlow,
   Background,
   Controls,
+  MiniMap,
+  type MiniMapNodeProps,
   Panel,
   applyNodeChanges,
   type NodeTypes,
@@ -20,25 +22,19 @@ import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeSt
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
-import { branchCountFontSize } from "./collapse";
 import { CoupleEdge }         from "./edges/CoupleEdge";
 import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import { AssistedEdge }       from "./edges/AssistedEdge";
-import type { RFNodeData, SibshipEdgeData, CoupleEdgeData, AssistedEdgeData } from "./layoutToFlow";
-import { assistedEdgeSegment } from "./assisted";
-import { ADOPTION_DASH } from "./adoption";
+import type { RFNodeData, CoupleEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
-import { sibshipSegments, segmentsPathD } from "./sibshipPath";
-import { endedBreakX, endedMarkSegments } from "./ended";
 import { highestConsanguinityLabel } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
 import { FilterBanner } from "./FilterBanner";
-import { SymbolShape, DeceasedSlash } from "./nodes/symbols";
-import { symbolPaint } from "./tags";
+import { isAffected } from "./conditions";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { ChartTitleNode, chartTitleNode } from "./nodes/ChartTitleNode";
 import { chartTitle } from "./labels";
@@ -55,170 +51,58 @@ const edgeTypes: EdgeTypes = {
   assistedEdge:       AssistedEdge,
 };
 
-// ── Custom minimap ─────────────────────────────────────────────────────────────
-// Renders a fixed-size SVG that always fits all content (no zoom/pan).
+// ── Minimap ─────────────────────────────────────────────────────────────────
+// React Flow's own minimap (#6, #125): always the whole pedigree, with the
+// viewport as a rectangle. Dragging pans the main view, a click centres it.
+// It only gives a sense of where you are, so people are plain shapes (filled
+// when affected) and there are no lines.
 
-const MINI_W   = 180;
-const MINI_H   = 120;
-const MINI_PAD = 8;
+const MINIMAP_SHAPE: Record<string, string> = { male: "minimap-square", female: "minimap-circle", unknown: "minimap-diamond" };
 
-const MINIMAP_STROKE_CSS =
-  '.pedigree-minimap [stroke="black"], .pedigree-minimap line[stroke="white"]'
-  + " { vector-effect: non-scaling-stroke; stroke-width: 1px; }";
-
-interface PedigreeMinimapProps {
-  pedigree:     Pedigree;
-  nodes:        Node<RFNodeData>[];
-  coupleEdges:  Edge<CoupleEdgeData>[];
-  sibshipEdges: Edge<SibshipEdgeData>[];
-  assistedEdges: Edge<AssistedEdgeData>[];
-}
-
-function PedigreeMinimap({ pedigree, nodes, coupleEdges, sibshipEdges, assistedEdges }: PedigreeMinimapProps) {
-  if (nodes.length === 0) return null;
-
-  // Bounding box over all node extents (nodes are centered at position with nodeOrigin=[0.5,0.5])
-  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-  const half = NODE_SIZE / 2;
-  for (const node of nodes) {
-    const { x, y } = node.position;
-    if (x - half < x0) x0 = x - half;
-    if (x + half > x1) x1 = x + half;
-    if (y - half < y0) y0 = y - half;
-    if (y + half > y1) y1 = y + half;
+/** A person on the minimap: the outline of their symbol in the node's box (NODE_SIZE square). */
+function MinimapNode({ x, y, width, height, className, color, strokeColor, strokeWidth }: MiniMapNodeProps) {
+  const paint = { fill: color, stroke: strokeColor, strokeWidth };
+  if (className.includes("minimap-circle")) {
+    return <ellipse cx={x + width / 2} cy={y + height / 2} rx={width / 2} ry={height / 2} {...paint} />;
   }
-
-  const contentW = x1 - x0 || 1;
-  const contentH = y1 - y0 || 1;
-  const availW   = MINI_W - 2 * MINI_PAD;
-  const availH   = MINI_H - 2 * MINI_PAD;
-  const scale    = Math.min(availW / contentW, availH / contentH);
-
-  // Center the content within the available area
-  const scaledW = contentW * scale;
-  const scaledH = contentH * scale;
-  const offsetX = MINI_PAD + (availW - scaledW) / 2;
-  const offsetY = MINI_PAD + (availH - scaledH) / 2;
-
-  const mx  = (cx: number) => (cx - x0) * scale + offsetX;
-  const my  = (cy: number) => (cy - y0) * scale + offsetY;
-
-  const nodePos = new Map(nodes.map(n => [n.id, n.position]));
-
-  return (
-    <Panel position="bottom-right" style={{ margin: 0, lineHeight: 0 }}>
-      <svg
-        width={MINI_W}
-        height={MINI_H}
-        className="pedigree-minimap"
-        style={{ display: "block", background: "white", border: "1px solid #d1d5db" }}
-      >
-        {/* The symbols are drawn at canvas size and scaled down; keep their
-            outlines and slashes a hairline instead of scaling 2px to nothing. */}
-        <style>{MINIMAP_STROKE_CSS}</style>
-        {/* Sibship edges — drawn first so nodes render on top */}
-        {sibshipEdges.map(edge => {
-          const data = edge.data as SibshipEdgeData;
-          if (!data?.childXs?.length) return null;
-          const kids = data.childXs.map((x, i) => ({ x, y: data.childYs?.[i] ?? data.childY }));
-          const d = segmentsPathD(
-            sibshipSegments(data.coupleX, data.coupleY, 0, kids, data.barOffset ?? 0, data.apart, data.converge),
-            (x, y) => [mx(x), my(y)],
-          );
-          return <path key={edge.id} d={d} stroke="black" strokeWidth={1} fill="none" />;
-        })}
-
-        {/* Assisted reproduction lines (#45) */}
-        {assistedEdges.map(edge => {
-          const seg = assistedEdgeSegment(edge, id => {
-            const n = nodes.find(x => x.id === id);
-            return n && { position: n.position, individual: n.data.individual, shape: n.data.shape };
-          });
-          if (!seg) return null;
-          const [x1, y1, x2, y2] = seg;
-          return (
-            <line key={edge.id} data-minimap-assisted x1={mx(x1)} y1={my(y1)} x2={mx(x2)} y2={my(y2)} stroke="black" strokeWidth={1}
-              strokeDasharray={edge.data?.kind === "social" ? ADOPTION_DASH : undefined} />
-          );
-        })}
-
-        {/* Couple edges */}
-        {coupleEdges.map(edge => {
-          const src = nodePos.get(edge.source);
-          const tgt = nodePos.get(edge.target);
-          if (!src || !tgt) return null;
-          const lx = mx(src.x + half);
-          const rx = mx(tgt.x - half);
-          const ey = my(src.y);
-          // Ended relationship (#98): the strokes at no less than half size,
-          // or they vanish at minimap scale.
-          const data = edge.data as CoupleEdgeData | undefined;
-          const ended = data?.ended && (
-            <path
-              data-minimap-ended
-              d={segmentsPathD(endedMarkSegments(endedBreakX(lx, rx, 0, 0, !!data.middleTaken), ey, Math.max(scale, 0.5)))}
-              stroke="black" strokeWidth={1} fill="none"
-            />
-          );
-          if (edge.type === "consanguineousEdge") {
-            return (
-              <g key={edge.id}>
-                <line x1={lx} y1={ey - 1.5} x2={rx} y2={ey - 1.5} stroke="black" strokeWidth={1} />
-                <line x1={lx} y1={ey + 1.5} x2={rx} y2={ey + 1.5} stroke="black" strokeWidth={1} />
-                {ended}
-              </g>
-            );
-          }
-          return (
-            <g key={edge.id}>
-              <line x1={lx} y1={ey} x2={rx} y2={ey} stroke="black" strokeWidth={1} />
-              {ended}
-            </g>
-          );
-        })}
-
-        {/* Nodes, on top of the edges: the canvas symbols scaled down (#6) */}
-        {nodes.map(node => {
-          const { x, y } = node.position;
-          const { individual, branch, shape } = node.data as RFNodeData;
-          return (
-            <g
-              key={node.id}
-              data-minimap-individual={individual.id}
-              transform={`translate(${mx(x - half)} ${my(y - half)}) scale(${scale})`}
-            >
-              <SymbolShape
-                individual={individual}
-                shape={shape}
-                size={NODE_SIZE}
-                paint={symbolPaint(individual, pedigree)}
-                clipId={`minimap-clip-${node.id}`}
-                caption={false}
-              />
-              {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
-              {branch && <BranchCount count={branch.children.length} />}
-            </g>
-          );
-        })}
-      </svg>
-    </Panel>
-  );
+  if (className.includes("minimap-diamond")) {
+    const cx = x + width / 2, cy = y + height / 2;
+    return <polygon points={`${cx},${y} ${x + width},${cy} ${cx},${y + height} ${x},${cy}`} {...paint} />;
+  }
+  if (className.includes("minimap-square")) return <rect x={x} y={y} width={width} height={height} {...paint} />;
+  return null; // the chart title
 }
 
-/** The number inside a collapsed-branch group symbol (#1), as on the canvas, for the minimap. */
-function BranchCount({ count }: { count: number }) {
-  const fs = branchCountFontSize(count, NODE_SIZE);
+function PedigreeMinimap({ pedigree }: { pedigree: Pedigree }) {
+  const { getZoom, setCenter } = useReactFlow();
+  // A drag on the minimap pans, and the browser still sends a click at the end: only a press that did not move centres.
+  const down = useRef<{ x: number; y: number } | null>(null);
+  const individual = (n: Node) => (n.data as Partial<RFNodeData>).individual;
   return (
-    <text
-      x={NODE_SIZE / 2}
-      y={NODE_SIZE / 2 + Math.round(fs * 0.36 * 10) / 10}
-      textAnchor="middle"
-      fontFamily="sans-serif"
-      fontSize={fs}
-      fill="black"
-    >
-      {count}
-    </text>
+    <div onPointerDownCapture={e => { down.current = { x: e.clientX, y: e.clientY }; }}>
+      <MiniMap
+        position="bottom-right"
+        pannable
+        nodeComponent={MinimapNode}
+        nodeClassName={n => {
+          const ind = individual(n);
+          return ind ? MINIMAP_SHAPE[(n.data as RFNodeData).shape ?? ind.sex] ?? "minimap-diamond" : "";
+        }}
+        nodeColor={n => { const ind = individual(n); return ind && isAffected(ind, pedigree) ? "black" : "white"; }}
+        nodeStrokeColor="black"
+        nodeStrokeWidth={4}
+        bgColor="white"
+        maskColor="rgba(229, 231, 235, 0.7)"
+        maskStrokeColor="#6b7280"
+        maskStrokeWidth={1}
+        style={{ border: "1px solid #d1d5db", margin: 0 }}
+        onClick={(e, position) => {
+          const from = down.current;
+          if (from && Math.hypot(e.clientX - from.x, e.clientY - from.y) > 3) return;
+          void setCenter(position.x, position.y, { zoom: getZoom(), duration: 200 });
+        }}
+      />
+    </div>
   );
 }
 
@@ -546,13 +430,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         <RevealOnRequest />
         <Controls />
         {showMinimap && (
-          <PedigreeMinimap
-            pedigree={pedigree}
-            nodes={rfNodes as Node<RFNodeData>[]}
-            coupleEdges={coupleEdges as Edge<CoupleEdgeData>[]}
-            sibshipEdges={sibshipEdges as Edge<SibshipEdgeData>[]}
-            assistedEdges={assistedEdges as Edge<AssistedEdgeData>[]}
-          />
+          <PedigreeMinimap pedigree={pedigree} />
         )}
       </ReactFlow>
       <CanvasContextMenu target={contextMenu} onClose={() => setContextMenu(null)} />
