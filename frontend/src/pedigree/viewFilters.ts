@@ -165,6 +165,10 @@ export interface ViewFilterControl {
   /** The fields to write to switch it on or off. */
   patch: (on: boolean) => ViewFilterPatch;
   result: (pedigree: Pedigree) => FilterResult;
+  /** Controls that share a group are alternatives: the menu draws them as one row of radio buttons. */
+  group?: "side";
+  /** The radio button's text inside its group's row. */
+  shortLabel?: string;
 }
 
 /** The filter controls, in the order the toolbar's Filter menu lists them. */
@@ -192,6 +196,8 @@ export const VIEW_FILTERS: readonly ViewFilterControl[] = [
     on: f => f?.side === "maternal",
     patch: on => ({ side: on ? "maternal" : undefined }),
     result: sideResult,
+    group: "side",
+    shortLabel: "Mother's",
   },
   {
     id: "paternal",
@@ -200,6 +206,8 @@ export const VIEW_FILTERS: readonly ViewFilterControl[] = [
     on: f => f?.side === "paternal",
     patch: on => ({ side: on ? "paternal" : undefined }),
     result: sideResult,
+    group: "side",
+    shortLabel: "Father's",
   },
 ];
 

@@ -525,7 +525,8 @@ draws NSGC symbols.
   hide people, so under these filters it turns them off like any other
   edit that hides someone. New filters: a field on `ViewFilters`, a row in
   `VIEW_FILTERS` (whether it is on, its patch, its `result`); the toolbar
-  `FilterMenu` and the banner read that list.
+  `FilterMenu` and the banner read that list; rows sharing a `group` are
+  alternatives, drawn as one row of radio buttons.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
   to a set key and zygosity; `layoutToFlow` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:

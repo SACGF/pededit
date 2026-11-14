@@ -10,7 +10,8 @@ import { conditionTags } from "../pedigree/conditions";
  * The view filters (#4) as a toolbar menu of switches, so they can be turned
  * on and off quickly. The button reads the active filter's name while one is
  * on, or how many are on. Further filters are rows in `VIEW_FILTERS`. With
- * two or more conditions, "Affected only" can be narrowed to one.
+ * two or more conditions, "Affected only" can be narrowed to one. Controls
+ * that share a `group` (the sides of the family) are one row of radio buttons.
  */
 export function FilterMenu({ disabled }: { disabled?: boolean }) {
   const pedigree = usePedigreeStore(s => s.pedigree);
@@ -20,6 +21,7 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
   const active = activeFilters(pedigree);
   const conditions = conditionTags(pedigree);
   const chosen = pedigree.filters?.affectedCondition;
+  const sides = VIEW_FILTERS.filter(f => f.group === "side");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -37,7 +39,7 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-2 space-y-2" side="bottom" align="end">
-        {VIEW_FILTERS.map(f => (
+        {VIEW_FILTERS.filter(f => !f.group).map(f => (
           <div key={f.id}>
             <label className="flex items-start gap-2 cursor-pointer">
               <input
@@ -66,6 +68,36 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
             )}
           </div>
         ))}
+        <fieldset>
+          <legend className="text-sm">Side of the family</legend>
+          <div className="text-xs text-gray-400">
+            Draw the proband and one parent's blood relatives with their partners. The other parent is drawn, their family is not.
+          </div>
+          <div className="flex gap-3 mt-1">
+            <label className="flex items-center gap-1 text-xs cursor-pointer">
+              <input
+                type="radio"
+                name="side"
+                value="both"
+                checked={!sides.some(f => f.on(pedigree.filters))}
+                onChange={() => setViewFilter("side", undefined)}
+              />
+              Both
+            </label>
+            {sides.map(f => (
+              <label key={f.id} className="flex items-center gap-1 text-xs cursor-pointer">
+                <input
+                  type="radio"
+                  name="side"
+                  value={f.id}
+                  checked={f.on(pedigree.filters)}
+                  onChange={() => updateViewFilters(f.patch(true))}
+                />
+                {f.shortLabel ?? f.label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <div className="text-xs text-gray-400 border-t pt-2">
           Figure exports draw the same; CSV, PED and JSON keep everyone.
         </div>
