@@ -55,13 +55,8 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
         <>
           <ChartTitleField />
           <ClinicalDetailsSection />
-          <div className="space-y-1" data-testid="selection-help">
-            <p className="text-xs text-gray-400">Select an individual to edit</p>
-            {/* There is no select mode (#122): say how selecting works. */}
-            <p className="text-[10px] text-gray-400">
-              Click to select, Shift+click to add or remove, Shift+drag to select an area. Drag the background to pan.
-            </p>
-          </div>
+          {/* How selecting works is in the left sidebar ("Using the canvas", #122). */}
+          <p className="text-xs text-gray-400">Select an individual to edit</p>
         </>
       )}
       <div className="border-t pt-3">
@@ -913,13 +908,14 @@ function probandTitle(pedigree: Pedigree, individual: Individual): string {
 
 /**
  * Sex (#120), with the more menu's rules: a choice `batchSexProblem` refuses
- * is disabled and the reason is written under the buttons.
+ * is greyed out, and the reason is its tooltip, so it shows only when someone
+ * reaches for that choice. `aria-disabled` rather than `disabled`, because a
+ * disabled button gets no hover in some browsers and so no tooltip.
  */
 function SexControl({ individual }: { individual: Individual }) {
   const { pedigree, setSex } = usePedigreeStore();
   const sexes = ["male", "female", "unknown"] as const;
   const problemOf = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individual.id], sex);
-  const reasons = [...new Set(sexes.map(problemOf).filter((p): p is string => !!p))];
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2">
@@ -931,17 +927,16 @@ function SexControl({ individual }: { individual: Individual }) {
               type="button"
               data-sex={sex}
               aria-pressed={individual.sex === sex}
-              disabled={!!problemOf(sex)}
+              aria-disabled={!!problemOf(sex) || undefined}
               title={problemOf(sex) ?? undefined}
-              onClick={() => { if (individual.sex !== sex) setSex(individual.id, sex); }}
-              className={`px-2 h-6 text-xs border-l first:border-l-0 ${individual.sex === sex ? "bg-black text-white" : "bg-white hover:bg-gray-100"} disabled:text-gray-300 disabled:hover:bg-white disabled:cursor-not-allowed`}
+              onClick={() => { if (individual.sex !== sex && !problemOf(sex)) setSex(individual.id, sex); }}
+              className={`px-2 h-6 text-xs border-l first:border-l-0 ${individual.sex === sex ? "bg-black text-white" : "bg-white hover:bg-gray-100"} aria-disabled:text-gray-300 aria-disabled:hover:bg-white aria-disabled:cursor-not-allowed`}
             >
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </button>
           ))}
         </div>
       </div>
-      {reasons.map(r => <p key={r} className="text-[10px] text-gray-500">{r}</p>)}
     </div>
   );
 }

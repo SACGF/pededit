@@ -52,17 +52,6 @@ export default function CanvasPage() {
   const [tagsOpen, setTagsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
-  const [linkCopied, setLinkCopied] = useState(false);
-
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      // Clipboard unavailable (e.g. insecure context); the URL bar still works.
-    }
-  };
   const [notFound, setNotFound] = useState(false);
 
   useKeyboardShortcuts();
@@ -240,14 +229,6 @@ export default function CanvasPage() {
                 This pedigree is saved at this URL and nowhere else. Bookmark it or copy the link to come back to it.
                 The home page also lists it under "Recent on this device" in this browser.
               </p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full mb-3 h-7 text-xs"
-                onClick={copyLink}
-              >
-                {linkCopied ? "Link copied" : "Copy link"}
-              </Button>
               <p>
                 <span
                   className="text-black underline underline-offset-1 cursor-pointer"
@@ -259,6 +240,18 @@ export default function CanvasPage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* How to select and move around: there is no select mode (#122), so it is said here, always in view. */}
+        <div className="px-3 py-2 border-t text-[11px] text-gray-500 leading-snug" data-testid="canvas-help">
+          <p className="text-gray-700 mb-1">Using the canvas</p>
+          <ul className="space-y-0.5">
+            <li>Click a person to select and edit them</li>
+            <li><b className="font-medium text-gray-700">Shift+click</b> to add or remove from the selection</li>
+            <li><b className="font-medium text-gray-700">Shift+drag</b> to select an area</li>
+            <li>Drag the background to pan, scroll to zoom</li>
+            <li>Right-click a person or couple line for more</li>
+          </ul>
         </div>
 
         {/* Feedback and self-hosting (#113) */}
