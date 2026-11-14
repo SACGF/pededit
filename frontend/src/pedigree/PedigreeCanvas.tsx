@@ -14,6 +14,8 @@ import {
   type NodeChange,
   type OnNodeDrag,
   useReactFlow,
+  useNodes,
+  useEdges,
   useStore as useFlowStore,
   useStoreApi,
 } from "@xyflow/react";
@@ -27,7 +29,10 @@ import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import { AssistedEdge }       from "./edges/AssistedEdge";
-import type { RFNodeData, CoupleEdgeData } from "./layoutToFlow";
+import type { RFNodeData, CoupleEdgeData, SibshipEdgeData, AssistedEdgeData } from "./layoutToFlow";
+import { sibshipSegments, segmentsPathD } from "./sibshipPath";
+import { assistedEdgeSegment } from "./assisted";
+import { symbolTopInset } from "./lifeStatus";
 import { NODE_SIZE } from "./constants";
 import { highestConsanguinityLabel } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
@@ -55,12 +60,76 @@ const edgeTypes: EdgeTypes = {
 // React Flow's own minimap (#6, #125): always the whole pedigree, with the
 // viewport as a rectangle. Dragging pans the main view, a click centres it.
 // It only gives a sense of where you are, so people are plain shapes (filled
-// when affected) and there are no lines.
+// when affected) joined by plain lines: couple lines (doubled when
+// consanguineous), lines of descent and assisted reproduction lines, with no
+// dashes, marks or text.
 
 const MINIMAP_SHAPE: Record<string, string> = { male: "minimap-square", female: "minimap-circle", unknown: "minimap-diamond" };
 
+/** Minimap line width in flow units, like the symbol outlines, so lines shrink with the symbols. */
+const MINIMAP_LINE_WIDTH = 3;
+
+/**
+ * The lines on the minimap, in flow coordinates from the live node positions
+ * (so they follow a drag). React Flow's MiniMap draws nodes only, with no
+ * slot for anything else in its SVG, so the first node draws these before
+ * its own shape, which puts them under every symbol.
+ */
+function MinimapEdges() {
+  const nodes = useNodes();
+  const edges = useEdges();
+  const byId = new Map(nodes.map(n => [n.id, n]));
+  const nodeAt = (id: string) => {
+    const n = byId.get(id);
+    if (!n) return undefined;
+    const d = n.data as Partial<RFNodeData>;
+    return { position: n.position, individual: d.individual, shape: d.shape };
+  };
+  const half = NODE_SIZE / 2;
+  const paths: string[] = [];
+  for (const edge of edges) {
+    if (edge.type === "coupleEdge" || edge.type === "consanguineousEdge") {
+      const a = byId.get(edge.source)?.position, b = byId.get(edge.target)?.position;
+      if (!a || !b) continue;
+      const [l, r] = a.x <= b.x ? [a, b] : [b, a];
+      const y = (l.y + r.y) / 2;
+      const offsets = edge.type === "consanguineousEdge" ? [-MINIMAP_LINE_WIDTH, MINIMAP_LINE_WIDTH] : [0];
+      for (const dy of offsets) paths.push(`M ${l.x + half} ${y + dy} L ${r.x - half} ${y + dy}`);
+    } else if (edge.type === "sibshipEdge") {
+      const data = edge.data as SibshipEdgeData | undefined;
+      if (!data) continue;
+      const lp = byId.get(data.leftParentId), rp = byId.get(data.rightParentId);
+      const kids = data.childIds.map(id => byId.get(id)).filter((n): n is Node => !!n);
+      if (!lp || !rp || kids.length === 0) continue;
+      const sexOf = (n: Node) => { const d = n.data as Partial<RFNodeData>; return d.shape ?? d.individual?.sex; };
+      const apart = data.apart
+        ? [{ ...lp.position, sex: sexOf(lp) }, { ...rp.position, sex: sexOf(rp) }]
+        : undefined;
+      paths.push(segmentsPathD(sibshipSegments(
+        (lp.position.x + rp.position.x) / 2,
+        (lp.position.y + rp.position.y) / 2,
+        data.hopHeight ?? 0,
+        kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).individual?.lifeStatus, NODE_SIZE) })),
+        data.barOffset ?? 0,
+        apart,
+        data.converge,
+      )));
+    } else if (edge.type === "assistedEdge") {
+      const seg = assistedEdgeSegment(edge as Edge<AssistedEdgeData>, nodeAt);
+      if (seg) paths.push(`M ${seg[0]} ${seg[1]} L ${seg[2]} ${seg[3]}`);
+    }
+  }
+  return <path data-minimap-edges d={paths.join(" ")} stroke="black" strokeWidth={MINIMAP_LINE_WIDTH} fill="none" />;
+}
+
 /** A person on the minimap: the outline of their symbol in the node's box (NODE_SIZE square). */
-function MinimapNode({ x, y, width, height, className, color, strokeColor, strokeWidth }: MiniMapNodeProps) {
+function MinimapNode(props: MiniMapNodeProps) {
+  const firstId = useFlowStore(s => s.nodes.find(n => !n.hidden)?.id);
+  const shape = <MinimapShape {...props} />;
+  return props.id === firstId ? <>{<MinimapEdges />}{shape}</> : shape;
+}
+
+function MinimapShape({ x, y, width, height, className, color, strokeColor, strokeWidth }: MiniMapNodeProps) {
   const paint = { fill: color, stroke: strokeColor, strokeWidth };
   if (className.includes("minimap-circle")) {
     return <ellipse cx={x + width / 2} cy={y + height / 2} rx={width / 2} ry={height / 2} {...paint} />;

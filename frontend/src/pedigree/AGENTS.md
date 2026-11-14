@@ -44,7 +44,11 @@ draws NSGC symbols.
   view and a click centres it (a press that moved is a drag, not a click).
   It is only for a sense of where you are, so `MinimapNode` draws each
   person as a plain square, circle or diamond (`RFNodeData.shape`), black
-  when `isAffected`, and no lines. An earlier custom minimap drew the real
+  when `isAffected`. `MinimapEdges` draws plain couple lines (doubled when
+  consanguineous), lines of descent and assisted lines, with no dashes,
+  marks or text, from live node positions. React Flow's MiniMap has no slot
+  for edges, so the first node's `nodeComponent` draws them before its own
+  shape, which keeps them under every symbol. An earlier custom minimap drew the real
   symbols and lines scaled down; it was too small to read and on a wide
   pedigree its 1px outlines covered sub-pixel symbols, so people looked
   black. Its strokes are in flow units (4 on a 40px symbol) so they shrink
