@@ -163,6 +163,30 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
 }
 
 /**
+ * What `personId` is to `otherId`, as a term for `personId`: "first cousin",
+ * "niece", "grandson". `nameRelationship` describes whichever of the two is
+ * nearer the common ancestors; when that is `otherId`, this turns the term
+ * round ("aunt" becomes "niece" or "nephew" by `personId`'s sex). Null when
+ * the relationship cannot be named for certain.
+ */
+export function relationshipTermFor(pedigree: Pedigree, personId: string, otherId: string, kinship: number): string | null {
+  // Level relationships name `b`, so put the person second.
+  const named = nameRelationship(pedigree, otherId, personId, kinship);
+  if (!named) return null;
+  if (named.subjectId === personId) return named.term;
+  const { up, down, half } = named;
+  const sex = pedigree.individuals.find(i => i.id === personId)?.sex;
+  if (up === 0) {
+    return down === 1
+      ? bySex(sex, "son", "daughter", "child")
+      : greats(down - 2) + bySex(sex, "grandson", "granddaughter", "grandchild");
+  }
+  if (up === 1) return (half ? "half-" : "") + greats(down - 2) + bySex(sex, "nephew", "niece", "niece or nephew");
+  // Cousins (up >= 2) read the same both ways.
+  return named.term;
+}
+
+/**
  * The relationship of a couple as NSGC writes it above a consanguineous
  * double line (#97): "first cousins", "half second cousins once removed",
  * "uncle and niece". Null when `nameRelationship` cannot name them.

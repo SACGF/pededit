@@ -10,6 +10,7 @@ import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { GENDER_IDENTITY_OPTIONS, assignedAtBirthText, drawsGender } from "../pedigree/gender";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
+import { referenceRelatedness } from "../pedigree/referenceRelatedness";
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
 import { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
@@ -600,7 +601,8 @@ function formatCoefficientX(x: number): string {
 }
 
 /**
- * Relatedness worked out from the drawn structure (#32): the person's
+ * Relatedness worked out from the drawn structure (#32): one line for how
+ * the person is related to the proband and the consultand (#134), the person's
  * inbreeding coefficient, and for each partner the couple's kinship
  * coefficient, which is what their children's inbreeding coefficient will
  * be. Each has its X-linked value beside it (#87). The coefficients are
@@ -615,12 +617,19 @@ function formatCoefficientX(x: number): string {
 function RelatednessSection({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipConsanguineous } = usePedigreeStore();
   const { inbreeding, inbreedingX, couples } = relatednessOf(pedigree, individual.id);
-  if (!(inbreeding > 0) && couples.length === 0) return null;
+  const references = referenceRelatedness(pedigree, individual.id);
+  if (!(inbreeding > 0) && couples.length === 0 && references.length === 0) return null;
 
   return (
     <div className="border-t pt-3 space-y-2" data-testid="relatedness">
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relatedness</div>
       <div className="text-xs text-gray-600 space-y-1.5">
+        {references.map(r => (
+          <div key={r.referenceId} data-testid="reference-relatedness" data-role={r.role}>
+            <span className="text-gray-800">{r.text}</span>
+            {r.detail && <div className="text-[10px] text-gray-500">{r.detail}</div>}
+          </div>
+        ))}
         {inbreeding > 0 && (
           <div data-testid="inbreeding" title="The chance that this person's two copies of a gene are the same copy inherited through both parents. It equals the kinship coefficient of the parents.">
             Inbreeding coefficient (F): <span className="font-medium">{formatCoefficient(inbreeding)}</span>

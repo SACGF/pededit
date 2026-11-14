@@ -387,6 +387,14 @@ draws NSGC symbols.
   only the coefficient and degree. That check is what keeps it honest, so do
   not relax it to "name the closest path". `pairLabels` names the two people
   (name, else "the unnamed female", else selection order).
+- `referenceRelatedness.ts` (#134): the edit panel's line for one person's
+  relationship to each proband and to each consultand who is not a proband
+  (so the consultands alone when nobody is proband; this differs from
+  `referencePeople` in `viewFilters.ts`, which drops the consultands once
+  there is a proband). `nameRelationship` names whichever of the pair is
+  nearer the common ancestors, which is often the proband ("aunt"), so the
+  panel goes through `relationshipTermFor`, which turns the term round to
+  the selected person ("niece").
 - `consanguinity.ts` — `consanguinityTest`, the one rule for a double couple
   line (#85), shared by the canvas, the legend and both SVG exporters. The
   line is double when the couple's kinship is above 0, so it follows blood:
