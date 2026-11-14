@@ -14,7 +14,7 @@ import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
 import { CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
-import { donorPairFor, sameSexCouple } from "../sameSex";
+import { coupleChildren, donorPairFor, sameSexCouple } from "../sameSex";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -146,7 +146,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   const twinMembers = twin?.set.members ?? [individualId, adjacentSibling(pedigree, individualId) ?? ""].filter(Boolean);
   // Partnerships of this person with no children: the childless mark applies to these (#15).
   const childlessCouples = partnerChoices(pedigree, individualId)
-    .filter(c => (pedigree.parentOf[c.partnershipId] ?? []).length === 0)
+    .filter(c => coupleChildren(pedigree, c.partnershipId).length === 0)
     .map(c => ({ ...c, status: pedigree.partnerships.find(p => p.id === c.partnershipId)?.childless }));
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
@@ -647,7 +647,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
-  const childless = (pedigree.parentOf[partnershipId] ?? []).length === 0;
+  const childless = coupleChildren(pedigree, partnershipId).length === 0;
   const sameSex = !!sameSexCouple(pedigree, partnershipId);
 
   function action(fn: () => void) {

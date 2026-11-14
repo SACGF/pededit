@@ -42,6 +42,29 @@ export function donorPairFor(pedigree: Pedigree, geneticParentId: string, partne
   });
 }
 
+/**
+ * The couple's children: those in `parentOf` and, for a couple whose
+ * children are donor-conceived (a same-sex couple, #105), the children of
+ * one partner's `donorConception` pair who have the other partner as a
+ * social parent. The childless mark, its menu and Remove partnership go by
+ * this, so a same-sex couple with children is not offered them.
+ */
+export function coupleChildren(pedigree: Pedigree, partnershipId: string): string[] {
+  const own = pedigree.parentOf[partnershipId] ?? [];
+  const couple = pedigree.partnerships.find(p => p.id === partnershipId);
+  if (!couple || couple.donorConception) return own;
+  const raised = new Set(own);
+  for (const [genetic, social] of [[couple.individual1, couple.individual2], [couple.individual2, couple.individual1]]) {
+    for (const p of pedigree.partnerships) {
+      if (!p.donorConception || (p.individual1 !== genetic && p.individual2 !== genetic)) continue;
+      for (const c of pedigree.parentOf[p.id] ?? []) {
+        if (pedigree.individuals.find(i => i.id === c)?.socialParents?.includes(social)) raised.add(c);
+      }
+    }
+  }
+  return [...raised];
+}
+
 /** Why `geneticParentId` cannot have a child through this same-sex couple, or null. */
 export function sameSexChildProblem(pedigree: Pedigree, partnershipId: string, geneticParentId: string): string | null {
   const p = sameSexCouple(pedigree, partnershipId);

@@ -14,7 +14,7 @@ import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
 import type { ViewFilterPatch } from "../pedigree/viewFilters";
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
-import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
+import { applySameSexChildren, coupleChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
 import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type ConditionState } from "../pedigree/conditions";
 
@@ -951,6 +951,12 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         if (!parentPId) return; // no parents — can't add sibling
 
         const sibling = makeIndividual("unknown", nextSibOrderInFamily(draft, parentPId));
+        // A donor-conceived child's sibling by the same donor is raised by
+        // the same social parents (the other partner of a same-sex couple, #105).
+        const source = draft.individuals.find(i => i.id === individualId);
+        if (draft.partnerships.find(p => p.id === parentPId)?.donorConception && source?.socialParents?.length) {
+          sibling.socialParents = [...source.socialParents];
+        }
         draft.individuals.push(sibling);
         draft.parentOf[parentPId] = [...draft.parentOf[parentPId], sibling.id];
       });
@@ -1124,7 +1130,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       const { pedigree } = get();
       const p = pedigree.partnerships.find(x => x.id === partnershipId);
       if (!p) return "Unknown partnership.";
-      const kids = pedigree.parentOf[partnershipId] ?? [];
+      const kids = coupleChildren(pedigree, partnershipId);
       if (kids.length > 0) {
         return `Not removed: this couple has ${kids.length === 1 ? "a child" : `${kids.length} children`}. Use Replace parents or Detach from parents on ${kids.length === 1 ? "the child" : "each child"} first.`;
       }

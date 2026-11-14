@@ -5,6 +5,7 @@ import { Legend } from "./Legend";
 import { SelectionPanel } from "./SelectionPanel";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
+import { coupleChildren } from "../pedigree/sameSex";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { GENDER_IDENTITY_OPTIONS, assignedAtBirthText, drawsGender } from "../pedigree/gender";
 import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
@@ -761,7 +762,7 @@ function CouplesForm({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeStore();
   const childlessEligible = pedigree.partnerships.filter(p =>
     (p.individual1 === individual.id || p.individual2 === individual.id)
-    && (pedigree.parentOf[p.id] ?? []).length === 0);
+    && coupleChildren(pedigree, p.id).length === 0);
   if (childlessEligible.length === 0) return null;
 
   return (
