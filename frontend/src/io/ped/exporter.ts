@@ -1,4 +1,6 @@
 import { isAffected, type Pedigree } from "@pedigree-editor/layout-engine";
+import { consanguinityTest } from "../../pedigree/consanguinity";
+import { kinshipOf } from "../../pedigree/relatedness";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
@@ -147,4 +149,27 @@ export function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
 /** Partnerships whose childless mark (#15) PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);
+}
+
+/**
+ * Couples whose consanguinity PED cannot carry (#97, #92): the text above
+ * the double line, and the manual override for a couple the drawn structure
+ * does not show to be related. A double line worked out from kinship comes
+ * back on import, since it follows from the parents.
+ */
+export function pedLostConsanguinity(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; what: string }[] {
+  const out: { partnership: Pedigree["partnerships"][0]; what: string }[] = [];
+  const candidates = pedigree.partnerships.filter(p => p.consanguineous || p.consanguinityLabel?.trim());
+  if (candidates.length === 0) return out;
+  const double = consanguinityTest(pedigree);
+  const kinship = kinshipOf(pedigree);
+  for (const p of candidates) {
+    const label = p.consanguinityLabel?.trim();
+    const override = !!p.consanguineous && !(kinship.kinship(p.individual1, p.individual2) > 0);
+    const shownLabel = !!label && double(p.individual1, p.individual2);
+    if (override && shownLabel) out.push({ partnership: p, what: `consanguineous ("${label}")` });
+    else if (override) out.push({ partnership: p, what: "marked consanguineous" });
+    else if (shownLabel) out.push({ partnership: p, what: `"${label}" above the double line` });
+  }
+  return out;
 }

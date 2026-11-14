@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded, pedLostAssisted } from "../io/ped/exporter.js";
+import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded, pedLostAssisted, pedLostConsanguinity } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
 import { childlessLabel } from "../pedigree/childless";
 import { adoptionLabel } from "../pedigree/adoption";
@@ -66,7 +66,8 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
     const lostTwins = pedLostTwins(pedigree);
     const lostEnded = pedLostEnded(pedigree);
     const lostAssisted = pedLostAssisted(pedigree);
-    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0 && lostAssisted.length === 0) { handleExportPed(dialect); return; }
+    const lostConsanguinity = pedLostConsanguinity(pedigree);
+    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0 && lostAssisted.length === 0 && lostConsanguinity.length === 0) { handleExportPed(dialect); return; }
     const nameOf = (id: string) => { const i = pedigree.individuals.find(x => x.id === id); return i?.name || id; };
     setPedWarning({
       dialect,
@@ -77,6 +78,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
         ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
         ...lostEnded.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: relationship ended`),
         ...lostAssisted.map(i => `${i.name || i.id}: ${assistedLossText(i, nameOf)}`),
+        ...lostConsanguinity.map(c => `${nameOf(c.partnership.individual1)} and ${nameOf(c.partnership.individual2)}: ${c.what}`),
       ],
     });
   }
@@ -122,7 +124,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
           <DialogHeader>
             <DialogTitle>PED cannot carry everything in this pedigree</DialogTitle>
             <DialogDescription>
-              PED has no column for pregnancy, pregnancy loss, twins, adoption or a childless couple mark, so{" "}
+              PED has no column for pregnancy, pregnancy loss, twins, adoption, a childless couple mark or consanguinity it cannot work out from the parents, so{" "}
               {pedWarning?.lines.length === 1 ? "this will be lost" : `these ${pedWarning?.lines.length} will be lost`}{" "}
               (pregnancies and losses become ordinary children). Download JSON keeps them.
             </DialogDescription>

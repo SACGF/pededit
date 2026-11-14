@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { exportPed, pedLostLifeStatus } from "../ped/exporter.js";
+import { exportPed, pedLostLifeStatus, pedLostConsanguinity } from "../ped/exporter.js";
 import { importPed } from "../ped/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -310,5 +310,40 @@ describe("pedLostLifeStatus", () => {
       siblingOrder: { mode: "insertion", affectedFirst: false },
     };
     expect(pedLostLifeStatus(ped).map(i => i.id)).toEqual(["b", "c"]);
+  });
+});
+
+describe("pedLostConsanguinity (#97)", () => {
+  const person = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+  // gf = gm, their children s1 and s2 marry in, and the grandchildren c1 and c2 are a couple: first cousins.
+  const cousins = (overrides: { g?: object; pc?: object; out?: object } = {}): Pedigree => makePedigree({
+    individuals: ["gf", "s1", "h2", "c1", "o1"].map(id => person(id, "male"))
+      .concat(["gm", "w1", "s2", "c2", "o2"].map(id => person(id, "female"))),
+    partnerships: [
+      { id: "g", individual1: "gf", individual2: "gm", ...overrides.g },
+      { id: "p1", individual1: "s1", individual2: "w1" },
+      { id: "p2", individual1: "h2", individual2: "s2" },
+      { id: "pc", individual1: "c1", individual2: "c2", ...overrides.pc },
+      { id: "out", individual1: "o1", individual2: "o2", ...overrides.out },
+    ],
+    parentOf: { g: ["s1", "s2"], p1: ["c1"], p2: ["c2"] },
+  });
+
+  it("says nothing when the double line follows from the parents", () => {
+    expect(pedLostConsanguinity(cousins())).toEqual([]);
+    expect(pedLostConsanguinity(cousins({ pc: { consanguineous: true } }))).toEqual([]);
+  });
+
+  it("lists the text above the double line and the override for a couple not shown to be related", () => {
+    const lost = pedLostConsanguinity(cousins({ pc: { consanguinityLabel: "first cousins" }, out: { consanguineous: true }, g: { consanguineous: true, consanguinityLabel: "second cousins" } }));
+    expect(lost.map(l => [l.partnership.id, l.what])).toEqual([
+      ["g", 'consanguineous ("second cousins")'],
+      ["pc", '"first cousins" above the double line'],
+      ["out", "marked consanguineous"],
+    ]);
+  });
+
+  it("ignores text on a couple whose line is not drawn double", () => {
+    expect(pedLostConsanguinity(cousins({ out: { consanguinityLabel: "third cousins" } }))).toEqual([]);
   });
 });
