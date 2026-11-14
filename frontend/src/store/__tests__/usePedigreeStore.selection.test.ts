@@ -95,6 +95,20 @@ describe("selection (#21)", () => {
     expect(get().past).toHaveLength(0); // not an edit
   });
 
+  it("selectDescendants leaves out people who are not drawn (#94, #4)", () => {
+    // kid1's branch collapsed: gk is hidden; kid1 and his partner stay drawn.
+    get().setDescendantsHidden(["kid1"], true);
+    expect(get().selectDescendants("dad")).toBe(5);
+    expect(new Set(get().selectedIds)).toEqual(new Set(["dad", "mum", "kid1", "kid2", "spouse"]));
+    // A view filter: Affected only with gk affected groups his unaffected
+    // aunt kid2 into a count symbol.
+    get().setDescendantsHidden(["kid1"], false);
+    get().updateIndividual("gk", { affected: true });
+    get().setViewFilter("affectedOnly", true);
+    expect(get().selectDescendants("dad")).toBe(5);
+    expect(new Set(get().selectedIds)).toEqual(new Set(["dad", "mum", "kid1", "spouse", "gk"]));
+  });
+
   it("selectDescendants of a leaf is just them; unknown ids select nothing", () => {
     expect(get().selectDescendants("kid2")).toBe(1);
     expect(get().selectedIds).toEqual(["kid2"]);

@@ -737,7 +737,11 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     selectDescendants: (id) => {
       const { pedigree } = get();
       if (!pedigree.individuals.some(i => i.id === id)) return 0;
-      const ids = [...removeWithDescendantsSet(pedigree, [id])];
+      // Only people who are drawn: someone hidden in a collapsed branch (#94)
+      // or by a view filter (#4) would otherwise be moved, deleted or edited
+      // without being seen.
+      const hidden = collapseInfo(pedigree).hidden;
+      const ids = [...removeWithDescendantsSet(pedigree, [id])].filter(x => !hidden.has(x));
       set(selectionOf(ids, id));
       return ids.length;
     },
