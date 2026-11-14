@@ -329,13 +329,16 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
   });
 
   it("people in a collapsed branch do not count (drawn pedigree)", () => {
-    // gm's only Tay-Sachs relatives are her carrier children; collapse hides the
-    // unaffected ones, but she carries it herself, so take hers off.
+    // The only Tay-Sachs carrier is gm's grandchild bk. Collapsing gf draws
+    // his children (affected and carriers are not grouped, #1) but hides
+    // their partners and children, so bk does not count.
     const p = family([CF, TS], "nsgc2022");
     byId(p, "gm").carrierTags = ["cf"];
     for (const id of ["c", "f", "g"]) p.individuals = p.individuals.filter(i => i.id !== id);
     p.parentOf.p = ["a", "b", "d", "e"];
-    byId(p, "b").carrierTags = ["ts"];
+    p.individuals.push(ind("bp", { sex: "male" }), ind("bk", { carrierTags: ["ts"] }));
+    p.partnerships.push({ id: "bb", individual1: "bp", individual2: "b" });
+    p.parentOf.bb = ["bk"];
     expect(sectionLayout(p)).toBe("halves");
     byId(p, "gf").descendantsHidden = true;
     const hidden = { ...p };

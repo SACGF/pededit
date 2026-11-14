@@ -464,7 +464,8 @@ draws NSGC symbols.
 - Collapsed-branch group symbols (#1), following NSGC 2008 Fig. 1 (a
   number inside a symbol means that many siblings; affected people are not
   grouped). For each drawn couple of a collapsed person, children who are
-  affected or carry a quadrant (condition) tag (`drawnIndividually`) stay in
+  affected or carriers (plain, of a condition, or presymptomatic;
+  `drawnIndividually`) stay in
   the drawn copy as themselves, real selectable people, with their own
   partners and descendants hidden and their own partnerships dropped. The
   other children become one stand-in child (id

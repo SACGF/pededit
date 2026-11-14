@@ -1,4 +1,5 @@
 import { isAffected, type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
+import { isCarrier } from "./conditions";
 import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } from "./removal";
 import { filterHidden, withoutFilters } from "./viewFilters";
 
@@ -110,11 +111,14 @@ export function branchOf(drawn: Pedigree, id: string): CollapsedBranch | undefin
 
 /**
  * True when a child of a collapsed couple is drawn as themselves rather than
- * counted in the group symbol: affected, or carrying a condition tag (a
- * quadrant fill). NSGC: affected people are not grouped.
+ * counted in the group symbol: affected (plainly or with a condition), or a
+ * carrier (plain, of a condition, #115, or presymptomatic). NSGC: affected
+ * people are not grouped; a known carrier is informative too, and grouping
+ * them would also change which conditions are "in use" on the chart, and so
+ * everyone else's sections (#115). The same people seed "Affected only" (#4).
  */
 export function drawnIndividually(individual: Individual, pedigree: Pedigree): boolean {
-  return isAffected(individual, pedigree);
+  return isAffected(individual, pedigree) || isCarrier(individual, pedigree) || !!individual.presymptomatic;
 }
 
 const cache = new WeakMap<Pedigree, CollapseInfo>();

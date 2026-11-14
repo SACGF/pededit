@@ -5,7 +5,7 @@ import { batchCollapseState } from "../selection";
 import { parseExportSvg } from "../../io/svg/exportLint";
 import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg, sectionConditions } from "../tags";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { deidentify } from "../../io/svg/deidentify";
@@ -400,6 +400,34 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     expect(parseExportSvg(svg).symbols).toHaveLength(5);
     expect(lintExport(p)).toEqual([]);
     expect(lintExport(p, { deidentify: true })).toEqual([]);
+  });
+
+  it("draws carriers as themselves too: plain, of a condition, and presymptomatic (#115)", () => {
+    const p = sibship();
+    p.individuals.find(i => i.id === "a")!.carrier = true;
+    p.individuals.find(i => i.id === "b")!.carrierTags = ["t1"];
+    p.individuals.find(i => i.id === "e")!.presymptomatic = true;
+    const { drawn, placeholders } = collapseInfo(p);
+    expect(placeholders.size).toBe(0);
+    expect(ids(drawn)).toEqual(sorted(["p1", "p2", "a", "b", "c", "d", "e"]));
+    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintExport(p)).toEqual([]);
+  });
+
+  it("keeps a condition in use when its only carrier is in a collapsed sibship (#115)", () => {
+    // Two conditions; the second is carried only by a child of the collapsed couple.
+    const p = sibship();
+    p.tags = [...p.tags!, { id: "t2", label: "Tay-Sachs", color: "#1f77b4", style: "quadrant" }];
+    p.canvasSettings = { nodesMoveable: true, snapToGrid: false, snapGridSize: 20, notation: "nsgc2022" };
+    p.individuals.find(i => i.id === "a")!.carrierTags = ["t2"];
+    expect(sectionConditions(drawnPedigree(p)).map(t => t.id)).toEqual(["t1", "t2"]);
+  });
+
+  it("shows the branch again when an edit would hide a drawn carrier", () => {
+    const before = sibship();
+    before.individuals.find(i => i.id === "a")!.carrier = true;
+    const after = sibship();
+    expect(rootsHidingNew(before, after)).toEqual(["p1"]);
   });
 
   it("shows the branch again when an edit would hide a drawn affected child", () => {
