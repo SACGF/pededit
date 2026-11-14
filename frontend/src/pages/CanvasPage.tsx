@@ -30,8 +30,11 @@ function formatDate(iso: string): string {
 
 /** The issue tracker, not the new-issue form, so people can search for an existing report first (#113). */
 const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
-/** How to run PedEdit on your own server, for clinical data (#113). */
-const INSTALL_URL = "https://github.com/SACGF/pededit/blob/main/INSTALL.md";
+/**
+ * The repository, for self-hosting with clinical data (#113). Clinicians
+ * hand this to whoever runs their servers, who finds INSTALL.md from there.
+ */
+const REPO_URL = "https://github.com/SACGF/pededit";
 
 export default function CanvasPage() {
   const { id } = useParams<{ id: string }>();
@@ -268,16 +271,16 @@ export default function CanvasPage() {
             </a>
           </p>
           <p className="mt-1">
-            PedEdit is open source. For clinical work you can{" "}
+            PedEdit is open source. For patient data, you can{" "}
             <a
-              href={INSTALL_URL}
+              href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-black underline underline-offset-1"
             >
               host your own copy
-            </a>
-            .
+            </a>{" "}
+            so it stays on your network.
           </p>
         </div>
 
