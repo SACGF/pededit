@@ -43,13 +43,27 @@ const MAX_DENOMINATOR = 256;
 export function formatCoefficient(x: number): string {
   if (!(x > EPS)) return "0";
   const decimal = String(Number(x.toPrecision(4)));
-  for (let den = 1; den <= MAX_DENOMINATOR; den *= 2) {
+  const fraction = asFraction(x, MAX_DENOMINATOR);
+  return fraction ? (fraction.includes("/") ? `${fraction} (${decimal})` : fraction) : decimal;
+}
+
+/**
+ * A coefficient short enough to draw on the figure (#97): a fraction up to
+ * /64 ("3/8"), else two significant figures ("0.30"), which is as much as a
+ * reader of a chart needs. The panels give it in full.
+ */
+export function briefCoefficient(x: number): string {
+  if (!(x > EPS)) return "0";
+  return asFraction(x, 64) ?? x.toPrecision(2);
+}
+
+/** "3/8" (or "1"), when `x` is a whole number of 1/2^k for a denominator up to `maxDen`. */
+function asFraction(x: number, maxDen: number): string | null {
+  for (let den = 1; den <= maxDen; den *= 2) {
     const num = x * den;
-    if (Math.abs(num - Math.round(num)) < EPS) {
-      return den === 1 ? String(Math.round(num)) : `${Math.round(num)}/${den} (${decimal})`;
-    }
+    if (Math.abs(num - Math.round(num)) < EPS) return den === 1 ? String(Math.round(num)) : `${Math.round(num)}/${den}`;
   }
-  return decimal;
+  return null;
 }
 
 function ordinal(n: number): string {

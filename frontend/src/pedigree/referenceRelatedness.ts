@@ -1,6 +1,6 @@
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 import { formatCoefficient, kinshipOf, kinshipXOf } from "./relatedness";
-import { relationshipTermFor } from "./relationship";
+import { ALSO_RELATED_OTHERWISE, relationshipTermFor } from "./relationship";
 
 /**
  * How one person is related to the proband and the consultand (#134), for
@@ -21,7 +21,7 @@ export type ReferenceRole = "proband" | "consultand";
 export interface ReferenceLine {
   referenceId: string;
   role: ReferenceRole;
-  /** "Proband's first cousin", "Related to the consultand in more than one way". */
+  /** "Proband's first cousin", "Proband's uncle, and related in other ways too", "Related to the consultand in more than one way". */
   text: string;
   /** "Kinship 1/16 (0.0625), X-linked 1/16 (0.0625)"; null when not related. */
   detail: string | null;
@@ -62,11 +62,13 @@ export function referenceRelatedness(
       continue;
     }
     const kinshipX = xCoefficients.kinship(personId, id);
-    const term = relationshipTermFor(pedigree, personId, id, kinship);
+    const named = relationshipTermFor(pedigree, personId, id, kinship);
     lines.push({
       referenceId: id,
       role,
-      text: term ? `${possessive} ${term}` : `Related to ${object} in more than one way`,
+      text: named
+        ? `${possessive} ${named.term}${named.extra ? ALSO_RELATED_OTHERWISE : ""}`
+        : `Related to ${object} in more than one way`,
       detail: `Kinship ${formatCoefficient(kinship)}, X-linked ${Number.isNaN(kinshipX) ? "unknown (a sex is not recorded)" : formatCoefficient(kinshipX)}`,
     });
   }

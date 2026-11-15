@@ -41,7 +41,7 @@ const texts = (p: Pedigree, id: string) =>
 describe("relationshipTermFor (#134)", () => {
   const p = family();
   const k = kinshipCoefficients(p);
-  const term = (a: string, b: string) => relationshipTermFor(p, a, b, k.kinship(a, b));
+  const term = (a: string, b: string) => relationshipTermFor(p, a, b, k.kinship(a, b))?.term ?? null;
 
   it("gives the term for the first person whichever is nearer the common ancestors", () => {
     expect(term("dad", "me")).toBe("father");
@@ -106,7 +106,7 @@ describe("referenceRelatedness (#134)", () => {
     ]);
   });
 
-  it("says related in more than one way when there is no single name", () => {
+  it("names double first cousins, and says when someone is related in other ways too", () => {
     // Double first cousins: two sisters marry two brothers.
     const person = (id: string, sex: Sex, extra: Partial<Individual> = {}): Individual => ({ id, sex, affected: false, sibOrder: 0, ...extra });
     const p: Pedigree = {
@@ -124,7 +124,35 @@ describe("referenceRelatedness (#134)", () => {
       parentOf: { p1: ["b1", "b2"], p2: ["s1", "s2"], x1: ["c1"], x2: ["c2"] },
       siblingOrder: { mode: "insertion", affectedFirst: false },
     };
-    expect(texts(p, "c2")).toEqual(["Related to the proband in more than one way. Kinship 1/8 (0.125), X-linked 3/16 (0.1875)"]);
+    expect(texts(p, "c2")).toEqual(["Proband's double first cousin. Kinship 1/8 (0.125), X-linked 3/16 (0.1875)"]);
+    // Their child is more than the proband's first cousin once removed.
+    const q: Pedigree = {
+      ...p,
+      individuals: [...p.individuals, person("k", "female")],
+      partnerships: [...p.partnerships, { id: "ck", individual1: "c1", individual2: "c2" }],
+      parentOf: { ...p.parentOf, ck: ["k"] },
+    };
+    expect(texts(q, "k")[0]).toMatch(/^Proband's daughter, and related in other ways too\. Kinship 5\/16/);
+  });
+
+  it("says related in more than one way when the closest common ancestors are not a couple", () => {
+    // Half first cousins twice over: the fathers share a father, the mothers a mother.
+    const person = (id: string, sex: Sex, extra: Partial<Individual> = {}): Individual => ({ id, sex, affected: false, sibOrder: 0, ...extra });
+    const p: Pedigree = {
+      individuals: [
+        person("F", "male"), person("w1", "female"), person("w2", "female"), person("M", "female"), person("h1", "male"), person("h2", "male"),
+        person("f1", "male"), person("f2", "male"), person("m1", "female"), person("m2", "female"),
+        person("a", "male", { proband: true }), person("b", "female"),
+      ],
+      partnerships: [
+        { id: "F1", individual1: "F", individual2: "w1" }, { id: "F2", individual1: "F", individual2: "w2" },
+        { id: "M1", individual1: "h1", individual2: "M" }, { id: "M2", individual1: "h2", individual2: "M" },
+        { id: "A", individual1: "f1", individual2: "m1" }, { id: "B", individual1: "f2", individual2: "m2" },
+      ],
+      parentOf: { F1: ["f1"], F2: ["f2"], M1: ["m1"], M2: ["m2"], A: ["a"], B: ["b"] },
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    expect(texts(p, "b")).toEqual(["Related to the proband in more than one way. Kinship 1/16 (0.0625), X-linked 1/16 (0.0625)"]);
   });
 
   it("writes an X-linked value that turns on an unknown sex as unknown", () => {

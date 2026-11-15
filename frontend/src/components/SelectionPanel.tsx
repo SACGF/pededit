@@ -1,7 +1,7 @@
 import { usePedigreeStore, selectedPair } from "../store/usePedigreeStore";
 import { batchLockState } from "../pedigree/selection";
 import { kinshipOf, kinshipXOf, formatCoefficient, degreeOfRelationship } from "../pedigree/relatedness";
-import { nameRelationship, pairLabels } from "../pedigree/relationship";
+import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigree/relationship";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
@@ -64,9 +64,10 @@ function capitalise(text: string): string {
 
 /**
  * Exactly two selected (#90): how they are related, for any two people, not
- * only partners. The relationship is named only when the drawn tree gives
- * one certain name (`nameRelationship`); otherwise the coefficient and its
- * degree say how close they are.
+ * only partners. The relationship is named when the drawn tree gives one
+ * name (`nameRelationship`), with "and related in other ways too" when they
+ * are closer than it says; otherwise the coefficient and its degree say how
+ * close they are.
  */
 function PairRelatedness({ pedigree, a, b }: { pedigree: Pedigree; a: string; b: string }) {
   const kinship = kinshipOf(pedigree).kinship(a, b);
@@ -80,7 +81,7 @@ function PairRelatedness({ pedigree, a, b }: { pedigree: Pedigree; a: string; b:
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relatedness</div>
       <p data-testid="pair-relationship" className="text-sm text-gray-800">
         {named
-          ? `${capitalise(label[named.subjectId])} is ${label[named.objectId]}'s ${named.term}.`
+          ? `${capitalise(label[named.subjectId])} is ${label[named.objectId]}'s ${named.term}${named.extra ? ALSO_RELATED_OTHERWISE : ""}.`
           : related
             ? `${capitalise(label[a])} and ${label[b]} are related in more than one way.`
             : `${capitalise(label[a])} and ${label[b]} are not related through anyone drawn.`}

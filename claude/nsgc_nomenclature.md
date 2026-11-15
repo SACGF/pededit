@@ -80,7 +80,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Previous partners need not be shown if they do not affect the genetic assessment. | Up to the user. |
 | Male partner on the left "if possible" (2008). Dropped as a rule in 2022 ("Both sides now"). | No rule enforced, which matches 2022. |
 | A break (two slashes) in the relationship line means the relationship has ended. | Follows (#98): `Partnership.ended`. |
-| Consanguinity: double relationship line. **If the degree of relationship is not obvious from the pedigree, write it above the line** (e.g. "third cousins"). | Follows: double line (#85, #92), text above it (#97), set per couple or named automatically with a setting. |
+| Consanguinity: double relationship line. **If the degree of relationship is not obvious from the pedigree, write it above the line** (e.g. "third cousins"). | Follows: double line (#85, #92), text above it (#97), set per couple or named automatically with a setting (with the kinship after the name when the couple are more closely related than it says, "siblings (3/8)"). |
 | Twins: monozygotic with a horizontal bar between the individual's lines (not between the symbols), dizygotic without, "?" when unknown. Triplets and more share the fork the same way. An asterisk marks zygosity that has been proven. | Follows (#11), except the "proven" asterisk, which has no field. |
 | No children by choice: one bar under the line of descent. Infertility: two bars. Reason written below. | Follows (#15). |
 | Adoption: brackets around every adopted person; dashed line from adoptive parents, solid from biological. Three cases are drawn: adopted in, adopted out, and adopted by a relative. | Follows (#12) for in and out. "By a relative" is not a separate option. |

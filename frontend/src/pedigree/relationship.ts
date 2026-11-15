@@ -1,15 +1,23 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
+import { briefCoefficient } from "./relatedness";
 
 /**
  * The name of the relationship between two people (#90): "first cousin once
  * removed", "half-sister", "great-aunt". Framework-free.
  *
- * A name is given only when it is certain. The relationship is read off the
- * closest common ancestors, then the kinship it implies is compared with the
- * kinship the engine computed for the pair. They differ whenever there is a
- * second line of descent, inbred ancestry or a monozygotic twin up the tree
- * (double first cousins, an uncle who is also a cousin), and then no name is
- * given: the panel falls back to the coefficient and its degree.
+ * The relationship is read off the closest common ancestors: one person
+ * (half relatives, or one is the other's ancestor), one couple (full
+ * relatives), or two couples at the same distance (double cousins, kinship
+ * twice that of plain cousins). The kinship that relationship implies is then
+ * compared with the kinship the engine computed for the pair. When the pair
+ * is more closely related than the name says (a second line of descent,
+ * inbred ancestry, a monozygotic twin up the tree: siblings whose parents are
+ * siblings, an uncle who is also a cousin), the name is kept and `extra` is
+ * set, so the text can say so rather than drop the name. The panels write
+ * "and related in other ways too", the figure the kinship ("siblings (3/8)").
+ * No name is given when the closest common ancestors fit none of those shapes
+ * (reached at different distances, or two people who are not a couple); the
+ * panels then say "related in more than one way".
  */
 
 export interface RelationshipName {
@@ -24,6 +32,10 @@ export interface RelationshipName {
   down: number;
   /** Related through one common ancestor rather than a couple. */
   half: boolean;
+  /** Related through two couples of common ancestors: double cousins. */
+  double: boolean;
+  /** More closely related than the term implies (kinship above what it gives). */
+  extra: boolean;
 }
 
 const EPS = 1e-9;
@@ -86,7 +98,7 @@ function greats(k: number): string {
  * The term for the subject, `up` generations below the common ancestors,
  * relative to the object, `down` generations below them (up <= down).
  */
-function term(up: number, down: number, half: boolean, sex: Sex | undefined, twin?: string): string {
+function term(up: number, down: number, half: boolean, sex: Sex | undefined, twin?: string, double = false): string {
   const h = half ? "half-" : "";
   if (up === 0) {
     if (down === 1) return bySex(sex, "father", "mother", "parent");
@@ -98,12 +110,12 @@ function term(up: number, down: number, half: boolean, sex: Sex | undefined, twi
   }
   if (up === 1) return h + greats(down - 2) + bySex(sex, "uncle", "aunt", "aunt or uncle");
   const removed = down - up;
-  return `${half ? "half " : ""}${ordinalWord(up - 1)} cousin${removed > 0 ? ` ${times(removed)} removed` : ""}`;
+  return `${half ? "half " : double ? "double " : ""}${ordinalWord(up - 1)} cousin${removed > 0 ? ` ${times(removed)} removed` : ""}`;
 }
 
 /**
- * The relationship of `a` and `b`, or null when it cannot be named for
- * certain (unrelated, or related in more than one way). `kinship` is the
+ * The relationship of `a` and `b`, or null when it cannot be named as
+ * one shape (unrelated, or related in more than one way). `kinship` is the
  * engine's autosomal kinship coefficient of the pair.
  */
 export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinship: number): RelationshipName | null {
@@ -127,8 +139,21 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
   const { m, n } = closest[0];
   if (closest.some(c => c.m !== m || c.n !== n)) return null;
 
+  // A couple of common ancestors counts when both descend from a shared child of theirs.
+  const children = (x: string, y: string) => {
+    const couple = pedigree.partnerships.find(p =>
+      (p.individual1 === x && p.individual2 === y) || (p.individual1 === y && p.individual2 === x));
+    return couple ? { couple, children: pedigree.parentOf[couple.id] ?? [] } : null;
+  };
+  const onLine = (x: string, y: string) => {
+    const c = children(x, y);
+    const via = (dist: Map<string, number>, gens: number) => !!c?.children.some(ch => dist.get(ch) === gens - 1);
+    return c && via(fromA, m) && via(fromB, n) ? c.couple : null;
+  };
+
   let expected: number;
   let half = false;
+  let double = false;
   let twin: string | undefined;
   if (m === 0 || n === 0) {
     // One is the other's ancestor.
@@ -139,13 +164,8 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
     expected = 0.5 ** (m + n + 1);
   } else if (closest.length === 2) {
     // Full relatives descend from one couple through a shared child of theirs.
-    const [x, y] = [closest[0].id, closest[1].id];
-    const couple = pedigree.partnerships.find(p =>
-      (p.individual1 === x && p.individual2 === y) || (p.individual1 === y && p.individual2 === x));
+    const couple = onLine(closest[0].id, closest[1].id);
     if (!couple) return null;
-    const children = pedigree.parentOf[couple.id] ?? [];
-    const onLine = (dist: Map<string, number>, gens: number) => children.some(c => dist.get(c) === gens - 1);
-    if (!onLine(fromA, m) || !onLine(fromB, n)) return null;
     expected = 2 * 0.5 ** (m + n + 1);
     if (m === 1 && n === 1) {
       const set = (couple.twins ?? []).find(t => t.members.includes(a) && t.members.includes(b));
@@ -153,26 +173,43 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
       else if (set?.zygosity === "dizygotic") twin = "fraternal twin";
       else if (set) twin = "twin";
     }
+  } else if (closest.length === 4 && m >= 2 && n >= 2) {
+    // Double cousins: two couples, each a full line to both of them.
+    const [first, ...rest] = closest.map(c => c.id);
+    const partner = rest.find(y => onLine(first, y));
+    const others = rest.filter(y => y !== partner);
+    if (!partner || !onLine(others[0], others[1])) return null;
+    double = true;
+    expected = 4 * 0.5 ** (m + n + 1);
   } else {
     return null;
   }
-  if (Math.abs(expected - kinship) > EPS) return null;
+  // Less related than the shape says cannot happen; be safe and give no name.
+  if (kinship < expected - EPS) return null;
+  const extra = kinship > expected + EPS;
 
   const [subjectId, objectId, up, down] = m < n ? [a, b, m, n] : [b, a, n, m];
-  return { subjectId, objectId, term: term(up, down, half, sexOf(subjectId), twin), up, down, half };
+  return { subjectId, objectId, term: term(up, down, half, sexOf(subjectId), twin, double), up, down, half, double, extra };
 }
 
 /**
  * What `personId` is to `otherId`, as a term for `personId`: "first cousin",
  * "niece", "grandson". `nameRelationship` describes whichever of the two is
  * nearer the common ancestors; when that is `otherId`, this turns the term
- * round ("aunt" becomes "niece" or "nephew" by `personId`'s sex). Null when
- * the relationship cannot be named for certain.
+ * round ("aunt" becomes "niece" or "nephew" by `personId`'s sex). `extra`
+ * as in `nameRelationship`. Null when the relationship cannot be named.
  */
-export function relationshipTermFor(pedigree: Pedigree, personId: string, otherId: string, kinship: number): string | null {
+export function relationshipTermFor(pedigree: Pedigree, personId: string, otherId: string, kinship: number): { term: string; extra: boolean } | null {
   // Level relationships name `b`, so put the person second.
   const named = nameRelationship(pedigree, otherId, personId, kinship);
   if (!named) return null;
+  return { term: turnedTerm(pedigree, named, personId), extra: named.extra };
+}
+
+/** Panel wording for `RelationshipName.extra`, after the term. */
+export const ALSO_RELATED_OTHERWISE = ", and related in other ways too";
+
+function turnedTerm(pedigree: Pedigree, named: RelationshipName, personId: string): string {
   if (named.subjectId === personId) return named.term;
   const { up, down, half } = named;
   const sex = pedigree.individuals.find(i => i.id === personId)?.sex;
@@ -189,11 +226,19 @@ export function relationshipTermFor(pedigree: Pedigree, personId: string, otherI
 /**
  * The relationship of a couple as NSGC writes it above a consanguineous
  * double line (#97): "first cousins", "half second cousins once removed",
- * "uncle and niece". Null when `nameRelationship` cannot name them.
+ * "uncle and niece", "double first cousins". When they are more closely
+ * related than that (`extra`), their kinship follows, as short as the figure
+ * needs (`briefCoefficient`): "siblings (3/8)", "uncle and niece (0.36)".
+ * Null when `nameRelationship` cannot name them.
  */
 export function nameCoupleRelationship(pedigree: Pedigree, a: string, b: string, kinship: number): string | null {
   const named = nameRelationship(pedigree, a, b, kinship);
   if (!named) return null;
+  const text = coupleTerm(pedigree, named);
+  return named.extra ? `${text} (${briefCoefficient(kinship)})` : text;
+}
+
+function coupleTerm(pedigree: Pedigree, named: RelationshipName): string {
   const { up, down, half } = named;
   if (up >= 2) return named.term.replace(/cousin/, "cousins");
   if (up === 1 && down === 1) return half ? "half-siblings" : "siblings";

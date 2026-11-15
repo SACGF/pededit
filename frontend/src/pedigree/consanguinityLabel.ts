@@ -79,10 +79,20 @@ export function consanguinityLabelRoom(lx: number, rx: number, left: SymbolTop, 
 /**
  * The label's lines for `maxWidth` px of room (`consanguinityLabelRoom`).
  * One line when rows are compact: the sibship bar above is then too close
- * for two.
+ * for two. A closing "(...)", the kinship of a couple more closely related
+ * than their name says ("first cousins once removed (25/256)"), is what the
+ * label exists to add, so when everything does not fit on two lines it keeps
+ * the last line to itself and the name is cut instead.
  */
 export function wrapConsanguinityLabel(text: string, maxWidth: number, rowHeight: number): string[] {
-  return wrapLabel(text, maxWidth / SCALE, rowHeight >= ROW_HEIGHT ? 2 : 1);
+  const maxLines = rowHeight >= ROW_HEIGHT ? 2 : 1;
+  const width = maxWidth / SCALE;
+  const lines = wrapLabel(text, width, maxLines);
+  const suffix = /^(.+) (\([^()\s]+\))$/.exec(text.trim());
+  if (maxLines < 2 || !suffix || lines.join(" ") === text.trim().replace(/\s+/g, " ")) return lines;
+  const [, name, kinship] = suffix;
+  const last = wrapLabel(kinship, width, 1);
+  return last[0] === kinship ? [...wrapLabel(name, width, maxLines - 1), kinship] : lines;
 }
 
 /**

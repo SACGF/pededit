@@ -70,7 +70,10 @@ describe("U-shape consanguinity labels (#109)", () => {
   it("writes the label along the line, between the partners, on the inward side", () => {
     const ex = EXAMPLES.find(e => e.label === "Spanish Habsburgs")!;
     const l = layoutUShape(named(ex.data))!;
-    expect(l.coupleLabels.map(c => c.lines.join(" ")).sort()).toEqual(["first cousins", "first cousins", "uncle and niece"]);
+    expect(l.coupleLabels.map(c => c.lines.join(" ")).sort()).toEqual([
+      "double first cousins (5/32)", "first cousins", "first cousins", "first cousins (0.10)", "first cousins (5/64)",
+      "first cousins once removed (0.091)", "uncle and niece", "uncle and niece (0.18)", "uncle and niece (0.22)",
+    ]);
     for (const c of l.coupleLabels) {
       expect(c.baselines.every(b => b < 0)).toBe(true);
       const partnership = ex.data.partnerships.find(p => p.id === c.partnershipId)!;

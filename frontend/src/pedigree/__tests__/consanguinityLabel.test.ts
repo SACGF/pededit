@@ -60,8 +60,25 @@ describe("nameCoupleRelationship (#97)", () => {
     expect(name(p, "s2", "c1")).toBe("aunt and nephew");
     expect(name(p, "gf", "s2")).toBe("father and daughter");
     expect(name(p, "gm", "c1")).toBe("grandmother and grandson");
-    // Descended from her twice over: no single name.
-    expect(name(p, "gm", "k")).toBeNull();
+    // Descended from her twice over: named, with the kinship that says it is closer.
+    expect(name(p, "gm", "k")).toBe("great-grandmother and great-granddaughter (1/8)");
+  });
+
+  it("keeps the name and adds the kinship for siblings whose parents are siblings", () => {
+    const ex = EXAMPLES.find(e => e.label === "House Targaryen")!.data;
+    expect(name(ex, "Aerys_II", "Rhaella")).toBe("siblings (3/8)");
+    expect(name(ex, "Jaehaerys_II", "Shaera")).toBe("siblings");
+    // Beyond /64 the figure gets two significant figures.
+    expect(name(ex, "Daemon", "Rhaenyra")).toBe("uncle and niece (0.36)");
+  });
+
+  it("names double first cousins without a number", () => {
+    const p = cousins();
+    // c2's father h2 becomes s1's wife's brother: two couples of grandparents.
+    p.individuals.push(person("wf", "male"), person("wm", "female"));
+    p.partnerships.push({ id: "w", individual1: "wf", individual2: "wm" });
+    p.parentOf.w = ["w1", "h2"];
+    expect(name(p, "c1", "c2")).toBe("double first cousins");
   });
 
   it("is null for an unrelated couple", () => {
@@ -91,6 +108,15 @@ describe("what is written above a double line (#97)", () => {
     const p = cousins();
     p.partnerships[0]!.consanguinityLabel = "  ";
     expect(consanguinityLabelText(p, p.partnerships[0]!)).toBeUndefined();
+  });
+
+  it("keeps a closing kinship on its own line and cuts the name instead", () => {
+    const width = 75;
+    expect(wrapConsanguinityLabel("first cousins once removed (0.098)", width, ROW_HEIGHT)).toEqual(["first cousins…", "(0.098)"]);
+    expect(wrapConsanguinityLabel("uncle and niece (0.36)", width, ROW_HEIGHT)).toEqual(["uncle and", "niece (0.36)"]);
+    // Text that fits is wrapped as usual, and one line is cut as usual.
+    expect(wrapConsanguinityLabel("siblings (3/8)", width, ROW_HEIGHT)).toEqual(["siblings (3/8)"]);
+    expect(wrapConsanguinityLabel("first cousins once removed (0.098)", width, ROW_HEIGHT - 1)).toEqual(["first cousins…"]);
   });
 
   it("keeps clear of lines of descent and ? marks on the symbol tops", () => {
@@ -199,7 +225,9 @@ describe("keeping the label off the text above (#109)", () => {
     const count = (compact: boolean) => consanguinityLabelPlacements(layoutToFlow(p, { compact })).length;
     expect(lintExport(p, { compact: true })).toEqual([]);
     expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && layoutToFlow(p).coupleEdges.some(e => e.data?.partnershipId === x.id && e.type === "consanguineousEdge")).length);
-    expect(count(true)).toBe(count(false) - 1);
+    // Nearly every couple here is more closely related than their name says, so
+    // the labels carry a kinship and compact rows have room for fewer of them.
+    expect(count(true)).toBe(8);
   });
 });
 

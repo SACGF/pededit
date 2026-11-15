@@ -46,6 +46,12 @@ function family(): Pedigree {
   };
 }
 
+const person = (id: string, sex: Sex) => ({ id, sex, affected: false, sibOrder: 0 });
+
+function extra(p: Pedigree, a: string, b: string): boolean | undefined {
+  return nameRelationship(p, a, b, kinshipCoefficients(p).kinship(a, b))?.extra;
+}
+
 function name(p: Pedigree, a: string, b: string): string | null {
   const r = nameRelationship(p, a, b, kinshipCoefficients(p).kinship(a, b));
   return r ? `${r.subjectId} is ${r.objectId}'s ${r.term}` : null;
@@ -108,25 +114,61 @@ describe("nameRelationship (#90)", () => {
     }
   });
 
-  it("gives no name when there is more than one line of descent", () => {
-    // Double first cousins: the cousin's other parent is mum's sibling.
+  it("names double cousins, whose kinship is twice that of cousins", () => {
+    // The cousin's other parent is mum's sibling.
     const q = family();
     q.individuals.push({ id: "mgf", sex: "male", affected: false, sibOrder: 0 }, { id: "mgm", sex: "female", affected: false, sibOrder: 0 });
     q.partnerships.push({ id: "mg", individual1: "mgf", individual2: "mgm" });
     q.parentOf.mg = ["mum", "uncleInLaw"];
     expect(kinshipCoefficients(q).kinship("me", "cousin")).toBe(1 / 8);
-    expect(name(q, "me", "cousin")).toBeNull();
+    expect(name(q, "me", "cousin")).toBe("cousin is me's double first cousin");
+    expect(extra(q, "me", "cousin")).toBe(false);
+    expect(name(q, "myKid", "cousinKid")).toBe("cousinKid is myKid's double second cousin");
+    expect(name(q, "me", "cousinKid")).toBe("me is cousinKid's double first cousin once removed");
+  });
 
-    // A child of first cousins is more than a nephew to their parent's sibling.
+  it("keeps the name and flags extra relatedness when there is more than one line of descent", () => {
+    // A child of first cousins is more than a niece to her parent's sibling.
     const r = family();
     r.individuals.push({ id: "inbred", sex: "female", affected: false, sibOrder: 0 });
     r.partnerships.push({ id: "mc", individual1: "sis", individual2: "cousin" });
     r.parentOf.mc = ["inbred"];
-    expect(name(r, "me", "inbred")).toBeNull();
+    expect(name(r, "me", "inbred")).toBe("me is inbred's uncle");
+    expect(extra(r, "me", "inbred")).toBe(true);
     // Nor is she simply her mother's daughter: her mother is also her father's cousin.
-    expect(name(r, "sis", "inbred")).toBeNull();
+    expect(name(r, "sis", "inbred")).toBe("sis is inbred's mother");
+    expect(extra(r, "sis", "inbred")).toBe(true);
     // The grandparents are reached two ways at the same distance.
-    expect(name(r, "gm", "inbred")).toBeNull();
+    expect(name(r, "gm", "inbred")).toBe("gm is inbred's great-grandmother");
+    expect(extra(r, "gm", "inbred")).toBe(true);
+    // Plain relatives are not flagged.
+    expect(extra(r, "me", "sis")).toBe(false);
+
+    // Siblings whose parents are siblings (kinship 3/8, not 1/4).
+    const s = family();
+    s.individuals.push(person("son", "male"), person("daughter", "female"));
+    s.partnerships.push({ id: "ms", individual1: "me", individual2: "sis" });
+    s.parentOf.ms = ["son", "daughter"];
+    expect(kinshipCoefficients(s).kinship("son", "daughter")).toBe(3 / 8);
+    expect(name(s, "son", "daughter")).toBe("daughter is son's sister");
+    expect(extra(s, "son", "daughter")).toBe(true);
+  });
+
+  it("gives no name when the closest common ancestors are not a couple", () => {
+    // Half first cousins twice over: the fathers share a father F, the mothers a mother M, and F and M are not partners.
+    const p: Pedigree = {
+      individuals: ["F", "w1", "w2", "M", "h1", "h2", "f1", "f2", "m1", "m2", "a", "b"].map(id =>
+        person(id, ["F", "h1", "h2", "f1", "f2", "a"].includes(id) ? "male" : "female")),
+      partnerships: [
+        { id: "F1", individual1: "F", individual2: "w1" }, { id: "F2", individual1: "F", individual2: "w2" },
+        { id: "M1", individual1: "h1", individual2: "M" }, { id: "M2", individual1: "h2", individual2: "M" },
+        { id: "A", individual1: "f1", individual2: "m1" }, { id: "B", individual1: "f2", individual2: "m2" },
+      ],
+      parentOf: { F1: ["f1"], F2: ["f2"], M1: ["m1"], M2: ["m2"], A: ["a"], B: ["b"] },
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    expect(kinshipCoefficients(p).kinship("a", "b")).toBe(1 / 16);
+    expect(name(p, "a", "b")).toBeNull();
   });
 
   it("does not use an adopted-in person's adoptive line", () => {

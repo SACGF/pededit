@@ -417,9 +417,16 @@ draws NSGC symbols.
   the manual override, whose common ancestors are not drawn); otherwise,
   with `canvasSettings.relationshipLabels` ("Name consanguineous
   relationships" in Settings, off by default), `nameCoupleRelationship`
-  from `relationship.ts` ("first cousins", "uncle and niece"), which is null
-  whenever `nameRelationship` cannot name the pair for certain, so inbred
-  lines get nothing. Never drawn on a single line. `layoutToFlow` puts the
+  from `relationship.ts` ("first cousins", "uncle and niece", "double first
+  cousins"). A couple more closely related than their name says (inbred
+  ancestry, a second line of descent: `RelationshipName.extra`) keeps the
+  name with their kinship after it, short for the figure ("siblings (3/8)",
+  `briefCoefficient`: fractions to /64, else two significant figures); the
+  panels say "and related in other ways too" instead. `wrapConsanguinityLabel`
+  keeps that "(...)" on its own last line and cuts the name when both do not
+  fit. Null, so nothing drawn, only when the closest common ancestors fit no
+  single relationship (two people who are not a couple, or reached at
+  different distances). Never drawn on a single line. `layoutToFlow` puts the
   wrapped lines on the double edge's data (`consanguinityLabel`): wrapped to
   `consanguinityLabelRoom`, which keeps clear of what lands on each symbol
   top (the line of descent, the "?" of #100) and runs over a bare top; one
