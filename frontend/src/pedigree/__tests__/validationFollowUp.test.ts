@@ -231,6 +231,9 @@ describe("follow-up checks (#116)", () => {
     // A surrogate who carried a child, and a donor who is a genetic parent, are linked.
     const linked = family([ind("c", { carriedBy: "s" })], { father: { reproductiveRole: "donor" }, couple: { donorConception: true }, extra: [ind("s", { reproductiveRole: "surrogate" })] });
     expect(only(linked, "role-not-linked")).toEqual([]);
+    // A male surrogate, which only an import can make.
+    const male = family([ind("c", { carriedBy: "s" })], { extra: [ind("s", { sex: "male", reproductiveRole: "surrogate" })] });
+    expect(only(male, "surrogate-male")).toMatchObject([{ individualId: "s", field: "reproductiveRole", fix: { label: "Not a surrogate" } }]);
   });
 
   it("14. someone not connected to anyone else", () => {

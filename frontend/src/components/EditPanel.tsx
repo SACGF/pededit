@@ -20,7 +20,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import type { Individual, Sex, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
-import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, symbolLetter } from "../pedigree/assisted";
+import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, reproductiveRoleProblem, symbolLetter } from "../pedigree/assisted";
 import { fieldProblems, worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
 import { ProblemIcon } from "./ProblemsMenu";
 import { ProblemFixes } from "./ProblemFixes";
@@ -842,9 +842,11 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
           className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
         >
           <option value="">None</option>
-          {REPRODUCTIVE_ROLE_OPTIONS.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
+          {REPRODUCTIVE_ROLE_OPTIONS.map(o => {
+            // A man cannot be a surrogate; one recorded as such (an import) keeps the option to show it.
+            const refused = o.value !== individual.reproductiveRole && !!reproductiveRoleProblem(pedigree, individual.id, o.value);
+            return <option key={o.value} value={o.value} disabled={refused}>{o.label}{refused ? ", not for a male" : ""}</option>;
+          })}
         </select>
       </Field>
       {hasParents && !linked && !expanded && (

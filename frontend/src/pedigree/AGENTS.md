@@ -564,7 +564,10 @@ draws NSGC symbols.
   keeps genetics in the ordinary structure so kinship, X-linked kinship,
   relationship names, the double line and PED need nothing special: the
   child's partnership is its GENETIC parents (donor included), flagged
-  `Partnership.donorConception` when one is a gamete donor. Such a pair gets
+  `Partnership.donorConception` when one is a gamete donor. Whoever carried
+  a pregnancy (a surrogate, or a child's `carriedBy`) cannot be made male:
+  `batchSexProblem` refuses it for every Sex control, `setReproductiveRole`
+  refuses S on a man, and `validation.ts` flags imports that have either. Such a pair gets
   no couple edge (`layoutToFlow` skips it, both lints skip
   `partnership-not-drawn` for it), and its sibship edge carries `apart`: a
   line from each parent's symbol to the bar replaces the couple drop

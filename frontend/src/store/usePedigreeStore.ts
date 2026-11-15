@@ -13,7 +13,7 @@ import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
 import type { ViewFilterPatch } from "../pedigree/viewFilters";
-import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../pedigree/assisted";
+import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, reproductiveRoleProblem, type Gamete } from "../pedigree/assisted";
 import { applySameSexChildren, coupleChildren, isSameSexCouple, sameSexChildProblem } from "../pedigree/sameSex";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../pedigree/batch";
 import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type ConditionState } from "../pedigree/conditions";
@@ -1552,6 +1552,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setReproductiveRole: (id, role) => {
+      const problem = reproductiveRoleProblem(get().pedigree, id, role);
+      if (problem) { get().setNotice({ kind: "error", text: problem }); return; }
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;

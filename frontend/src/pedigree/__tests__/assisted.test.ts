@@ -4,7 +4,7 @@ import { kinshipCoefficients, placementParentOf } from "@pedigree-editor/layout-
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import {
   assistedLinks, applyAddDonor, addDonorProblem, applyAddSurrogate, addSurrogateProblem,
-  assistedLinkSegment, donorDescentSegments, symbolExitPoint,
+  assistedLinkSegment, donorDescentSegments, symbolExitPoint, reproductiveRoleProblem,
 } from "../assisted";
 import { layoutToFlow } from "../layoutToFlow";
 import { sibshipSegments } from "../sibshipPath";
@@ -18,6 +18,7 @@ import { exportPed, pedLostAssisted } from "../../io/ped/exporter";
 import { exportCsv } from "../../io/csv/exporter";
 import { importJson, exportJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { batchSexProblem } from "../batch";
 import { EXAMPLES } from "../../data/examples";
 
 const base = { siblingOrder: { mode: "insertion" as const, affectedFirst: false } };
@@ -188,6 +189,34 @@ describe("assisted reproduction: store and removal (#45)", () => {
     const c1 = usePedigreeStore.getState().pedigree.individuals.find(i => i.id === "c1")!;
     expect(c1.carriedBy).toBeUndefined();
     expect(c1.socialParents).toBeUndefined();
+  });
+});
+
+describe("assisted reproduction: a surrogate or carrier cannot be male (#45)", () => {
+  beforeEach(() => usePedigreeStore.getState().initialize(assisted()));
+  const sexOf = (id: string) => usePedigreeStore.getState().pedigree.individuals.find(i => i.id === id)!.sex;
+
+  it("refuses making a surrogate or a child's carrier male, with the reason", () => {
+    const s = usePedigreeStore.getState();
+    expect(batchSexProblem(s.pedigree, ["ar_s3"], "male")).toMatch(/is a surrogate \(S\).*gender identity/);
+    expect(batchSexProblem(s.pedigree, ["ar_w2"], "male")).toMatch(/carried a child/);
+    s.setSex("ar_s3", "male");
+    s.setSex("ar_w2", "male");
+    expect(sexOf("ar_s3")).toBe("female");
+    expect(sexOf("ar_w2")).toBe("female");
+    expect(usePedigreeStore.getState().notice?.text).toMatch(/^Not available/);
+    expect(usePedigreeStore.getState().setSexMany(["ar_c1", "ar_s3"], "male")).toMatch(/surrogate/);
+    // Unknown sex stays allowed: it means not recorded.
+    expect(batchSexProblem(s.pedigree, ["ar_s3"], "unknown")).toBeNull();
+  });
+
+  it("refuses the surrogate role for a man", () => {
+    const p = usePedigreeStore.getState().pedigree;
+    const man = p.individuals.find(i => i.sex === "male" && !i.reproductiveRole)!;
+    expect(reproductiveRoleProblem(p, man.id, "surrogate")).toMatch(/male/);
+    expect(reproductiveRoleProblem(p, man.id, "donor")).toBeNull();
+    usePedigreeStore.getState().setReproductiveRole(man.id, "surrogate");
+    expect(usePedigreeStore.getState().pedigree.individuals.find(i => i.id === man.id)!.reproductiveRole).toBeUndefined();
   });
 });
 

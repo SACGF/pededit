@@ -618,6 +618,16 @@ export const RULES: Rule[] = [
     },
   },
   {
+    // 13. The same for a surrogate (S): the editor refuses it, imports can have it.
+    id: "surrogate-male",
+    individual: ind => ind.reproductiveRole === "surrogate" && ind.sex === "male" && {
+      severity: "warning",
+      field: "reproductiveRole",
+      message: "A surrogate (S) whose biological sex is male.",
+      fix: { label: "Not a surrogate", apply: a => a.setReproductiveRole(ind.id, undefined) },
+    },
+  },
+  {
     // 13. A donor is a genetic parent of a child; a surrogate carried one (#45).
     id: "role-not-linked",
     individual: (ind, ctx) => {

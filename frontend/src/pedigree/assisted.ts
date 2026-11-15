@@ -419,3 +419,14 @@ export function assistedLossText(ind: Individual, nameOf: (id: string) => string
   if (ind.socialParents?.length) parts.push(`social parent ${ind.socialParents.map(nameOf).join(", ")}`);
   return parts.join("; ");
 }
+
+/**
+ * Why `id` cannot be given this reproductive role, or null. A surrogate
+ * carried a pregnancy, so cannot be male (biological sex); as with the Sex
+ * control (`batchSexProblem`), a gender identity draws her as a man.
+ */
+export function reproductiveRoleProblem(pedigree: Pedigree, id: string, role: ReproductiveRole | undefined): string | null {
+  const ind = pedigree.individuals.find(i => i.id === id);
+  if (role !== "surrogate" || ind?.sex !== "male") return null;
+  return `${ind.name?.trim() || "This person"} is male and cannot have carried a pregnancy. Sex here is biological sex; record a gender identity to draw someone as a man.`;
+}

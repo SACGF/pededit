@@ -82,13 +82,35 @@ export function batchSexTargets(pedigree: Pedigree, ids: string[]): Set<string> 
  * Why `ids` cannot all be given `sex`, or null. Partners may be of the same
  * sex (#105); the genetic parents of a child may not, so a change that
  * would make two of them the same known sex is refused (see
- * `geneticParentsSexProblem`). The single-person Sex menu uses this too.
+ * `geneticParentsSexProblem`). Nor can anyone who carried a pregnancy, a
+ * surrogate (S) or a child's "Carried by" (#45), be made male: sex is
+ * biological sex, and a gender identity is the way to draw them as a man.
+ * The single-person Sex menu uses this too.
  */
 export function batchSexProblem(pedigree: Pedigree, ids: string[], sex: Sex): string | null {
   const targets = batchSexTargets(pedigree, ids);
   if (targets.size === 0) return "Nobody selected.";
   if (sex === "unknown") return null;
+  if (sex === "male") {
+    const carrier = carriedPregnancyProblem(pedigree, targets);
+    if (carrier) return carrier;
+  }
   const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
   for (const id of targets) sexOf.set(id, sex);
   return geneticParentsSexProblem(pedigree, targets, id => sexOf.get(id));
+}
+
+/** Why none of `targets` can be male: one carried a pregnancy (#45). Null when none did. */
+function carriedPregnancyProblem(pedigree: Pedigree, targets: Set<string>): string | null {
+  for (const id of targets) {
+    const ind = pedigree.individuals.find(i => i.id === id);
+    const child = pedigree.individuals.find(i => i.carriedBy === id);
+    if (!ind || (ind.reproductiveRole !== "surrogate" && !child)) continue;
+    const name = ind.name?.trim();
+    const what = ind.reproductiveRole === "surrogate"
+      ? `${name ? `${name} is` : "this is"} a surrogate (S)`
+      : `${name || "this person"} carried ${child!.name?.trim() || "a child"}`;
+    return `Not available: ${what}, and sex here is biological sex. Record a gender identity to draw them as a man.`;
+  }
+  return null;
 }
