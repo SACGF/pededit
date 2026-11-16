@@ -58,12 +58,14 @@ Deployment" half).
   (#47) or anything else here changes what is kept or where it is sent. A
   proxy or CDN in front of Nginx sees every pedigree in transit and belongs
   in that text too.
-- Error reporting (#49) is off until the config has `sentry_dsn` (Django
-  reads it) and `sentry_frontend_dsn` (`deploy.sh` passes it to the build as
-  `VITE_SENTRY_DSN`, so the frontend only changes on a rebuild). A
-  `Content-Security-Policy` added to the vhost must allow the DSN's host in
-  `connect-src`. `dist/assets/*.js.map` are published on purpose so Sentry
-  can read them; do not block `.map` in Nginx. See INSTALL.md step 12.
+- Error reporting (#49) goes to Rollbar and is off until the config has
+  `rollbar_access_token` (post_server_item, Django reads it) and
+  `rollbar_client_access_token` (post_client_item, `deploy.sh` passes it to
+  the build as `VITE_ROLLBAR_ACCESS_TOKEN`, so the frontend only changes on a
+  rebuild). A `Content-Security-Policy` added to the vhost must allow
+  `https://api.rollbar.com` in `connect-src`. `dist/assets/*.js.map` are
+  published on purpose so Rollbar can download them; do not block `.map` in
+  Nginx. See INSTALL.md step 12.
 
 ## Production hardening (#47)
 

@@ -145,34 +145,44 @@ Vite build.
 
 ## Error reporting (`peded/error_reporting.py`, #49)
 
-Sentry, started from the end of `settings.py` only when the site config has
-`sentry_dsn` and `debug` is false. Otherwise `sentry_sdk` is not imported at
-all (a test starts a fresh interpreter to check).
+Rollbar (pyrollbar), started from the end of `settings.py` only when the site
+config has `rollbar_access_token` and `debug` is false. Otherwise `rollbar` is
+not imported at all (a test starts a fresh interpreter to check). Rollbar,
+not Sentry, because the maintainer's other projects use it with Slack alerts.
 
-**The scrubbing rule: an event is rebuilt from an allowlist.** `scrub_event`
-(the SDK's `before_send`) copies the fields known to be safe into a new dict
-and drops the rest, so nothing the SDK or a new integration attaches gets
-through by default. It never sends request bodies, query strings, headers,
-cookies, the user, the client IP, local variables (`vars`), breadcrumbs,
-tags, extra or contexts other than the Python version. The URL sent is the
-matched route pattern (`/api/pedigrees/{pk}/`); a path that matched no route
-becomes `[unmatched]`, because the UUID in a pedigree URL is the edit
-capability. Anything new you want on an event (a tag, a context, a
-breadcrumb, `set_user`) must be added to `scrub_event` with a test in
+**What reports:** `ErrorReportHandler` on the root logger, for every record
+at ERROR or above. Unhandled view exceptions arrive that way too: Django logs
+them on `django.request` with the request attached, and the handler takes
+only the matched route and the method from it. pyrollbar's Django middleware
+is deliberately not used, since it hands the SDK the whole request. The
+handler skips the `rollbar` logger, or a failed post would report itself.
+For that handler to see `django.request`, the `django` logger has no handler
+of its own and propagates to root's console handler.
+
+**The scrubbing rule: an item is rebuilt from an allowlist.** `scrub_payload`
+(a pyrollbar payload handler, the last step before posting) copies the fields
+known to be safe into a new dict and drops the rest, so nothing the SDK
+attaches gets through by default. It never sends request bodies, query
+strings, headers, cookies, the person, the client IP, local variables and
+argument values, `custom`, the server's host name or argv. The context sent is
+the matched route pattern (`/api/pedigrees/{pk}/`), and `scrub_payload`
+accepts it only if it is one of the URLconf's routes (`known_routes`): a
+typed path such as `/p/<surname>/` looks just like a route. A path that
+matched no route becomes `[unmatched]`, because the UUID in a pedigree URL is
+the edit capability. Anything new you want on an item (custom data, a person,
+a fingerprint) must be added to `scrub_payload` with a test in
 `api/tests_error_reporting.py`, which sends real requests through the WSGI
-handler with a capturing transport and searches the serialised envelope for
+handler, keeps the JSON pyrollbar would have posted and searches it for
 every name, date, note, token and UUID of its fixture.
 
 - Exception and log messages are the one free-text field. `scrub_text` keeps
   the first line, drops everything between the first and last quote
   character (Python and Postgres quote the values they interpolate) and
-  replaces ids, dates, long numbers, emails, URLs and tokens. It cannot catch
-  a name interpolated without quotes: never put pedigree content in an
-  exception or log message, and use `%r` / `!r` if a value must appear.
-- The Django test client skips `WSGIHandler.__call__`, where the SDK reads
-  the URL, headers and query string, so those tests call the handler
-  directly (`_request`). A test through `self.client` would pass without
-  testing the request scrubbing.
-- Tracing, profiles, sessions and client reports are off: errors only.
+  replaces ids, dates, long numbers, emails, URLs and tokens. A logged error
+  sends its format string, never its arguments. It cannot catch a name
+  interpolated without quotes: never put pedigree content in an exception or
+  log message, and use `%r` / `!r` if a value must appear.
+- The Django test client skips `WSGIHandler.__call__`, so those tests call
+  the handler directly (`_request`) to get a request built as Gunicorn's is.
 - `frontend/src/errorReporting/scrub.ts` is the browser's copy of the same
   rules; keep `scrubText` and `scrub_text` in step.

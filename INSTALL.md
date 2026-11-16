@@ -396,50 +396,53 @@ Neither can tell that the app loads but then breaks in the browser. That needs e
 
 ## 12. Error reporting (optional)
 
-Off by default. With no DSN in the site config nothing is loaded and nothing is sent: the backend never imports `sentry_sdk` and the frontend build contains no reporter. Turning it on sends error reports to a third party (Sentry, or a self-hosted Sentry), so say so in your privacy statement.
+Off by default. With no Rollbar token in the site config nothing is loaded and nothing is sent: the backend never imports `rollbar` and the frontend build contains no reporter. Turning it on sends error reports to a third party (Rollbar), so say so in your privacy statement.
 
 To turn it on:
 
-1. Create a Sentry account and two projects, one of platform Django and one of platform Browser JavaScript. Each has a DSN (Project settings > Client Keys).
-2. In each project's settings, under Security & Privacy, turn on "Prevent Storing of IP Addresses" and leave "Data Scrubber" on. In the browser project leave "Allow JavaScript Source Fetching" on (see source maps below).
-3. Add the DSNs to `/etc/pededit/pededit.json`:
+1. Create a Rollbar project (one project takes both the Django and the browser reports). Under Project Settings > Project Access Tokens it has a `post_server_item` token and a `post_client_item` token.
+2. Add them to `/etc/pededit/pededit.json`:
 
    ```json
-   "sentry_dsn": "https://<key>@<host>/<django project id>",
-   "sentry_frontend_dsn": "https://<key>@<host>/<browser project id>",
-   "sentry_environment": "production"
+   "rollbar_access_token": "<post_server_item token>",
+   "rollbar_client_access_token": "<post_client_item token>",
+   "rollbar_environment": "production"
    ```
 
    | Key | Used by | Default |
    |---|---|---|
-   | `sentry_dsn` | Django. Ignored while `debug` is true. | empty: off |
-   | `sentry_frontend_dsn` | `deploy.sh`, which passes it to the frontend build as `VITE_SENTRY_DSN`. It ends up in the public JavaScript, which is normal for a browser DSN: it can only submit reports. | empty: off |
-   | `sentry_environment` | Both, as the report's environment. | `production` |
+   | `rollbar_access_token` | Django. Ignored while `debug` is true. Keep it secret: it can post anything to the project. | empty: off |
+   | `rollbar_client_access_token` | `deploy.sh`, which passes it to the frontend build as `VITE_ROLLBAR_ACCESS_TOKEN`. It ends up in the public JavaScript, which is normal for a `post_client_item` token: it can only submit reports. | empty: off |
+   | `rollbar_environment` | Both, as the report's environment. | `production` |
 
-4. Run `sudo bash /opt/pededit/deploy/deploy.sh`. The frontend only changes when it is rebuilt; the build prints `Error reporting is on. Release: ...` when it has a DSN.
-5. If Nginx sends a `Content-Security-Policy` header, add the DSN's host to `connect-src`, or the browser blocks the reports.
+3. Run `sudo bash /opt/pededit/deploy/deploy.sh`. The frontend only changes when it is rebuilt; the build prints `Error reporting is on. Code version: ...` when it has a token.
+4. If Nginx sends a `Content-Security-Policy` header, add `https://api.rollbar.com` to `connect-src`, or the browser blocks the reports.
+5. Notifications (Slack, email) are set up in Rollbar itself, under Project Settings > Notifications.
 
 **What a report contains.** Pedigrees are family health data, and the `/p/<id>` link is the key to an anonymous pedigree, so both sides build each report from a short list of fields and drop everything else (`backend/peded/error_reporting.py`, `frontend/src/errorReporting/scrub.ts`):
 
-- the type of the error and its message, with quoted text, ids, dates, long numbers, emails, URLs and tokens removed;
-- the stack trace: file, function and line (the backend also sends the lines of source code around each frame, which is public code);
+- the class of the error and its message, with quoted text, ids, dates, long numbers, emails, URLs and tokens removed (for a logged error, the log call's format string, never its values);
+- the stack trace: file, function and line (the backend also sends the line of source code of each frame, which is public code);
 - the kind of page or API route it happened on, as a pattern (`/p/[id]`, `/api/pedigrees/{pk}/`), and the HTTP method;
-- the release (the commit for the backend, the build date for the frontend), the environment, and for the backend the Python and package versions.
+- the code version (the commit for the backend, the build date for the frontend), the environment, and the Python version.
 
-**What is never sent:** names, dates of birth, notes or any other pedigree content; pedigree ids and links; request and response bodies; query strings; headers, cookies and sign-in tokens; who the user is; local variables; console output; text from the page; clicks and keystrokes; breadcrumbs; performance traces; session replays. Sentry sees the connection a browser report arrives on (IP address and browser version), as any web server does; the settings in step 2 stop the address being stored, and the report itself asks for that too.
+**What is never sent:** names, dates of birth, notes or any other pedigree content; pedigree ids and links; request and response bodies; query strings; headers, cookies and sign-in tokens; who the user is (no Rollbar "person"); the user's IP address; local variables; console output; text from the page; clicks and keystrokes; telemetry; the server's host name. Rollbar sees the connection a browser report arrives on (IP address and browser version), as any web server does; it stores an IP address on an item only when the report includes one, and these never do.
 
 The message of an error is the one free-text field. An error written as `raise ValueError(f"bad name {name!r}")` is safe because the quoted part is removed, but text interpolated without quotes is only caught if it looks like an id, date, number, email or URL. Do not put pedigree content in exception or log messages.
 
-**Source maps (readable frontend stack traces).** The build publishes a source map beside each script (`dist/assets/*.js.map`). The code is public, so this gives nothing away, and Sentry fetches the map from your site when a report arrives, which needs no token and no upload step. It only works if Sentry can reach the site: for a site behind a login or firewall, upload the maps instead after each build, filed under the release name the build prints:
+**Source maps (readable frontend stack traces).** The build publishes a source map beside each script (`dist/assets/*.js.map`). The code is public, so this gives nothing away, and each report tells Rollbar to download the map from your site (`source_map_enabled`, filed under the code version), which needs no upload step. It only works if Rollbar can reach the site: for a site behind a login or firewall, upload each map after the build instead, with the `post_server_item` token and the code version the build prints:
 
 ```bash
-npx @sentry/cli sourcemaps upload --org <org> --project <browser project> \
-    --release "pededit-frontend@<build date>" --url-prefix "~/assets" /opt/pededit/frontend/dist/assets
+curl https://api.rollbar.com/api/1/sourcemap \
+  -F access_token=<post_server_item token> \
+  -F version="pededit-frontend@<build date>" \
+  -F minified_url=https://your-domain/assets/index-<hash>.js \
+  -F source_map=@/opt/pededit/frontend/dist/assets/index-<hash>.js.map
 ```
 
-That needs a Sentry auth token (`SENTRY_AUTH_TOKEN`) and is not part of `deploy.sh`. Backend stack traces need nothing: Python sends source lines itself.
+That is not part of `deploy.sh`. Backend stack traces need nothing: Python sends source lines itself.
 
-**Checking it works.** After the deploy, `sudo -u pededit /opt/pededit/backend/.venv/bin/python manage.py shell -c "import sentry_sdk; sentry_sdk.capture_message('PedEdit backend test'); sentry_sdk.flush()"` (run from `/opt/pededit/backend`) should show up in the Django project. For the frontend, open the site, run `setTimeout(() => { throw new Error("PedEdit frontend test") })` in the browser console and look in the browser project.
+**Checking it works.** After the deploy, from `/opt/pededit/backend` run `sudo -u pededit .venv/bin/python manage.py shell -c "import rollbar; rollbar.report_message('PedEdit backend test'); rollbar.wait()"`; it should show up in the project as a `python` item. For the frontend, open the site, run `setTimeout(() => { throw new Error("PedEdit frontend test") })` in the browser console and look for a `javascript` item.
 
 ## 13. Database backups
 

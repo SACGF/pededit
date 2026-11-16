@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { buildReport, componentNames, parseStack, routeOf, scrubScriptUrl, scrubText, MAX_TEXT } from "../scrub";
-import { createReporter, envelopeBody, envelopeUrl } from "../reporter";
+import { createReporter, isAccessToken, itemBody, ROLLBAR_ITEM_URL } from "../reporter";
 
 // A pedigree's content and its link: none of this may appear in a report (#49).
 const UUID = "3f2b8c1e-9d4a-4e7b-8a6f-1c2d3e4f5a6b";
@@ -19,7 +19,7 @@ const CTX = {
   release: "pededit-frontend@2026-11-16T00:00:00.000Z",
   environment: "production",
   now: new Date("2026-11-16T01:02:03Z"),
-  eventId: "0".repeat(32),
+  eventId: "00000000-0000-4000-8000-000000000000",
 };
 
 const CHROME_STACK = `TypeError: Cannot read properties of undefined (reading '${NAME}')
@@ -97,12 +97,12 @@ describe("parseStack", () => {
     const frames = parseStack(CHROME_STACK, ORIGIN);
     expectNoSecrets(frames);
     expect(frames[frames.length - 1]).toEqual({
-      filename: `${ORIGIN}/assets/index-BxK3f9a2.js`, function: "drawPerson", lineno: 412, colno: 1877, in_app: true,
+      filename: `${ORIGIN}/assets/index-BxK3f9a2.js`, method: "drawPerson", lineno: 412, colno: 1877,
     });
     expect(frames.map((f) => f.filename)).toEqual([
       "[external]", `${ORIGIN}/p/[id]`, `${ORIGIN}/assets/index-BxK3f9a2.js`, `${ORIGIN}/assets/index-BxK3f9a2.js`,
     ]);
-    expect(frames[0]).toEqual({ filename: "[external]", function: "inject", in_app: false });
+    expect(frames[0]).toEqual({ filename: "[external]", method: "inject" });
   });
 
   it("reads Firefox and Safari frames", () => {
@@ -110,7 +110,7 @@ describe("parseStack", () => {
     expectNoSecrets(frames);
     expect(frames).toHaveLength(4);
     expect(frames[3]).toEqual({
-      filename: `${ORIGIN}/assets/index-BxK3f9a2.js`, function: "drawPerson", lineno: 412, colno: 1877, in_app: true,
+      filename: `${ORIGIN}/assets/index-BxK3f9a2.js`, method: "drawPerson", lineno: 412, colno: 1877,
     });
   });
 
@@ -137,46 +137,48 @@ describe("buildReport", () => {
     });
     expectNoSecrets(report);
     expect(report).toEqual({
-      event_id: "0".repeat(32),
+      uuid: "00000000-0000-4000-8000-000000000000",
       timestamp: 1794790923,
-      platform: "javascript",
-      level: "error",
-      release: CTX.release,
       environment: "production",
-      transaction: "/p/[id]",
+      level: "error",
+      platform: "browser",
+      language: "javascript",
+      framework: "browser-js",
+      code_version: CTX.release,
+      context: "/p/[id]",
       request: { url: `${ORIGIN}/p/[id]` },
-      exception: {
-        values: [{
-          type: "TypeError",
-          value: "Cannot read properties of undefined (reading [redacted])",
-          mechanism: { type: "react", handled: true },
-          stacktrace: { frames: parseStack(CHROME_STACK, ORIGIN) },
-        }],
+      body: {
+        trace: {
+          frames: parseStack(CHROME_STACK, ORIGIN),
+          exception: { class: "TypeError", message: "Cannot read properties of undefined (reading [redacted])" },
+        },
       },
-      extra: { components: ["PersonNode", "div", "CanvasPage"] },
-      sdk: { name: "pededit.reporter", version: "1", settings: { infer_ip: "never" } },
-      user: {},
+      custom: { mechanism: "react", handled: true, components: ["PersonNode", "div", "CanvasPage"] },
+      client: { javascript: { code_version: CTX.release, source_map_enabled: true, guess_uncaught_frames: true } },
+      notifier: { name: "pededit.reporter", version: "1" },
     });
+    // No person, no IP: Rollbar fills in neither unless a report asks.
+    expect(JSON.stringify(report)).not.toMatch(/person|user_ip|\$remote_ip/);
   });
 
   it("scrubs messages that interpolate without quotes", () => {
     const report = buildReport(errorWith(`Pedigree ${UUID} of ${DOB} failed for counsellor@hospital.example`, FIREFOX_STACK, "Error"), CTX);
     expectNoSecrets(report);
-    expect(report.exception.values[0].value).toBe("Pedigree [id] of [date] failed for [email]");
+    expect(report.body.trace.exception.message).toBe("Pedigree [id] of [date] failed for [email]");
   });
 
   it("handles what is thrown or rejected that is not an Error", () => {
     const thrownString = buildReport(`save of '${NAME}' failed in ${UUID}`, CTX);
     expectNoSecrets(thrownString);
-    expect(thrownString.exception.values[0]).toMatchObject({ type: "NonError", value: "save of [redacted] failed in [id]" });
+    expect(thrownString.body.trace.exception).toEqual({ class: "NonError", message: "save of [redacted] failed in [id]" });
 
     // A rejected pedigree object: nothing of it is read.
     const thrownObject = buildReport({ individuals: [{ name: NAME, dob: DOB, notes: NOTES }], id: UUID }, CTX);
     expectNoSecrets(thrownObject);
-    expect(thrownObject.exception.values[0]).toMatchObject({ type: "Error", value: "", stacktrace: { frames: [] } });
+    expect(thrownObject.body.trace).toEqual({ exception: { class: "Error", message: "" }, frames: [] });
 
     for (const odd of [undefined, null, 42, Symbol("x")]) {
-      expect(buildReport(odd, CTX).exception.values[0]).toMatchObject({ type: "NonError", value: "" });
+      expect(buildReport(odd, CTX).body.trace.exception).toEqual({ class: "NonError", message: "" });
     }
     const hostile = { get message(): string { throw new Error(NAME); }, name: `${NAME}` };
     expectNoSecrets(buildReport(hostile, CTX));
@@ -184,7 +186,7 @@ describe("buildReport", () => {
 
   it("does not send a path that is not a route, or the GitHub sign-in code", () => {
     const report = buildReport(new Error("x"), { ...CTX, pathname: `/notes/${NAME}` });
-    expect(report.transaction).toBe("[other]");
+    expect(report.context).toBe("[other]");
     expectNoSecrets(report);
     expect(buildReport(new Error("x"), { ...CTX, pathname: "/auth/github/callback" }).request.url)
       .toBe(`${ORIGIN}/auth/github/callback`);
@@ -200,16 +202,13 @@ describe("componentNames", () => {
 });
 
 describe("reporter", () => {
-  const DSN = "https://publickey@o1.ingest.errors.invalid/42";
+  const TOKEN_OK = "0123456789abcdef0123456789abcdef";
 
-  it("turns a DSN into the envelope endpoint", () => {
-    expect(envelopeUrl(DSN)).toBe(
-      "https://o1.ingest.errors.invalid/api/42/envelope/?sentry_version=7&sentry_key=publickey&sentry_client=pededit.reporter%2F1",
-    );
-    expect(envelopeUrl("https://publickey@sentry.clinic.invalid/sentry/7")).toMatch(/^https:\/\/sentry\.clinic\.invalid\/sentry\/api\/7\/envelope\/\?/);
-    expect(envelopeUrl("")).toBeNull();
-    expect(envelopeUrl("not a dsn")).toBeNull();
-    expect(envelopeUrl("https://o1.ingest.errors.invalid/42")).toBeNull();
+  it("accepts only something shaped like a Rollbar token", () => {
+    expect(isAccessToken(TOKEN_OK)).toBe(true);
+    expect(isAccessToken("")).toBe(false);
+    expect(isAccessToken("https://publickey@o1.ingest.errors.invalid/42")).toBe(false);
+    expect(isAccessToken(TOKEN_OK.toUpperCase())).toBe(false);
   });
 
   function withWindow<T>(fn: () => T): T {
@@ -220,29 +219,27 @@ describe("reporter", () => {
     try { return fn(); } finally { vi.unstubAllGlobals(); }
   }
 
-  it("posts one scrubbed envelope, with no cookies and no referrer", () => {
+  it("posts one scrubbed item, with no cookies and no referrer", () => {
     const post = vi.fn(() => Promise.resolve(new Response()));
     withWindow(() => {
-      const send = createReporter({ dsn: DSN, release: CTX.release, environment: "production" }, post as unknown as typeof fetch);
+      const send = createReporter({ accessToken: TOKEN_OK, release: CTX.release, environment: "production" }, post as unknown as typeof fetch);
       send(errorWith(`bad '${NAME}' in ${UUID}`, CHROME_STACK), { mechanism: "onerror" });
     });
     expect(post).toHaveBeenCalledTimes(1);
     const [url, init] = post.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe(envelopeUrl(DSN));
+    expect(url).toBe(ROLLBAR_ITEM_URL);
     expect(init).toMatchObject({ method: "POST", credentials: "omit", referrerPolicy: "no-referrer" });
-    expectNoSecrets(url);
     expectNoSecrets(init.body as string);
-    const lines = (init.body as string).split("\n");
-    expect(lines).toHaveLength(3);
-    expect(JSON.parse(lines[1])).toEqual({ type: "event" });
-    expect(JSON.parse(lines[2]).transaction).toBe("/p/[id]");
-    expect(Object.keys(JSON.parse(lines[0])).sort()).toEqual(["event_id", "sent_at"]);
+    const body = JSON.parse(init.body as string);
+    expect(Object.keys(body).sort()).toEqual(["access_token", "data"]);
+    expect(body.access_token).toBe(TOKEN_OK);
+    expect(body.data.context).toBe("/p/[id]");
   });
 
   it("sends a repeated error once and stops after five", () => {
     const post = vi.fn(() => Promise.resolve(new Response()));
     withWindow(() => {
-      const send = createReporter({ dsn: DSN, release: "r", environment: "e" }, post as unknown as typeof fetch);
+      const send = createReporter({ accessToken: TOKEN_OK, release: "r", environment: "e" }, post as unknown as typeof fetch);
       const same = errorWith("again", CHROME_STACK);
       send(same, { mechanism: "onerror" });
       send(same, { mechanism: "react" });
@@ -252,17 +249,17 @@ describe("reporter", () => {
     expect(post).toHaveBeenCalledTimes(5);
   });
 
-  it("sends nothing when the DSN is not one, and never throws", () => {
+  it("sends nothing when the token is not one, and never throws", () => {
     const post = vi.fn(() => Promise.reject(new Error("offline")));
     withWindow(() => {
-      expect(createReporter({ dsn: "nonsense", release: "r", environment: "e" }, post as unknown as typeof fetch)(new Error("x"), { mechanism: "onerror" })).toBeNull();
+      expect(createReporter({ accessToken: "nonsense", release: "r", environment: "e" }, post as unknown as typeof fetch)(new Error("x"), { mechanism: "onerror" })).toBeNull();
       expect(post).not.toHaveBeenCalled();
-      expect(() => createReporter({ dsn: DSN, release: "r", environment: "e" }, post as unknown as typeof fetch)(new Error("x"), { mechanism: "onerror" })).not.toThrow();
+      expect(() => createReporter({ accessToken: TOKEN_OK, release: "r", environment: "e" }, post as unknown as typeof fetch)(new Error("x"), { mechanism: "onerror" })).not.toThrow();
     });
   });
 
-  it("writes the envelope as three JSON lines", () => {
+  it("writes the item as the token and the report", () => {
     const report = buildReport(new Error("x"), CTX);
-    expect(envelopeBody(report).split("\n").map((l) => JSON.parse(l))[2]).toEqual(report);
+    expect(JSON.parse(itemBody(TOKEN_OK, report))).toEqual({ access_token: TOKEN_OK, data: report });
   });
 });

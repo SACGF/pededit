@@ -106,8 +106,11 @@ LOGGING = {
             "style": "{",
         },
     },
+    # Everything reaches the console through root. Error reporting (below)
+    # adds its handler to root too, so it sees django.request's errors.
+    "root": {"handlers": ["console"], "level": "WARNING"},
     "loggers": {
-        "django": {"handlers": ["console"], "level": "INFO"},
+        "django": {"level": "INFO"},
         "django.server": {"handlers": ["django.server"], "level": "INFO", "propagate": False},
     },
 }
@@ -176,13 +179,17 @@ GITHUB_CLIENT_ID     = _secrets.GITHUB_CLIENT_ID
 GITHUB_CLIENT_SECRET = _secrets.GITHUB_CLIENT_SECRET
 
 # ── Error reporting (#49) ────────────────────────────────────────────────────
-# Does nothing, and imports nothing, without a sentry_dsn in the site config.
+# Does nothing, and imports nothing, without a rollbar_access_token in the
+# site config. When on, every record logged at ERROR goes to Rollbar through
+# the root logger, unhandled exceptions included (django.request logs them).
 from peded.error_reporting import init_error_reporting
 from peded.version import VERSION as _VERSION
 
-init_error_reporting(
-    dsn=_secrets.SENTRY_DSN,
-    environment=_secrets.SENTRY_ENVIRONMENT,
-    release=_VERSION,
+if init_error_reporting(
+    access_token=_secrets.ROLLBAR_ACCESS_TOKEN,
+    environment=_secrets.ROLLBAR_ENVIRONMENT,
+    code_version=_VERSION,
     debug=DEBUG,
-)
+):
+    LOGGING["handlers"]["error_reporting"] = {"class": "peded.error_reporting.ErrorReportHandler"}
+    LOGGING["root"]["handlers"].append("error_reporting")

@@ -1,10 +1,10 @@
 """Error reports must not carry pedigree data or pedigree links (#49).
 
 Each test raises inside a real request with the fixture below in the body, the
-locals, the exception message and the URL, sends the event through the real
-SDK with a transport that keeps the envelope instead of posting it, and
-searches the serialised bytes for every secret. Nothing here touches the
-network: the DSN host is `.invalid` and the transport never sends.
+locals, the exception message and the URL, lets the real
+SDK build the item through the logging handler settings.py installs, keeps
+the JSON it would have posted, and searches it for every secret. Nothing here
+touches the network: the post itself is replaced.
 """
 
 import io
@@ -24,12 +24,14 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import AccessToken
 
 from peded import error_reporting
-from peded.error_reporting import init_error_reporting, scrub_event, scrub_text
+from peded.error_reporting import (
+    ErrorReportHandler, init_error_reporting, route_of, scrub_payload, scrub_text,
+)
 
 from .models import Pedigree
 from .serializers import PedigreeSerializer
 
-FAKE_DSN = "https://publickey@errors.invalid/1"
+FAKE_TOKEN = "0123456789abcdef0123456789abcdef"
 
 NAME = "Wilhelmina Featherstonehaugh"
 SURNAME = "Featherstonehaugh"
@@ -58,31 +60,12 @@ SECRETS = [NAME, SURNAME, "Wilhelmina", "Bartholomew", "Quince", DOB, "1962", NO
            COOKIE, QUERY_VALUE]
 
 
-class CapturingTransport:
-    """Keeps what the SDK would have posted. Built lazily: no sentry import at module load."""
-
-    def __new__(cls, envelopes):
-        from sentry_sdk.transport import Transport
-
-        class _Capturing(Transport):
-            def capture_envelope(self, envelope):
-                envelopes.append(envelope)
-
-            def flush(self, timeout, callback=None):
-                pass
-
-            def kill(self):
-                pass
-
-        return _Capturing
+def _captured(posted) -> str:
+    return "\n".join(posted)
 
 
-def _serialise(envelopes) -> str:
-    return b"\n".join(e.serialize() for e in envelopes).decode("utf-8", "replace")
-
-
-def _events(envelopes) -> list:
-    return [item.get_event() for e in envelopes for item in e.items if item.get_event()]
+def _items(posted) -> list:
+    return [json.loads(p)["data"] for p in posted]
 
 
 def _failing_update(self, instance, validated_data):
@@ -110,19 +93,23 @@ def _failing_update_logged(self, instance, validated_data):
 
 class ErrorReportScrubbingTests(APITestCase):
     def setUp(self):
-        import sentry_sdk
+        import rollbar
 
-        self.envelopes = []
+        self.posted = []
         started = init_error_reporting(
-            FAKE_DSN, environment="test", release="abc123",
-            transport=CapturingTransport(self.envelopes),
+            FAKE_TOKEN, environment="test", code_version="abc123", handler="blocking",
         )
         self.assertTrue(started)
-        self.addCleanup(lambda: sentry_sdk.get_global_scope().set_client(None))
-        self.addCleanup(lambda: sentry_sdk.get_client().close())
+        patcher = mock.patch.object(rollbar, "_send_payload", lambda body, token: self.posted.append(body))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        handler = ErrorReportHandler()
+        logging.getLogger().addHandler(handler)
+        self.addCleanup(lambda: logging.getLogger().removeHandler(handler))
+        self.addCleanup(lambda: rollbar.events.remove_payload_handler(scrub_payload))
         self.pedigree = Pedigree.objects.create(title=CHART_TITLE, data=PEDIGREE_DATA)
         self.uuid = str(self.pedigree.pk)
-        # A signed-in request, so the event could carry a user and a live token.
+        # A signed-in request, so the item could carry a user and a live token.
         self.user = User.objects.create_user("counsellor", email="counsellor@hospital.example")
         self.token = str(AccessToken.for_user(self.user))
 
@@ -137,8 +124,8 @@ class ErrorReportScrubbingTests(APITestCase):
     def _request(self, method, path, body=None, query=""):
         """One request through the real WSGI handler, as Gunicorn calls it.
 
-        The test client skips `WSGIHandler.__call__`, which is where the SDK
-        reads the URL, query string, headers and client address.
+        The test client skips `WSGIHandler.__call__`, which builds the
+        request the way Gunicorn's would be, client address and all.
         """
         payload = json.dumps(body).encode() if body is not None else b""
         environ = self.client._base_environ(
@@ -172,10 +159,7 @@ class ErrorReportScrubbingTests(APITestCase):
             )
 
     def _sent(self):
-        import sentry_sdk
-
-        sentry_sdk.flush()
-        return _serialise(self.envelopes)
+        return _captured(self.posted)
 
     def assertNoSecrets(self, text):
         self.assertTrue(text, "nothing was captured")
@@ -187,57 +171,48 @@ class ErrorReportScrubbingTests(APITestCase):
         text = self._sent()
         self.assertNoSecrets(text)
 
-        events = _events(self.envelopes)
-        self.assertEqual(len(events), 1, text)
-        event = events[0]
+        items = _items(self.posted)
+        self.assertEqual(len(items), 1, text)
+        item = items[0]
         # Still useful: what failed, where, and on which route.
-        exc = event["exception"]["values"][-1]
-        self.assertEqual(exc["type"], "ValueError")
-        self.assertTrue(exc["value"].startswith("Cannot save [redacted]"), exc["value"])
-        frames = exc["stacktrace"]["frames"]
-        self.assertEqual(frames[-1]["function"], "_failing_update")
-        self.assertIn("raise ValueError", frames[-1]["context_line"])
-        self.assertEqual(event["transaction"], "/api/pedigrees/{pk}/")
-        self.assertEqual(event["request"], {"url": "/api/pedigrees/{pk}/", "method": "PATCH"})
-        self.assertEqual(event["release"], "abc123")
-        self.assertEqual(event["environment"], "test")
+        trace = item["body"]["trace"]
+        self.assertEqual(trace["exception"]["class"], "ValueError")
+        self.assertTrue(trace["exception"]["message"].startswith("Cannot save [redacted]"), trace)
+        self.assertEqual(trace["frames"][-1]["method"], "_failing_update")
+        self.assertIn("raise ValueError", trace["frames"][-1]["code"])
+        self.assertEqual(item["context"], "/api/pedigrees/{pk}/")
+        self.assertEqual(item["request"], {"url": "/api/pedigrees/{pk}/", "method": "PATCH"})
+        self.assertEqual(item["code_version"], "abc123")
+        self.assertEqual(item["environment"], "test")
 
     def test_only_allowlisted_keys_are_sent(self):
         self._patch()
         self._sent()
-        event = _events(self.envelopes)[0]
+        self.assertEqual(set(json.loads(self.posted[0])), {"access_token", "data"})
+        item = _items(self.posted)[0]
         self.assertLessEqual(
-            set(event),
-            {"event_id", "timestamp", "platform", "level", "release", "environment", "logger",
-             "exception", "logentry", "transaction", "request", "contexts", "modules", "sdk",
-             "server_name", "user"},
+            set(item),
+            {"uuid", "timestamp", "environment", "level", "language", "framework", "code_version",
+             "notifier", "body", "context", "request", "server"},
         )
-        self.assertEqual(event["user"], {})
-        self.assertEqual(event["server_name"], "")
-        self.assertEqual(set(event["contexts"]), {"runtime"})
-        for exc in event["exception"]["values"]:
-            for frame in exc["stacktrace"]["frames"]:
-                self.assertLessEqual(
-                    set(frame),
-                    {"filename", "function", "module", "lineno", "colno", "in_app",
-                     "context_line", "pre_context", "post_context"},
-                )
-        # One envelope item per event: no attachments, sessions or transactions.
-        for envelope in self.envelopes:
-            self.assertEqual([item.type for item in envelope.items], ["event"])
+        self.assertNotIn("person", item)
+        self.assertEqual(item["server"], {})
+        self.assertEqual(set(item["body"]), {"trace"})
+        for frame in item["body"]["trace"]["frames"]:
+            self.assertLessEqual(set(frame), {"filename", "method", "lineno", "colno", "code"})
 
     def test_message_without_quotes_and_with_a_detail_line(self):
         self._patch(_failing_update_unquoted)
         text = self._sent()
         self.assertNoSecrets(text)
-        exc = _events(self.envelopes)[0]["exception"]["values"][-1]
-        self.assertEqual(exc["value"], "pedigree [id] of [date] failed")
+        trace = _items(self.posted)[0]["body"]["trace"]
+        self.assertEqual(trace["exception"]["message"], "pedigree [id] of [date] failed")
 
     def test_logged_errors(self):
         self.assertEqual(self._patch(_failing_update_logged), 200)
         text = self._sent()
         self.assertNoSecrets(text)
-        messages = [e["logentry"]["message"] for e in _events(self.envelopes)]
+        messages = [i["body"]["message"]["body"] for i in _items(self.posted)]
         self.assertEqual(
             messages, ["Could not save pedigree %s for %s", "Could not save [redacted] in [id]"]
         )
@@ -250,68 +225,91 @@ class ErrorReportScrubbingTests(APITestCase):
             self._request("GET", f"/p/{self.uuid}/{SURNAME}/", query=f"name={SURNAME}")
         text = self._sent()
         self.assertNoSecrets(text)
-        event = _events(self.envelopes)[0]
-        self.assertEqual(event["transaction"], "[unmatched]")
-        self.assertEqual(event["request"]["url"], "[unmatched]")
+        item = _items(self.posted)[0]
+        self.assertEqual(item["context"], "[unmatched]")
+        self.assertEqual(item["request"]["url"], "[unmatched]")
 
-    def test_no_breadcrumbs_or_traces(self):
-        import sentry_sdk
+    def test_warnings_and_rollbars_own_errors_are_not_reported(self):
+        logging.getLogger("api.views").warning("slow save of %s", NAME)
+        logging.getLogger("rollbar").error("Exception while posting item %r", NAME)
+        self.assertEqual(self.posted, [])
 
-        sentry_sdk.add_breadcrumb(category="query", message=f"SELECT ... WHERE name = '{NAME}'")
-        with sentry_sdk.start_transaction(name=f"/p/{self.uuid}"):
-            pass
-        self._patch()
+    def test_a_chained_exception(self):
+        def failing(self_, instance, validated_data):
+            try:
+                raise KeyError(NAME)
+            except KeyError as e:
+                raise RuntimeError(f"could not save {instance.pk}") from e
+
+        self._patch(failing)
         text = self._sent()
         self.assertNoSecrets(text)
-        self.assertNotIn("breadcrumbs", text)
-        for envelope in self.envelopes:
-            self.assertEqual([item.type for item in envelope.items], ["event"])
+        chain = _items(self.posted)[0]["body"]["trace_chain"]
+        self.assertEqual([t["exception"]["class"] for t in chain], ["RuntimeError", "KeyError"])
+        self.assertEqual(chain[1]["exception"]["message"], "[redacted]")
 
 
-class ScrubEventTests(APITestCase):
-    """`scrub_event` alone, on an event carrying everything the SDK could attach."""
+class ScrubPayloadTests(APITestCase):
+    """`scrub_payload` alone, on an item carrying everything the SDK could attach."""
 
     UUID = "3f2b8c1e-9d4a-4e7b-8a6f-1c2d3e4f5a6b"
 
-    def _hostile_event(self):
-        return {
-            "event_id": "0" * 32, "timestamp": "2026-11-16T00:00:00Z", "platform": "python",
-            "level": "error", "release": "abc", "environment": "production",
-            "server_name": "clinic-server-7", "transaction": f"/api/pedigrees/{self.UUID}/",
-            "transaction_info": {"source": "url"},
-            "user": {"id": 42, "email": "counsellor@hospital.example", "ip_address": "203.0.113.9"},
+    def _hostile_payload(self):
+        return {"access_token": FAKE_TOKEN, "data": {
+            "uuid": "0" * 32, "timestamp": 1794790923, "environment": "production", "level": "error",
+            "language": "python 3.13.0", "framework": "django", "code_version": "abc",
+            "notifier": {"name": "pyrollbar", "version": "1.5.0", "note": NOTES},
+            "context": f"/p/{SURNAME}/",
+            "person": {"id": 42, "email": "counsellor@hospital.example", "username": "counsellor"},
             "request": {
                 "url": f"https://pededit.example/api/pedigrees/{self.UUID}/",
-                "method": "PATCH", "query_string": f"name={SURNAME}",
-                "data": PEDIGREE_DATA, "cookies": {"sessionid": COOKIE},
-                "headers": {"Authorization": f"Bearer {TOKEN}", "Referer": f"/p/{self.UUID}"},
-                "env": {"REMOTE_ADDR": "203.0.113.9"},
+                "method": "PATCH", "query_string": f"name={SURNAME}", "user_ip": "203.0.113.9",
+                "body": json.dumps(PEDIGREE_DATA), "POST": PEDIGREE_DATA,
+                "headers": {"Authorization": f"Bearer {TOKEN}", "Referer": f"/p/{self.UUID}",
+                            "Cookie": f"sessionid={COOKIE}"},
             },
-            "breadcrumbs": {"values": [{"message": NOTES, "data": {"url": f"/p/{self.UUID}"}}]},
-            "extra": {"pedigree": PEDIGREE_DATA, "sys.argv": ["manage.py"]},
-            "tags": {"patient": NAME},
-            "contexts": {"runtime": {"name": "CPython", "version": "3.13.0", "build": NAME},
-                         "pedigree": PEDIGREE_DATA},
-            "exception": {"values": [{
-                "type": "ValueError", "module": "builtins", "value": f"bad name {NAME!r}",
-                "mechanism": {"type": "django", "handled": False, "data": {"note": NOTES}},
-                "stacktrace": {"frames": [{
-                    "filename": "api/views.py", "function": "update", "lineno": 12, "in_app": True,
-                    "context_line": "    raise ValueError(name)",
-                    "vars": {"name": NAME, "dob": DOB, "data": PEDIGREE_DATA},
-                }]},
-            }]},
-            "threads": {"values": [{"name": NAME}]},
-            "fingerprint": [NAME],
-        }
+            "server": {"host": "clinic-server-7", "pid": 7, "argv": ["gunicorn", NAME], "root": "/opt"},
+            "custom": {"pedigree": PEDIGREE_DATA},
+            "fingerprint": NAME,
+            "title": NAME,
+            "attributes": [{"key": "session_id", "value": COOKIE}],
+            "body": {"trace": {
+                "exception": {"class": "ValueError", "message": f"bad name {NAME!r}", "description": NOTES},
+                "frames": [{
+                    "filename": "api/views.py", "method": "update", "lineno": 12,
+                    "code": "    raise ValueError(name)",
+                    "locals": {"name": NAME, "dob": DOB, "data": PEDIGREE_DATA},
+                    "argspec": ["name"], "keywordspec": "kw", "varargspec": "args",
+                }],
+            }},
+        }}
 
     def test_everything_not_allowlisted_is_dropped(self):
-        hint = {"attachments": [NOTES]}
-        text = json.dumps(scrub_event(self._hostile_event(), hint))
+        text = json.dumps(scrub_payload(self._hostile_payload()))
         for secret in SECRETS + [self.UUID, "203.0.113.9", "hospital.example", "clinic-server-7"]:
             self.assertNotIn(secret, text)
-        self.assertNotIn("vars", text)
-        self.assertEqual(hint["attachments"], [])
+        self.assertNotIn("locals", text)
+        self.assertNotIn("argspec", text)
+
+    def test_a_message_item_keeps_only_its_text(self):
+        payload = {"access_token": FAKE_TOKEN, "data": {
+            "body": {"message": {"body": f"saving '{NAME}'", "pedigree": PEDIGREE_DATA}},
+            "custom": {"pedigree": PEDIGREE_DATA},
+        }}
+        out = scrub_payload(payload)["data"]
+        self.assertEqual(out["body"], {"message": {"body": "saving [redacted]"}})
+
+    def test_route_of(self):
+        def req(route):
+            return mock.Mock(resolver_match=mock.Mock(route=route) if route is not None else None)
+
+        self.assertEqual(route_of(req("api/pedigrees/(?P<pk>[^/.]+)/$")), "/api/pedigrees/{pk}/")
+        self.assertEqual(route_of(req("api/tag-presets/<int:pk>/")), "/api/tag-presets/{pk}/")
+        # Shaped like a route but not one of ours: a typed path, not sent.
+        self.assertEqual(route_of(req(f"p/{SURNAME}/")), "[unmatched]")
+        self.assertEqual(route_of(req("api/health/")), "/api/health/")
+        self.assertEqual(route_of(req(None)), "[unmatched]")
+        self.assertEqual(route_of(object()), "[unmatched]")
 
     def test_scrub_text(self):
         cases = {
@@ -337,27 +335,27 @@ class ScrubEventTests(APITestCase):
 
 
 class ErrorReportingOffTests(APITestCase):
-    def test_no_dsn_or_debug_means_not_started(self):
+    def test_no_token_or_debug_means_not_started(self):
         with mock.patch.dict(sys.modules):
             with mock.patch("builtins.__import__", side_effect=AssertionError("imported")):
                 self.assertFalse(init_error_reporting(""))
                 self.assertFalse(init_error_reporting(None))
-                self.assertFalse(init_error_reporting(FAKE_DSN, debug=True))
+                self.assertFalse(init_error_reporting(FAKE_TOKEN, debug=True))
 
-    def test_a_mistyped_dsn_does_not_stop_django(self):
+    def test_a_mistyped_token_does_not_stop_django(self):
         with self.assertLogs("peded.error_reporting", level="WARNING"):
-            self.assertFalse(init_error_reporting("not a dsn"))
+            self.assertFalse(init_error_reporting("not a token"))
 
     def test_django_starts_without_loading_the_sdk(self):
-        # A fresh interpreter, because the tests above import sentry_sdk here.
-        if settings.DEBUG is False and getattr(__import__("site_config"), "SENTRY_DSN", ""):
+        # A fresh interpreter, because the tests above import rollbar here.
+        if settings.DEBUG is False and getattr(__import__("site_config"), "ROLLBAR_ACCESS_TOKEN", ""):
             self.skipTest("this machine's site config turns error reporting on")
         code = (
             "import sys, django, os;"
             "os.environ['DJANGO_SETTINGS_MODULE']='peded.settings';"
             "django.setup();"
             "import peded.urls;"
-            "loaded=[m for m in sys.modules if m.split('.')[0]=='sentry_sdk'];"
+            "loaded=[m for m in sys.modules if m.split('.')[0]=='rollbar'];"
             "sys.exit(1 if loaded else 0)"
         )
         result = subprocess.run(

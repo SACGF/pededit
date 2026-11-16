@@ -1,25 +1,25 @@
 /**
  * Error reporting (#49): the part that is always in the bundle, a few lines.
- * With no DSN in the build it does nothing: no listener, no request, and the
+ * With no Rollbar token in the build it does nothing: no listener, no request, and the
  * reporter chunk (`reporter.ts`, `scrub.ts`) is never fetched. What a report
  * contains is decided in `scrub.ts`, and only there.
  */
-import { SENTRY_DSN, SENTRY_ENVIRONMENT } from "../config";
+import { ROLLBAR_ACCESS_TOKEN, ROLLBAR_ENVIRONMENT } from "../config";
 import { BUILD_DATE } from "../utils/buildInfo";
 
 type Extra = { mechanism: "onerror" | "unhandledrejection" | "react"; componentStack?: string | null };
 type Send = (thrown: unknown, extra: Extra) => unknown;
 
-export const errorReportingOn = SENTRY_DSN !== "";
+export const errorReportingOn = ROLLBAR_ACCESS_TOKEN !== "";
 
-/** The build date, never the commit (see `utils/buildInfo.ts`). `vite build` prints it for source map uploads. */
+/** The build date, never the commit (see `utils/buildInfo.ts`). Sent as the code version Rollbar files source maps under. */
 export const RELEASE = `pededit-frontend@${BUILD_DATE ?? "dev"}`;
 
 let reporter: Promise<Send> | null = null;
 
 function load(): Promise<Send> {
   reporter ??= import("./reporter").then((m) =>
-    m.createReporter({ dsn: SENTRY_DSN, release: RELEASE, environment: SENTRY_ENVIRONMENT }),
+    m.createReporter({ accessToken: ROLLBAR_ACCESS_TOKEN, release: RELEASE, environment: ROLLBAR_ENVIRONMENT }),
   );
   return reporter;
 }

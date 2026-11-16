@@ -267,7 +267,7 @@ the flow. They run in CI.
 | `person-tab-saves` | typing on the Person tab, auto-save, reload |
 | `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
 | `example-link` | `/example/<slug>` (#150): one new pedigree per visit, Back makes no extra copy, unknown slug, the landing page's links |
-| `error-reporting-off` | with no Sentry DSN, an uncaught error sends no request off the site and loads no reporter (#49) |
+| `error-reporting-off` | with no Rollbar token, an uncaught error sends no request off the site and loads no reporter (#49) |
 | `rejected-token` | a sign-in token the server rejects: one refresh, then signed out on the same page, and a pedigree's link still opens (#191) |
 | `rate-limited` | spends a test address's anonymous-create allowance, then the landing page, an example link and GitHub sign-in say how long to wait (#184) |
 | `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |

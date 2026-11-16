@@ -84,7 +84,8 @@ THROTTLE_RATES = {**DEFAULT_THROTTLE_RATES, **_cfg.get("throttle_rates", {})}
 NUM_PROXIES = _cfg.get("num_proxies", 1)
 
 # ── Error reporting (peded/error_reporting.py, #49) ──────────────────────────
-# Off without a DSN, and whenever debug is on. sentry_frontend_dsn is not read
-# here: deploy.sh passes it to the frontend build.
-SENTRY_DSN         = _cfg.get("sentry_dsn", "")
-SENTRY_ENVIRONMENT = _cfg.get("sentry_environment", "production")
+# Off without a token, and whenever debug is on. rollbar_access_token is the
+# project's post_server_item token. rollbar_client_access_token
+# (post_client_item) is not read here: deploy.sh passes it to the frontend build.
+ROLLBAR_ACCESS_TOKEN = _cfg.get("rollbar_access_token", "")
+ROLLBAR_ENVIRONMENT  = _cfg.get("rollbar_environment", "production")

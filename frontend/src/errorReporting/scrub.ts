@@ -71,7 +71,7 @@ export function routeOf(pathname: string): string {
 
 /**
  * A script URL from a stack frame: kept only when it is one of our own
- * scripts, as origin and path (which is what Sentry needs to find the source
+ * scripts, as origin and path (which is what Rollbar needs to find the source
  * map). Browser extensions, blob: and inline code become "[external]".
  */
 export function scrubScriptUrl(url: string, origin: string): string {
@@ -86,10 +86,9 @@ export function scrubScriptUrl(url: string, origin: string): string {
 
 export interface Frame {
   filename: string;
-  function?: string;
+  method?: string;
   lineno?: number;
   colno?: number;
-  in_app: boolean;
 }
 
 // "    at fn (url:1:2)", "    at async fn (url:1:2)", "    at url:1:2"
@@ -98,7 +97,7 @@ const V8_FRAME = /^\s*at (?:(.+?) \()?((?:[a-z][a-z0-9+.-]*:)?\/\/?[^\s()]+?):(\
 const GECKO_FRAME = /^\s*([^@\s]*)@((?:[a-z][a-z0-9+.-]*:)?\/\/?[^\s]+?):(\d+):(\d+)\s*$/i;
 
 /**
- * Frames from `error.stack`, oldest first as Sentry wants. A line that is not
+ * Frames from `error.stack`, oldest first as Rollbar wants. A line that is not
  * a frame is dropped: in Chrome the first line repeats the message, and that
  * must not get past `scrubText` this way.
  */
@@ -109,9 +108,9 @@ export function parseStack(stack: unknown, origin: string): Frame[] {
     const m = V8_FRAME.exec(line) ?? GECKO_FRAME.exec(line);
     if (!m) continue;
     const filename = scrubScriptUrl(m[2], origin);
-    const frame: Frame = { filename, in_app: filename !== "[external]" };
+    const frame: Frame = { filename };
     const fn = m[1]?.trim();
-    if (fn && FUNCTION_NAME.test(fn)) frame.function = fn.replace(UUID, ID_PLACEHOLDER);
+    if (fn && FUNCTION_NAME.test(fn)) frame.method = fn.replace(UUID, ID_PLACEHOLDER);
     if (filename !== "[external]") {
       frame.lineno = Number(m[3]);
       frame.colno = Number(m[4]);
@@ -148,35 +147,45 @@ export interface ReportContext {
   eventId?: string;
 }
 
+/** A Rollbar item's `data` (https://docs.rollbar.com/reference/create-item). */
 export interface Report {
-  event_id: string;
+  uuid: string;
   timestamp: number;
-  platform: "javascript";
-  level: "error";
-  release: string;
   environment: string;
-  transaction: string;
+  level: "error";
+  platform: "browser";
+  language: "javascript";
+  framework: "browser-js";
+  code_version: string;
+  /** The route pattern, shown on the item in Rollbar. */
+  context: string;
   request: { url: string };
-  exception: {
-    values: [{
-      type: string;
-      value: string;
-      mechanism: { type: Mechanism; handled: boolean };
-      stacktrace: { frames: Frame[] };
-    }];
+  body: {
+    trace: {
+      frames: Frame[];
+      exception: { class: string; message: string };
+    };
   };
-  extra?: { components: string[] };
-  sdk: { name: string; version: string; settings: { infer_ip: "never" } };
-  user: Record<string, never>;
+  custom: { mechanism: Mechanism; handled: boolean; components?: string[] };
+  /** Tells Rollbar to fetch the source map named by each script (vite.config.ts). */
+  client: { javascript: { code_version: string; source_map_enabled: true; guess_uncaught_frames: true } };
+  notifier: { name: "pededit.reporter"; version: "1" };
 }
 
-function newEventId(): string {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+function newUuid(): string {
+  const b = new Uint8Array(16);
+  crypto.getRandomValues(b);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const hex = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-/** The whole report for one thrown value. Every field is set here and nowhere else. */
+/**
+ * The whole report for one thrown value. Every field is set here and nowhere
+ * else. There is no `person` and no `request.user_ip`: Rollbar records the
+ * sender's address only when a report asks it to.
+ */
 export function buildReport(thrown: unknown, ctx: ReportContext): Report {
   const isObject = typeof thrown === "object" && thrown !== null;
   const read = (key: "name" | "message" | "stack"): unknown => {
@@ -191,25 +200,28 @@ export function buildReport(thrown: unknown, ctx: ReportContext): Report {
   const components = componentNames(ctx.componentStack);
 
   return {
-    event_id: ctx.eventId ?? newEventId(),
-    timestamp: (ctx.now ?? new Date()).getTime() / 1000,
-    platform: "javascript",
-    level: "error",
-    release: ctx.release,
+    uuid: ctx.eventId ?? newUuid(),
+    timestamp: Math.floor((ctx.now ?? new Date()).getTime() / 1000),
     environment: ctx.environment,
-    transaction: route,
+    level: "error",
+    platform: "browser",
+    language: "javascript",
+    framework: "browser-js",
+    code_version: ctx.release,
+    context: route,
     request: { url: ctx.origin + route },
-    exception: {
-      values: [{
-        type,
-        value: scrubText(message),
-        mechanism: { type: ctx.mechanism, handled: ctx.mechanism === "react" },
-        stacktrace: { frames: parseStack(read("stack"), ctx.origin) },
-      }],
+    body: {
+      trace: {
+        frames: parseStack(read("stack"), ctx.origin),
+        exception: { class: type, message: scrubText(message) },
+      },
     },
-    ...(components.length ? { extra: { components } } : {}),
-    // Without this Sentry records the sender's IP address as the user.
-    sdk: { name: "pededit.reporter", version: "1", settings: { infer_ip: "never" } },
-    user: {},
+    custom: {
+      mechanism: ctx.mechanism,
+      handled: ctx.mechanism === "react",
+      ...(components.length ? { components } : {}),
+    },
+    client: { javascript: { code_version: ctx.release, source_map_enabled: true, guess_uncaught_frames: true } },
+    notifier: { name: "pededit.reporter", version: "1" },
   };
 }

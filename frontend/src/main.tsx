@@ -12,7 +12,7 @@ if (import.meta.env.DEV) {
   void import("./devHooks");
 }
 
-// Does nothing unless the build was given a Sentry DSN (#49).
+// Does nothing unless the build was given a Rollbar access token (#49).
 initErrorReporting();
 
 createRoot(document.getElementById("root")!).render(

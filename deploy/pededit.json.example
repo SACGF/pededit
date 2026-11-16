@@ -12,7 +12,7 @@
   "github_client_id": "",
   "github_client_secret": "",
 
-  "sentry_dsn": "",
-  "sentry_frontend_dsn": "",
-  "sentry_environment": "production"
+  "rollbar_access_token": "",
+  "rollbar_client_access_token": "",
+  "rollbar_environment": "production"
 }

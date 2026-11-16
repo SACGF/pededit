@@ -66,16 +66,16 @@ function servedCommitPlugin(): Plugin {
 }
 
 /**
- * Error reporting (#49): when the build has a DSN, print the release name the
- * reports will carry, which is what a source map upload has to be filed under
- * (INSTALL.md, "Error reporting").
+ * Error reporting (#49): when the build has a Rollbar token, print the code
+ * version the reports will carry, which is what Rollbar files source maps
+ * under (INSTALL.md, "Error reporting").
  */
 function errorReportingReleasePlugin(buildDate: string): Plugin {
   return {
     name: "pededit-error-reporting-release",
     apply: "build",
     closeBundle() {
-      if (process.env.VITE_SENTRY_DSN) console.log(`\nError reporting is on. Release: pededit-frontend@${buildDate}`);
+      if (process.env.VITE_ROLLBAR_ACCESS_TOKEN) console.log(`\nError reporting is on. Code version: pededit-frontend@${buildDate}`);
     },
   };
 }
@@ -85,9 +85,10 @@ const BUILD_DATE = new Date().toISOString();
 export default defineConfig({
   plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE)],
   // Source maps are published beside the scripts (#49). The code is public
-  // anyway, browsers fetch them only with developer tools open, and Sentry
-  // reads them from the site to turn a minified stack into source lines, so
-  // readable error reports need no upload step and no Sentry token.
+  // anyway, browsers fetch them only with developer tools open, and Rollbar
+  // downloads them from the site (each report sets source_map_enabled) to
+  // turn a minified stack into source lines, so readable error reports need
+  // no upload step and no server token in the build.
   build: { sourcemap: true },
   // Shown as "Last deployed" in the footer and on /changelog (#79). Production
   // builds run in deploy.sh, so build time is deploy time.
