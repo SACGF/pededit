@@ -1,6 +1,7 @@
 import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, ROW_HEIGHT } from "./constants";
 import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
+import { highestDuplicateArc } from "./couplePath";
 import { kinshipOf } from "./relatedness";
 import { nameCoupleRelationship } from "./relationship";
 
@@ -222,6 +223,16 @@ export function consanguinityLabelPlacements(flow: {
 /** The highest point any couple label reaches, or Infinity when there is none. */
 export function highestConsanguinityLabel(flow: Parameters<typeof consanguinityLabelPlacements>[0]): number {
   return Math.min(Infinity, ...consanguinityLabelPlacements(flow).map(p => consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy)));
+}
+
+/**
+ * The highest point of anything drawn over the symbols, or Infinity when
+ * there is nothing: the couple labels (#97) and the dashed arcs between two
+ * copies of someone (#172). The chart title is raised to clear it, on the
+ * canvas (`chartTitleNode`) and in the export (`computeBounds`).
+ */
+export function highestAboveSymbols(flow: Parameters<typeof consanguinityLabelPlacements>[0] & Parameters<typeof highestDuplicateArc>[0]): number {
+  return Math.min(highestConsanguinityLabel(flow), highestDuplicateArc(flow, NODE_SIZE / 2));
 }
 
 /**

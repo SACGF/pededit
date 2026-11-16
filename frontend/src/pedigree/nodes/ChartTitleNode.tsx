@@ -19,8 +19,9 @@ const LINE_HEIGHT = TITLE_FONT_SIZE + 4;
 /**
  * The title node centred over the symbols, its baseline TITLE_GAP (plus room
  * for a deceased slash) above the highest one, as in the SVG export.
- * `aboveTop` is the highest point of anything drawn over the symbols (the
- * consanguinity labels of #97); the title is raised to clear it.
+ * `aboveTop` is the highest point of anything drawn over the symbols
+ * (`highestAboveSymbols`: the consanguinity labels of #97 and the dashed
+ * arcs between two copies of someone, #172); the title is raised to clear it.
  */
 export function chartTitleNode(
   title: string,

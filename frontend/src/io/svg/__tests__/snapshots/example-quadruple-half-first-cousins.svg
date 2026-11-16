@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="601" height="505"
-     viewBox="0 0 601 505">
+<svg xmlns="http://www.w3.org/2000/svg" width="601" height="533"
+     viewBox="0 0 601 533">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
           refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="601" height="505" fill="white"/>
+<rect width="601" height="533" fill="white"/>
 <text class="chart-title" x="300.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
-<g transform="translate(60 100)">
+<g transform="translate(60 128)">
 <g class="couple-lines">
 <path d="M 20 0 L 60 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 20 0 L 30 0 L 30 -28 L 130 -28 L 130 0 L 140 0" stroke="black" stroke-width="2" fill="none"/>
@@ -102,7 +102,7 @@
 <g class="consanguinity-labels">
 </g>
 </g>
-<g class="pedigree-key" transform="translate(0 425)">
+<g class="pedigree-key" transform="translate(0 453)">
 <rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
 <path d="M 41 36 Q 48 18 55 36" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
 </g>

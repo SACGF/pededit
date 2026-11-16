@@ -22,6 +22,8 @@
  *                          runs into a symbol, a line, other text, a copy number
  *                          or a dashed arc between two copies (unless the label
  *                          is on a white backing, #109)
+ *   title-collides         the chart title is drawn through a dashed arc between
+ *                          two copies, a consanguinity label or a symbol (#172)
  *
  * PNG and PDF are rasterised from this SVG, so the lint covers them too. The
  * U-shape export has its own geometry and is not checked here.
@@ -36,7 +38,7 @@ import { placementParentOf, type Pedigree } from "@pedigree-editor/layout-engine
 import { NODE_SIZE } from "../../pedigree/constants";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { FlowData } from "../../pedigree/layoutToFlow";
-import { textWidth } from "../../pedigree/labels";
+import { textWidth, titleWidth } from "../../pedigree/labels";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
@@ -57,7 +59,8 @@ export type ExportLintCode =
   | "child-wrong-parents"
   | "assisted-not-drawn"
   | "labels-overlap"
-  | "consanguinity-label-collides";
+  | "consanguinity-label-collides"
+  | "title-collides";
 
 export interface ExportLintFinding {
   code: ExportLintCode;
@@ -90,6 +93,8 @@ interface Parsed {
   copyNumbers: { x: number; y: number; text: string }[];
   /** White backings behind consanguinity labels on a dashed arc (#109), as [x1, y1, x2, y2]. */
   coupleBackings: [number, number, number, number][];
+  /** The chart title (`class="chart-title"`): its centre on the baseline, and the text. */
+  titles: { x: number; y: number; text: string }[];
   /** False when the SVG has none of the groups exportSvg writes. */
   structured: boolean;
   /** Offset of the pedigree group: canvas coordinates plus this give SVG coordinates. */
@@ -110,7 +115,7 @@ function polyline(d: string): Pt[] | null {
 
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
-  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], duplicateArcs: [], copyNumbers: [], coupleBackings: [], structured: false, origin: [0, 0] };
+  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], duplicateArcs: [], copyNumbers: [], coupleBackings: [], titles: [], structured: false, origin: [0, 0] };
   type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
@@ -160,6 +165,12 @@ export function parseExportSvg(svg: string): Parsed {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
       textInto = out.copyNumbers;
+    }
+    // The chart title is outside every group, on purpose: it is not a label.
+    if (name === "text" && attrs.class === "chart-title" && !skipped()) {
+      textStart = m.index + m[0].length;
+      textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
+      textInto = out.titles;
     }
     if (name === "rect" && g === "consanguinity-labels" && !skipped()) {
       const n = (k: string) => Number(attrs[k]);
@@ -473,6 +484,19 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     const twin = coupleBoxes.find((o, j) => j !== i && overlaps(box, o.box));
     if (twin) hit(`the label "${twin.t.text}"`);
   });
+
+  // 6. The chart title (#172): nothing drawn over the top row may reach it.
+  for (const t of parsed.titles) {
+    const box = textBox(t, titleWidth(t.text), 10);
+    const hit = (what: string) => out.push({ code: "title-collides", message: `the chart title "${t.text}" is drawn through ${what}`, individuals: [] });
+    const sym = parsed.symbols.find(([x, y]) => overlaps(box, [x - half - 4, y - half - 4, x + half + 4, y + half]));
+    if (sym) hit(`the symbol at ${at(toCanvas(sym))}`);
+    else if (arcSegs.some(s => overlaps(box, segBox(s)))) hit("a dashed arc between two copies");
+    else {
+      const label = coupleBoxes.find(o => overlaps(box, o.box));
+      if (label) hit(`the label "${label.t.text}" above a double line`);
+    }
+  }
   return out;
 }
 

@@ -501,8 +501,10 @@ draws NSGC symbols.
   deceased slash, or above the line where it hops higher.
   `ConsanguineousEdge` and `svgExporter` (group `consanguinity-labels`)
   draw it from `consanguinityLabelBaselines`; both raise the chart title
-  over a top-row label (`highestConsanguinityLabel`, `chartTitleNode`'s
-  `aboveTop`). Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
+  over a top-row label and over the dashed arc of someone drawn twice in
+  the top row (#172), through one helper (`highestAboveSymbols`, passed as
+  `chartTitleNode`'s `aboveTop` and to the export's `computeBounds`):
+  anything new drawn above the top row's symbols belongs in it. Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
   hands it every obstacle near a label as a box (`TextBlock`): the text
   under each symbol as the export writes it (`labelBlock.ts`, lower and
   taller than the canvas's, so clear there means clear on the canvas too),

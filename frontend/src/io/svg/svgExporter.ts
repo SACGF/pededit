@@ -9,7 +9,7 @@ import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { PersonGlyph } from "../../pedigree/personGlyph";
 import {
-  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
+  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestAboveSymbols,
 } from "../../pedigree/consanguinityLabel";
 import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT } from "../../pedigree/labelBlock";
 import type { FlowData } from "../../pedigree/layoutToFlow";
@@ -101,7 +101,8 @@ function computeBounds(
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
-  // Consanguinity labels (#97) over the top row reach above the symbols.
+  // Consanguinity labels (#97) and the dashed arcs between two copies of
+  // someone (#172) over the top row reach above the symbols.
   const aboveExtra = Math.max(0, Math.ceil(rawMinY - NODE_SIZE / 2 - aboveTop));
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
@@ -316,7 +317,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
   const duplicates = flow.duplicateEdges.length > 0;
-  const bounds  = computeBounds(working, flow.nodes.map(n => n.data.glyph), slotPos, options, highestConsanguinityLabel(flow), duplicates);
+  const bounds  = computeBounds(working, flow.nodes.map(n => n.data.glyph), slotPos, options, highestAboveSymbols(flow), duplicates);
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [

@@ -35,7 +35,7 @@ import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { assistedEdgeSegment } from "./assisted";
 import { symbolTopInset } from "./lifeStatus";
 import { NODE_SIZE } from "./constants";
-import { highestConsanguinityLabel } from "./consanguinityLabel";
+import { highestAboveSymbols } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { PickingBanner } from "./PickingBanner";
@@ -353,8 +353,8 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   const pedigreeName = useAppStore(s => s.activeTitle);
   const title = chartTitle(pedigree, pedigreeName);
   const titleNode = useMemo(
-    () => chartTitleNode(title, computedNodes, highestConsanguinityLabel({ nodes: computedNodes, coupleEdges })),
-    [title, computedNodes, coupleEdges],
+    () => chartTitleNode(title, computedNodes, highestAboveSymbols({ nodes: computedNodes, coupleEdges, duplicateEdges })),
+    [title, computedNodes, coupleEdges, duplicateEdges],
   );
   const flowNodes = titleNode ? [...rfNodes, titleNode as unknown as Node<RFNodeData>] : rfNodes;
   const fitExpected = useMemo(

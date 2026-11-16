@@ -94,3 +94,22 @@ export function consanguineousPathsD(
     couplePathD(x1, y1 + h, x2, y2 + h, hopHeight - gap, inset + h),
   ];
 }
+
+/**
+ * The highest point any dashed arc between two copies reaches, or Infinity
+ * when there is none. An arc on one row rises `bulge` above the symbols, so
+ * in the top row it is the highest thing drawn (#172).
+ */
+export function highestDuplicateArc(flow: {
+  nodes: { id: string; position: { x: number; y: number } }[];
+  duplicateEdges: { source: string; target: string; data?: { bulge?: number } }[];
+}, half: number): number {
+  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  let top = Infinity;
+  for (const e of flow.duplicateEdges) {
+    const a = pos.get(e.source), b = pos.get(e.target);
+    if (!a || !b) continue;
+    for (const [, y] of duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half)) top = Math.min(top, y);
+  }
+  return top;
+}

@@ -166,7 +166,12 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
   `symbols`, `labels`, `consanguinity-labels`, whose white `<rect>` marks a
   label the dashed arcs may pass behind, #109) and `class="mark"` on lines that join nobody
-  (childless and twin marks). It never writes ids into the SVG: symbols are
+  (childless and twin marks). The chart title is outside the `labels` group
+  on purpose (it is not a label), so it has a check of its own,
+  `title-collides` (#172): the `class="chart-title"` text against the
+  symbols, the dashed arcs and the consanguinity labels. The canvas title
+  is a React Flow node outside `layoutToFlow`'s output and has no lint; it
+  is placed by the same `highestAboveSymbols`. It never writes ids into the SVG: symbols are
   matched to people by position, because an id can be a name after a PED
   import and must not leak from a de-identified export.
 - `pngExporter.ts` — rasterises the SVG via canvas at a chosen DPI (#18),

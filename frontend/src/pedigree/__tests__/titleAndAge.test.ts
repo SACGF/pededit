@@ -3,10 +3,12 @@ import { chartTitle, detailLines, labelMaxWidth, titleWidth, DEFAULT_PEDIGREE_NA
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
-import { SLOT_WIDTH } from "../constants";
+import { NODE_SIZE, SLOT_WIDTH } from "../constants";
+import { highestDuplicateArc } from "../couplePath";
+import { highestAboveSymbols } from "../consanguinityLabel";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
-import { lintExport } from "../../io/svg/exportLint";
+import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
 import { deidentify } from "../../io/svg/deidentify";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
@@ -127,6 +129,64 @@ describe("chart title (#20)", () => {
       expect(width).toBeGreaterThanOrEqual(titleWidth(title));
     }
     expect(lintExport(family(), { title })).toEqual([]);
+  });
+
+  /** Quadruple half first cousins: A and C each have children with B and with D, so the founder row draws people twice. */
+  function drawnTwiceInTopRow(): Pedigree {
+    const ind = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+    return {
+      individuals: [ind("A", "male"), ind("B", "female"), ind("C", "male"), ind("D", "female"),
+                    ind("F1", "male"), ind("M1", "female"), ind("F2", "male"), ind("M2", "female"),
+                    ind("X", "male"), ind("Y", "female")],
+      partnerships: [
+        { id: "ab", individual1: "A", individual2: "B" }, { id: "cd", individual1: "C", individual2: "D" },
+        { id: "ad", individual1: "A", individual2: "D" }, { id: "cb", individual1: "C", individual2: "B" },
+        { id: "x", individual1: "F1", individual2: "M1" }, { id: "y", individual1: "F2", individual2: "M2" },
+      ],
+      parentOf: { ab: ["F1"], cd: ["M1"], ad: ["F2"], cb: ["M2"], x: ["X"], y: ["Y"] },
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+  }
+  const TITLE_Y = /(class="chart-title"[^>]* y=")([\d.]+)"/;
+  const TRANSLATE_Y = /<g transform="translate\([\d.e+-]+ ([\d.e+-]+)\)">/;
+
+  it("is raised above the dashed arc of someone drawn twice in the top row (#172)", () => {
+    const p = drawnTwiceInTopRow();
+    const flow = layoutToFlow(p);
+    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const arcTop = highestDuplicateArc(flow, NODE_SIZE / 2);
+    // The fixture does what it is for: an arc rises above the top row's symbols.
+    expect(arcTop).toBeLessThan(topRow - NODE_SIZE / 2 - 10);
+    expect(highestAboveSymbols(flow)).toBe(arcTop);
+
+    // Canvas: the bottom of the title box is above the top of the arc.
+    const node = chartTitleNode("Quadruple half first cousins", flow.nodes, highestAboveSymbols(flow))!;
+    expect(node.position.y + node.height! / 2).toBeLessThan(arcTop);
+
+    // Export: the title's baseline is above the arc, and the lint agrees.
+    const options = { title: "Quadruple half first cousins" };
+    const svg = exportSvg(p, options);
+    const titleY = Number(TITLE_Y.exec(svg)![2]);
+    const translateY = Number(TRANSLATE_Y.exec(svg)![1]);
+    expect(titleY).toBeLessThan(arcTop + translateY - 10);
+    expect(lintExport(p, options)).toEqual([]);
+  });
+
+  it("the export lint catches a title drawn through an arc or a symbol (#172)", () => {
+    const p = drawnTwiceInTopRow();
+    const flow = layoutToFlow(p);
+    const svg = exportSvg(p, { title: "Quadruple half first cousins" });
+    const moved = (dy: number) => svg.replace(TITLE_Y, (_m, pre: string, y: string) => `${pre}${Number(y) + dy}"`);
+    const messages = (s: string) => lintExportSvg(p, flow, s).filter(f => f.code === "title-collides").map(f => f.message).join();
+    expect(messages(svg)).toBe("");
+    // Where the title was before the fix: the arc's height lower.
+    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const bulge = topRow - NODE_SIZE / 2 - highestDuplicateArc(flow, NODE_SIZE / 2);
+    expect(messages(moved(bulge))).toContain("is drawn through a dashed arc between two copies");
+    // Lower still, onto the symbols.
+    const titleY = Number(TITLE_Y.exec(svg)![2]);
+    const translateY = Number(TRANSLATE_Y.exec(svg)![1]);
+    expect(messages(moved(topRow + translateY - titleY))).toContain("is drawn through the symbol at");
   });
 
   it("JSON carries chartTitle and the importer checks its type", () => {

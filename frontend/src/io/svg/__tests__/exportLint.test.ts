@@ -12,6 +12,9 @@ describe("export lint over every example", () => {
     it(`${ex.label} exports cleanly, normal, compact and de-identified`, () => {
       expect(summary(ex.data)).toEqual([]);
       expect(summary(ex.data, { compact: true })).toEqual([]);
+      // With the chart title, which nothing over the top row may reach (#172).
+      expect(summary(ex.data, { title: ex.label })).toEqual([]);
+      expect(summary(ex.data, { title: ex.label, compact: true })).toEqual([]);
       expect(summary(ex.data, { deidentify: true, title: "T" })).toEqual([]);
       // Pedigree numbers before the names (#8).
       const numbered = { ...ex.data, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...ex.data.canvasSettings, showNumbers: true } };
