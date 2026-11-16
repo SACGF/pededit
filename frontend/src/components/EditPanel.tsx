@@ -1,10 +1,10 @@
 import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Legend } from "./Legend";
+import { Legend, SectionHeader } from "./Legend";
 import { ConditionsAndTags } from "./ConditionsAndTags";
 import { SelectionPanel } from "./SelectionPanel";
-import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
+import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { coupleChildren } from "../pedigree/sameSex";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
@@ -124,148 +124,32 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
   const withConditions = conditionMode(pedigree) !== "plain";
   // Editor warnings (#116) on a field: highlighted, with the message under it.
   const problemsOn = (field: ProblemField) => ({ problemFor: individual.id, problemField: field, problems: fieldProblems(pedigree, individual.id, field) });
+  // The rarely set fields fold to one line while none is set for this person
+  // (#138). Opening them stays open across selections, since the form is
+  // not keyed by person. A warning on one of them opens them too.
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const showDetails = detailsOpen || hasDetails(pedigree, individual)
+    || (["lifeStatus", "reproductiveRole", "carriedBy"] as ProblemField[]).some(f => fieldProblems(pedigree, individual.id, f).length > 0);
 
+  // One list, most used first (#138): who and their status, then dates, then
+  // conditions, then the rarer fields. Headings only where a section is a
+  // list (conditions, evaluations, partners) or read-only (relatedness).
   return (
     <div className="space-y-4">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        Individual
-      </div>
-
-      <Field label="Name">
-        <Input
-          value={individual.name ?? ""}
-          onChange={e => updateIndividual(individual.id, { name: e.target.value })}
-          className="h-7 text-sm"
-          placeholder="Full name"
-        />
-      </Field>
-
-      {/* Text, not the browser date picker, so a year alone can be entered (#104), as for death (#103). */}
-      <Field label="Date of birth" {...problemsOn("dob")}>
-        <Input
-          value={individual.dob ?? ""}
-          aria-label="Date of birth"
-          onChange={e => updateIndividual(individual.id, { dob: e.target.value.trim() ? e.target.value : undefined })}
-          className="h-7 text-sm"
-          placeholder="YYYY or YYYY-MM-DD"
-        />
-      </Field>
-
-      {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
-      <Field label="Date of death" {...problemsOn("dod")}>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1 text-xs text-gray-600 cursor-pointer shrink-0">
-            <input
-              type="checkbox"
-              name="deceased"
-              checked={!!individual.deceased}
-              onChange={e => setDeceased(individual.id, e.target.checked)}
-              className="accent-black"
-            />
-            <span>Deceased</span>
-          </label>
+      <div className="space-y-2">
+        <Field inline label="Name">
           <Input
-            value={individual.dod ?? ""}
-            aria-label="Date of death"
-            onChange={e => setDateOfDeath(individual.id, e.target.value.trim() ? e.target.value : undefined)}
+            value={individual.name ?? ""}
+            aria-label="Name"
+            onChange={e => updateIndividual(individual.id, { name: e.target.value })}
             className="h-7 text-sm"
-            placeholder="YYYY or YYYY-MM-DD"
+            placeholder="Full name"
           />
-        </div>
-      </Field>
-
-      <Field label="Age" {...problemsOn("age")}>
-        <Input
-          value={individual.age ?? ""}
-          onChange={e => updateIndividual(individual.id, { age: e.target.value || undefined })}
-          className="h-7 text-sm"
-          placeholder="e.g. 50s, d. 72"
-          aria-label="Age"
-        />
-        {individual.age?.trim() && (individual.dob || (individual.deceased && individual.dod)) ? (
-          <p className="text-[10px] text-gray-500">Shown under the symbol in place of the years of birth and death.</p>
-        ) : !individual.age?.trim() && ageText(individual) ? (
-          <p className="text-[10px] text-gray-500">Shown under the symbol as "{ageText(individual)}" (NSGC prefers the year to the full date).</p>
-        ) : null}
-      </Field>
-
-      <Field label="Notes">
-        <textarea
-          value={individual.notes ?? ""}
-          onChange={e => updateIndividual(individual.id, { notes: e.target.value })}
-          className="w-full border rounded px-2 py-1 text-sm resize-none h-20 focus:outline-hidden focus:ring-1 focus:ring-black"
-          placeholder="Clinical notes"
-        />
-      </Field>
-
-      <Field label="Pregnancy / loss" {...problemsOn("lifeStatus")}>
-        <select
-          value={individual.lifeStatus ?? ""}
-          disabled={isLifeStatusLocked}
-          title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
-          onChange={e => setLifeStatus(individual.id, (e.target.value || undefined) as LifeStatus | undefined)}
-          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black disabled:opacity-50"
-        >
-          <option value="">None</option>
-          {LIFE_STATUS_OPTIONS.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      </Field>
-
-      <Field label="Adoption">
-        <select
-          value={individual.adopted ?? ""}
-          aria-label="Adoption"
-          onChange={e => setAdopted(individual.id, (e.target.value || undefined) as Adoption | undefined)}
-          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-        >
-          <option value="">None</option>
-          {ADOPTION_OPTIONS.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        {individual.adopted === "in" && (
-          <p className="text-[10px] text-gray-500">Brackets round the symbol, dashed line to the adoptive parents.</p>
-        )}
-        {individual.adopted === "out" && (
-          <p className="text-[10px] text-gray-500">Brackets round the symbol, solid line to the biological parents.</p>
-        )}
-      </Field>
-
-      {!individual.lifeStatus && (
-        <Field label="Gender identity">
-          <select
-            name="genderIdentity"
-            value={individual.genderIdentity ?? ""}
-            aria-label="Gender identity"
-            onChange={e => updateIndividual(individual.id, { genderIdentity: (e.target.value || undefined) as GenderIdentity | undefined })}
-            className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-          >
-            <option value="">Not recorded</option>
-            {GENDER_IDENTITY_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-          {individual.genderIdentity && (
-            <p className="text-[10px] text-gray-500" data-testid="gender-identity-note">
-              {drawsGender(individual, pedigree)
-                ? `The symbol shows gender identity${assignedAtBirthText(individual, pedigree) ? `, with ${assignedAtBirthText(individual, pedigree)} under it` : ""}.`
-                : "Recorded only: symbols show biological sex (Settings)."}
-              {" "}Genetics always uses sex ({individual.sex}).
-            </p>
-          )}
         </Field>
-      )}
 
-      <AssistedForm key={individual.id} individual={individual} problemsOn={problemsOn} />
+        <SexControl individual={individual} />
 
-      <div className="border-t pt-3 space-y-2">
-        <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-          Status
-        </div>
-        <div className="text-xs text-gray-600 space-y-1">
-          <SexControl individual={individual} />
+        <div className="text-xs text-gray-600 space-y-1" data-testid="status">
           {withConditions ? (
             <PlainStatusForm individual={individual} problemsOn={problemsOn} />
           ) : (
@@ -300,7 +184,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
                     else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
                     else setCarrier(individual.id, false);
                   }}
-                  className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+                  className="w-full min-w-0 h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
                 >
                   <option value="">No</option>
                   <option value="carrier">{notationOf(pedigree) === "nsgc2008" ? "Carrier (dot)" : "Carrier (half patterned)"}</option>
@@ -317,6 +201,17 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
               Not drawn: the affected fill replaces the carrier mark. Use a gene result tag to show it.
             </p>
           )}
+          {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              name="deceased"
+              checked={!!individual.deceased}
+              onChange={e => setDeceased(individual.id, e.target.checked)}
+              className="accent-black"
+            />
+            <span>Deceased</span>
+          </label>
           <label className="flex items-center gap-2 cursor-pointer" title="Draws a ? above the symbol (NSGC)">
             <input
               type="checkbox"
@@ -327,30 +222,69 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
             />
             <span>Family history not known</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer" title={probandTitle(pedigree, individual)}>
-            <input
-              type="checkbox"
-              name="proband"
-              checked={!!individual.proband}
-              onChange={() => setProband(individual.id)}
-              className="accent-black"
-            />
-            <span>Proband</span>
-          </label>
-          <ProblemHighlight {...problemsOn("consultand")}>
-            <label className="flex items-center gap-2 cursor-pointer" title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P.">
+          <div className="flex items-start gap-4">
+            <label className="flex items-center gap-2 cursor-pointer" title={probandTitle(pedigree, individual)}>
               <input
                 type="checkbox"
-                name="consultand"
-                checked={!!individual.consultand}
-                onChange={e => setConsultand(individual.id, e.target.checked)}
+                name="proband"
+                checked={!!individual.proband}
+                onChange={() => setProband(individual.id)}
                 className="accent-black"
               />
-              <span>Consultand</span>
+              <span>Proband</span>
             </label>
-          </ProblemHighlight>
-          {individual.lifeStatus && <div className="font-medium">{lifeStatusLabel(individual.lifeStatus)}</div>}
+            <ProblemHighlight {...problemsOn("consultand")}>
+              <label className="flex items-center gap-2 cursor-pointer" title="The person seeking counselling: an arrow without the P. A proband who is also the consultand keeps the P.">
+                <input
+                  type="checkbox"
+                  name="consultand"
+                  checked={!!individual.consultand}
+                  onChange={e => setConsultand(individual.id, e.target.checked)}
+                  className="accent-black"
+                />
+                <span>Consultand</span>
+              </label>
+            </ProblemHighlight>
+          </div>
         </div>
+
+        {/* Text, not the browser date picker, so a year alone can be entered (#104), as for death (#103). */}
+        <Field inline label="Born" {...problemsOn("dob")}>
+          <Input
+            value={individual.dob ?? ""}
+            aria-label="Date of birth"
+            title="Date of birth: a year alone (YYYY) or a full date (YYYY-MM-DD)"
+            onChange={e => updateIndividual(individual.id, { dob: e.target.value.trim() ? e.target.value : undefined })}
+            className="h-7 text-xs"
+            placeholder="YYYY(-MM-DD)"
+          />
+        </Field>
+
+        <Field inline label="Died" {...problemsOn("dod")}>
+          <Input
+            value={individual.dod ?? ""}
+            aria-label="Date of death"
+            title="Date of death: a year alone (YYYY) or a full date (YYYY-MM-DD). Entering one ticks Deceased."
+            onChange={e => setDateOfDeath(individual.id, e.target.value.trim() ? e.target.value : undefined)}
+            className="h-7 text-xs"
+            placeholder="YYYY(-MM-DD)"
+          />
+        </Field>
+
+        <Field inline label="Age" {...problemsOn("age")}>
+          <Input
+            value={individual.age ?? ""}
+            onChange={e => updateIndividual(individual.id, { age: e.target.value || undefined })}
+            className="h-7 text-xs"
+            placeholder="e.g. 50s, d. 72"
+            aria-label="Age"
+          />
+          {individual.age?.trim() && (individual.dob || (individual.deceased && individual.dod)) ? (
+            <p className="text-[10px] text-gray-500">Shown under the symbol in place of the years of birth and death.</p>
+          ) : !individual.age?.trim() && ageText(individual) ? (
+            <p className="text-[10px] text-gray-500">Shown under the symbol as "{ageText(individual)}" (NSGC prefers the year to the full date).</p>
+          ) : null}
+        </Field>
       </div>
 
       <ConditionsAndTags
@@ -363,13 +297,108 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
       />
 
       <EvaluationsForm key={`evaluations-${individual.id}`} individual={individual} problems={problemsOn("evaluations")} />
-      <TwinsForm individual={individual} />
+
+      <div className="border-t pt-3 space-y-2">
+        <textarea
+          value={individual.notes ?? ""}
+          aria-label="Notes"
+          onChange={e => updateIndividual(individual.id, { notes: e.target.value })}
+          className="w-full border rounded px-2 py-1 text-sm resize-y h-14 focus:outline-hidden focus:ring-1 focus:ring-black"
+          placeholder="Notes"
+        />
+
+        {!showDetails ? (
+          <button
+            type="button"
+            data-testid="more-details"
+            onClick={() => setDetailsOpen(true)}
+            className="flex items-center gap-1 text-left text-xs text-gray-500 hover:text-black"
+          >
+            <ChevronRight size={12} className="shrink-0" />
+            Pregnancy, adoption, gender identity, donor, twin
+          </button>
+        ) : (<>
+        <Field inline label="Pregnancy / loss" {...problemsOn("lifeStatus")}>
+          <select
+            value={individual.lifeStatus ?? ""}
+            aria-label="Pregnancy / loss"
+            disabled={isLifeStatusLocked}
+            title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
+            onChange={e => setLifeStatus(individual.id, (e.target.value || undefined) as LifeStatus | undefined)}
+            className={`${SELECT} disabled:opacity-50`}
+          >
+            <option value="">None</option>
+            {LIFE_STATUS_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </Field>
+
+        <Field inline label="Adoption">
+          <select
+            value={individual.adopted ?? ""}
+            aria-label="Adoption"
+            onChange={e => setAdopted(individual.id, (e.target.value || undefined) as Adoption | undefined)}
+            className={SELECT}
+          >
+            <option value="">None</option>
+            {ADOPTION_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          {individual.adopted === "in" && (
+            <p className="text-[10px] text-gray-500">Brackets round the symbol, dashed line to the adoptive parents.</p>
+          )}
+          {individual.adopted === "out" && (
+            <p className="text-[10px] text-gray-500">Brackets round the symbol, solid line to the biological parents.</p>
+          )}
+        </Field>
+
+        {!individual.lifeStatus && (
+          <Field inline label="Gender identity">
+            <select
+              name="genderIdentity"
+              value={individual.genderIdentity ?? ""}
+              aria-label="Gender identity"
+              onChange={e => updateIndividual(individual.id, { genderIdentity: (e.target.value || undefined) as GenderIdentity | undefined })}
+              className={SELECT}
+            >
+              <option value="">Not recorded</option>
+              {GENDER_IDENTITY_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            {individual.genderIdentity && (
+              <p className="text-[10px] text-gray-500" data-testid="gender-identity-note">
+                {drawsGender(individual, pedigree)
+                  ? `The symbol shows gender identity${assignedAtBirthText(individual, pedigree) ? `, with ${assignedAtBirthText(individual, pedigree)} under it` : ""}.`
+                  : "Recorded only: symbols show biological sex (Settings)."}
+                {" "}Genetics always uses sex ({individual.sex}).
+              </p>
+            )}
+          </Field>
+        )}
+
+        <AssistedForm key={individual.id} individual={individual} problemsOn={problemsOn} />
+        <TwinsForm individual={individual} />
+        </>)}
+      </div>
+
       <RelatednessSection individual={individual} />
-      <EndedForm individual={individual} />
-      <CouplesForm individual={individual} />
+      <PartnersForm individual={individual} />
     </div>
   );
 }
+
+/** True when any of the folded fields (#138) is set for this person, so they show. */
+function hasDetails(pedigree: Pedigree, individual: Individual): boolean {
+  return !!(individual.lifeStatus || individual.adopted || individual.genderIdentity || individual.reproductiveRole
+    || individual.carriedBy || individual.socialParents?.length || twinSetOf(pedigree, individual.id)
+    || pedigree.partnerships.some(p => p.donorConception && (pedigree.parentOf[p.id] ?? []).includes(individual.id)));
+}
+
+/** A dropdown in an inline `Field`: it fills the control column. */
+const SELECT = "w-full min-w-0 h-7 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black";
 
 /**
  * Status when the pedigree defines any condition (#115, #136): only the
@@ -489,8 +518,18 @@ function EvaluationsForm({ individual, problems }: { individual: Individual; pro
     else setEvaluations(individual.id, saved.filter((_, k) => k !== i));
   };
   return (
-    <div className="border-t pt-3 space-y-2" data-testid="evaluations-form">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Evaluations</div>
+    <div className={`border-t pt-3 ${evs.length ? "space-y-2" : ""}`} data-testid="evaluations-form">
+      <SectionHeader action={
+        <button
+          type="button"
+          data-testid="add-evaluation"
+          onClick={() => setDraft(true)}
+          disabled={draft}
+          className="text-xs text-gray-600 underline hover:text-black disabled:text-gray-300 disabled:no-underline"
+        >
+          Add
+        </button>
+      }>Evaluations</SectionHeader>
       <ProblemHighlight {...problems}>
       {evs.map((ev, i) => (
         <div key={i} className="space-y-1" data-evaluation-row={i}>
@@ -534,15 +573,6 @@ function EvaluationsForm({ individual, problems }: { individual: Individual; pro
         </div>
       ))}
       </ProblemHighlight>
-      <button
-        type="button"
-        data-testid="add-evaluation"
-        onClick={() => setDraft(true)}
-        disabled={draft}
-        className="text-xs underline text-gray-600 hover:text-black"
-      >
-        Add evaluation
-      </button>
     </div>
   );
 }
@@ -587,9 +617,8 @@ function TwinsForm({ individual }: { individual: Individual }) {
   };
 
   return (
-    <div className="border-t pt-3 space-y-2" data-testid="twins-form">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Twins</div>
-      <Field label="Zygosity">
+    <div className="space-y-1" data-testid="twins-form">
+      <Field inline label="Twin">
         <select
           value={twin?.set.zygosity ?? ""}
           aria-label="Zygosity"
@@ -598,7 +627,7 @@ function TwinsForm({ individual }: { individual: Individual }) {
             const next = members.length >= 2 ? members : [adjacentSibling(pedigree, individual.id)!];
             apply(z, next);
           }}
-          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+          className={SELECT}
         >
           <option value="">Not a twin</option>
           {ZYGOSITY_OPTIONS.map(o => {
@@ -609,8 +638,8 @@ function TwinsForm({ individual }: { individual: Individual }) {
         </select>
       </Field>
       {twin && (
-        <div className="space-y-1">
-          <Label className="text-xs text-gray-600">Twin of</Label>
+        <div className="space-y-1 pl-20">
+          <div className="text-xs text-gray-600">Twin of</div>
           {siblings.map(id => {
             const on = members.includes(id);
             return (
@@ -676,7 +705,7 @@ function RelatednessSection({ individual }: { individual: Individual }) {
 
   return (
     <div className="border-t pt-3 space-y-2" data-testid="relatedness">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relatedness</div>
+      <SectionHeader>Relatedness</SectionHeader>
       <div className="text-xs text-gray-600 space-y-1.5">
         {references.map(r => (
           <div key={r.referenceId} data-testid="reference-relatedness" data-role={r.role}>
@@ -790,75 +819,61 @@ function capitalise(text: string): string {
 }
 
 /**
- * Ended relationships (#98): one checkbox per partner. NSGC draws a
- * relationship that no longer exists (separated, divorced) as two short
- * strokes across the couple line.
+ * Partners (#138): one block per couple this person is in, with the ended
+ * mark (#98: two short strokes across the couple line for a separation or
+ * divorce) and, while the couple has no children, the childless mark (#15).
+ * A gamete donation pair (#45) is not a couple and is left out.
  */
-function EndedForm({ individual }: { individual: Individual }) {
-  const { pedigree, setPartnershipEnded } = usePedigreeStore();
-  // A gamete donation pair (#45) is not a couple and has no line to mark.
+function PartnersForm({ individual }: { individual: Individual }) {
+  const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeStore();
   const own = pedigree.partnerships.filter(p => (p.individual1 === individual.id || p.individual2 === individual.id) && !p.donorConception);
   if (own.length === 0) return null;
   return (
-    <div className="border-t pt-3 space-y-2" data-testid="ended-form">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relationship</div>
-      {own.map(p => (
-        <label key={p.id} className="flex items-center gap-2 cursor-pointer text-xs text-gray-600" title="Separated or divorced: two short strokes across the couple line">
-          <input
-            type="checkbox"
-            checked={!!p.ended}
-            onChange={e => setPartnershipEnded(p.id, e.target.checked)}
-            className="accent-black"
-          />
-          <span>Ended with {partnerLabel(pedigree, individual.id, p.id)}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-/**
- * Childless couple marks (#15), one block per partnership of this person that
- * has no children. A couple with children has nothing to set here.
- */
-function CouplesForm({ individual }: { individual: Individual }) {
-  const { pedigree, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeStore();
-  const childlessEligible = pedigree.partnerships.filter(p =>
-    (p.individual1 === individual.id || p.individual2 === individual.id)
-    && coupleChildren(pedigree, p.id).length === 0);
-  if (childlessEligible.length === 0) return null;
-
-  return (
-    <div className="border-t pt-3 space-y-3" data-testid="couples-form">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        Couple without children
-      </div>
-      {childlessEligible.map(p => (
-        <div key={p.id} className="space-y-1">
-          <Field label={`With ${partnerLabel(pedigree, individual.id, p.id)}`}>
-            <select
-              value={p.childless ?? ""}
-              aria-label={`Childless mark with ${partnerLabel(pedigree, individual.id, p.id)}`}
-              onChange={e => setPartnershipChildless(p.id, (e.target.value || undefined) as ChildlessStatus | undefined)}
-              className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-            >
-              <option value="">No mark</option>
-              {CHILDLESS_OPTIONS.map(o => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </Field>
-          {p.childless && (
-            <Input
-              value={p.childlessReason ?? ""}
-              aria-label="Reason shown under the mark"
-              onChange={e => setPartnershipChildlessReason(p.id, e.target.value)}
-              className="h-7 text-sm"
-              placeholder="Reason (optional), e.g. vasectomy"
-            />
-          )}
-        </div>
-      ))}
+    <div className="border-t pt-3 space-y-2" data-testid="partners-form">
+      <SectionHeader>Partners</SectionHeader>
+      {own.map(p => {
+        const partner = partnerLabel(pedigree, individual.id, p.id);
+        const childless = coupleChildren(pedigree, p.id).length === 0;
+        return (
+          <div key={p.id} className="space-y-1 text-xs text-gray-600" data-partner-row={p.id}>
+            <div className="text-gray-800 break-words">{partner}</div>
+            <label className="flex items-center gap-2 cursor-pointer" title="Separated or divorced: two short strokes across the couple line">
+              <input
+                type="checkbox"
+                checked={!!p.ended}
+                aria-label={`Ended with ${partner}`}
+                onChange={e => setPartnershipEnded(p.id, e.target.checked)}
+                className="accent-black"
+              />
+              <span>Relationship ended</span>
+            </label>
+            {childless && (
+              <Field inline label="No children">
+                <select
+                  value={p.childless ?? ""}
+                  aria-label={`Childless mark with ${partner}`}
+                  onChange={e => setPartnershipChildless(p.id, (e.target.value || undefined) as ChildlessStatus | undefined)}
+                  className={SELECT}
+                >
+                  <option value="">No mark</option>
+                  {CHILDLESS_OPTIONS.map(o => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                {p.childless && (
+                  <Input
+                    value={p.childlessReason ?? ""}
+                    aria-label="Reason shown under the mark"
+                    onChange={e => setPartnershipChildlessReason(p.id, e.target.value)}
+                    className="h-7 text-xs"
+                    placeholder="Reason, e.g. vasectomy"
+                  />
+                )}
+              </Field>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -888,12 +903,12 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
   const addable = candidates.filter(c => !social.includes(c.id) && c.id !== individual.carriedBy);
   return (
     <div className="space-y-2" data-testid="assisted-form">
-      <Field label="Donor / surrogate" {...problemsOn("reproductiveRole")}>
+      <Field inline label="Donor / surrogate" {...problemsOn("reproductiveRole")}>
         <select
           value={individual.reproductiveRole ?? ""}
           aria-label="Donor or surrogate"
           onChange={e => setReproductiveRole(individual.id, (e.target.value || undefined) as ReproductiveRole | undefined)}
-          className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+          className={SELECT}
         >
           <option value="">None</option>
           {REPRODUCTIVE_ROLE_OPTIONS.map(o => {
@@ -904,18 +919,18 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
         </select>
       </Field>
       {hasParents && !linked && !expanded && (
-        <button className="text-[11px] text-gray-500 underline hover:text-black" onClick={() => setExpanded(true)}>
-          Carried by someone else, or social parents...
+        <button className="pl-20 text-[11px] text-left text-gray-500 underline hover:text-black" onClick={() => setExpanded(true)}>
+          Carried by, social parents...
         </button>
       )}
       {(linked || expanded) && (
         <>
-          <Field label="Carried by" {...problemsOn("carriedBy")}>
+          <Field inline label="Carried by" {...problemsOn("carriedBy")}>
             <select
               value={individual.carriedBy ?? ""}
               aria-label="Carried by"
               onChange={e => setCarriedBy(individual.id, e.target.value || undefined)}
-              className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+              className={SELECT}
             >
               <option value="">The genetic mother</option>
               {carriers.map(c => <option key={c.id} value={c.id}>{label(c.id)}</option>)}
@@ -924,7 +939,7 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
               <p className="text-[10px] text-gray-500">Solid line from her: she carried the pregnancy but is not the genetic mother, so not a parent for kinship.</p>
             )}
           </Field>
-          <Field label="Social parents">
+          <Field inline label="Social parents">
             {social.map(id => (
               <div key={id} className="flex items-center justify-between text-xs text-gray-600">
                 <span className="truncate">{label(id)}</span>
@@ -942,9 +957,9 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
                 value=""
                 aria-label="Add social parent"
                 onChange={e => e.target.value && setSocialParents(individual.id, [...social, e.target.value])}
-                className="w-full h-7 border rounded px-2 text-sm bg-white text-gray-500 focus:outline-hidden focus:ring-1 focus:ring-black"
+                className={`${SELECT} text-gray-500`}
               >
-                <option value="">Add a social parent...</option>
+                <option value="">Add...</option>
                 {addable.map(c => <option key={c.id} value={c.id}>{label(c.id)}</option>)}
               </select>
             )}
@@ -982,11 +997,13 @@ function SexControl({ individual }: { individual: Individual }) {
   const { pedigree, setSex } = usePedigreeStore();
   const sexes = ["male", "female", "unknown"] as const;
   const problemOf = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individual.id], sex);
+  // Full width, with no label column: three buttons do not fit beside one (#138).
+  const atBirth = !!individual.genderIdentity && !individual.lifeStatus;
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2">
-        <span className="shrink-0">Sex{individual.genderIdentity && !individual.lifeStatus ? " assigned at birth" : ""}</span>
-        <div className="flex border rounded overflow-hidden" role="group" aria-label="Sex">
+    <div className="space-y-1 text-xs text-gray-600">
+      {atBirth && <div>Sex assigned at birth</div>}
+      <div className="flex">
+        <div className="flex flex-1 border rounded overflow-hidden" role="group" aria-label={atBirth ? "Sex assigned at birth" : "Sex"}>
           {sexes.map(sex => (
             <button
               key={sex}
@@ -996,7 +1013,7 @@ function SexControl({ individual }: { individual: Individual }) {
               aria-disabled={!!problemOf(sex) || undefined}
               title={problemOf(sex) ?? undefined}
               onClick={() => { if (individual.sex !== sex && !problemOf(sex)) setSex(individual.id, sex); }}
-              className={`px-2 h-6 text-xs border-l first:border-l-0 ${individual.sex === sex ? "bg-black text-white" : "bg-white hover:bg-gray-100"} aria-disabled:text-gray-300 aria-disabled:hover:bg-white aria-disabled:cursor-not-allowed`}
+              className={`flex-1 px-1 h-6 text-xs border-l first:border-l-0 ${individual.sex === sex ? "bg-black text-white" : "bg-white hover:bg-gray-100"} aria-disabled:text-gray-300 aria-disabled:hover:bg-white aria-disabled:cursor-not-allowed`}
             >
               {sex.charAt(0).toUpperCase() + sex.slice(1)}
             </button>
@@ -1007,7 +1024,22 @@ function SexControl({ individual }: { individual: Individual }) {
   );
 }
 
-function Field({ label, children, ...problem }: { label: string; children: React.ReactNode } & ProblemProps) {
+/**
+ * A labelled field. `inline` puts the label in a narrow column beside the
+ * control (#138), for single-line controls, so each takes one row; a long
+ * label wraps. Messages and warnings go under the control.
+ */
+function Field({ label, inline, children, ...problem }: { label: string; inline?: boolean; children: React.ReactNode } & ProblemProps) {
+  if (inline) {
+    return (
+      <div className="flex items-start gap-2">
+        <Label className="w-[4.5rem] shrink-0 min-h-7 flex items-center text-xs leading-tight text-gray-600">{label}</Label>
+        <div className="flex-1 min-w-0">
+          <ProblemHighlight {...problem}>{children}</ProblemHighlight>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="space-y-1">
       <Label className="text-xs text-gray-600">{label}</Label>

@@ -167,16 +167,22 @@ stub so the app still builds without Google login.
   folded "Clinical details" section, #102, whose fields, order and labels
   come from `pedigree/clinicalDetails.ts`. Whole-pedigree fields go on the
   Pedigree tab, not in Settings, which is only how the chart is drawn, and
-  the figure `Legend` (#75) is shown there only. Person holds the
-  individual form with name, DOB, free-text age, Status, "Conditions and
-  tags" (`ConditionsAndTags.tsx`, #136: every defined tag with its key
-  swatch, conditions first with No / Affected / Carrier, the rest as
-  checkboxes, and the "Add / edit" button), and the Relatedness section of
-  #32 with the double-line checkbox of #85).
+  the figure `Legend` (#75) is shown there only. Person is one
+  list, most used first (#138): name, sex and the status checkboxes, dates
+  and free-text age, "Conditions and tags" (`ConditionsAndTags.tsx`, #136:
+  every defined tag with its key swatch, conditions first with No /
+  Affected / Carrier, the rest as checkboxes, and the "Add / edit"
+  button), Evaluations, notes, then the rarely set fields (pregnancy or
+  loss, adoption, gender identity, donor or surrogate, twin), folded to one
+  line while none is set for the person or warned about, then Relatedness
+  (#32, with the double-line checkbox of #85) and Partners (ended and
+  childless marks per couple). A section gets a heading only when it is a
+  list or read-only; single-line fields use `Field inline`, the label in a
+  72px column beside the control, as the panel is 240px wide).
   "Conditions and tags" (`CONDITIONS_AND_TAGS`) is the user-facing name for
   what the tags dialog defines; "tag" stays the code's word. Every other
   user-facing word follows the glossary in the root `AGENTS.md` (#137).
-  The Status section edits sex, affected, proband and consultand with the
+  The status controls edit sex, affected, proband and consultand with the
   more menu's store actions and rules (#120: refused sexes disabled with
   `batchSexProblem`'s reason written out); keep the two in step when a rule
   changes. A toolbar add selects the new person and sets `revealRequest`,
