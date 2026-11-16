@@ -781,6 +781,34 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
   `layout-engine/AGENTS.md`). `layoutToFlow`'s `improveLayout: false` gives
   the plain port to compare against.
 
+## Layout cache (#189)
+
+- **Every layout in the frontend goes through `cachedLayout`
+  (`layoutCache.ts`), never `alignPedigreeByFamily` directly.** The engine's
+  quadratic program is nearly all of the cost of an edit on a large pedigree
+  (4.8 s of a 5 s edit at 513 people), so its result is kept while the
+  structure is unchanged: `layoutToFlow`, `pedigreeNumbers`, the swap sides
+  check and the render lint share one layout, and marking someone affected,
+  typing a name or dropping a dragged person does not lay out again.
+- **It is correct by construction, not by a list of what matters.** The
+  engine is given `layoutInput(pedigree)`, a copy with the fields the layout
+  does not read left out, and the result is kept under that copy's JSON.
+  What the engine was not given cannot change its answer. So a field missing
+  from `PERSON_FIELDS_NOT_LAID_OUT` only costs speed, and a field wrongly in
+  it changes the drawing, which `layoutCache.test.ts` catches by laying out
+  every example, fixture and test data file both ways, in each sibling order.
+  A new field that the layout never reads should be added to the list, or
+  editing it lays out again.
+- `dob` is given to the engine only when siblings are ordered by date of
+  birth, and `affected` and `tags` only with "affected first": those two
+  settings are what read them.
+- Unconnected families are kept one by one as well (the engine's
+  `alignFamily` option), so a change in one family does not lay out the
+  others. A few structures are kept, for undo and redo.
+- The result is shared: never change a `LayoutResult` you were given.
+- What it does not help: an edit that changes structure in one large family
+  still runs the whole quadratic program (about 4 s at 513 people).
+
 ## Render lint
 
 `renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would

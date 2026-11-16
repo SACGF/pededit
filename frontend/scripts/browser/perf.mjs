@@ -48,13 +48,14 @@ end of the last frame that took longer than 25 ms, or of the first frame when
 none did), with the time to the first frame alone in a second table:
   open     the pedigree's data arriving, to the first frame with every symbol
   select   a click on a person near the middle of the canvas
-  edit     the A key (toggle affected), which reruns the whole layout
+  edit     the A key (toggle affected), which redraws everyone but reuses
+           the layout, since no structure changed (#189)
   hover    moving the mouse onto another person
   zoom     one wheel notch
   drag     dragging that person through 60 mouse moves sent as fast as the
            page takes them: the time per redraw of the person somewhere new
            (17 ms is the full 60 frames a second)
-  drop     releasing them, which pins them and reruns the layout
+  drop     releasing them, which pins them (the layout is reused too)
 and, in the dev build, three computations run on their own in the page: the
 layout engine, layoutToFlow (engine included) and the editor's problems.
 The pedigree is drawn fitted to a 1440x900 window with nodes unlocked

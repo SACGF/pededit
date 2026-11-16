@@ -396,9 +396,10 @@ What the columns are:
   page and visible. Loading the app's own code is left out (in the dev build
   that is Vite serving hundreds of modules).
 - `select` (a click on the person nearest the middle), `edit` (the A key,
-  which like every edit reruns the whole layout), `hover` (the mouse moving
+  which redraws everyone and reuses the layout, #189: neither it nor the
+  drop times a change of structure, which still lays out again), `hover` (the mouse moving
   onto another person), `zoom` (one wheel notch), `drop` (releasing a dragged
-  person, which pins them and reruns the layout): from the input event,
+  person, which pins them): from the input event,
   before the app's handlers, until the page is quiet again, which is the end
   of the last frame that took longer than 25 ms, or of the first frame when
   none did. So nothing reads below about 10 ms, and work of under 25 ms that

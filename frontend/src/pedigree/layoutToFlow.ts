@@ -1,5 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
-import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import { buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { duplicateArcPoints, hopGeometry } from "./couplePath";
@@ -263,7 +264,7 @@ export function pedigreeNumbers(full: Pedigree): Map<string, string> {
   if (cached) return cached;
   let numbers = new Map<string, string>();
   if (pedigree.individuals.length > 0) {
-    const result = alignPedigreeByFamily(pedigree, { improve: true });
+    const result = cachedLayout(pedigree, { improve: true });
     numbers = numberFromLayout(pedigree, result, findLinelessCopies(result));
   }
   numbersCache.set(pedigree, numbers);
@@ -283,7 +284,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] };
   }
-  const result: LayoutResult = alignPedigreeByFamily(pedigree, { improve: options.improveLayout ?? true });
+  const result: LayoutResult = cachedLayout(pedigree, { improve: options.improveLayout ?? true });
   const spacing = layoutSpacing(options.compact);
 
   const hidden = findLinelessCopies(result);

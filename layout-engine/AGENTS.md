@@ -156,6 +156,22 @@ demonstrably worse, while keeping the port as the tested baseline:
   positions identical, Targaryen's hop gone. `layoutToFlow(p, { improveLayout:
   false })` gives the plain port for such comparisons.
 
+## Speed (#42, #189)
+
+- `alignped4`'s quadratic program is the cost of a layout: 99% at 238 and
+  513 people (0.45 s and 4.8 s in Node), growing about tenfold for twice the
+  people because `quadprog` is a dense solver. Everything before it
+  (`kindepth`, `autohint`, `alignped1` to `alignped3`) is tens of
+  milliseconds at 513 people.
+- The engine keeps nothing between calls. The editor keeps results itself
+  (`frontend/src/pedigree/layoutCache.ts`), through `AlignOptions.alignFamily`,
+  which `alignPedigreeByFamily` calls in place of `alignPedigree` for each
+  family.
+- `alignped4` fills `D = P'P` from the non-zero entries of each penalty row
+  (a row has a handful). It is the same sums in the same order as the full
+  product, so positions are bit for bit the same. R does this with one BLAS
+  call and has no such loop to fix.
+
 ## Conventions
 
 - Internal arrays are 1-based with index 0 unused, matching the R source.

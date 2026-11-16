@@ -1,5 +1,6 @@
 import type { LayoutResult, Pedigree } from "@pedigree-editor/layout-engine";
-import { alignPedigreeByFamily, drawnLeftPartner } from "@pedigree-editor/layout-engine";
+import { drawnLeftPartner } from "@pedigree-editor/layout-engine";
+import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 
 /**
@@ -60,7 +61,7 @@ export function swapSidesPlan(pedigree: Pedigree, partnershipId: string): { side
   if (!p) return { problem: "Unknown partnership." };
   const drawn = drawnPedigree(pedigree);
   const base = drawn.partnerships.some(q => q.id === partnershipId) ? drawn : pedigree;
-  const before = alignPedigreeByFamily(base);
+  const before = cachedLayout(base);
   const left = drawnLeftPartner(base, before, partnershipId);
   if (!left) return { problem: "These partners are not drawn side by side, so there is no side to swap." };
   const other = (q: { individual1: string; individual2: string }, id: string) => id === q.individual1 ? q.individual2 : q.individual1;
@@ -81,7 +82,7 @@ export function swapSidesPlan(pedigree: Pedigree, partnershipId: string): { side
   const plans = Object.keys(sides).length > 1 ? [sides, { [partnershipId]: sides[partnershipId]! }] : [sides];
   for (const plan of plans) {
     const after = withSides(base, plan);
-    const result = alignPedigreeByFamily(after);
+    const result = cachedLayout(after);
     const honoured = (q: { id: string; leftPartner?: string }) => drawnLeftPartner(after, result, q.id) === q.leftPartner;
     if (
       honoured({ id: partnershipId, leftPartner: plan[partnershipId] })

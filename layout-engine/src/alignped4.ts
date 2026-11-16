@@ -166,14 +166,17 @@ export function alignped4(
     // D = pmat^T * pmat + epsilon * I (positive definite).
     // Build as 1-indexed (length nTotal+1, index 0 unused).
     const eps = 1e-8;
-    const D: number[][] = Array.from({ length: nTotal + 1 }, (_, i) =>
-      Array.from({ length: nTotal + 1 }, (__, j) => {
-        if (i === 0 || j === 0) return 0;
-        let s = 0;
-        for (let k = 0; k <= npenal; k++) s += (pmat[k]![i] ?? 0) * (pmat[k]![j] ?? 0);
-        return s + (i === j ? eps : 0);
-      })
-    );
+    // Each penalty row has a handful of non-zero entries, so D is filled from
+    // those: the same sums in the same order as the full product, without
+    // visiting every pair of variables for every row (#189).
+    const D: number[][] = Array.from({ length: nTotal + 1 }, () => new Array<number>(nTotal + 1).fill(0));
+    for (let k = 0; k <= npenal; k++) {
+      const row = pmat[k]!;
+      const nonZero: number[] = [];
+      for (let i = 1; i <= nTotal; i++) if (row[i]) nonZero.push(i);
+      for (const i of nonZero) for (const j of nonZero) D[i]![j]! += row[i]! * row[j]!;
+    }
+    for (let i = 1; i <= nTotal; i++) D[i]![i]! += eps;
 
     // Amat: (nTotal+1) × (coff+1), 1-indexed. quadprog expects Amat^T * x >= bvec.
     // cmat is already 1-indexed [constraint][variable], so Amat[var][con] = cmat[con][var].

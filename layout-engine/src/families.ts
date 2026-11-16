@@ -101,7 +101,8 @@ export function alignPedigreeByFamily(pedigree: Pedigree, options: AlignOptions 
   const widthSlack = pedigree.canvasSettings?.layoutWidth === "relaxed" ? RELAXED_WIDTH_SLACK : 0;
   options = { improve: true, widthSlack, ...options };
   const { families, isolated } = splitFamilies(pedigree);
-  if (families.length <= 1) return alignPedigree(pedigree, options);
+  const alignOne = options.alignFamily ?? alignPedigree;
+  if (families.length <= 1) return alignOne(pedigree, options);
 
   const groups = isolated.length > 0 ? [...families, isolated] : families;
   const globalIndex = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
@@ -111,7 +112,7 @@ export function alignPedigreeByFamily(pedigree: Pedigree, options: AlignOptions 
 
   for (const ids of groups) {
     const sub = subPedigree(pedigree, new Set(ids));
-    const r = alignPedigree(sub, options);
+    const r = alignOne(sub, options);
     const toGlobal = sub.individuals.map(ind => globalIndex.get(ind.id)!);
 
     let min = Infinity, max = -Infinity;

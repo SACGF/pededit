@@ -22,7 +22,8 @@
  * vitest over every example. Framework-free so all three share it.
  */
 import type { Pedigree, LayoutResult } from "@pedigree-editor/layout-engine";
-import { alignPedigreeByFamily, placementParentOf } from "@pedigree-editor/layout-engine";
+import { placementParentOf } from "@pedigree-editor/layout-engine";
+import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
 import type { FlowData } from "./layoutToFlow";
@@ -76,7 +77,7 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
   // person kinship2 put in that slot, from the same layout layoutToFlow uses.
   let layout: LayoutResult | undefined;
   const slotLabel = (nodeId: string) => {
-    layout ??= alignPedigreeByFamily(pedigree);
+    layout ??= cachedLayout(pedigree);
     const [lev, slot] = nodeId.split("-").map(Number);
     const idx = layout.nid[lev!]?.[slot!];
     const id = idx ? pedigree.individuals[Math.floor(idx) - 1]?.id : undefined;

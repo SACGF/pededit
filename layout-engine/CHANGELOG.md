@@ -22,3 +22,6 @@ First release on npm.
   X-linked.
 - `buildPedigreeFromFlat`: PED-style rows to a `Pedigree`.
 - ES modules and TypeScript declarations, Node 20 or later and browsers.
+- `AlignOptions.alignFamily`: called by `alignPedigreeByFamily` for each
+  family, so a caller can keep the layouts of families that have not
+  changed. The engine itself keeps nothing between calls.

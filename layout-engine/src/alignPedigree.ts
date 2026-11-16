@@ -25,6 +25,13 @@ export interface AlignOptions {
    * `canvasSettings.layoutWidth`.
    */
   widthSlack?: number;
+  /**
+   * Called by `alignPedigreeByFamily` in place of `alignPedigree` for each
+   * family it lays out (#189), so a caller can keep the results of families
+   * that have not changed. It must return what `alignPedigree(family,
+   * options)` returns. The engine itself keeps nothing between calls.
+   */
+  alignFamily?: (family: Pedigree, options: AlignOptions) => LayoutResult;
 }
 
 /**
