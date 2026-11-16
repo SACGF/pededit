@@ -230,7 +230,8 @@ demonstrably worse, while keeping the port as the tested baseline:
   Run them again when the output of `alignPedigree` or the API changes. The
   README ships in the tarball, so it cannot link to `claude/` for anything
   it needs.
-- **Licence**: `AGPL-3.0-only`, the repository's `LICENSE`. kinship2 is
+- **Licence**: `AGPL-3.0-or-later` (the maintainer's choice, #196), the
+  repository's `LICENSE`. kinship2 is
   GPL (>= 2); the port is used under GPL 3, which may be combined with AGPL
   3 work (section 13). A more permissive licence is not possible for the
   ported code.

@@ -440,8 +440,8 @@ kinship2 is copyright its authors and licensed GPL (version 2 or later). If
 you publish figures laid out with this package, please cite their paper.
 
 This package is licensed under the GNU Affero General Public License,
-version 3 (`AGPL-3.0-only`), the licence of the PedEdit repository; the full
-text is in `LICENSE`. The code derived from kinship2 is used under version 3
+version 3 or (at your option) any later version (`AGPL-3.0-or-later`), the
+licence of the PedEdit repository; the full text is in `LICENSE`. The code derived from kinship2 is used under version 3
 of the GPL, which allows it to be combined with work under the AGPL
 (section 13 of both licences). The AGPL is a copyleft licence: read it
 before using this package in software you distribute, or offer over a
