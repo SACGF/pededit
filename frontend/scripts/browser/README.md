@@ -266,6 +266,7 @@ the flow. They run in CI.
 | `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
 | `example-link` | `/example/<slug>` (#150): one new pedigree per visit, Back makes no extra copy, unknown slug, the landing page's links |
 | `error-reporting-off` | with no Sentry DSN, an uncaught error sends no request off the site and loads no reporter (#49) |
+| `rejected-token` | a sign-in token the server rejects: one refresh, then signed out on the same page, and a pedigree's link still opens (#191) |
 | `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
@@ -571,6 +572,12 @@ harness runs `manage.py agent_token`, which creates a `claude_agent` user
 with no usable password (if it does not exist) and mints a simplejwt pair,
 and seeds it into `localStorage` the way `useAppStore` keeps tokens. Needs
 Django running and `backend/.venv` (or `PEDEDIT_PYTHON`).
+
+The tokens are signed with this checkout's `backend/secret_key.txt`, so the
+running Django must use the same key. A git worktree makes its own, and a
+Django of the main checkout rejects tokens minted there (#194): the harness
+checks the tokens against `/api/auth/me/` first and stops with a message
+saying so, rather than running the page signed out (#191).
 
 ## Base URL
 

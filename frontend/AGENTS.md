@@ -311,7 +311,11 @@ reporting is off, and the dev server never reports.
   few seconds. There is no toast library; use this instead of `alert`.
 - `api/client.ts` — axios instance with bearer token and a single shared
   refresh promise on 401 (refresh tokens rotate, so concurrent refreshes would
-  consume each other).
+  consume each other). When the refresh fails too, the tokens are dropped,
+  `useAppStore` is signed out through `setSignedOutHandler`, and the request
+  is sent again without a token, so a pedigree's link still opens (#191).
+  It never navigates: going to the landing page lost the pedigree the link
+  opened.
 - `data/examples.ts` — the example pedigrees on the landing page. Each has
   a `slug`, its name in `/example/<slug>` (#150). Those links are published,
   so a slug is never changed or reused; `data/__tests__/examples.test.ts`

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { authApi, pedigreeApi, PedigreeMeta, UserInfo } from "../api/client";
+import { authApi, pedigreeApi, PedigreeMeta, UserInfo, setSignedOutHandler } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore } from "./usePedigreeStore";
 import { recordRecentPedigree, renameRecentPedigree, forgetRecentPedigree } from "../utils/recentPedigrees";
@@ -112,8 +112,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
   loadPedigrees: async () => {
     if (!get().isAuthenticated) return;
-    const { data } = await pedigreeApi.list();
-    set({ pedigrees: data });
+    try {
+      const { data } = await pedigreeApi.list();
+      set({ pedigrees: data });
+    } catch (err) {
+      // The token was rejected and the page is now signed out (#191): nothing to list.
+      if (!get().isAuthenticated) return;
+      throw err;
+    }
   },
 
   openPedigree: async (id) => {
@@ -231,3 +237,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     }));
   },
 }));
+
+// Tokens the server rejected and could not refresh were dropped (#191): show
+// the page signed out. The pedigree open stays open; it was opened anonymously.
+setSignedOutHandler(() => useAppStore.setState({ user: null, isAuthenticated: false, pedigrees: [] }));

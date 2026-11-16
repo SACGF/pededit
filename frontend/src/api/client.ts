@@ -22,22 +22,34 @@ apiClient.interceptors.request.use((config) => {
 // a new one with an already-consumed refresh token.
 let tokenRefreshInProgress: Promise<string> | null = null;
 
-// On 401, try to refresh the token once
+let onSignedOut: (() => void) | null = null;
+/** Called when the tokens are found to be no good and have been dropped (the app store signs out). */
+export function setSignedOutHandler(fn: (() => void) | null) {
+  onSignedOut = fn;
+}
+
+/**
+ * A 401 means the token was rejected: an owned pedigree answers 404 to
+ * everyone else, so nothing else gives one. Refresh once; if that fails too
+ * (expired, signed with another key, user gone), drop the tokens, sign out
+ * and send the request again without a token (#191). Anonymous mode is the
+ * default, so a pedigree opened by its link still opens, and the page ends
+ * signed out where it was, with one refresh request and no reload. (It used
+ * to go to the landing page, which a harness that puts the tokens back on
+ * every load turned into a loop of refreshes.)
+ */
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
-      original._retry = true;
-      const refresh = localStorage.getItem("refresh_token");
-      if (!refresh) {
-        // No refresh token — clear any stale tokens and go to landing
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/";
-        return Promise.reject(error);
-      }
+    if (error.response?.status !== 401 || !original || original._retry) return Promise.reject(error);
+    original._retry = true;
+    // Sent without a token: there is nothing to refresh, it is just not allowed (/auth/me/).
+    if (!original.headers?.Authorization) return Promise.reject(error);
 
+    const refresh = localStorage.getItem("refresh_token");
+    let newToken: string | null = null;
+    if (refresh) {
       // Start a refresh if none is already in progress; otherwise reuse it.
       if (!tokenRefreshInProgress) {
         tokenRefreshInProgress = axios
@@ -51,21 +63,25 @@ apiClient.interceptors.response.use(
             tokenRefreshInProgress = null;
           });
       }
-
-      try {
-        const newToken = await tokenRefreshInProgress;
-        original.headers.Authorization = `Bearer ${newToken}`;
-        return apiClient(original);
-      } catch {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/";
-        return Promise.reject(error);
-      }
+      newToken = await tokenRefreshInProgress.catch(() => null);
     }
-    return Promise.reject(error);
+
+    if (newToken) {
+      original.headers.Authorization = `Bearer ${newToken}`;
+    } else {
+      signOutLocally();
+      delete original.headers.Authorization;
+    }
+    return apiClient(original);
   }
 );
+
+function signOutLocally() {
+  const had = localStorage.getItem("access_token") !== null || localStorage.getItem("refresh_token") !== null;
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  if (had) onSignedOut?.();
+}
 
 // ── Auth endpoints ────────────────────────────────────────────────────────────
 
