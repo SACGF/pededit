@@ -147,6 +147,25 @@ reporting is off, and the dev server never reports.
   draws the shared fork, and `setSex` on a monozygotic twin changes the whole
   set.
 - Visual style is black and white, minimal chrome. No colour except tags.
+- Small screens (#169): viewing is the bar on a phone (display, pan, zoom,
+  tap to select), editing is a nice to have. Below Tailwind's `lg` (1024px,
+  so a phone on its side counts) `CanvasPage` hides the left sidebar behind
+  the toolbar's menu button (it opens over the canvas), turns the side panel
+  into a sheet under the canvas that is shut to its row of tabs until a tab
+  is tapped (`EditPanel`'s `open` / `onOpenChange`; selecting someone does
+  not open it, so the chart stays in view), lets the toolbar scroll sideways,
+  leaves out the minimap and shows a dismissible line saying how to move
+  around and that editing is easier on a computer (localStorage
+  `smallScreenNoticeDismissed`). It is all `lg:` / `max-lg:` classes plus
+  `hooks/useSmallScreen.ts` for what CSS cannot do, and nothing changes from
+  `lg` up: check desktop screenshots are identical after touching it. While
+  the editor is mounted the root element has `touch-action: pan-x pan-y`, so
+  the browser never zooms the page there: the canvas takes every touch, so a
+  page zoomed from the toolbar could not be zoomed back out. Fields are 16px
+  on touch screens (`index.css`) because iOS Safari zooms into smaller ones
+  on focus. The height is `h-app` (100dvh), not `h-screen`: 100vh is taller
+  than a phone shows while its address bar is out. Check with
+  `scripts/browser/phone.mjs`, which emulates touch; it is not a phone.
 - Toolbar popovers (Radix) close on a canvas click only because
   `PedigreeCanvas` registers its wrapper with `useDismissableLayerSurface`:
   React Flow's pan/zoom stops `mousedown` from reaching the document, and

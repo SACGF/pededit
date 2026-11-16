@@ -75,6 +75,18 @@ draws NSGC symbols.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
+  By touch (#169) there is no hover: a touch `pointerdown` on the symbol
+  opens the pill and it stays while the person is selected, closing when the
+  selection clears. Do not lean on the mouse events a browser makes up after
+  a tap: they differ between browsers (and chromium's emulation moves its
+  mouse away again, which closed the pill at once). Its buttons are larger
+  under `pointer-coarse:`. The pill is centred on the person and is wider
+  than a phone, so near a screen edge part of it is off screen until the
+  canvas is panned.
+- The four invisible `Handle`s on a node only anchor edges. `index.css` gives
+  them `pointer-events: none` (#169): React Flow marks handles `nopan` and
+  lets them take the pointer, so a drag that began on one did not pan, and a
+  finger on a chart fitted to a phone lands on one often.
 - `nodes/MoreMenu.tsx` — affected, deceased (Mark living also clears the date of death, #103), proband, consultand, sex, lock/unlock,
   move sib left/right, delete, and "Add children..." (count stepper, plus a
   partner choice when the person has several partnerships). The menu is

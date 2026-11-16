@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
@@ -42,6 +42,12 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
+  // Touch (#169): there is no hover, so a tap on the symbol opens the pill
+  // and it stays for as long as the person is selected. The mouse events a
+  // browser makes up after a tap differ between browsers and cannot be
+  // relied on to open it or to close it.
+  const [isTouchPill, setIsTouchPill] = useState(false);
+  useEffect(() => { if (!isSelected) setIsTouchPill(false); }, [isSelected]);
   const nameCut = isLabelCut(nameLines, glyph.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
@@ -105,6 +111,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         // drag moves just them; pressing on a selected one keeps the group
         // for a group drag (#21). Only for the symbol itself: the hover pill
         // and more menu are portals whose events bubble here too.
+        if (e.pointerType === "touch" && !picking && e.currentTarget.contains(e.target as Element)) setIsTouchPill(true);
         if (picking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
         if (e.currentTarget.contains(e.target as Element)) setSelectedId(individual.id);
       }}
@@ -250,7 +257,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       <HoverPill
         nodeId={nodeId}
         individualId={individual.id}
-        isVisible={isPillVisible && !picking}
+        isVisible={(isPillVisible || (isTouchPill && isSelected)) && !picking}
         hasParents={hasParents}
         name={individual.name}
         nameOnly={isNameHovered && nameCut}

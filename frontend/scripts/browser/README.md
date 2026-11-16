@@ -313,6 +313,52 @@ Rules that keep them worth having:
   you expect. A flow that cannot fail tests nothing. The flows here were
   each checked that way.
 
+### phone.mjs: does it work by touch on a small screen?
+
+```bash
+node frontend/scripts/browser/phone.mjs                       # landing page and two pedigrees at three sizes, about 80 seconds
+node frontend/scripts/browser/phone.mjs --viewport 390x844 --fixture example:3 --no-landing --verbose
+```
+
+```
+phone: emulated in chromium (touch, mobile viewport, pixel ratio 3). Not a phone: iOS Safari, finger size, the keyboard and speed need a real one.
+ok    390x844  landing page  (4 of 4 checks, 2.6 s)
+FAIL  390x844  editor, example:House Targaryen  (16 of 17 checks, 12.1 s)
+        FAIL  a one-finger drag pans the canvas: dragged 70,50 and the canvas moved 0,0
+        note  fitted at zoom 0.27: a symbol is 11 px across
+phone: 1 of 9 page(s) failed
+```
+
+What a phone must be able to do with a pedigree link (#169), in a context
+with `hasTouch`, `isMobile`, device pixel ratio 3 and a phone user agent: at
+390x844, 360x640 and 844x390 (a phone on its side) by default, on the landing
+page, a 4 person example and House Targaryen (96 people). Per editor page:
+the viewport meta tag, no sideways page scroll, the canvas keeps at least half
+the screen, everyone is in view on open, a tap selects a person, the Person
+tab opens and closes, More options opens from a tap on the pill's "···", the
+menu button opens the sidebar, a one-finger drag pans (from bare canvas and
+from a person), a two-finger pinch zooms out and back in, the page itself
+never scrolls or zooms (also when pinching on the toolbar), and no JavaScript
+errors or warnings. `--verbose` lists the passed checks and the notes (canvas
+size, the size of a symbol at fit, the size of the "···" button).
+Screenshots of each page as loaded, with the Person tab, the menu and the
+sidebar open, go to `frontend/test-output/browser/phone/`. It runs in CI.
+
+Taps are playwright's `touchscreen.tap`; drags and pinches are
+`Input.dispatchTouchEvent` through the DevTools protocol, since playwright
+has no multi-touch. Gestures are spaced 700 ms apart: d3-zoom, under React
+Flow, reads a touch within 500 ms of the last one as a double tap.
+
+**Emulation is not a phone.** It is desktop chromium with touch events. It
+cannot show iOS Safari (a different engine, with its own rules for hover,
+zoom on focus and the address bar), a finger's size against a 28 px button,
+the on-screen keyboard covering the Person tab, long-press, or real speed.
+One thing it does that no phone does: after a tap it moves its pretend mouse
+back to the top left corner, so anything that depends on the mouse events a
+browser makes up after a tap behaves differently here. A clean run means
+nothing is broken that emulation can show; #169 still needs a person with a
+phone.
+
 ## CI
 
 `.github/workflows/ci.yml` runs on every PR and push to main: layout engine
@@ -323,7 +369,7 @@ SQLite Django, then the lints with `--all-fixtures` and the console sweep
 with `--all-test-data` (every valid file of the test data set in
 `test-data/pedigrees/`, which includes the feature fixtures), so each of them
 must load without JS errors, draw and export cleanly, and survive a save and
-reload; then `flows.mjs`, the end-to-end flows. On failure the job prints the tail
+reload; then `flows.mjs`, the end-to-end flows, and `phone.mjs`, the emulated phone. On failure the job prints the tail
 of the Vite and Django logs. Reproduce a failing step locally with the same
 command after `servers.mjs up`.
 

@@ -3,7 +3,7 @@ import { usePedigreeStore } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { RotateCcw, RotateCw, Settings, Download, Image } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded, pedLostAssisted, pedLostConsanguinity } from "../io/ped/exporter.js";
 import { lifeStatusLabel } from "../pedigree/lifeStatus";
@@ -43,9 +43,11 @@ function UnknownIcon() {
 interface ToolbarProps {
   onSettingsClick: () => void;
   onExportSvgClick: () => void;
+  /** Small screens (#169): opens the left sidebar, which is hidden there. */
+  onMenuClick: () => void;
 }
 
-export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
+export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: ToolbarProps) {
   const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
   const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
@@ -118,7 +120,17 @@ export function Toolbar({ onSettingsClick, onExportSvgClick }: ToolbarProps) {
   }
 
   return (
-    <div className="flex items-center gap-1 px-2 py-1 border-b bg-white">
+    // Small screens (#169): the buttons keep their size and the row scrolls sideways.
+    <div className="flex items-center gap-1 px-2 py-1 border-b bg-white max-lg:overflow-x-auto max-lg:*:shrink-0 max-lg:[scrollbar-width:none]" data-testid="toolbar">
+      <Button
+        variant="ghost" size="sm"
+        title="Menu"
+        onClick={onMenuClick}
+        className="lg:hidden h-7 w-7 p-0"
+        data-testid="sidebar-toggle"
+      >
+        <Menu size={14} />
+      </Button>
       <Dialog open={pedWarning !== null} onOpenChange={open => { if (!open) setPedWarning(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>

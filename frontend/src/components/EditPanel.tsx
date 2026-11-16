@@ -17,7 +17,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import type { Individual, Sex, LifeStatus, ChildlessStatus, Pedigree, Adoption, Zygosity, GenderIdentity, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
@@ -35,6 +35,13 @@ import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
 
 interface EditPanelProps {
   onManageTags?: () => void;
+  /**
+   * Small screens only (#169): the panel is a sheet under the canvas, shut to
+   * its row of tabs until a tab is tapped. From `lg` up it is always open and
+   * these do nothing.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 type PanelTab = "person" | "pedigree";
@@ -55,7 +62,7 @@ type PanelTab = "person" | "pedigree";
  * Only the content under the tabs scrolls, with a stable scrollbar gutter, so
  * switching between a short and a long tab never moves the tabs or the text.
  */
-export function EditPanel({ onManageTags }: EditPanelProps) {
+export function EditPanel({ onManageTags, open = true, onOpenChange }: EditPanelProps) {
   const { pedigree, selectedId, selectedIds } = usePedigreeStore();
   const anyone = selectedIds.length > 0;
   const [tab, setTab] = useState<PanelTab>(anyone ? "person" : "pedigree");
@@ -66,15 +73,28 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
   const multiple = selectedIds.length > 1;
   const onPerson = tab === "person" && anyone;
   const individual = onPerson && !multiple ? pedigree.individuals.find(i => i.id === selectedId) : undefined;
+  // Small screens (#169): tapping a tab opens the sheet; selecting someone
+  // on the chart does not, so the chart stays in view while looking around.
+  const selectTab = (next: PanelTab) => { setTab(next); onOpenChange?.(true); };
 
   return (
     <div className="flex h-full flex-col">
-      <div role="tablist" aria-label="Side panel" className="flex shrink-0 border-b text-xs">
-        <PanelTabButton tab="person" current={onPerson ? "person" : "pedigree"} onSelect={setTab} disabled={!anyone}
+      <div role="tablist" aria-label="Side panel" className={`flex shrink-0 text-xs border-b ${open ? "" : "max-lg:border-b-0"}`}>
+        <PanelTabButton tab="person" current={onPerson ? "person" : "pedigree"} onSelect={selectTab} disabled={!anyone}
           title={anyone ? undefined : "Select someone on the chart to edit them"}>Person</PanelTabButton>
-        <PanelTabButton tab="pedigree" current={onPerson ? "person" : "pedigree"} onSelect={setTab}>Pedigree</PanelTabButton>
+        <PanelTabButton tab="pedigree" current={onPerson ? "person" : "pedigree"} onSelect={selectTab}>Pedigree</PanelTabButton>
+        <button
+          type="button"
+          className="lg:hidden shrink-0 px-4 text-gray-500 hover:text-black"
+          aria-label={open ? "Close panel" : "Open panel"}
+          aria-expanded={open}
+          data-testid="panel-toggle"
+          onClick={() => onOpenChange?.(!open)}
+        >
+          {open ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+        </button>
       </div>
-      <div className="flex-1 overflow-y-auto [scrollbar-gutter:stable]" data-testid="panel-scroll">
+      <div className={`flex-1 overflow-y-auto [scrollbar-gutter:stable] ${open ? "" : "max-lg:hidden"}`} data-testid="panel-scroll">
         <div className="p-4 space-y-4" role="tabpanel" data-testid={onPerson ? "panel-person" : "panel-pedigree"}>
           {!onPerson ? (
             <>

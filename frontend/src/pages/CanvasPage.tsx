@@ -11,6 +11,7 @@ import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
 import { TagsDialog } from "../components/TagsDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useSmallScreen } from "../hooks/useSmallScreen";
 import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { forgetRecentPedigree } from "../utils/recentPedigrees";
@@ -36,6 +37,10 @@ const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
  */
 const REPO_URL = "https://github.com/SACGF/pededit";
 
+/** Shown on small screens until dismissed (#169): viewing works by touch, editing is built for a mouse and keyboard. */
+const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom, tap a person to select them. Editing is easier on a computer.";
+const SMALL_SCREEN_NOTICE_KEY = "smallScreenNoticeDismissed";
+
 export default function CanvasPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -56,8 +61,29 @@ export default function CanvasPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [notFound, setNotFound] = useState(false);
+  // Small screens (#169): the sidebar opens over the canvas from the
+  // toolbar's menu button, and the side panel is a sheet under the canvas
+  // that stays shut until one of its tabs is tapped. Neither state does
+  // anything from `lg` up, where both are always shown.
+  const small = useSmallScreen();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [smallNoticeDismissed, setSmallNoticeDismissed] = useState(() => {
+    try { return localStorage.getItem(SMALL_SCREEN_NOTICE_KEY) === "true"; } catch { return false; }
+  });
 
   useKeyboardShortcuts();
+
+  // The editor is a canvas: two fingers zoom the chart, not the page. A page
+  // zoomed from the toolbar or a panel could not be zoomed back out from the
+  // canvas, which takes every touch itself. Scrolling inside panels is kept.
+  // On the root element so dialogs, which are portals, are covered too.
+  useEffect(() => {
+    const root = document.documentElement;
+    const before = root.style.touchAction;
+    root.style.touchAction = "pan-x pan-y";
+    return () => { root.style.touchAction = before; };
+  }, []);
 
   // Notices (what an edit did, or why it was refused) fade after a few seconds.
   useEffect(() => {
@@ -158,9 +184,16 @@ export default function CanvasPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="relative flex h-app overflow-hidden">
+      {/* Small screens: a tap outside the open sidebar closes it. */}
+      {sidebarOpen && (
+        <div className="absolute inset-0 z-20 bg-black/20 lg:hidden" data-testid="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
       {/* Left sidebar */}
-      <div className="w-56 border-r bg-white flex flex-col shrink-0">
+      <div
+        className={`${sidebarOpen ? "flex absolute inset-y-0 left-0 z-30" : "hidden"} lg:flex lg:static w-56 border-r bg-white flex-col shrink-0`}
+        data-testid="sidebar"
+      >
         <div className="p-3 border-b flex items-center justify-between">
           <button
             className="text-xs font-medium hover:underline"
@@ -299,15 +332,34 @@ export default function CanvasPage() {
       </div>
 
       {/* Right column: toolbar + editing area */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Toolbar
           onSettingsClick={() => setSettingsOpen(true)}
           onExportSvgClick={() => setExportDialogOpen(true)}
+          onMenuClick={() => setSidebarOpen(open => !open)}
         />
 
-        <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1 relative">
-            <PedigreeCanvas showMinimap={showMinimap} compact={compact} />
+        {/* Small screens: how to move around by touch, and that editing wants a bigger screen (#169). */}
+        {!smallNoticeDismissed && (
+          <div className="lg:hidden flex items-start gap-2 px-3 py-1.5 border-b bg-white text-[11px] leading-snug text-gray-600" data-testid="small-screen-notice">
+            <p className="flex-1">{SMALL_SCREEN_NOTICE}</p>
+            <button
+              className="-my-1 -mr-2 px-2 py-1 text-sm leading-none text-gray-400 hover:text-black"
+              aria-label="Dismiss"
+              onClick={() => {
+                setSmallNoticeDismissed(true);
+                try { localStorage.setItem(SMALL_SCREEN_NOTICE_KEY, "true"); } catch { /* storage unavailable */ }
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 min-w-0 relative">
+            {/* The minimap would cover a third of a phone's canvas. */}
+            <PedigreeCanvas showMinimap={showMinimap && !small} compact={compact} />
             {notice && (
               <div
                 role={notice.kind === "error" ? "alert" : "status"}
@@ -325,8 +377,8 @@ export default function CanvasPage() {
             )}
           </div>
 
-          <div className="w-60 border-l bg-white shrink-0 overflow-hidden">
-            <EditPanel onManageTags={() => setTagsOpen(true)} />
+          <div className={`lg:w-60 lg:border-l max-lg:border-t bg-white shrink-0 overflow-hidden ${panelOpen ? "max-lg:h-[50dvh]" : ""}`}>
+            <EditPanel onManageTags={() => setTagsOpen(true)} open={panelOpen} onOpenChange={setPanelOpen} />
           </div>
         </div>
       </div>

@@ -133,7 +133,7 @@ function PillButton({ title, disabled, onClick, children }: PillButtonProps) {
       disabled={disabled}
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className={`
-        px-1.5 py-0.5 rounded-full font-mono text-[10px] leading-none
+        px-1.5 py-0.5 rounded-full font-mono text-[10px] leading-none pointer-coarse:px-2.5 pointer-coarse:py-2 pointer-coarse:text-xs
         hover:bg-gray-100 active:bg-gray-200
         disabled:opacity-30 disabled:cursor-not-allowed
         transition-colors

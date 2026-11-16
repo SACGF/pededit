@@ -200,9 +200,12 @@ export async function launchBrowser() {
   }
 }
 
-/** A fresh context; with asAgent, localStorage carries a JWT pair for claude_agent. */
-export async function newContext(browser, { asAgent = false, viewport, deviceScaleFactor = 1, localStorage: seed = [] } = {}) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor, acceptDownloads: true });
+/**
+ * A fresh context; with asAgent, localStorage carries a JWT pair for claude_agent.
+ * `device` is passed to playwright as it is (hasTouch, isMobile, userAgent: phone.mjs).
+ */
+export async function newContext(browser, { asAgent = false, viewport, deviceScaleFactor = 1, localStorage: seed = [], device = {} } = {}) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor, acceptDownloads: true, ...device });
   if (seed.length) {
     const pairs = seed.map(kv => {
       const eq = kv.indexOf("=");

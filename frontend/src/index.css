@@ -120,6 +120,33 @@
   }
 }
 
+/* The editor fills the screen. On a phone 100vh is taller than what shows
+   while the browser's address bar is out, so use the dynamic height where the
+   browser has it (#169). */
+.h-app {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* iOS Safari zooms the page into any field whose text is under 16px when it
+   takes focus, and does not zoom back out (#169). Only for touch screens, so
+   the desktop panels keep their small type. Outside the layers so it beats
+   the text-size utilities. */
+@media (pointer: coarse) and (max-width: 1023px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* The invisible handles on each side of a symbol only anchor the lines:
+   nothing is ever connected by hand. React Flow lets them take the pointer
+   and marks them "nopan", so a drag that began on one did not pan, which a
+   finger on a chart fitted to a phone screen hits often (#169). */
+.react-flow .react-flow__handle,
+.react-flow .react-flow__handle.connectionindicator {
+  pointer-events: none;
+}
+
 /* Multi-select (#21). The store owns the selection and a group is dragged by
    any of its nodes, so React Flow's box round the selected nodes (left after
    a rubber band, and covering them) is not used. The band itself is grey. */

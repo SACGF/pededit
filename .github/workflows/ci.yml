@@ -101,6 +101,8 @@ jobs:
         run: node frontend/scripts/browser/console.mjs --all-test-data --fixture-via-api
       - name: End-to-end flows (build, select, drag, conditions, export, import, filters, problems, signed in)
         run: node frontend/scripts/browser/flows.mjs
+      - name: Emulated phone (touch pan, pinch, tap, small-screen layout)
+        run: node frontend/scripts/browser/phone.mjs
       - name: Server logs
         if: failure()
         run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true

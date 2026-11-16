@@ -53,7 +53,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
         <button
           title="More options"
           onClick={(e) => e.stopPropagation()}
-          className="px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors"
+          className="px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors pointer-coarse:px-2.5 pointer-coarse:py-2 pointer-coarse:text-xs"
         >
           ···
         </button>
