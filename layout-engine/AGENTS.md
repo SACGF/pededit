@@ -209,8 +209,7 @@ demonstrably worse, while keeping the port as the tested baseline:
   workspace) needs the same alias, or it will look for `dist/`.
 - **Build**: `npm -w layout-engine run build` (`scripts/build.mjs`) runs
   `tsc -p tsconfig.build.json` into `dist/` (ES modules and `.d.ts`, one file
-  per source file) and copies the root `LICENSE` beside it, since npm only
-  packs a licence from the package directory. `prepack` runs it, so
+  per source file). `prepack` runs it, so
   `npm pack` and `npm publish` cannot ship a stale build. ESM only:
   `require()` of it works from Node 20.19, and a second CommonJS build was
   not worth the dual-package trouble. CI runs
@@ -230,11 +229,15 @@ demonstrably worse, while keeping the port as the tested baseline:
   Run them again when the output of `alignPedigree` or the API changes. The
   README ships in the tarball, so it cannot link to `claude/` for anything
   it needs.
-- **Licence**: `AGPL-3.0-or-later` (the maintainer's choice, #196), the
-  repository's `LICENSE`. kinship2 is
-  GPL (>= 2); the port is used under GPL 3, which may be combined with AGPL
-  3 work (section 13). A more permissive licence is not possible for the
-  ported code.
+- **Licence**: `GPL-3.0-or-later`, with the GPL 3 text in this directory's
+  own `LICENSE` (committed; npm only packs a licence from the package
+  directory). The rest of the repository is `AGPL-3.0-or-later`; the engine
+  is GPL so that companies that refuse AGPL dependencies can still use it,
+  and a web app that bundles it still distributes it, so the source must be
+  offered either way (the maintainer's choice, #196). kinship2 is GPL (>= 2);
+  the port is used under GPL 3, and the editor combines it with its AGPL 3
+  code under section 13 of both licences. A more permissive licence is not
+  possible for the ported code.
 - **Renaming the package** (the scope is the maintainer's choice): change
   `name` in `package.json`, then the same string in `frontend/package.json`
   (dependency), the three aliases above,

@@ -125,6 +125,8 @@ pededit/
 
 PedEdit is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version (`AGPL-3.0-or-later`). The full text is in [LICENSE](LICENSE). The AGPL is a copyleft licence: if you run a modified version as a service over a network, you must offer its users the source.
 
-The layout engine (`layout-engine/`) is a translation into TypeScript of the layout algorithm of the [kinship2](https://cran.r-project.org/package=kinship2) R package, copyright its authors and licensed GPL (version 2 or later). The code derived from it is used under version 3 of the GPL, which allows it to be combined with work under the AGPL (section 13 of both licences). If you publish figures laid out with PedEdit, please cite:
+The layout engine in `layout-engine/`, published to npm on its own, is licensed under the GNU General Public License, version 3 or (at your option) any later version (`GPL-3.0-or-later`), with the text in [layout-engine/LICENSE](layout-engine/LICENSE).
+
+The layout engine is a translation into TypeScript of the layout algorithm of the [kinship2](https://cran.r-project.org/package=kinship2) R package, copyright its authors and licensed GPL (version 2 or later). The code derived from it is used under version 3 of the GPL, which allows it to be combined with work under the AGPL (section 13 of both licences). If you publish figures laid out with PedEdit, please cite:
 
 > Sinnwell JP, Therneau TM, Schaid DJ. The kinship2 R package for pedigree data. Human Heredity. 2014;78(2):91-93. doi:10.1159/000363105

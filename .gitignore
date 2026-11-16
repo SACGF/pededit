@@ -213,8 +213,6 @@ __marimo__/
 
 /layout-engine/node_modules/
 /layout-engine/dist/
-# Copied from the root by layout-engine/scripts/build.mjs for the npm tarball
-/layout-engine/LICENSE
 /layout-engine/*.tgz
 
 # Frontend build output

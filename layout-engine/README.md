@@ -439,12 +439,12 @@ The layout algorithm is a translation into TypeScript of code from kinship2:
 kinship2 is copyright its authors and licensed GPL (version 2 or later). If
 you publish figures laid out with this package, please cite their paper.
 
-This package is licensed under the GNU Affero General Public License,
-version 3 or (at your option) any later version (`AGPL-3.0-or-later`), the
-licence of the PedEdit repository; the full text is in `LICENSE`. The code derived from kinship2 is used under version 3
-of the GPL, which allows it to be combined with work under the AGPL
-(section 13 of both licences). The AGPL is a copyleft licence: read it
-before using this package in software you distribute, or offer over a
-network, under other terms.
+This package is licensed under the GNU General Public License, version 3 or
+(at your option) any later version (`GPL-3.0-or-later`), as allowed by
+kinship2's licence; the full text is in `LICENSE`. The GPL is a copyleft
+licence: if you distribute software that includes this package, and a web
+page that bundles it counts, you must offer its source under the GPL too.
+Read it before using this package in software you distribute under other
+terms.
 
 Bugs and questions: https://github.com/SACGF/pededit/issues

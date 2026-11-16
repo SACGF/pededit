@@ -12,7 +12,7 @@
     "kinship",
     "genogram"
   ],
-  "license": "AGPL-3.0-or-later",
+  "license": "GPL-3.0-or-later",
   "author": "SACGF (https://github.com/SACGF)",
   "homepage": "https://github.com/SACGF/pededit/tree/main/layout-engine#readme",
   "repository": {
