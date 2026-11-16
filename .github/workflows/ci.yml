@@ -84,6 +84,12 @@ jobs:
         run: node frontend/scripts/browser/lint.mjs --all-examples --compact --deidentify
       - name: Console sweep, every example saved and reloaded through the API
         run: node frontend/scripts/browser/console.mjs --all-examples --fixture-via-api
+      - name: Render and export lint, every feature fixture
+        run: node frontend/scripts/browser/lint.mjs --all-fixtures
+      - name: Render and export lint, every feature fixture, compact and de-identified
+        run: node frontend/scripts/browser/lint.mjs --all-fixtures --compact --deidentify
+      - name: Console sweep, every feature fixture saved and reloaded through the API
+        run: node frontend/scripts/browser/console.mjs --all-fixtures --fixture-via-api
       - name: Server logs
         if: failure()
         run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true

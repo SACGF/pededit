@@ -192,8 +192,9 @@ it is `src/io/svg/__tests__/exportLint.test.ts`; in a page,
 and frontend vitest, `tsc -b`, the backend tests, and the page checks on
 headless chromium: `lint.mjs --all-examples` (normal, then compact and
 de-identified) and `console.mjs --all-examples --fixture-via-api` against a
-SQLite Django, so each example must load without JS errors, draw and export
-cleanly, and survive a save and reload. On failure the job prints the tail
+SQLite Django, then the same three with `--all-fixtures`, so each example and
+feature fixture must load without JS errors, draw and export cleanly, and
+survive a save and reload. On failure the job prints the tail
 of the Vite and Django logs. Reproduce a failing step locally with the same
 command after `servers.mjs up`.
 
@@ -204,6 +205,10 @@ command after `servers.mjs up`.
 PATCHes go to the in-memory copy. SPEC is one of:
 
 - `example:N` or `example:LABEL` from `frontend/src/data/examples.ts`
+- `fixture:SLUG` from `frontend/src/fixtures/features.ts`: the feature
+  fixtures (#140), small artificial pedigrees that between them draw every
+  symbol, line and label (`fixture:status`, `fixture:couples`,
+  `fixture:text-2008`...). An unknown slug lists them.
 - a `.ped` file, optionally `FILE.ped#FAMID` (imported with the app's own `importPed`)
 - a `.json` file: the app's own Download JSON envelope (`{format, version,
   pedigree}`) or a bare Pedigree, both read with the app's `importJson`, or
@@ -215,6 +220,16 @@ does not look clean. Import errors stop the run.
 
 `shot.mjs`, `console.mjs` and `lint.mjs` accept `--fixture` several times and
 handle each in turn.
+
+`--all-examples` and `--all-fixtures` (all three tools) stand for every
+example and every feature fixture. The examples are real families and draw
+only part of what the renderers can; a change to drawing code should be
+checked on the fixtures too:
+
+```bash
+node frontend/scripts/browser/lint.mjs --all-fixtures
+node frontend/scripts/browser/shot.mjs --all-fixtures --tile --out-dir /tmp/fx
+```
 
 ### Fixtures through the real backend
 

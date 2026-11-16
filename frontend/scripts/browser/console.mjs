@@ -6,14 +6,13 @@
 import {
   COMMON_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
   assertServerUp, loadFixture, openPage, finishPage, contextOptions, resolveFindings, SourceMapper,
-  summaryLine, findingLines, writesLine, hasFindings, servedInfo, servedLines, UsageError, resolveTarget, inApp,
+  summaryLine, findingLines, writesLine, hasFindings, servedInfo, servedLines, UsageError, SET_FLAGS, SET_HELP, expandSetFlags,
 } from "./harness.mjs";
 
 const HELP = `usage: node frontend/scripts/browser/console.mjs [URL] [options]
 
-  --all-examples      Check every example in src/data/examples.ts, as if each
-                      were given with --fixture example:N (combine with
-                      --fixture-via-api to check each survives a save).
+${SET_HELP}
+                      Combine with --fixture-via-api to check each survives a save.
 
 Prints the served commit, one summary line, then one line per finding with a
 file:line. Everything goes to stdout.
@@ -21,21 +20,9 @@ Exits 0 when the page is clean, 1 when there are findings, 2 on usage errors.
 ${COMMON_HELP}`;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool" });
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), SET_FLAGS);
   if (flags.help) { console.log(HELP); return 0; }
-  if (flags["all-examples"]) {
-    // The examples are TypeScript served by Vite; count them there.
-    const base = resolveTarget("/", { allowRemote: flags["allow-remote"] });
-    await assertServerUp(base);
-    const browser = await launchBrowser();
-    try {
-      const context = await newContext(browser, {});
-      const n = await inApp(context, base, async () => (await import("/src/data/examples.ts")).EXAMPLES.length);
-      flags.fixture = [...(flags.fixture ?? []), ...Array.from({ length: n }, (_, i) => `example:${i}`)];
-    } finally {
-      await closeBrowser(browser);
-    }
-  }
+  await expandSetFlags(flags);
   if (positional.length > 1) throw new UsageError("usage: one URL at most (use --fixture several times for several pedigrees)");
   const targets = targetsFrom(positional[0], flags);
   await assertServerUp(targets[0].url);

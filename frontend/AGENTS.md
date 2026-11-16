@@ -219,6 +219,16 @@ stub so the app still builds without Google login.
   consume each other).
 - `data/examples.ts` — the example pedigrees on the landing page.
 - `fixtures/` — pedigrees used by tests and dev-only render scripts.
+  `fixtures/features.ts` holds the feature fixtures (#140): small artificial
+  pedigrees that between them draw every symbol, line and label, each also
+  in NSGC 2008 and black and white where that changes the drawing. The
+  examples are real families for users and draw only part of it, so drawing
+  changes are checked on these (`--fixture fixture:SLUG`, `--all-fixtures`).
+  `fixtures/__tests__/featureFixtures.test.ts` reads the field list from
+  `docs/pedigree-json-schema.json` and fails when a field or enum value is
+  set by no fixture: a new drawn field needs a fixture person, a field that
+  draws nothing goes in that test's `DRAWS_NOTHING`. A new setting that
+  changes the drawing gets a variant in `VARIANTS`.
 
 ## Conventions
 

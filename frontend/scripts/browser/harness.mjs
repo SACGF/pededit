@@ -105,8 +105,9 @@ export const COMMON_HELP = `
 Common options:
   --fixture SPEC      Serve a pedigree at /p/fixture without the backend. SPEC is
                       a .json Pedigree or Download JSON file, a .ped file
-                      (optionally FILE.ped#FAMID), or example:N / example:LABEL
-                      from src/data/examples.ts. The URL defaults to /p/fixture.
+                      (optionally FILE.ped#FAMID), example:N / example:LABEL
+                      from src/data/examples.ts, or fixture:SLUG from
+                      src/fixtures/features.ts. The URL defaults to /p/fixture.
   --fixture-via-api   POST each fixture through the real API (Django running)
                       and open /p/<id> instead. Afterwards the harness checks
                       persistence: what was POSTed against what loaded, and the
@@ -273,6 +274,18 @@ export async function loadFixture(spec, context, base) {
       throw new UsageError(`no example matches "${key}". Examples: ${examples.map((e, i) => `${i}:${e.label}`).join(", ")}`);
     }
     return { label: spec, title: ex.label, pedigree: ex.data, warnings: [] };
+  }
+
+  if (spec.startsWith("fixture:")) {
+    // Feature fixtures (#140, src/fixtures/features.ts): dense test pedigrees, by slug.
+    const key = spec.slice("fixture:".length);
+    const fixtures = await inApp(context, base, async () => {
+      const { FEATURE_FIXTURES } = await import("/src/fixtures/features.ts");
+      return FEATURE_FIXTURES.map(f => ({ slug: f.slug, label: f.label, data: f.data }));
+    });
+    const fx = fixtures.find(f => f.slug === key);
+    if (!fx) throw new UsageError(`no feature fixture "${key}". Fixtures: ${fixtures.map(f => f.slug).join(", ")}`);
+    return { label: spec, title: fx.label, pedigree: fx.data, warnings: [] };
   }
 
   const [file, famId] = spec.split("#");
@@ -1071,6 +1084,39 @@ export function contextOptions(flags, extra = {}) {
 }
 
 /** Work out the list of { url, fixtureSpec } targets from positional args and --fixture. */
+/** parseArgs spec for the two "every pedigree of a set" flags. */
+export const SET_FLAGS = { "all-examples": "bool", "all-fixtures": "bool" };
+
+export const SET_HELP = `  --all-examples      Every example in src/data/examples.ts, as if each were
+                      given with --fixture example:N.
+  --all-fixtures      Every feature fixture in src/fixtures/features.ts (#140),
+                      as if each were given with --fixture fixture:SLUG.`;
+
+/**
+ * Turn --all-examples and --all-fixtures into --fixture specs. Both lists are
+ * TypeScript served by Vite, so they are read there.
+ */
+export async function expandSetFlags(flags) {
+  if (!flags["all-examples"] && !flags["all-fixtures"]) return;
+  const base = resolveTarget("/", { allowRemote: flags["allow-remote"] });
+  await assertServerUp(base);
+  const browser = await launchBrowser();
+  try {
+    const context = await newContext(browser, {});
+    const sets = await inApp(context, base, async () => ({
+      examples: (await import("/src/data/examples.ts")).EXAMPLES.length,
+      fixtures: (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => f.slug),
+    }));
+    flags.fixture = [
+      ...(flags.fixture ?? []),
+      ...(flags["all-examples"] ? Array.from({ length: sets.examples }, (_, i) => `example:${i}`) : []),
+      ...(flags["all-fixtures"] ? sets.fixtures.map(s => `fixture:${s}`) : []),
+    ];
+  } finally {
+    await closeBrowser(browser);
+  }
+}
+
 export function targetsFrom(positionalUrl, flags) {
   const fixtures = flags.fixture ?? [];
   if (flags["fixture-via-api"] && !fixtures.length) throw new UsageError("--fixture-via-api needs --fixture SPEC");

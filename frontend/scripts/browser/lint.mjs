@@ -11,9 +11,10 @@ import {
   resolveTarget, assertServerUp, loadFixture, inApp, openPage, servedInfo, servedLines, DEFAULT_BASE, UsageError,
 } from "./harness.mjs";
 
-const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--fixture SPEC ...] [URL] [options]
+const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--all-fixtures] [--fixture SPEC ...] [URL] [options]
 
   --all-examples      Lint every example in src/data/examples.ts.
+  --all-fixtures      Lint every feature fixture in src/fixtures/features.ts (#140).
   --fixture SPEC      Lint a fixture (repeatable; same SPECs as the other tools).
   URL                 Lint the pedigree loaded in an editor page (/p/<id>),
                       after any steps, as __pededit.check() sees it.
@@ -43,7 +44,7 @@ ${COMMON_HELP}`;
 const isBad = r => r.findings.length + r.exportFindings.length > 0;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool", monochrome: "bool" });
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", "all-fixtures": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool", monochrome: "bool" });
   // Settings forced on before linting: names above double lines, monochrome tag fills.
   const named = {
     ...(flags["relationship-labels"] ? { relationshipLabels: true } : {}),
@@ -51,8 +52,8 @@ await main(async () => {
   };
   const exportOpts = flags["no-export"] ? null : { compact: !!flags.compact, deidentify: !!flags.deidentify, uShape: !!flags["u-shape"] };
   if (flags.help) { console.log(HELP); return 0; }
-  const specs = [...(flags["all-examples"] ? ["__all__"] : []), ...(flags.fixture ?? [])];
-  if (!specs.length && !positional.length) throw new UsageError("usage: give --all-examples, --fixture SPEC or a URL");
+  const specs = [...(flags["all-examples"] ? ["__examples__"] : []), ...(flags["all-fixtures"] ? ["__fixtures__"] : []), ...(flags.fixture ?? [])];
+  if (!specs.length && !positional.length) throw new UsageError("usage: give --all-examples, --all-fixtures, --fixture SPEC or a URL");
   if (positional.length > 1) throw new UsageError("usage: one URL at most");
   const base = positional[0] ? resolveTarget(positional[0], { allowRemote: flags["allow-remote"] }) : DEFAULT_BASE;
   await assertServerUp(base);
@@ -64,21 +65,23 @@ await main(async () => {
     const context = await newContext(browser, contextOptions(flags));
     for (const spec of specs) {
       let items;
-      if (spec === "__all__") {
-        items = await inApp(context, base, async ({ compact, exportOpts, named }) => {
-          const { EXAMPLES } = await import("/src/data/examples.ts");
+      if (spec === "__examples__" || spec === "__fixtures__") {
+        items = await inApp(context, base, async ({ compact, exportOpts, named, fixtures }) => {
+          const set = fixtures
+            ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data }))
+            : (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data }));
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
           const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
-          return EXAMPLES.map((e, i) => ({
-            name: `example:${i} ${e.label}`,
+          return set.map(e => ({
+            name: e.name,
             findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact })),
             exportFindings: exportOpts ? lintExport(withNames(e.data), exportOpts) : [],
           }));
-        }, { compact: !!flags.compact, exportOpts, named });
+        }, { compact: !!flags.compact, exportOpts, named, fixtures: spec === "__fixtures__" });
       } else {
         const fixture = await loadFixture(spec, context, base);
         const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named }) => {
