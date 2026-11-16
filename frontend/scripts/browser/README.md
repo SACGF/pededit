@@ -43,7 +43,7 @@ In the page, `__pededit.commit` holds the same as of server start.
 
 ## The tools
 
-All four take a URL (a path like `/p/<id>` is resolved against
+`console.mjs`, `shot.mjs`, `eval.mjs` and `lint.mjs` take a URL (a path like `/p/<id>` is resolved against
 `http://localhost:5173`) or `--fixture`, plus ordered interaction steps.
 `--help` on any of them lists every option.
 
@@ -185,6 +185,45 @@ U-shape export is not. It relies on the group classes `exportSvg` writes
 on childless and twin marks; keep them when changing the exporter. In vitest
 it is `src/io/svg/__tests__/exportLint.test.ts`; in a page,
 `__pededit.checkExport()`.
+
+### compare.mjs: did the drawing change between two commits?
+
+```bash
+node frontend/scripts/browser/compare.mjs --all-examples --all-fixtures            # working tree against HEAD
+node frontend/scripts/browser/compare.mjs --base origin/main --all-fixtures        # against another commit
+node frontend/scripts/browser/compare.mjs --all-fixtures --compact --deidentify --nsgc2008 --monochrome
+```
+
+```
+before: 2a30eba  (http://localhost:5180)
+after:  2a30eba +1 uncommitted  (working tree)
+drawings: canvas, export, u-shape
+DIFF  fixture:status
+        canvas  23 px changed in 443x243 at 265,105  frontend/test-output/browser/compare/fixture-status.canvas.png
+same  fixture:couples
+compare: 1 of 2 pedigree(s) differ
+```
+
+For a change that is meant to move nothing (#142). It checks `--base` (default
+`HEAD`) out under `.worktrees/` with its own Vite, draws each pedigree on both
+sides and compares pixel for pixel, with no tolerance: the canvas at zoom 1
+with editor-only marks hidden (minimap, controls, dev ids, problem markers),
+the standard SVG export and the U-shape export. Both sides draw the working
+tree's pedigree data, so it compares drawing code, not fixtures. Each
+difference gets an image (before, after, and the after drawing greyed with
+the changed pixels in red, boxed) and, for exports, the two SVG files. An
+export whose text changed but draws the same is noted and does not fail. Exit
+0 when nothing differs. About 3 seconds a pedigree.
+
+It is not in CI: screenshots depend on the machine's fonts and chromium, so
+it compares two commits on one machine and commits no images. Paste its report
+on the issue of a refactoring change. The base runs with this checkout's
+`node_modules`, so it cannot judge a dependency upgrade.
+
+`servers.mjs up --worktree REF` serves a commit the same way and leaves it
+running (#70): a frozen copy for a testing run while the working tree is
+being edited. Pass the URL it prints as `PEDEDIT_BASE`, or to `compare.mjs
+--base-url`. `servers.mjs down` stops it and removes the worktree.
 
 ## CI
 

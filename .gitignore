@@ -224,5 +224,8 @@ __marimo__/
 # Claude Code agent worktrees
 /.claude/worktrees/
 
+# Other commits checked out by frontend/scripts/browser/worktree.mjs (servers.mjs up --worktree, compare.mjs)
+/.worktrees/
+
 # Private pedigree data, never commit
 /test-data/real_example_not_public/

@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } 
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { startWorktree, removeWorktree } from "./worktree.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_DIR = path.resolve(HERE, "../..");
@@ -15,14 +16,21 @@ const BACKEND_DIR = path.join(REPO_ROOT, "backend");
 const CACHE_DIR = path.join(REPO_ROOT, "node_modules", ".cache", "pededit-browser");
 const STATE = path.join(CACHE_DIR, "servers.json");
 
-const HELP = `usage: node frontend/scripts/browser/servers.mjs up|down|status [--frontend-only]
+const HELP = `usage: node frontend/scripts/browser/servers.mjs up|down|status [--frontend-only] [--worktree REF]
 
   up               Start whichever of Vite (:5173) and Django (:8000) is not
                    already answering, and wait until both are. Logs go to
                    ${path.relative(REPO_ROOT, CACHE_DIR)}/{vite,django}.log
   up --frontend-only
                    Vite only; enough for --fixture checks.
-  down             Stop the servers that \`up\` started.
+  up --worktree REF
+                   Also (or only: Vite and Django are left as they are) check
+                   REF out under .worktrees/ and serve it with its own Vite on
+                   a free port, so a testing run is not disturbed by edits to
+                   the working tree. Prints the URL to pass as PEDEDIT_BASE.
+                   It uses this checkout's node_modules and the Django on 8000.
+  down             Stop the servers that \`up\` started, and remove the
+                   worktrees it made.
   status           Say what is answering.`;
 
 const SERVERS = {
@@ -90,13 +98,28 @@ async function up(names) {
   return 0;
 }
 
+async function upWorktree(ref) {
+  mkdirSync(CACHE_DIR, { recursive: true });
+  const state = readState();
+  const w = await startWorktree(ref);
+  state[`worktree:${w.sha.slice(0, 12)}:${w.pid}`] = { pid: w.pid, log: w.log, dir: w.dir, url: w.url };
+  writeFileSync(STATE, JSON.stringify(state, null, 2));
+  console.log(`worktree: ${w.sha.slice(0, 7)} served (pid ${w.pid}) at ${w.url}/ from ${path.relative(REPO_ROOT, w.dir)}`);
+  console.log(`  PEDEDIT_BASE=${w.url} node frontend/scripts/browser/console.mjs --fixture example:2`);
+  return 0;
+}
+
 function down() {
   const state = readState();
-  for (const [name, { pid }] of Object.entries(state)) {
-    if (!alive(pid)) { console.log(`${name}: pid ${pid} already gone`); continue; }
-    // detached children lead their own process group; this also stops runserver's reloader child.
-    try { process.kill(-pid, "SIGTERM"); } catch { process.kill(pid, "SIGTERM"); }
-    console.log(`${name}: stopped pid ${pid}`);
+  for (const [name, { pid, dir }] of Object.entries(state)) {
+    if (!alive(pid)) console.log(`${name}: pid ${pid} already gone`);
+    else {
+      // detached children lead their own process group; this also stops runserver's reloader child.
+      try { process.kill(-pid, "SIGTERM"); } catch { process.kill(pid, "SIGTERM"); }
+      console.log(`${name}: stopped pid ${pid}`);
+    }
+    // Another worktree server may still serve the same checkout.
+    if (dir && !Object.entries(state).some(([n, o]) => n !== name && o.dir === dir && alive(o.pid))) removeWorktree(dir);
   }
   rmSync(STATE, { force: true });
   return 0;
@@ -107,6 +130,9 @@ async function status() {
   for (const [name, s] of Object.entries(SERVERS)) {
     const ours = state[name] && alive(state[name].pid) ? ` (started by servers.mjs, pid ${state[name].pid})` : "";
     console.log(`${name}: ${(await answering(s.url)) ? "answering" : "not answering"} at ${s.url}${ours}`);
+  }
+  for (const [name, w] of Object.entries(state)) {
+    if (w.dir) console.log(`${name.split(":").slice(0, 2).join(" ")}: ${alive(w.pid) ? "answering" : "not answering"} at ${w.url}/ (pid ${w.pid})`);
   }
   // Which checkout and commit Vite serves (vite.config.ts /__pededit/commit).
   try {
@@ -125,9 +151,14 @@ async function status() {
 
 const [cmd, ...rest] = process.argv.slice(2);
 const frontendOnly = rest.includes("--frontend-only");
+const worktreeAt = rest.indexOf("--worktree");
+const worktreeRef = worktreeAt >= 0 ? rest[worktreeAt + 1] : null;
 let code;
 try {
-  if (cmd === "up") code = await up(frontendOnly ? ["vite"] : ["vite", "django"]);
+  if (cmd === "up" && worktreeAt >= 0) {
+    if (!worktreeRef) throw new Error("--worktree needs a commit, branch or tag");
+    code = await upWorktree(worktreeRef);
+  } else if (cmd === "up") code = await up(frontendOnly ? ["vite"] : ["vite", "django"]);
   else if (cmd === "down") code = down();
   else if (cmd === "status") code = await status();
   else { console.log(HELP); code = cmd ? 2 : 0; }
