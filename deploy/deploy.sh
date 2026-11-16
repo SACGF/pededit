@@ -45,6 +45,12 @@ if ! sudo -u pededit .venv/bin/python manage.py check --deploy --fail-level WARN
 fi
 cd /opt/pededit
 
+echo "==> Checking the backup setup"
+# The dump itself is taken just before the migration (#48). Checking that it
+# can be taken happens here, while stopping still leaves the site untouched.
+install -d -o pededit -g pededit -m 700 /var/backups/pededit
+sudo -u pededit bash /opt/pededit/deploy/backup.sh --check
+
 echo "==> Installing Node dependencies"
 sudo -u pededit npm ci
 
@@ -65,6 +71,10 @@ sudo -u pededit env \
 echo "==> Updating backend"
 cd /opt/pededit/backend
 sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
+# A dump from before the migration, so a migration that goes wrong can be
+# undone (#48, INSTALL.md step 12). A failed dump stops the deploy here: the
+# database is not migrated without one.
+sudo -u pededit bash /opt/pededit/deploy/backup.sh --predeploy
 sudo -u pededit .venv/bin/python manage.py migrate
 # The table the rate limit counters live in (#47). Does nothing once it exists.
 sudo -u pededit .venv/bin/python manage.py createcachetable

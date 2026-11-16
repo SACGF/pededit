@@ -1,0 +1,12 @@
+[Unit]
+Description=Nightly PedEdit database backup
+
+[Timer]
+# In the server's time zone. Persistent: a run missed while the server was
+# off happens at the next boot.
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

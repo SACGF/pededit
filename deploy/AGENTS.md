@@ -96,4 +96,50 @@ Deployment" half).
   dependency and put static requests through Gunicorn's three workers for no
   gain. Revisit only if Nginx goes away.
 
-Still to do (#48, #49): automated database backups, Sentry.
+## Database backups (#48)
+
+- `backup.sh` (nightly from `pededit-backup.timer`, as user `pededit`):
+  `pg_dump` custom format to a temporary name, checked, renamed, then
+  retention, then the off-box mirror. `--predeploy` is what `deploy.sh` runs
+  before `migrate` (no off-box copy, so a deploy does not depend on the
+  remote; the next nightly run mirrors it). `--check` is the preflight
+  `deploy.sh` runs before the build. `restore-test.sh` restores a dump into a
+  scratch database and checks it. Like the other units, the service and
+  timer are installed by hand (INSTALL.md step 12), not by `deploy.sh`,
+  which only creates `/var/backups/pededit`.
+- **Privacy fact: a deleted pedigree stays in backups for up to 8 weeks.**
+  Deleting removes the row at once, but every dump taken while it existed
+  keeps it until pruned, on the server and off it. Retention is the newest
+  dump of each of the last 14 days and of each of the last 8 ISO weeks
+  (oldest kept dump: under 8 weeks), plus 5 pre-deploy dumps capped at the
+  daily window so they do not stretch that. Any text about deletion (the
+  landing page's data statement, #178) must agree with these numbers, and
+  whether the off-box copies are encrypted and where they are held is set on
+  the server (`/etc/pededit/backup.env`), not in this repo: ask the
+  maintainer before stating either.
+- Retention counts days and weeks that have a dump, by the UTC time in the
+  file name, never by file age. If backups stop for a month the newest
+  dumps are still kept, and a copied or touched file keeps its place.
+- The off-box copy mirrors (`rclone sync`, `rsync --delete`), so remote
+  retention equals local. `BACKUP_MAX_REMOTE_DELETE` stops a run that would
+  delete many remote dumps, which is what an emptied local directory looks
+  like. Encryption is GnuPG to a public key file (`--recipient-file`, no
+  keyring on the server); chosen over `age` because gpg is in a stock Ubuntu
+  install. Only the off-box copies are encrypted (`offsite/*.gpg`): the
+  local dumps sit beside the live database, and the restore test must read
+  them.
+- With no destination configured the script warns `LOCAL ONLY` on every
+  run and still exits 0. Whether that is the case on pededit.com is the
+  maintainer's to say.
+- `pg_dump` runs as the app's role from `database_url` (password in the
+  environment, never in arguments). It fails if any table in the database
+  is owned by another role, which is the right outcome but surprising: a
+  scratch table made as `postgres` breaks the nightly backup.
+- `bash deploy/test-backup.sh` tests retention, the failure paths and the
+  mirror with `pg_dump`, `pg_restore` and `rclone` stubbed, so it needs no
+  database. It is not in CI. Run it after any change to `backup.sh`. There
+  is no `shellcheck` in the dev environment; `bash -n` at least. A real
+  dump and restore need PostgreSQL: a throwaway cluster works without root
+  (`/usr/lib/postgresql/*/bin/initdb` and `pg_ctl` under `/tmp`).
+
+Still to do (#49): Sentry.

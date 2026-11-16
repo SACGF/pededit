@@ -106,6 +106,8 @@ deploy/
 └── pededit-nginx.conf      # Nginx vhost → /etc/nginx/sites-available/pededit
 ```
 
+Database backups (step 12) add `backup.sh`, `restore-test.sh`, `pededit-backup.service`, `pededit-backup.timer` and `backup.env.example` from the same directory.
+
 Architecture:
 
 ```
@@ -379,7 +381,7 @@ Use the deploy script, which pulls social login client IDs from `/etc/pededit/pe
 sudo bash /opt/pededit/deploy/deploy.sh
 ```
 
-It first runs `manage.py check --deploy --fail-level WARNING` and stops, with the running site untouched, if Django has anything to say about the production settings (step 8). Then it pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
+It first runs `manage.py check --deploy --fail-level WARNING` and stops, with the running site untouched, if Django has anything to say about the production settings (step 8). It dumps the database just before the migrations (step 12). In between it pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
 
 The script does not install the service file or the Nginx config. If `deploy/pededit.service` changed, copy it into place again as in step 6. If `deploy/pededit-nginx.conf` changed, make the same edit by hand in `/etc/nginx/sites-available/pededit`, then `sudo nginx -t && sudo systemctl reload nginx`. Do not copy the file over the installed one: that loses your `server_name` and the TLS lines Certbot added.
 
@@ -392,7 +394,108 @@ Any monitor that reads the HTTP status works (UptimeRobot's free HTTP monitor do
 
 Neither can tell that the app loads but then breaks in the browser. That needs error reporting (#49).
 
+## 12. Database backups
+
+Pedigrees are family health data on one server. `deploy/backup.sh` dumps the database every night, keeps a rolling set, and copies it off the server.
+
+### Install
+
+```bash
+sudo install -d -o pededit -g pededit -m 700 /var/backups/pededit
+sudo cp /opt/pededit/deploy/pededit-backup.service /opt/pededit/deploy/pededit-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now pededit-backup.timer
+
+sudo systemctl start pededit-backup      # take one now
+sudo systemctl status pededit-backup     # "status=0/SUCCESS", and the script's own lines
+systemctl list-timers pededit-backup     # when the next one runs (02:30 server time)
+```
+
+Each run writes `/var/backups/pededit/pededit-db-<UTC time>.dump` (`pg_dump` custom format, compressed) under a temporary name, checks it is a readable archive of a believable size that contains the pedigree table, and only then gives it its final name. Any failure exits non-zero with a line starting `BACKUP FAILED`, so the unit shows as failed in `systemctl status pededit-backup` and `systemctl --failed`, with the reason in `journalctl -u pededit-backup`.
+
+`deploy.sh` also takes a dump just before it runs migrations (`pededit-predeploy-<time>.dump`), and refuses to migrate if it cannot.
+
+### Copy it off the server
+
+Until you do this, every run ends with a `LOCAL ONLY` warning, and it means it: a backup on the same disk as the database is lost with the server.
+
+```bash
+sudo cp /opt/pededit/deploy/backup.env.example /etc/pededit/backup.env
+sudo chown root:pededit /etc/pededit/backup.env
+sudo chmod 640 /etc/pededit/backup.env
+sudo nano /etc/pededit/backup.env
+```
+
+Set one or both of:
+
+- `BACKUP_RCLONE_DEST` for object storage (S3, Backblaze B2 and others): `sudo apt install rclone`, create a bucket and a key that can only write to it, run `sudo RCLONE_CONFIG=/etc/pededit/rclone.conf rclone config`, then `sudo chown root:pededit /etc/pededit/rclone.conf && sudo chmod 640 /etc/pededit/rclone.conf` and set `RCLONE_CONFIG` in `backup.env` as the example shows.
+- `BACKUP_RSYNC_DEST` for a second host over ssh. Make a key for it (`sudo ssh-keygen -t ed25519 -N '' -f /etc/pededit/backup_ssh_key`, then `sudo chown pededit /etc/pededit/backup_ssh_key`), add the `.pub` to the backup account on the other host, and record that host's key: `sudo -u pededit mkdir -p -m 700 ~pededit/.ssh && ssh-keyscan backup.example.org | sudo -u pededit tee -a ~pededit/.ssh/known_hosts`.
+
+Both mirror the kept dumps, so the copies follow the same retention as the server. Only files named `pededit-*.dump*` are touched at the destination, and a run that would delete more than 10 of them there stops instead (a sign the local set has gone missing). For protection against a compromised server deleting its own backups, turn on versioning or object lock on the bucket; then the bucket's own expiry rule decides how long a deleted pedigree stays in it.
+
+**Encrypt what leaves the server.** The copies are family health data in someone else's storage. Make a GnuPG key pair on your own machine, not on the server, and put only the public key on the server:
+
+```bash
+# on your own machine
+gpg --quick-generate-key "PedEdit backups <you@example.org>" default default never
+gpg --armor --export "PedEdit backups" > backup-public-key.asc
+# copy backup-public-key.asc to the server as /etc/pededit/backup-public-key.asc (root:pededit, 640)
+```
+
+Set `BACKUP_GPG_PUBLIC_KEY=/etc/pededit/backup-public-key.asc`. From then on only `.dump.gpg` files leave the server. The dumps on the server itself stay unencrypted: the live database sits beside them, and the restore test reads them. Without the private key the copies cannot be read by anyone, you included, so keep it (and its passphrase) somewhere that survives losing both the server and your laptop.
+
+Then run it and look: `sudo systemctl start pededit-backup; sudo journalctl -u pededit-backup -n 20` should end with an `off-box: mirrored to ...` line and no `LOCAL ONLY` warning. Check the files really are at the destination.
+
+**Being told when backups stop.** Nobody reads `systemctl status` on a server that is working. Set `BACKUP_PING_URL` to a dead man's switch (healthchecks.io or similar) with a period of one day: the script fetches it after each successful nightly run, and the service emails you when the ping is late, whether the backup failed or the timer never fired.
+
+### What is kept, and for how long
+
+- The newest dump of each of the last 14 days that have one.
+- The newest dump of each of the last 8 calendar weeks that have one.
+- The newest 5 pre-deploy dumps, none older than 14 days.
+
+Change the numbers with `BACKUP_KEEP_DAILY`, `BACKUP_KEEP_WEEKLY` and `BACKUP_KEEP_PREDEPLOY` in `backup.env`.
+
+**This is also how long deleted data lives on.** A pedigree that a user deletes is removed from the database at once, but it stays in every dump taken while it existed, on the server and in the off-box copies, until those dumps are pruned: up to 8 weeks with the defaults. Nothing removes one pedigree from a dump. Say so wherever the site describes what happens to deleted data, and if you shorten or lengthen the retention, change that statement with it. If the nightly run stops, nothing is pruned either, so old dumps stay until it runs again.
+
+### Test the restore
+
+A backup nobody has restored is a hope. This restores the newest dump into a scratch database, checks the tables, the row counts and that every pedigree's data came back, compares the count with the live database, and drops the scratch database. It does not touch the live one:
+
+```bash
+sudo bash /opt/pededit/deploy/restore-test.sh
+```
+
+It ends with `RESTORE TEST PASSED` or `RESTORE TEST FAILED` and the reason, including when the newest dump is more than two days old. Run it when you set backups up and every few months after. To test an off-box copy, which is the one that matters when the server is gone, fetch it, decrypt it on the machine that holds the private key (`gpg --output x.dump --decrypt pededit-db-....dump.gpg`), and give the script the file: `sudo bash deploy/restore-test.sh /path/to/x.dump`.
+
+### Restore for real
+
+On the same server, back to a chosen dump. The damaged database is renamed, not dropped, until the restored one is seen to work.
+
+```bash
+DUMP=/var/backups/pededit/pededit-db-20261116T023000Z.dump   # the one you chose
+
+sudo systemctl stop pededit
+sudo -u postgres psql -c "ALTER DATABASE pededit RENAME TO pededit_before_restore"
+sudo -u postgres createdb -O pededit pededit
+sudo cat "$DUMP" | sudo -u postgres pg_restore --no-owner --role=pededit --exit-on-error -d pededit
+
+cd /opt/pededit/backend
+sudo -u pededit .venv/bin/python manage.py migrate    # only does anything if the code is newer than the dump
+sudo systemctl start pededit
+curl -s http://127.0.0.1:8000/api/health/
+sudo -u pededit .venv/bin/python manage.py usage_stats
+```
+
+Open a pedigree you know. When you are satisfied: `sudo -u postgres dropdb pededit_before_restore`. Everything saved after the dump was taken is gone from the restored database; it is still in `pededit_before_restore` if that database is readable.
+
+To undo a bad migration, restore the `pededit-predeploy-...` dump the same way, after checking out the commit that was running before (`deploy.sh` would migrate again).
+
+On a new server, after losing the old one: follow this guide from step 1 to step 5 but stop before "Run migrations", fetch the newest off-box copy, decrypt it with the private key, then run the `pg_restore` line above into the empty database from step 3, and carry on from the migrations. `/etc/pededit/pededit.json` and `backend/secret_key.txt` are not in the database dump: without the old secret key everyone signed in has to sign in again, and nothing else is lost.
+
 ## Troubleshooting
+
+**`pededit-backup` failed.** `sudo journalctl -u pededit-backup -n 30` has a `BACKUP FAILED` line with the reason. A `pg_dump` "permission denied for table" means a table in the database belongs to another role (made by hand as `postgres`, say): give it to the app's role with `ALTER TABLE ... OWNER TO pededit`, or drop it. A failed off-box copy leaves the local dump in place and fails the run. `status=226/NAMESPACE` means `/var/backups/pededit` does not exist.
 
 **`deploy.sh` says the health check did not return 200.** With no "last answer" line, Gunicorn failed to start. With one, the answer names the failing check: `"database": "unavailable"` or `"disk": "low"` (free some space, `df -h`). `sudo journalctl -u pededit -e` has the detail; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
 

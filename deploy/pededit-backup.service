@@ -1,0 +1,22 @@
+[Unit]
+Description=PedEdit database backup (pg_dump, retention, off-box copy)
+Documentation=file:/opt/pededit/INSTALL.md
+After=postgresql.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pededit
+Group=pededit
+ExecStart=/bin/bash /opt/pededit/deploy/backup.sh
+Nice=10
+
+# Hardening. The script writes only to the backup directory: if BACKUP_DIR in
+# /etc/pededit/backup.env is changed, change ReadWritePaths with it
+# (systemctl edit pededit-backup). The home directory is read-only here, so
+# for rsync put the destination's host key in ~pededit/.ssh/known_hosts
+# beforehand, and keep the rclone config in /etc/pededit (RCLONE_CONFIG).
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/pededit
+ReadOnlyPaths=/etc/pededit
