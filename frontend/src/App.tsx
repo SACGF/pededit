@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import CanvasPage from "./pages/CanvasPage";
 import ChangelogPage from "./pages/ChangelogPage";
+import ExamplePage from "./pages/ExamplePage";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
       <Route path="/changelog" element={<ChangelogPage />} />
       <Route path="/p/:id" element={<CanvasPage />} />
+      <Route path="/example/:slug" element={<ExamplePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

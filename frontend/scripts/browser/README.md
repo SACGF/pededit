@@ -263,7 +263,8 @@ the flow. They run in CI.
 | `hide-and-filter` | hide descendants, the group symbol, each view filter, nobody deleted |
 | `problems-list` | the problems list, a fix, "Fix all like this", F8 |
 | `person-tab-saves` | typing on the Person tab, auto-save, reload |
-| `signed-in` | as the agent user: Your pedigrees, rename, delete |
+| `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
+| `example-link` | `/example/<slug>` (#150): one new pedigree per visit, Back makes no extra copy, unknown slug, the landing page's links |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 
@@ -308,7 +309,7 @@ Rules that keep them worth having:
   and "the node is drawn there".
 - **Break it once.** Before committing a flow, break the feature it covers
   (make the store action return early) and see the flow fail on the check
-  you expect. A flow that cannot fail tests nothing. The twelve here were
+  you expect. A flow that cannot fail tests nothing. The flows here were
   each checked that way.
 
 ## CI

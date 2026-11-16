@@ -2,6 +2,11 @@ import type { Pedigree, Individual, Partnership, Sex, Tag } from "@pedigree-edit
 import { withCurrentNotation } from "../pedigree/notation";
 
 export interface ExamplePedigree {
+  /**
+   * The example's name in its link, /example/<slug> (#150). Links are
+   * published, so never change or reuse one; a new example gets a new slug.
+   */
+  slug: string;
   label: string;
   description: string;
   /** Heading in the example picker. Entries without a group come first, under no heading. */
@@ -16,6 +21,7 @@ const siblingOrder = { mode: "insertion" as const, affectedFirst: false };
 /** Built-in examples, all drawn in the current NSGC edition (#115): see the end of the list. */
 const EXAMPLE_LIST: ExamplePedigree[] = [
   {
+    slug: "simple-family",
     label: "Simple family",
     description: "2 generations · 4 individuals",
     data: {
@@ -33,6 +39,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "three-generations",
     label: "Three generations",
     description: "3 generations · 9 individuals · autosomal dominant",
     data: {
@@ -64,6 +71,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "multi-branch-family",
     label: "Multi-branch family",
     description: "4 generations · 16 individuals · multiple branches",
     data: {
@@ -110,6 +118,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "large-family",
     label: "Large family",
     description: "5 generations · 100 individuals · autosomal recessive",
     data: {
@@ -291,6 +300,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "uncle-niece",
     label: "Uncle-niece",
     description: "3 generations · consanguineous cross-generational mating",
     data: {
@@ -321,6 +331,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "remarriage",
     label: "Remarriage · half-siblings",
     description: "2 generations · father with two partnerships · half-siblings",
     data: {
@@ -349,6 +360,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "multiple-partners",
     label: "Multiple partners",
     description: "3 generations · one person with three partners · partner chain",
     data: {
@@ -393,6 +405,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "high-complexity",
     label: "High complexity",
     description: "4 generations · consanguinity · multiple traits",
     data: {
@@ -434,6 +447,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   {
+    slug: "assisted-reproduction",
     label: "Assisted reproduction",
     description: "NSGC 2008 Fig. 3 · sperm donor · egg donor · surrogate · egg donor who carries · NSGC 2022 female couple",
     data: {
@@ -505,6 +519,12 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
  * it existed), and an example opened now is new (#115).
  */
 export const EXAMPLES: ExamplePedigree[] = EXAMPLE_LIST.map(e => ({ ...e, data: withCurrentNotation(e.data) }));
+
+/** The example a /example/<slug> link names (#150), whatever the case of the letters typed. */
+export function exampleBySlug(slug: string | undefined): ExamplePedigree | undefined {
+  const wanted = slug?.toLowerCase();
+  return EXAMPLES.find(e => e.slug === wanted);
+}
 
 /** Example picker headings in display order. "" is the ungrouped set above. */
 export const EXAMPLE_GROUPS: string[] = [...new Set(EXAMPLES.map(e => e.group ?? ""))];
@@ -970,58 +990,58 @@ function historicAndClassicExamples(): ExamplePedigree[] {
 
 
   const focal = { affected: true };
-  const classic: Array<[string, string, Row[]]> = [
-    ["3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
+  const classic: Array<[slug: string, label: string, description: string, rows: Row[]]> = [
+    ["three-quarter-siblings", "3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
       ["GF", M, null, null], ["GM", F, null, null],
       ["F1", M, "GF", "GM"], ["F2", M, "GF", "GM"], ["M", F, null, null],
       ["A", M, "F1", "M", focal], ["B", F, "F2", "M", focal],
     ]],
-    ["5/8 siblings", "share a mother; fathers are half brothers. Kinship 5/32", [
+    ["five-eighths-siblings", "5/8 siblings", "share a mother; fathers are half brothers. Kinship 5/32", [
       ["GF", M, null, null], ["GM1", F, null, null], ["GM2", F, null, null],
       ["F1", M, "GF", "GM1"], ["F2", M, "GF", "GM2"], ["M", F, null, null],
       ["A", M, "F1", "M", focal], ["B", F, "F2", "M", focal],
     ]],
-    ["Full-sib mating", "brother and sister have a child. F = 1/4", [
+    ["full-sib-mating", "Full-sib mating", "brother and sister have a child. F = 1/4", [
       ["GF", M, null, null], ["GM", F, null, null],
       ["S", M, "GF", "GM"], ["D", F, "GF", "GM"],
       ["C", M, "S", "D", focal],
     ]],
-    ["Half-sib triangle", "every pair of parents are half siblings", [
+    ["half-sib-triangle", "Half-sib triangle", "every pair of parents are half siblings", [
       ["P1", M, null, null], ["P2", F, null, null], ["P3", M, null, null], ["P4", F, null, null],
       ["C12", M, "P1", "P2"], ["C23", F, "P3", "P2"], ["C34", M, "P3", "P4"],
       ["D1", M, "C12", "C23"], ["D2", F, "C34", "C23"],
       ["E", M, "D1", "D2", focal],
     ]],
-    ["Double first cousins", "two sibling pairs intermarry. Kinship 1/8", [
+    ["double-first-cousins", "Double first cousins", "two sibling pairs intermarry. Kinship 1/8", [
       ["A1", M, null, null], ["A2", F, null, null], ["B1", M, null, null], ["B2", F, null, null],
       ["a1", M, "A1", "A2"], ["a2", F, "A1", "A2"], ["b1", M, "B1", "B2"], ["b2", F, "B1", "B2"],
       ["X", M, "a1", "b2", focal], ["Y", F, "b1", "a2", focal],
     ]],
-    ["Double second cousins (A)", "fathers first cousins, mothers first cousins. Kinship 1/32", [
+    ["double-second-cousins-a", "Double second cousins (A)", "fathers first cousins, mothers first cousins. Kinship 1/32", [
       ["G1", M, null, null], ["G2", F, null, null], ["H1", M, null, null], ["H2", F, null, null],
       ["g1", M, "G1", "G2"], ["g2", M, "G1", "G2"], ["s1", F, null, null], ["s2", F, null, null],
       ["h1", F, "H1", "H2"], ["h2", F, "H1", "H2"], ["t1", M, null, null], ["t2", M, null, null],
       ["P1", M, "g1", "s1"], ["P2", M, "g2", "s2"], ["Q1", F, "t1", "h1"], ["Q2", F, "t2", "h2"],
       ["X", M, "P1", "Q1", focal], ["Y", F, "P2", "Q2", focal],
     ]],
-    ["Double second cousins (B)", "fathers are double first cousins. Kinship 1/32", [
+    ["double-second-cousins-b", "Double second cousins (B)", "fathers are double first cousins. Kinship 1/32", [
       ["G1", M, null, null], ["G2", F, null, null], ["H1", M, null, null], ["H2", F, null, null],
       ["g1", M, "G1", "G2"], ["g2", F, "G1", "G2"], ["h1", M, "H1", "H2"], ["h2", F, "H1", "H2"],
       ["P1", M, "g1", "h2"], ["P2", M, "h1", "g2"], ["s1", F, null, null], ["s2", F, null, null],
       ["X", M, "P1", "s1", focal], ["Y", F, "P2", "s2", focal],
     ]],
-    ["Quadruple half first cousins", "each parent of X is a half sibling of each parent of Y. Kinship 1/8", [
+    ["quadruple-half-first-cousins", "Quadruple half first cousins", "each parent of X is a half sibling of each parent of Y. Kinship 1/8", [
       ["A", M, null, null], ["B", F, null, null], ["C", M, null, null], ["D", F, null, null],
       ["F1", M, "A", "B"], ["M1", F, "C", "D"], ["F2", M, "A", "D"], ["M2", F, "C", "B"],
       ["X", M, "F1", "M1", focal], ["Y", F, "F2", "M2", focal],
     ]],
-    ["Grandparent and grandchild's partner", "a couple spanning two generations", [
+    ["grandparent-and-grandchilds-partner", "Grandparent and grandchild's partner", "a couple spanning two generations", [
       ["GF", M, null, null], ["GM", F, null, null],
       ["P", F, "GF", "GM"], ["S", M, null, null],
       ["GC", M, "S", "P"], ["Z", F, null, null],
       ["GGC", F, "GC", "Z"], ["W", M, "GF", "Z", focal],
     ]],
-    ["Two lineages joined twice", "marriages between two families in successive generations", [
+    ["two-lineages-joined-twice", "Two lineages joined twice", "marriages between two families in successive generations", [
       ["A1", M, null, null], ["A2", F, null, null], ["B1", M, null, null], ["B2", F, null, null],
       ["a1", M, "A1", "A2"], ["a2", F, "A1", "A2"], ["b1", F, "B1", "B2"], ["b2", M, "B1", "B2"],
       ["X", M, null, null], ["Y", F, null, null],
@@ -1032,6 +1052,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
 
   return [
     {
+      slug: "habsburgs",
       label: "Spanish Habsburgs",
       description: "9 generations · 33 individuals · nested uncle-niece and cousin marriages",
       group: "Historic",
@@ -1039,6 +1060,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       data: fromRows(habsburg, { deceased: true }),
     },
     {
+      slug: "queen-victoria",
       label: "Queen Victoria · haemophilia B",
       description: "4 generations · 49 individuals · X-linked recessive with carriers",
       group: "Historic",
@@ -1046,19 +1068,22 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       data: fromRows(victoria, { deceased: true }),
     },
     {
+      slug: "tutankhamun",
       label: "Tutankhamun's family",
       description: "5 generations · 10 individuals · brother-sister parents",
       group: "Historic",
       citation: "Hawass et al. (2010) JAMA 303(7): 638, Fig. 2",
       data: fromRows(tutankhamun, { deceased: true }),
     },
-    ...classic.map(([label, description, rows]): ExamplePedigree => ({
+    ...classic.map(([slug, label, description, rows]): ExamplePedigree => ({
+      slug,
       label,
       description: `${rows.length} individuals · ${description}`,
       group: "Classic",
       data: fromRows(rows),
     })),
     {
+      slug: "targaryen",
       label: "House Targaryen",
       description: "16 generations · 96 individuals · sibling, uncle-niece and cousin marriages. Daenerys F = 0.375",
       group: "Fiction",
@@ -1066,6 +1091,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       data: withTags(fromRows(targaryen, { deceased: true }), targaryenTags, targaryenNotes),
     },
     {
+      slug: "buendia",
       label: "The Buendías",
       description: "9 generations · 30 individuals · cousin and aunt-nephew marriages, the pig's tail",
       group: "Fiction",
@@ -1073,6 +1099,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       data: withTags(fromRows(buendia, { deceased: true }), buendiaTags, buendiaNotes),
     },
     {
+      slug: "atreides",
       label: "House Atreides",
       description: "5 generations · 33 individuals · the Bene Gesserit breeding programme",
       group: "Fiction",

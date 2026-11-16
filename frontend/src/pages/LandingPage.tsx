@@ -47,17 +47,6 @@ export default function LandingPage() {
     }
   };
 
-  const handleExample = async (index: number) => {
-    const ex = EXAMPLES[index];
-    setLoading(`example-${index}`);
-    try {
-      const id = await createPedigreeFromData(ex.label, ex.data);
-      navigate(`/p/${id}`);
-    } finally {
-      setLoading(null);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -146,22 +135,19 @@ export default function LandingPage() {
                   <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">{group}</p>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {EXAMPLES.map((ex, i) => (ex.group ?? "") === group && (
-                    <button
-                      key={i}
-                      className="text-left border rounded p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                      onClick={() => handleExample(i)}
-                      disabled={loading !== null}
+                  {EXAMPLES.map(ex => (ex.group ?? "") === group && (
+                    // A link, so it can be copied or opened in a new tab; ExamplePage makes the copy (#150).
+                    <Link
+                      key={ex.slug}
+                      to={`/example/${ex.slug}`}
+                      className="block text-left border rounded p-3 hover:bg-gray-50 transition-colors"
                     >
                       <span className="block text-xs font-medium mb-0.5">{ex.label}</span>
                       <span className="block text-[10px] text-gray-400">{ex.description}</span>
                       {ex.citation && (
                         <span className="block text-[10px] text-gray-400 mt-0.5">{ex.citation}</span>
                       )}
-                      {loading === `example-${i}` && (
-                        <span className="block text-[10px] text-gray-400 mt-1">Loading…</span>
-                      )}
-                    </button>
+                    </Link>
                   ))}
                 </div>
               </div>

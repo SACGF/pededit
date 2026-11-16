@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /p/
+Disallow: /example/
 Disallow: /api/
 Disallow: /admin/
 Sitemap: https://pededit.com/sitemap.xml
