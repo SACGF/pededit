@@ -553,3 +553,20 @@ describe("U-shape figure shape", () => {
     expect(l.nodes.has("a3")).toBe(true); // married in, beside b3
   });
 });
+
+describe("the U-shape draws no symbol of its own (#149)", () => {
+  it("ushape/ has no symbol outline in it, and render.ts calls the shared symbol renderer", async () => {
+    const { readFileSync, readdirSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const dir = join(__dirname, "../ushape");
+    const files = readdirSync(dir).filter(f => f.endsWith(".ts"));
+    expect(files.sort()).toEqual(["connectors.ts", "constants.ts", "layout.ts", "render.ts", "tree.ts"]);
+    for (const f of files) {
+      const source = readFileSync(join(dir, f), "utf8");
+      expect(source, f).not.toMatch(/<circle|<polygon|clipPath|renderSectorListSvg|renderAffectedCoreSvg|symbolPaint/);
+    }
+    expect(readFileSync(join(dir, "render.ts"), "utf8")).toContain("renderPersonShapeSvg(");
+    // The layout half holds no SVG at all.
+    for (const f of ["tree.ts", "layout.ts"]) expect(readFileSync(join(dir, f), "utf8"), f).not.toMatch(/<[a-z]+ [a-z-]+="/);
+  });
+});

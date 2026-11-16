@@ -1,11 +1,10 @@
-import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { duplicateArcD } from "../../pedigree/couplePath";
 import { coupleLineGeometry, sibshipLineGeometry } from "../../pedigree/lineGeometry";
 import { TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
-import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
-import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill, assistedEdgeSegment } from "../../pedigree/assisted";
+import { assistedEdgeSegment } from "../../pedigree/assisted";
 import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { PersonGlyph } from "../../pedigree/personGlyph";
@@ -17,22 +16,14 @@ import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
-import { renderPresymptomaticLineSvg, renderDocumentedMarkSvg } from "../../pedigree/evaluation";
-import { renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
+import { renderDocumentedMarkSvg } from "../../pedigree/evaluation";
+import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "../../pedigree/proband";
 import { renderExportKeySvg } from "../../pedigree/exportKey";
+import {
+  STROKE, DECEASED_OVERHANG, seg, renderPersonShapeSvg, renderDeceasedSlashSvg, renderProbandArrowSvg, renderLifeStatusCaption,
+} from "./symbolSvg";
 import type { SvgExportOptions } from "./types";
-import {
-  renderSectorListSvg, renderAnnotationItemsSvg, 
-  renderAffectedCoreSvg, type SymbolPaint,
-} from "../../pedigree/tags";
-import {
-  usesLossTriangle, CAPTION_FONT_SIZE,
-  lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
-  carrierDot, symbolTopInset, CARRIER_RIM,
-} from "../../pedigree/lifeStatus";
 
-const STROKE = 2;
-const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
 const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 // Where the text under a symbol goes (pedigree/labelBlock.ts, shared with
 // the couple label placement, #109). The first baseline leaves a gap between
@@ -185,22 +176,6 @@ function renderConsanguinityLabels(flow: FlowData): string[] {
 
 // ── Sibship lines ─────────────────────────────────────────────────────────────
 
-/**
- * A straight line. `mark` tags a childless or twin mark, which is not a line
- * joining people, so the export lint (exportLint.ts) leaves it out.
- */
-function seg(x1: number, y1: number, x2: number, y2: number, dashed = false, mark = false): string {
-  const dash = dashed ? ` stroke-dasharray="${ADOPTION_DASH}"` : "";
-  return `<line${mark ? ` class="mark"` : ""} x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"${dash}/>`;
-}
-
-/** Brackets round an adopted individual's symbol, centred on the origin. Shared with the U-shape exporter. */
-export function renderAdoptionBrackets(ind: Individual): string {
-  if (!ind.adopted) return "";
-  const half = NODE_SIZE / 2;
-  return `<g data-adopted="${ind.adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
-}
-
 /** Lines of descent, from the edges the canvas draws (#143, `sibshipLineGeometry`). */
 function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
   const lines: string[] = [];
@@ -233,143 +208,7 @@ function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
   });
 }
 
-/** "D" or "S" inside the symbol (#45), centred on the origin. Shared with the U-shape exporter. */
-export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black" | "white" = "white"): string {
-  const letter = symbolLetter(ind);
-  if (!letter) return "";
-  const half = NODE_SIZE / 2;
-  const h = halo ? ` stroke="white" stroke-width="3" paint-order="stroke"` : "";
-  return `<text x="0" y="${roleLetterBaselineY(NODE_SIZE, -half)}" text-anchor="middle" font-family="sans-serif" font-size="${roleLetterFontSize(NODE_SIZE)}" font-weight="bold" fill="${roleLetterFill(base)}"${h}>${letter}</text>`;
-}
-
 // ── Symbols ───────────────────────────────────────────────────────────────────
-
-function renderShape(ind: Individual, glyph: PersonGlyph, clipId: string): string {
-  const half = NODE_SIZE / 2;
-  // What fills the symbol, by the notation (#115), as decided for the canvas (#144).
-  const paint = glyph.paint;
-  const fill = paint.base;
-
-  // Geometry without paint, reused for the clipPath, the filled base and the
-  // re-stroked outline that keeps the border crisp over tag sectors.
-  const triangle = lossTriangleGeom(ind);
-  let geom: string;
-  if (triangle) {
-    geom = triangle;
-  } else if (glyph.shape === "male") {
-    geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (glyph.shape === "female") {
-    geom = `<circle cx="0" cy="0" r="${half - 1}"`;
-  } else {
-    const pts = `0,${-(half - 1)} ${half - 1},0 0,${half - 1} ${-(half - 1)},0`;
-    geom = `<polygon points="${pts}"`;
-  }
-  const stroke = `stroke="black" stroke-width="${STROKE}"`;
-
-  let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  const sectors = paint.sectors;
-  if (sectors.length > 0) {
-    shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
-      + renderSectorListSvg(sectors, NODE_SIZE, clipId)
-      + (paint.core ? renderAffectedCoreSvg(geom) : "")
-      + `${geom} ${stroke} fill="none"/>`;
-  }
-
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0, paint.base)
-    + (paint.line ? renderPresymptomaticLineSvg(glyph.lifeStatus, NODE_SIZE, -half, -half, sectors.length > 0) : "") + renderLifeStatusMarks(ind, geom, clipId, paint)
-    + renderAnnotationItemsSvg(glyph.annotations, NODE_SIZE, glyph.caption ? CAPTION_SHIFT : 0);
-}
-
-/**
- * Carrier dot (NSGC 2008), centred on the origin's symbol; `show` is
- * `symbolPaint(...).dot`, which leaves it off an affected fill and off a
- * carrier whose condition is recorded (#115). With `rim` (tag colours behind
- * it) it gets a white rim, as on the canvas. Shared with the U-shape exporter.
- */
-export function renderCarrierDot(ind: Individual, rim: boolean, show: boolean): string {
-  if (!show) return "";
-  const half = NODE_SIZE / 2;
-  const d = carrierDot(ind.lifeStatus, NODE_SIZE, -half, -half);
-  return rim
-    ? `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r + CARRIER_RIM / 2}" fill="black" stroke="white" stroke-width="${CARRIER_RIM}"/>`
-    : `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="black"/>`;
-}
-
-/**
- * Where a sibship drop meets the child: the top of the symbol box, lowered to
- * the apex for a loss triangle. Relative to the symbol centre.
- */
-export function childDropEndOffset(ind: Individual | undefined): number {
-  return -NODE_SIZE / 2 + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
-}
-
-/*
- * Pregnancy / pregnancy-loss symbols (NSGC 2008), centred on the origin.
- * Mirror SymbolShape in symbols.tsx and are shared with the U-shape exporter.
- * The "SB" / "ECT" caption is a label line, see lifeStatusCaption.
- */
-
-/**
- * Unpainted outline of the small loss triangle (miscarriage, termination,
- * ectopic), in the same open-tag form as the sex symbol geometry so callers
- * can reuse it for the clipPath and the outline. Null when the individual is
- * drawn with their sex symbol.
- */
-export function lossTriangleGeom(ind: Individual): string | null {
-  if (!usesLossTriangle(ind.lifeStatus)) return null;
-  const half = NODE_SIZE / 2;
-  return `<polygon points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
-}
-
-/**
- * "P", the termination slash or the stillbirth slash drawn over the symbol.
- * Empty when born. `geom` is the unpainted symbol outline (see renderShape):
- * on an affected symbol the part of a slash inside it is redrawn in white,
- * clipped to that outline, so the slash does not vanish into the fill.
- */
-export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: string, paint: Pick<SymbolPaint, "base" | "dot">): string {
-  const status = ind.lifeStatus;
-  if (!status) return "";
-  const filled = paint.base === "black";
-  const half = NODE_SIZE / 2;
-  const slash = (s: { x1: number; y1: number; x2: number; y2: number }) => {
-    const attrs = `x1="${s.x1}" y1="${s.y1}" x2="${s.x2}" y2="${s.y2}" stroke-width="${STROKE}"`;
-    let out = `<line ${attrs} stroke="black"/>`;
-    if (filled) {
-      const id = `${clipId}-slash`;
-      out += `<clipPath id="${id}">${geom}/></clipPath><line ${attrs} stroke="white" clip-path="url(#${id})"/>`;
-    }
-    return out;
-  };
-  if (status === "termination") return slash(lossSlashEnds(NODE_SIZE, -half, -half));
-  if (status === "pregnancy") {
-    const textFill = filled ? "white" : "black";
-    const carrier = paint.dot;
-    return `<text x="0" y="${pregnancyBaselineY(NODE_SIZE, -half, carrier)}" text-anchor="middle" font-family="sans-serif" font-size="${pregnancyFontSize(NODE_SIZE, carrier)}" font-weight="bold" fill="${textFill}">P</text>`;
-  }
-  if (status === "stillbirth") {
-    const o = half + DECEASED_OVERHANG;
-    return slash({ x1: -o, y1: -o, x2: o, y2: o });
-  }
-  return "";
-}
-
-/** "SB" / "ECT" caption as a label line at the given baseline, centred on cx. */
-export function renderLifeStatusCaption(caption: string, cx: number, y: number): string {
-  return `<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${CAPTION_FONT_SIZE}" fill="black">${caption}</text>`;
-}
-
-function renderDeceasedSlash(): string {
-  const o = DECEASED_OVERHANG;
-  const half = NODE_SIZE / 2;
-  return `<line x1="${-half - o}" y1="${-half - o}" x2="${half + o}" y2="${half + o}" stroke="black" stroke-width="${STROKE}"/>`;
-}
-
-/** Proband arrow with its "P", or the consultand's arrow without (#99). */
-function renderProbandArrow(kind: ArrowKind): string {
-  const half = NODE_SIZE / 2;
-  return renderArrowSvg(kind, NODE_SIZE, -half, -half, { stroke: STROKE, markerId: "proband-arrowhead" });
-}
 
 /** Copy number of someone drawn more than once, top right, as DuplicateSuperscript on the canvas. */
 function renderDuplicateMark(index: number): string {
@@ -390,9 +229,9 @@ function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
     const { x: cx, y: cy } = pos;
 
     elems.push(`<g transform="translate(${cx} ${cy})">`);
-    elems.push(renderShape(ind, glyph, `symbol-clip-${node.id}`));
-    if (glyph.deceased) elems.push(renderDeceasedSlash());
-    if (glyph.arrow) elems.push(renderProbandArrow(glyph.arrow));
+    elems.push(renderPersonShapeSvg(ind, glyph, `symbol-clip-${node.id}`, { captionShift: CAPTION_SHIFT }));
+    if (glyph.deceased) elems.push(renderDeceasedSlashSvg());
+    if (glyph.arrow) elems.push(renderProbandArrowSvg(glyph.arrow));
     if (glyph.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -NODE_SIZE / 2, -NODE_SIZE / 2));
     if (glyph.documented) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
     // Every drawn copy is numbered 1, 2, ... as on the canvas.

@@ -5,7 +5,7 @@
  * out of uShapeExporter.ts (#149).
  */
 import { type Pedigree } from "@pedigree-editor/layout-engine";
-import { childDropEndOffset } from "../svgExporter";
+import { childDropEndOffset } from "../symbolSvg";
 import { assistedLinks } from "../../../pedigree/assisted";
 import { ADOPTION_DASH } from "../../../pedigree/adoption";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../../pedigree/ended";

@@ -98,9 +98,34 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   Tests find symbols by `<g transform="translate(..)">` followed by a shape,
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.
-- `uShapeExporter.ts` — `layoutUShape` and `exportUShapeSvg`: horseshoe layout
-  for large families (partners, consanguinity, flat bottom, fan for small
-  families). Plan in `claude/export_u_plan.md`. Symbols, labels and slashes
+- `symbolSvg.ts` (#149): a person's symbol as SVG markup, for both figure
+  exports. `renderPersonShapeSvg(ind, glyph, clipId, { rotation,
+  captionShift })` draws the outline, fill, sections, brackets, dot, letter,
+  presymptomatic line, pregnancy and loss marks and the annotation row from
+  the person's glyph; the standard export calls it upright, the U-shape
+  turned along its track, where letters ("D", "S", "P") are turned back
+  upright and slashes turn with the symbol. With `renderDeceasedSlashSvg`
+  and `renderProbandArrowSvg` it is the only place a symbol is written as a
+  string: before #149 the U-shape had its own near copy, the one most often
+  missed. A symbol change is made here and in `SymbolShape`
+  (`pedigree/nodes/symbols.tsx`) for the canvas. Order inside the symbol:
+  the role letter is under the presymptomatic line in both exports (the
+  U-shape had them the other way round; nobody is both in practice).
+- `uShapeExporter.ts` — the public entry (`layoutUShape`,
+  `exportUShapeSvg`): horseshoe layout for large families (partners,
+  consanguinity, flat bottom, fan for small families). Plan in
+  `claude/export_u_plan.md`. The code is in `ushape/` (#149, split from one
+  1,600-line file): `tree.ts` builds the descendant tree of one founder
+  couple (nodes, unions, joins; no positions), `layout.ts` is the bent
+  coordinate system, the packing along the tracks and the public
+  `UShapeLayout` (no SVG in it, so it could move beside the layout engine),
+  `connectors.ts` draws the lines along the tracks (this geometry is the
+  U-shape's own and stays so), `render.ts` draws the text beside each symbol
+  and the consanguinity labels and assembles the figure, `constants.ts` has
+  the shared sizes. No symbol is drawn in `ushape/`: `render.ts` calls
+  `symbolSvg.ts`. `glyphOf` in `layout.ts` caches each person's glyph per
+  pedigree object, so, as with `kinshipOf`, a test that changes a pedigree
+  in place after laying it out must make a fresh object. Symbols, labels and slashes
   rotate with the track (that is the design, labels included); only the
   pregnancy "P" is counter-rotated to stay upright (#71), since a sideways P
   reads as another letter. Twins (#11): `sortSibs` averages a set's order

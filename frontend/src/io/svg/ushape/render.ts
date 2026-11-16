@@ -3,23 +3,19 @@
  * consanguinity labels, title and key, assembled into the SVG. Split out of
  * uShapeExporter.ts (#149).
  */
-import { type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
+import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { deidentify } from "../deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../../pedigree/collapse";
 import { type PersonGlyph } from "../../../pedigree/personGlyph";
-import {
-  renderSectorListSvg, renderAnnotationItemsSvg, 
-  renderAffectedCoreSvg, ANNOTATION_ROW_HEIGHT,
-} from "../../../pedigree/tags";
+import { ANNOTATION_ROW_HEIGHT } from "../../../pedigree/tags";
 import { renderExportKeySvg } from "../../../pedigree/exportKey";
 import type { SvgExportOptions } from "../types";
-import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, renderAdoptionBrackets, renderRoleLetterSvg } from "../svgExporter";
+import { renderPersonShapeSvg, renderDeceasedSlashSvg, renderProbandArrowSvg } from "../symbolSvg";
 import { titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../../pedigree/labels";
 import { renderFamilyHistorySvg } from "../../../pedigree/familyHistory";
-import { renderPresymptomaticLineSvg, renderDocumentedMarkSvg } from "../../../pedigree/evaluation";
-import { renderArrowSvg, type ArrowKind } from "../../../pedigree/proband";
+import { renderDocumentedMarkSvg } from "../../../pedigree/evaluation";
 import { CONSANGUINITY_LABEL_FONT_SIZE } from "../../../pedigree/consanguinityLabel";
-import { NODE_SIZE, HALF, STROKE, DECEASED_OVERHANG, PROBAND_TAIL, LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
+import { NODE_SIZE, HALF, PROBAND_TAIL, LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
 import { walk } from "./tree";
 import { build, nodeAt, toLayout, glyphOf, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
 import { trackPath, renderConnectors } from "./connectors";
@@ -37,68 +33,13 @@ export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
 }
 
 /**
- * The symbol, rotated with its group. The "P" of a pregnancy is text and
- * reads as a different letter once it lies on its side, so it is turned back
- * upright; the slashes of a termination and stillbirth stay with the symbol
- * like the deceased slash does.
- */
-export function renderShape(ind: Individual, glyph: PersonGlyph, clipId: string, rotation: number): string {
-  // What fills the symbol, by the notation (#115), as on the canvas (#144).
-  const paint = glyph.paint;
-  const fill = paint.base;
-  const triangle = lossTriangleGeom(ind);
-  let geom: string;
-  if (triangle) {
-    geom = triangle;
-  } else if (glyph.shape === "male") {
-    geom = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (glyph.shape === "female") {
-    geom = `<circle cx="0" cy="0" r="${HALF - 1}"`;
-  } else {
-    const h = HALF - 1;
-    geom = `<polygon points="0,${-h} ${h},0 0,${h} ${-h},0"`;
-  }
-  const stroke = `stroke="black" stroke-width="${STROKE}"`;
-  let shape = `${geom} ${stroke} fill="${fill}"/>`;
-  const sectors = paint.sectors;
-  if (sectors.length > 0) {
-    shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
-      + renderSectorListSvg(sectors, NODE_SIZE, clipId)
-      + (paint.core ? renderAffectedCoreSvg(geom) : "")
-      + `${geom} ${stroke} fill="none"/>`;
-  }
-  shape += renderCarrierDot(ind, sectors.length > 0, paint.dot);
-  if (paint.line) shape += renderPresymptomaticLineSvg(glyph.lifeStatus, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
-  const captionShift = glyph.caption ? LABEL_LINE_HEIGHT : 0;
-  shape = renderAdoptionBrackets(ind) + shape;
-  // "D" or "S" (#45) is text, kept upright like the "P".
-  const letter = renderRoleLetterSvg(ind, sectors.length > 0, paint.base);
-  shape += letter && rotation !== 0 ? `<g transform="rotate(${r(-rotation)})">${letter}</g>` : letter;
-  let marks = renderLifeStatusMarks(ind, geom, clipId, paint);
-  if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
-    marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;
-  }
-  return shape + marks + renderAnnotationItemsSvg(glyph.annotations, NODE_SIZE, captionShift);
-}
-
-export function renderDeceasedSlash(): string {
-  const o = HALF + DECEASED_OVERHANG;
-  return `<line x1="${-o}" y1="${-o}" x2="${o}" y2="${o}" stroke="black" stroke-width="${STROKE}"/>`;
-}
-
-/** Proband arrow with its "P" (kept upright in the rotated symbol), or the consultand's without (#99). */
-export function renderProbandArrow(kind: ArrowKind, rotation: number): string {
-  return renderArrowSvg(kind, NODE_SIZE, -HALF, -HALF, { stroke: STROKE, markerId: "proband-arrowhead", uprightDeg: -rotation });
-}
-
-/**
  * Labels sit on the outward side of the symbol, rotated with it. For anyone
  * with children the descent line runs through that spot, so the text gets a
  * white backing to stay readable.
  */
 export function renderLabel(glyph: PersonGlyph, hasDescent: boolean): string {
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
-  // by renderShape, over the white backing), name, then the detail lines in
+  // by the symbol renderer, over the white backing), name, then the detail lines in
   // NSGC order (age, onset, pedigree number).
   const caption = glyph.caption;
   // The pedigree number (#8) is the one the standard figure shows, so the
@@ -141,9 +82,10 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
         renderLabel(glyph, solo && m.id === n.blood) +
-        renderShape(ind, glyph, clipId, pos.rotation) +
-        (glyph.deceased ? renderDeceasedSlash() : "") +
-        (glyph.arrow ? renderProbandArrow(glyph.arrow, pos.rotation) : "") +
+        // The symbol is the standard figure's (io/svg/symbolSvg.ts), turned with the track.
+        renderPersonShapeSvg(ind, glyph, clipId, { rotation: pos.rotation, captionShift: glyph.caption ? LABEL_LINE_HEIGHT : 0 }) +
+        (glyph.deceased ? renderDeceasedSlashSvg() : "") +
+        (glyph.arrow ? renderProbandArrowSvg(glyph.arrow, pos.rotation) : "") +
         (glyph.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -HALF, -HALF, -pos.rotation) : "") +
         (glyph.documented ? renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -HALF, -HALF, -pos.rotation) : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
