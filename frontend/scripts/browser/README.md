@@ -225,6 +225,91 @@ running (#70): a frozen copy for a testing run while the working tree is
 being edited. Pass the URL it prints as `PEDEDIT_BASE`, or to `compare.mjs
 --base-url`. `servers.mjs down` stops it and removes the worktree.
 
+### flows.mjs: does using it still work?
+
+```bash
+node frontend/scripts/browser/flows.mjs                 # every flow, about two minutes
+node frontend/scripts/browser/flows.mjs drag-and-pin exports
+node frontend/scripts/browser/flows.mjs --list
+```
+
+```
+ok    build-undo-redo  (19 checks, 14.1 s)
+FAIL  drag-and-pin  (3 checks, 3.6 s)
+        after a drag the person is pinned: not so
+          (after: the hover pill unlocks the person)
+          screenshot: frontend/test-output/browser/flows/drag-and-pin.failed.png
+flows: 1 of 12 failed
+```
+
+End-to-end flows (#167): scripted journeys through the real editor against
+Vite and Django (`servers.mjs up`, not `--frontend-only`), each in a fresh
+browser profile, with checks on the stores, the page, the server and any file
+downloaded. The sweeps above look at a pedigree as loaded; these click, type,
+drag, save and export. An uncaught JavaScript error or `console.error` fails
+the flow. They run in CI.
+
+| Flow | Covers |
+|---|---|
+| `build-undo-redo` | blank pedigree, toolbar add, hover pill, More options, undo to empty, redo, save |
+| `anonymous-link` | create signed out, the `/p/<id>` link, "Recent on this device" |
+| `set-parents-by-picking` | "Set parents..." by clicking two cousins; the couple line turns double |
+| `multi-select-batch` | Shift+click, rubber band, the "N selected" menu as one undo step, the D key |
+| `drag-and-pin` | unlock, drag, pin survives a reload, Reset layout |
+| `conditions` | Conditions and tags dialog, affected and carrier per condition, legend |
+| `exports` | SVG, PNG, PDF, U-shape, de-identified, CSV, JSON, PED: each file read back |
+| `imports` | PED and JSON by upload; a refused file |
+| `hide-and-filter` | hide descendants, the group symbol, each view filter, nobody deleted |
+| `problems-list` | the problems list, a fix, "Fix all like this", F8 |
+| `person-tab-saves` | typing on the Person tab, auto-save, reload |
+| `signed-in` | as the agent user: Your pedigrees, rename, delete |
+
+**Adding a flow.** A file in `flows/`, numbered for order:
+
+```js
+export default {
+  name: "swap-sides",
+  about: "One line for --list: what journey, what it proves",
+  // asAgent: true,   // signed in as claude_agent
+  async run(t) {
+    const id = await t.openFixture("test-data/pedigrees/structure/three-partners.json");
+    await t.menu("[data-partnership-id=\"p1\"]", "Swap sides");
+    t.equal((await t.pedigree()).partnerships[0].leftPartner, "w1", "Swap sides records who is on the left");
+    await t.reload();
+    t.equal((await t.stored(id)).data.partnerships[0].leftPartner, "w1", "and it is saved");
+  },
+};
+```
+
+`t` drives the page with the same steps as the command line (`t.click`,
+`t.rightClick`, `t.hover`, `t.fill`, `t.select`, `t.choose`, `t.drag`,
+`t.upload`, `t.download`, `t.press`, `t.holding("Shift", fn)`, `t.reload`),
+so a step still acts on exactly one visible element and fails otherwise.
+`t.pill(id, "Add son")` and `t.menu(id, "Add partner")` are the hover pill and
+the right-click menu. `t.openFixture(spec)` saves a fixture through the API
+and opens it, `t.open(path)` goes anywhere, `t.newTab()` is a second tab in
+the same profile. Read with `t.pedigree()`, `t.drawn()`, `t.stored(id)`,
+`t.eval(fn)`, `t.text(sel)`, `t.count(sel)`. Check with `t.equal(actual,
+expected, what)`, `t.ok`, `t.match`, `t.notMatch`: `what` is a sentence
+saying what should be true, and is what a failure prints. The list is in
+`makeT` in `flows.mjs`.
+
+Rules that keep them worth having:
+
+- A flow is for a journey that crosses modules (edit, save, reload, export).
+  A rule or an edge case belongs in a unit test or a file of the test data
+  set, which are faster and do not break when a label changes.
+- Start from a file of the test data set or an example, not from clicks,
+  unless building it is what the flow is about.
+- Select by `data-*` attribute, `title` or `aria-label`; a button's text only
+  where the text is the thing users look for.
+- Check the store or the server, then the page: "the pedigree has the pin"
+  and "the node is drawn there".
+- **Break it once.** Before committing a flow, break the feature it covers
+  (make the store action return early) and see the flow fail on the check
+  you expect. A flow that cannot fail tests nothing. The twelve here were
+  each checked that way.
+
 ## CI
 
 `.github/workflows/ci.yml` runs on every PR and push to main: layout engine
@@ -235,7 +320,7 @@ SQLite Django, then the lints with `--all-fixtures` and the console sweep
 with `--all-test-data` (every valid file of the test data set in
 `test-data/pedigrees/`, which includes the feature fixtures), so each of them
 must load without JS errors, draw and export cleanly, and survive a save and
-reload. On failure the job prints the tail
+reload; then `flows.mjs`, the end-to-end flows. On failure the job prints the tail
 of the Vite and Django logs. Reproduce a failing step locally with the same
 command after `servers.mjs up`.
 

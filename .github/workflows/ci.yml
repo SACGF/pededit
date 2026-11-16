@@ -55,7 +55,7 @@ jobs:
         run: .venv/bin/python manage.py test api
 
   page-checks:
-    name: Page checks (render lint, export lint, console, persistence)
+    name: Page checks (render lint, export lint, console, persistence, flows)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -90,6 +90,8 @@ jobs:
         run: node frontend/scripts/browser/lint.mjs --all-fixtures --compact --deidentify
       - name: Console sweep, every valid test data file (feature fixtures included) saved and reloaded through the API
         run: node frontend/scripts/browser/console.mjs --all-test-data --fixture-via-api
+      - name: End-to-end flows (build, select, drag, conditions, export, import, filters, problems, signed in)
+        run: node frontend/scripts/browser/flows.mjs
       - name: Server logs
         if: failure()
         run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true
