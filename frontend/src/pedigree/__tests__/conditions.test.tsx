@@ -600,10 +600,10 @@ describe("condition-not-recorded warning (#115)", () => {
   it("the fix records the condition and clears the warning", () => {
     usePedigreeStore.getState().initialize(family());
     const problems = () => findProblems(usePedigreeStore.getState().pedigree).filter(x => x.rule === "condition-not-recorded");
-    problems().find(x => x.individualId === "e")!.moreFixes![0]!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(problems().find(x => x.individualId === "e")!.moreFixes![0]!);
     const e = usePedigreeStore.getState().pedigree.individuals.find(i => i.id === "e")!;
     expect(e).toMatchObject({ carrier: false, carrierTags: ["ts"] });
-    problems().find(x => x.individualId === "d")!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(problems().find(x => x.individualId === "d")!.fix!);
     expect(problems().map(x => x.individualId)).toEqual(["f", "g"]);
   });
 });

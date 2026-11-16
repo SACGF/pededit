@@ -12,7 +12,8 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { symbolPaint, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 import { arrowKind } from "../proband";
-import { problemsOf, worstSeverity } from "../validation";
+import { worstSeverity } from "../validation";
+import { problemsOf } from "../../components/problemList";
 import { ProblemIcon } from "../../components/ProblemsMenu";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

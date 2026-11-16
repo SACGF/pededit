@@ -1,3 +1,4 @@
+import { applyFixEdit, type ProblemFix } from "../pedigree/validation";
 import { create } from "zustand";
 import { produce } from "immer";
 import type {
@@ -319,6 +320,10 @@ interface PedigreeState {
    * the pedigree as it was before all of them.
    */
   groupEdits: (run: () => void) => void;
+  /** Make a problem's one-click fix (#116). A fix is data (`FixEdit`, #126); this is where it becomes an edit. */
+  applyFix: (fix: ProblemFix) => void;
+  /** Several fixes as one undo step ("Fix all like this"). */
+  applyFixes: (fixes: ProblemFix[]) => void;
 
   // Structural mutations (each snapshots before mutating)
   addIndividual: (sex: Sex) => void;
@@ -758,6 +763,9 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       const { past } = get();
       if (past.length > before + 1) set({ past: past.slice(0, before + 1) });
     },
+
+    applyFix: (fix) => applyFixEdit(fix.edit, get()),
+    applyFixes: (fixes) => get().groupEdits(() => { for (const fix of fixes) applyFixEdit(fix.edit, get()); }),
 
     undo: () => {
       const { past, pedigree, future } = get();

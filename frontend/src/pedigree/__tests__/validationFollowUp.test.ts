@@ -6,9 +6,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import type { Individual, Partnership, Pedigree, Tag } from "@pedigree-editor/layout-engine";
-import {
-  findProblems, problemsOf, problemsLike, fixesOf, adjacentProblem, ageInYears, problemSubject, RULES, type Problem,
-} from "../validation";
+import { findProblems, problemsLike, fixesOf, ageInYears, RULES, type Problem } from "../validation";
+import { problemsOf, adjacentProblem, problemSubject } from "../../components/problemList";
 import { ageRange, certainlyBefore, dayRange, minDaysApart, addYears } from "../dateRanges";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { ProblemFixes, fixAllLike } from "../../components/ProblemFixes";
@@ -167,7 +166,7 @@ describe("follow-up checks (#116)", () => {
     expect(only(sibs({}, true), "siblings-out-of-order")).toEqual([]);
     // The fix orders by birth date, and the warning goes.
     usePedigreeStore.getState().initialize(sibs());
-    prob!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(prob!.fix!);
     expect(only(usePedigreeStore.getState().pedigree, "siblings-out-of-order")).toEqual([]);
   });
 
@@ -185,8 +184,8 @@ describe("follow-up checks (#116)", () => {
     expect(ac).toMatchObject({ individualId: "c", field: "carrier", fix: { label: "Not a carrier" } });
     expect(ps).toMatchObject({ individualId: "d", field: "carrier", fix: { label: "Not presymptomatic" } });
     usePedigreeStore.getState().initialize(p);
-    ac.fix!.apply(usePedigreeStore.getState());
-    ps.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(ac.fix!);
+    usePedigreeStore.getState().applyFix(ps.fix!);
     const after = usePedigreeStore.getState().pedigree;
     expect(after.individuals.find(i => i.id === "c")).toMatchObject({ affected: true, carrier: false });
     expect(after.individuals.find(i => i.id === "d")!.presymptomatic).toBeUndefined();
@@ -207,7 +206,7 @@ describe("follow-up checks (#116)", () => {
     const found = only(p, "onset-unaffected");
     expect(found).toHaveLength(2);
     usePedigreeStore.getState().initialize(p);
-    for (const x of found) x.fix!.apply(usePedigreeStore.getState());
+    for (const x of found) usePedigreeStore.getState().applyFix(x.fix!);
     expect(only(usePedigreeStore.getState().pedigree, "onset-unaffected")).toEqual([]);
     expect(only(family([ind("c", { affected: true, onset: "40s" })]), "onset-unaffected")).toEqual([]);
   });
@@ -217,7 +216,7 @@ describe("follow-up checks (#116)", () => {
     expect(only(p, "evaluation-empty")).toMatchObject([{ individualId: "c", field: "evaluations", fix: { label: "Remove empty evaluations" } }]);
     expect(only(p, "evaluation-documented-no-result")).toMatchObject([{ individualId: "d" }]);
     usePedigreeStore.getState().initialize(p);
-    only(p, "evaluation-empty")[0]!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(only(p, "evaluation-empty")[0]!.fix!);
     expect(usePedigreeStore.getState().pedigree.individuals.find(i => i.id === "c")!.evaluations).toEqual([{ detail: "echo", result: "negative" }]);
     expect(only(family([ind("c", { evaluations: [{ documented: true, result: "positive" }] })]), "evaluation-documented-no-result")).toEqual([]);
   });
@@ -250,7 +249,7 @@ describe("follow-up checks (#116)", () => {
     const [prob] = only(p, "missing-reference");
     expect(prob).toMatchObject({ individualId: "c", fix: { label: "Remove what is missing" } });
     usePedigreeStore.getState().initialize(p);
-    prob!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(prob!.fix!);
     const c = usePedigreeStore.getState().pedigree.individuals.find(i => i.id === "c")!;
     expect(c.tags).toEqual(["cf"]);
     expect(c.socialParents).toBeUndefined();

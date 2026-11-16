@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  findProblems, problemsOf, fieldProblems, dateBefore, worstSeverity, problemSubject, problemTarget, RULES,
-  type Rule,
-} from "../validation";
+import { findProblems, dateBefore, worstSeverity, RULES, type Rule } from "../validation";
+import { problemsOf, fieldProblems, problemSubject, problemTarget } from "../../components/problemList";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { EXAMPLES } from "../../data/examples";
@@ -70,7 +68,7 @@ describe("editor warnings (#116): starter rules", () => {
     const [prob] = found(p);
     expect(prob).toMatchObject({ rule: "dod-not-deceased", field: "dod", fix: { label: "Mark deceased" } });
     usePedigreeStore.getState().initialize(p);
-    prob!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(prob!.fix!);
     const after = usePedigreeStore.getState().pedigree;
     expect(after.individuals[0]).toMatchObject({ deceased: true, dod: "2007" });
     expect(found(after)).toEqual([]);
@@ -81,7 +79,7 @@ describe("editor warnings (#116): starter rules", () => {
     const problems = found(p);
     expect(problems).toMatchObject([{ rule: "proband-unaffected", individualId: "a", field: "affected", fix: { label: "Mark affected" } }]);
     usePedigreeStore.getState().initialize(p);
-    problems[0]!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(problems[0]!.fix!);
     expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
   });
 
@@ -90,11 +88,11 @@ describe("editor warnings (#116): starter rules", () => {
     const problems = found(p);
     expect(problems).toMatchObject([{ rule: "consultand-deceased", individualId: "a", field: "consultand", fix: { label: "Not the consultand" }, moreFixes: [{ label: "Mark living" }] }]);
     usePedigreeStore.getState().initialize(p);
-    problems[0]!.moreFixes![0]!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(problems[0]!.moreFixes![0]!);
     expect(usePedigreeStore.getState().pedigree.individuals[0]).toMatchObject({ consultand: true, deceased: false });
     expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
     usePedigreeStore.getState().initialize(p);
-    problems[0]!.fix!.apply(usePedigreeStore.getState());
+    usePedigreeStore.getState().applyFix(problems[0]!.fix!);
     expect(found(usePedigreeStore.getState().pedigree)).toEqual([]);
   });
 

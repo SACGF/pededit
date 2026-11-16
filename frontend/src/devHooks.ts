@@ -25,7 +25,7 @@ import { lintExport } from "./io/svg/exportLint";
 import { exportSvg } from "./io/svg/svgExporter";
 import { exportUShapeSvg } from "./io/svg/uShapeExporter";
 import { chartTitle } from "./pedigree/labels";
-import { problemsOf } from "./pedigree/validation";
+import { problemsOf } from "./components/problemList";
 import type { SvgExportOptions } from "./io/svg/types";
 import { alignPedigree, kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import { importPed, exportPed } from "./io/ped";

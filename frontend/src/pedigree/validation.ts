@@ -12,8 +12,13 @@
  *
  * `field` names the edit panel field to highlight and focus; the panel
  * wraps each such field in `data-problem-field` (see `PROBLEM_FIELDS`).
- * `fix` is an optional one-click repair through the pedigree store's
- * setters (`FixActions` lists the ones fixes may use; the store satisfies it).
+ * `fix` is an optional one-click repair, as data (`FixEdit`, #126): the
+ * store's `applyFix` makes the edit.
+ *
+ * This module is the rules only. It knows the data model, the conditions
+ * and dates, and nothing of the editor: no store, no layout, no React. What
+ * the editor needs on top (the per-pedigree cache, who a problem is about,
+ * which problem F8 goes to) is in `components/problemList.ts`.
  */
 import type {
   Evaluation, Individual, Partnership, Pedigree, ReproductiveRole, SiblingOrderSettings, Tag,
@@ -21,7 +26,6 @@ import type {
 import { parsePartialDate, type PartialDate } from "./labels";
 import { affectedConditions, affectedControlOn, carrierLabel, conditionMode, conditionTags, isAffected, plainAffected, plainCarrier, resolvePlainAffected, type ConditionState } from "./conditions";
 import { addYears, ageRange, certainlyBefore, minDaysApart, partialDateOf } from "./dateRanges";
-import { pedigreeNumbers } from "./layoutToFlow";
 
 export type Severity = "warning" | "error";
 
@@ -34,7 +38,7 @@ export type ProblemField =
   | "dob" | "dod" | "age" | "lifeStatus" | "affected" | "conditions" | "carrier" | "presymptomatic"
   | "evaluations" | "reproductiveRole" | "carriedBy" | "consultand";
 
-/** The pedigree store setters a fix may call. `usePedigreeStore.getState()` satisfies it. */
+/** The pedigree store setters a fix edit is made with. `usePedigreeStore.getState()` satisfies it. */
 export interface FixActions {
   setAffected: (id: string, affected: boolean) => void;
   setDeceased: (id: string, deceased: boolean) => void;
@@ -50,10 +54,49 @@ export interface FixActions {
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
 }
 
+/**
+ * What a fix does, as data (#126): one named edit with its arguments, so a
+ * fix can be compared in a test, listed, sent somewhere or applied in bulk
+ * without holding a function. Most are a plain change to one person
+ * (`updateIndividual`); the named ones go through the store's setter of the
+ * same name because it has rules of its own (marking deceased, recording a
+ * condition, clearing an onset). A new kind of fix is a new member here and a
+ * case in `applyFixEdit`.
+ */
+export type FixEdit =
+  | { op: "setAffected"; id: string; affected: boolean }
+  | { op: "setDeceased"; id: string; deceased: boolean }
+  | { op: "setConditionStatus"; id: string; tagId: string; state: ConditionState }
+  | { op: "setCarrier"; id: string; carrier: boolean }
+  | { op: "setPresymptomatic"; id: string; presymptomatic: boolean }
+  | { op: "setOnset"; id: string; tagId: string | null; value: string }
+  | { op: "setEvaluations"; id: string; evaluations: Evaluation[] }
+  | { op: "setCarriedBy"; childId: string; carrierId?: string }
+  | { op: "setReproductiveRole"; id: string; role?: ReproductiveRole }
+  | { op: "updateIndividual"; id: string; updates: Partial<Individual> }
+  | { op: "updateSiblingOrderSettings"; settings: Partial<SiblingOrderSettings> };
+
 export interface ProblemFix {
   /** Button text, a short imperative ("Mark affected"). */
   label: string;
-  apply: (actions: FixActions) => void;
+  edit: FixEdit;
+}
+
+/** Make a fix's edit through the store's setters. The one place an edit turns into calls. */
+export function applyFixEdit(edit: FixEdit, a: FixActions): void {
+  switch (edit.op) {
+    case "setAffected": return a.setAffected(edit.id, edit.affected);
+    case "setDeceased": return a.setDeceased(edit.id, edit.deceased);
+    case "setConditionStatus": return a.setConditionStatus(edit.id, edit.tagId, edit.state);
+    case "setCarrier": return a.setCarrier(edit.id, edit.carrier);
+    case "setPresymptomatic": return a.setPresymptomatic(edit.id, edit.presymptomatic);
+    case "setOnset": return a.setOnset(edit.id, edit.tagId, edit.value);
+    case "setEvaluations": return a.setEvaluations(edit.id, edit.evaluations);
+    case "setCarriedBy": return a.setCarriedBy(edit.childId, edit.carrierId);
+    case "setReproductiveRole": return a.setReproductiveRole(edit.id, edit.role);
+    case "updateIndividual": return a.updateIndividual(edit.id, edit.updates);
+    case "updateSiblingOrderSettings": return a.updateSiblingOrderSettings(edit.settings);
+  }
 }
 
 export interface Problem {
@@ -285,7 +328,7 @@ export const RULES: Rule[] = [
       severity: "warning",
       field: "dod",
       message: "Has a date of death but is not marked deceased, so the date is not drawn.",
-      fix: { label: "Mark deceased", apply: a => a.setDeceased(ind.id, true) },
+      fix: { label: "Mark deceased", edit: { op: "setDeceased", id: ind.id, deceased: true } },
     },
   },
   {
@@ -296,7 +339,7 @@ export const RULES: Rule[] = [
       severity: "warning",
       field: "affected",
       message: "The proband is not marked affected. NSGC: the proband is always affected; an unaffected person seeking advice is the consultand.",
-      fix: { label: "Mark affected", apply: a => a.setAffected(ind.id, true) },
+      fix: { label: "Mark affected", edit: { op: "setAffected", id: ind.id, affected: true } },
     },
   },
   {
@@ -308,7 +351,7 @@ export const RULES: Rule[] = [
       if (!ind.consultand) return null;
       const loss = !!ind.lifeStatus && ind.lifeStatus !== "pregnancy";
       if (!ind.deceased && !loss) return null;
-      const notConsultand: ProblemFix = { label: "Not the consultand", apply: a => a.updateIndividual(ind.id, { consultand: false }) };
+      const notConsultand: ProblemFix = { label: "Not the consultand", edit: { op: "updateIndividual", id: ind.id, updates: { consultand: false } } };
       return {
         severity: "warning",
         field: "consultand",
@@ -316,7 +359,7 @@ export const RULES: Rule[] = [
           ? "The consultand is a pregnancy loss. The consultand is the person seeking counselling."
           : "The consultand is marked deceased. The consultand is the person seeking counselling; for a relative who has died, mark the person asking instead.",
         fix: notConsultand,
-        ...(loss ? {} : { moreFixes: [{ label: "Mark living", apply: (a: FixActions) => a.setDeceased(ind.id, false) }] }),
+        ...(loss ? {} : { moreFixes: [{ label: "Mark living", edit: { op: "setDeceased", id: ind.id, deceased: false } }] }),
       };
     },
   },
@@ -331,7 +374,7 @@ export const RULES: Rule[] = [
         // #118: the flag beside recorded conditions is drawn black under them, so say what it adds.
         const recorded = affectedConditions(ind, ctx.pedigree);
         const others = ctx.conditions.filter(t => !recorded.includes(t));
-        const record = (t: Tag): ProblemFix => ({ label: `Record as ${t.label}`, apply: a => a.updateIndividual(ind.id, resolvePlainAffected(ind, t.id, ctx.pedigree)) });
+        const record = (t: Tag): ProblemFix => ({ label: `Record as ${t.label}`, edit: { op: "updateIndividual", id: ind.id, updates: resolvePlainAffected(ind, t.id, ctx.pedigree) } });
         if (recorded.length === 0) {
           out.push({
             severity: "warning",
@@ -345,7 +388,7 @@ export const RULES: Rule[] = [
             severity: "warning",
             field: "conditions",
             message: `Marked affected as well as affected with ${names}: affected with what else? Drawn filled black under the ${names} section${recorded.length > 1 ? "s" : ""}.`,
-            fix: { label: `Only ${names}`, apply: a => a.updateIndividual(ind.id, resolvePlainAffected(ind, null, ctx.pedigree)) },
+            fix: { label: `Only ${names}`, edit: { op: "updateIndividual", id: ind.id, updates: resolvePlainAffected(ind, null, ctx.pedigree) } },
             ...(others.length ? { moreFixes: others.map(record) } : {}),
           });
         }
@@ -355,7 +398,7 @@ export const RULES: Rule[] = [
           severity: "warning",
           field: "conditions",
           message: "A carrier, but of which condition? The legend shows it as \"Carrier (condition not recorded)\".",
-          ...perCondition(ctx.conditions, t => ({ label: `Record as ${carrierLabel(t)}`, apply: a => a.setConditionStatus(ind.id, t.id, "carrier") })),
+          ...perCondition(ctx.conditions, t => ({ label: `Record as ${carrierLabel(t)}`, edit: { op: "setConditionStatus", id: ind.id, tagId: t.id, state: "carrier" } })),
         });
       }
       return out;
@@ -447,7 +490,7 @@ export const RULES: Rule[] = [
         severity: "warning",
         field: "dod",
         message: `Not marked deceased, but born ${shown(ind.dob)}: over 110 today.`,
-        fix: { label: "Mark deceased", apply: a => a.setDeceased(ind.id, true) },
+        fix: { label: "Mark deceased", edit: { op: "setDeceased", id: ind.id, deceased: true } },
       };
     },
   },
@@ -498,7 +541,7 @@ export const RULES: Rule[] = [
         severity: "warning",
         field: "dob",
         message: `Drawn to the right of a younger sibling${younger.name?.trim() ? `, ${younger.name.trim()}` : ""} (born ${shown(younger.dob)}): siblings are drawn in the order they were added.`,
-        fix: { label: "Order siblings by birth date", apply: a => a.updateSiblingOrderSettings({ mode: "birthDate" }) },
+        fix: { label: "Order siblings by birth date", edit: { op: "updateSiblingOrderSettings", settings: { mode: "birthDate" } } },
       };
     },
   },
@@ -528,7 +571,7 @@ export const RULES: Rule[] = [
           severity: "warning",
           field,
           message: "Both affected and a carrier. The affected fill hides the carrier mark.",
-          fix: { label: "Not a carrier", apply: a => a.setCarrier(ind.id, false) },
+          fix: { label: "Not a carrier", edit: { op: "setCarrier", id: ind.id, carrier: false } },
         });
       }
       const both = (ind.carrierTags ?? []).filter(t => ind.tags?.includes(t));
@@ -538,7 +581,7 @@ export const RULES: Rule[] = [
           severity: "warning",
           field,
           message: `Both affected with and a carrier of ${names.join(", ")}. Drawn as affected.`,
-          fix: { label: "Keep affected", apply: a => a.updateIndividual(ind.id, { carrierTags: ind.carrierTags!.filter(t => !both.includes(t)) }) },
+          fix: { label: "Keep affected", edit: { op: "updateIndividual", id: ind.id, updates: { carrierTags: ind.carrierTags!.filter(t => !both.includes(t)) } } },
         });
       }
       return out;
@@ -551,7 +594,7 @@ export const RULES: Rule[] = [
       severity: "warning",
       field: conditionMode(ctx.pedigree) === "plain" ? "carrier" : "presymptomatic",
       message: "Presymptomatic means not affected now, and the affected fill hides the vertical line.",
-      fix: { label: "Not presymptomatic", apply: a => a.setPresymptomatic(ind.id, false) },
+      fix: { label: "Not presymptomatic", edit: { op: "setPresymptomatic", id: ind.id, presymptomatic: false } },
     },
   },
   {
@@ -567,7 +610,7 @@ export const RULES: Rule[] = [
           message: isAffected(ind, ctx.pedigree)
             ? `An age of onset (${ind.onset.trim()}) for "affected", but they are affected only with a recorded condition. It is not drawn.`
             : `An age of onset (${ind.onset.trim()}) on someone not affected. It is not drawn.`,
-          fix: { label: "Clear age of onset", apply: a => a.setOnset(ind.id, null, "") },
+          fix: { label: "Clear age of onset", edit: { op: "setOnset", id: ind.id, tagId: null, value: "" } },
         });
       }
       for (const [tagId, value] of Object.entries(ind.tagOnset ?? {})) {
@@ -577,7 +620,7 @@ export const RULES: Rule[] = [
           severity: "warning",
           field: "affected",
           message: `An age of onset of ${tag.label} (${value.trim()}), who is not affected with it. It is not drawn.`,
-          fix: { label: "Clear age of onset", apply: a => a.setOnset(ind.id, tagId, "") },
+          fix: { label: "Clear age of onset", edit: { op: "setOnset", id: ind.id, tagId, value: "" } },
         });
       }
       return out;
@@ -593,7 +636,7 @@ export const RULES: Rule[] = [
         severity: "warning",
         field: "evaluations",
         message: empty.length === 1 ? "An evaluation with nothing recorded." : `${empty.length} evaluations with nothing recorded.`,
-        fix: { label: "Remove empty evaluations", apply: a => a.setEvaluations(ind.id, evs.filter(e => !empty.includes(e))) },
+        fix: { label: "Remove empty evaluations", edit: { op: "setEvaluations", id: ind.id, evaluations: evs.filter(e => !empty.includes(e)) } },
       };
     },
   },
@@ -615,7 +658,7 @@ export const RULES: Rule[] = [
         severity: "warning",
         field: "carriedBy",
         message: `Carried by ${carrier.name?.trim() || "someone"} whose biological sex is male.`,
-        fix: { label: "Carried by the genetic mother", apply: a => a.setCarriedBy(ind.id, undefined) },
+        fix: { label: "Carried by the genetic mother", edit: { op: "setCarriedBy", childId: ind.id } },
       };
     },
   },
@@ -626,7 +669,7 @@ export const RULES: Rule[] = [
       severity: "warning",
       field: "reproductiveRole",
       message: "A surrogate (S) whose biological sex is male.",
-      fix: { label: "Not a surrogate", apply: a => a.setReproductiveRole(ind.id, undefined) },
+      fix: { label: "Not a surrogate", edit: { op: "setReproductiveRole", id: ind.id } },
     },
   },
   {
@@ -644,7 +687,7 @@ export const RULES: Rule[] = [
         severity: "warning",
         field: "reproductiveRole",
         message: `${what} who is not linked to any child. Use the child's more menu to add an existing ${role}.`,
-        fix: { label: role === "donor" ? "Not a donor" : "Not a surrogate", apply: a => a.setReproductiveRole(ind.id, undefined) },
+        fix: { label: role === "donor" ? "Not a donor" : "Not a surrogate", edit: { op: "setReproductiveRole", id: ind.id } },
       };
     },
   },
@@ -664,7 +707,7 @@ export const RULES: Rule[] = [
       return !!fixed && {
         severity: "warning",
         message: "Refers to a condition, tag or person that is not in the pedigree.",
-        fix: { label: "Remove what is missing", apply: a => a.updateIndividual(ind.id, fixed) },
+        fix: { label: "Remove what is missing", edit: { op: "updateIndividual", id: ind.id, updates: fixed } },
       };
     },
     partnership: (p, ctx) => {
@@ -716,77 +759,10 @@ export function findProblems(pedigree: Pedigree, rules: Rule[] = RULES, today: D
   return out;
 }
 
-export interface ProblemIndex {
-  all: Problem[];
-  /** By person; a couple's problems are listed under both partners. */
-  byIndividual: Map<string, Problem[]>;
-  errors: number;
-  warnings: number;
-}
-
-const cache = new WeakMap<Pedigree, ProblemIndex>();
-
-/**
- * The problems in a pedigree, memoised per pedigree object. Every edit makes
- * a new object (immer), so this runs once per edit however many canvas nodes
- * ask.
- */
-export function problemsOf(pedigree: Pedigree): ProblemIndex {
-  const hit = cache.get(pedigree);
-  if (hit) return hit;
-  const all = findProblems(pedigree);
-  const byIndividual = new Map<string, Problem[]>();
-  const add = (id: string, p: Problem) => {
-    const list = byIndividual.get(id);
-    if (list) list.push(p); else byIndividual.set(id, [p]);
-  };
-  for (const p of all) {
-    if (p.individualId) add(p.individualId, p);
-    else if (p.partnershipId) {
-      const couple = pedigree.partnerships.find(x => x.id === p.partnershipId);
-      if (couple) { add(couple.individual1, p); add(couple.individual2, p); }
-    }
-  }
-  const errors = all.filter(p => p.severity === "error").length;
-  const index: ProblemIndex = { all, byIndividual, errors, warnings: all.length - errors };
-  cache.set(pedigree, index);
-  return index;
-}
-
-/** One person's problems on one field, for the edit panel. */
-export function fieldProblems(pedigree: Pedigree, individualId: string, field: ProblemField): Problem[] {
-  return (problemsOf(pedigree).byIndividual.get(individualId) ?? []).filter(p => p.field === field);
-}
-
 /** The worst severity in a list, or undefined when it is empty. */
 export function worstSeverity(problems: Problem[]): Severity | undefined {
   if (problems.length === 0) return undefined;
   return problems.some(p => p.severity === "error") ? "error" : "warning";
-}
-
-/**
- * Who a problem is about, for the problems list: the pedigree number (#8)
- * then the name, "II-2, Mary", or "II-2, unnamed female" with no name. The
- * number is left out for someone not drawn (a hidden branch, #94). The
- * numbers come from the layout, so they are only worked out when asked.
- */
-export function problemSubject(pedigree: Pedigree, problem: Problem, numbers: Map<string, string> = pedigreeNumbers(pedigree)): string {
-  const label = (id: string) => {
-    const ind = pedigree.individuals.find(i => i.id === id);
-    const number = numbers.get(id);
-    const name = ind?.name?.trim()
-      || (ind?.sex === "male" ? "unnamed male" : ind?.sex === "female" ? "unnamed female" : "unnamed person");
-    return number ? `${number}, ${name}` : name.charAt(0).toUpperCase() + name.slice(1);
-  };
-  if (problem.individualId) return label(problem.individualId);
-  const couple = pedigree.partnerships.find(p => p.id === problem.partnershipId);
-  return couple ? `${label(couple.individual1)} and ${label(couple.individual2)}` : "Couple";
-}
-
-/** The person to select for a problem: the person, or a couple's first partner (the panel shows their couples). */
-export function problemTarget(pedigree: Pedigree, problem: Problem): string | undefined {
-  if (problem.individualId) return problem.individualId;
-  return pedigree.partnerships.find(p => p.id === problem.partnershipId)?.individual1;
 }
 
 /** A problem's one-click fixes, `fix` first then `moreFixes`. */
@@ -805,25 +781,4 @@ export function problemsLike(all: Problem[], problem: Problem, label: string): {
     const fix = fixesOf(p).find(f => f.label === label);
     return fix ? [{ problem: p, fix }] : [];
   });
-}
-
-/**
- * The problem to go to from the keyboard (#116), `dir` 1 for next and -1
- * for previous, wrapping. `from` is the one gone to last: when it is still
- * listed the step is from it; when it has been fixed, the problem now in its
- * place is next. With none yet, the selected person's first problem, else
- * the first (or last) in the list.
- */
-export function adjacentProblem(
-  pedigree: Pedigree, all: Problem[], from: { id: string; index: number } | null, dir: 1 | -1, selectedId?: string | null,
-): Problem | undefined {
-  const n = all.length;
-  if (n === 0) return undefined;
-  if (from) {
-    const i = all.findIndex(p => p.id === from.id);
-    if (i >= 0) return all[(i + dir + n) % n];
-    return all[((dir === 1 ? from.index : from.index - 1) % n + n) % n];
-  }
-  const mine = selectedId ? all.find(p => problemTarget(pedigree, p) === selectedId) : undefined;
-  return mine ?? (dir === 1 ? all[0] : all[n - 1]);
 }

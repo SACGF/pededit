@@ -3,7 +3,8 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { usePedigreeStore } from "../store/usePedigreeStore";
-import { adjacentProblem, problemsOf, problemSubject, problemTarget, type Problem } from "../pedigree/validation";
+import type { Problem } from "../pedigree/validation";
+import { adjacentProblem, problemsOf, problemSubject, problemTarget } from "./problemList";
 import { pedigreeNumbers } from "../pedigree/layoutToFlow";
 import { ProblemFixes } from "./ProblemFixes";
 

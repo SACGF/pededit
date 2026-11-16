@@ -306,16 +306,26 @@ draws NSGC symbols.
   beside each condition marked Affected in "Conditions and tags" (#136). Drawn under the symbol
   as "onset 40s" or "BC 45y" (tag abbrev, cut before the age is).
 
-- `validation.ts` — editor warnings (#116). `problemsOf(pedigree)` runs
-  `RULES` once per pedigree object (WeakMap, so every canvas node can ask)
-  and gives `{ id, rule, severity, individualId | partnershipId, field,
-  message, fix? }`. A new check is one `Rule` with an `individual` or
+- `validation.ts` — editor warnings (#116): the rules only. It imports the
+  data model, `conditions.ts` and the date helpers and nothing of the
+  editor (no store, layout or React; a test holds it to that, #126), so the
+  checks can run anywhere. `findProblems(pedigree)` runs `RULES` and gives
+  `{ id, rule, severity, individualId | partnershipId, field, message,
+  fix? }`. What the editor adds is in `components/problemList.ts`:
+  `problemsOf(pedigree)` (once per pedigree object, WeakMap, so every canvas
+  node can ask), `fieldProblems`, `problemSubject`, `problemTarget`,
+  `adjacentProblem`. A new check is one `Rule` with an `individual` or
   `partnership` function returning a draft; `RuleContext` is the place for
   facts worked out once per pass (e.g. the condition count #115 needs).
   `field` must be a `ProblemField` that the Person tab wraps in
   `data-problem-field` (via `Field`'s `problemField` or `ProblemHighlight`),
-  or the list cannot focus it. `fix.apply` gets the store as `FixActions`;
-  add the setter a new fix needs to that interface. Problems only advise:
+  or the list cannot focus it. A fix is data (#126): `{ label, edit }`,
+  where `edit` is a `FixEdit`, one named edit with its arguments
+  (`{ op: "setDeceased", id, deceased: true }`, or `updateIndividual` with a
+  patch). The store's `applyFix` / `applyFixes` make it through
+  `applyFixEdit`, the one switch from an edit to a setter call. A fix that
+  needs a new setter: add it to `FixActions`, a member to `FixEdit` and a
+  case to `applyFixEdit`. Never put a function on a fix. Problems only advise:
   nothing may refuse a save or an edit because of one. Shown three ways:
   the field outline and message in `EditPanel`, the toolbar's
   `ProblemsMenu` (hidden at zero; a click selects the person, or a couple's
@@ -345,9 +355,9 @@ draws NSGC symbols.
   the rules or fields here: `RULES` and `ProblemField` are the list.
   Fixes are drawn by one component, `components/ProblemFixes.tsx`, in the
   panel and the list alike. "Fix all like this" groups problems of the same
-  rule offering a fix with the same label (`problemsLike`) and applies each
-  one's own fix inside the store's `groupEdits`, which folds the undo
-  snapshots into one. The list names people by pedigree number
+  rule offering a fix with the same label (`problemsLike`) and hands each
+  one's own fix to the store's `applyFixes`, which runs them inside
+  `groupEdits` so the undo snapshots fold into one. The list names people by pedigree number
   (`problemSubject`, "II-2, unnamed female"); hovering an item sets the
   store's `problemHighlightId`, a dashed outline on that node. F8 /
   Shift+F8 (`stepProblem`, `adjacentProblem`) go to the next / previous

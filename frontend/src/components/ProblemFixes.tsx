@@ -1,5 +1,6 @@
 import { usePedigreeStore } from "../store/usePedigreeStore";
-import { fixesOf, problemsLike, problemsOf, type Problem, type ProblemFix } from "../pedigree/validation";
+import { fixesOf, problemsLike, type Problem, type ProblemFix } from "../pedigree/validation";
+import { problemsOf } from "./problemList";
 
 /**
  * Apply `label`'s fix to every problem like `problem` (same rule, same fix
@@ -8,7 +9,7 @@ import { fixesOf, problemsLike, problemsOf, type Problem, type ProblemFix } from
 export function fixAllLike(problem: Problem, label: string): number {
   const store = usePedigreeStore.getState();
   const like = problemsLike(problemsOf(store.pedigree).all, problem, label);
-  store.groupEdits(() => { for (const { fix } of like) fix.apply(usePedigreeStore.getState()); });
+  store.applyFixes(like.map(l => l.fix));
   return like.length;
 }
 
@@ -16,8 +17,8 @@ export function fixAllLike(problem: Problem, label: string): number {
  * A problem's one-click fixes as underlined links, and "Fix all N like
  * this" when the same fix applies to several problems (#116). The one place
  * fixes are drawn: the edit panel under a highlighted field and the
- * toolbar's problems list both use it, and every click goes through the
- * rule's own fix objects.
+ * toolbar's problems list both use it, and every click hands the rule's own
+ * fix (data, #126) to the store's `applyFix`.
  */
 export function ProblemFixes({ problem, all: given }: { problem: Problem; /** Every problem in the pedigree; worked out when not given. */ all?: Problem[] }) {
   const pedigree = usePedigreeStore(s => s.pedigree);
@@ -52,7 +53,7 @@ export function ProblemFixes({ problem, all: given }: { problem: Problem; /** Ev
             type="button"
             data-problem-fix={f.label}
             className={link}
-            onClick={() => f.apply(usePedigreeStore.getState())}
+            onClick={() => usePedigreeStore.getState().applyFix(f)}
           >
             {f.label}
           </button>

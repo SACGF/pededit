@@ -22,7 +22,8 @@ import type { Individual, Sex, LifeStatus, ChildlessStatus, Pedigree, Adoption, 
 import type { Evaluation, EvaluationResult } from "@pedigree-editor/layout-engine";
 import { EVALUATION_RESULT_OPTIONS, evaluationsOf } from "../pedigree/evaluation";
 import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, reproductiveRoleProblem, symbolLetter } from "../pedigree/assisted";
-import { fieldProblems, worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
+import { worstSeverity, type Problem, type ProblemField } from "../pedigree/validation";
+import { fieldProblems } from "./problemList";
 import { ProblemIcon } from "./ProblemsMenu";
 import { ProblemFixes } from "./ProblemFixes";
 import {
