@@ -34,8 +34,9 @@ describe("legend and export key: one list of rows (#148)", () => {
       const exported = keyRows(drawnPedigree(c.data), "export", { duplicates: legend.relationships.some(r => r.kind === "duplicate") });
       const shared = (rows: KeyRow[]) => rows.filter(r => !KEY_DIFFERENCES.legendOnly.includes(r.kind));
 
-      // Symbols: the same rows; the order may differ.
-      expect(shared(legend.symbols).map(what).sort()).toEqual(exported.symbols.map(what).sort());
+      // Symbols: the same rows in the same order (#173).
+      expect(KEY_DIFFERENCES.symbolOrderDiffers).toBe(false);
+      expect(shared(legend.symbols).map(what)).toEqual(exported.symbols.map(what));
       // Relationships: the same rows in the same order.
       expect(shared(legend.relationships).map(what)).toEqual(exported.relationships.map(what));
       // Labels agree, but for the life statuses the export names by their caption.

@@ -310,14 +310,15 @@ draws NSGC symbols.
   does not compile until both draw it. A new row for the key is a member of
   `KeyRow`, a line in `keyRows` and a place in `SYMBOL_ORDER` or
   `RELATIONSHIP_ORDER`, never a test of the pedigree in either renderer.
-  The two lists differ on purpose and by history, and every difference is in
-  that file (`KEY_DIFFERENCES`, the two order tables, "Legend only" /
-  "Export only"): the legend also explains the plain shapes and the plain
-  couple line and lists unused tags; the export names a stillbirth and an
-  ectopic pregnancy by their caption; and the symbol rows come in a
-  different order (sex assigned at birth, and the proband, consultand and
-  family history rows). `__tests__/keyRows.test.tsx` holds them to exactly
-  those differences over every fixture and example.
+  The two lists differ on purpose, and every difference is in that file
+  (`KEY_DIFFERENCES`, the two order tables, "Legend only" / "Export only"):
+  the legend also explains the plain shapes and the plain couple line and
+  lists unused tags; the export names a stillbirth and an ectopic pregnancy
+  by their caption. The rows come in one order in both (#173: status, then
+  the proband and consultand arrows, then family history, as NSGC's key
+  reads), the legend's shapes first. `__tests__/keyRows.test.tsx` holds
+  them to exactly those differences, order included, over every fixture
+  and example.
 - `evaluation.ts` — evaluation results and presymptomatic carrier (#101,
   #114). `Individual.evaluations` is a list of `{ result, detail,
   documented }`; `labels.ts` writes each as a detail section between onset

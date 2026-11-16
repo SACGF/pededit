@@ -83,7 +83,7 @@ export interface KeyRows {
 }
 
 /**
- * How the legend and the export key differ, on purpose or by history. A test
+ * How the legend and the export key differ, on purpose. A test
  * checks that these are the only differences, so a new one has to be written
  * down here.
  */
@@ -94,22 +94,23 @@ export const KEY_DIFFERENCES = {
   legendListsUnusedTags: true,
   /** A stillbirth and an ectopic pregnancy name their caption in the export key ("Stillbirth (SB)"). */
   exportLabels: { stillbirth: "Stillbirth (SB)", ectopic: "Ectopic pregnancy (ECT)" } as Partial<Record<LifeStatus, string>>,
-  /** The order of the symbol rows differs (below); the relationship rows keep one order. */
-  symbolOrderDiffers: true,
+  /** The symbol rows keep one order, after the legend's shapes, and so do the relationship rows (#173). */
+  symbolOrderDiffers: false,
 };
 
-/** Order of the symbol rows. The legend begins with the shapes; the two also place three rows differently. */
+/**
+ * Order of the symbol rows, the same for both (#173): status first, then the
+ * two arrows together, then family history, as NSGC's own key reads. The
+ * legend begins with the shapes.
+ */
+const EXPORT_SYMBOL_ORDER: KeyRowKind[] = [
+  "affected", "affectedCore", "carrier", "presymptomatic", "deceased", "assignedAtBirth",
+  "proband", "consultand", "familyHistoryUnknown", "evaluation", "documented",
+  "lifeStatus", "adopted", "role", "collapsedBranch",
+];
 const SYMBOL_ORDER: Record<KeyTarget, KeyRowKind[]> = {
-  legend: [
-    "sex", "assignedAtBirth", "affected", "affectedCore", "carrier", "presymptomatic", "deceased",
-    "proband", "familyHistoryUnknown", "consultand", "evaluation", "documented",
-    "lifeStatus", "adopted", "role", "collapsedBranch",
-  ],
-  export: [
-    "affected", "affectedCore", "carrier", "presymptomatic", "deceased", "assignedAtBirth",
-    "proband", "consultand", "familyHistoryUnknown", "evaluation", "documented",
-    "lifeStatus", "adopted", "role", "collapsedBranch",
-  ],
+  legend: ["sex", ...EXPORT_SYMBOL_ORDER],
+  export: EXPORT_SYMBOL_ORDER,
 };
 
 const RELATIONSHIP_ORDER: Record<KeyTarget, KeyRowKind[]> = {
