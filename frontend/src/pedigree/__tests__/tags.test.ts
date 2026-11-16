@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { Pedigree, Tag } from "@pedigree-editor/layout-engine";
-import {
-  sectorAngles, sectorsFor, sectorPath, annotationRow, tagsInUse, tagsOf,
-  nextTagColor, TAG_PALETTE, renderTagLegendSvg, renderSectorsSvg, hasAnnotationRow,
-  renderExportKeySvg, needsAffectedCore, renderAffectedCoreSvg,
-} from "../tags";
+import { sectorAngles, sectorsFor, sectorPath, annotationRow, tagsInUse, tagsOf, nextTagColor, TAG_PALETTE, renderTagLegendSvg, renderSectorsSvg, hasAnnotationRow, needsAffectedCore, renderAffectedCoreSvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 
 const tremor: Tag   = { id: "t1", label: "Tremor", color: "#000000", style: "quadrant" };
 const seizure: Tag  = { id: "t2", label: "Tonic-clonic seizures", color: "#d62728", style: "quadrant" };

@@ -298,7 +298,26 @@ draws NSGC symbols.
   conditions a 2008 person affected only with recorded ones has quarters on
   white, as NSGC 2008 shades a quadrant per condition. Canvas, both exporters and the legends read it; never
   test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
-  `keyTagRows` are the key rows for the app legend and the export key.
+  `keyTagRows` work out the affected, carrier and tag rows of the key for
+  `keyRows` (below).
+- `keyRows.ts` (#148): the rows of the chart's key as plain data, for the
+  legend on the Pedigree tab and for the key of the exports:
+  `keyRows(pedigree, "legend" | "export")` gives the tag, symbol,
+  relationship and clinical detail rows, each with a `kind`, a label and
+  what its swatch shows. `components/Legend.tsx` (`KeySwatch`) and
+  `exportKey.ts` (`renderKeySwatchSvg`, moved out of `tags.ts`) each draw a
+  row through a switch on its kind ending in a `never` check, so a new kind
+  does not compile until both draw it. A new row for the key is a member of
+  `KeyRow`, a line in `keyRows` and a place in `SYMBOL_ORDER` or
+  `RELATIONSHIP_ORDER`, never a test of the pedigree in either renderer.
+  The two lists differ on purpose and by history, and every difference is in
+  that file (`KEY_DIFFERENCES`, the two order tables, "Legend only" /
+  "Export only"): the legend also explains the plain shapes and the plain
+  couple line and lists unused tags; the export names a stillbirth and an
+  ectopic pregnancy by their caption; and the symbol rows come in a
+  different order (sex assigned at birth, and the proband, consultand and
+  family history rows). `__tests__/keyRows.test.tsx` holds them to exactly
+  those differences over every fixture and example.
 - `evaluation.ts` — evaluation results and presymptomatic carrier (#101,
   #114). `Individual.evaluations` is a list of `{ result, detail,
   documented }`; `labels.ts` writes each as a detail section between onset

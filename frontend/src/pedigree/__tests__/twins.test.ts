@@ -5,7 +5,7 @@ import { lintFlow } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { twinSetProblem, twinMembership, zygositiesInUse } from "../twins";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { importJson } from "../../io/json/importer";

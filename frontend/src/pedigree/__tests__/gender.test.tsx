@@ -7,7 +7,7 @@ import { detailLines } from "../labels";
 import { layoutToFlow } from "../layoutToFlow";
 import type { RFNodeData } from "../layoutToFlow";
 import { SymbolShape } from "../nodes/symbols";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";

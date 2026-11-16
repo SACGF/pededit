@@ -5,7 +5,8 @@ import {
   tagPaint, tagFillMode, fillLayers, renderRegionFillSvg, patternLinesD, patternDotsD, tint,
   MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR, TAG_FILL_OPTIONS, isTagFill,
 } from "../tagFills";
-import { sectorsFor, symbolPaint, renderSectorsSvg, renderTagLegendSvg, renderExportKeySvg, annotationRow, renderAnnotationRowSvg, sectorPath } from "../tags";
+import { sectorsFor, symbolPaint, renderSectorsSvg, renderTagLegendSvg, annotationRow, renderAnnotationRowSvg, sectorPath } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { SymbolShape } from "../nodes/symbols";
 import { TagSwatchSvg } from "../../components/Legend";
 import { exportSvg } from "../../io/svg/svgExporter";

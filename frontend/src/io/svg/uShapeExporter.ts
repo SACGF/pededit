@@ -3,9 +3,10 @@ import { deidentify } from "./deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
 import { personGlyph, type PersonGlyph } from "../../pedigree/personGlyph";
 import {
-  renderSectorListSvg, renderAnnotationItemsSvg, renderExportKeySvg,
+  renderSectorListSvg, renderAnnotationItemsSvg, 
   renderAffectedCoreSvg, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
+import { renderExportKeySvg } from "../../pedigree/exportKey";
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets, renderRoleLetterSvg } from "./svgExporter";
 import { assistedLinks } from "../../pedigree/assisted";

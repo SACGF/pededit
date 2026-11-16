@@ -48,9 +48,11 @@ async function answering(url) {
 }
 
 /** Check out `ref` under .worktrees/ (reusing a checkout of the same commit) and return its directory. */
-export function ensureWorktree(ref) {
+export function ensureWorktree(ref, { own = false } = {}) {
   const sha = resolveCommit(ref);
-  const dir = path.join(WORKTREES_DIR, sha.slice(0, 12));
+  // `own`: a directory no other run shares, so that removing it afterwards
+  // cannot take the checkout from under a second run of the same commit.
+  const dir = path.join(WORKTREES_DIR, sha.slice(0, 12) + (own ? `-${process.pid}` : ""));
   if (!existsSync(path.join(dir, "frontend", "package.json"))) {
     mkdirSync(WORKTREES_DIR, { recursive: true });
     git(["worktree", "prune"]);
@@ -76,12 +78,12 @@ export default mergeConfig(base, {
  * Start Vite for `ref` on a free port and wait until it answers.
  * Returns { url, sha, dir, pid, log, stop }.
  */
-export async function startWorktree(ref, { port } = {}) {
-  const { sha, dir } = ensureWorktree(ref);
+export async function startWorktree(ref, { port, own = false } = {}) {
+  const { sha, dir } = ensureWorktree(ref, { own });
   const chosen = port ?? await freePort(5180);
   const url = `http://localhost:${chosen}`;
   mkdirSync(CACHE_DIR, { recursive: true });
-  const log = path.join(CACHE_DIR, `worktree-${sha.slice(0, 12)}.log`);
+  const log = path.join(CACHE_DIR, `worktree-${path.basename(dir)}.log`);
   const vite = path.join(path.dirname(createRequire(path.join(FRONTEND_DIR, "package.json")).resolve("vite/package.json")), "bin", "vite.js");
   const fd = openSync(log, "a");
   const child = spawn(process.execPath, [vite, "--config", CONFIG_NAME, "--port", String(chosen), "--strictPort"], {

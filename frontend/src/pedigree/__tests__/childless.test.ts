@@ -3,7 +3,7 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { childlessMarkSegments, childlessReasonBaselineY, activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP } from "../childless";
 import { exportSvg } from "../../io/svg/svgExporter";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /** Two couples on one row: a = b (childless, infertility) and c = d with a child. */

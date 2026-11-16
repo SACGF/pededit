@@ -197,7 +197,7 @@ node frontend/scripts/browser/compare.mjs --all-fixtures --compact --deidentify 
 ```
 before: 2a30eba  (http://localhost:5180)
 after:  2a30eba +1 uncommitted  (working tree)
-drawings: canvas, export, u-shape
+drawings: canvas, legend, export, u-shape
 DIFF  fixture:status
         canvas  23 px changed in 443x243 at 265,105  frontend/test-output/browser/compare/fixture-status.canvas.png
 same  fixture:couples
@@ -208,7 +208,8 @@ For a change that is meant to move nothing (#142). It checks `--base` (default
 `HEAD`) out under `.worktrees/` with its own Vite, draws each pedigree on both
 sides and compares pixel for pixel, with no tolerance: the canvas at zoom 1
 with editor-only marks hidden (minimap, controls, dev ids, problem markers),
-the standard SVG export and the U-shape export. Both sides draw the working
+the legend on the Pedigree tab, the standard SVG export and the U-shape
+export. Both sides draw the working
 tree's pedigree data, so it compares drawing code, not fixtures. Each
 difference gets an image (before, after, and the after drawing greyed with
 the changed pixels in red, boxed) and, for exports, the two SVG files. An

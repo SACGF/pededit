@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { clinicalDetailLines, wrapText } from "../clinicalDetails";
-import { renderExportKeySvg, renderClinicalDetailsSvg } from "../tags";
+import { renderExportKeySvg, renderClinicalDetailsSvg } from "../exportKey";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";

@@ -1,39 +1,24 @@
-import type { Individual, Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
-import {
-  pedigreeTags, tagsInUse, conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, statusKeyRows, keyTagRows,
-  PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES,
-  ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
-} from "../pedigree/tags";
-import { CONDITIONS_AND_TAGS, carrierLabel } from "../pedigree/conditions";
+import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
+import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE } from "../pedigree/tags";
+import { CONDITIONS_AND_TAGS } from "../pedigree/conditions";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
-import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
-import { notationOf } from "../pedigree/notation";
-import { FAMILY_HISTORY_LEGEND_LABEL } from "../pedigree/familyHistory";
-import { arrowKind, ARROW_LEGEND_LABEL, type ArrowKind } from "../pedigree/proband";
-import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
-import { CHILDLESS_OPTIONS, childlessPartnerships } from "../pedigree/childless";
-import { ADOPTION_OPTIONS, adoptionLegendLabel, ADOPTION_DASH } from "../pedigree/adoption";
-import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "../pedigree/assisted";
-import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "../pedigree/twins";
+import { type ArrowKind } from "../pedigree/proband";
+import { ADOPTION_DASH } from "../pedigree/adoption";
 import type { Zygosity } from "@pedigree-editor/layout-engine";
 import type { ChildlessStatus, Adoption, ReproductiveRole } from "@pedigree-editor/layout-engine";
-import { consanguinityTest } from "@/pedigree/consanguinity";
-import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "@/pedigree/ended";
+import { endedMarkSegments } from "@/pedigree/ended";
 import { segmentsPathD } from "@/pedigree/sibshipPath";
-import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "@/pedigree/collapse";
 import { Button } from "@/components/ui/button";
-import { clinicalDetailLines } from "@/pedigree/clinicalDetails";
-import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "@/pedigree/gender";
 import { Tags } from "lucide-react";
-import { drawsDuplicates } from "@/pedigree/duplicates";
-import { DUPLICATE_LEGEND_LABEL } from "@/pedigree/constants";
+import { keyRows, type KeyRow } from "@/pedigree/keyRows";
 
 /**
  * The figure legend, on the edit panel's Pedigree tab (#75, #135). A
  * person's own conditions and tags, with the same swatches, are edited on the
- * Person tab (`ConditionsAndTags`, #136). The exported key
- * (`renderExportKeySvg`) lists the same statuses in the same order.
+ * Person tab (`ConditionsAndTags`, #136). Which rows it has comes from `keyRows`
+ * (`pedigree/keyRows.ts`, #148), the list the exported key draws from too;
+ * this file draws their swatches.
  */
 
 type Sex = "male" | "female" | "unknown";
@@ -356,95 +341,57 @@ interface LegendProps {
   onManageTags?: () => void;
 }
 
+/** A row with a swatch in the Symbols or Relationships section: every kind but a tag and a clinical detail. */
+type SwatchRow = Exclude<KeyRow, { kind: "tag" | "clinicalDetail" }>;
+
+/**
+ * The swatch of one row. One case for each kind of row in `keyRows`: a new
+ * kind does not compile until it is drawn here (and in the export key).
+ */
+function KeySwatch({ row }: { row: SwatchRow }): React.ReactNode {
+  switch (row.kind) {
+    case "sex": return <SymbolSvg sex={row.shape} />;
+    case "assignedAtBirth": return <span className="text-[10px] text-black">{row.code}</span>;
+    case "affected": return <SymbolSvg sex={row.shape} affected />;
+    case "affectedCore": return <AffectedCoreSvg sex={row.shape} />;
+    case "carrier": return row.half ? <PlainCarrierSvg sex={row.shape} /> : <SymbolSvg sex={row.shape} carrier />;
+    case "presymptomatic": return <PresymptomaticSvg sex={row.shape} />;
+    case "deceased": return <DeceasedSvg sex={row.shape} />;
+    case "proband":
+    case "consultand": return <ProbandSvg sex={row.shape} kind={row.kind} />;
+    case "familyHistoryUnknown": return <FamilyHistorySvg sex={row.shape} />;
+    case "evaluation": return <EvaluationSvg mark={row.mark} />;
+    case "documented": return <DocumentedSvg sex={row.shape} />;
+    case "lifeStatus": return <LifeStatusSvg sex={row.shape} lifeStatus={row.status} />;
+    case "adopted": return <AdoptedSvg sex={row.shape} adopted={row.adopted} />;
+    case "role": return <RoleSvg sex={row.shape} role={row.role} />;
+    case "collapsedBranch": return <CollapsedBranchSvg />;
+    case "couple": return <CoupleSvg />;
+    case "consanguineous": return <ConsanguineousSvg />;
+    case "ended": return <EndedSvg />;
+    case "childless": return <ChildlessSvg status={row.status} />;
+    case "twins": return <TwinsSvg zygosity={row.zygosity} />;
+    case "assistedLine": return <AssistedLineSvg dashed={row.line === "social"} />;
+    case "duplicate": return <DuplicateArcSvg />;
+    default: {
+      const unhandled: never = row;
+      return unhandled;
+    }
+  }
+}
+
 export function Legend({ pedigree: full, onManageTags }: LegendProps) {
-  // Only what is drawn: hidden descendants (#94) add no entries, and the
-  // group symbols standing for collapsed siblings (#1) have their own row.
-  const { drawn: pedigree, placeholders } = collapseInfo(full);
-  const { partnerships } = pedigree;
-  const individuals = pedigree.individuals.filter(i => !isBranchPlaceholderId(i.id));
-
-  // Swatches use the shape drawn, which is the gender identity's when shown (#26).
-  const shape = (i: Individual) => symbolSex(i, pedigree);
-  const hasMale    = individuals.some(i => shape(i) === "male");
-  const hasFemale  = individuals.some(i => shape(i) === "female");
-  const hasUnknown = individuals.some(i => shape(i) === "unknown");
-  const byGender = anyDrawnByGender(pedigree);
-
-  // Affected and carrier with no condition recorded, as drawn (#115, `statusKeyRows`).
-  const status = statusKeyRows(pedigree, individuals);
-  const deceasedInd = individuals.find(i => i.deceased);
-  const probandInd  = individuals.find(i => arrowKind(i) === "proband");
-  const consultandInd = individuals.find(i => arrowKind(i) === "consultand");
-
-  const hasCouples        = partnerships.some(p => !p.donorConception); // a donor pair (#45) has no couple line
-  // Same rule the canvas uses for the double line: flagged, or related by blood.
-  const related = consanguinityTest(pedigree);
-  const hasConsanguineous = partnerships.some(p => related(p.individual1, p.individual2));
-
-  const indRows: { icon: React.ReactNode; label: string }[] = [];
-  if (hasMale)    indRows.push({ icon: <SymbolSvg sex="male" />,    label: byGender ? "Man / male" : "Male" });
-  if (hasFemale)  indRows.push({ icon: <SymbolSvg sex="female" />,  label: byGender ? "Woman / female" : "Female" });
-  if (hasUnknown) indRows.push({ icon: <SymbolSvg sex="unknown" />, label: byGender ? "Non-binary / unknown sex" : "Unknown sex" });
-  for (const { code, label } of assignedAtBirthInUse(pedigree)) {
-    indRows.push({ icon: <span className="text-[10px] text-black">{code}</span>, label });
-  }
-  if (status.affected) indRows.push({ icon: <SymbolSvg sex={shape(status.affected)} affected />, label: status.affectedLabel });
-  if (status.core) indRows.push({ icon: <AffectedCoreSvg sex={shape(status.core)} />, label: status.coreLabel });
-  if (status.carrier) {
-    indRows.push({
-      icon: status.carrierHalf ? <PlainCarrierSvg sex={shape(status.carrier)} /> : <SymbolSvg sex={shape(status.carrier)} carrier />,
-      label: status.carrierLabel,
-    });
-  }
-  const ev = evaluationKeyInfo(individuals, pedigree, notationOf(pedigree));
-  const evLegend = evaluationLegend(notationOf(pedigree));
-  if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={shape(ev.presymptomatic)} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
-  if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={shape(deceasedInd)} />,        label: "Deceased" });
-  if (probandInd)  indRows.push({ icon: <ProbandSvg sex={shape(probandInd)} kind="proband" />, label: ARROW_LEGEND_LABEL.proband });
-  const historyInd = individuals.find(i => i.familyHistoryUnknown);
-  if (historyInd) indRows.push({ icon: <FamilyHistorySvg sex={shape(historyInd)} />, label: FAMILY_HISTORY_LEGEND_LABEL });
-  if (consultandInd) indRows.push({ icon: <ProbandSvg sex={shape(consultandInd)} kind="consultand" />, label: ARROW_LEGEND_LABEL.consultand });
-  if (ev.evaluated) indRows.push({ icon: <EvaluationSvg mark={evLegend.mark} />, label: evLegend.label });
-  if (ev.documented) indRows.push({ icon: <DocumentedSvg sex={shape(ev.documented)} />, label: DOCUMENTED_LEGEND_LABEL });
-  for (const o of LIFE_STATUS_OPTIONS) {
-    const ind = individuals.find(i => i.lifeStatus === o.value);
-    if (ind) indRows.push({ icon: <LifeStatusSvg sex={shape(ind)} lifeStatus={o.value} />, label: o.label });
-  }
-  for (const o of ADOPTION_OPTIONS) {
-    const ind = individuals.find(i => i.adopted === o.value);
-    if (ind) indRows.push({ icon: <AdoptedSvg sex={shape(ind)} adopted={o.value} />, label: adoptionLegendLabel(o.value) });
-  }
-
-  for (const o of REPRODUCTIVE_ROLE_OPTIONS) {
-    const ind = individuals.find(i => symbolLetter(i) === o.letter);
-    if (ind) indRows.push({ icon: <RoleSvg sex={shape(ind)} role={o.value} />, label: roleLegendLabel(o.value) });
-  }
-  if (placeholders.size > 0) indRows.push({ icon: <CollapsedBranchSvg />, label: COLLAPSED_BRANCH_LABEL });
-
-  const relRows: { icon: React.ReactNode; label: string }[] = [];
-  if (hasCouples)        relRows.push({ icon: <CoupleSvg />,         label: "Couple" });
-  if (hasConsanguineous) relRows.push({ icon: <ConsanguineousSvg />, label: "Consanguineous couple" });
-  if (hasEndedPartnership(pedigree)) relRows.push({ icon: <EndedSvg />, label: ENDED_LABEL });
-  const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
-  for (const o of CHILDLESS_OPTIONS) {
-    if (childless.has(o.value)) relRows.push({ icon: <ChildlessSvg status={o.value} />, label: o.label });
-  }
-  const zygosities = zygositiesInUse(pedigree);
-  for (const o of ZYGOSITY_OPTIONS) {
-    if (zygosities.has(o.value)) relRows.push({ icon: <TwinsSvg zygosity={o.value} />, label: twinLegendLabel(o.value) });
-  }
-  const linkKinds = new Set(assistedLinks(pedigree).map(l => l.kind));
-  if (linkKinds.has("carrier")) relRows.push({ icon: <AssistedLineSvg dashed={false} />, label: CARRIER_LINE_LEGEND });
-  if (linkKinds.has("social"))  relRows.push({ icon: <AssistedLineSvg dashed />,        label: SOCIAL_LINE_LEGEND });
-  if (drawsDuplicates(full))    relRows.push({ icon: <DuplicateArcSvg />,               label: DUPLICATE_LEGEND_LABEL });
-
+  // Which rows, in what order and with what label: `keyRows` (#148), the
+  // list the export key draws from too. Only what is drawn is listed: hidden
+  // descendants (#94) add no entries.
+  const key = keyRows(full, "legend");
+  const pedigree = key.pedigree;
+  const indRows = key.symbols as SwatchRow[];
+  const relRows = key.relationships as SwatchRow[];
   // Every defined tag is listed so an unused one can still be ticked; the
   // exported key lists only tags someone carries.
-  const tags = pedigreeTags(pedigree);
-  const details = clinicalDetailLines(full);
-  const used = new Set(tagsInUse(pedigree).map(t => t.id));
-  // Conditions with carriers get a "<condition> carrier" row after their own (#115).
-  const carriersOf = new Set(keyTagRows(pedigree).filter(r => r.carrier).map(r => r.tag.id));
+  const tagRows = key.tags.flatMap(r => (r.kind === "tag" ? [r] : []));
+  const details = key.details.flatMap(r => (r.kind === "clinicalDetail" ? [r] : []));
 
   const manage = onManageTags && (
     <Button
@@ -462,42 +409,27 @@ export function Legend({ pedigree: full, onManageTags }: LegendProps) {
     <div className="space-y-4" data-testid="legend">
       <div className="space-y-1">
         <SectionHeader action={manage}>{CONDITIONS_AND_TAGS}</SectionHeader>
-        {tags.length === 0 ? (
+        {tagRows.length === 0 ? (
           <p className="text-[10px] text-gray-400">None defined for this pedigree yet.</p>
         ) : (
           <div>
-            {tags.map(tag => {
-              const inUse = used.has(tag.id);
-              const swatch = (
+            {tagRows.map(row => (
+              <div
+                key={`${row.tag.id}${row.carrier ? " carrier" : ""}`}
+                className="flex items-center gap-1.5 min-w-0"
+                data-legend-carrier-row={row.carrier ? row.tag.id : undefined}
+              >
                 <div className="flex items-center justify-center w-10 h-7 shrink-0">
-                  <TagSwatchSvg tag={tag} pedigree={pedigree} />
+                  <TagSwatchSvg tag={row.tag} pedigree={pedigree} carrier={row.carrier} />
                 </div>
-              );
-              const text = (
                 <span
-                  className={`text-xs truncate ${inUse ? "text-gray-800" : "text-gray-400"}`}
-                  title={inUse ? undefined : "No one has this yet"}
+                  className={`text-xs truncate ${row.inUse ? "text-gray-800" : "text-gray-400"}`}
+                  title={row.inUse ? undefined : "No one has this yet"}
                 >
-                  {tag.label}
+                  {row.label}
                 </span>
-              );
-              return (
-                <div key={tag.id}>
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    {swatch}
-                    {text}
-                  </div>
-                  {carriersOf.has(tag.id) && (
-                    <div className="flex items-center gap-1.5 min-w-0" data-legend-carrier-row={tag.id}>
-                      <div className="flex items-center justify-center w-10 h-7 shrink-0">
-                        <TagSwatchSvg tag={tag} pedigree={pedigree} carrier />
-                      </div>
-                      <span className="text-xs truncate text-gray-800">{carrierLabel(tag)}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -506,7 +438,7 @@ export function Legend({ pedigree: full, onManageTags }: LegendProps) {
         <div className="space-y-1">
           <SectionHeader>Symbols</SectionHeader>
           <div>
-            {indRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+            {indRows.map(r => <LegendRow key={r.label} icon={<KeySwatch row={r} />} label={r.label} />)}
           </div>
         </div>
       )}
@@ -515,7 +447,7 @@ export function Legend({ pedigree: full, onManageTags }: LegendProps) {
         <div className="space-y-1">
           <SectionHeader>Relationships</SectionHeader>
           <div>
-            {relRows.map(r => <LegendRow key={r.label} icon={r.icon} label={r.label} />)}
+            {relRows.map(r => <LegendRow key={r.label} icon={<KeySwatch row={r} />} label={r.label} />)}
           </div>
         </div>
       )}

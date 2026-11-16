@@ -70,8 +70,8 @@ One word per concept (#137). The app's labels, the docs (`AGENTS.md` files, `cla
 | Dot tag, text tag | "dot", "text"; text tags carry a short abbreviation | `style: "dot"`, `style: "text"`, `Tag.abbrev` | |
 | Affected or a carrier with no condition recorded | "Affected", "Carrier"; with two or more conditions "Affected (condition not recorded)", "Carrier (condition not recorded)" | the plain flags `Individual.affected`, `Individual.carrier` (`plainAffected`, `plainCarrier`) | "plain" in the UI |
 | Affected at all | "affected" | `isAffected` (the flag or any condition) | reading `Individual.affected` for it |
-| The chart's key in the app | "legend", on the Pedigree tab | `Legend.tsx` | "key" |
-| The chart's key in SVG/PNG/PDF exports | "key" (NSGC's word) | `<g class="pedigree-key">`, `keyTagRows`, `statusKeyRows` | "legend" |
+| The chart's key in the app | "legend", on the Pedigree tab | `Legend.tsx`, rows from `keyRows(pedigree, "legend")` | "key" |
+| The chart's key in SVG/PNG/PDF exports | "key" (NSGC's word) | `<g class="pedigree-key">`, `pedigree/exportKey.ts`, rows from `keyRows(pedigree, "export")` | "legend" |
 | Drawing conditions and tags in colour or black and white | Settings "Conditions and tags drawn in": Colour / Black and white patterns | `canvasSettings.tagFills`, `"monochrome"` | "Tag fills" |
 | A signed-in user's saved conditions and tags | "My library", in the Conditions and tags dialog | `TagPreset`, `/api/tag-presets/` | "tag library" |
 | A person on the chart | "person", "people" | `Individual` | "individual" in UI text |

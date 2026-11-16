@@ -19,9 +19,10 @@ import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
 import { renderPresymptomaticLineSvg, renderDocumentedMarkSvg } from "../../pedigree/evaluation";
 import { renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
+import { renderExportKeySvg } from "../../pedigree/exportKey";
 import type { SvgExportOptions } from "./types";
 import {
-  renderSectorListSvg, renderAnnotationItemsSvg, renderExportKeySvg,
+  renderSectorListSvg, renderAnnotationItemsSvg, 
   renderAffectedCoreSvg, type SymbolPaint,
 } from "../../pedigree/tags";
 import {

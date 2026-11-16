@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Draw the same pedigrees from two commits and report what differs, image by
-// image (#142): the canvas at a fixed zoom, the standard SVG export and the
-// U-shape export. A refactoring should move nothing; this shows that it did
+// image (#142): the canvas at a fixed zoom, the legend on the Pedigree tab,
+// the standard SVG export and the U-shape export. A refactoring should move nothing; this shows that it did
 // not, or exactly where it did.
 //
 // The "before" side is a commit checked out in a git worktree with its own
@@ -29,8 +29,8 @@ ${SET_HELP}
   --deidentify        De-identified exports (the canvas is not affected).
   --nsgc2008          Draw every pedigree in NSGC 2008 notation.
   --monochrome        Draw conditions and tags in black and white patterns.
-  --no-canvas, --no-export, --no-u-shape
-                      Leave one of the three drawings out.
+  --no-canvas, --no-legend, --no-export, --no-u-shape
+                      Leave one of the four drawings out.
   --out-dir DIR       Where the images of differences go (default
                       frontend/test-output/browser/compare/, emptied first).
   --keep-base         Leave the base worktree in place afterwards.
@@ -43,7 +43,7 @@ ${COMMON_HELP}`;
 
 const FLAGS = {
   ...SET_FLAGS, base: "string", "base-url": "string", compact: "bool", deidentify: "bool", nsgc2008: "bool",
-  monochrome: "bool", "no-canvas": "bool", "no-export": "bool", "no-u-shape": "bool", "out-dir": "string", "keep-base": "bool",
+  monochrome: "bool", "no-canvas": "bool", "no-legend": "bool", "no-export": "bool", "no-u-shape": "bool", "out-dir": "string", "keep-base": "bool",
 };
 
 /** Space round the drawing in a canvas picture, flow units (= pixels at zoom 1). */
@@ -94,8 +94,43 @@ async function canvasShot(page, b) {
     return { x: Math.ceil(pane.x), y: Math.ceil(pane.y), width, height, paneWidth: pane.width, paneHeight: pane.height };
   }, { tx: PAD - Math.floor(b.x1), ty: PAD - Math.floor(b.y1), width, height });
   if (clip.paneWidth < width || clip.paneHeight < height) throw new Error(`canvas pane ${clip.paneWidth}x${clip.paneHeight} is smaller than the drawing ${width}x${height}`);
+  return settled(() => page.screenshot({ clip: { x: clip.x, y: clip.y, width, height } }), page);
+}
+
+/**
+ * A picture of the legend on the side panel's Pedigree tab, in a window tall
+ * enough that the panel does not scroll. Null when the page has none.
+ */
+async function legendShot(page) {
+  const tab = page.locator('[data-testid="panel-tab-pedigree"]');
+  if (!(await tab.count())) return null;
+  await tab.click();
+  const legend = page.locator('[data-testid="legend"]');
+  if (!(await legend.count())) return null;
+  const size = page.viewportSize();
+  await page.setViewportSize({ width: size.width, height: 4000 });
+  // A scrolling panel is painted on a layer of its own, whose anti-aliasing
+  // varies from one load to the next; painted with the page it does not.
+  await page.addStyleTag({ content: '[data-testid="panel-scroll"] { overflow: visible !important; }' });
+  await page.mouse.move(2, 2);
+  return settled(() => legend.screenshot(), page);
+}
+
+/**
+ * A picture once it has stopped changing: taken again until two in a row are
+ * the same. The side panel lays out again after the window is resized, and a
+ * picture caught part way differs by a few pixels of anti-aliasing.
+ */
+async function settled(take, page, tries = 8) {
   await page.waitForTimeout(150);
-  return page.screenshot({ clip: { x: clip.x, y: clip.y, width, height } });
+  let last = await take();
+  for (let i = 0; i < tries; i++) {
+    await page.waitForTimeout(120);
+    const next = await take();
+    if (next.equals(last)) return next;
+    last = next;
+  }
+  return last;
 }
 
 /** Rasterise an SVG string in chromium. */
@@ -176,7 +211,8 @@ await main(async () => {
   } else {
     const ref = flags.base ?? "HEAD";
     try { resolveCommit(ref); } catch (e) { throw new UsageError(e.message); }
-    worktree = await startWorktree(ref);
+    // With --keep-base the checkout is the shared one, to be found again; otherwise this run's own.
+    worktree = await startWorktree(ref, { own: !flags["keep-base"] });
     before = worktree.url;
   }
 
@@ -188,6 +224,7 @@ await main(async () => {
   const sides = [{ name: "before", url: before }, { name: "after", url: after }];
   const drawings = [
     ...(flags["no-canvas"] ? [] : ["canvas"]),
+    ...(flags["no-legend"] ? [] : ["legend"]),
     ...(flags["no-export"] ? [] : ["export"]),
     ...(flags["no-u-shape"] ? [] : ["u-shape"]),
   ];
@@ -235,6 +272,14 @@ await main(async () => {
         }
         item.differences.push(entry);
       };
+      if (drawings.includes("legend")) {
+        // Before the canvas picture, while the window still has its starting
+        // width: after it is resized for the canvas, the legend's rounded
+        // corners anti-alias differently from one load to the next.
+        const pa = await legendShot(a.page), pb = await legendShot(b.page);
+        if (!pa || !pb) item.errors.push("legend: none on one side");
+        else if (!pa.equals(pb)) await record("legend", pa, pb);
+      }
       if (drawings.includes("canvas")) {
         if (!a.bounds || !b.bounds) item.errors.push("canvas: nothing drawn on one side");
         else {

@@ -5,7 +5,7 @@ import { endedBreakX, endedMarkSegments, middleTaken, ENDED_STROKE_DX, ENDED_STR
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { importJson, exportJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";

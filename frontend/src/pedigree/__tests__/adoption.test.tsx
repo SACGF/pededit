@@ -7,7 +7,7 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportCsv } from "../../io/csv/exporter";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 

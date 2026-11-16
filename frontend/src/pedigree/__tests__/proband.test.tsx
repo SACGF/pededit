@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { arrowKind, arrowGeometry, ARROW_LEGEND_LABEL } from "../proband";
 import { ProbandArrow } from "../nodes/symbols";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";

@@ -13,7 +13,7 @@ import { nameRelationship } from "../relationship";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
-import { renderExportKeySvg } from "../tags";
+import { renderExportKeySvg } from "../exportKey";
 import { exportPed, pedLostAssisted } from "../../io/ped/exporter";
 import { exportCsv } from "../../io/csv/exporter";
 import { importJson, exportJson } from "../../io/json";

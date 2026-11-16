@@ -1,19 +1,7 @@
 import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layout-engine";
-import { consanguinityTest } from "./consanguinity";
-import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "./ended";
-import { LIFE_STATUS_OPTIONS, lossTrianglePoints, lossSlashEnds, usesLossTriangle } from "./lifeStatus";
-import { CHILDLESS_OPTIONS, childlessPartnerships } from "./childless";
-import { REPRODUCTIVE_ROLE_OPTIONS, roleLegendLabel, symbolLetter, assistedLinks, CARRIER_LINE_LEGEND, SOCIAL_LINE_LEGEND } from "./assisted";
-import { ADOPTION_OPTIONS, adoptionLegendLabel, adoptionBracketSegments } from "./adoption";
-import { ZYGOSITY_OPTIONS, twinLegendLabel, zygositiesInUse } from "./twins";
-import { DUPLICATE_LEGEND_LABEL } from "./constants";
-import { COLLAPSED_BRANCH_LABEL, collapseInfo, drawnPedigree } from "./collapse";
-import { clinicalDetailLines, wrapText } from "./clinicalDetails";
-import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
-import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
-import { drawsPresymptomatic, evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
+import { drawnPedigree } from "./collapse";
+import { drawsPresymptomatic } from "./evaluation";
 import { notationOf } from "./notation";
-import { symbolSex, assignedAtBirthInUse } from "./gender";
 import { tagPaint, carrierPaintFrom, renderRegionFillSvg, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
 import type { TagPaint } from "./tagFills";
 import { affectedControlOn, carrierConditions, isConditionTag, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
@@ -451,7 +439,7 @@ function polar(cx: number, cy: number, r: number, deg: number): [number, number]
   return [cx + r * Math.sin(a), cy - r * Math.cos(a)];
 }
 
-function fmt(n: number): string {
+export function fmt(n: number): string {
   return String(Math.round(n * 1000) / 1000);
 }
 
@@ -518,7 +506,7 @@ export function hasAnnotationRow(individual: Individual, pedigree: Pedigree): bo
 
 // ── String SVG rendering (exporters) ──────────────────────────────────────────
 
-function escapeXml(s: string): string {
+export function escapeXml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -578,11 +566,11 @@ export function tagTextWidth(tag: Tag): number {
   return tagCanvasText(tag).length * ANNOTATION_BOLD_CHAR_WIDTH;
 }
 const ANNOTATION_BOLD_CHAR_WIDTH = 6;
-const LEGEND_LABEL_GAP = 8;
-const LEGEND_CHAR_WIDTH = 6;
+export const LEGEND_LABEL_GAP = 8;
+export const LEGEND_CHAR_WIDTH = 6;
 
 /** Width of the swatch column: a square, or wider for long text tags. */
-function swatchColumnWidth(tags: readonly Tag[]): number {
+export function swatchColumnWidth(tags: readonly Tag[]): number {
   return Math.max(LEGEND_SWATCH, ...tags.filter(t => t.style === "text").map(tagTextWidth));
 }
 
@@ -641,7 +629,7 @@ export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
   return rows;
 }
 
-function legendLabelSvg(label: string, x: number, cy: number): string {
+export function legendLabelSvg(label: string, x: number, cy: number): string {
   return `<text x="${fmt(x)}" y="${cy + LEGEND_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${escapeXml(label)}</text>`;
 }
 
@@ -694,58 +682,7 @@ export function unusedTagSuggestions(pedigree: Pedigree): Omit<Tag, "id">[] {
   return BUILTIN_TAG_SUGGESTIONS.filter(s => !tags.some(t => t.label === s.label && t.style === s.style));
 }
 
-// ── Export key: status rows plus tags ─────────────────────────────────────────
-
-type KeyStatus = "affected" | "carrier" | "deceased";
-
-/** Unpainted, unclosed outline of a legend swatch symbol with top-left (x, y). */
-function swatchGeom(sex: Individual["sex"], x: number, y: number, s: number): string {
-  const c = s / 2;
-  if (sex === "female") return `<circle cx="${fmt(x + c)}" cy="${fmt(y + c)}" r="${fmt(c)}"`;
-  if (sex === "unknown") {
-    return `<polygon points="${fmt(x + c)},${fmt(y)} ${fmt(x + s)},${fmt(y + c)} ${fmt(x + c)},${fmt(y + s)} ${fmt(x)},${fmt(y + c)}"`;
-  }
-  return `<rect x="${fmt(x)}" y="${fmt(y)}" width="${s}" height="${s}"`;
-}
-
-function renderStatusSwatchSvg(status: KeyStatus, sex: Individual["sex"], withCore: boolean, x: number, y: number): string {
-  const s = LEGEND_SWATCH;
-  const geom = swatchGeom(sex, x, y, s);
-  const stroke = `stroke="black" stroke-width="1.5"`;
-  const cx = x + s / 2, cy = y + s / 2;
-  if (status === "affected") {
-    if (!withCore) return `${geom} fill="black" ${stroke}/>`;
-    // A tagged affected person: light grey stands for any tag colours, round the black centre.
-    const k = AFFECTED_CORE_SCALE;
-    const scaled = `translate(${fmt(cx)} ${fmt(cy)}) scale(${k}) translate(${fmt(-cx)} ${fmt(-cy)})`;
-    return `${geom} fill="#bdbdbd" ${stroke}/>`
-      + `<g transform="${scaled}">${geom} fill="black" stroke="white" stroke-width="${fmt((AFFECTED_CORE_RIM * 2) / k)}"/>${geom} fill="black" stroke="none"/></g>`;
-  }
-  if (status === "carrier") {
-    return `${geom} fill="white" ${stroke}/><circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(s * 0.15)}" fill="black"/>`;
-  }
-  const o = 3;
-  return `${geom} fill="white" ${stroke}/><line x1="${x - o}" y1="${y - o}" x2="${x + s + o}" y2="${y + s + o}" stroke="black" stroke-width="1.5"/>`;
-}
-
-/** Key swatch for a pregnancy or loss, drawn like the symbol (NSGC). */
-function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>, sex: Individual["sex"], x: number, y: number): string {
-  const s = LEGEND_SWATCH;
-  const stroke = `stroke="black" stroke-width="1.5"`;
-  if (usesLossTriangle(status)) {
-    const tri = `<polygon points="${lossTrianglePoints(s, x, y)}" fill="white" ${stroke}/>`;
-    if (status !== "termination") return tri;
-    const e = lossSlashEnds(s, x, y);
-    return tri + `<line x1="${fmt(e.x1)}" y1="${fmt(e.y1)}" x2="${fmt(e.x2)}" y2="${fmt(e.y2)}" ${stroke}/>`;
-  }
-  const geom = swatchGeom(sex, x, y, s);
-  if (status === "pregnancy") {
-    return `${geom} fill="white" ${stroke}/><text x="${fmt(x + s / 2)}" y="${fmt(y + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>`;
-  }
-  // Stillbirth: the symbol with a slash, as for deceased.
-  const o = 3;
-  return `${geom} fill="white" ${stroke}/><line x1="${x - o}" y1="${y - o}" x2="${x + s + o}" y2="${y + s + o}" ${stroke}/>`;
-}
+// ── Key rows: affected and carrier ────────────────────────────────────────────
 
 /**
  * The Affected / Carrier rows of a key (#115), shared by the in-app legend
@@ -794,286 +731,4 @@ export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = 
     carrierLabel: plainStatusLabel("Carrier", pedigree),
     carrierHalf: true,
   };
-}
-
-/** Key swatch for the NSGC 2022 carrier with no condition recorded: the right half dotted. */
-export function renderPlainCarrierSwatchSvg(sex: Individual["sex"], x: number, y: number): string {
-  const s = LEGEND_SWATCH;
-  const geom = swatchGeom(sex, x, y, s);
-  const clipId = `legend-plain-carrier-${sex}`;
-  const [start, end] = PLAIN_CARRIER_ANGLES;
-  return `<clipPath id="${clipId}">${geom}/></clipPath>`
-    + `${geom} fill="white" stroke="none"/>`
-    + renderRegionFillSvg(PLAIN_CARRIER_PAINT.fill, PLAIN_CARRIER_PAINT.color, sectorPath(x + s / 2, y + s / 2, s, start, end), { x, y, size: s }, `${clipId}-fill`, clipId)
-    + `${geom} fill="none" stroke="black" stroke-width="1.5"/>`;
-}
-
-/**
- * The full export key: Affected, Carrier and Deceased rows when anyone in the
- * pedigree has that status, then one row per tag in use. Same contract as
- * renderTagLegendSvg (top-left at (x, y), empty when there is nothing to
- * explain); exporters reserve `height` below the pedigree and at least
- * `width` across. Each swatch uses the sex of the first person with the
- * status, as the in-app legend does.
- */
-export function renderExportKeySvg(
-  pedigree: Pedigree, x: number, y: number,
-  /** The drawing joins two copies of someone with a dashed arc (#124); the exporter knows from its layout. */
-  { duplicates = false }: { duplicates?: boolean } = {},
-): TagLegendBlock {
-  const rows: { label: string; swatch: (sy: number) => string }[] = [];
-  const inds = pedigree.individuals;
-  // Swatches use the shape drawn, the gender identity's when shown (#26).
-  const shape = (i: Individual) => symbolSex(i, pedigree);
-  // Affected and carrier with no condition recorded, as drawn (`symbolPaint`, #115).
-  const st = statusKeyRows(pedigree, inds);
-  if (st.affected) {
-    const ind = st.affected;
-    rows.push({ label: st.affectedLabel, swatch: sy => renderStatusSwatchSvg("affected", shape(ind), false, x, sy) });
-  }
-  if (st.core) {
-    const ind = st.core;
-    rows.push({ label: st.coreLabel, swatch: sy => renderStatusSwatchSvg("affected", shape(ind), true, x, sy) });
-  }
-  if (st.carrier) {
-    const ind = st.carrier;
-    rows.push({
-      label: st.carrierLabel,
-      swatch: sy => st.carrierHalf ? renderPlainCarrierSwatchSvg(shape(ind), x, sy) : renderStatusSwatchSvg("carrier", shape(ind), false, x, sy),
-    });
-  }
-  // Presymptomatic carrier and evaluation notation (#101).
-  const ev = evaluationKeyInfo(inds, pedigree, notationOf(pedigree));
-  const evLegend = evaluationLegend(notationOf(pedigree));
-  if (ev.presymptomatic) {
-    const sex = shape(ev.presymptomatic);
-    rows.push({
-      label: PRESYMPTOMATIC_LEGEND_LABEL,
-      swatch: sy => `${swatchGeom(sex, x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
-        + `<line x1="${fmt(x + LEGEND_SWATCH / 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + LEGEND_SWATCH / 2)}" y2="${fmt(sy + LEGEND_SWATCH - 1)}" stroke="black" stroke-width="1.5"/>`,
-    });
-  }
-  const deceased = inds.find(i => i.deceased);
-  if (deceased) rows.push({ label: "Deceased", swatch: sy => renderStatusSwatchSvg("deceased", shape(deceased), false, x, sy) });
-  // Sex assigned at birth under a symbol drawn by gender identity (#26).
-  for (const { code, label } of assignedAtBirthInUse(pedigree)) {
-    rows.push({
-      label,
-      swatch: sy => `<text x="${fmt(x)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3)}" font-family="sans-serif" font-size="7" textLength="${LEGEND_SWATCH}" lengthAdjust="spacingAndGlyphs" fill="black">${code}</text>`,
-    });
-  }
-  // Proband and consultand arrows (#99).
-  for (const kind of ["proband", "consultand"] as const) {
-    if (inds.some(i => arrowKind(i) === kind)) {
-      rows.push({ label: ARROW_LEGEND_LABEL[kind], swatch: sy => renderArrowKeySwatchSvg(kind, x, sy, LEGEND_SWATCH) });
-    }
-  }
-  // Family history not known (#100): a "?" over a small symbol.
-  const history = inds.find(i => i.familyHistoryUnknown);
-  if (history) {
-    rows.push({
-      label: FAMILY_HISTORY_LEGEND_LABEL,
-      swatch: sy => {
-        const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + LEGEND_SWATCH - s;
-        return `${swatchGeom(shape(history), ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
-          + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(oy - 1)}" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="black">?</text>`;
-      },
-    });
-  }
-  if (ev.evaluated) {
-    rows.push({
-      label: evLegend.label,
-      swatch: sy => `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">${evLegend.mark}</text>`,
-    });
-  }
-  if (ev.documented) {
-    const sex = shape(ev.documented);
-    rows.push({
-      label: DOCUMENTED_LEGEND_LABEL,
-      swatch: sy => {
-        const s = LEGEND_SWATCH * 0.6, ox = x + (LEGEND_SWATCH - s) / 2 - 2, oy = sy + (LEGEND_SWATCH - s) / 2;
-        return `${swatchGeom(sex, ox, oy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
-          + `<text x="${fmt(ox + s + 0.5)}" y="${fmt(oy + s + 5)}" font-family="sans-serif" font-size="11" fill="black">*</text>`;
-      },
-    });
-  }
-  // Pregnancies and losses, in the in-app legend's order and wording.
-  for (const o of LIFE_STATUS_OPTIONS) {
-    const ind = inds.find(i => i.lifeStatus === o.value);
-    if (!ind) continue;
-    const label = o.value === "stillbirth" ? "Stillbirth (SB)" : o.value === "ectopic" ? "Ectopic pregnancy (ECT)" : o.label;
-    rows.push({ label, swatch: sy => renderLifeStatusSwatchSvg(o.value, shape(ind), x, sy) });
-  }
-  // Adoption brackets (#12), drawn a little smaller so they fit the swatch column.
-  for (const o of ADOPTION_OPTIONS) {
-    const ind = inds.find(i => i.adopted === o.value);
-    if (!ind) continue;
-    rows.push({
-      label: adoptionLegendLabel(o.value),
-      swatch: sy => {
-        const s = LEGEND_SWATCH * 0.7, ox = x + (LEGEND_SWATCH - s) / 2, oy = sy + (LEGEND_SWATCH - s) / 2;
-        const geom = swatchGeom(shape(ind), ox, oy, s);
-        const brackets = adoptionBracketSegments(s, ox, oy)
-          .map(([x1, y1, x2, y2]) => `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`)
-          .join("");
-        return brackets + `${geom} fill="white" stroke="black" stroke-width="1.5"/>`;
-      },
-    });
-  }
-  // Assisted reproduction (#45): the symbol with its "D" or "S".
-  for (const o of REPRODUCTIVE_ROLE_OPTIONS) {
-    const ind = inds.find(i => symbolLetter(i) === o.letter);
-    if (!ind) continue;
-    rows.push({
-      label: roleLegendLabel(o.value),
-      swatch: sy => `${swatchGeom(shape(ind), x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
-        + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">${o.letter}</text>`,
-    });
-  }
-  // Collapsed branches (#1): a diamond with "n" in it.
-  if (collapseInfo(pedigree).placeholders.size > 0) {
-    rows.push({
-      label: COLLAPSED_BRANCH_LABEL,
-      swatch: sy => `${swatchGeom("unknown", x, sy, LEGEND_SWATCH)} fill="white" stroke="black" stroke-width="1.5"/>`
-        + `<text x="${fmt(x + LEGEND_SWATCH / 2)}" y="${fmt(sy + LEGEND_SWATCH / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-style="italic" fill="black">n</text>`,
-    });
-  }
-  // Double couple line, by the same rule the canvas and exporter draw it with.
-  const related = consanguinityTest(pedigree);
-  if (pedigree.partnerships.some(p => related(p.individual1, p.individual2))) {
-    rows.push({
-      label: "Consanguineous couple",
-      swatch: sy => {
-        const cy = sy + LEGEND_SWATCH / 2;
-        const line = (y: number) => `<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(x + LEGEND_SWATCH)}" y2="${fmt(y)}" stroke="black" stroke-width="1.5"/>`;
-        return line(cy - 2) + line(cy + 2);
-      },
-    });
-  }
-
-  // Ended relationship (#98): a couple line with the two strokes across it.
-  if (hasEndedPartnership(pedigree)) {
-    rows.push({
-      label: ENDED_LABEL,
-      swatch: sy => {
-        const cy = sy + LEGEND_SWATCH / 2;
-        const line = (x1: number, y1: number, x2: number, y2: number) =>
-          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
-        return line(x, cy, x + LEGEND_SWATCH, cy)
-          + endedMarkSegments(x + LEGEND_SWATCH / 2, cy, 0.7).map(([x1, y1, x2, y2]) => line(x1, y1, x2, y2)).join("");
-      },
-    });
-  }
-
-  // Childless couple marks (#15): a short couple line with the mark under it.
-  const childless = new Set(childlessPartnerships(pedigree).map(p => p.childless!));
-  for (const o of CHILDLESS_OPTIONS) {
-    if (!childless.has(o.value)) continue;
-    rows.push({
-      label: o.label,
-      swatch: sy => {
-        const s = LEGEND_SWATCH, cx = x + s / 2, top = sy + 2, bar = sy + s - 2;
-        const line = (x1: number, y1: number, x2: number, y2: number) =>
-          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
-        let out = line(x, top, x + s, top) + line(cx, top, cx, bar) + line(cx - 4, bar, cx + 4, bar);
-        if (o.value === "infertility") out += line(cx - 4, bar - 3, cx + 4, bar - 3);
-        return out;
-      },
-    });
-  }
-
-  // Twin forks (#11).
-  const zygosities = zygositiesInUse(pedigree);
-  for (const o of ZYGOSITY_OPTIONS) {
-    if (!zygosities.has(o.value)) continue;
-    rows.push({
-      label: twinLegendLabel(o.value),
-      swatch: sy => {
-        const s = LEGEND_SWATCH, cx = x + s / 2, top = sy + 1, bottom = sy + s;
-        const line = (x1: number, y1: number, x2: number, y2: number) =>
-          `<line x1="${fmt(x1)}" y1="${fmt(y1)}" x2="${fmt(x2)}" y2="${fmt(y2)}" stroke="black" stroke-width="1.5"/>`;
-        let out = line(x + 2, top, x + s - 2, top) + line(cx, top, x + 1, bottom) + line(cx, top, x + s - 1, bottom);
-        const my = (top + bottom) / 2;
-        if (o.value === "monozygotic") out += line(cx - 4, my, cx + 4, my);
-        if (o.value === "unknown") out += `<text x="${fmt(cx)}" y="${fmt(my + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text>`;
-        return out;
-      },
-    });
-  }
-
-  // Lines of assisted reproduction (#45): a slanting line, dashed for a social parent.
-  const linkKinds = new Set(assistedLinks(pedigree).map(l => l.kind));
-  for (const kind of ["carrier", "social"] as const) {
-    if (!linkKinds.has(kind)) continue;
-    rows.push({
-      label: kind === "carrier" ? CARRIER_LINE_LEGEND : SOCIAL_LINE_LEGEND,
-      swatch: sy => `<line x1="${fmt(x + 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + LEGEND_SWATCH - 2)}" y2="${fmt(sy + LEGEND_SWATCH - 1)}" stroke="black" stroke-width="1.5"${kind === "social" ? ` stroke-dasharray="4 2"` : ""}/>`,
-    });
-  }
-
-  // Someone drawn more than once (#124): a dashed arc, as between the copies.
-  if (duplicates) {
-    rows.push({
-      label: DUPLICATE_LEGEND_LABEL,
-      swatch: sy => `<path d="M ${fmt(x + 1)} ${fmt(sy + LEGEND_SWATCH - 2)} Q ${fmt(x + LEGEND_SWATCH / 2)} ${fmt(sy - 4)} ${fmt(x + LEGEND_SWATCH - 1)} ${fmt(sy + LEGEND_SWATCH - 2)}" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/>`,
-    });
-  }
-
-  const tagRows = keyTagRows(pedigree);
-  const tags = tagRows.map(r => r.tag);
-  const details = renderClinicalDetailsSvg(pedigree, x, 0);
-  if (rows.length === 0 && tagRows.length === 0 && details.height === 0) return { markup: [], width: 0, height: 0 };
-
-  const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
-  const rowY = (i: number) => y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2;
-  const markup = rows.map((r, i) =>
-    r.swatch(rowY(i)) + legendLabelSvg(r.label, x + labelOffset, rowY(i) + LEGEND_SWATCH / 2),
-  );
-  tagRows.forEach((r, j) => markup.push(renderTagLegendRowSvg(r.tag, pedigree, x, rowY(rows.length + j), labelOffset, r.carrier)));
-
-  const longest = Math.max(0, ...rows.map(r => r.label.length), ...tagRows.map(r => r.label.length));
-  const symbolsHeight = (rows.length + tagRows.length) * LEGEND_ROW_HEIGHT;
-  // The clinical details (#102) go under the symbol rows, a half row apart.
-  const gap = symbolsHeight > 0 && details.height > 0 ? LEGEND_ROW_HEIGHT / 2 : 0;
-  if (details.height > 0) {
-    markup.push(`<g class="clinical-details" transform="translate(0 ${fmt(y + symbolsHeight + gap)})">`, ...details.markup, `</g>`);
-  }
-  return {
-    markup,
-    width: Math.max(symbolsHeight > 0 ? labelOffset + longest * LEGEND_CHAR_WIDTH : 0, details.width),
-    height: symbolsHeight + gap + details.height,
-  };
-}
-
-/** Characters per line of a clinical detail in the export key before it wraps. */
-const DETAIL_WRAP = 70;
-const DETAIL_LINE_HEIGHT = 14;
-const DETAIL_INDENT = 12;
-
-/**
- * The filled clinical key fields (#102) as "Label: value" text lines, top-left
- * at (x, y), long values wrapped. Empty when none is filled.
- */
-export function renderClinicalDetailsSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
-  const lines = clinicalDetailLines(pedigree);
-  if (lines.length === 0) return { markup: [], width: 0, height: 0 };
-  const markup: string[] = [];
-  let widest = 0;
-  let row = 0;
-  for (const { label, value } of lines) {
-    const head = `${label}: `;
-    const wrapped = wrapText(value, DETAIL_WRAP - head.length);
-    wrapped.forEach((text, i) => {
-      const baseline = y + row * DETAIL_LINE_HEIGHT + LEGEND_FONT_SIZE;
-      const body = i === 0
-        ? `<tspan font-weight="bold">${escapeXml(label)}:</tspan> ${escapeXml(text)}`
-        : escapeXml(text);
-      // A hanging indent: the bold label's real width is not known here.
-      const indent = i === 0 ? 0 : DETAIL_INDENT;
-      markup.push(`<text x="${fmt(x + indent)}" y="${fmt(baseline)}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${body}</text>`);
-      widest = Math.max(widest, i === 0 ? head.length + text.length : DETAIL_INDENT / LEGEND_CHAR_WIDTH + text.length);
-      row++;
-    });
-  }
-  return { markup, width: widest * LEGEND_CHAR_WIDTH, height: row * DETAIL_LINE_HEIGHT };
 }

@@ -88,7 +88,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   the edge or node data lacks is added to that data in `layoutToFlow`, not
   worked out again here.
 - `svgExporter.ts` — standard layout as an SVG string, including the key
-  (`renderExportKeySvg` in `pedigree/tags.ts`: Affected, Carrier, Deceased
+  (`renderExportKeySvg` in `pedigree/exportKey.ts`, its rows from
+  `keyRows(pedigree, "export")`, #148: Affected, Carrier, Deceased
   rows when present, then tags in use), in a `<g class="pedigree-key">`.
   The "Same person drawn more than once" row (#124) cannot be read off the
   pedigree: each exporter passes `{ duplicates }` from its own drawing
