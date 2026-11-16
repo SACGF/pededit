@@ -205,6 +205,63 @@ class SerializerMatchesSchemaTests(APITestCase):
             self.assertEqual(required, expected, name)
 
 
+class PedigreeAccessTests(APITestCase):
+    """
+    Who can read, change and delete a pedigree. The landing page states these
+    rules to users (#178, `YourData` in frontend/src/pages/LandingPage.tsx):
+    change that text with any change here.
+    """
+
+    DATA = {"individuals": [], "partnerships": [], "parentOf": {}}
+
+    def setUp(self):
+        self.owner = User.objects.create_user("owner@example.com", email="owner@example.com")
+        self.other = User.objects.create_user("other@example.com", email="other@example.com")
+
+    def _create(self, user=None):
+        self.client.force_authenticate(user)
+        resp = self.client.post("/api/pedigrees/", {"title": "T", "data": self.DATA}, format="json")
+        self.assertEqual(resp.status_code, 201, resp.content)
+        self.client.force_authenticate(None)
+        return resp.data["id"]
+
+    def test_anonymous_pedigree_is_open_to_anyone_with_the_link(self):
+        pid = self._create()
+        self.assertIsNone(Pedigree.objects.get(pk=pid).owner)
+        url = f"/api/pedigrees/{pid}/"
+        for user in (None, self.other):
+            self.client.force_authenticate(user)
+            self.assertEqual(self.client.get(url).status_code, 200)
+            self.assertEqual(self.client.patch(url, {"title": "Renamed"}, format="json").status_code, 200)
+        # Opening or editing it signed in does not make it that user's.
+        self.assertIsNone(Pedigree.objects.get(pk=pid).owner)
+
+    def test_anonymous_pedigree_is_deleted_without_an_account(self):
+        pid = self._create()
+        self.assertEqual(self.client.delete(f"/api/pedigrees/{pid}/").status_code, 204)
+        self.assertFalse(Pedigree.objects.filter(pk=pid).exists())
+        self.assertEqual(self.client.get(f"/api/pedigrees/{pid}/").status_code, 404)
+
+    def test_owned_pedigree_link_works_for_the_owner_only(self):
+        pid = self._create(self.owner)
+        url = f"/api/pedigrees/{pid}/"
+        for user in (None, self.other):
+            self.client.force_authenticate(user)
+            self.assertEqual(self.client.get(url).status_code, 404)
+            self.assertEqual(self.client.patch(url, {"title": "Taken"}, format="json").status_code, 404)
+            self.assertEqual(self.client.delete(url).status_code, 404)
+        self.client.force_authenticate(self.owner)
+        self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertEqual(self.client.delete(url).status_code, 204)
+        self.assertFalse(Pedigree.objects.filter(pk=pid).exists())
+
+    def test_nothing_lists_anonymous_pedigrees(self):
+        self._create()
+        self.assertEqual(self.client.get("/api/pedigrees/").status_code, 401)
+        self.client.force_authenticate(self.other)
+        self.assertEqual(self.client.get("/api/pedigrees/").data, [])
+
+
 class TagPresetTests(APITestCase):
     def setUp(self):
         self.alice = User.objects.create_user("alice", password="pw12345678")

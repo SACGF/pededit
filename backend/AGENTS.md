@@ -51,6 +51,16 @@ marks those `accepted-unchecked` and #170 is the decision to refuse them.
 - Create without a token makes an anonymous pedigree; with a token it is
   owned.
 - `/api/tag-presets/` is auth only and scoped to the owner.
+- An owned pedigree answers 404 to everyone but its owner, so its link is
+  not a way to share it. An anonymous pedigree stays anonymous when a
+  signed-in user opens or edits it: nothing ever sets `owner` after create.
+- These rules are pinned by `PedigreeAccessTests` and stated to users on the
+  landing page (#178, `YourData` in `frontend/src/pages/LandingPage.tsx`).
+  Change that text with any change to them.
+- There is no `api/admin.py`, so Django admin shows users only, not
+  pedigrees. `Pedigree.data` is plain JSON in the database, readable by
+  whoever can read the database. Delete is a hard delete, and there is no
+  way to delete an account from the app.
 
 ## Auth
 

@@ -109,6 +109,20 @@ stub so the app still builds without Google login.
   and keeps the popover open. A new surface that stops mouse events needs
   the same. Keep `@radix-ui/react-dismissable-layer` at the version the
   popover uses, so there is one copy of its context.
+- **The landing page tells users what is stored, who can read it and how to
+  delete it** (#178, `YourData` in `pages/LandingPage.tsx`, "What happens to
+  your pedigrees"). Each sentence states what the code does, and the comment
+  above it lists where. Change the sentence in the same commit as a change
+  to: the access rules, deleting, what de-identified export drops, anything
+  kept in `localStorage`, a script, font or request to another site, or what
+  the server logs. It is not a privacy policy and must not be called one. It
+  does not say where the server is or who runs it, because the repository
+  does not.
+- **Google's sign-in script loads on every page**, not only `/login`, when
+  the build has a Google client ID: `GoogleAuthProvider` wraps the whole app
+  in `main.tsx` and `@react-oauth/google` adds the script tag on mount. It is
+  the only request to another site, and the landing page says so (the
+  sentence follows `GOOGLE_CLIENT_ID`).
 
 ## Layout of src/
 

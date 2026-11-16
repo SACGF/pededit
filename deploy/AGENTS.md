@@ -47,6 +47,17 @@ Deployment" half).
 - `pededit-nginx.conf` — serves the Vite build, proxies `/api/` and `/admin/`
   to Gunicorn, serves `/djstatic/`.
 - `pededit.json.example` — template for the config file.
+- The landing page tells users what the server keeps (#178, `YourData` in
+  `frontend/src/pages/LandingPage.tsx`): request logs with the time, the
+  address requested (an API address contains the pedigree's id, which for an
+  anonymous pedigree is its key), the browser and the IP address, never the
+  request body; that deleting removes the row at once; and that an earlier
+  backup would still hold it. Nginx logs with its default format, Gunicorn
+  to the journal, and how long either is kept is set on the box, not here.
+  Change that text when backups (#48), error reporting (#49), rate limiting
+  (#47) or anything else here changes what is kept or where it is sent. A
+  proxy or CDN in front of Nginx sees every pedigree in transit and belongs
+  in that text too.
 
 Still to do (#47 to #49): Django security settings hardening, rate limiting,
 Sentry, automated database backups.

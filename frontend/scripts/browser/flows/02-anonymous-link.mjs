@@ -1,8 +1,8 @@
-// Create while signed out, come back by the /p/<id> link, and find the
-// pedigree under "Recent on this device".
+// Create while signed out, come back by the /p/<id> link, find the
+// pedigree under "Recent on this device", and delete it.
 export default {
   name: "anonymous-link",
-  about: "A pedigree made while signed out is reached again by its link and listed under Recent on this device",
+  about: "A pedigree made while signed out is reached again by its link, listed under Recent on this device and deleted from Settings",
   async run(t) {
     await t.open("/");
     t.equal(await t.eval(() => localStorage.getItem("access_token")), null, "nobody is signed in");
@@ -28,5 +28,16 @@ export default {
     await t.waitFor('button[title="Add female"]');
     t.equal(t.currentId(), id, "and the list opens it");
     t.equal(await t.people(), 1, "with the person in it");
+
+    // Deleting needs no account either, as the landing page says (#178).
+    await t.click('button[title="Pedigree settings"]');
+    await t.click('button:has-text("Delete this pedigree")');
+    await t.click('button:text-is("Delete permanently")');
+    await t.sleep(500);
+    t.equal((await fetch(new URL(`/api/pedigrees/${id}/`, t.base))).status, 404, "deleting it from Settings while signed out removes it from the server");
+    await t.open("/");
+    await t.sleep(500);
+    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${id}"]`), 0, "and from Recent on this device");
+    t.match(await t.text('[data-testid="your-data"]'), /No account is needed/, "the landing page says how to delete it");
   },
 };
