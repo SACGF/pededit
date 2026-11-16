@@ -47,11 +47,6 @@ export const CAPTION_FONT_SIZE = 9;
  */
 export const CAPTION_ROW_HEIGHT = CAPTION_FONT_SIZE + 2;
 
-/** Height of the caption row for this status, 0 when there is no caption. */
-export function captionRowHeight(status: LifeStatus | undefined): number {
-  return lifeStatusCaption(status) ? CAPTION_ROW_HEIGHT : 0;
-}
-
 /** Baseline of the caption, measured from the top of the symbol box. */
 export function captionBaselineY(size: number): number {
   return size + CAPTION_FONT_SIZE + 1;

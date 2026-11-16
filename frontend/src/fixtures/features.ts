@@ -390,7 +390,3 @@ const VARIANTS: FeatureFixture[] = [
 ];
 
 export const FEATURE_FIXTURES: FeatureFixture[] = [...BASE, ...VARIANTS];
-
-export function featureFixture(slug: string): FeatureFixture | undefined {
-  return FEATURE_FIXTURES.find(f => f.slug === slug);
-}

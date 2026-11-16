@@ -64,10 +64,6 @@ export function symbolLetter(ind: Pick<Individual, "reproductiveRole" | "lifeSta
   return roleLetter(ind.reproductiveRole);
 }
 
-export function isDonorPartnership(p: Partnership | undefined): boolean {
-  return !!p?.donorConception;
-}
-
 /** One line of assisted reproduction: from a carrier, social or genetic parent to a child. */
 export interface AssistedLink {
   from: string;

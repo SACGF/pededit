@@ -14,10 +14,6 @@ export const ZYGOSITY_OPTIONS: { value: Zygosity; label: string }[] = [
   { value: "unknown",     label: "Unknown zygosity" },
 ];
 
-export function zygosityLabel(z: Zygosity): string {
-  return ZYGOSITY_OPTIONS.find(o => o.value === z)?.label ?? z;
-}
-
 /** Legend wording. */
 export function twinLegendLabel(z: Zygosity): string {
   return z === "monozygotic" ? "Monozygotic twins" : z === "dizygotic" ? "Dizygotic twins" : "Twins, zygosity unknown";
@@ -36,12 +32,6 @@ export function twinSetOf(pedigree: Pedigree, individualId: string): { partnersh
   const partnership = parentPartnershipOf(pedigree, individualId);
   const set = partnership?.twins?.find(t => t.members.includes(individualId));
   return partnership && set ? { partnership, set } : undefined;
-}
-
-/** Ids of the individual's siblings (same partnership), in parentOf order. */
-export function siblingsOf(pedigree: Pedigree, individualId: string): string[] {
-  const partnership = parentPartnershipOf(pedigree, individualId);
-  return partnership ? (pedigree.parentOf[partnership.id] ?? []).filter(id => id !== individualId) : [];
 }
 
 /**
@@ -76,19 +66,8 @@ export function zygositiesInUse(pedigree: Pedigree): Set<Zygosity> {
   return out;
 }
 
-/** Partnerships with at least one drawable twin set (PED cannot carry them). */
-export function twinPartnerships(pedigree: Pedigree): Partnership[] {
-  return pedigree.partnerships.filter(p => {
-    const children = new Set(pedigree.parentOf[p.id] ?? []);
-    return (p.twins ?? []).some(t => t.members.filter(m => children.has(m)).length >= 2);
-  });
-}
-
 /** Font size (px) of the "?" on a fork of unknown zygosity. */
 export const TWIN_QUESTION_FONT_SIZE = 11;
-
-/** Width (px) of the fork's own bar when a twin set is the sibship's only children and sits under the couple. */
-export const TWIN_FORK_MIN_SPREAD = 0;
 
 /**
  * Individual id to twin set key ("partnershipId:index") and zygosity, for

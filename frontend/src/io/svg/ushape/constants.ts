@@ -8,7 +8,6 @@ import { ENDED_STROKE_DY } from "../../../pedigree/ended";
 export const NODE_SIZE = 40;
 export const HALF = NODE_SIZE / 2;
 export const STROKE = 2;
-export const DECEASED_OVERHANG = 4;
 export const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 export const LABEL_FONT_SIZE = 10;
 export const LABEL_LINE_HEIGHT = 13;

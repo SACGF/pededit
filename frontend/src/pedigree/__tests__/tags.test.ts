@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Pedigree, Tag } from "@pedigree-editor/layout-engine";
-import { sectorAngles, sectorsFor, sectorPath, annotationRow, tagsInUse, tagsOf, nextTagColor, TAG_PALETTE, renderTagLegendSvg, renderSectorsSvg, hasAnnotationRow, needsAffectedCore, renderAffectedCoreSvg } from "../tags";
+import { sectorAngles, symbolPaint, sectorPath, annotationRow, tagsInUse, tagsOf, nextTagColor, TAG_PALETTE, renderSectorListSvg, hasAnnotationRow, renderAffectedCoreSvg } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
 
 const tremor: Tag   = { id: "t1", label: "Tremor", color: "#000000", style: "quadrant" };
@@ -36,10 +36,10 @@ describe("sectorAngles", () => {
   });
 });
 
-describe("sectorsFor", () => {
+describe("symbolPaint sectors", () => {
   it("returns only the quadrant tags the individual carries, keeping their slot", () => {
     const p = makePedigree([tremor, sequenced, seizure, myoclonic], { a: ["t3", "s1"] });
-    const sectors = sectorsFor(p.individuals[0]!, p);
+    const sectors = symbolPaint(p.individuals[0]!, p).sectors;
     expect(sectors).toHaveLength(1);
     expect(sectors[0]!.tag.id).toBe("t3");
     // t3 is the third quadrant tag (dot tag does not take a slot): lower right
@@ -48,23 +48,23 @@ describe("sectorsFor", () => {
 
   it("ignores ids that no longer exist", () => {
     const p = makePedigree([tremor], { a: ["t1", "gone"] });
-    expect(sectorsFor(p.individuals[0]!, p)).toHaveLength(1);
+    expect(symbolPaint(p.individuals[0]!, p).sectors).toHaveLength(1);
     expect(tagsOf(p.individuals[0]!, p).map(t => t.id)).toEqual(["t1"]);
   });
 
   it("with five quadrant tags, people with only the first four keep their quarters", () => {
     const fifth: Tag = { id: "t5", label: "Fifth", color: "#9467bd", style: "quadrant" };
     const p = makePedigree([tremor, seizure, myoclonic, focal, fifth], { a: ["t2", "t4"], b: ["t1", "t5"] });
-    const a = sectorsFor(p.individuals[0]!, p).map(x => [x.tag.id, x.start, x.end]);
+    const a = symbolPaint(p.individuals[0]!, p).sectors.map(x => [x.tag.id, x.start, x.end]);
     expect(a).toEqual([["t2", 0, 90], ["t4", 180, 270]]);
     // b carries the fifth tag: their own quadrant tags become equal slices, no empty wedges.
-    const b = sectorsFor(p.individuals[1]!, p).map(x => [x.tag.id, x.start, x.end]);
+    const b = symbolPaint(p.individuals[1]!, p).sectors.map(x => [x.tag.id, x.start, x.end]);
     expect(b).toEqual([["t1", 0, 180], ["t5", 180, 360]]);
   });
 
   it("is empty when the individual has no tags", () => {
     const p = makePedigree([tremor, seizure]);
-    expect(sectorsFor(p.individuals[0]!, p)).toEqual([]);
+    expect(symbolPaint(p.individuals[0]!, p).sectors).toEqual([]);
   });
 });
 
@@ -128,16 +128,16 @@ describe("nextTagColor", () => {
 describe("string SVG rendering", () => {
   it("renders one clipped path per sector in the tag colour", () => {
     const p = makePedigree([tremor, seizure], { a: ["t1", "t2"] });
-    const svg = renderSectorsSvg(p.individuals[0]!, p, 40, "clip-x");
+    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "clip-x");
     expect(svg.match(/<path /g)).toHaveLength(2);
     expect(svg).toContain('fill="#d62728"');
     expect(svg).toContain('clip-path="url(#clip-x)"');
   });
 
-  it("legend block has a row per tag in use and escapes labels", () => {
+  it("export key has a row per tag in use and escapes labels", () => {
     const weird: Tag = { id: "w", label: "A & B <c>", color: "#000", style: "dot" };
     const p = makePedigree([tremor, weird, seizure], { a: ["w", "t2"] });
-    const legend = renderTagLegendSvg(p, 10, 10);
+    const legend = renderExportKeySvg(p, 10, 10);
     expect(legend.markup).toHaveLength(2);
     expect(legend.height).toBeGreaterThan(0);
     expect(legend.markup.join("")).toContain("A &amp; B &lt;c&gt;");
@@ -146,7 +146,7 @@ describe("string SVG rendering", () => {
 
   it("text tags in the key leave a gap before their label", () => {
     const p = makePedigree([genotype], { a: ["g1"] });
-    const row = renderTagLegendSvg(p, 0, 0).markup.join("");
+    const row = renderExportKeySvg(p, 0, 0).markup.join("");
     const xs = [...row.matchAll(/<text x="([\d.]+)"/g)].map(m => parseFloat(m[1]!));
     // swatch text starts at 0 and is about 5 characters of 9px bold; the label starts past it
     expect(xs[0]).toBe(0);
@@ -177,23 +177,18 @@ describe("string SVG rendering", () => {
   it("export key is empty with no status and no tags", () => {
     expect(renderExportKeySvg(makePedigree([tremor]), 0, 0).markup).toEqual([]);
   });
-
-  it("legend is empty when no tag is applied", () => {
-    const p = makePedigree([tremor]);
-    expect(renderTagLegendSvg(p, 0, 0)).toEqual({ markup: [], width: 0, height: 0 });
-  });
 });
 
 describe("affected core", () => {
   it("is drawn only for affected people with quadrant sectors", () => {
     const p = makePedigree([tremor, seizure, myoclonic, focal], { a: ["t1", "t2", "t3", "t4"], b: ["t1"] });
     const [a, b] = p.individuals as [Pedigree["individuals"][0], Pedigree["individuals"][0]];
-    expect(needsAffectedCore(a, p)).toBe(false);
+    expect(symbolPaint(a, p).core).toBe(false);
     a.affected = true;
-    expect(needsAffectedCore(a, p)).toBe(true);
+    expect(symbolPaint(a, p).core).toBe(true);
     b.affected = true;
     b.tags = [];
-    expect(needsAffectedCore(b, p)).toBe(false);
+    expect(symbolPaint(b, p).core).toBe(false);
   });
 
   it("renders a scaled black copy of the outline", () => {

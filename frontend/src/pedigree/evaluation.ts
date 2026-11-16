@@ -136,12 +136,10 @@ export function presymptomaticLine(status: LifeStatus | undefined, size: number,
 export const PRESYMPTOMATIC_RIM = 1.5;
 export const PRESYMPTOMATIC_STROKE = 2;
 
-/** The line as SVG markup for a symbol box with top-left (ox, oy); `rim` over tag colours. */
-export function renderPresymptomaticSvg(ind: Individual, pedigree: Pick<Pedigree, "tags">, size: number, ox: number, oy: number, rim = false): string {
-  return drawsPresymptomatic(ind, pedigree) ? renderPresymptomaticLineSvg(ind.lifeStatus, size, ox, oy, rim) : "";
-}
-
-/** The line itself, for a renderer that already knows it is drawn (`PersonGlyph.paint.line`, #144). */
+/**
+ * The line as SVG markup for a symbol box with top-left (ox, oy); `rim` over
+ * tag colours. The caller draws it only when `SymbolPaint.line` says so.
+ */
 export function renderPresymptomaticLineSvg(lifeStatus: Individual["lifeStatus"], size: number, ox: number, oy: number, rim = false): string {
   const l = presymptomaticLine(lifeStatus, size, ox, oy);
   const attrs = `class="presymptomatic" x1="${l.x1}" y1="${l.y1}" x2="${l.x2}" y2="${l.y2}"`;

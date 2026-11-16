@@ -36,5 +36,4 @@
 // This file is the public entry.
 export { exportUShapeSvg } from "./ushape/render";
 export { layoutUShape } from "./ushape/layout";
-export type { UShapeLayout, UShapeNode, UShapeCoupleLabel } from "./ushape/layout";
-export type { UShapeOptions } from "./ushape/tree";
+export type { UShapeLayout, UShapeNode } from "./ushape/layout";

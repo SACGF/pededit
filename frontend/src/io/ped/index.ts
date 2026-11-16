@@ -9,7 +9,7 @@ import { withCurrentNotation } from "../../pedigree/notation";
 export { exportPed };
 export type { ExportOptions, ImportResult };
 export { ValidationIssueCode };
-export type { ValidationIssue, IssueSeverity } from "./types.js";
+export type { IssueSeverity } from "./types.js";
 
 /**
  * Full import pipeline: parse → validate → convert → return per-family pedigrees.

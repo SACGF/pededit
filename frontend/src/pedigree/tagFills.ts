@@ -39,10 +39,6 @@ export const TAG_FILL_OPTIONS: readonly TagFillOption[] = [
 
 const FILL_VALUES = new Set<string>(TAG_FILL_OPTIONS.map(o => o.value));
 
-export function isTagFill(v: unknown): v is TagFill {
-  return typeof v === "string" && FILL_VALUES.has(v);
-}
-
 /**
  * Patterns handed out in monochrome mode to quadrant tags whose own fill is
  * solid, in quadrant order, skipping any a tag already has. Vertical lines go
@@ -124,10 +120,6 @@ export function tagPaint(tag: Tag, pedigree: Pedigree): TagPaint {
  * pattern and the carrier by the lighter lines. Both are defined in the key.
  */
 export const CARRIER_TINT = 0.45;
-
-export function carrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
-  return carrierPaintFrom(tagPaint(tag, pedigree));
-}
 
 /** The carrier paint for a condition whose affected section is drawn with `affected`. */
 export function carrierPaintFrom(affected: TagPaint): TagPaint {

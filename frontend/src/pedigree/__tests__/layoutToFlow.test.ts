@@ -3,7 +3,10 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../fixtures/consanguineous";
-import { SLOT_WIDTH, ROW_HEIGHT, SIB_BAR_FACTOR, COUPLE_HOP } from "../constants";
+import { SLOT_WIDTH, ROW_HEIGHT, COUPLE_HOP } from "../constants";
+
+// The sibship bar is drawn halfway between a couple and their children.
+const SIB_BAR_FACTOR = 0.5;
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 // Concrete layout engine output for these fixtures (verified by running alignPedigree):

@@ -194,7 +194,7 @@ draws NSGC symbols.
   dots, shade) is drawn in its colour on white; `canvasSettings.tagFills`
   "monochrome" draws every tag black, conditions and traits each with a pattern
   (their own, else the first free one in `MONOCHROME_PATTERN_ORDER`).
-  Renderers never read `tag.color` directly: `sectorsFor` puts the resolved
+  Renderers never read `tag.color` directly: `symbolPaint` puts the resolved
   `color` / `fill` on each `Sector`, `annotationRow` on each item, and the
   legends call `tagPaint` (cached per pedigree object, like `kinshipOf`).
   Patterns are plain clipped paths, not SVG `<pattern>`, so svg2pdf draws
@@ -289,7 +289,7 @@ draws NSGC symbols.
   `resolvePlainAffected` as one `updateIndividual` so a click is one undo
   step. Drawing is decided once in
   `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
-  `carrierPaint` from tagFills.ts, plus the 2022 dotted half for a plain
+  `carrierPaintFrom` from tagFills.ts, plus the 2022 dotted half for a plain
   carrier as the `PLAIN_CARRIER_TAG` sector, left off when the person's
   affected conditions cover the right half, which the Person tab then
   reports as not drawn), black base, black centre,
@@ -330,7 +330,7 @@ draws NSGC symbols.
   the symbol's lower right corner (outside adoption brackets), canvas and
   both exporters. `Individual.presymptomatic` is a
   vertical line through the symbol, drawn inside `SymbolShape` (from
-  `SymbolPaint.line`) and by `renderPresymptomaticSvg`. It is not drawn on
+  `SymbolPaint.line`) and by `renderPresymptomaticLineSvg`. It is not drawn on
   anyone `isAffected` (the flag or any condition), the same test as the
   "presymptomatic-affected" warning, so the warning never says a line is
   hidden that is in fact drawn. With no conditions defined the editor

@@ -8,12 +8,6 @@ export const ROW_HEIGHT = 120;
 export const NODE_SIZE = 40;
 
 /**
- * Fraction of ROW_HEIGHT at which the sibship bar is drawn between
- * generations. 0.5 = exactly midway (= sibBarY = (level - 0.5) * ROW_HEIGHT).
- */
-export const SIB_BAR_FACTOR = 0.5;
-
-/**
  * Height (px) a couple line rises to pass over an intermediate partner when
  * someone has three or more partners. Must clear NODE_SIZE / 2.
  */

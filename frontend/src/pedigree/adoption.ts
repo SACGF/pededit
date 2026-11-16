@@ -45,6 +45,3 @@ export function adoptionBracketSegments(size: number, ox = 0, oy = 0): Segment[]
     [rx, top, rx, bottom], [rx, top, rx - f, top], [rx, bottom, rx - f, bottom],
   ];
 }
-
-/** How wide the brackets reach beyond the symbol box on each side. */
-export const ADOPTION_BRACKET_EXTENT = ADOPTION_BRACKET_GAP;

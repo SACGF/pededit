@@ -3,9 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree, Tag, TagFill } from "@pedigree-editor/layout-engine";
 import {
   tagPaint, tagFillMode, fillLayers, renderRegionFillSvg, patternLinesD, patternDotsD, tint,
-  MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR, TAG_FILL_OPTIONS, isTagFill,
+  MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR,
 } from "../tagFills";
-import { sectorsFor, symbolPaint, renderSectorsSvg, renderTagLegendSvg, annotationRow, renderAnnotationRowSvg, sectorPath } from "../tags";
+import { symbolPaint, renderSectorListSvg, annotationRow, renderAnnotationItemsSvg, sectorPath } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
 import { SymbolShape } from "../nodes/symbols";
 import { TagSwatchSvg } from "../../components/Legend";
@@ -57,11 +57,6 @@ describe("tagPaint (#67)", () => {
     const fills = tags.map(t => tagPaint(t, ped(tags, true)).fill);
     expect(fills.slice(0, MONOCHROME_PATTERN_ORDER.length)).toEqual([...MONOCHROME_PATTERN_ORDER]);
     expect(fills).not.toContain("solid");
-  });
-
-  it("every offered fill is valid, and nothing else is", () => {
-    expect(TAG_FILL_OPTIONS.every(o => isTagFill(o.value))).toBe(true);
-    expect(isTagFill("plaid")).toBe(false);
   });
 });
 
@@ -121,16 +116,16 @@ describe("pattern geometry", () => {
 describe("renderers draw the pattern (#67)", () => {
   const tags = [q("a", "#d62728", "diagonal"), q("b", "#1f77b4", "dots"), q("c", "#2ca02c")];
 
-  it("sectorsFor carries the resolved colour and fill", () => {
+  it("symbolPaint carries the resolved colour and fill", () => {
     const p = ped(tags);
-    expect(sectorsFor(p.individuals[0]!, p).map(s => [s.color, s.fill])).toEqual([
+    expect(symbolPaint(p.individuals[0]!, p).sectors.map(s => [s.color, s.fill])).toEqual([
       ["#d62728", "diagonal"], ["#1f77b4", "dots"], ["#2ca02c", "solid"],
     ]);
   });
 
   it("export sectors: patterns in the tag colour, solid as before", () => {
     const p = ped(tags);
-    const svg = renderSectorsSvg(p.individuals[0]!, p, 40, "clip");
+    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "clip");
     expect(svg).toContain(`stroke="#d62728"`);
     expect(svg).toContain(`<clipPath id="clip-s0">`);
     expect(svg).toContain(`clip-path="url(#clip-s1)"`);
@@ -163,7 +158,7 @@ describe("renderers draw the pattern (#67)", () => {
     const app = renderToStaticMarkup(<TagSwatchSvg tag={tags[0]!} pedigree={p} />);
     expect(app).toContain(`data-tag-fill="diagonal"`);
     expect(app).toContain(`stroke="#d62728"`);
-    const key = renderTagLegendSvg(p, 0, 0).markup.join("");
+    const key = renderExportKeySvg(p, 0, 0).markup.join("");
     expect(key).toContain(`legend-clip-a-fill`);
     expect(key).toContain(`stroke="#d62728"`);
   });
@@ -173,7 +168,7 @@ describe("renderers draw the pattern (#67)", () => {
     const text: Tag = { id: "t", label: "Gene", color: "#ff7f0e", style: "text", abbrev: "+/-" };
     const p = ped([dot, text], true);
     expect(annotationRow(p.individuals[0]!, p).map(i => i.color)).toEqual([MONOCHROME_COLOR, MONOCHROME_COLOR]);
-    const svg = renderAnnotationRowSvg(p.individuals[0]!, p, 40);
+    const svg = renderAnnotationItemsSvg(annotationRow(p.individuals[0]!, p), 40);
     expect(svg).not.toContain("#2ca02c");
     expect(svg).not.toContain("#ff7f0e");
   });
@@ -199,9 +194,9 @@ describe("renderers draw the pattern (#67)", () => {
   it("sectorPath regions stay the clip for a pie slice of five tags", () => {
     const five = Array.from({ length: 5 }, (_, i) => q(`t${i}`, "#d62728", "vertical"));
     const p = ped(five);
-    const sectors = sectorsFor(p.individuals[0]!, p);
+    const sectors = symbolPaint(p.individuals[0]!, p).sectors;
     expect(sectors).toHaveLength(5);
-    const svg = renderSectorsSvg(p.individuals[0]!, p, 40, "c");
+    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "c");
     expect((svg.match(/<clipPath id="c-s\d">/g) ?? []).length).toBe(5);
     expect(svg).toContain(sectorPath(0, 0, 40, 0, 72));
   });

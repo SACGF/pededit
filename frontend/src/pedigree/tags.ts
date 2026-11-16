@@ -91,7 +91,7 @@ export interface Sector {
   tag: Tag;
   start: number;
   end: number;
-  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`, or `carrierPaint`). */
+  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`, or `carrierPaintFrom`). */
   color: string;
   fill: TagFill;
   /** A carrier of this condition (#115), drawn with the carrier pattern; or the plain carrier half (`PLAIN_CARRIER_TAG`). */
@@ -399,11 +399,6 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
   };
 }
 
-/** Sectors to paint on an individual's symbol (see `symbolPaint`). */
-export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[] {
-  return symbolPaint(individual, pedigree).sectors;
-}
-
 // ── Affected core ─────────────────────────────────────────────────────────────
 
 /**
@@ -417,11 +412,6 @@ export function sectorsFor(individual: Individual, pedigree: Pedigree): Sector[]
 export const AFFECTED_CORE_SCALE = 0.55;
 /** White rim around the core, in symbol pixels (after scaling). */
 export const AFFECTED_CORE_RIM = 1.5;
-
-/** True when the symbol needs the black centre described above (`symbolPaint`). */
-export function needsAffectedCore(individual: Individual, pedigree: Pedigree): boolean {
-  return symbolPaint(individual, pedigree).core;
-}
 
 /**
  * The core as SVG markup for a symbol centred on (0, 0). `geom` is the
@@ -516,15 +506,10 @@ export function escapeXml(s: string): string {
 }
 
 /**
- * Sector fills for a symbol centred on (0, 0) of the given size, as SVG
- * markup. `clipId` must be the id of a <clipPath> matching the symbol outline
- * that the caller has already emitted.
+ * Sector fills (`SymbolPaint.sectors`) for a symbol centred on (0, 0) of the
+ * given size, as SVG markup. `clipId` must be the id of a <clipPath> matching
+ * the symbol outline that the caller has already emitted.
  */
-export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, size: number, clipId: string): string {
-  return renderSectorListSvg(symbolPaint(individual, pedigree).sectors, size, clipId);
-}
-
-/** The same from the sectors themselves (`PersonGlyph.paint.sectors`, #144). */
 export function renderSectorListSvg(sectors: Sector[], size: number, clipId: string): string {
   if (sectors.length === 0) return "";
   const r = size; // beyond the half-diagonal, so the clip does the shaping
@@ -535,14 +520,10 @@ export function renderSectorListSvg(sectors: Sector[], size: number, clipId: str
 }
 
 /**
- * Annotation row for a symbol centred on (0, 0), as SVG markup. `offsetY`
- * moves the row down, e.g. past an "SB" / "ECT" caption.
+ * Annotation row (the items of `annotationRow`) for a symbol centred on
+ * (0, 0), as SVG markup. `offsetY` moves the row down, e.g. past an "SB" /
+ * "ECT" caption.
  */
-export function renderAnnotationRowSvg(individual: Individual, pedigree: Pedigree, size: number, offsetY = 0): string {
-  return renderAnnotationItemsSvg(annotationRow(individual, pedigree), size, offsetY);
-}
-
-/** The same from the row's items (`PersonGlyph.annotations`, #144). */
 export function renderAnnotationItemsSvg(items: AnnotationItem[], size: number, offsetY = 0): string {
   if (items.length === 0) return "";
   const cy = size / 2 + ANNOTATION_Y + offsetY;
@@ -633,33 +614,11 @@ export function legendLabelSvg(label: string, x: number, cy: number): string {
   return `<text x="${fmt(x)}" y="${cy + LEGEND_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${escapeXml(label)}</text>`;
 }
 
-/** Width needed by the widest legend row, for sizing the export canvas. */
-export function tagLegendWidth(tags: readonly Tag[], labels: readonly string[] = tags.map(t => t.label)): number {
-  const longest = Math.max(0, ...labels.map(l => l.length));
-  return swatchColumnWidth(tags) + LEGEND_LABEL_GAP + longest * LEGEND_CHAR_WIDTH;
-}
-
 export interface TagLegendBlock {
   /** SVG markup lines; empty when no tag is in use. */
   markup: string[];
   width: number;
   height: number;
-}
-
-/**
- * The key for every tag applied to at least one individual, one row per tag,
- * with its top-left corner at (x, y). Exporters use renderExportKeySvg, which
- * adds status rows above these.
- */
-export function renderTagLegendSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {
-  const rows = keyTagRows(pedigree);
-  if (rows.length === 0) return { markup: [], width: 0, height: 0 };
-  const tags = rows.map(r => r.tag);
-  const labelOffset = swatchColumnWidth(tags) + LEGEND_LABEL_GAP;
-  const markup = rows.map((r, i) =>
-    renderTagLegendRowSvg(r.tag, pedigree, x, y + i * LEGEND_ROW_HEIGHT + (LEGEND_ROW_HEIGHT - LEGEND_SWATCH) / 2, labelOffset, r.carrier),
-  );
-  return { markup, width: tagLegendWidth(tags, rows.map(r => r.label)), height: rows.length * LEGEND_ROW_HEIGHT };
 }
 
 // ── Built-in suggestions ──────────────────────────────────────────────────────

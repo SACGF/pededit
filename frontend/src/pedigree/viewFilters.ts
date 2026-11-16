@@ -216,15 +216,6 @@ export function activeFilters(pedigree: Pedigree): ViewFilterControl[] {
   return VIEW_FILTERS.filter(f => f.on(pedigree.filters));
 }
 
-/** True when "affected only" is switched on for this pedigree. */
-export function affectedOnlyOn(pedigree: Pedigree): boolean {
-  return pedigree.filters?.affectedOnly === true;
-}
-
-/** True when any view filter is switched on. */
-export function anyFilterOn(pedigree: Pedigree): boolean {
-  return activeFilters(pedigree).length > 0;
-}
 
 /** A filter's name as the toolbar and banner write it: "Affected only (BRCA1)" with a condition chosen. */
 export function filterLabel(control: ViewFilterControl, pedigree: Pedigree): string {

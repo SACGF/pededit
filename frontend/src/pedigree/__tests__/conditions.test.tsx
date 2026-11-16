@@ -5,9 +5,9 @@ import {
   affectedControlOn, applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isAffected, isCarrier,
   plainAffected, plainCarrier, resolvePlainAffected, CONDITIONS_AND_TAGS,
 } from "../conditions";
-import { symbolPaint, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
+import { symbolPaint, renderSectorListSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
-import { carrierPaint, tagPaint } from "../tagFills";
+import { carrierPaintFrom, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape } from "../nodes/symbols";
 import { Legend } from "../../components/Legend";
@@ -241,11 +241,11 @@ describe("symbolPaint (#115)", () => {
     for (const tags of [[CF, TS], [{ ...CF, fill: "dots" as const }, { ...TS, fill: "shade" as const }]]) {
       for (const mono of [undefined, "monochrome" as const]) {
         const p = family(tags, "nsgc2022", mono);
-        for (const t of tags) expect(carrierPaint(t, p)).not.toEqual(tagPaint(t, p));
+        for (const t of tags) expect(carrierPaintFrom(tagPaint(t, p))).not.toEqual(tagPaint(t, p));
       }
     }
     const mono = family(undefined, "nsgc2022", "monochrome");
-    expect(carrierPaint(CF, mono)).toEqual({ color: "#8c8c8c", fill: tagPaint(CF, mono).fill });
+    expect(carrierPaintFrom(tagPaint(CF, mono))).toEqual({ color: "#8c8c8c", fill: tagPaint(CF, mono).fill });
   });
 });
 
@@ -376,7 +376,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
         const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
         expect(canvas).toContain(sectorPath(20, 20, 40, start, end));
         const centred = sectorPath(0, 0, 40, start, end);
-        expect(renderSectorsSvg(a, p, 40, "x")).toContain(centred);
+        expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
         expect(exportSvg(p)).toContain(centred);
         expect(exportUShapeSvg(p)).toContain(centred);
       }
@@ -442,7 +442,7 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
     const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
     expect(canvas).toContain(`<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`);
     const centred = `<path d="${sectorPath(0, 0, 40, 0, 360)}" fill="#000000"`;
-    expect(renderSectorsSvg(a, p, 40, "x")).toContain(centred);
+    expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
     expect(exportSvg(p)).toContain(centred);
     expect(exportUShapeSvg(p)).toContain(centred);
     // Keys: the condition's own row, a solid black whole swatch named for it; then its carriers, hatched.
