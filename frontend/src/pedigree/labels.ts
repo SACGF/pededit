@@ -303,3 +303,31 @@ export function chartTitle(pedigree: Pick<Pedigree, "chartTitle">, pedigreeName?
 export function titleWidth(title: string): number {
   return title.length * TITLE_CHAR_WIDTH;
 }
+
+/** Height (px) of the canvas title's line box. */
+export const TITLE_LINE_HEIGHT = TITLE_FONT_SIZE + 4;
+
+/**
+ * Where the canvas draws the chart title (#20): the centre of its line box,
+ * centred over the symbols with its baseline TITLE_GAP (plus room for a
+ * deceased slash) above the highest one, as in the SVG export, and raised
+ * further to clear `aboveTop`, the highest point of anything drawn over the
+ * symbols (`highestAboveSymbols`, #97, #172). Null with no title or no
+ * symbols. `half` is half a symbol. Shared by `chartTitleNode` and the
+ * canvas lint (#188).
+ */
+export function chartTitlePlace(
+  title: string,
+  symbols: { position: { x: number; y: number } }[],
+  half: number,
+  aboveTop = Infinity,
+): { x: number; y: number; width: number; height: number } | null {
+  if (!title || symbols.length === 0) return null;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity;
+  for (const { position: { x, y } } of symbols) {
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y);
+  }
+  // The baseline sits about a third of the font size below the box centre.
+  const baseline = Math.min(minY - half, aboveTop) - TITLE_GAP - 4;
+  return { x: (minX + maxX) / 2, y: baseline - TITLE_FONT_SIZE / 3, width: Math.ceil(titleWidth(title)) + 8, height: TITLE_LINE_HEIGHT };
+}

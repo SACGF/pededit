@@ -26,7 +26,7 @@
  *                          two copies, a consanguinity label or a symbol (#172)
  *
  * PNG and PDF are rasterised from this SVG, so the lint covers them too. The
- * U-shape export has its own geometry and is not checked here.
+ * U-shape export has its own geometry and its own lint (`uShapeLint.ts`).
  *
  * Symbols are matched to people by position, against the canvas layout:
  * the export carries no ids (they could be names after a PED import, which

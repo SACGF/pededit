@@ -8,6 +8,8 @@
  * label's own rotated frame.
  *
  *   consanguinity-label-collides  a label runs into a line, a symbol or text
+ *   title-collides                the chart title runs into anything drawn:
+ *                                 a line or dashed arc, a symbol, a label (#188)
  *
  * The one exception: a label the exporter wrote on a white backing (a
  * `<rect fill="white">` in its group) may have the thin dashed link between
@@ -20,7 +22,7 @@
  * check of the layout's arithmetic, as the other lints are.
  */
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { textWidth } from "../../pedigree/labels";
+import { textWidth, titleWidth, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import type { ExportLintFinding } from "./exportLint";
 import { exportUShapeSvg } from "./uShapeExporter";
 import type { SvgExportOptions } from "./types";
@@ -128,6 +130,7 @@ function segHitsBox(a: P, b: P, box: [number, number, number, number], pad: numb
 export function lintUShapeSvg(svg: string): ExportLintFinding[] {
   const shapes: { what: string; pts: P[]; pad: number; dupLink?: boolean }[] = [];
   const labels: Label[] = [];
+  const titles: { text: string; box: [number, number, number, number] }[] = [];
   const stack: { m: M; kind: string }[] = [{ m: IDENTITY, kind: "" }];
   const top = () => stack[stack.length - 1]!;
   const skipping = () => stack.some(s => s.kind === "skip");
@@ -157,6 +160,13 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     if (tag === "text") {
       const size = num(a, "font-size") || 10;
       const text = (textContent ?? "").replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "").replace(/&[a-z]+;/g, "x");
+      // The chart title, outside every group, upright: checked against everything below.
+      if (a.class === "chart-title") {
+        const w = titleWidth(text), [x, y] = apply(m, [num(a, "x"), num(a, "y")]);
+        const fs = num(a, "font-size") || TITLE_FONT_SIZE;
+        titles.push({ text, box: [x - w / 2, y - 0.8 * fs, x + w / 2, y + 0.3 * fs] });
+        continue;
+      }
       // The standard export writes each line straight into the group (#97).
       if (top().kind === "labels") { labels.push({ m, lines: [{ text, y: num(a, "y"), size }], backed: false, x: num(a, "x") }); continue; }
       if (inLabel) { labels[labels.length - 1]!.lines.push({ text, y: num(a, "y"), size }); continue; }
@@ -204,6 +214,15 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     // A label on a white backing may have a dashed link pass behind it.
     const hit = shapes.find(s => !(l.backed && s.dupLink) && s.pts.some((p, i) => i > 0 && segHitsBox(apply(inv, s.pts[i - 1]!), apply(inv, p), box, s.pad)));
     if (hit) out.push({ code: "consanguinity-label-collides", message: `in the U-shape export the label "${text}" runs into ${hit.what}`, individuals: [] });
+    const c: P[] = [[box[0], box[1]], [box[2], box[1]], [box[2], box[3]], [box[0], box[3]], [box[0], box[1]]];
+    shapes.push({ what: `the label "${text}"`, pts: c.map(p => apply(l.m, p)), pad: 0 });
+  }
+  // The chart title (#188): nothing drawn may reach it, the dashed links between copies included.
+  for (const t of titles) {
+    const [x1, y1, x2, y2] = t.box;
+    const hit = shapes.find(s => s.pts.some((p, i) => (i > 0 && segHitsBox(s.pts[i - 1]!, p, t.box, s.pad))
+      || (s.pts.length === 1 && p[0] >= x1 && p[0] <= x2 && p[1] >= y1 && p[1] <= y2)));
+    if (hit) out.push({ code: "title-collides", message: `in the U-shape export the chart title "${t.text}" runs into ${hit.what}`, individuals: [] });
   }
   return out;
 }

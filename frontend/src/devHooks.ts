@@ -69,7 +69,9 @@ const hooks = {
    */
   check: (pedigree?: Pedigree, options?: LayoutToFlowOptions) => {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
-    return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }));
+    // With the chart title the canvas draws (#20, #188).
+    const title = chartTitle(p, useAppStore.getState().activeTitle) || undefined;
+    return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }), { title });
   },
   /**
    * Export lint (io/svg/exportLint.ts): what the standard SVG export (and so

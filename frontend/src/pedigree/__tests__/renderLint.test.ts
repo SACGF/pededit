@@ -15,20 +15,21 @@ const KNOWN_BROKEN: Record<string, string[]> = {};
 /** Extra findings in compact mode only, by label, as for KNOWN_BROKEN. */
 const KNOWN_BROKEN_COMPACT_EXTRA: Record<string, string[]> = {};
 
-const codes = (p: Pedigree, compact = false) =>
-  [...new Set(lintFlow(p, layoutToFlow(p, { compact })).map(f => f.code))].sort();
+// With the example's name as the chart title, as the canvas draws it (#188).
+const codes = (p: Pedigree, compact = false, title?: string) =>
+  [...new Set(lintFlow(p, layoutToFlow(p, { compact }), { title }).map(f => f.code))].sort();
 
 describe("render lint over every example", () => {
   for (const ex of EXAMPLES) {
     it(`${ex.label} draws ${KNOWN_BROKEN[ex.label] ? "with its known problems only" : "cleanly"}`, () => {
-      expect(codes(ex.data)).toEqual(KNOWN_BROKEN[ex.label] ?? []);
+      expect(codes(ex.data, false, ex.label)).toEqual(KNOWN_BROKEN[ex.label] ?? []);
     });
   }
 
   it("compact mode raises the same findings, plus its known extras", () => {
     for (const ex of EXAMPLES) {
-      const want = [...new Set([...codes(ex.data), ...(KNOWN_BROKEN_COMPACT_EXTRA[ex.label] ?? [])])].sort();
-      expect({ label: ex.label, codes: codes(ex.data, true) }).toEqual({ label: ex.label, codes: want });
+      const want = [...new Set([...codes(ex.data, false, ex.label), ...(KNOWN_BROKEN_COMPACT_EXTRA[ex.label] ?? [])])].sort();
+      expect({ label: ex.label, codes: codes(ex.data, true, ex.label) }).toEqual({ label: ex.label, codes: want });
     }
   });
 
@@ -53,6 +54,17 @@ describe("lintFlow", () => {
 
   it("is clean on a trio", () => {
     expect(lintFlow(base, layoutToFlow(base))).toEqual([]);
+    expect(lintFlow(base, layoutToFlow(base), { title: "A family" })).toEqual([]);
+  });
+
+  it("reports a chart title drawn through something over the top row (#188)", () => {
+    // A couple line hopping far above the symbols, which the title is not raised to clear.
+    const flow = layoutToFlow(base);
+    flow.coupleEdges = flow.coupleEdges.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
+    const found = lintFlow(base, flow, { title: "A family" }).filter(f => f.code === "title-collides");
+    expect(found.map(f => f.message)).toEqual(['the chart title "A family" is drawn through a couple line hopping over a symbol']);
+    // No title, no check.
+    expect(lintFlow(base, flow).filter(f => f.code === "title-collides")).toEqual([]);
   });
 
   it("reports a child whose parent line is gone", () => {

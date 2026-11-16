@@ -170,8 +170,12 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   on purpose (it is not a label), so it has a check of its own,
   `title-collides` (#172): the `class="chart-title"` text against the
   symbols, the dashed arcs and the consanguinity labels. The canvas title
-  is a React Flow node outside `layoutToFlow`'s output and has no lint; it
-  is placed by the same `highestAboveSymbols`. It never writes ids into the SVG: symbols are
+  is a React Flow node outside `layoutToFlow`'s output, so `lintFlow` takes
+  the title as an option and places it with the same `chartTitlePlace`
+  (#188); `lint.mjs` and `__pededit.check()` pass the pedigree's title.
+  `uShapeLint.ts` has its own `title-collides`: the U-shape draws the title
+  in its own band above a margin that holds everything it draws, and no
+  example, fixture or test data file has needed more (#188). It never writes ids into the SVG: symbols are
   matched to people by position, because an id can be a name after a PED
   import and must not leak from a de-identified export.
 - `pngExporter.ts` — rasterises the SVG via canvas at a chosen DPI (#18),

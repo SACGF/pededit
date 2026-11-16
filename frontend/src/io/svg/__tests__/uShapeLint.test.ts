@@ -10,13 +10,14 @@ import { lintUShape, lintUShapeSvg } from "../uShapeLint";
 
 const named = (p: Pedigree): Pedigree =>
   ({ ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, relationshipLabels: true } });
-const messages = (p: Pedigree, partners: boolean) => lintUShape(p, { uShapePartners: partners }).map(f => f.message);
+// With a chart title, as the export dialog draws one (#188).
+const messages = (p: Pedigree, partners: boolean, title = "A family") => lintUShape(p, { uShapePartners: partners, title }).map(f => f.message);
 
 describe("U-shape consanguinity labels (#109)", () => {
   for (const ex of EXAMPLES) {
-    it(`${ex.label}: every label clear of lines, symbols and text`, () => {
-      expect(messages(named(ex.data), true)).toEqual([]);
-      expect(messages(named(ex.data), false)).toEqual([]);
+    it(`${ex.label}: every label and the title clear of lines, symbols and text`, () => {
+      expect(messages(named(ex.data), true, ex.label)).toEqual([]);
+      expect(messages(named(ex.data), false, ex.label)).toEqual([]);
     });
   }
 
@@ -108,5 +109,17 @@ describe("U-shape consanguinity labels (#109)", () => {
     const broken = svg.replace(`<g class="consanguinity-labels">`,
       `<line x1="${px - 3}" y1="${py - 3}" x2="${px + 3}" y2="${py + 3}" stroke="black" stroke-width="1"/>\n<g class="consanguinity-labels">`);
     expect(lintUShapeSvg(broken).map(f => f.code)).toEqual(["consanguinity-label-collides"]);
+  });
+});
+
+describe("U-shape chart title (#188)", () => {
+  it("the lint catches anything drawn through the title", () => {
+    const ex = EXAMPLES[0]!;
+    const svg = exportUShapeSvg(ex.data, { uShape: true, title: "Smith family" });
+    expect(lintUShapeSvg(svg)).toEqual([]);
+    // A dashed link across the top of the figure, where the title is.
+    const y = /class="chart-title"[^>]* y="([\d.]+)"/.exec(svg)![1];
+    const broken = svg.replace("</svg>", `<line x1="0" y1="${Number(y) - 4}" x2="2000" y2="${Number(y) - 4}" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>\n</svg>`);
+    expect(lintUShapeSvg(broken).map(f => f.code)).toEqual(["title-collides"]);
   });
 });

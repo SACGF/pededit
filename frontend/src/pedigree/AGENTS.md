@@ -516,7 +516,10 @@ draws NSGC symbols.
   over a top-row label and over the dashed arc of someone drawn twice in
   the top row (#172), through one helper (`highestAboveSymbols`, passed as
   `chartTitleNode`'s `aboveTop` and to the export's `computeBounds`):
-  anything new drawn above the top row's symbols belongs in it. Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
+  anything new drawn above the top row's symbols belongs in it. The
+  canvas lint checks it (`title-collides` in `renderLint.ts`, #188, with
+  the title placed by `chartTitlePlace` in `labels.ts`, which
+  `chartTitleNode` also uses). Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
   hands it every obstacle near a label as a box (`TextBlock`): the text
   under each symbol as the export writes it (`labelBlock.ts`, lower and
   taller than the canvas's, so clear there means clear on the canvas too),

@@ -17,6 +17,9 @@
  *   sibship-bars-overlap   two couples' sibship bars run along the same line, so they read as one sibship
  *   symbols-overlap        two symbols sit on top of each other, or touch
  *   labels-overlap         two name or date labels on one row run into each other
+ *   title-collides         the chart title runs into a symbol, a dashed arc between
+ *                          two copies, a couple label or a hopping couple line (#188);
+ *                          only when `options.title` is given, as the canvas draws it
  *
  * Used by `__pededit.check()` (devHooks.ts), `scripts/browser/lint.mjs` and the
  * vitest over every example. Framework-free so all three share it.
@@ -28,7 +31,9 @@ import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
-import { linesWidth } from "./labels";
+import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
+import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth, highestAboveSymbols } from "./consanguinityLabel";
+import { duplicateArcPoints } from "./couplePath";
 
 export type LintCode =
   | "missing-individual"
@@ -43,7 +48,8 @@ export type LintCode =
   | "assisted-not-drawn"
   | "sibship-bars-overlap"
   | "symbols-overlap"
-  | "labels-overlap";
+  | "labels-overlap"
+  | "title-collides";
 
 export interface LintFinding {
   code: LintCode;
@@ -63,7 +69,7 @@ const MIN_SYMBOL_GAP = 8;
 /** Two sibship bars closer than this (px) vertically read as one line where they overlap. */
 const MIN_BAR_GAP = 4;
 
-export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
+export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: string } = {}): LintFinding[] {
   const pedigree = drawnPedigree(full); // hidden descendants (#94) are meant to be missing
   const out: LintFinding[] = [];
   const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
@@ -294,5 +300,49 @@ export function lintFlow(full: Pedigree, flow: FlowData): LintFinding[] {
     }
   }
 
+  if (options.title) out.push(...lintTitle(options.title, flow));
   return out;
+}
+
+/** Slash overhang (px) a deceased symbol's slash reaches above the symbol. */
+const SLASH_REACH = 4;
+
+/**
+ * The canvas title (#188), placed as `chartTitleNode` places it, against
+ * everything drawn near the top of the chart. The title is raised to clear
+ * `highestAboveSymbols`, so a finding means that missed something.
+ */
+function lintTitle(title: string, flow: FlowData): LintFinding[] {
+  const half = NODE_SIZE / 2;
+  const place = chartTitlePlace(title, flow.nodes, half, highestAboveSymbols(flow));
+  if (!place) return [];
+  const w = titleWidth(title);
+  const box = [place.x - w / 2, place.y - place.height / 2, place.x + w / 2, place.y + place.height / 2] as const;
+  const inBox = ([x, y]: readonly [number, number]) => x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3];
+  const overlaps = (b: readonly [number, number, number, number]) => b[0] < box[2] && b[2] > box[0] && b[1] < box[3] && b[3] > box[1];
+  const found = (what: string, individuals: string[] = []): LintFinding[] =>
+    [{ code: "title-collides", message: `the chart title "${title}" is drawn through ${what}`, individuals }];
+
+  for (const n of flow.nodes) {
+    const { x, y } = n.position;
+    if (overlaps([x - half, y - half - SLASH_REACH, x + half, y + half])) return found(`the symbol of ${n.data.individual.id}`, [n.data.individual.id]);
+  }
+  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  for (const e of flow.duplicateEdges) {
+    const a = pos.get(e.source), b = pos.get(e.target);
+    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 48).some(inBox)) return found("a dashed arc between two copies");
+  }
+  for (const p of consanguinityLabelPlacements(flow)) {
+    const lw = Math.max(...p.lines.map(consanguinityLabelWidth));
+    if (overlaps([p.x - lw / 2, consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy), p.x + lw / 2, consanguinityLabelBaseline(p.cy, p.hop) + p.dy + 3])) {
+      return found(`the label "${p.lines.join(" ")}" above a double line`);
+    }
+  }
+  for (const e of flow.coupleEdges) {
+    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
+    if (!a || !b || hop <= 0) continue;
+    const y = Math.min(a.y, b.y) - hop;
+    if (overlaps([Math.min(a.x, b.x), y - 1, Math.max(a.x, b.x), y + 1])) return found("a couple line hopping over a symbol");
+  }
+  return [];
 }

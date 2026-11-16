@@ -68,34 +68,41 @@ await main(async () => {
       if (spec === "__examples__" || spec === "__fixtures__") {
         items = await inApp(context, base, async ({ compact, exportOpts, named, fixtures }) => {
           const set = fixtures
-            ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data }))
-            : (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data }));
+            ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data, title: f.label }))
+            : (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data, title: e.label }));
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
           const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
-          return set.map(e => ({
-            name: e.name,
-            findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact })),
-            exportFindings: exportOpts ? lintExport(withNames(e.data), exportOpts) : [],
-          }));
+          // The chart title the editor would draw (#20, #188), named after the pedigree; none when de-identified.
+          const { chartTitle } = await import("/src/pedigree/labels.ts");
+          return set.map(e => {
+            const title = chartTitle(e.data, e.title) || undefined;
+            return {
+              name: e.name,
+              findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact }), { title }),
+              exportFindings: exportOpts ? lintExport(withNames(e.data), { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
+            };
+          });
         }, { compact: !!flags.compact, exportOpts, named, fixtures: spec === "__fixtures__" });
       } else {
         const fixture = await loadFixture(spec, context, base);
-        const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named }) => {
+        const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named, name }) => {
           const pedigree = Object.keys(named).length ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, ...named } } : raw;
           const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
           const { lintFlow } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
+          const { chartTitle } = await import("/src/pedigree/labels.ts");
+          const title = chartTitle(pedigree, name) || undefined;
           return [{
-            findings: lintFlow(pedigree, layoutToFlow(pedigree, { compact })),
-            exportFindings: exportOpts ? lintExport(pedigree, exportOpts) : [],
+            findings: lintFlow(pedigree, layoutToFlow(pedigree, { compact }), { title }),
+            exportFindings: exportOpts ? lintExport(pedigree, { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
           }];
-        }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts, named });
+        }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts, named, name: fixture.title });
         items = [{ name: spec, findings: one.findings, exportFindings: one.exportFindings, warnings: fixture.warnings }];
       }
       results.push(...items);
