@@ -266,6 +266,7 @@ the flow. They run in CI.
 | `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
 | `example-link` | `/example/<slug>` (#150): one new pedigree per visit, Back makes no extra copy, unknown slug, the landing page's links |
 | `error-reporting-off` | with no Sentry DSN, an uncaught error sends no request off the site and loads no reporter (#49) |
+| `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

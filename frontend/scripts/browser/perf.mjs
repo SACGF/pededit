@@ -258,8 +258,7 @@ async function interact(page, around) {
   await run("drag", async () => {
     await page.evaluate(id => window.__perf.watchNode(id), who.id);
     for (let i = 1; i <= DRAG_MOVES; i++) {
-      // Up and to the right: the hover pill is below the person, and a mouse released over one of its
-      // disabled buttons never ends the drag (chromium sends no mouseup there).
+      // Up and to the right, away from the hover pill below the person, so the drop lands on the canvas.
       await page.mouse.move(who.x + i * 2, who.y - i);
     }
     const f = await page.evaluate(() => window.__perf.moved());

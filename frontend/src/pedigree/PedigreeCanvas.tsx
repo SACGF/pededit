@@ -38,6 +38,7 @@ import { NODE_SIZE } from "./constants";
 import { highestAboveSymbols } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
+import { endMouseGesturesOverDisabled } from "../utils/mouseupOverDisabled";
 import { PickingBanner } from "./PickingBanner";
 import { FilterBanner } from "./FilterBanner";
 import { isAffected } from "./conditions";
@@ -282,6 +283,8 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   const [contextMenu, setContextMenu] = useState<ContextMenuTarget | null>(null);
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;
+  // A drag let go over a disabled hover pill button must still end (#185).
+  useEffect(() => endMouseGesturesOverDisabled(), []);
 
   const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges, assistedEdges } = useMemo(
     () => pedigree.individuals.length > 0

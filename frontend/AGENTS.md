@@ -173,6 +173,12 @@ reporting is off, and the dev server never reports.
   and keeps the popover open. A new surface that stops mouse events needs
   the same. Keep `@radix-ui/react-dismissable-layer` at the version the
   popover uses, so there is one copy of its context.
+- Browsers send no mouse events to a disabled control, only pointer events,
+  and React Flow's drag and pan end on a window `mouseup`. A drag let go
+  over a raw disabled `<button>` (the hover pill's) never ended (#185), so
+  `PedigreeCanvas` installs `utils/mouseupOverDisabled.ts`, which sends the
+  missing `mouseup`. shadcn's `Button` is `disabled:pointer-events-none`
+  and never had the problem.
 - **The landing page tells users what is stored, who can read it and how to
   delete it** (#178, `YourData` in `pages/LandingPage.tsx`, "What happens to
   your pedigrees"). Each sentence states what the code does, and the comment
