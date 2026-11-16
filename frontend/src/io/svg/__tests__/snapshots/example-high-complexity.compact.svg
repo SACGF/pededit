@@ -10,12 +10,12 @@
 <text class="chart-title" x="222.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">High complexity</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 121.45 0 L 189.45 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 86.84 82 L 154.84 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 86.84 86 L 154.84 86" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 224.68 84 L 292.68 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 168 L 68 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 136 168 L 204 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 141.45 0 L 169.45 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 106.84 82 L 134.84 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 106.84 86 L 134.84 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 244.68 84 L 272.68 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 168 L 48 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 156 168 L 184 168" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="155.45" y1="0" x2="155.45" y2="42" stroke="black" stroke-width="2"/>

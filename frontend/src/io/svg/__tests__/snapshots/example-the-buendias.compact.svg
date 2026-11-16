@@ -10,20 +10,20 @@
 <text class="chart-title" x="308.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">The Buendías</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 215.33 0 L 283.33 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 84 L 136 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 204 84 L 272 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 340 84 L 408 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 102 166 L 170 166" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 102 170 L 170 170" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 252 L 68 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 204 252 L 272 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 238 336 L 306 336" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 340 420 L 408 420" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 328.67 504 L 396.67 504" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 362.67 586 L 430.67 586" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 362.67 590 L 430.67 590" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 235.33 0 L 263.33 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 84 L 116 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 224 84 L 252 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 360 84 L 388 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 122 166 L 150 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 122 170 L 150 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 252 L 48 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 224 252 L 252 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 258 336 L 286 336" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 360 420 L 388 420" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 348.67 504 L 376.67 504" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 382.67 586 L 410.67 586" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 382.67 590 L 410.67 590" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>

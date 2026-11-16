@@ -1,9 +1,10 @@
 /**
  * Render lint for the standard SVG export (#72). The canvas lint
- * (`pedigree/renderLint.ts`) checks layoutToFlow's output, but `exportSvg`
- * draws its couple and sibship lines itself from the kinship2 layout, so a
- * mistake there would pass that lint. This one parses the exported SVG and
- * checks what it actually draws against the pedigree:
+ * (`pedigree/renderLint.ts`) checks layoutToFlow's output. `exportSvg` draws
+ * from that same output since #143 (it used to run its own layout for the
+ * lines), but it is still a second renderer writing its own SVG, so this
+ * one parses the exported file and checks what it actually draws against
+ * the pedigree:
  *
  *   missing-individual     someone in the pedigree has no symbol in the export
  *   symbol-not-on-canvas   the export draws a symbol where the canvas has none
@@ -259,9 +260,14 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   /** Symbols whose box (grown by pad) contains p. */
   const symbolsAt = ([px, py]: Pt, pad = TOUCH) =>
     symbols.filter(s => Math.abs(s.pos[0] - px) <= half + pad && Math.abs(s.pos[1] - py) <= half + pad);
-  /** The symbol a couple line ends in: its centre, or 2px off it for a double line. */
-  const endSymbol = ([px, py]: Pt) =>
-    symbols.find(s => Math.abs(s.pos[0] - px) < 0.5 && Math.abs(s.pos[1] - py) <= COUPLE_TOUCH);
+  /**
+   * The symbol a couple line ends at: the edge of its box facing the other
+   * partner (`side` 1 for the line's left end, at the symbol's right edge, -1
+   * for its right end), at the symbol's height or 2px off it for a double
+   * line. As the canvas draws it (`coupleLineGeometry`, #143).
+   */
+  const endSymbol = ([px, py]: Pt, side: 1 | -1) =>
+    symbols.find(s => Math.abs(s.pos[0] + side * half - px) < 0.5 && Math.abs(s.pos[1] - py) <= COUPLE_TOUCH);
 
   // 2. Couple lines.
   const partnerPairs = new Set(pedigree.partnerships.map(p => pairKey(p.individual1, p.individual2)));
@@ -271,7 +277,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   const once = (key: string, f: ExportLintFinding) => { if (!reported.has(key)) { reported.add(key); out.push(f); } };
   for (const raw of parsed.couples) {
     const pts = raw.map(toCanvas);
-    const a = endSymbol(pts[0]!), b = endSymbol(pts[pts.length - 1]!);
+    const a = endSymbol(pts[0]!, 1), b = endSymbol(pts[pts.length - 1]!, -1);
     const segs = segsOf(pts);
     if (!a || !b) {
       const end = !a ? pts[0]! : pts[pts.length - 1]!;

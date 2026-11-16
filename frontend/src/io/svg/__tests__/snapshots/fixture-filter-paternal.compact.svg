@@ -10,10 +10,10 @@
 <text class="chart-title" x="416" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Filter: father&apos;s side</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 269.4 0 L 337.4 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 84.35 84 L 152.35 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 280.73 84 L 348.73 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 477.13 84 L 545.13 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 289.4 0 L 317.4 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 104.35 84 L 132.35 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 300.73 84 L 328.73 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 497.13 84 L 525.13 84" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="303.4" y1="0" x2="303.4" y2="42" stroke="black" stroke-width="2"/>

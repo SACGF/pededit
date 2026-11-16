@@ -94,9 +94,10 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
     // and runs through Mum, and the child hangs from it.
     const pos = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position;
     const f = pos("f"), m = pos("m"), x = pos("x");
-    const from = `M ${f.x} ${f.y} L ${m.x} ${m.y}`;
+    // A couple line runs between the facing edges of the two symbol boxes.
+    const from = `M ${f.x + 20} ${f.y} L ${m.x - 20} ${m.y}`;
     expect(svg).toContain(from);
-    const broken = svg.replace(from, `M ${f.x} ${f.y} L ${x.x} ${x.y}`);
+    const broken = svg.replace(from, `M ${f.x + 20} ${f.y} L ${x.x - 20} ${x.y}`);
     const found = codes(broken);
     expect(found).toContain("couple-not-partners");
     expect(found).toContain("partnership-not-drawn");

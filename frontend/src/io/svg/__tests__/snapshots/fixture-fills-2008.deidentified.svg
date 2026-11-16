@@ -9,7 +9,7 @@
 <rect width="520" height="625" fill="white"/>
 <g transform="translate(60 60)">
 <g class="couple-lines">
-<path d="M 160 0 L 240 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 180 0 L 220 0" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="200" y1="0" x2="200" y2="60" stroke="black" stroke-width="2"/>

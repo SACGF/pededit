@@ -10,12 +10,12 @@
 <text class="chart-title" x="860" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Assisted reproduction</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 80 0 L 160 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 360 0 L 440 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 760 0 L 840 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1160 0 L 1240 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1520 0 L 1600 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 720 120 L 800 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 100 0 L 140 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 380 0 L 420 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 780 0 L 820 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1180 0 L 1220 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1540 0 L 1580 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 740 120 L 780 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="20" y1="20" x2="80" y2="100" stroke="black" stroke-width="2"/>

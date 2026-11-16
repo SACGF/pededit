@@ -10,11 +10,11 @@
 <text class="chart-title" x="316.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Multi-branch family</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 223.05 0 L 303.05 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 129.22 120 L 209.22 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 370.7 120 L 450.7 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 80 240 L 160 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 240 240 L 320 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 243.05 0 L 283.05 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 149.22 120 L 189.22 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 390.7 120 L 430.7 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 100 240 L 140 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 260 240 L 300 240" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="263.05" y1="0" x2="263.05" y2="60" stroke="black" stroke-width="2"/>

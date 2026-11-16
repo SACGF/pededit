@@ -109,9 +109,19 @@ draws NSGC symbols.
   into a click on a button. A `title` attribute on the label does nothing
   while it has `pointer-events: none`, which is how the first version of
   #68 shipped a tooltip that never appeared.
+- `lineGeometry.ts` (#143): what is drawn for a couple line
+  (`coupleLineGeometry`: the path or the two paths of a double line, its hop,
+  the childless and ended marks) and for a sibship (`sibshipLineGeometry`),
+  from the edge data `layoutToFlow` made and the positions of the symbols at
+  the ends. The canvas edge components call it with live node positions and
+  `svgExporter` with the laid out ones, so the two cannot disagree; before
+  #143 the export ran its own layout and drew a hopping line's riser out of
+  the top of the symbol. A couple line runs between the facing edges of the
+  two symbol boxes, never centre to centre. Add anything new on a line
+  there, not in a renderer.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
-  the sibship bar follows dragged nodes. The lines come from
-  `sibshipPath.ts`, shared with `svgExporter`: the bar sits
+  the sibship bar follows dragged nodes. The segments come from
+  `sibshipPath.ts`: the bar sits
   halfway to the highest child and every child gets its own drop, so a child
   pinned off its siblings' row is still reached. Bars of different couples
   that would run along one line each get their own height (#80,
@@ -120,8 +130,8 @@ draws NSGC symbols.
   parents. Offsets only lower a bar (labels hang above the halfway line),
   and the order is chosen so drops cross other bars as little as possible.
   `layoutToFlow` puts the offset on the edge data (`barOffset`), so during a
-  drag the heights are as of the last layout; `svgExporter` calls the same
-  function. The U-shape export has its own geometry and does not use it. `CoupleEdge` and
+  drag the heights are as of the last layout; `svgExporter` reads the same
+  edge data. The U-shape export has its own geometry and does not use it. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
   the dashed arc between copies; its path is `duplicateArcD` in
   `couplePath.ts`, shared with the SVG exporter.

@@ -10,9 +10,9 @@
 <text class="chart-title" x="115" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Full-sib mating</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 82 L 68 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 86 L 68 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 82 L 48 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 86 L 48 86" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>

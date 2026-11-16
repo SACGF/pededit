@@ -10,9 +10,9 @@
 <text class="chart-title" x="162" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">3/4 siblings</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 68 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 136 84 L 204 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 0 L 116 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 84 L 48 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 156 84 L 184 84" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="102" y1="0" x2="102" y2="42" stroke="black" stroke-width="2"/>

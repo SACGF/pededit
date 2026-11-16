@@ -10,10 +10,10 @@
 <text class="chart-title" x="280" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Filter: blood relatives, mother&apos;s side</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 210.59 0 L 278.59 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 112.98 84 L 180.98 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 308.2 84 L 376.2 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 272 168 L 340 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 230.59 0 L 258.59 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 132.98 84 L 160.98 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 328.2 84 L 356.2 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 292 168 L 320 168" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="244.59" y1="0" x2="244.59" y2="42" stroke="black" stroke-width="2"/>

@@ -10,16 +10,16 @@
 <text class="chart-title" x="637.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Queen Victoria · haemophilia B</text>
 <g transform="translate(126 100)">
 <g class="couple-lines">
-<path d="M 441.88 0 L 509.88 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 269.75 84 L 337.75 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 677.75 84 L 745.75 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 898.65 84 L 966.65 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 166 L 68 166" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 170 L 68 170" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 408 168 L 476 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 612 168 L 680 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 884 168 L 952 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 461.88 0 L 489.88 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 84 L 48 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 289.75 84 L 317.75 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 697.75 84 L 725.75 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 918.65 84 L 946.65 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 166 L 48 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 170 L 48 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 428 168 L 456 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 632 168 L 660 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 904 168 L 932 168" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="475.88" y1="0" x2="475.88" y2="42" stroke="black" stroke-width="2"/>

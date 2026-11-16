@@ -1,19 +1,15 @@
-import { alignPedigreeByFamily, buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
-import type { Pedigree, LayoutResult, Individual, PartnerSet } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { symbolSex } from "../../pedigree/gender";
 import { NODE_SIZE } from "../../pedigree/constants";
-import { couplePathD, consanguineousPathsD, duplicateArcD, hopGeometry } from "../../pedigree/couplePath";
-import { sibshipBarOffsets, sibshipPaths, twinForkMarks } from "../../pedigree/sibshipPath";
-import type { SibshipChild } from "../../pedigree/sibshipPath";
-import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
+import { duplicateArcD } from "../../pedigree/couplePath";
+import { coupleLineGeometry, sibshipLineGeometry } from "../../pedigree/lineGeometry";
+import { TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
 import { wrapLabel, labelMaxWidth, detailLines, detailsBacked, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { layoutSpacing } from "../../pedigree/spacing";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
-import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill, assistedEdgeSegment, type LinePoint } from "../../pedigree/assisted";
-import { activeChildless, childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
+import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill, assistedEdgeSegment } from "../../pedigree/assisted";
+import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
-import { consanguinityTest } from "../../pedigree/consanguinity";
-import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
 import {
   CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
 } from "../../pedigree/consanguinityLabel";
@@ -37,7 +33,6 @@ import {
 } from "../../pedigree/lifeStatus";
 
 const STROKE = 2;
-const CONSANG_GAP = 4;       // px gap between consanguineous double lines
 const DECEASED_OVERHANG = 4; // matches DeceasedSlash in symbols.tsx
 const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 // Where the text under a symbol goes (pedigree/labelBlock.ts, shared with
@@ -155,66 +150,25 @@ function svgDefs(): string {
 // ── Couple lines ──────────────────────────────────────────────────────────────
 
 /**
- * Rise of the couple line for the spouse marker at (level, slot): 0 when the
- * adjacent slots are partners, otherwise enough to clear the slots between the
- * real partners (someone with three or more partners).
+ * Couple lines, from the edges the canvas draws (#143): the same geometry
+ * (`coupleLineGeometry`), so a line, its hop and the marks on it are where
+ * the canvas has them.
  */
-function hopAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number) {
-  const rc = resolveCouple(result, partners, level, slot);
-  return hopGeometry(rc.hop ? rc.rightSlot - rc.leftSlot : 1);
-}
-
-function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
-  return hopAt(result, partners, level, slot).hopHeight;
-}
-
-function renderCoupleLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
+function renderCoupleLines(flow: FlowData, slotPos: SlotPos): string[] {
   const lines: string[] = [];
-  const related = consanguinityTest(pedigree);
-  const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const path = (d: string) => `<path d="${d}" stroke="black" stroke-width="${STROKE}" fill="none"/>`;
-  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
-  const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level] - 1; slot++) {
-      const sp = result.spouse[level][slot];
-      if (sp === 0) continue;
-
-      // Join the real partners; a marker between two non-partners is a line
-      // passing through to a further partner and hops over the slots between.
-      const rc    = resolveCouple(result, partners, level, slot);
-      const left  = slotPos.get(`${level}-${rc.leftSlot}`)!;
-      const right = slotPos.get(`${level}-${rc.rightSlot}`)!;
-      const { hopHeight: hop, hopInset } = hopAt(result, partners, level, slot);
-
-      const a = idAt(level, rc.leftSlot), b = idAt(level, rc.rightSlot);
-      const partnership = partnershipOf.get(pairKey(a, b));
-      // Gamete donation (#45): the genetic parents are not a couple, so no line.
-      if (partnership?.donorConception) continue;
-      const consang = related(a, b);
-      if (!consang) {
-        lines.push(path(couplePathD(left.x, left.y, right.x, right.y, hop, hopInset)));
-      } else {
-        for (const d of consanguineousPathsD(left.x, left.y, right.x, right.y, hop, CONSANG_GAP, hopInset)) lines.push(path(d));
-      }
-      // Ended relationship (#98): two strokes across the line, aside from
-      // anything hung from its middle.
-      if (partnership?.ended) {
-        // The export draws couple lines from symbol centre to centre.
-        const half = NODE_SIZE / 2;
-        const cx = endedBreakX(left.x + half, right.x - half, hop, Math.max(0, hopInset - half), middleTaken(partnership, pedigree));
-        const cy = (left.y + right.y) / 2 - hop + (consang && hop > 0 ? CONSANG_GAP / 2 : 0);
-        for (const [x1, y1, x2, y2] of endedMarkSegments(cx, cy)) lines.push(seg(x1, y1, x2, y2, false, true));
-      }
-      // Childless couple mark (#15), hung from the middle of the line.
-      const childless = partnership && activeChildless(partnership, pedigree);
-      if (partnership && childless) {
-        const cx = (left.x + right.x) / 2;
-        const topY = (left.y + right.y) / 2 - hop + (consang ? CONSANG_GAP / 2 : 0);
-        for (const [x1, y1, x2, y2] of childlessMarkSegments(cx, topY, childless)) lines.push(seg(x1, y1, x2, y2, false, true));
-        if (partnership.childlessReason) {
-          lines.push(`<text x="${cx}" y="${childlessReasonBaselineY(topY)}" text-anchor="middle" font-family="sans-serif" font-size="${CHILDLESS_REASON_FONT_SIZE}" fill="black">${escapeXml(partnership.childlessReason)}</text>`);
-        }
+  for (const edge of flow.coupleEdges) {
+    const left = slotPos.get(edge.source), right = slotPos.get(edge.target);
+    if (!left || !right) continue;
+    const line = coupleLineGeometry(edge.data, edge.type === "consanguineousEdge", left, right);
+    for (const d of line.paths) lines.push(path(d));
+    // Ended relationship (#98): two strokes across the line.
+    for (const [x1, y1, x2, y2] of line.ended ?? []) lines.push(seg(x1, y1, x2, y2, false, true));
+    // Childless couple mark (#15), hung from the middle of the line.
+    if (line.childless) {
+      for (const [x1, y1, x2, y2] of line.childless.segments) lines.push(seg(x1, y1, x2, y2, false, true));
+      if (line.childless.reason) {
+        lines.push(`<text x="${line.childless.cx}" y="${line.childless.reasonY}" text-anchor="middle" font-family="sans-serif" font-size="${CHILDLESS_REASON_FONT_SIZE}" fill="black">${escapeXml(line.childless.reason)}</text>`);
       }
     }
   }
@@ -250,63 +204,23 @@ export function renderAdoptionBrackets(ind: Individual): string {
   return `<g data-adopted="${ind.adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
 }
 
-function renderSibshipLines(pedigree: Pedigree, result: LayoutResult, partners: PartnerSet, slotPos: SlotPos): string[] {
+/** Lines of descent, from the edges the canvas draws (#143, `sibshipLineGeometry`). */
+function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
   const lines: string[] = [];
-  const twins = twinMembership(pedigree);
-  const sibships: { coupleX: number; coupleY: number; hop: number; children: (SibshipChild & { x: number; y: number })[]; apart?: LinePoint[]; converge: boolean }[] = [];
-  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
-  const donorPairs = new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKey(p.individual1, p.individual2)));
-  const idAt = (level: number, slot: number) => pedigree.individuals[Math.floor(result.nid[level][slot]) - 1]?.id ?? "";
-  const sexAt = (level: number, slot: number) => {
-    const ind = pedigree.individuals[Math.floor(result.nid[level][slot]) - 1];
-    return ind ? symbolSex(ind, pedigree) : undefined;
-  };
-
-  for (let level = 1; level < result.n.length; level++) {
-    const groups = new Map<number, number[]>();
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const f = result.fam[level][slot];
-      if (f === 0) continue;
-      if (!groups.has(f)) groups.set(f, []);
-      groups.get(f)!.push(slot);
-    }
-
-    for (const [f, slots] of groups) {
-      const leftPos  = slotPos.get(`${level - 1}-${f - 1}`)!;
-      const rightPos = slotPos.get(`${level - 1}-${f}`)!;
-      const coupleX  = (leftPos.x + rightPos.x) / 2;
-      const coupleY  = (leftPos.y + rightPos.y) / 2;
-      const hop      = hopHeightAt(result, partners, level - 1, f - 1);
-      const children = slots.map(s => {
-        const child = pedigree.individuals[Math.floor(result.nid[level][s]) - 1];
-        return {
-          ...slotPos.get(`${level}-${s}`)!,
-          topInset: symbolTopInset(child?.lifeStatus, NODE_SIZE),
-          dashed: child?.adopted === "in",
-          ...(child ? twins.get(child.id) ?? {} : {}),
-        };
-      });
-      // Gamete donation (#45): a line from each parent instead of the couple drop.
-      const rc = resolveCouple(result, partners, level - 1, f - 1);
-      const apart = donorPairs.has(pairKey(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot))) ? [{ ...leftPos, sex: sexAt(level - 1, f - 1) }, { ...rightPos, sex: sexAt(level - 1, f) }] : undefined;
-      const converge = slots.length === 1 && !!apart;
-      sibships.push({ coupleX, coupleY, hop, children, apart, converge });
-    }
-  }
-
-  // Bars that would run along the same line get a height each (#80), as on the canvas.
-  const offsets = sibshipBarOffsets(sibships.map(s => ({
-    coupleX: s.coupleX, coupleY: s.coupleY, childXs: s.children.map(c => c.x), childYs: s.children.map(c => c.y),
-  })));
-  sibships.forEach(({ coupleX, coupleY, hop, children, apart, converge }, i) => {
-    const { solid, dashed } = sibshipPaths(coupleX, coupleY, hop, children, offsets[i], apart, converge);
-    for (const [x1, y1, x2, y2] of solid) lines.push(seg(x1, y1, x2, y2));
-    for (const [x1, y1, x2, y2] of dashed) lines.push(seg(x1, y1, x2, y2, true));
-    for (const m of twinForkMarks(coupleY, children, offsets[i])) {
+  const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
+  for (const edge of flow.sibshipEdges) {
+    const geometry = edge.data && sibshipLineGeometry(edge.data, id => {
+      const position = slotPos.get(id);
+      return position && { position, data: nodeById.get(id)?.data };
+    });
+    if (!geometry) continue;
+    for (const [x1, y1, x2, y2] of geometry.solid) lines.push(seg(x1, y1, x2, y2));
+    for (const [x1, y1, x2, y2] of geometry.dashed) lines.push(seg(x1, y1, x2, y2, true));
+    for (const m of geometry.marks) {
       if (m.kind === "bar") lines.push(seg(m.segment[0], m.segment[1], m.segment[2], m.segment[3], false, true));
       else lines.push(`<text x="${m.x}" y="${m.y + TWIN_QUESTION_FONT_SIZE * 0.35}" text-anchor="middle" font-family="sans-serif" font-size="${TWIN_QUESTION_FONT_SIZE}" font-weight="bold" fill="black">?</text>`);
     }
-  });
+  }
   return lines;
 }
 
@@ -471,33 +385,30 @@ function renderDuplicateMark(index: number): string {
   return `<text x="${half + 2}" y="${-half + 2}" font-family="sans-serif" font-size="10" fill="black">${index}</text>`;
 }
 
-function renderSymbols(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, flow: FlowData): string[] {
+function renderSymbols(pedigree: Pedigree, slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
-  // Every drawn copy is numbered 1, 2, ... in the same order as on the canvas.
-  const copyIndex = new Map(flow.nodes.map(n => [n.id, n.data.isDuplicate ? n.data.duplicateIndex : undefined]));
   const childIds = new Set(Object.values(pedigree.parentOf).flat());
 
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const pos = slotPos.get(`${level}-${slot}`);
-      if (!pos) continue; // a copy with no line, not drawn
-      const nid = Math.floor(result.nid[level][slot]);
-      const ind = pedigree.individuals[nid - 1];
-      const { x: cx, y: cy } = pos;
-      const dupIndex = copyIndex.get(`${level}-${slot}`);
+  // One symbol for each node the canvas draws, in its order (row by row).
+  for (const node of flow.nodes) {
+    const pos = slotPos.get(node.id);
+    if (!pos) continue;
+    const ind = node.data.individual;
+    const { x: cx, y: cy } = pos;
+    // Every drawn copy is numbered 1, 2, ... as on the canvas.
+    const dupIndex = node.data.isDuplicate ? node.data.duplicateIndex : undefined;
 
-      elems.push(`<g transform="translate(${cx} ${cy})">`);
-      elems.push(renderShape(ind, pedigree, `symbol-clip-${level}-${slot}`));
-      if (ind.deceased) elems.push(renderDeceasedSlash());
-      const arrow = arrowKind(ind);
-      if (arrow) elems.push(renderProbandArrow(arrow));
-      if (ind.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -NODE_SIZE / 2, -NODE_SIZE / 2));
-      if (hasDocumentedEvaluation(ind)) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
-      if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
-      const branch = branchOf(pedigree, ind.id);
-      if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)
-      elems.push(`</g>`);
-    }
+    elems.push(`<g transform="translate(${cx} ${cy})">`);
+    elems.push(renderShape(ind, pedigree, `symbol-clip-${node.id}`));
+    if (ind.deceased) elems.push(renderDeceasedSlash());
+    const arrow = arrowKind(ind);
+    if (arrow) elems.push(renderProbandArrow(arrow));
+    if (ind.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -NODE_SIZE / 2, -NODE_SIZE / 2));
+    if (hasDocumentedEvaluation(ind)) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
+    if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
+    const branch = branchOf(pedigree, ind.id);
+    if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)
+    elems.push(`</g>`);
   }
   return elems;
 }
@@ -513,19 +424,19 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(pedigree: Pedigree, result: LayoutResult, slotPos: SlotPos, labelMax: number, backed: Set<string> = new Set()): string[] {
+function renderLabels(pedigree: Pedigree, slotPos: SlotPos, flow: FlowData, labelMax: number, backed: Set<string> = new Set()): string[] {
   const elems: string[] = [];
-  const seen = new Set<number>();
+  const seen = new Set<string>();
   const numbers = labelNumbers(pedigree);
 
-  for (let level = 0; level < result.n.length; level++) {
-    for (let slot = 0; slot < result.n[level]; slot++) {
-      const pos = slotPos.get(`${level}-${slot}`);
-      const nid = Math.floor(result.nid[level][slot]);
-      if (!pos || seen.has(nid)) continue;
-      seen.add(nid);
+  // Text goes under the first drawn copy of each person only.
+  {
+    for (const node of flow.nodes) {
+      const pos = slotPos.get(node.id);
+      const ind = node.data.individual;
+      if (!pos || seen.has(ind.id)) continue;
+      seen.add(ind.id);
 
-      const ind = pedigree.individuals[nid - 1];
       const { x: cx, y: cy } = pos;
       // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
       // row, name, then the detail lines in NSGC order (age, onset, number).
@@ -574,8 +485,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   }
 
   // What the canvas draws: hidden descendants (#94) left out.
+  // The one layout: everything below is drawn from what the canvas draws (#143).
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  const result  = alignPedigreeByFamily(working);
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
   const duplicates = flow.duplicateEdges.length > 0;
@@ -597,16 +508,15 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   }
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
-  const partners = buildPartnerSetFromPedigree(working);
   // The group classes are what the export lint (exportLint.ts) reads.
   const group = (cls: string, body: string[]) => lines.push(`<g class="${cls}">`, ...body, `</g>`);
-  group("couple-lines", renderCoupleLines(working, result, partners, slotPos));
-  group("sibship-lines", renderSibshipLines(working, result, partners, slotPos));
+  group("couple-lines", renderCoupleLines(flow, slotPos));
+  group("sibship-lines", renderSibshipLines(flow, slotPos));
   group("assisted-lines", renderAssistedLines(flow, slotPos));
   group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
-  group("symbols", renderSymbols(working, result, slotPos, flow));
+  group("symbols", renderSymbols(working, slotPos, flow));
   const backed = new Set(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id));
-  group("labels", renderLabels(working, result, slotPos, labelMaxWidth(layoutSpacing(options.compact).slotWidth), backed));
+  group("labels", renderLabels(working, slotPos, flow, labelMaxWidth(layoutSpacing(options.compact).slotWidth), backed));
   group("consanguinity-labels", renderConsanguinityLabels(flow));
   lines.push(`</g>`);
 

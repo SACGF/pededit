@@ -9,14 +9,14 @@
 <rect width="2680" height="639" fill="white"/>
 <g transform="translate(60 60)">
 <g class="couple-lines">
-<path d="M 200 0 L 280 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 680 0 L 760 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1040 0 L 1120 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1320 0 L 1400 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1720 0 L 1800 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2120 0 L 2200 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2480 0 L 2560 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1680 120 L 1760 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 220 0 L 260 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 700 0 L 740 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1060 0 L 1100 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1340 0 L 1380 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1740 0 L 1780 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2140 0 L 2180 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2500 0 L 2540 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1700 120 L 1740 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="240" y1="0" x2="240" y2="60" stroke="black" stroke-width="2"/>

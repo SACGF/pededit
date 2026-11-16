@@ -10,8 +10,8 @@
 <text class="chart-title" x="236.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Remarriage · half-siblings</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 53.94 0 L 133.94 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 133.94 0 L 213.94 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 73.94 0 L 113.94 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 153.94 0 L 193.94 0" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="93.94" y1="0" x2="93.94" y2="60" stroke="black" stroke-width="2"/>

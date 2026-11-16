@@ -10,10 +10,10 @@
 <text class="chart-title" x="246.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Filter: affected only, one condition</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 56.67 0 L 124.67 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 272 0 L 340 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 84 L 136 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 204 84 L 272 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 76.67 0 L 104.67 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 292 0 L 320 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 84 L 116 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 224 84 L 252 84" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="90.67" y1="0" x2="90.67" y2="42" stroke="black" stroke-width="2"/>

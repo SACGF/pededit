@@ -10,8 +10,8 @@
 <text class="chart-title" x="356" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Text under the symbol</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 320 0 L 400 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 80 120 L 160 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 340 0 L 380 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 100 120 L 140 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="360" y1="0" x2="360" y2="60" stroke="black" stroke-width="2"/>

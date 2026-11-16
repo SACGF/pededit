@@ -10,12 +10,12 @@
 <text class="chart-title" x="264.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 0 L 10 0 L 10 -28 L 126 -28 L 126 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 204 0 L 272 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 340 0 L 408 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 11.33 84 L 79.33 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 147.33 84 L 238 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 30 0 L 30 -28 L 106 -28 L 106 0 L 116 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 224 0 L 252 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 360 0 L 388 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 31.33 84 L 59.33 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 167.33 84 L 218 84" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>

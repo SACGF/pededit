@@ -9,12 +9,12 @@
 <rect width="873" height="597" fill="white"/>
 <g transform="translate(92 60)">
 <g class="couple-lines">
-<path d="M 167.8 0 L 247.8 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 494.36 0 L 574.36 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 120 L 80 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 160 120 L 240 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 383.39 120 L 463.39 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 605.32 120 L 685.32 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 187.8 0 L 227.8 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 514.36 0 L 554.36 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 120 L 60 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 180 120 L 220 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 403.39 120 L 443.39 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 625.32 120 L 665.32 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="207.8" y1="0" x2="207.8" y2="60" stroke="black" stroke-width="2"/>

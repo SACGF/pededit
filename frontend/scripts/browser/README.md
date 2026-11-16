@@ -170,8 +170,8 @@ checks run in vitest over every example
 to draw wrong: fixing one makes that test fail until it is removed from the
 list.
 
-The SVG export draws its couple and sibship lines itself, from the kinship2
-layout, so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
+The SVG export is a second renderer (strings, where the canvas is React
+components), so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
 `export` lines in the report, `--no-export` to skip, `--deidentify` for the
 de-identified export). It parses what the SVG draws and matches symbols to
 people by position against the canvas layout, since the export carries no

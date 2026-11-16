@@ -10,10 +10,10 @@
 <text class="chart-title" x="148" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Uncle-niece</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 34 0 L 102 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 84 L 136 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 34 166 L 102 166" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 34 170 L 102 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 0 L 82 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 84 L 116 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 166 L 82 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 170 L 82 170" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="68" y1="0" x2="68" y2="42" stroke="black" stroke-width="2"/>

@@ -10,32 +10,32 @@
 <text class="chart-title" x="1537.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Large family</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 642.02 0 L 722.02 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1487.04 0 L 1567.04 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2495.73 0 L 2575.73 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 341.25 120 L 421.25 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 635.61 120 L 715.61 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1393.71 120 L 1473.71 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1633.71 120 L 1713.71 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2275.73 120 L 2355.73 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2475.73 120 L 2555.73 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2695.73 120 L 2775.73 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 120.8 240 L 200.8 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 280.8 240 L 360.8 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 520.8 240 L 600.8 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 680.8 240 L 760.8 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1239.7 240 L 1319.7 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1399.7 240 L 1479.7 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1719.7 240 L 1799.7 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2042.4 240 L 2122.4 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2202.4 240 L 2282.4 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2762.4 240 L 2842.4 240" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 40 360 L 120 360" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 360 360 L 440 360" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1120.8 360 L 1200.8 360" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1601.6 360 L 1681.6 360" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2201.6 360 L 2281.6 360" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2361.6 360 L 2441.6 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 662.02 0 L 702.02 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1507.04 0 L 1547.04 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2515.73 0 L 2555.73 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 361.25 120 L 401.25 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 655.61 120 L 695.61 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1413.71 120 L 1453.71 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1653.71 120 L 1693.71 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2295.73 120 L 2335.73 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2495.73 120 L 2535.73 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2715.73 120 L 2755.73 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 140.8 240 L 180.8 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 300.8 240 L 340.8 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 540.8 240 L 580.8 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 700.8 240 L 740.8 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1259.7 240 L 1299.7 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1419.7 240 L 1459.7 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1739.7 240 L 1779.7 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2062.4 240 L 2102.4 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2222.4 240 L 2262.4 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2782.4 240 L 2822.4 240" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 360 L 100 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 380 360 L 420 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1140.8 360 L 1180.8 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1621.6 360 L 1661.6 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2221.6 360 L 2261.6 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2381.6 360 L 2421.6 360" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="682.02" y1="0" x2="682.02" y2="60" stroke="black" stroke-width="2"/>

@@ -10,15 +10,15 @@
 <text class="chart-title" x="162.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Half-sib triangle</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 136 0 L 204 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 34 82 L 102 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 34 86 L 102 86" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 102 82 L 170 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 102 86 L 170 86" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 166 L 136 166" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 170 L 136 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 0 L 116 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 156 0 L 184 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 82 L 82 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 86 L 82 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 122 82 L 150 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 122 86 L 150 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 166 L 116 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 170 L 116 170" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>

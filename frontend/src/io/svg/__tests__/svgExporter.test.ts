@@ -511,3 +511,15 @@ describe("exportSvg — duplicate copies", () => {
     expect(marks.sort()).toEqual(["1", "2"]);
   });
 });
+
+describe("the export draws from the canvas's layout data (#143)", () => {
+  it("svgExporter.ts imports only types from the layout engine and never lays out itself", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const source = readFileSync(join(__dirname, "../svgExporter.ts"), "utf8");
+    const engine = [...source.matchAll(/^import ([^;]*?) from "@pedigree-editor\/layout-engine";/gms)].map(m => m[1]!.trim());
+    expect(engine.length).toBeGreaterThan(0);
+    expect(engine.filter(i => !i.startsWith("type "))).toEqual([]);
+    expect(source).not.toMatch(/alignPedigree|resolveCouple|buildPartnerSet/);
+  });
+});

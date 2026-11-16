@@ -10,26 +10,26 @@
 <text class="chart-title" x="600" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Couples and lines, pinned and snapped</text>
 <g transform="translate(100 100)">
 <g class="couple-lines">
-<path d="M 460 0 L 540 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 120 L 80 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 160 120 L 240 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 320 120 L 400 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 480 0 L 520 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 120 L 60 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 180 120 L 220 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 340 120 L 380 120" stroke="black" stroke-width="2" fill="none"/>
 <line class="mark" x1="344.5" y1="126" x2="350.5" y2="114" stroke="black" stroke-width="2"/>
 <line class="mark" x1="349.5" y1="126" x2="355.5" y2="114" stroke="black" stroke-width="2"/>
 <line class="mark" x1="360" y1="120" x2="360" y2="138" stroke="black" stroke-width="2"/>
 <line class="mark" x1="353" y1="138" x2="367" y2="138" stroke="black" stroke-width="2"/>
-<path d="M 560 120 L 640 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 580 120 L 620 120" stroke="black" stroke-width="2" fill="none"/>
 <line class="mark" x1="600" y1="120" x2="600" y2="138" stroke="black" stroke-width="2"/>
 <line class="mark" x1="593" y1="138" x2="607" y2="138" stroke="black" stroke-width="2"/>
 <line class="mark" x1="593" y1="134" x2="607" y2="134" stroke="black" stroke-width="2"/>
 <text x="600" y="149" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
-<path d="M 880 120 L 960 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 900 120 L 940 120" stroke="black" stroke-width="2" fill="none"/>
 <line class="mark" x1="904.5" y1="126" x2="910.5" y2="114" stroke="black" stroke-width="2"/>
 <line class="mark" x1="909.5" y1="126" x2="915.5" y2="114" stroke="black" stroke-width="2"/>
-<path d="M 960 118 L 1040 118" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 960 122 L 1040 122" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 40 238 L 200 238" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 40 242 L 200 242" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 980 118 L 1020 118" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 980 122 L 1020 122" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 238 L 180 238" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 242 L 180 242" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="500" y1="0" x2="500" y2="60" stroke="black" stroke-width="2"/>

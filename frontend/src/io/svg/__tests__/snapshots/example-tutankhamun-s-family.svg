@@ -10,11 +10,11 @@
 <text class="chart-title" x="136" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Tutankhamun&apos;s family</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 40 0 L 120 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 120 L 80 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 238 L 80 238" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 242 L 80 242" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 40 360 L 120 360" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 0 L 100 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 120 L 60 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 238 L 60 238" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 242 L 60 242" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 360 L 100 360" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="80" y1="0" x2="80" y2="60" stroke="black" stroke-width="2"/>

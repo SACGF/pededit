@@ -10,32 +10,32 @@
 <text class="chart-title" x="1318.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Large family</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 545.71 0 L 613.71 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1263.99 0 L 1331.99 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2121.37 0 L 2189.37 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 290.06 84 L 358.06 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 540.27 84 L 608.27 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1184.65 84 L 1252.65 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1388.65 84 L 1456.65 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1934.37 84 L 2002.37 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2104.37 84 L 2172.37 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2291.37 84 L 2359.37 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 102.68 168 L 170.68 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 238.68 168 L 306.68 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 442.68 168 L 510.68 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 578.68 168 L 646.68 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1053.75 168 L 1121.75 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1189.75 168 L 1257.75 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1461.75 168 L 1529.75 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1736.04 168 L 1804.04 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1872.04 168 L 1940.04 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2348.04 168 L 2416.04 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 34 252 L 102 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 306 252 L 374 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 952.68 252 L 1020.68 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1361.36 252 L 1429.36 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1871.36 252 L 1939.36 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 2007.36 252 L 2075.36 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 565.71 0 L 593.71 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1283.99 0 L 1311.99 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2141.37 0 L 2169.37 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 310.06 84 L 338.06 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 560.27 84 L 588.27 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1204.65 84 L 1232.65 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1408.65 84 L 1436.65 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1954.37 84 L 1982.37 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2124.37 84 L 2152.37 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2311.37 84 L 2339.37 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 122.68 168 L 150.68 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 258.68 168 L 286.68 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 462.68 168 L 490.68 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 598.68 168 L 626.68 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1073.75 168 L 1101.75 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1209.75 168 L 1237.75 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1481.75 168 L 1509.75 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1756.04 168 L 1784.04 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1892.04 168 L 1920.04 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2368.04 168 L 2396.04 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 252 L 82 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 326 252 L 354 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 972.68 252 L 1000.68 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1381.36 252 L 1409.36 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1891.36 252 L 1919.36 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2027.36 252 L 2055.36 252" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="579.71" y1="0" x2="579.71" y2="42" stroke="black" stroke-width="2"/>

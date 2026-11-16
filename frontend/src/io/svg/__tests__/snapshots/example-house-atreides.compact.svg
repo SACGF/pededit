@@ -10,18 +10,18 @@
 <text class="chart-title" x="389.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Atreides</text>
 <g transform="translate(106.63 100)">
 <g class="couple-lines">
-<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 68 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 136 84 L 204 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 272 84 L 340 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 408 84 L 476 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 1.58 168 L 69.58 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 341.58 168 L 409.58 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 477.58 168 L 545.58 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 85.79 252 L 204 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 408 252 L 476 252" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 258.95 336 L 442 336" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 88 0 L 116 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 84 L 48 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 156 84 L 184 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 292 84 L 320 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 428 84 L 456 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 21.58 168 L 49.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 361.58 168 L 389.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 497.58 168 L 525.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 105.79 252 L 184 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 428 252 L 456 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 278.95 336 L 422 336" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>

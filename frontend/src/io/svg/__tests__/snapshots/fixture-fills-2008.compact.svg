@@ -10,7 +10,7 @@
 <text class="chart-title" x="230" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Pattern fills, NSGC 2008</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 136 0 L 204 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 156 0 L 184 0" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="170" y1="0" x2="170" y2="42" stroke="black" stroke-width="2"/>

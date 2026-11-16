@@ -10,8 +10,8 @@
 <text class="chart-title" x="376" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Status and conditions</text>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 346.67 0 L 426.67 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 120 120 L 200 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 366.67 0 L 406.67 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 140 120 L 180 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="386.67" y1="0" x2="386.67" y2="60" stroke="black" stroke-width="2"/>

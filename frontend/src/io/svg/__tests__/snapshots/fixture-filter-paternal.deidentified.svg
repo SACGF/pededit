@@ -9,10 +9,10 @@
 <rect width="952" height="557" fill="white"/>
 <g transform="translate(92 60)">
 <g class="couple-lines">
-<path d="M 316.95 0 L 396.95 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 99.24 120 L 179.24 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 330.27 120 L 410.27 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 561.33 120 L 641.33 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 336.95 0 L 376.95 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 119.24 120 L 159.24 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 350.27 120 L 390.27 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 581.33 120 L 621.33 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="356.95" y1="0" x2="356.95" y2="60" stroke="black" stroke-width="2"/>
