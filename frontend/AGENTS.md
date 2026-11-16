@@ -33,6 +33,45 @@ package published to npm (#22, `layout-engine/AGENTS.md` "Publishing").
 `@react-oauth/google` is not installed, `vite.config.ts` aliases it to a no-op
 stub so the app still builds without Google login.
 
+`config.ts` also reads `VITE_SENTRY_DSN` and `VITE_SENTRY_ENVIRONMENT`
+(`deploy.sh` sets them from the site config). Empty, the default, means error
+reporting is off, and the dev server never reports.
+
+## Error reporting (`src/errorReporting/`, #49)
+
+- `index.ts` is the only part in the main bundle: with no DSN it adds no
+  listener and never imports `reporter.ts`, and the build emits no reporter
+  chunk at all (about 4 kB, 2 kB gzipped, when it does). The
+  `error-reporting-off` flow checks that an error on a pedigree page sends no
+  request off the site.
+- It is hand-written, not `@sentry/browser`: the SDK collects console
+  output, the DOM text of clicks and fetch URLs (which hold the pedigree id)
+  as breadcrumbs by default, and every default would need switching off and
+  re-checking on each upgrade. `reporter.ts` posts one envelope to the DSN's
+  endpoint with no cookies and no Referer.
+- **The scrubbing rule: a report is built from an allowlist in `scrub.ts`.**
+  `buildReport` sets every field: error type, message through `scrubText`,
+  stack frames of our own scripts, the route pattern (`/p/[id]`, never the
+  path, query or hash), release and environment. It reads only `name`,
+  `message` and `stack` of what was thrown, and nothing from the DOM, the
+  stores, the console or the network. Anything new on a report (a tag, a
+  breadcrumb, the pedigree's size) is added there with a test in
+  `__tests__/scrub.test.ts` showing it cannot carry pedigree content or the
+  pedigree id. `backend/peded/error_reporting.py` is the server's copy of
+  the rules.
+- `scrubText` drops everything between the first and last quote of a
+  message, since engines quote what they interpolate (a JSON parse error
+  quotes a piece of the JSON). It cannot catch a name interpolated without
+  quotes, so no `throw new Error(...)` may interpolate pedigree content
+  (none does today; a new route also needs adding to `ROUTES`).
+- The release is the build date (`pededit-frontend@<date>`), never the
+  commit, for the reason in `utils/buildInfo.ts`.
+- `components/ErrorBoundary.tsx` wraps the app in `main.tsx`: a render error
+  shows a plain page with Reload instead of a blank one, and is reported.
+- `vite.config.ts` sets `build.sourcemap: true` so Sentry can fetch the maps
+  from the site (INSTALL.md step 12). The code is public; the maps are not a
+  leak.
+
 ## Product facts an agent must know
 
 - **Anonymous mode is the default.** Nobody needs an account. Creating a

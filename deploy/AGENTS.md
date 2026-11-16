@@ -58,6 +58,12 @@ Deployment" half).
   (#47) or anything else here changes what is kept or where it is sent. A
   proxy or CDN in front of Nginx sees every pedigree in transit and belongs
   in that text too.
+- Error reporting (#49) is off until the config has `sentry_dsn` (Django
+  reads it) and `sentry_frontend_dsn` (`deploy.sh` passes it to the build as
+  `VITE_SENTRY_DSN`, so the frontend only changes on a rebuild). A
+  `Content-Security-Policy` added to the vhost must allow the DSN's host in
+  `connect-src`. `dist/assets/*.js.map` are published on purpose so Sentry
+  can read them; do not block `.map` in Nginx. See INSTALL.md step 12.
 
 ## Production hardening (#47)
 
@@ -105,7 +111,7 @@ Deployment" half).
   remote; the next nightly run mirrors it). `--check` is the preflight
   `deploy.sh` runs before the build. `restore-test.sh` restores a dump into a
   scratch database and checks it. Like the other units, the service and
-  timer are installed by hand (INSTALL.md step 12), not by `deploy.sh`,
+  timer are installed by hand (INSTALL.md step 13), not by `deploy.sh`,
   which only creates `/var/backups/pededit`.
 - **Privacy fact: a deleted pedigree stays in backups for up to 8 weeks.**
   Deleting removes the row at once, but every dump taken while it existed
@@ -141,5 +147,3 @@ Deployment" half).
   is no `shellcheck` in the dev environment; `bash -n` at least. A real
   dump and restore need PostgreSQL: a throwaway cluster works without root
   (`/usr/lib/postgresql/*/bin/initdb` and `pg_ctl` under `/tmp`).
-
-Still to do (#49): Sentry.

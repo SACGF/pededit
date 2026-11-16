@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleAuthProvider } from "./components/GoogleAuthProvider.tsx";
 import App from "./App.tsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
+import { initErrorReporting } from "./errorReporting";
 import "./index.css";
 
 if (import.meta.env.DEV) {
@@ -10,11 +12,16 @@ if (import.meta.env.DEV) {
   void import("./devHooks");
 }
 
+// Does nothing unless the build was given a Sentry DSN (#49).
+initErrorReporting();
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleAuthProvider>
       <BrowserRouter>
-        <App />
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
       </BrowserRouter>
     </GoogleAuthProvider>
   </StrictMode>

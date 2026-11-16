@@ -65,11 +65,33 @@ function servedCommitPlugin(): Plugin {
   };
 }
 
+/**
+ * Error reporting (#49): when the build has a DSN, print the release name the
+ * reports will carry, which is what a source map upload has to be filed under
+ * (INSTALL.md, "Error reporting").
+ */
+function errorReportingReleasePlugin(buildDate: string): Plugin {
+  return {
+    name: "pededit-error-reporting-release",
+    apply: "build",
+    closeBundle() {
+      if (process.env.VITE_SENTRY_DSN) console.log(`\nError reporting is on. Release: pededit-frontend@${buildDate}`);
+    },
+  };
+}
+
+const BUILD_DATE = new Date().toISOString();
+
 export default defineConfig({
-  plugins: [react(), servedCommitPlugin()],
+  plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE)],
+  // Source maps are published beside the scripts (#49). The code is public
+  // anyway, browsers fetch them only with developer tools open, and Sentry
+  // reads them from the site to turn a minified stack into source lines, so
+  // readable error reports need no upload step and no Sentry token.
+  build: { sourcemap: true },
   // Shown as "Last deployed" in the footer and on /changelog (#79). Production
   // builds run in deploy.sh, so build time is deploy time.
-  define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(new Date().toISOString()) },
+  define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(BUILD_DATE) },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

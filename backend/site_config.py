@@ -82,3 +82,9 @@ THROTTLE_RATES = {**DEFAULT_THROTTLE_RATES, **_cfg.get("throttle_rates", {})}
 # is 2. Too low and everyone behind the CDN shares one bucket; too high and a
 # client can pick its own bucket by sending the header itself.
 NUM_PROXIES = _cfg.get("num_proxies", 1)
+
+# ── Error reporting (peded/error_reporting.py, #49) ──────────────────────────
+# Off without a DSN, and whenever debug is on. sentry_frontend_dsn is not read
+# here: deploy.sh passes it to the frontend build.
+SENTRY_DSN         = _cfg.get("sentry_dsn", "")
+SENTRY_ENVIRONMENT = _cfg.get("sentry_environment", "production")

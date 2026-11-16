@@ -16,6 +16,9 @@ fi
 # Pull client IDs from the JSON config
 GOOGLE_CID=$(python3 -c "import json; print(json.load(open('$CONFIG')).get('google_client_id', ''))")
 GITHUB_CID=$(python3 -c "import json; print(json.load(open('$CONFIG')).get('github_client_id', ''))")
+# Error reporting (#49): empty means the frontend is built without it.
+SENTRY_FRONTEND_DSN=$(python3 -c "import json; print(json.load(open('$CONFIG')).get('sentry_frontend_dsn', ''))")
+SENTRY_ENV=$(python3 -c "import json; print(json.load(open('$CONFIG')).get('sentry_environment', 'production'))")
 
 echo "==> Pulling latest code"
 cd /opt/pededit
@@ -63,16 +66,19 @@ sudo -u pededit node frontend/scripts/changelog.mjs \
 echo "==> Building frontend"
 echo "    VITE_GOOGLE_CLIENT_ID=${GOOGLE_CID:+(set)}"
 echo "    VITE_GITHUB_CLIENT_ID=${GITHUB_CID:+(set)}"
+echo "    VITE_SENTRY_DSN=${SENTRY_FRONTEND_DSN:+(set)}"
 sudo -u pededit env \
     VITE_GOOGLE_CLIENT_ID="$GOOGLE_CID" \
     VITE_GITHUB_CLIENT_ID="$GITHUB_CID" \
+    VITE_SENTRY_DSN="$SENTRY_FRONTEND_DSN" \
+    VITE_SENTRY_ENVIRONMENT="$SENTRY_ENV" \
     npm -w @pedigree-editor/frontend run build
 
 echo "==> Updating backend"
 cd /opt/pededit/backend
 sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
 # A dump from before the migration, so a migration that goes wrong can be
-# undone (#48, INSTALL.md step 12). A failed dump stops the deploy here: the
+# undone (#48, INSTALL.md step 13). A failed dump stops the deploy here: the
 # database is not migrated without one.
 sudo -u pededit bash /opt/pededit/deploy/backup.sh --predeploy
 sudo -u pededit .venv/bin/python manage.py migrate

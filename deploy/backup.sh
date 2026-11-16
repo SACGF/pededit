@@ -118,7 +118,7 @@ check_setup() {
         command -v "$tool" >/dev/null || fail "$tool is not installed"
     done
     [[ -d "$BACKUP_DIR" && -w "$BACKUP_DIR" ]] \
-        || fail "$BACKUP_DIR is missing or not writable by $(id -un) (INSTALL.md, step 12)"
+        || fail "$BACKUP_DIR is missing or not writable by $(id -un) (INSTALL.md, step 13)"
     if [[ -n "$BACKUP_RCLONE_DEST" ]]; then
         command -v rclone >/dev/null || fail "BACKUP_RCLONE_DEST is set but rclone is not installed"
     fi

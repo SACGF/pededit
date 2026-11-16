@@ -174,3 +174,15 @@ CORS_ALLOW_HEADERS = [
 GOOGLE_CLIENT_ID     = _secrets.GOOGLE_CLIENT_ID
 GITHUB_CLIENT_ID     = _secrets.GITHUB_CLIENT_ID
 GITHUB_CLIENT_SECRET = _secrets.GITHUB_CLIENT_SECRET
+
+# ── Error reporting (#49) ────────────────────────────────────────────────────
+# Does nothing, and imports nothing, without a sentry_dsn in the site config.
+from peded.error_reporting import init_error_reporting
+from peded.version import VERSION as _VERSION
+
+init_error_reporting(
+    dsn=_secrets.SENTRY_DSN,
+    environment=_secrets.SENTRY_ENVIRONMENT,
+    release=_VERSION,
+    debug=DEBUG,
+)

@@ -142,3 +142,37 @@ can only be counted as pedigrees. `claude_agent` is excluded.
 
 Static files are served under `djstatic/` so they do not collide with the
 Vite build.
+
+## Error reporting (`peded/error_reporting.py`, #49)
+
+Sentry, started from the end of `settings.py` only when the site config has
+`sentry_dsn` and `debug` is false. Otherwise `sentry_sdk` is not imported at
+all (a test starts a fresh interpreter to check).
+
+**The scrubbing rule: an event is rebuilt from an allowlist.** `scrub_event`
+(the SDK's `before_send`) copies the fields known to be safe into a new dict
+and drops the rest, so nothing the SDK or a new integration attaches gets
+through by default. It never sends request bodies, query strings, headers,
+cookies, the user, the client IP, local variables (`vars`), breadcrumbs,
+tags, extra or contexts other than the Python version. The URL sent is the
+matched route pattern (`/api/pedigrees/{pk}/`); a path that matched no route
+becomes `[unmatched]`, because the UUID in a pedigree URL is the edit
+capability. Anything new you want on an event (a tag, a context, a
+breadcrumb, `set_user`) must be added to `scrub_event` with a test in
+`api/tests_error_reporting.py`, which sends real requests through the WSGI
+handler with a capturing transport and searches the serialised envelope for
+every name, date, note, token and UUID of its fixture.
+
+- Exception and log messages are the one free-text field. `scrub_text` keeps
+  the first line, drops everything between the first and last quote
+  character (Python and Postgres quote the values they interpolate) and
+  replaces ids, dates, long numbers, emails, URLs and tokens. It cannot catch
+  a name interpolated without quotes: never put pedigree content in an
+  exception or log message, and use `%r` / `!r` if a value must appear.
+- The Django test client skips `WSGIHandler.__call__`, where the SDK reads
+  the URL, headers and query string, so those tests call the handler
+  directly (`_request`). A test through `self.client` would pass without
+  testing the request scrubbing.
+- Tracing, profiles, sessions and client reports are off: errors only.
+- `frontend/src/errorReporting/scrub.ts` is the browser's copy of the same
+  rules; keep `scrubText` and `scrub_text` in step.
