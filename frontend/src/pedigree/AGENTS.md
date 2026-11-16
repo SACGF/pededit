@@ -38,7 +38,7 @@ draws NSGC symbols.
   symbol. React Flow's box round a finished selection is hidden in
   `index.css`, and its delete key is off (the store deletes).
   `selection.ts` has the batch lock counts used by the more menu's
-  "N selected" section and the edit panel's `SelectionPanel`.
+  "N selected" section and the Person tab's `SelectionPanel`.
 - The minimap (#6, #125) is React Flow's `<MiniMap pannable>`, on by
   default; Settings > "Show minimap" turns it off per browser (localStorage
   `showMinimap`, read in `CanvasPage`, only `"false"` hides it). It is always the
@@ -56,7 +56,7 @@ draws NSGC symbols.
   black. Its strokes are in flow units (4 on a 40px symbol) so they shrink
   with the symbol. The chart title node is in its bounds but not drawn.
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
-  deceased slash, proband arrow, carrier dot, tag quadrants and annotation row.
+  deceased slash, proband arrow, carrier dot, condition and trait sections and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
@@ -138,8 +138,8 @@ draws NSGC symbols.
   every nth point when the grid is under 10px; React Flow centres a dot in
   its pattern tile, so `PedigreeCanvas` offsets it by half a tile.
 - `tags.ts` — framework-free tag geometry and palette shared with the
-  exporters and the legend. Quadrant sector is determined by the tag's order
-  within the pedigree's quadrant-style tags. How many sections a symbol has
+  exporters and the legend. A section's place is set by the tag's order
+  among the pedigree's `style: "quadrant"` tags (conditions and traits). How many sections a symbol has
   follows the number of conditions in use in NSGC 2022 (`sectionConditions`,
   `sectionLayout`): someone on the drawn pedigree (`drawnPedigree`, so not
   a collapsed branch) is affected with or a carrier of it. One is the whole
@@ -157,17 +157,17 @@ draws NSGC symbols.
   canvas (full pedigree) and exporters (drawn copy) get the same answer.
   The editor's per-condition controls (`conditionMode`) still count the
   conditions defined, so every defined condition can be recorded. Only the first four have a
-  fixed section; someone carrying a fifth or later quadrant tag gets equal
-  slices of just the quadrant tags they carry, so other people's symbols
-  never gain empty wedges. An affected person with any quadrant sector keeps
+  fixed section; someone with a fifth or later condition or trait gets equal
+  slices of just the ones they have, so other people's symbols
+  never gain empty wedges. An affected person with any section keeps
   a black centre (the outline scaled by `AFFECTED_CORE_SCALE`, white rim),
   otherwise four tagged quarters hide the affected fill. `symbols.tsx`
   (`AffectedCore`) and `renderAffectedCoreSvg` draw it; keep them in step.
   Black is last in `TAG_PALETTE` so a new tag never defaults to it.
 - `tagFills.ts` — pattern fills and the monochrome setting (#67). A
-  quadrant tag's `fill` (solid, diagonal, horizontal, vertical, crosshatch,
+  condition's or trait's `fill` (solid, diagonal, horizontal, vertical, crosshatch,
   dots, shade) is drawn in its colour on white; `canvasSettings.tagFills`
-  "monochrome" draws every tag black, quadrant tags each with a pattern
+  "monochrome" draws every tag black, conditions and traits each with a pattern
   (their own, else the first free one in `MONOCHROME_PATTERN_ORDER`).
   Renderers never read `tag.color` directly: `sectorsFor` puts the resolved
   `color` / `fill` on each `Sector`, `annotationRow` on each item, and the
@@ -179,7 +179,7 @@ draws NSGC symbols.
   two renderers; per-condition carrier fills (#115) use them.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
-  symbol with a small triangle; quadrant tags are clipped to that triangle.
+  symbol with a small triangle; sections are clipped to that triangle.
   A pregnancy or loss can have no partner or children, enforced in the store
   actions and greyed out in the menus.
   Positions that depend on the status live here too, so canvas and exports
@@ -189,7 +189,7 @@ draws NSGC symbols.
   On an affected symbol the termination / stillbirth slash is redrawn in
   white clipped to the symbol outline, so it stays visible over the fill.
   The carrier dot (NSGC 2008 only, #115) is never drawn on an affected
-  symbol (the edit panel says so); a carrier condition (#115) or a gene
+  symbol (the Person tab says so); a carrier condition (#115) or a gene
   result text tag ("+/-" built-in suggestion in `tags.ts`) shows it.
 
 - `proband.ts` — proband and consultand arrows (#99, NSGC 2008 Fig. 1):
@@ -214,12 +214,12 @@ draws NSGC symbols.
   father/mother columns read `sex`. A non-binary person always gets the
   code (the diamond alone does not say their sex); a man who is male or a
   woman who is female gets none. Pregnancies and losses ignore any stored
-  gender identity, and the edit panel hides the field for them.
+  gender identity, and the Person tab hides the field for them.
 
 - `familyHistory.ts` — "family history not known" (#100, NSGC 2008 Fig. 2):
   `Individual.familyHistoryUnknown` draws a bold "?" above the symbol,
   centred, or 9px left of centre when a line of descent comes into the top
-  of the symbol (the person has parents drawn). Set from the edit panel
+  of the symbol (the person has parents drawn). Set from the Person tab
   checkbox and the more / right-click menus. `FamilyHistoryMark` on the
   canvas and legend, `renderFamilyHistorySvg` in both exporters (upright in
   the U-shape). It reaches about 13px above the row, inside the title gap.
@@ -232,18 +232,18 @@ draws NSGC symbols.
   it too. Read the setting through `notationOf`; test pedigrees without
   `canvasSettings` are 2008.
 - `conditions.ts` — affected and carrier per condition (#115). A condition
-  is a quadrant tag that is not a trait (`isConditionTag`; `Tag.kind:
+  is a `Tag` with `style: "quadrant"` that is not a trait (`isConditionTag`; `Tag.kind:
   "trait"`, #118, is a coloured section only: it takes a section in
   `sectionInfo` like a condition, is a plain tag in the store and menus,
   never affected, never solid black in monochrome). Test conditions with
   `isConditionTag` / `conditionTags`, never `style === "quadrant"`. A
-  condition tag in `Individual.tags` is affected with that condition, in
+  condition in `Individual.tags` is affected with that condition, in
   `Individual.carrierTags` a carrier of it. The plain flags are what the
   conditions do not say: `affected` is affected with something not
   recorded, `carrier` a carrier with no condition recorded. Recording or
   clearing a condition never sets or clears `affected` (#118: the old
   coupling made the flag beside a condition ambiguous, so marking someone
-  with a quadrant tag affected drew nothing). "Is this person affected?"
+  with a condition affected drew nothing). "Is this person affected?"
   is `isAffected` (layout-engine, re-exported here: the flag or any
   affected condition), used by PED/CSV, filters, sibling order, collapse
   and warnings; never read `ind.affected` for that. The plain Affected
@@ -254,7 +254,7 @@ draws NSGC symbols.
   the rules live in one place: recording a carrier condition clears the
   plain carrier flag; with exactly one condition the plain Affected and
   Carrier controls of A, the more menu and batch record it; with two or
-  more the menus ask per condition. The edit panel records a condition only
+  more the menus ask per condition. The Person tab records a condition only
   in "Conditions and tags" (`components/ConditionsAndTags.tsx`, #136), at any
   number of conditions, and once any is defined its Status shows only the
   plain flags (`PlainStatusForm`, which sets the flag itself, never the one
@@ -266,7 +266,7 @@ draws NSGC symbols.
   `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
   `carrierPaint` from tagFills.ts, plus the 2022 dotted half for a plain
   carrier as the `PLAIN_CARRIER_TAG` sector, left off when the person's
-  affected conditions cover the right half, which the edit panel then
+  affected conditions cover the right half, which the Person tab then
   reports as not drawn), black base, black centre,
   2008 dot. The black base is `plainAffected` in 2022 (sectors over it, the
   black centre on top) and `affectedControlOn` in 2008, so with two
@@ -292,13 +292,13 @@ draws NSGC symbols.
   exports keep the evaluations, details included, as they keep onset.
 
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected
-  status and `Individual.tagOnset` per quadrant tag, both free text since
+  status and `Individual.tagOnset` per condition, both free text since
   onset is often known only as "40s" or "childhood". `onsetsOf` is the one
   reader and skips values that no longer apply (not affected, tag not
-  carried, not a quadrant tag), so the panel, canvas and exports agree. The
+  carried, not a condition), so the panel, canvas and exports agree. The
   store also deletes them when the tag is untagged or deleted, or the
-  person is set unaffected. Edited in the panel next to "Affected" and
-  under each ticked quadrant tag row of the legend. Drawn under the symbol
+  person is set unaffected. Edited on the Person tab next to "Affected" and
+  beside each condition marked Affected in "Conditions and tags" (#136). Drawn under the symbol
   as "onset 40s" or "BC 45y" (tag abbrev, cut before the age is).
 
 - `validation.ts` — editor warnings (#116). `problemsOf(pedigree)` runs
@@ -306,8 +306,8 @@ draws NSGC symbols.
   and gives `{ id, rule, severity, individualId | partnershipId, field,
   message, fix? }`. A new check is one `Rule` with an `individual` or
   `partnership` function returning a draft; `RuleContext` is the place for
-  facts worked out once per pass (e.g. the condition tag count #115 needs).
-  `field` must be a `ProblemField` that the edit panel wraps in
+  facts worked out once per pass (e.g. the condition count #115 needs).
+  `field` must be a `ProblemField` that the Person tab wraps in
   `data-problem-field` (via `Field`'s `problemField` or `ProblemHighlight`),
   or the list cannot focus it. `fix.apply` gets the store as `FixActions`;
   add the setter a new fix needs to that interface. Problems only advise:
@@ -369,7 +369,7 @@ draws NSGC symbols.
   cross-generation link draws
   the older partner twice with the dashed arc, as kinship2 does; that is the
   layout, not a bug in the link.
-- `relatedness.ts` — what the edit panel's Relatedness section says (#32):
+- `relatedness.ts` — what the Person tab's Relatedness section says (#32):
   `formatCoefficient` (a fraction with its decimal up to a denominator of
   256, a decimal alone beyond), `degreeOfRelationship` (1/4 first degree,
   halving per degree, "between" when it lands in a gap) and `relatednessOf`.
@@ -393,7 +393,7 @@ draws NSGC symbols.
   only the coefficient and degree. That check is what keeps it honest, so do
   not relax it to "name the closest path". `pairLabels` names the two people
   (name, else "the unnamed female", else selection order).
-- `referenceRelatedness.ts` (#134): the edit panel's line for one person's
+- `referenceRelatedness.ts` (#134): the Person tab's line for one person's
   relationship to each proband and to each consultand who is not a proband
   (so the consultands alone when nobody is proband; this differs from
   `referencePeople` in `viewFilters.ts`, which drops the consultands once
@@ -529,7 +529,7 @@ draws NSGC symbols.
   would hide someone new (`filterHidingNew`), so an added unaffected child
   never vanishes into a count. "Affected only" seeds are affected, carrier
   (plain or of a condition, #115),
-  proband, consultand and quadrant-tag people; their ancestors are kept, and
+  proband, consultand and people with a condition; their ancestors are kept, and
   a seed with no parents and no drawn children keeps their partners (an
   affected person who married in would otherwise float). Half sibs by a
   partner who is not kept are not drawn or counted. `affectedCondition`
@@ -606,7 +606,7 @@ draws NSGC symbols.
   an isolated founder: `families.ts` keeps her in the child's family and
   `alignPedigree` appends her to the row above the child, not the top row.
   Editing: `applyAddDonor` / `applyAddSurrogate` (store `addDonor`,
-  `addSurrogate`, more menu "Assisted reproduction"); the edit panel's
+  `addSurrogate`, more menu "Assisted reproduction"); the Person tab's
   `AssistedForm` sets the letter, carrier and social parents.
 - `sameSex.ts`: same-sex couples (#105, NSGC 2022 Fig. 5). Partners may
   share a sex; a child's genetic parents (its `parentOf` partnership) may
@@ -651,7 +651,7 @@ renderer:
 1. age (`ageText`): the free-text `Individual.age` when set, otherwise the
    year of birth, "b. 1978" (#20). NSGC prefers a year or an age to a full
    date for privacy, so the full DOB is never drawn; it stays in the data,
-   the edit panel and CSV. A DOB not starting with a year (the age range a
+   the Person tab and CSV. A DOB not starting with a year (the age range a
    de-identified export puts in `dob`) is drawn as it is. One line, on
    purpose: a two-line name plus DOB plus age ran into the sibship bar
    halfway to the next row, so the age replaces the year. The date of death

@@ -30,7 +30,7 @@ const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--
                       Turn on "Name consanguineous relationships" first, so
                       every double line the pedigree can name has text above
                       it (#97, #109). Examples and fixtures only.
-  --monochrome        Turn on "Tag fills: black and white patterns" first
+  --monochrome        Set "Conditions and tags drawn in: black and white patterns" first
                       (#67), so every quadrant tag is drawn as a pattern.
                       Examples and fixtures only.
 

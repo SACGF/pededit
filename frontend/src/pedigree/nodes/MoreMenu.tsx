@@ -13,7 +13,7 @@ import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
-import { CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
+import { CONDITIONS_AND_TAGS, CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { coupleChildren, donorPairFor, sameSexCouple } from "../sameSex";
 
 function clampCount(n: number): number {
@@ -299,7 +299,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
         )}
 
         {menuTags(pedigree).length > 0 && (
-          <MenuSection label="Tags">
+          <MenuSection label={menuTagsLabel(pedigree)}>
             {menuTags(pedigree).map(tag => {
               const on = individual.tags?.includes(tag.id) ?? false;
               return (
@@ -439,7 +439,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               onClick={() => action(() => setLifeStatus(individualId, o.value))}
               active={individual.lifeStatus === o.value}
               disabled={isLifeStatusLocked}
-              title={isLifeStatusLocked ? "Not available: this individual has a partner or children" : undefined}
+              title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
             >
               {o.label}
             </MenuItem>
@@ -993,7 +993,7 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
       )}
 
       {menuTags(pedigree).length > 0 && (
-        <MenuSection label={`Tags of ${n}`}>
+        <MenuSection label={`${menuTagsLabel(pedigree)} of ${n}`}>
           {menuTags(pedigree).map(tag => {
             const count = st.tags[tag.id] ?? 0;
             const all = count === n;
@@ -1068,6 +1068,15 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
 function menuTags(pedigree: Pedigree): Tag[] {
   const tags = pedigree.tags ?? [];
   return conditionMode(pedigree) === "per-condition" ? tags.filter(t => !isConditionTag(t)) : tags;
+}
+
+/**
+ * The heading over `menuTags`: "Tags" once the conditions have their own
+ * section, "Conditions and tags" while the sole condition is listed here too
+ * (glossary in the root AGENTS.md: a tag is anything that is not a condition).
+ */
+function menuTagsLabel(pedigree: Pedigree): string {
+  return menuTags(pedigree).some(isConditionTag) ? CONDITIONS_AND_TAGS : "Tags";
 }
 
 function ConditionItemLabel({ tag, text, on }: { tag: Tag; text: string; on: boolean }) {

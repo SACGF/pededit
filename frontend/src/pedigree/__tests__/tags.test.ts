@@ -163,7 +163,7 @@ describe("string SVG rendering", () => {
     p.individuals[1]!.deceased = true;
     const key = renderExportKeySvg(p, 0, 0);
     const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
-    expect(labels).toEqual(["Affected", "Affected, with tags (black centre)", "Carrier", "Deceased", "Tremor"]);
+    expect(labels).toEqual(["Affected", "Affected, with conditions (black centre)", "Carrier", "Deceased", "Tremor"]);
     expect(key.height).toBe(5 * 20);
   });
 

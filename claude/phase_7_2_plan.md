@@ -2,6 +2,8 @@
 
 *Define tags per pedigree, apply them to individuals, and choose how each tag is drawn: a coloured quarter of the symbol, a coloured dot, or short coloured text under the symbol. A legend is generated automatically. Signed-in users can keep a personal tag library to reuse across pedigrees.*
 
+Written before the wording settled: the app now calls this "Conditions and tags", a quadrant tag is a condition or trait filling a section, and the personal tag library is "My library". See the glossary in the root `AGENTS.md` (#137).
+
 ---
 
 ## What the issue asks for

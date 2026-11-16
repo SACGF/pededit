@@ -176,7 +176,7 @@ export const VIEW_FILTERS: readonly ViewFilterControl[] = [
   {
     id: "affectedOnly",
     label: "Affected only",
-    description: "Draw affected people, carriers, people with a condition tag, the proband and the consultand, with their ancestors. Other siblings become one numbered symbol.",
+    description: "Draw affected people, carriers, people with a condition, the proband and the consultand, with their ancestors. Other siblings become one numbered symbol.",
     on: f => f?.affectedOnly === true,
     patch: on => on ? { affectedOnly: true } : { affectedOnly: undefined, affectedCondition: undefined },
     result: affectedOnlyResult,

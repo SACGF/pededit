@@ -336,7 +336,7 @@ export const RULES: Rule[] = [
           out.push({
             severity: "warning",
             field: "conditions",
-            message: "Affected, but with which condition? The key shows it as \"Affected (condition not recorded)\".",
+            message: "Affected, but with which condition? The legend shows it as \"Affected (condition not recorded)\".",
             ...perCondition(ctx.conditions, record),
           });
         } else {
@@ -354,7 +354,7 @@ export const RULES: Rule[] = [
         out.push({
           severity: "warning",
           field: "conditions",
-          message: "A carrier, but of which condition? The key shows it as \"Carrier (condition not recorded)\".",
+          message: "A carrier, but of which condition? The legend shows it as \"Carrier (condition not recorded)\".",
           ...perCondition(ctx.conditions, t => ({ label: `Record as ${carrierLabel(t)}`, apply: a => a.setConditionStatus(ind.id, t.id, "carrier") })),
         });
       }
@@ -663,7 +663,7 @@ export const RULES: Rule[] = [
       const fixed = missingReferences(ind, ctx.pedigree, ctx.byId);
       return !!fixed && {
         severity: "warning",
-        message: "Refers to a tag or person that is not in the pedigree.",
+        message: "Refers to a condition, tag or person that is not in the pedigree.",
         fix: { label: "Remove what is missing", apply: a => a.updateIndividual(ind.id, fixed) },
       };
     },

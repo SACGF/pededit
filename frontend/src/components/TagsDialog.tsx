@@ -21,6 +21,9 @@ interface TagsDialogProps {
 
 const STYLES: TagStyle[] = ["quadrant", "dot", "text"];
 
+/** What the style select shows: the code's "quadrant" is a section, which can be the whole symbol or a half (#115). */
+const STYLE_NAMES: Record<TagStyle, string> = { quadrant: "section", dot: "dot", text: "text" };
+
 // ── Colour picker ─────────────────────────────────────────────────────────────
 
 function ColorSwatch({ color, style, fill, size = 14 }: { color: string; style: TagStyle; fill?: TagFill; size?: number }) {
@@ -94,14 +97,16 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     if (!open || !isAuthenticated) return;
     tagPresetApi.list()
       .then(({ data }) => { setPresets(data); setPresetsError(null); })
-      .catch(() => setPresetsError("Could not load your tag library."));
+      .catch(() => setPresetsError("Could not load your library."));
   }, [open, isAuthenticated]);
 
   function handleAdd() {
-    // Four quarters is the readable limit, so a fifth tag starts as a dot rather
-    // than silently turning every quarter into a pie slice.
+    // Four quarters is the readable limit, so a fifth starts as a dot tag rather
+    // than silently turning every quarter into a pie slice. A new section is a
+    // condition until set to trait, so it is named as one.
     const style: TagStyle = quads.length < 4 ? "quadrant" : "dot";
-    addTag({ label: `Tag ${tags.length + 1}`, color: nextTagColor(tags), style });
+    const label = style === "quadrant" ? `Condition ${quads.length + 1}` : `Tag ${tags.length - quads.length + 1}`;
+    addTag({ label, color: nextTagColor(tags), style });
   }
 
   function handleAddFromPreset(p: TagPresetPayload) {
@@ -115,7 +120,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
       });
       setPresets(prev => [...prev, data].sort((a, b) => a.label.localeCompare(b.label)));
     } catch {
-      setPresetsError("Could not save to your tag library.");
+      setPresetsError("Could not save to your library.");
     }
   }
 
@@ -124,7 +129,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
       await tagPresetApi.delete(id);
       setPresets(prev => prev.filter(p => p.id !== id));
     } catch {
-      setPresetsError("Could not remove the tag from your library.");
+      setPresetsError("Could not remove it from your library.");
     }
   }
 
@@ -143,21 +148,22 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
 
         <div className="space-y-4">
           <p className="text-xs text-gray-500">
-            Tags mark individuals with a condition, a genotype or a sample status.
-            A quadrant tag fills a quarter of the symbol; the order below sets which quarter.
-            Its fill can be solid or a pattern (hatched, lines, dotted) drawn in the tag's colour.
-            A quadrant is a condition (the person is affected with it) unless set to trait: a coloured
-            section that says nothing about affected status, such as a cohort or a sample.
+            A condition fills a section of the symbol for the people affected with it, and the
+            hatched section for its carriers. The order below sets which section (the whole symbol,
+            a half or a quarter, by how many are in use). Its fill can be solid or a pattern (hatched,
+            lines, dotted) drawn in its colour. A section set to trait is coloured only and says
+            nothing about affected status, such as a cohort or a sample. Dot and text tags mark a
+            genotype or a sample status under the symbol.
           </p>
           {tagFillMode(pedigree) === "monochrome" && (
             <p className="text-[10px] text-gray-500">
-              Settings has tag fills set to black and white: every tag is drawn in black, and quadrant tags
-              with a solid fill get a pattern of their own.
+              Settings draws conditions and tags in black and white: every one is drawn in black, and
+              conditions and traits with a solid fill get a pattern of their own.
             </p>
           )}
 
           {tags.length === 0 ? (
-            <p className="text-xs text-gray-400">No tags yet.</p>
+            <p className="text-xs text-gray-400">None defined yet.</p>
           ) : (
             <div className="border divide-y">
               {tags.map((tag, i) => {
@@ -179,7 +185,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                       title={TAG_STYLE_LABELS[tag.style]}
                       className="h-6 text-xs border rounded px-1 bg-white"
                     >
-                      {STYLES.map(st => <option key={st} value={st}>{st}</option>)}
+                      {STYLES.map(st => <option key={st} value={st}>{STYLE_NAMES[st]}</option>)}
                     </select>
 
                     {tag.style === "quadrant" && (
@@ -191,7 +197,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                           const fill = e.target.value as TagFill;
                           updateTag(tag.id, { fill: fill === "solid" ? undefined : fill });
                         }}
-                        title="How the tag fills its part of the symbol, in the tag's colour"
+                        title="How it fills its section of the symbol, in its colour"
                         className="h-6 w-28 shrink-0 text-xs border rounded px-1 bg-white"
                       >
                         {TAG_FILL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -226,7 +232,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                       {position?.name}
                     </span>
 
-                    <span className="w-5 shrink-0 text-[10px] text-gray-400 text-right" title="Individuals with this tag">
+                    <span className="w-5 shrink-0 text-[10px] text-gray-400 text-right" title="People with this">
                       {usageCount(tag.id)}
                     </span>
 
@@ -238,14 +244,14 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                     </IconButton>
                     {isAuthenticated && (
                       <IconButton
-                        title={inLibrary(tag) ? "Already in your library" : "Save to my tag library"}
+                        title={inLibrary(tag) ? "Already in your library" : "Save to my library"}
                         disabled={inLibrary(tag) || !tag.label.trim()}
                         onClick={() => handleSaveToLibrary(tag)}
                       >
                         <BookmarkPlus size={12} />
                       </IconButton>
                     )}
-                    <IconButton title="Delete tag" destructive onClick={() => deleteTag(tag.id)}>
+                    <IconButton title="Delete" destructive onClick={() => deleteTag(tag.id)}>
                       <Trash2 size={12} />
                     </IconButton>
                   </div>
@@ -256,14 +262,14 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
 
           {quads.length > 4 && (
             <p className="text-[10px] text-gray-500">
-              More than four quadrant tags: the first four keep their quarter. Anyone with a fifth or later
-              quadrant tag has their quadrant tags drawn as equal slices, clockwise from the top.
+              More than four conditions and traits: the first four keep their quarter. Anyone with a fifth
+              or later has their sections drawn as equal slices, clockwise from the top.
             </p>
           )}
 
           <div className="flex flex-wrap items-center gap-1.5">
             <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={handleAdd}>
-              <Plus size={12} /> Add tag
+              <Plus size={12} /> Add condition or tag
             </Button>
             {unusedTagSuggestions(pedigree).map(s => (
               <button
@@ -281,12 +287,12 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
           {isAuthenticated && (
             <div className="border-t pt-3">
               <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                My tag library
+                My library
               </div>
               {presetsError && <p className="text-[10px] text-red-600 mb-1">{presetsError}</p>}
               {presets.length === 0 ? (
                 <p className="text-[10px] text-gray-400">
-                  Save a tag with the bookmark button to reuse it in other pedigrees.
+                  Save a condition or tag with the bookmark button to reuse it in other pedigrees.
                 </p>
               ) : (
                 <ul className="space-y-0.5">
@@ -294,7 +300,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                     <li key={p.id} className="flex items-center gap-2 text-xs">
                       <ColorSwatch color={p.color} style={p.style} size={10} />
                       <span className="flex-1 truncate">{p.label}</span>
-                      <span className="text-[10px] text-gray-400">{p.style}</span>
+                      <span className="text-[10px] text-gray-400">{STYLE_NAMES[p.style]}</span>
                       <button
                         type="button"
                         onClick={() => handleAddFromPreset(p)}

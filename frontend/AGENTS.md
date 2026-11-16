@@ -38,7 +38,8 @@ stub so the app still builds without Google login.
   localStorage `recentPedigrees`, recorded by `openPedigree`, renamed by
   `renamePedigree`, dropped by `deletePedigree` and by a 404 on open. It is
   per browser and never sent to the server. Signing in (Google or GitHub)
-  only adds the "Your pedigrees" list and the per-user tag library.
+  only adds the "Your pedigrees" list and "My library" of conditions and
+  tags.
 - `Individual.sex` is biological sex and drives every genetic calculation;
   an optional `genderIdentity` can change only the symbol drawn (#26,
   `pedigree/gender.ts`, see root AGENTS.md "Biological sex notation").
@@ -46,7 +47,7 @@ stub so the app still builds without Google login.
   children (`addPartner`; the layout engine feeds them to kinship2 as
   `childlessCouples`, which R has no way to express; `Partnership.childless`
   adds the NSGC infertility / no-children-by-choice mark under the couple
-  line, #15, set from the edit panel or more menu and cleared when a child is
+  line, #15, set from the Person tab or more menu and cleared when a child is
   added), a single known parent (`addParent` inserts an
   unknown-sex placeholder partner because kinship2 needs 0 or 2 parents;
   every auto partner is made with `placeholder: true`, and while nothing is
@@ -141,7 +142,7 @@ stub so the app still builds without Google login.
   canvas settings, tags. All edits go through immer `produce` and push an undo
   snapshot. Add new edits here, not in components.
   Selection (#21) is `selectedIds` (every selected person) plus `selectedId`,
-  the primary (last clicked) one that the edit panel and single-person menu
+  the primary (last clicked) one that the Person tab and single-person menu
   items read. Change it only through `setSelectedId` / `toggleSelected` /
   `setSelection` / `selectDescendants`, which keep the two in step; every
   edit, undo and redo drops ids that no longer exist. `selectedPair(state)`
@@ -173,7 +174,8 @@ stub so the app still builds without Google login.
   checkboxes, and the "Add / edit" button), and the Relatedness section of
   #32 with the double-line checkbox of #85).
   "Conditions and tags" (`CONDITIONS_AND_TAGS`) is the user-facing name for
-  what the tags dialog defines; "tag" stays the code's word.
+  what the tags dialog defines; "tag" stays the code's word. Every other
+  user-facing word follows the glossary in the root `AGENTS.md` (#137).
   The Status section edits sex, affected, proband and consultand with the
   more menu's store actions and rules (#120: refused sexes disabled with
   `batchSexProblem`'s reason written out); keep the two in step when a rule

@@ -52,7 +52,7 @@ sudo -u postgres psql -c "CREATE USER pededit WITH PASSWORD 'pededit';"
 sudo -u postgres psql -c "CREATE DATABASE pededit OWNER pededit;"
 ```
 
-Google and GitHub sign-in are optional: add `google_client_id`, `github_client_id` and `github_client_secret` to the config to enable them. Without them everything works except "Your pedigrees" and the tag library.
+Google and GitHub sign-in are optional: add `google_client_id`, `github_client_id` and `github_client_secret` to the config to enable them. Without them everything works except "Your pedigrees" and "My library" of conditions and tags.
 
 ### 3. Set up the backend
 

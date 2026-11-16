@@ -171,10 +171,10 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               </div>
             </div>
             <div className="mt-2">
-              <div className="text-sm">Tag fills</div>
+              <div className="text-sm">Conditions and tags drawn in</div>
               <select
                 name="tagFills"
-                aria-label="Tag fills"
+                aria-label="Conditions and tags drawn in"
                 value={tagFillMode(pedigree)}
                 onChange={e => updateCanvasSettings({ tagFills: e.target.value as TagFillMode })}
                 className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
@@ -182,7 +182,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 {TAG_FILL_MODE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
               <div className="text-xs text-gray-400 mt-1">
-                Black and white draws every tag in black and gives each quadrant tag a pattern (its own, or one chosen for it), on the canvas and in exports, for print and journals.
+                Black and white draws every condition and tag in black and gives each condition and trait a pattern (its own, or one chosen for it), on the canvas and in exports, for print and journals.
               </div>
             </div>
           </div>

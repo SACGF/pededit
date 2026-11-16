@@ -30,7 +30,8 @@ supplied.
   storing `validated_data`: DRF drops undeclared keys and fills defaults,
   which lost `lifeStatus` on every save. Still add new `types.ts` fields to
   the serializer so they get validated.
-- `TagPreset` — a signed-in user's reusable tag library. Pedigrees always
+- `TagPreset` — a signed-in user's saved condition or tag ("My library"
+  in the Conditions and tags dialog). Pedigrees always
   carry their own copy of tags, so presets are a convenience only.
 
 ## Access rules (`api/views.py`)

@@ -66,7 +66,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 
 | Rule | PedEdit |
 |---|---|
-| Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the edit panel and CSV. "Deceased" alone means date unknown. |
+| Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the Person tab and CSV. "Deceased" alone means date unknown. |
 | Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |
 
@@ -132,8 +132,8 @@ Further Fig. 3 and Fig. 4 points:
   symptoms, a dot hides under a fill, and screening often finds several
   carrier results. The vertical line stays, "typically for dominant
   conditions", with the condition in the key. PedEdit follows this (#115,
-  `symbolPaint` in `tags.ts`, `conditions.ts`): a condition (quadrant tag)
-  has a per-person state, affected or carrier (`Individual.carrierTags`).
+  `symbolPaint` in `tags.ts`, `conditions.ts`): a condition (a section `Tag`
+  that is not a trait) has a per-person state, affected or carrier (`Individual.carrierTags`).
   Affected fills the condition's section in its fill; carrier fills the
   same section hatched in its colour (or, for a patterned condition, the
   same pattern in a lighter tint), keyed "Cystic fibrosis carrier". As
@@ -147,7 +147,7 @@ Further Fig. 3 and Fig. 4 points:
   branch, #94) do not count, since NSGC divides what the chart shows; the
   Affected only filter (#4) keeps everyone with a condition, so it never
   changes the count. Sections go to the conditions in use in the order of
-  the tags dialog, so each keeps the same section on every symbol and
+  the Conditions and tags dialog, so each keeps the same section on every symbol and
   position still names it; they move only when a condition comes into or
   goes out of use. NSGC shades the symbol for a single condition, so in
   black and white mode the one condition in use is solid black, keyed with
@@ -202,10 +202,10 @@ in colour, and offers sixteen quadrant shading patterns instead of colours;
 pedigreejs and Schematex use coloured pie slices or quadrants with a key.
 Journals that print in black and white need the pattern form.
 
-PedEdit: each quadrant tag can be solid, diagonal hatch, horizontal lines,
-vertical lines, cross-hatch, dots, or a light shade, drawn in the tag's
-colour on white (`Tag.fill`), and the pedigree setting "Tag fills: black and
-white patterns" (`canvasSettings.tagFills`) draws every tag in black with a
+PedEdit: each condition or trait can be solid, diagonal hatch, horizontal lines,
+vertical lines, cross-hatch, dots, or a light shade, drawn in its
+colour on white (`Tag.fill`), and the pedigree setting "Conditions and tags
+drawn in: Black and white patterns" (`canvasSettings.tagFills`) draws every one in black with a
 pattern each, on the canvas and in exports. To keep them apart from marks
 with a meaning of their own, the textures are fine (lines 4px apart on a
 40px symbol): a single vertical line is the presymptomatic carrier, a single
@@ -324,9 +324,9 @@ sex" mode nothing on the chart shows that a gender identity is recorded. The 202
 use for groups.
 
 **Trait sections (#118, opt-in, agreed with the maintainer).** NSGC shading
-always means a condition or phenotype, defined in the key. PedEdit's quadrant
-tags are conditions by default and follow that. A quadrant tag can instead be
-set to "trait" in the Tags dialog (`Tag.kind`): a coloured section for
+always means a condition or phenotype, defined in the key. PedEdit's sections
+are conditions by default and follow that. A section can instead be
+set to "trait" in the Conditions and tags dialog (`Tag.kind`): a coloured section for
 something that is not a condition (a cohort, a biobank sample, a family
 trait), named in the key like any section, and ignored by everything that
 asks who is affected (PED, CSV, the Affected only filter, the proband

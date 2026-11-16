@@ -202,7 +202,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
         <select
           value={individual.lifeStatus ?? ""}
           disabled={isLifeStatusLocked}
-          title={isLifeStatusLocked ? "Not available: this individual has a partner or children" : undefined}
+          title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
           onChange={e => setLifeStatus(individual.id, (e.target.value || undefined) as LifeStatus | undefined)}
           className="w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black disabled:opacity-50"
         >
@@ -1085,7 +1085,7 @@ function ClinicalDetailsSection() {
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
         className="flex items-center gap-1 text-xs text-gray-600 hover:text-black"
-        title="Reason for referral, ancestry, historian, recorder and date, for the key (NSGC)"
+        title="Reason for referral, ancestry, historian, recorder and date, for the legend and the export key (NSGC)"
       >
         {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
         Clinical details
@@ -1119,7 +1119,7 @@ function ClinicalDetailsSection() {
             );
           })}
           <p className="text-[10px] text-gray-500">
-            Filled fields are listed in the key and in exports. De-identified exports leave them all out.
+            Filled fields are listed in the legend and the export key. De-identified exports leave them all out.
           </p>
         </div>
       )}

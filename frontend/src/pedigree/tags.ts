@@ -739,7 +739,7 @@ function renderLifeStatusSwatchSvg(status: NonNullable<Individual["lifeStatus"]>
  * The Affected / Carrier rows of a key (#115), shared by the in-app legend
  * and the export key: who each row's swatch is drawn for (its shape), and its
  * label. Follows what is drawn (`symbolPaint`):
- * - NSGC 2008: "Affected" for a black fill, "Affected, with tags (black
+ * - NSGC 2008: "Affected" for a black fill, "Affected, with conditions (black
  *   centre)", "Carrier" for the dot, as before;
  * - NSGC 2022: "Affected" only for a solid black fill (affected with no
  *   condition recorded), "Affected, condition not recorded (black centre)"
@@ -767,7 +767,7 @@ export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = 
       affected: paints.find(({ p }) => p.base === "black")?.i,
       affectedLabel: anyPlainAffected ? plainStatusLabel("Affected", pedigree) : "Affected",
       core: paints.find(({ p }) => p.core)?.i,
-      coreLabel: "Affected, with tags (black centre)",
+      coreLabel: "Affected, with conditions (black centre)",
       carrier: paints.find(({ p }) => p.dot)?.i,
       carrierLabel: plainStatusLabel("Carrier", pedigree),
       carrierHalf: false,

@@ -85,7 +85,7 @@ export function PickingBanner() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Or type a name to pick"
-            aria-label="Search individuals to pick"
+            aria-label="Search people to pick"
             className="w-full h-6 border rounded px-2 text-xs focus:outline-hidden focus:ring-1 focus:ring-black"
           />
           {matches.length > 0 && (
