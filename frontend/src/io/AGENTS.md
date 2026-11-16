@@ -186,6 +186,19 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   path, so figure exports draw whatever the canvas shows with no export
   option of their own.
 - `types.ts` — `SvgExportOptions`.
+- Snapshots (#69): `__tests__/svgSnapshots.test.ts` exports every example
+  and every feature fixture (#140) as the standard SVG (normal and compact,
+  fixtures also de-identified) and the U-shape, and compares each with a
+  committed file in `__tests__/snapshots/` (numbers with four or more
+  decimals rounded to two). The lints check structure; this is what notices
+  a change in how something looks. A refactoring must leave them alone. A
+  change that is meant to move something: rerun with
+  `npm -w frontend run test -- -u svgSnapshots`, look at old and new
+  (`shot.mjs FILE.svg`), and say what changed in the commit message. Adding
+  an example or fixture writes its files on the first local run; CI fails on
+  a missing file, so commit them. The export must stay the same from one run
+  to the next: no ids from counters that outlive a call, no dates, no
+  `Math.random`.
 
 `__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render
 helpers, not tests.

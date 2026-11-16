@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="493"
+     viewBox="0 0 1480 493">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="1480" height="493" fill="white"/>
+<text class="chart-title" x="740" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Assisted reproduction</text>
+<g transform="translate(60 100)">
+<g class="couple-lines">
+<path d="M 68 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 306 0 L 374 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 646 0 L 714 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 986 0 L 1054 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1292 0 L 1360 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 612 84 L 680 84" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="20" y1="20" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="68" y1="20" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="340" y1="0" x2="340" y2="42" stroke="black" stroke-width="2"/>
+<line x1="340" y1="42" x2="340" y2="42" stroke="black" stroke-width="2"/>
+<line x1="340" y1="42" x2="340" y2="64" stroke="black" stroke-width="2"/>
+<line x1="680" y1="0" x2="680" y2="42" stroke="black" stroke-width="2"/>
+<line x1="680" y1="42" x2="680" y2="42" stroke="black" stroke-width="2"/>
+<line x1="680" y1="42" x2="680" y2="64" stroke="black" stroke-width="2"/>
+<line x1="918" y1="20" x2="918" y2="64" stroke="black" stroke-width="2"/>
+<line x1="966" y1="20" x2="918" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1244" y1="20" x2="1292" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1292" y1="20" x2="1292" y2="64" stroke="black" stroke-width="2"/>
+<line x1="646" y1="84" x2="646" y2="126" stroke="black" stroke-width="2"/>
+<line x1="646" y1="126" x2="748" y2="126" stroke="black" stroke-width="2"/>
+<line x1="748" y1="126" x2="748" y2="148" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+<line x1="428.56" y1="13.44" x2="340" y2="64" stroke="black" stroke-width="2"/>
+<line x1="748" y1="104" x2="748" y2="148" stroke="black" stroke-width="2"/>
+</g>
+<g class="duplicate-arcs">
+</g>
+<g class="symbols">
+<g transform="translate(0 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(68 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(136 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(306 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(374 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(442 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(646 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(714 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(918 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(986 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1054 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1224 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(1292 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1360 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(68 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(340 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+</g>
+<g transform="translate(612 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(680 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(748 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">S</text>
+</g>
+<g transform="translate(918 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(1292 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(748 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+</g>
+<g class="labels">
+<text x="136" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+<text x="306" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+<text x="1360" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 353)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<polygon points="48,22 56,30 48,38 40,30" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="33.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Pregnancy</text>
+<rect x="40" y="42" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="53.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">D</text><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Sperm or egg donor (D)</text>
+<circle cx="48" cy="70" r="8" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="73.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">S</text><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Surrogate (S)</text>
+<line x1="42" y1="83" x2="54" y2="97" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Carried the pregnancy, not the genetic mother</text>
+</g>
+</svg>

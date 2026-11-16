@@ -1,0 +1,379 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1275" height="622"
+     viewBox="0 0 1275 622">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="1275" height="622" fill="white"/>
+<text class="chart-title" x="637.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Queen Victoria · haemophilia B</text>
+<g transform="translate(126 100)">
+<g class="couple-lines">
+<path d="M 441.88 0 L 509.88 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 269.75 84 L 337.75 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 677.75 84 L 745.75 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 898.65 84 L 966.65 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 166 L 68 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 170 L 68 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 408 168 L 476 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 612 168 L 680 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 884 168 L 952 168" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="475.88" y1="0" x2="475.88" y2="42" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="966.65" y2="42" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="201.75" y1="42" x2="201.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="337.75" y1="42" x2="337.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="405.75" y1="42" x2="405.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="473.75" y1="42" x2="473.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="541.75" y1="42" x2="541.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="609.75" y1="42" x2="609.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="677.75" y1="42" x2="677.75" y2="64" stroke="black" stroke-width="2"/>
+<line x1="966.65" y1="42" x2="966.65" y2="64" stroke="black" stroke-width="2"/>
+<line x1="34" y1="84" x2="34" y2="126" stroke="black" stroke-width="2"/>
+<line x1="0" y1="126" x2="34" y2="126" stroke="black" stroke-width="2"/>
+<line x1="0" y1="126" x2="0" y2="148" stroke="black" stroke-width="2"/>
+<line x1="303.75" y1="84" x2="303.75" y2="126" stroke="black" stroke-width="2"/>
+<line x1="68" y1="126" x2="544" y2="126" stroke="black" stroke-width="2"/>
+<line x1="68" y1="126" x2="68" y2="148" stroke="black" stroke-width="2"/>
+<line x1="136" y1="126" x2="136" y2="148" stroke="black" stroke-width="2"/>
+<line x1="204" y1="126" x2="204" y2="148" stroke="black" stroke-width="2"/>
+<line x1="272" y1="126" x2="272" y2="148" stroke="black" stroke-width="2"/>
+<line x1="340" y1="126" x2="340" y2="148" stroke="black" stroke-width="2"/>
+<line x1="476" y1="126" x2="476" y2="148" stroke="black" stroke-width="2"/>
+<line x1="544" y1="126" x2="544" y2="148" stroke="black" stroke-width="2"/>
+<line x1="711.75" y1="84" x2="711.75" y2="126" stroke="black" stroke-width="2"/>
+<line x1="680" y1="126" x2="748" y2="126" stroke="black" stroke-width="2"/>
+<line x1="680" y1="126" x2="680" y2="148" stroke="black" stroke-width="2"/>
+<line x1="748" y1="126" x2="748" y2="148" stroke="black" stroke-width="2"/>
+<line x1="932.65" y1="84" x2="932.65" y2="126" stroke="black" stroke-width="2"/>
+<line x1="816" y1="126" x2="1088" y2="126" stroke="black" stroke-width="2"/>
+<line x1="816" y1="126" x2="816" y2="148" stroke="black" stroke-width="2"/>
+<line x1="952" y1="126" x2="952" y2="148" stroke="black" stroke-width="2"/>
+<line x1="1020" y1="126" x2="1020" y2="148" stroke="black" stroke-width="2"/>
+<line x1="1088" y1="126" x2="1088" y2="148" stroke="black" stroke-width="2"/>
+<line x1="34" y1="168" x2="34" y2="210" stroke="black" stroke-width="2"/>
+<line x1="-34" y1="210" x2="102" y2="210" stroke="black" stroke-width="2"/>
+<line x1="-34" y1="210" x2="-34" y2="232" stroke="black" stroke-width="2"/>
+<line x1="34" y1="210" x2="34" y2="232" stroke="black" stroke-width="2"/>
+<line x1="102" y1="210" x2="102" y2="232" stroke="black" stroke-width="2"/>
+<line x1="442" y1="168" x2="442" y2="210" stroke="black" stroke-width="2"/>
+<line x1="204.68" y1="210" x2="476.68" y2="210" stroke="black" stroke-width="2"/>
+<line x1="204.68" y1="210" x2="204.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="272.68" y1="210" x2="272.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="340.68" y1="210" x2="340.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="408.68" y1="210" x2="408.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="476.68" y1="210" x2="476.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="646" y1="168" x2="646" y2="210" stroke="black" stroke-width="2"/>
+<line x1="544.68" y1="210" x2="680.68" y2="210" stroke="black" stroke-width="2"/>
+<line x1="544.68" y1="210" x2="544.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="612.68" y1="210" x2="612.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="680.68" y1="210" x2="680.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="918" y1="168" x2="918" y2="210" stroke="black" stroke-width="2"/>
+<line x1="748.68" y1="210" x2="1088.68" y2="210" stroke="black" stroke-width="2"/>
+<line x1="748.68" y1="210" x2="748.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="816.68" y1="210" x2="816.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="884.68" y1="210" x2="884.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="952.68" y1="210" x2="952.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="1020.68" y1="210" x2="1020.68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="1088.68" y1="210" x2="1088.68" y2="232" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+</g>
+<g class="duplicate-arcs">
+</g>
+<g class="symbols">
+<g transform="translate(441.88 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(509.88 0)">
+<clipPath id="symbol-clip-0-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-0-1-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-0-1)"/><g clip-path="url(#symbol-clip-0-1)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-0-1-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(0 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(68 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(201.75 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(269.75 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(337.75 84)">
+<clipPath id="symbol-clip-1-4"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-1-4-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-1-4)"/><g clip-path="url(#symbol-clip-1-4)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-1-4-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(405.75 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(473.75 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(541.75 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(609.75 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(677.75 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(745.75 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(898.65 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(966.65 84)">
+<clipPath id="symbol-clip-1-12"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-1-12-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-1-12)"/><g clip-path="url(#symbol-clip-1-12)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-1-12-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(0 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(68 168)">
+<clipPath id="symbol-clip-2-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-2-1-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-2-1)"/><g clip-path="url(#symbol-clip-2-1)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-2-1-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(136 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(204 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(272 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(340 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(408 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(476 168)">
+<clipPath id="symbol-clip-2-7"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-2-7-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-2-7)"/><g clip-path="url(#symbol-clip-2-7)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-2-7-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(544 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(612 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(680 168)">
+<clipPath id="symbol-clip-2-10"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-2-10-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-2-10)"/><g clip-path="url(#symbol-clip-2-10)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-2-10-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(748 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(816 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(884 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(952 168)">
+<clipPath id="symbol-clip-2-14"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-2-14-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-2-14)"/><g clip-path="url(#symbol-clip-2-14)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-2-14-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(1020 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(1088 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(-34 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(34 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(102 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(204.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(272.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(340.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(408.68 252)">
+<clipPath id="symbol-clip-3-6"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-3-6-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-3-6)"/><g clip-path="url(#symbol-clip-3-6)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-3-6-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(476.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(544.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(612.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(680.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(748.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(816.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(884.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(952.68 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(1020.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(1088.68 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+</g>
+<g class="labels">
+<text x="441.88" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Prince Albert</title>Prince</text>
+<text x="441.88" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Albert</text>
+<text x="509.88" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Queen Victoria</title>Queen</text>
+<text x="509.88" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Victoria</text>
+<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Frederick III</title>Frederick</text>
+<text x="0" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III</text>
+<text x="68" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Victoria, Princess Royal</title>Victoria,</text>
+<text x="68" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Princess…</text>
+<text x="201.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Edward VII</text>
+<text x="269.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Louis IV of Hesse</title>Louis IV</text>
+<text x="269.75" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Hesse</text>
+<text x="337.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alice</text>
+<text x="405.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alfred</text>
+<text x="473.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helena</text>
+<text x="541.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Louise</text>
+<text x="609.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arthur</text>
+<text x="677.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Leopold</text>
+<text x="745.75" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Helen of Waldeck</title>Helen of</text>
+<text x="745.75" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Waldeck</text>
+<text x="898.65" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Henry of Battenberg</title>Henry of</text>
+<text x="898.65" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Battenberg</text>
+<text x="966.65" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Beatrice</text>
+<text x="0" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Henry of Prussia</title>Henry of</text>
+<text x="0" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Prussia</text>
+<text x="68" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Irene of Hesse</title>Irene of</text>
+<text x="68" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Hesse</text>
+<text x="136" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Victoria of Hesse</title>Victoria</text>
+<text x="136" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Hesse</text>
+<text x="204" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Elisabeth of Hesse</title>Elisabeth</text>
+<text x="204" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Hesse</text>
+<text x="272" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Ernest Louis</title>Ernest</text>
+<text x="272" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Louis</text>
+<text x="340" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Friedrich</text>
+<text x="408" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Nicholas II</title>Nicholas</text>
+<text x="408" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II</text>
+<text x="476" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alix (Empress Alexandra)</title>Alix</text>
+<text x="476" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">(Empress…</text>
+<text x="544" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Marie of Hesse</title>Marie of</text>
+<text x="544" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Hesse</text>
+<text x="612" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alexander of Teck</title>Alexander</text>
+<text x="612" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Teck</text>
+<text x="680" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alice of Albany</title>Alice of</text>
+<text x="680" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Albany</text>
+<text x="748" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Charles Edward</title>Charles</text>
+<text x="748" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Edward</text>
+<text x="816" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alexander of Battenberg</title>Alexander</text>
+<text x="816" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of…</text>
+<text x="884" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alfonso XIII</title>Alfonso</text>
+<text x="884" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">XIII</text>
+<text x="952" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Victoria Eugenie</title>Victoria</text>
+<text x="952" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Eugenie</text>
+<text x="1020" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Leopold of Battenberg</title>Leopold of</text>
+<text x="1020" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Battenberg</text>
+<text x="1088" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Maurice of Battenberg</title>Maurice of</text>
+<text x="1088" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Battenberg</text>
+<text x="-34" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Waldemar of Prussia</title>Waldemar</text>
+<text x="-34" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Prussia</text>
+<text x="34" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Sigismund of Prussia</title>Sigismund</text>
+<text x="34" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Prussia</text>
+<text x="102" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Heinrich of Prussia</title>Heinrich</text>
+<text x="102" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">of Prussia</text>
+<text x="204.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olga</text>
+<text x="272.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Tatiana</text>
+<text x="340.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria</text>
+<text x="408.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anastasia</text>
+<text x="476.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alexei</text>
+<text x="544.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>May of Teck</title>May of</text>
+<text x="544.68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Teck</text>
+<text x="612.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Rupert of Teck</title>Rupert of</text>
+<text x="612.68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Teck</text>
+<text x="680.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Maurice of Teck</title>Maurice of</text>
+<text x="680.68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Teck</text>
+<text x="748.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alfonso, Prince of Asturias</title>Alfonso,</text>
+<text x="748.68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Prince of…</text>
+<text x="816.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaime</text>
+<text x="884.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Beatriz</text>
+<text x="952.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Maria Cristina</title>Maria</text>
+<text x="952.68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Cristina</text>
+<text x="1020.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Juan</text>
+<text x="1088.68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Gonzalo</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 482)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<clipPath id="legend-plain-carrier-female"><circle cx="48" cy="30" r="8"/></clipPath><circle cx="48" cy="30" r="8" fill="white" stroke="none"/><clipPath id="legend-plain-carrier-female-fill"><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z"/></clipPath><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z" fill="white" clip-path="url(#legend-plain-carrier-female)"/><g clip-path="url(#legend-plain-carrier-female)"><path d="M40.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0" fill="#000000" clip-path="url(#legend-plain-carrier-female-fill)"/></g><circle cx="48" cy="30" r="8" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Carrier</text>
+<circle cx="48" cy="50" r="8" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="39" x2="59" y2="61" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
+<line x1="47.2" y1="70.8" x2="52.46" y2="65.54" stroke="black" stroke-width="1.5"/><polygon points="56,62 54.23,67.3 50.7,63.77" fill="black"/><text x="46.7" y="78" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<line x1="40" y1="88" x2="56" y2="88" stroke="black" stroke-width="1.5"/><line x1="40" y1="92" x2="56" y2="92" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+</g>
+</svg>

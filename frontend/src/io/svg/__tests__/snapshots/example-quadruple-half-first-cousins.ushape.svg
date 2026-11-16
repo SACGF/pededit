@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="453" height="416"
+     viewBox="0 0 453 416">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="453" height="416" fill="white"/>
+<text class="chart-title" x="226.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
+<g transform="translate(225 -64.1)">
+<path d="M -80 200 L 0 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-40" y1="200" x2="-40" y2="234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -117 234 L -40 234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-117" y1="234" x2="-117" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 0 200 L 80 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="40" y1="200" x2="40" y2="234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="40" y1="234" x2="40" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 40 266 L 120 266" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="80" y1="266" x2="80" y2="300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="80" y1="300" x2="80" y2="312" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -117 266 L -37 266" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-77" y1="266" x2="-77" y2="300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-77" y1="300" x2="-77" y2="312" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<g data-id="B" transform="translate(-80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="A" transform="translate(0 200) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="D" transform="translate(80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="F2" transform="translate(40 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="M2" transform="translate(120 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Y" transform="translate(80 332) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="F1" transform="translate(-117 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="M1" transform="translate(-37 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="X" transform="translate(-77 332) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/></g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 356)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+</g>
+</svg>

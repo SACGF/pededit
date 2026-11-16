@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2296" height="607"
+     viewBox="0 0 2296 607">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="2296" height="607" fill="white"/>
+<text class="chart-title" x="1148" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Pregnancies, losses and assisted reproduction</text>
+<g transform="translate(60 100)">
+<g class="couple-lines">
+<path d="M 170 0 L 238 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 578 0 L 646 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 884 0 L 952 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1122 0 L 1190 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1462 0 L 1530 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1802 0 L 1870 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 2108 0 L 2176 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1428 84 L 1496 84" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="204" y1="0" x2="204" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="408" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="0" y2="64" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="136" y1="42" x2="136" y2="72" stroke="black" stroke-width="2"/>
+<line x1="204" y1="42" x2="204" y2="72" stroke="black" stroke-width="2"/>
+<line x1="272" y1="42" x2="272" y2="64" stroke="black" stroke-width="2"/>
+<line x1="340" y1="42" x2="340" y2="72" stroke="black" stroke-width="2"/>
+<line x1="408" y1="42" x2="408" y2="72" stroke="black" stroke-width="2"/>
+<line x1="612" y1="0" x2="612" y2="42" stroke="black" stroke-width="2"/>
+<line x1="612" y1="42" x2="612" y2="42" stroke="black" stroke-width="2"/>
+<line x1="612" y1="42" x2="612" y2="64" stroke="black" stroke-width="2"/>
+<line x1="836" y1="20" x2="884" y2="64" stroke="black" stroke-width="2"/>
+<line x1="884" y1="20" x2="884" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1156" y1="0" x2="1156" y2="42" stroke="black" stroke-width="2"/>
+<line x1="1156" y1="42" x2="1156" y2="42" stroke="black" stroke-width="2"/>
+<line x1="1156" y1="42" x2="1156" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1496" y1="0" x2="1496" y2="42" stroke="black" stroke-width="2"/>
+<line x1="1496" y1="42" x2="1496" y2="42" stroke="black" stroke-width="2"/>
+<line x1="1496" y1="42" x2="1496" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1734" y1="20" x2="1734" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1782" y1="20" x2="1734" y2="64" stroke="black" stroke-width="2"/>
+<line x1="2060" y1="20" x2="2108" y2="64" stroke="black" stroke-width="2"/>
+<line x1="2108" y1="20" x2="2108" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1462" y1="84" x2="1462" y2="126" stroke="black" stroke-width="2"/>
+<line x1="1462" y1="126" x2="1564" y2="126" stroke="black" stroke-width="2"/>
+<line x1="1564" y1="126" x2="1564" y2="148" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+<line x1="1244.56" y1="13.44" x2="1156" y2="64" stroke="black" stroke-width="2"/>
+<line x1="1564" y1="104" x2="1564" y2="148" stroke="black" stroke-width="2"/>
+</g>
+<g class="duplicate-arcs">
+</g>
+<g class="symbols">
+<g transform="translate(170 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(238 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(578 0)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(646 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(816 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(884 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(952 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1122 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1190 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1258 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(1462 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1530 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1734 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(1802 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1870 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(2040 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">D</text>
+</g>
+<g transform="translate(2108 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(2176 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(0 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(68 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="white">P</text>
+</g>
+<g transform="translate(136 84)">
+<polygon points="0,-12 12,12 -12,12" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(204 84)">
+<polygon points="0,-12 12,12 -12,12" stroke="black" stroke-width="2" fill="black"/><line x1="-15" y1="-15" x2="15" y2="15" stroke-width="2" stroke="black"/><clipPath id="symbol-clip-1-3-slash"><polygon points="0,-12 12,12 -12,12"/></clipPath><line x1="-15" y1="-15" x2="15" y2="15" stroke-width="2" stroke="white" clip-path="url(#symbol-clip-1-3-slash)"/>
+</g>
+<g transform="translate(272 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke-width="2" stroke="black"/>
+</g>
+<g transform="translate(340 84)">
+<polygon points="0,-12 12,12 -12,12" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(408 84)">
+<clipPath id="symbol-clip-1-6"><polygon points="0,-12 12,12 -12,12"/></clipPath><polygon points="0,-12 12,12 -12,12" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-1-6-s0"><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z"/></clipPath><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="white" clip-path="url(#symbol-clip-1-6)"/><g clip-path="url(#symbol-clip-1-6)"><path d="M-19 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 -6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 -2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M-1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-1-6-s0)"/></g><polygon points="0,-12 12,12 -12,12" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g transform="translate(612 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(884 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(1156 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+</g>
+<g transform="translate(1428 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1496 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1564 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="6.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black">S</text>
+</g>
+<g transform="translate(1734 84)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/><text x="0" y="7" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(2108 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(1564 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+</g>
+<g class="labels">
+<text x="952" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+<text x="1122" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+<text x="2176" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text>
+<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">20 wk</text>
+<text x="136" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">8 wk</text>
+<text x="272" y="116" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">SB</text>
+<text x="272" y="130" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">32 wk</text>
+<text x="340" y="116" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">ECT</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 367)">
+<circle cx="48" cy="10" r="8" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<clipPath id="legend-plain-carrier-male"><rect x="40" y="22" width="16" height="16"/></clipPath><rect x="40" y="22" width="16" height="16" fill="white" stroke="none"/><clipPath id="legend-plain-carrier-male-fill"><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z"/></clipPath><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z" fill="white" clip-path="url(#legend-plain-carrier-male)"/><g clip-path="url(#legend-plain-carrier-male)"><path d="M40.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0" fill="#000000" clip-path="url(#legend-plain-carrier-male-fill)"/></g><rect x="40" y="22" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Carrier</text>
+<polygon points="48,42 56,50 48,58 40,50" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="53.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Pregnancy</text>
+<polygon points="48,65.2 52.8,74.8 43.2,74.8" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Miscarriage</text>
+<polygon points="48,85.2 52.8,94.8 43.2,94.8" fill="white" stroke="black" stroke-width="1.5"/><line x1="40.2" y1="82.2" x2="55.8" y2="97.8" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Termination</text>
+<circle cx="48" cy="110" r="8" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="99" x2="59" y2="121" stroke="black" stroke-width="1.5"/><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Stillbirth (SB)</text>
+<polygon points="48,125.2 52.8,134.8 43.2,134.8" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">Ectopic pregnancy (ECT)</text>
+<rect x="40" y="142" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="153.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">D</text><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Sperm or egg donor (D)</text>
+<circle cx="48" cy="170" r="8" fill="white" stroke="black" stroke-width="1.5"/><text x="48" y="173.5" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">S</text><text x="64" y="174" font-family="sans-serif" font-size="10" fill="black">Surrogate (S)</text>
+<line x1="42" y1="183" x2="54" y2="197" stroke="black" stroke-width="1.5"/><text x="64" y="194" font-family="sans-serif" font-size="10" fill="black">Carried the pregnancy, not the genetic mother</text>
+</g>
+</svg>

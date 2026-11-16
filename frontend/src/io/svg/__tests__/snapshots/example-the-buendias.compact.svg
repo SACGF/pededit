@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="617" height="1122"
+     viewBox="0 0 617 1122">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="617" height="1122" fill="white"/>
+<text class="chart-title" x="308.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">The Buendías</text>
+<g transform="translate(92 100)">
+<g class="couple-lines">
+<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 215.33 0 L 283.33 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 68 84 L 136 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 204 84 L 272 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 340 84 L 408 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 102 166 L 170 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 102 170 L 170 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 252 L 68 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 204 252 L 272 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 238 336 L 306 336" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 340 420 L 408 420" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 328.67 504 L 396.67 504" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 362.67 586 L 430.67 586" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 362.67 590 L 430.67 590" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="68" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="0" y2="64" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="249.33" y1="0" x2="249.33" y2="42" stroke="black" stroke-width="2"/>
+<line x1="136" y1="42" x2="340" y2="42" stroke="black" stroke-width="2"/>
+<line x1="136" y1="42" x2="136" y2="64" stroke="black" stroke-width="2"/>
+<line x1="272" y1="42" x2="272" y2="64" stroke="black" stroke-width="2"/>
+<line x1="340" y1="42" x2="340" y2="64" stroke="black" stroke-width="2"/>
+<line x1="102" y1="84" x2="102" y2="126" stroke="black" stroke-width="2"/>
+<line x1="102" y1="126" x2="102" y2="126" stroke="black" stroke-width="2"/>
+<line x1="102" y1="126" x2="102" y2="148" stroke="black" stroke-width="2"/>
+<line x1="238" y1="84" x2="238" y2="126" stroke="black" stroke-width="2"/>
+<line x1="238" y1="126" x2="238" y2="126" stroke="black" stroke-width="2"/>
+<line x1="238" y1="126" x2="238" y2="148" stroke="black" stroke-width="2"/>
+<line x1="374" y1="84" x2="374" y2="126" stroke="black" stroke-width="2"/>
+<line x1="374" y1="126" x2="374" y2="126" stroke="black" stroke-width="2"/>
+<line x1="374" y1="126" x2="374" y2="148" stroke="black" stroke-width="2"/>
+<line x1="136" y1="168" x2="136" y2="210" stroke="black" stroke-width="2"/>
+<line x1="68" y1="210" x2="204" y2="210" stroke="black" stroke-width="2"/>
+<line x1="68" y1="210" x2="68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="136" y1="210" x2="136" y2="232" stroke="black" stroke-width="2"/>
+<line x1="204" y1="210" x2="204" y2="232" stroke="black" stroke-width="2"/>
+<line x1="34" y1="252" x2="34" y2="294" stroke="black" stroke-width="2"/>
+<line x1="34" y1="294" x2="34" y2="294" stroke="black" stroke-width="2"/>
+<line x1="34" y1="294" x2="34" y2="316" stroke="black" stroke-width="2"/>
+<line x1="238" y1="252" x2="238" y2="294" stroke="black" stroke-width="2"/>
+<line x1="238" y1="294" x2="238" y2="294" stroke="black" stroke-width="2"/>
+<line x1="238" y1="294" x2="238" y2="316" stroke="black" stroke-width="2"/>
+<line x1="272" y1="336" x2="272" y2="378" stroke="black" stroke-width="2"/>
+<line x1="204" y1="378" x2="340" y2="378" stroke="black" stroke-width="2"/>
+<line x1="204" y1="378" x2="204" y2="400" stroke="black" stroke-width="2"/>
+<line x1="272" y1="378" x2="272" y2="400" stroke="black" stroke-width="2"/>
+<line x1="340" y1="378" x2="340" y2="400" stroke="black" stroke-width="2"/>
+<line x1="374" y1="420" x2="374" y2="462" stroke="black" stroke-width="2"/>
+<line x1="260.67" y1="462" x2="464.67" y2="462" stroke="black" stroke-width="2"/>
+<line x1="260.67" y1="462" x2="260.67" y2="484" stroke="black" stroke-width="2"/>
+<line x1="396.67" y1="462" x2="396.67" y2="484" stroke="black" stroke-width="2"/>
+<line x1="464.67" y1="462" x2="464.67" y2="484" stroke="black" stroke-width="2"/>
+<line x1="362.67" y1="504" x2="362.67" y2="546" stroke="black" stroke-width="2"/>
+<line x1="362.67" y1="546" x2="362.67" y2="546" stroke="black" stroke-width="2"/>
+<line x1="362.67" y1="546" x2="362.67" y2="568" stroke="black" stroke-width="2"/>
+<line x1="396.67" y1="588" x2="396.67" y2="630" stroke="black" stroke-width="2"/>
+<line x1="396.67" y1="630" x2="396.67" y2="630" stroke="black" stroke-width="2"/>
+<line x1="396.67" y1="630" x2="396.67" y2="652" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+</g>
+<g class="duplicate-arcs">
+<path d="M 0 64 Q 102 33.2 204 64" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 170 148 Q 272 117.2 374 148" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 0 232 Q 136 201.2 272 232" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 444.67 504 Q 424.67 504 430.67 568" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+</g>
+<g class="symbols">
+<g transform="translate(0 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(68 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(215.33 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(283.33 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(0 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(68 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(136 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(204 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(272 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(340 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(408 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(102 168)">
+<clipPath id="symbol-clip-2-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-2-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(170 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(238 168)">
+<clipPath id="symbol-clip-2-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-2-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(374 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(0 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(68 252)">
+<clipPath id="symbol-clip-3-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-3-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(136 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(204 252)">
+<clipPath id="symbol-clip-3-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-3-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(272 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(34 336)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(238 336)">
+<clipPath id="symbol-clip-4-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-4-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(306 336)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(204 420)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(272 420)">
+<clipPath id="symbol-clip-5-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-5-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(340 420)">
+<clipPath id="symbol-clip-5-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-5-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(408 420)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(260.67 504)">
+<clipPath id="symbol-clip-6-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-6-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(328.67 504)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(396.67 504)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(464.67 504)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(362.67 588)">
+<clipPath id="symbol-clip-7-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-7-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(430.67 588)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(396.67 672)">
+<clipPath id="symbol-clip-8-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-8-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
+</g>
+</g>
+<g class="labels">
+<text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Buendía</text>
+<text x="68" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Grandmother</title>Grandmothe</text>
+<text x="68" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">r</text>
+<text x="215.33" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Iguarán</text>
+<text x="283.33" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Grandmother</title>Grandmothe</text>
+<text x="283.33" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">r</text>
+<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Uncle</text>
+<text x="68" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text>
+<text x="136" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mother</text>
+<text x="272" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aunt</text>
+<text x="340" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text>
+<text x="408" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mother</text>
+<text x="102" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio B.</title>José</text>
+<text x="102" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio B.</text>
+<text x="170" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Úrsula</text>
+<text x="238" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Cousin</text>
+<text x="0" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Pilar</text>
+<text x="68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Col. Aureliano</title>Col.</text>
+<text x="68" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aureliano</text>
+<text x="136" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Amaranta</text>
+<text x="204" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text>
+<text x="204" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text>
+<text x="34" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano José</title>Aureliano</text>
+<text x="34" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">José</text>
+<text x="238" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text>
+<text x="306" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Santa Sofía</title>Santa</text>
+<text x="306" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sofía</text>
+<text x="204" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Remedios</text>
+<text x="272" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>J. A. Segundo</title>J. A.</text>
+<text x="272" y="485" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Segundo</text>
+<text x="340" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">A. Segundo</text>
+<text x="408" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fernanda</text>
+<text x="260.67" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text>
+<text x="260.67" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text>
+<text x="328.67" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mauricio</text>
+<text x="396.67" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Meme</text>
+<text x="464.67" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amaranta Ú.</title>Amaranta</text>
+<text x="464.67" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ú.</text>
+<text x="362.67" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano B.</title>Aureliano</text>
+<text x="362.67" y="653" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">B.</text>
+<text x="396.67" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aureliano</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 922)">
+<rect x="40" y="2" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="-1" x2="59" y2="21" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
+<line x1="47.2" y1="30.8" x2="52.46" y2="25.54" stroke="black" stroke-width="1.5"/><polygon points="56,22 54.23,27.3 50.7,23.77" fill="black"/><text x="46.7" y="38" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<line x1="40" y1="48" x2="56" y2="48" stroke="black" stroke-width="1.5"/><line x1="40" y1="52" x2="56" y2="52" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+<path d="M 41 76 Q 48 58 55 76" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
+<clipPath id="legend-clip-pig_tail"><rect x="40" y="82" width="16" height="16"/></clipPath><rect x="40" y="82" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 90 L 32 90 A 16 16 0 0 1 48 74 Z" fill="#e377c2" clip-path="url(#legend-clip-pig_tail)"/><rect x="40" y="82" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Pig&apos;s tail</text>
+<clipPath id="legend-clip-aureliano"><rect x="40" y="102" width="16" height="16"/></clipPath><rect x="40" y="102" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 110 L 48 94 A 16 16 0 0 1 64 110 Z" fill="#1f77b4" clip-path="url(#legend-clip-aureliano)"/><rect x="40" y="102" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Aureliano temperament: withdrawn, lucid</text>
+<clipPath id="legend-clip-jose_arcadio"><rect x="40" y="122" width="16" height="16"/></clipPath><rect x="40" y="122" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 130 L 64 130 A 16 16 0 0 1 48 146 Z" fill="#ff7f0e" clip-path="url(#legend-clip-jose_arcadio)"/><rect x="40" y="122" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">José Arcadio temperament: impulsive, enterprising</text>
+<circle cx="48" cy="150" r="3.5" fill="#2ca02c"/><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Studied Melquíades&apos;s parchments</text>
+</g>
+</svg>

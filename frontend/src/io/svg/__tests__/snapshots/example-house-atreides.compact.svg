@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="779" height="870"
+     viewBox="0 0 779 870">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="779" height="870" fill="white"/>
+<text class="chart-title" x="389.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Atreides</text>
+<g transform="translate(106.63 100)">
+<g class="couple-lines">
+<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 68 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 136 84 L 204 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 272 84 L 340 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 408 84 L 476 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 1.58 168 L 69.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 341.58 168 L 409.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 477.58 168 L 545.58 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 85.79 252 L 204 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 408 252 L 476 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 258.95 336 L 442 336" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="34" y2="42" stroke="black" stroke-width="2"/>
+<line x1="0" y1="42" x2="0" y2="64" stroke="black" stroke-width="2"/>
+<line x1="102" y1="0" x2="102" y2="42" stroke="black" stroke-width="2"/>
+<line x1="102" y1="42" x2="136" y2="42" stroke="black" stroke-width="2"/>
+<line x1="136" y1="42" x2="136" y2="64" stroke="black" stroke-width="2"/>
+<line x1="34" y1="84" x2="34" y2="126" stroke="black" stroke-width="2"/>
+<line x1="1.58" y1="126" x2="34" y2="126" stroke="black" stroke-width="2"/>
+<line x1="1.58" y1="126" x2="1.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="170" y1="84" x2="170" y2="126" stroke="black" stroke-width="2"/>
+<line x1="137.58" y1="126" x2="205.58" y2="126" stroke="black" stroke-width="2"/>
+<line x1="137.58" y1="126" x2="137.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="205.58" y1="126" x2="205.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="306" y1="84" x2="306" y2="126" stroke="black" stroke-width="2"/>
+<line x1="273.58" y1="126" x2="306" y2="126" stroke="black" stroke-width="2"/>
+<line x1="273.58" y1="126" x2="273.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="442" y1="84" x2="442" y2="126" stroke="black" stroke-width="2"/>
+<line x1="341.58" y1="126" x2="442" y2="126" stroke="black" stroke-width="2"/>
+<line x1="341.58" y1="126" x2="341.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="35.58" y1="168" x2="35.58" y2="210" stroke="black" stroke-width="2"/>
+<line x1="-14.63" y1="210" x2="85.79" y2="210" stroke="black" stroke-width="2"/>
+<line x1="-14.63" y1="210" x2="-14.63" y2="232" stroke="black" stroke-width="2"/>
+<line x1="85.79" y1="210" x2="85.79" y2="232" stroke="black" stroke-width="2"/>
+<line x1="375.58" y1="168" x2="375.58" y2="210" stroke="black" stroke-width="2"/>
+<line x1="204" y1="210" x2="375.58" y2="210" stroke="black" stroke-width="2"/>
+<line x1="204" y1="210" x2="204" y2="232" stroke="black" stroke-width="2"/>
+<line x1="511.58" y1="168" x2="511.58" y2="222" stroke="black" stroke-width="2"/>
+<line x1="272" y1="222" x2="612" y2="222" stroke="black" stroke-width="2"/>
+<line x1="272" y1="222" x2="272" y2="232" stroke="black" stroke-width="2"/>
+<line x1="340" y1="222" x2="340" y2="232" stroke="black" stroke-width="2"/>
+<line x1="476" y1="222" x2="476" y2="232" stroke="black" stroke-width="2"/>
+<line x1="544" y1="222" x2="544" y2="232" stroke="black" stroke-width="2"/>
+<line x1="612" y1="222" x2="612" y2="232" stroke="black" stroke-width="2"/>
+<line x1="144.89" y1="252" x2="144.89" y2="294" stroke="black" stroke-width="2"/>
+<line x1="53.87" y1="294" x2="258.95" y2="294" stroke="black" stroke-width="2"/>
+<line x1="53.87" y1="294" x2="53.87" y2="316" stroke="black" stroke-width="2"/>
+<line x1="121.87" y1="294" x2="121.87" y2="316" stroke="black" stroke-width="2"/>
+<line x1="258.95" y1="294" x2="258.95" y2="316" stroke="black" stroke-width="2"/>
+<line x1="442" y1="252" x2="442" y2="294" stroke="black" stroke-width="2"/>
+<line x1="442" y1="294" x2="442" y2="294" stroke="black" stroke-width="2"/>
+<line x1="442" y1="294" x2="442" y2="316" stroke="black" stroke-width="2"/>
+<line x1="350.47" y1="336" x2="350.47" y2="378" stroke="black" stroke-width="2"/>
+<line x1="350.47" y1="378" x2="350.47" y2="378" stroke="black" stroke-width="2"/>
+<line x1="350.47" y1="378" x2="350.47" y2="400" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+</g>
+<g class="duplicate-arcs">
+<path d="M 69.58 148 Q 171.58 117.2 273.58 148" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+</g>
+<g class="symbols">
+<g transform="translate(0 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(68 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(136 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(0 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(68 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-7.2" cy="27" r="3.5" fill="#1f77b4"/><text x="5.5" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text>
+</g>
+<g transform="translate(136 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(204 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(272 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(340 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(408 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(476 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(1.58 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-24.8" cy="27" r="3.5" fill="#1f77b4"/><text x="-12.1" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text><text x="12.7" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(69.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(137.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(205.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(273.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(341.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(409.58 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(477.58 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(545.58 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-7.2" cy="27" r="3.5" fill="#1f77b4"/><text x="5.5" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text>
+</g>
+<g transform="translate(-14.63 252)">
+<clipPath id="symbol-clip-3-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-3-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(85.79 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><circle cx="-14.5" cy="27" r="3.5" fill="#1f77b4"/><text x="8.6" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(204 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(272 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text>
+</g>
+<g transform="translate(340 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(408 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(476 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(544 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(612 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(53.87 336)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(121.87 336)">
+<clipPath id="symbol-clip-4-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-4-1)"/><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="white" stroke-width="5.455"/></g><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="none"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(258.95 336)">
+<clipPath id="symbol-clip-4-2"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-4-2)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+</g>
+<g transform="translate(442 336)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(350.47 420)">
+<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>
+</g>
+</g>
+<g class="labels">
+<text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Baron&apos;s mother</title>Baron&apos;s</text>
+<text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
+<text x="68" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Dmitri Harkonnen</title>Dmitri</text>
+<text x="68" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Harkonnen</text>
+<text x="136" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Abulurd&apos;s mother</title>Abulurd&apos;s</text>
+<text x="136" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
+<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Baron Harkonnen</title>Baron</text>
+<text x="0" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Harkonnen</text>
+<text x="68" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mohiam</text>
+<text x="136" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Abulurd</text>
+<text x="204" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Emmi Rabban</title>Emmi</text>
+<text x="204" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rabban</text>
+<text x="272" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Paulus Atreides</title>Paulus</text>
+<text x="272" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Atreides</text>
+<text x="340" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Helena Richese</title>Helena</text>
+<text x="340" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Richese</text>
+<text x="408" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Pardot Kynes</title>Pardot</text>
+<text x="408" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Kynes</text>
+<text x="476" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Liet&apos;s mother</title>Liet&apos;s</text>
+<text x="476" y="149" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
+<text x="1.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jessica</text>
+<text x="69.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duke Leto</text>
+<text x="137.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rabban</text>
+<text x="205.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Feyd-Rautha</title>Feyd-Rauth</text>
+<text x="205.58" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">a</text>
+<text x="341.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Liet-Kynes</text>
+<text x="409.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Chani&apos;s mother</title>Chani&apos;s</text>
+<text x="409.58" y="233" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
+<text x="477.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaddam IV</text>
+<text x="545.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anirul</text>
+<text x="-14.63" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alia</text>
+<text x="85.79" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Paul</text>
+<text x="204" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Chani</text>
+<text x="272" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Irulan</text>
+<text x="340" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Chalice</text>
+<text x="408" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Farad&apos;n&apos;s father</title>Farad&apos;n&apos;s</text>
+<text x="408" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">father</text>
+<text x="476" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Wensicia</text>
+<text x="544" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Josifa</text>
+<text x="612" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rugi</text>
+<text x="53.87" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Leto</text>
+<text x="121.87" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Leto II</text>
+<text x="258.95" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ghanima</text>
+<text x="442" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Farad&apos;n</text>
+<text x="350.47" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Their descendants</title>Their</text>
+<text x="350.47" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">descendan…</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 670)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="84" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<rect x="40" y="22" width="16" height="16" fill="#bdbdbd" stroke="black" stroke-width="1.5"/><g transform="translate(48 30) scale(0.55) translate(-48 -30)"><rect x="40" y="22" width="16" height="16" fill="black" stroke="white" stroke-width="5.455"/><rect x="40" y="22" width="16" height="16" fill="black" stroke="none"/></g><text x="84" y="34" font-family="sans-serif" font-size="10" fill="black">Affected, condition not recorded (black centre)</text>
+<line x1="47.2" y1="50.8" x2="52.46" y2="45.54" stroke="black" stroke-width="1.5"/><polygon points="56,42 54.23,47.3 50.7,43.77" fill="black"/><text x="46.7" y="58" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="84" y="54" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<path d="M 41 76 Q 48 58 55 76" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/><text x="84" y="74" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
+<clipPath id="legend-clip-preborn"><rect x="40" y="82" width="16" height="16"/></clipPath><rect x="40" y="82" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 32 90 A 16 16 0 1 1 64 90 A 16 16 0 1 1 32 90 Z" fill="#9467bd" clip-path="url(#legend-clip-preborn)"/><rect x="40" y="82" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="84" y="94" font-family="sans-serif" font-size="10" fill="black">Pre-born (ancestral memory before birth)</text>
+<circle cx="48" cy="110" r="3.5" fill="#1f77b4"/><text x="84" y="114" font-family="sans-serif" font-size="10" fill="black">Survived the spice agony</text>
+<text x="40" y="133.5" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text><text x="84" y="134" font-family="sans-serif" font-size="10" fill="black">Bene Gesserit</text>
+<text x="40" y="153.5" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text><text x="84" y="154" font-family="sans-serif" font-size="10" fill="black">Fremen, by birth or adoption</text>
+</g>
+</svg>

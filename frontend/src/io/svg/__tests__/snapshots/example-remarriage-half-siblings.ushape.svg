@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="470" height="370"
+     viewBox="0 0 470 370">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="470" height="370" fill="white"/>
+<text class="chart-title" x="235" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Remarriage · half-siblings</text>
+<g transform="translate(206 -64.1)">
+<path d="M -80 200 L 0 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-40" y1="200" x2="-40" y2="234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -98 234 L -40 234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-98" y1="234" x2="-98" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-40" y1="234" x2="-40" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 0 200 L 80 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="40" y1="200" x2="40" y2="234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 40 234 L 156 234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="40" y1="234" x2="40" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="98" y1="234" x2="98" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="156" y1="234" x2="156" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<g data-id="rm_mom1" transform="translate(-80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="rm_dad" transform="translate(0 200) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="rm_mom2" transform="translate(80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="rm_c2c" transform="translate(156 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="rm_c2b" transform="translate(98 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
+<g data-id="rm_c2a" transform="translate(40 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="rm_c1b" transform="translate(-40 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="rm_c1a" transform="translate(-98 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/></g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 290)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<line x1="47.2" y1="30.8" x2="52.46" y2="25.54" stroke="black" stroke-width="1.5"/><polygon points="56,22 54.23,27.3 50.7,23.77" fill="black"/><text x="46.7" y="38" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+</g>
+</svg>

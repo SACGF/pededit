@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="807" height="864"
+     viewBox="0 0 807 864">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="807" height="864" fill="white"/>
+<text class="chart-title" x="403.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Atreides</text>
+<g transform="translate(524.9 -64.1)">
+<path d="M -80 200 L 0 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-40" y1="200" x2="-40" y2="260" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -143.3 260 L -40 260" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-143.3" y1="260" x2="-143.3" y2="272" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 0 200 L 80 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="40" y1="200" x2="40" y2="260" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 40 260 L 78.6 260" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="78.6" y1="260" x2="78.6" y2="272" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 78.6 292 L 158.6 292" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="118.6" y1="292" x2="118.6" y2="352" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 63.3 352 L 173.9 352" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="63.3" y1="352" x2="63.3" y2="364" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="173.9" y1="352" x2="173.9" y2="364" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -143.3 292 L -63.3 292" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-103.3" y1="292" x2="-103.3" y2="352" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-103.3" y1="352" x2="-103.3" y2="364" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -183.3 384 A 384 384 0 0 0 -178.6 384 L -103.3 384" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-142.2" y1="384" x2="-142.2" y2="444" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -256.8 437.1 A 444 444 0 0 0 -178.6 444 L -72.3 444" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-256.8" y1="437.1" x2="-258.9" y2="448.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-72.3" y1="444" x2="-72.3" y2="456" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -262.4 468.6 A 476 476 0 0 0 -182.9 476" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-222.8" y1="473.9" x2="-228.4" y2="533.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -403.2 486.7 A 536 536 0 0 0 -178.6 536 L -123 536" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-403.2" y1="486.7" x2="-408.2" y2="497.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-304.8" y1="520.9" x2="-307.6" y2="532.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-123" y1="536" x2="-123" y2="548" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -203 567.5 A 568 568 0 0 0 -178.6 568 L -123 568" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-155.1" y1="568" x2="-155.1" y2="628" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -163 628 L -155.1 628" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-163" y1="628" x2="-163" y2="640" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<g data-id="Baron_mother" transform="translate(-80 200) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baron&apos;s mother</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Dmitri_Harkonnen" transform="translate(0 200) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Dmitri Harkonnen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Abulurd_mother" transform="translate(80 200) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Abulurd&apos;s mother</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Abulurd" transform="translate(78.6 292) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Abulurd</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Emmi_Rabban" transform="translate(158.6 292) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Emmi Rabban</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Feyd_Rautha" transform="translate(173.9 384) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Feyd-Rautha</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Rabban" transform="translate(63.3 384) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rabban</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Baron_Harkonnen" transform="translate(-143.3 292) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baron Harkonnen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Mohiam" transform="translate(-63.3 292) rotate(0)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mohiam</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-7.2" cy="27" r="3.5" fill="#1f77b4"/><text x="5.5" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text></g>
+<g data-id="Leto_I" transform="translate(-183.3 384) rotate(0.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duke Leto</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Jessica" transform="translate(-103.3 384) rotate(0)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jessica</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-24.8" cy="27" r="3.5" fill="#1f77b4"/><text x="-12.1" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text><text x="12.7" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g data-id="Alia" transform="translate(-72.3 476) rotate(0)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alia</text><clipPath id="symbol-clip-11"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-11)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g data-id="Paul" transform="translate(-262.4 468.6) rotate(10.1)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Paul</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><circle cx="-14.5" cy="27" r="3.5" fill="#1f77b4"/><text x="8.6" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white" transform="rotate(-10.14 -42 42)"/><text class="proband-letter" x="-42" y="47" transform="rotate(-10.14 -42 42)" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
+<g data-id="Chani" transform="translate(-182.9 476) rotate(0.5)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Chani</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g data-id="Farad_n" transform="translate(-203 567.5) rotate(2.5)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Farad&apos;n</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Ghanima" transform="translate(-123 568) rotate(0)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ghanima</text><clipPath id="symbol-clip-15"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-15)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g data-id="Atreides_line" transform="translate(-163 660) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Their descendants</text><polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="Leto_II" transform="translate(-312.3 552) rotate(13.6)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Leto II</text><clipPath id="symbol-clip-17"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-17)"/><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="white" stroke-width="5.455"/></g><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="none"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g data-id="Leto_first" transform="translate(-416.6 515.7) rotate(24.8)"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Leto</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text></g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 684)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="84" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<rect x="40" y="22" width="16" height="16" fill="#bdbdbd" stroke="black" stroke-width="1.5"/><g transform="translate(48 30) scale(0.55) translate(-48 -30)"><rect x="40" y="22" width="16" height="16" fill="black" stroke="white" stroke-width="5.455"/><rect x="40" y="22" width="16" height="16" fill="black" stroke="none"/></g><text x="84" y="34" font-family="sans-serif" font-size="10" fill="black">Affected, condition not recorded (black centre)</text>
+<line x1="47.2" y1="50.8" x2="52.46" y2="45.54" stroke="black" stroke-width="1.5"/><polygon points="56,42 54.23,47.3 50.7,43.77" fill="black"/><text x="46.7" y="58" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="84" y="54" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<clipPath id="legend-clip-preborn"><rect x="40" y="62" width="16" height="16"/></clipPath><rect x="40" y="62" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 32 70 A 16 16 0 1 1 64 70 A 16 16 0 1 1 32 70 Z" fill="#9467bd" clip-path="url(#legend-clip-preborn)"/><rect x="40" y="62" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="84" y="74" font-family="sans-serif" font-size="10" fill="black">Pre-born (ancestral memory before birth)</text>
+<circle cx="48" cy="90" r="3.5" fill="#1f77b4"/><text x="84" y="94" font-family="sans-serif" font-size="10" fill="black">Survived the spice agony</text>
+<text x="40" y="113.5" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text><text x="84" y="114" font-family="sans-serif" font-size="10" fill="black">Bene Gesserit</text>
+<text x="40" y="133.5" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text><text x="84" y="134" font-family="sans-serif" font-size="10" fill="black">Fremen, by birth or adoption</text>
+</g>
+</svg>

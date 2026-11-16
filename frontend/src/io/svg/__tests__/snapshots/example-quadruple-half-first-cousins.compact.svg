@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="529" height="433"
+     viewBox="0 0 529 433">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="529" height="433" fill="white"/>
+<text class="chart-title" x="264.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
+<g transform="translate(60 100)">
+<g class="couple-lines">
+<path d="M 0 0 L 68 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 0 L 10 0 L 10 -28 L 126 -28 L 126 0 L 136 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 204 0 L 272 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 340 0 L 408 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 11.33 84 L 79.33 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 147.33 84 L 238 84" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>
+<line x1="11.33" y1="42" x2="34" y2="42" stroke="black" stroke-width="2"/>
+<line x1="11.33" y1="42" x2="11.33" y2="64" stroke="black" stroke-width="2"/>
+<line x1="102" y1="-28" x2="102" y2="42" stroke="black" stroke-width="2"/>
+<line x1="102" y1="42" x2="147.33" y2="42" stroke="black" stroke-width="2"/>
+<line x1="147.33" y1="42" x2="147.33" y2="64" stroke="black" stroke-width="2"/>
+<line x1="238" y1="0" x2="238" y2="42" stroke="black" stroke-width="2"/>
+<line x1="238" y1="42" x2="238" y2="42" stroke="black" stroke-width="2"/>
+<line x1="238" y1="42" x2="238" y2="64" stroke="black" stroke-width="2"/>
+<line x1="374" y1="0" x2="374" y2="42" stroke="black" stroke-width="2"/>
+<line x1="374" y1="42" x2="374" y2="42" stroke="black" stroke-width="2"/>
+<line x1="374" y1="42" x2="374" y2="64" stroke="black" stroke-width="2"/>
+<line x1="45.33" y1="84" x2="45.33" y2="126" stroke="black" stroke-width="2"/>
+<line x1="45.33" y1="126" x2="45.33" y2="126" stroke="black" stroke-width="2"/>
+<line x1="45.33" y1="126" x2="45.33" y2="148" stroke="black" stroke-width="2"/>
+<line x1="192.67" y1="84" x2="192.67" y2="126" stroke="black" stroke-width="2"/>
+<line x1="192.67" y1="126" x2="192.67" y2="126" stroke="black" stroke-width="2"/>
+<line x1="192.67" y1="126" x2="192.67" y2="148" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+</g>
+<g class="duplicate-arcs">
+<path d="M 68 -20 Q 136 -50.8 204 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 136 -20 Q 238 -50.8 340 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 272 -20 Q 340 -50.8 408 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 79.33 64 Q 226.67 33.2 374 64" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+</g>
+<g class="symbols">
+<g transform="translate(0 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(68 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(136 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(204 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(272 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(340 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(408 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(11.33 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(79.33 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(147.33 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(238 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(374 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
+</g>
+<g transform="translate(45.33 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+</g>
+<g transform="translate(192.67 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
+</g>
+</g>
+<g class="labels">
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 353)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<path d="M 41 36 Q 48 18 55 36" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
+</g>
+</svg>

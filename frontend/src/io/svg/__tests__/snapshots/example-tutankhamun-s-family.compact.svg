@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="254" height="686"
+     viewBox="0 0 254 686">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
+          refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="254" height="686" fill="white"/>
+<text class="chart-title" x="127" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Tutankhamun&apos;s family</text>
+<g transform="translate(92 100)">
+<g class="couple-lines">
+<path d="M 34 0 L 102 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 84 L 68 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 166 L 68 166" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 0 170 L 68 170" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 34 252 L 102 252" stroke="black" stroke-width="2" fill="none"/>
+</g>
+<g class="sibship-lines">
+<line x1="68" y1="0" x2="68" y2="42" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="68" y2="42" stroke="black" stroke-width="2"/>
+<line x1="68" y1="42" x2="68" y2="64" stroke="black" stroke-width="2"/>
+<line x1="34" y1="84" x2="34" y2="126" stroke="black" stroke-width="2"/>
+<line x1="0" y1="126" x2="68" y2="126" stroke="black" stroke-width="2"/>
+<line x1="0" y1="126" x2="0" y2="148" stroke="black" stroke-width="2"/>
+<line x1="68" y1="126" x2="68" y2="148" stroke="black" stroke-width="2"/>
+<line x1="34" y1="168" x2="34" y2="210" stroke="black" stroke-width="2"/>
+<line x1="34" y1="210" x2="34" y2="210" stroke="black" stroke-width="2"/>
+<line x1="34" y1="210" x2="34" y2="232" stroke="black" stroke-width="2"/>
+<line x1="68" y1="252" x2="68" y2="294" stroke="black" stroke-width="2"/>
+<line x1="34" y1="294" x2="102" y2="294" stroke="black" stroke-width="2"/>
+<line x1="34" y1="294" x2="34" y2="316" stroke="black" stroke-width="2"/>
+<line x1="102" y1="294" x2="102" y2="316" stroke="black" stroke-width="2"/>
+</g>
+<g class="assisted-lines">
+</g>
+<g class="duplicate-arcs">
+</g>
+<g class="symbols">
+<g transform="translate(34 0)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(102 0)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(0 84)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(68 84)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(0 168)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(68 168)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(34 252)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
+</g>
+<g transform="translate(102 252)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(34 336)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(102 336)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+</g>
+<g class="labels">
+<text x="34" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Yuya</text>
+<text x="102" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Thuya</text>
+<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amenhotep III</title>Amenhotep</text>
+<text x="0" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III</text>
+<text x="68" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tiye (KV35EL)</title>Tiye</text>
+<text x="68" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">(KV35EL)</text>
+<text x="0" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV55</text>
+<text x="68" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV35YL</text>
+<text x="34" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tutankhamun</title>Tutankhamu</text>
+<text x="34" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">n</text>
+<text x="102" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV21A</text>
+<text x="34" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 1</text>
+<text x="102" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 2</text>
+</g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 566)">
+<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<rect x="40" y="22" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="19" x2="59" y2="41" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
+<line x1="47.2" y1="50.8" x2="52.46" y2="45.54" stroke="black" stroke-width="1.5"/><polygon points="56,42 54.23,47.3 50.7,43.77" fill="black"/><text x="46.7" y="58" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<line x1="40" y1="68" x2="56" y2="68" stroke="black" stroke-width="1.5"/><line x1="40" y1="72" x2="56" y2="72" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+</g>
+</svg>
