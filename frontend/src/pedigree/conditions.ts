@@ -21,8 +21,10 @@ export { isAffected, isConditionTag };
  * be recorded (the drawing divides the symbol by those in use,
  * `sectionConditions` in tags.ts):
  * - none: the Affected and Carrier controls set the plain flags, as before;
- * - one ("single"): the same controls also record that condition, so ticking
- *   Affected adds the tag and Carrier adds it to `carrierTags`;
+ * - one ("single"): the same controls of A, the more menu and batch also
+ *   record that condition, so Affected adds the tag and Carrier adds it to
+ *   `carrierTags`. The edit panel does not: it records every condition in
+ *   "Conditions and tags" and keeps only the plain flags in Status (#136);
  * - two or more ("per-condition"): the edit panel and the batch menu ask per
  *   condition. A plain flag still draws, keyed "(condition not recorded)",
  *   and a warning (validation.ts, "condition-not-recorded") offers a
@@ -108,6 +110,12 @@ export function plainCarrier(ind: Individual, pedigree: Pick<Pedigree, "tags">):
 export function isCarrier(ind: Individual, pedigree: Pick<Pedigree, "tags">): boolean {
   return !!ind.carrier || carrierConditions(ind, pedigree).length > 0;
 }
+
+/**
+ * The umbrella name, wherever the user sees one, for what the tags dialog
+ * defines (#136): conditions, and traits, dots and text tags, which are not.
+ */
+export const CONDITIONS_AND_TAGS = "Conditions and tags";
 
 /** Key label suffix for a plain flag once the pedigree has two or more conditions. */
 export const CONDITION_NOT_RECORDED = "(condition not recorded)";

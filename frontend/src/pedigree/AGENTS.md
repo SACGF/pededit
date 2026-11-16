@@ -247,12 +247,16 @@ draws NSGC symbols.
   and warnings; never read `ind.affected` for that. The plain Affected
   control's state (A, more menu, batch counts) is `affectedControlOn`: the
   flag, or with one condition, that condition. Every editor path
-  (panel, more menu, batch, legend checkbox, "A" shortcut, warning fixes)
+  (panel, more menu, batch, "A" shortcut, warning fixes)
   goes through `applyConditionState` / `applyAffected` / `applyCarrier`, so
   the rules live in one place: recording a carrier condition clears the
   plain carrier flag; with exactly one condition the plain Affected and
-  Carrier controls record it; with two or more the panel
-  (`ConditionsForm`) and menus ask per condition, and a plain flag (alone,
+  Carrier controls of A, the more menu and batch record it; with two or
+  more the menus ask per condition. The edit panel records a condition only
+  in "Conditions and tags" (`components/ConditionsAndTags.tsx`, #136), at any
+  number of conditions, and once any is defined its Status shows only the
+  plain flags (`PlainStatusForm`, which sets the flag itself, never the one
+  condition), so the two never record the same thing. A plain flag (alone,
   or beside recorded conditions) gets the "condition-not-recorded" warning
   with one fix per condition (`Problem.moreFixes`), built with
   `resolvePlainAffected` as one `updateIndividual` so a click is one undo

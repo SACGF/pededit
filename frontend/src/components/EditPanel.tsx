@@ -2,6 +2,7 @@ import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Legend } from "./Legend";
+import { ConditionsAndTags } from "./ConditionsAndTags";
 import { SelectionPanel } from "./SelectionPanel";
 import { LIFE_STATUS_OPTIONS, lifeStatusLabel } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
@@ -25,8 +26,7 @@ import { fieldProblems, worstSeverity, type Problem, type ProblemField } from ".
 import { ProblemIcon } from "./ProblemsMenu";
 import { ProblemFixes } from "./ProblemFixes";
 import {
-  CONDITION_NOT_RECORDED, affectedControlOn, carrierLabel, conditionMode, conditionStateOf, conditionTags, plainAffected, plainCarrier,
-  resolvePlainAffected, soleCondition, type ConditionState,
+  CONDITION_NOT_RECORDED, affectedControlOn, conditionMode, plainAffected, plainCarrier, resolvePlainAffected, soleCondition,
 } from "../pedigree/conditions";
 import { batchSexProblem, carrierStatusOf } from "../pedigree/batch";
 import { notationOf } from "../pedigree/notation";
@@ -47,21 +47,21 @@ type PanelTab = "person" | "pedigree";
  * shortcut. Every selection write makes a new `selectedIds` array, so
  * clicking the person already selected switches back too. Choosing the
  * Pedigree tab keeps the selection, so Person returns to the same people.
- * Person is disabled while nobody is selected. On the Person tab the legend's
- * tag rows are that person's tag checkboxes (#75); on the Pedigree tab it is
- * the plain legend.
+ * Person is disabled while nobody is selected. The figure legend is on the
+ * Pedigree tab only; the Person tab has the person's own conditions and tags
+ * with the same swatches (#136).
  *
  * Only the content under the tabs scrolls, with a stable scrollbar gutter, so
  * switching between a short and a long tab never moves the tabs or the text.
  */
 export function EditPanel({ onManageTags }: EditPanelProps) {
-  const { pedigree, selectedId, selectedIds, setIndividualTag, setOnset } = usePedigreeStore();
+  const { pedigree, selectedId, selectedIds } = usePedigreeStore();
   const anyone = selectedIds.length > 0;
   const [tab, setTab] = useState<PanelTab>(anyone ? "person" : "pedigree");
   useEffect(() => {
     setTab(selectedIds.length > 0 ? "person" : "pedigree");
   }, [selectedIds]);
-  // Several selected (#21): the batch panel, and the legend without one person's tag checkboxes.
+  // Several selected (#21): the batch panel.
   const multiple = selectedIds.length > 1;
   const onPerson = tab === "person" && anyone;
   const individual = onPerson && !multiple ? pedigree.individuals.find(i => i.id === selectedId) : undefined;
@@ -79,21 +79,15 @@ export function EditPanel({ onManageTags }: EditPanelProps) {
             <>
               <ChartTitleField />
               <ClinicalDetailsSection />
+              <div className="border-t pt-3">
+                <Legend pedigree={pedigree} onManageTags={onManageTags} />
+              </div>
             </>
           ) : multiple ? (
             <SelectionPanel />
           ) : individual ? (
-            <IndividualForm individual={individual} />
+            <IndividualForm individual={individual} onManageTags={onManageTags} />
           ) : null}
-          <div className="border-t pt-3">
-            <Legend
-              pedigree={pedigree}
-              individual={individual}
-              onToggleTag={individual ? (tagId, on) => setIndividualTag(individual.id, tagId, on) : undefined}
-              onSetTagOnset={individual ? (tagId, value) => setOnset(individual.id, tagId, value) : undefined}
-              onManageTags={onManageTags}
-            />
-          </div>
         </div>
       </div>
     </div>
@@ -121,13 +115,13 @@ function PanelTabButton({ tab, current, onSelect, disabled, title, children }: {
 }
 
 
-function IndividualForm({ individual }: { individual: Individual }) {
-  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand } = usePedigreeStore();
+function IndividualForm({ individual, onManageTags }: { individual: Individual; onManageTags?: () => void }) {
+  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand, setConditionStatus, setIndividualTag } = usePedigreeStore();
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
-  // How affected and carrier are asked: plain, for the one condition, or per condition (#115).
-  const mode = conditionMode(pedigree);
-  const sole = soleCondition(pedigree);
+  // With any condition defined, conditions are recorded only in "Conditions and tags" and
+  // Status keeps the plain flags, affected or carrier with no condition recorded (#136).
+  const withConditions = conditionMode(pedigree) !== "plain";
   // Editor warnings (#116) on a field: highlighted, with the message under it.
   const problemsOn = (field: ProblemField) => ({ problemFor: individual.id, problemField: field, problems: fieldProblems(pedigree, individual.id, field) });
 
@@ -272,75 +266,49 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
         <div className="text-xs text-gray-600 space-y-1">
           <SexControl individual={individual} />
-          {/* Same rule as A and the more menu (#120): the flag, or the one condition (#118). */}
-          {mode !== "per-condition" && (
-            <ProblemHighlight {...problemsOn("affected")}>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="affected"
-                  checked={affectedControlOn(individual, pedigree)}
-                  onChange={e => setAffected(individual.id, e.target.checked)}
-                  className="accent-black"
-                />
-                <span>{sole ? `Affected with ${sole.label}` : "Affected"}</span>
-              </label>
-            </ProblemHighlight>
-          )}
-          {affectedControlOn(individual, pedigree) && (
-            <div className="flex items-center gap-2 pl-5">
-              <span className="shrink-0">Age of onset</span>
-              <Input
-                value={individual.onset ?? ""}
-                aria-label="Age of onset"
-                onChange={e => setOnset(individual.id, null, e.target.value)}
-                className="h-6 text-xs"
-                placeholder="e.g. 45y, 40s, childhood"
-              />
-            </div>
-          )}
-          {mode === "per-condition" ? (
-            <ConditionsForm individual={individual} problems={problemsOn("conditions")} />
+          {withConditions ? (
+            <PlainStatusForm individual={individual} problemsOn={problemsOn} />
           ) : (
-            // One carrier status (#101): the plain carrier, or the presymptomatic vertical line.
-            // With one condition, Carrier records it (#115).
-            <ProblemHighlight {...problemsOn("carrier")}>
-            <div className="flex items-center gap-2">
-              <span className="shrink-0">Carrier</span>
-              <select
-                value={carrierStatusOf(individual, pedigree) === "none" ? "" : carrierStatusOf(individual, pedigree)}
-                aria-label="Carrier status"
-                onChange={e => {
-                  const v = e.target.value;
-                  if (v === "carrier") setCarrier(individual.id, true);
-                  else if (v === "presymptomatic") setPresymptomatic(individual.id, true);
-                  else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
-                  else setCarrier(individual.id, false);
-                }}
-                className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-              >
-                <option value="">No</option>
-                <option value="carrier">
-                  {sole ? carrierLabel(sole) : notationOf(pedigree) === "nsgc2008" ? "Carrier (dot)" : "Carrier (half patterned)"}
-                </option>
-                <option value="presymptomatic">Presymptomatic (vertical line)</option>
-              </select>
-            </div>
-            </ProblemHighlight>
-          )}
-          {mode === "per-condition" && (
-            <ProblemHighlight {...problemsOn("presymptomatic")}>
-            <label className="flex items-center gap-2 cursor-pointer" title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)">
-              <input
-                type="checkbox"
-                name="presymptomatic"
-                checked={!!individual.presymptomatic}
-                onChange={e => setPresymptomatic(individual.id, e.target.checked)}
-                className="accent-black"
-              />
-              <span>Presymptomatic (vertical line)</span>
-            </label>
-            </ProblemHighlight>
+            <>
+              {/* Same rule as A and the more menu (#120). */}
+              <ProblemHighlight {...problemsOn("affected")}>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="affected"
+                    checked={affectedControlOn(individual, pedigree)}
+                    onChange={e => setAffected(individual.id, e.target.checked)}
+                    className="accent-black"
+                  />
+                  <span>Affected</span>
+                </label>
+              </ProblemHighlight>
+              {affectedControlOn(individual, pedigree) && (
+                <OnsetInput value={individual.onset} onChange={v => setOnset(individual.id, null, v)} />
+              )}
+              {/* One carrier status (#101): the plain carrier, or the presymptomatic vertical line. */}
+              <ProblemHighlight {...problemsOn("carrier")}>
+              <div className="flex items-center gap-2">
+                <span className="shrink-0">Carrier</span>
+                <select
+                  value={carrierStatusOf(individual, pedigree) === "none" ? "" : carrierStatusOf(individual, pedigree)}
+                  aria-label="Carrier status"
+                  onChange={e => {
+                    const v = e.target.value;
+                    if (v === "carrier") setCarrier(individual.id, true);
+                    else if (v === "presymptomatic") setPresymptomatic(individual.id, true);
+                    else if (individual.presymptomatic) setPresymptomatic(individual.id, false);
+                    else setCarrier(individual.id, false);
+                  }}
+                  className="w-full h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+                >
+                  <option value="">No</option>
+                  <option value="carrier">{notationOf(pedigree) === "nsgc2008" ? "Carrier (dot)" : "Carrier (half patterned)"}</option>
+                  <option value="presymptomatic">Presymptomatic (vertical line)</option>
+                </select>
+              </div>
+              </ProblemHighlight>
+            </>
           )}
           {/* Affected and a plain carrier is a warning (#116), which says the mark is hidden. */}
           {plainCarrier(individual, pedigree) && !problemsOn("carrier").problems.concat(problemsOn("conditions").problems).some(p => p.rule === "affected-and-carrier") && !symbolPaint(individual, pedigree).dot
@@ -385,6 +353,15 @@ function IndividualForm({ individual }: { individual: Individual }) {
         </div>
       </div>
 
+      <ConditionsAndTags
+        pedigree={pedigree}
+        individual={individual}
+        onConditionState={(tagId, state) => setConditionStatus(individual.id, tagId, state)}
+        onToggleTag={(tagId, on) => setIndividualTag(individual.id, tagId, on)}
+        onSetTagOnset={(tagId, value) => setOnset(individual.id, tagId, value)}
+        onManageTags={onManageTags}
+      />
+
       <EvaluationsForm key={`evaluations-${individual.id}`} individual={individual} problems={problemsOn("evaluations")} />
       <TwinsForm individual={individual} />
       <RelatednessSection individual={individual} />
@@ -395,55 +372,85 @@ function IndividualForm({ individual }: { individual: Individual }) {
 }
 
 /**
- * Status per condition (#115), shown when the pedigree has two or more
- * condition (quadrant) tags: affected, carrier or neither for each. A plain
- * Affected or Carrier flag with no condition is listed below with its
- * warning and one-click fixes, and can be cleared; nothing is refused.
+ * Status when the pedigree defines any condition (#115, #136): only the
+ * plain flags, affected or carrier with no condition recorded, since each
+ * condition is recorded in "Conditions and tags". The Affected box sets the
+ * flag itself, never the one condition as A and the more menu do, so the two
+ * places never record the same thing. A plain carrier is only shown, to be
+ * cleared, as the warning's fixes record it as a condition. Their warnings
+ * ("condition-not-recorded") and one-click fixes sit here.
  */
-function ConditionsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
-  const { pedigree, setConditionStatus, updateIndividual, setCarrier, setAffected } = usePedigreeStore();
-  const conditions = conditionTags(pedigree);
+function PlainStatusForm({ individual, problemsOn }: { individual: Individual; problemsOn: (field: ProblemField) => ProblemProps }) {
+  const { pedigree, updateIndividual, setCarrier, setPresymptomatic, setOnset } = usePedigreeStore();
+  const affected = plainAffected(individual, pedigree);
+  // With one condition, the flag beside that condition adds nothing (plainAffected),
+  // so the box could not tick: it is disabled instead.
+  const sole = soleCondition(pedigree);
+  const covered = !affected && !!sole && !!individual.tags?.includes(sole.id);
+  // The affected status's own onset (#93) while it is drawn: under the flag, or
+  // with one condition, an onset recorded before #136 under that condition.
+  const ownOnset = affected || (affectedControlOn(individual, pedigree) && !!individual.onset?.trim());
   return (
-    <ProblemHighlight {...problems}>
-      <div className="space-y-1" data-testid="conditions-form">
-        <div>Conditions</div>
-        {conditions.map(t => (
-          <div key={t.id} className="flex items-center gap-2 pl-2" data-condition-row={t.id}>
-            <span className="flex-1 min-w-0 truncate" title={t.label}>{t.label}</span>
-            <select
-              value={conditionStateOf(individual, t.id)}
-              aria-label={`${t.label} status`}
-              onChange={e => setConditionStatus(individual.id, t.id, e.target.value as ConditionState)}
-              className="w-24 shrink-0 h-6 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
+    <>
+      <ProblemHighlight {...problemsOn("conditions")}>
+        <div className="space-y-1" data-testid="plain-status">
+          <ProblemHighlight {...problemsOn("affected")}>
+            <label
+              className={`flex items-center gap-2 ${covered ? "text-gray-400" : "cursor-pointer"}`}
+              title={covered ? `Already affected with ${sole!.label}, the only condition` : undefined}
             >
-              <option value="none">No</option>
-              <option value="affected">Affected</option>
-              <option value="carrier">Carrier</option>
-            </select>
-          </div>
-        ))}
-        {/* Always offered, as the more menu's Mark affected is (#120); the flag means affected with something not recorded (#118). */}
-        <label className="flex items-center gap-2 cursor-pointer pl-2">
+              <input
+                type="checkbox"
+                name="plainAffected"
+                checked={affected}
+                disabled={covered}
+                onChange={e => updateIndividual(individual.id, e.target.checked
+                  ? { affected: true }
+                  // Only the flag: recorded conditions stay (#118).
+                  : resolvePlainAffected(individual, null, pedigree))}
+                className="accent-black"
+              />
+              <span>Affected {CONDITION_NOT_RECORDED}</span>
+            </label>
+          </ProblemHighlight>
+          {ownOnset && <OnsetInput value={individual.onset} onChange={v => setOnset(individual.id, null, v)} />}
+          {plainCarrier(individual, pedigree) && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="plainCarrier" checked onChange={() => setCarrier(individual.id, false)} className="accent-black" />
+              <span>Carrier {CONDITION_NOT_RECORDED}</span>
+            </label>
+          )}
+        </div>
+      </ProblemHighlight>
+      <ProblemHighlight {...problemsOn("presymptomatic")}>
+        <label className="flex items-center gap-2 cursor-pointer" title="Clinically unaffected now but may develop the condition: a vertical line through the symbol (NSGC)">
           <input
             type="checkbox"
-            name="plainAffected"
-            checked={plainAffected(individual, pedigree)}
-            onChange={e => e.target.checked
-              ? setAffected(individual.id, true)
-              // Only the flag: recorded conditions stay (#118).
-              : updateIndividual(individual.id, resolvePlainAffected(individual, null, pedigree))}
+            name="presymptomatic"
+            checked={!!individual.presymptomatic}
+            onChange={e => setPresymptomatic(individual.id, e.target.checked)}
             className="accent-black"
           />
-          <span>Affected {CONDITION_NOT_RECORDED}</span>
+          <span>Presymptomatic (vertical line)</span>
         </label>
-        {plainCarrier(individual, pedigree) && (
-          <label className="flex items-center gap-2 cursor-pointer pl-2">
-            <input type="checkbox" name="plainCarrier" checked onChange={() => setCarrier(individual.id, false)} className="accent-black" />
-            <span>Carrier {CONDITION_NOT_RECORDED}</span>
-          </label>
-        )}
-      </div>
-    </ProblemHighlight>
+      </ProblemHighlight>
+    </>
+  );
+}
+
+/** Age of onset of the affected status (#93), under the Affected box. */
+function OnsetInput({ value, onChange }: { value: string | undefined; onChange: (value: string) => void }) {
+  return (
+    <div className="flex items-center gap-2 pl-5">
+      <span className="shrink-0">Age of onset</span>
+      <Input
+        value={value ?? ""}
+        aria-label="Age of onset"
+        onChange={e => onChange(e.target.value)}
+        className="h-6 text-xs"
+        placeholder="e.g. 45y, 40s, childhood"
+      />
+    </div>
   );
 }
 

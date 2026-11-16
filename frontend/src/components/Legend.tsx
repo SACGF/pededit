@@ -4,7 +4,7 @@ import {
   PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES,
   ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../pedigree/tags";
-import { carrierLabel, conditionStateOf, isConditionTag } from "../pedigree/conditions";
+import { CONDITIONS_AND_TAGS, carrierLabel } from "../pedigree/conditions";
 import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "../pedigree/evaluation";
@@ -23,8 +23,6 @@ import { ENDED_LABEL, endedMarkSegments, hasEndedPartnership } from "@/pedigree/
 import { segmentsPathD } from "@/pedigree/sibshipPath";
 import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "@/pedigree/collapse";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { tagTakesOnset } from "@/pedigree/onset";
 import { clinicalDetailLines } from "@/pedigree/clinicalDetails";
 import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "@/pedigree/gender";
 import { Tags } from "lucide-react";
@@ -32,11 +30,10 @@ import { drawsDuplicates } from "@/pedigree/duplicates";
 import { DUPLICATE_LEGEND_LABEL } from "@/pedigree/constants";
 
 /**
- * The figure legend, always visible in the edit panel (#75). With an
- * individual selected the tag rows become checkboxes for that person, so the
- * same rows serve as the key and as the tag editor, and the symbol and
- * relationship sections are dropped to keep the editor short. The exported
- * key (`renderExportKeySvg`) lists the same statuses in the same order.
+ * The figure legend, on the edit panel's Pedigree tab (#75, #135). A
+ * person's own conditions and tags, with the same swatches, are edited on the
+ * Person tab (`ConditionsAndTags`, #136). The exported key
+ * (`renderExportKeySvg`) lists the same statuses in the same order.
  */
 
 type Sex = "male" | "female" | "unknown";
@@ -334,7 +331,7 @@ function ConsanguineousSvg() {
 
 // ── Layout helpers ─────────────────────────────────────────────────────────────
 
-function SectionHeader({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+export function SectionHeader({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between">
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">{children}</div>
@@ -356,15 +353,10 @@ function LegendRow({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 interface LegendProps {
   pedigree: Pedigree;
-  /** When set, the tag rows are checkboxes that tag or untag this person. */
-  individual?: Individual;
-  onToggleTag?: (tagId: string, on: boolean) => void;
-  /** Age of onset for a condition tag the person carries (#93). */
-  onSetTagOnset?: (tagId: string, value: string) => void;
   onManageTags?: () => void;
 }
 
-export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset, onManageTags }: LegendProps) {
+export function Legend({ pedigree: full, onManageTags }: LegendProps) {
   // Only what is drawn: hidden descendants (#94) add no entries, and the
   // group symbols standing for collapsed siblings (#1) have their own row.
   const { drawn: pedigree, placeholders } = collapseInfo(full);
@@ -458,7 +450,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
     <Button
       variant="outline" size="sm"
       className="h-6 px-1.5 gap-1 text-[11px]"
-      title="Define tags and colours for this pedigree"
+      title="Define conditions and tags for this pedigree"
       onClick={onManageTags}
     >
       <Tags size={11} />
@@ -469,9 +461,9 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
   return (
     <div className="space-y-4" data-testid="legend">
       <div className="space-y-1">
-        <SectionHeader action={manage}>Tags</SectionHeader>
+        <SectionHeader action={manage}>{CONDITIONS_AND_TAGS}</SectionHeader>
         {tags.length === 0 ? (
-          <p className="text-[10px] text-gray-400">No tags defined for this pedigree yet.</p>
+          <p className="text-[10px] text-gray-400">None defined for this pedigree yet.</p>
         ) : (
           <div>
             {tags.map(tag => {
@@ -483,48 +475,12 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
               );
               const text = (
                 <span
-                  className={`text-xs truncate ${inUse || individual ? "text-gray-800" : "text-gray-400"}`}
-                  title={inUse ? undefined : "No one has this tag yet"}
+                  className={`text-xs truncate ${inUse ? "text-gray-800" : "text-gray-400"}`}
+                  title={inUse ? undefined : "No one has this yet"}
                 >
                   {tag.label}
                 </span>
               );
-              if (individual && onToggleTag) {
-                const on = individual.tags?.includes(tag.id) ?? false;
-                // A condition the person carries (#115): set in the Status section, noted here.
-                const carrierOfIt = isConditionTag(tag) && conditionStateOf(individual, tag.id) === "carrier";
-                return (
-                  <div key={tag.id}>
-                    <label className="flex items-center gap-1.5 cursor-pointer min-w-0">
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        onChange={e => onToggleTag(tag.id, e.target.checked)}
-                        className="accent-black shrink-0"
-                      />
-                      {carrierOfIt ? (
-                        <div className="flex items-center justify-center w-10 h-7 shrink-0">
-                          <TagSwatchSvg tag={tag} pedigree={pedigree} carrier />
-                        </div>
-                      ) : swatch}
-                      {text}
-                      {carrierOfIt && <span className="text-[10px] text-gray-500 shrink-0" data-carrier-of={tag.id}>carrier</span>}
-                    </label>
-                    {on && onSetTagOnset && tagTakesOnset(tag) && (
-                      <div className="flex items-center gap-2 pl-5 pb-1 text-xs text-gray-600">
-                        <span className="shrink-0">Age of onset</span>
-                        <Input
-                          value={individual.tagOnset?.[tag.id] ?? ""}
-                          aria-label={`Age of onset of ${tag.label}`}
-                          onChange={e => onSetTagOnset(tag.id, e.target.value)}
-                          className="h-6 text-xs"
-                          placeholder="e.g. 45y"
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              }
               return (
                 <div key={tag.id}>
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -546,7 +502,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
         )}
       </div>
 
-      {!individual && indRows.length > 0 && (
+      {indRows.length > 0 && (
         <div className="space-y-1">
           <SectionHeader>Symbols</SectionHeader>
           <div>
@@ -555,7 +511,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
         </div>
       )}
 
-      {!individual && relRows.length > 0 && (
+      {relRows.length > 0 && (
         <div className="space-y-1">
           <SectionHeader>Relationships</SectionHeader>
           <div>
@@ -564,7 +520,7 @@ export function Legend({ pedigree: full, individual, onToggleTag, onSetTagOnset,
         </div>
       )}
 
-      {!individual && details.length > 0 && (
+      {details.length > 0 && (
         <div className="space-y-1" data-testid="legend-clinical-details">
           <SectionHeader>Clinical details</SectionHeader>
           <dl className="text-xs text-gray-800 space-y-0.5">

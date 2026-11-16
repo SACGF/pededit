@@ -3,13 +3,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Individual, NotationEdition, Pedigree, Tag } from "@pedigree-editor/layout-engine";
 import {
   affectedControlOn, applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isAffected, isCarrier,
-  plainAffected, plainCarrier, resolvePlainAffected,
+  plainAffected, plainCarrier, resolvePlainAffected, CONDITIONS_AND_TAGS,
 } from "../conditions";
 import { symbolPaint, renderExportKeySvg, renderSectorsSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
 import { carrierPaint, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape } from "../nodes/symbols";
 import { Legend } from "../../components/Legend";
+import { ConditionsAndTags } from "../../components/ConditionsAndTags";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
@@ -497,10 +498,30 @@ describe("renderers (#115)", () => {
     expect(old).toContain(">Carrier<");
   });
 
-  it("app legend marks a selected carrier's condition row", () => {
-    const p = family(undefined, "nsgc2022");
-    const out = renderToStaticMarkup(<Legend pedigree={p} individual={byId(p, "b")} onToggleTag={() => {}} />);
-    expect(out).toContain(`data-carrier-of="cf"`);
+  it("Person tab section (#136): conditions first with a status select and carrier swatch, then other tags as checkboxes", () => {
+    const trait: Tag = { id: "tall", label: "Tall", color: "#2ca02c", style: "quadrant", kind: "trait" };
+    const p = { ...family([trait, CF, TS], "nsgc2022"), individuals: family().individuals.map(i => i.id === "c" ? { ...i, tags: ["ts", "tall"] } : i) };
+    const noop = () => {};
+    const out = renderToStaticMarkup(
+      <ConditionsAndTags pedigree={p} individual={byId(p, "c")} onConditionState={noop} onToggleTag={noop} onSetTagOnset={noop} />,
+    );
+    expect(out).toContain(CONDITIONS_AND_TAGS);
+    // Conditions before the trait, although the trait is defined first.
+    expect(out.indexOf('data-condition-row="cf"')).toBeLessThan(out.indexOf('data-tag-row="tall"'));
+    expect(out.indexOf('data-condition-row="ts"')).toBeLessThan(out.indexOf('data-tag-row="tall"'));
+    // c is a carrier of CF and affected with Tay-Sachs: the selects say so, the CF swatch is the carrier one.
+    const row = (id: string) => out.slice(out.indexOf(`data-condition-row="${id}"`) + 1).split(/data-(condition|tag)-row/)[0]!;
+    expect(row("cf")).toMatch(/<option value="carrier" selected/);
+    expect(row("cf")).toContain("legend-clip-cf-carrier");
+    expect(row("ts")).toMatch(/<option value="affected" selected/);
+    expect(row("ts")).toContain('aria-label="Age of onset of Tay-Sachs"');
+    expect(row("cf")).not.toContain("Age of onset");
+    // The trait is a checkbox, ticked.
+    expect(out.slice(out.indexOf('data-tag-row="tall"'))).toMatch(/type="checkbox"[^>]*checked/);
+  });
+
+  it("the legend lists conditions and tags under the shared name (#136)", () => {
+    expect(renderToStaticMarkup(<Legend pedigree={family(undefined, "nsgc2022")} />)).toContain(CONDITIONS_AND_TAGS);
   });
 
   for (const notation of ["nsgc2022", "nsgc2008"] as const) {

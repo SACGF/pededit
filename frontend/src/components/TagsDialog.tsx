@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CONDITIONS_AND_TAGS } from "@/pedigree/conditions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -137,7 +138,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle className="text-sm font-medium">Tags</DialogTitle>
+          <DialogTitle className="text-sm font-medium">{CONDITIONS_AND_TAGS}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">

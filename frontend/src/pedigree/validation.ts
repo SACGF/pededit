@@ -521,10 +521,12 @@ export const RULES: Rule[] = [
     individual: (ind, ctx) => {
       const out: ProblemDraft[] = [];
       const perCondition = conditionMode(ctx.pedigree) === "per-condition";
+      // With any condition the panel's Status has the plain flags block, not the carrier select (#136).
+      const field = conditionMode(ctx.pedigree) === "plain" ? "carrier" : "conditions";
       if (isAffected(ind, ctx.pedigree) && plainCarrier(ind, ctx.pedigree) && (!perCondition || plainAffected(ind, ctx.pedigree))) {
         out.push({
           severity: "warning",
-          field: perCondition ? "conditions" : "carrier",
+          field,
           message: "Both affected and a carrier. The affected fill hides the carrier mark.",
           fix: { label: "Not a carrier", apply: a => a.setCarrier(ind.id, false) },
         });
@@ -534,7 +536,7 @@ export const RULES: Rule[] = [
       if (names.length) {
         out.push({
           severity: "warning",
-          field: perCondition ? "conditions" : "carrier",
+          field,
           message: `Both affected with and a carrier of ${names.join(", ")}. Drawn as affected.`,
           fix: { label: "Keep affected", apply: a => a.updateIndividual(ind.id, { carrierTags: ind.carrierTags!.filter(t => !both.includes(t)) }) },
         });
@@ -547,7 +549,7 @@ export const RULES: Rule[] = [
     id: "presymptomatic-affected",
     individual: (ind, ctx) => !!ind.presymptomatic && isAffected(ind, ctx.pedigree) && {
       severity: "warning",
-      field: conditionMode(ctx.pedigree) === "per-condition" ? "presymptomatic" : "carrier",
+      field: conditionMode(ctx.pedigree) === "plain" ? "carrier" : "presymptomatic",
       message: "Presymptomatic means not affected now, and the affected fill hides the vertical line.",
       fix: { label: "Not presymptomatic", apply: a => a.setPresymptomatic(ind.id, false) },
     },

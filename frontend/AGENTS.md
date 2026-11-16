@@ -165,8 +165,15 @@ stub so the app still builds without Google login.
   selection. Pedigree holds the chart title field, #20, and under it the
   folded "Clinical details" section, #102, whose fields, order and labels
   come from `pedigree/clinicalDetails.ts`. Whole-pedigree fields go on the
-  Pedigree tab, not in Settings, which is only how the chart is drawn; individual form with name, DOB, free-text age, the
-  Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75).
+  Pedigree tab, not in Settings, which is only how the chart is drawn, and
+  the figure `Legend` (#75) is shown there only. Person holds the
+  individual form with name, DOB, free-text age, Status, "Conditions and
+  tags" (`ConditionsAndTags.tsx`, #136: every defined tag with its key
+  swatch, conditions first with No / Affected / Carrier, the rest as
+  checkboxes, and the "Add / edit" button), and the Relatedness section of
+  #32 with the double-line checkbox of #85).
+  "Conditions and tags" (`CONDITIONS_AND_TAGS`) is the user-facing name for
+  what the tags dialog defines; "tag" stays the code's word.
   The Status section edits sex, affected, proband and consultand with the
   more menu's store actions and rules (#120: refused sexes disabled with
   `batchSexProblem`'s reason written out); keep the two in step when a rule
