@@ -1,0 +1,50 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A single known parent",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "x",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0,
+        "placeholder": true
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "x",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

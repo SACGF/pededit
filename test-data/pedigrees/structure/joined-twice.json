@@ -1,0 +1,199 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Two families joined by two marriages",
+  "pedigree": {
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "individuals": [
+      {
+        "id": "A1",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "A2",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "B1",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "B2",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "a1",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a2",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "b1",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b2",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "X",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 4
+      },
+      {
+        "id": "Y",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 5
+      },
+      {
+        "id": "c1",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a3",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b3",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c2",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "A1+A2",
+        "individual1": "A1",
+        "individual2": "A2"
+      },
+      {
+        "id": "B1+B2",
+        "individual1": "B1",
+        "individual2": "B2"
+      },
+      {
+        "id": "a1+b1",
+        "individual1": "a1",
+        "individual2": "b1"
+      },
+      {
+        "id": "X+a2",
+        "individual1": "X",
+        "individual2": "a2"
+      },
+      {
+        "id": "b2+Y",
+        "individual1": "b2",
+        "individual2": "Y"
+      },
+      {
+        "id": "a3+b3",
+        "individual1": "a3",
+        "individual2": "b3"
+      }
+    ],
+    "parentOf": {
+      "A1+A2": [
+        "a1",
+        "a2"
+      ],
+      "B1+B2": [
+        "b1",
+        "b2"
+      ],
+      "a1+b1": [
+        "c1"
+      ],
+      "X+a2": [
+        "a3"
+      ],
+      "b2+Y": [
+        "b3"
+      ],
+      "a3+b3": [
+        "c2"
+      ]
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

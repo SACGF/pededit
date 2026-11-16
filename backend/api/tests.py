@@ -440,3 +440,65 @@ class UsageStatsCommandTests(APITestCase):
         text = out.getvalue()
         self.assertIn("last 7 days", text)
         self.assertIn("anonymous pedigrees", text)
+
+
+class PedigreeDataSetTests(APITestCase):
+    """The shared test data set (#167, test-data/pedigrees/): the same files
+    the frontend sweeps and the page checks read. manifest.json says what the
+    server should do with each file's pedigree."""
+
+    DATA_DIR = Path(__file__).resolve().parents[2] / "test-data" / "pedigrees"
+
+    @classmethod
+    def cases(cls):
+        manifest = json.loads((cls.DATA_DIR / "manifest.json").read_text())
+        for entry in manifest["files"]:
+            if entry["server"] == "not-sent":
+                continue
+            doc = json.loads((cls.DATA_DIR / entry["file"]).read_text())
+            # An envelope carries the pedigree; a bare document is the pedigree.
+            data = doc["pedigree"] if "format" in doc or "pedigree" in doc else doc
+            yield entry, data
+
+    def test_every_valid_file_is_stored_unchanged(self):
+        seen = 0
+        for entry, data in self.cases():
+            if entry["server"] != "accepted":
+                continue
+            seen += 1
+            with self.subTest(entry["file"]):
+                resp = self.client.post("/api/pedigrees/", {"title": entry["file"], "data": data}, format="json")
+                self.assertEqual(resp.status_code, 201, resp.data)
+                pk = resp.data["id"]
+                self.assertEqual(self.client.get(f"/api/pedigrees/{pk}/").json()["data"], data)
+                # A save of what was loaded (the editor's auto-save) keeps it too.
+                resp = self.client.patch(f"/api/pedigrees/{pk}/", {"data": data}, format="json")
+                self.assertEqual(resp.status_code, 200, resp.data)
+                self.assertEqual(Pedigree.objects.get(pk=pk).data, data)
+        self.assertGreater(seen, 40)
+
+    def test_every_refused_file_is_refused(self):
+        seen = 0
+        for entry, data in self.cases():
+            if entry["server"] != "refused":
+                continue
+            seen += 1
+            with self.subTest(entry["file"]):
+                resp = self.client.post("/api/pedigrees/", {"title": entry["file"], "data": data}, format="json")
+                self.assertEqual(resp.status_code, 400, entry["file"])
+        self.assertGreater(seen, 1)
+
+    def test_structure_is_not_checked(self):
+        """Files the JSON importer refuses for their structure (an id that does
+        not exist, a cycle) are stored: the serializers check each field's
+        shape only. Whether the server should refuse them is #170; this test
+        records what it does, so a change is made on purpose."""
+        seen = 0
+        for entry, data in self.cases():
+            if entry["server"] != "accepted-unchecked":
+                continue
+            seen += 1
+            with self.subTest(entry["file"]):
+                resp = self.client.post("/api/pedigrees/", {"title": entry["file"], "data": data}, format="json")
+                self.assertEqual(resp.status_code, 201, entry["file"])
+        self.assertGreater(seen, 5)

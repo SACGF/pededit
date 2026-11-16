@@ -1,0 +1,72 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Missing references",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "x",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "tags": [
+          "nope"
+        ],
+        "carrierTags": [
+          "gone"
+        ],
+        "tagOnset": {
+          "nope": "30s"
+        }
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "f",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "x"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "tags": [
+      {
+        "id": "c1",
+        "label": "Condition one",
+        "color": "#d62728",
+        "style": "quadrant"
+      },
+      {
+        "id": "c2",
+        "label": "Condition two",
+        "color": "#1f77b4",
+        "style": "quadrant"
+      }
+    ]
+  }
+}

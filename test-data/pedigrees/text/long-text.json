@@ -1,0 +1,83 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Very long names, variant names, condition labels and a long title",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Maximilian-Alexander Bartholomew Fitzgerald-Montgomery the Third of Somewhere"
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Supercalifragilisticexpialidocious"
+      },
+      {
+        "id": "c",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Wolfeschlegelsteinhausenbergerdorff",
+        "tags": [
+          "c"
+        ],
+        "tagOnset": {
+          "c": "between the ages of forty and fifty"
+        },
+        "evaluations": [
+          {
+            "result": "positive",
+            "detail": "NM_000059.4(BRCA2):c.5946delT p.(Ser1982ArgfsTer22)",
+            "documented": true
+          },
+          {
+            "result": "negative",
+            "detail": "NM_007294.4(BRCA1):c.68_69delAG p.(Glu23ValfsTer17)"
+          },
+          {
+            "result": "uninformative",
+            "detail": "chr17:g.43045712_43045802del (GRCh38)"
+          }
+        ]
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "a",
+        "individual2": "b"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "tags": [
+      {
+        "id": "c",
+        "label": "A condition with a name long enough to wrap in the legend and the export key twice over",
+        "color": "#d62728",
+        "style": "quadrant",
+        "abbrev": "LONGABBREV"
+      }
+    ],
+    "chartTitle": "A chart title long enough to be wider than the three people drawn underneath it, so the figure has to widen"
+  }
+}

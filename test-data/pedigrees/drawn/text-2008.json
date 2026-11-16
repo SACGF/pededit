@@ -1,0 +1,231 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Text under the symbol, NSGC 2008",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "gf",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Bartholomew Featherstonehaugh-Wetherby",
+        "dob": "1931-04-02",
+        "dod": "2009-11-17",
+        "deceased": true,
+        "notes": "Notes are never drawn."
+      },
+      {
+        "id": "gm",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Ottoline",
+        "dob": "1934",
+        "age": "92y"
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Persephone Quillfeather",
+        "dob": "1958-06",
+        "genderIdentity": "woman",
+        "tags": [
+          "ms"
+        ],
+        "tagOnset": {
+          "ms": "childhood"
+        },
+        "hpoTerms": [
+          "HP:0001250"
+        ]
+      },
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 0,
+        "name": "Rupert",
+        "age": "d. 60s",
+        "deceased": true,
+        "onset": "40s"
+      },
+      {
+        "id": "u1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "name": "Sorrel",
+        "dob": "1961-01-30",
+        "genderIdentity": "woman"
+      },
+      {
+        "id": "u2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2,
+        "name": "Tamsin",
+        "dob": "1963-09-09",
+        "genderIdentity": "man",
+        "tags": [
+          "gt"
+        ]
+      },
+      {
+        "id": "u3",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 3,
+        "name": "Umber",
+        "genderIdentity": "nonbinary",
+        "age": "50s"
+      },
+      {
+        "id": "u4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 4,
+        "name": "Vesper",
+        "genderIdentity": "nonbinary"
+      },
+      {
+        "id": "u5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 5,
+        "genderIdentity": "nonbinary",
+        "age": "44y"
+      },
+      {
+        "id": "k1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Wilhelmina",
+        "dob": "1985-12-01",
+        "proband": true,
+        "tags": [
+          "ms",
+          "gt"
+        ],
+        "tagOnset": {
+          "ms": "27y"
+        },
+        "evaluations": [
+          {
+            "result": "positive",
+            "detail": "HLA-DRB1*15:01",
+            "documented": true
+          },
+          {
+            "result": "negative",
+            "detail": "NOTCH3 c.1672C>T p.(Arg558Cys)"
+          },
+          {
+            "result": "uninformative"
+          }
+        ]
+      },
+      {
+        "id": "k2",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 1,
+        "name": "Xavier",
+        "dob": "1988",
+        "onset": "birth",
+        "evaluations": [
+          {
+            "detail": "MRI pending"
+          }
+        ]
+      },
+      {
+        "id": "k3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2,
+        "name": "Yolanda",
+        "age": "3 wk",
+        "lifeStatus": "stillbirth"
+      },
+      {
+        "id": "k4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3,
+        "name": "Zebedee",
+        "dob": "1995-02-14",
+        "adopted": "in"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "gf",
+        "individual2": "gm"
+      },
+      {
+        "id": "p1",
+        "individual1": "f",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "m",
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "u5"
+      ],
+      "p1": [
+        "k1",
+        "k2",
+        "k3",
+        "k4"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "birthDate",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2008",
+      "showNumbers": true,
+      "nameLabels": "wrap",
+      "symbolsShow": "gender"
+    },
+    "tags": [
+      {
+        "id": "ms",
+        "label": "Multiple sclerosis",
+        "color": "#d62728",
+        "style": "quadrant",
+        "abbrev": "MS"
+      },
+      {
+        "id": "gt",
+        "label": "Genotype",
+        "color": "#000000",
+        "style": "text",
+        "abbrev": "+/-"
+      }
+    ],
+    "chartTitle": "Featherstonehaugh-Wetherby family",
+    "clinicalDetails": {
+      "referralReason": "Family history of multiple sclerosis",
+      "maternalAncestry": "Cornish",
+      "paternalAncestry": "Not known",
+      "historian": "Proband",
+      "recordedBy": "A. Counsellor",
+      "recordedOn": "2026-11-16"
+    }
+  }
+}

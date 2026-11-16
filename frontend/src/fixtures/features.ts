@@ -21,19 +21,19 @@ export interface FeatureFixture {
   data: Pedigree;
 }
 
-const SETTINGS_2022: CanvasSettings = { nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" };
+export const SETTINGS_2022: CanvasSettings = { nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" };
 
-type Extra = Partial<Omit<Individual, "id" | "sex">>;
-const person = (id: string, sex: Individual["sex"], extra: Extra = {}): Individual =>
+export type Extra = Partial<Omit<Individual, "id" | "sex">>;
+export const person = (id: string, sex: Individual["sex"], extra: Extra = {}): Individual =>
   ({ id, sex, affected: false, sibOrder: 0, ...extra });
-const M = (id: string, extra?: Extra) => person(id, "male", extra);
-const F = (id: string, extra?: Extra) => person(id, "female", extra);
-const U = (id: string, extra?: Extra) => person(id, "unknown", extra);
-const couple = (id: string, individual1: string, individual2: string, extra: Partial<Partnership> = {}): Partnership =>
+export const M = (id: string, extra?: Extra) => person(id, "male", extra);
+export const F = (id: string, extra?: Extra) => person(id, "female", extra);
+export const U = (id: string, extra?: Extra) => person(id, "unknown", extra);
+export const couple = (id: string, individual1: string, individual2: string, extra: Partial<Partnership> = {}): Partnership =>
   ({ id, individual1, individual2, ...extra });
 
 /** Children numbered in the order written, as the editor numbers them. */
-function build(
+export function build(
   individuals: Individual[],
   partnerships: Partnership[],
   parentOf: Record<string, string[]>,

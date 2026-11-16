@@ -1,0 +1,98 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A pregnancy with a partner, a man who carried a child, roles linked to nobody, someone unconnected",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "preg",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "lifeStatus": "pregnancy"
+      },
+      {
+        "id": "pp",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "carrierman",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "child1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2,
+        "carriedBy": "carrierman"
+      },
+      {
+        "id": "surr",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3,
+        "reproductiveRole": "surrogate"
+      },
+      {
+        "id": "donor",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "alone",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "f",
+        "individual2": "m"
+      },
+      {
+        "id": "p1",
+        "individual1": "pp",
+        "individual2": "preg"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "preg",
+        "carrierman",
+        "child1",
+        "surr",
+        "donor"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

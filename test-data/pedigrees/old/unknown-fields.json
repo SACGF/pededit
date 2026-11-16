@@ -1,0 +1,61 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Unknown fields",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "futureField": {
+          "nested": [
+            1,
+            2,
+            3
+          ]
+        },
+        "karyotype": "46,XY"
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "f",
+        "individual2": "m",
+        "marriedOn": "1990"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022",
+      "futureSetting": true
+    },
+    "futureTopLevel": "kept"
+  },
+  "futureEnvelopeField": 1
+}

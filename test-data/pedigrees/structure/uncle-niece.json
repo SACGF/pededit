@@ -1,0 +1,124 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "An uncle and niece couple",
+  "pedigree": {
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "individuals": [
+      {
+        "id": "un_gf",
+        "sex": "male",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "un_gm",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "un_uncle",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "un_sis",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "un_bil",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "un_niece",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "un_c1",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "proband": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "un_c2",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "proband": false,
+        "sibOrder": 2
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "un_pp1",
+        "individual1": "un_gf",
+        "individual2": "un_gm",
+        "consanguineous": false
+      },
+      {
+        "id": "un_pp2",
+        "individual1": "un_bil",
+        "individual2": "un_sis",
+        "consanguineous": false
+      },
+      {
+        "id": "un_pp3",
+        "individual1": "un_uncle",
+        "individual2": "un_niece",
+        "consanguineous": true
+      }
+    ],
+    "parentOf": {
+      "un_pp1": [
+        "un_uncle",
+        "un_sis"
+      ],
+      "un_pp2": [
+        "un_niece"
+      ],
+      "un_pp3": [
+        "un_c1",
+        "un_c2"
+      ]
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "format": "someone-elses-pedigree",
+  "version": 1,
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "f",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    }
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Pattern fills, NSGC 2008",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "tags": [
+          "f1",
+          "f2",
+          "f3",
+          "f4"
+        ]
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "carrierTags": [
+          "f1",
+          "f2",
+          "f3",
+          "f4"
+        ]
+      },
+      {
+        "id": "k1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "tags": [
+          "f5"
+        ]
+      },
+      {
+        "id": "k2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "tags": [
+          "f6"
+        ]
+      },
+      {
+        "id": "k3",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 2,
+        "tags": [
+          "f7"
+        ]
+      },
+      {
+        "id": "k4",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 3,
+        "tags": [
+          "f1",
+          "f5",
+          "f6",
+          "f7"
+        ]
+      },
+      {
+        "id": "k5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4,
+        "carrierTags": [
+          "f5",
+          "f7"
+        ],
+        "tags": [
+          "f2"
+        ]
+      },
+      {
+        "id": "k6",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 5,
+        "tags": [
+          "f3"
+        ],
+        "carrierTags": [
+          "f4"
+        ],
+        "lifeStatus": "miscarriage"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "a",
+        "individual2": "b"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "k1",
+        "k2",
+        "k3",
+        "k4",
+        "k5",
+        "k6"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2008",
+      "tagFills": "color"
+    },
+    "tags": [
+      {
+        "id": "f1",
+        "label": "Solid",
+        "color": "#d62728",
+        "style": "quadrant",
+        "fill": "solid"
+      },
+      {
+        "id": "f2",
+        "label": "Horizontal",
+        "color": "#1f77b4",
+        "style": "quadrant",
+        "fill": "horizontal"
+      },
+      {
+        "id": "f3",
+        "label": "Vertical",
+        "color": "#2ca02c",
+        "style": "quadrant",
+        "fill": "vertical"
+      },
+      {
+        "id": "f4",
+        "label": "Diagonal",
+        "color": "#9467bd",
+        "style": "quadrant",
+        "fill": "diagonal"
+      },
+      {
+        "id": "f5",
+        "label": "Cross-hatched",
+        "color": "#ff7f0e",
+        "style": "quadrant",
+        "fill": "crosshatch"
+      },
+      {
+        "id": "f6",
+        "label": "Dotted",
+        "color": "#8c564b",
+        "style": "quadrant",
+        "fill": "dots",
+        "kind": "trait"
+      },
+      {
+        "id": "f7",
+        "label": "Shaded",
+        "color": "#e377c2",
+        "style": "quadrant",
+        "fill": "shade"
+      }
+    ]
+  }
+}

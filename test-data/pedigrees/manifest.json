@@ -1,0 +1,914 @@
+{
+  "today": "2026-11-16",
+  "files": [
+    {
+      "file": "structure/one-person.json",
+      "group": "structure",
+      "purpose": "One person",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 1,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/childless-couple.json",
+      "group": "structure",
+      "purpose": "A couple with no children",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 2,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/single-parent.json",
+      "group": "structure",
+      "purpose": "A single known parent: the other is the editor's placeholder partner",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/three-partners.json",
+      "group": "structure",
+      "purpose": "One person with three partners and a child by each",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 7,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/half-siblings.json",
+      "group": "structure",
+      "purpose": "Half siblings through the mother and through the father",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 7,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/cousin-couple.json",
+      "group": "structure",
+      "purpose": "First cousins who are a couple, with a child",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 9,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/uncle-niece.json",
+      "group": "structure",
+      "purpose": "An uncle and niece couple",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/double-first-cousins.json",
+      "group": "structure",
+      "purpose": "Double first cousins: two sibling pairs intermarry",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 10,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/sibling-couple.json",
+      "group": "structure",
+      "purpose": "A brother and sister couple",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 5,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/across-generations.json",
+      "group": "structure",
+      "purpose": "A couple across generations, so someone is drawn twice",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/joined-twice.json",
+      "group": "structure",
+      "purpose": "Two families joined by two marriages",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/unconnected.json",
+      "group": "structure",
+      "purpose": "Two unconnected families and two unconnected people",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 9,
+      "problems": [
+        "not-connected:lone1",
+        "not-connected:lone2"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/sibship-of-12.json",
+      "group": "structure",
+      "purpose": "A sibship of twelve",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "structure/eight-generations.json",
+      "group": "structure",
+      "purpose": "Eight generations in one line of descent",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 15,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "reproduction/triplets.json",
+      "group": "reproduction",
+      "purpose": "Triplets of each zygosity",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 11,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "reproduction/two-fathers.json",
+      "group": "reproduction",
+      "purpose": "Two men with two children by one egg donor, carried by a surrogate",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 6,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/status.json",
+      "group": "drawn",
+      "purpose": "Status and conditions: affected, carrier, presymptomatic, deceased, proband and consultand, \"?\", conditions affected and carrier, a trait, dot and text tags, evaluations and the documented \"*\"",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [
+        "affected-and-carrier:n",
+        "condition-not-recorded:gf",
+        "condition-not-recorded:gm",
+        "condition-not-recorded:n",
+        "condition-not-recorded:n:1",
+        "condition-not-recorded:s4",
+        "condition-not-recorded:u"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/fills.json",
+      "group": "drawn",
+      "purpose": "Pattern fills: every pattern fill, carrier fills, and a fifth to seventh section drawn as slices",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [
+        "condition-not-recorded:k4"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/text.json",
+      "group": "drawn",
+      "purpose": "Text under the symbol: long names, year of birth, free-text age, onset per condition, evaluations, AMAB / AFAB / UAAB, pedigree numbers, chart title, clinical details in the key",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 13,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/couples.json",
+      "group": "drawn",
+      "purpose": "Couples and lines: twins of each zygosity, ended and childless couples, a second partner, a swapped couple, double lines with text above, adoption in and out",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 23,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/reproduction.json",
+      "group": "drawn",
+      "purpose": "Pregnancies, losses and assisted reproduction: every pregnancy and loss symbol, a placeholder partner, donors, a surrogate, carried-by and social parent lines, a same-sex couple",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 34,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/collapsed.json",
+      "group": "drawn",
+      "purpose": "Hidden descendants: collapsed branches: group symbols by sex and mixed, affected and carrier children drawn beside them",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 27,
+      "problems": [
+        "condition-not-recorded:c9"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/filter-affected.json",
+      "group": "drawn",
+      "purpose": "Filter: affected only, one condition: the Affected only view filter narrowed to a condition",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 27,
+      "problems": [
+        "condition-not-recorded:c9"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/filter-maternal.json",
+      "group": "drawn",
+      "purpose": "Filter: blood relatives, mother's side: Blood relatives only with Mother's side only",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 27,
+      "problems": [
+        "condition-not-recorded:c9"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/filter-paternal.json",
+      "group": "drawn",
+      "purpose": "Filter: father's side: Father's side only",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 27,
+      "problems": [
+        "condition-not-recorded:c9"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/status-2008.json",
+      "group": "drawn",
+      "purpose": "Status and conditions, NSGC 2008: 2008: carrier dot, a quarter per condition, black base",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [
+        "affected-and-carrier:n",
+        "condition-not-recorded:gf",
+        "condition-not-recorded:gm",
+        "condition-not-recorded:n",
+        "condition-not-recorded:n:1",
+        "condition-not-recorded:s4",
+        "condition-not-recorded:u"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/status-mono.json",
+      "group": "drawn",
+      "purpose": "Status and conditions, black and white: black and white patterns",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [
+        "affected-and-carrier:n",
+        "condition-not-recorded:gf",
+        "condition-not-recorded:gm",
+        "condition-not-recorded:n",
+        "condition-not-recorded:n:1",
+        "condition-not-recorded:s4",
+        "condition-not-recorded:u"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/status-2008-mono.json",
+      "group": "drawn",
+      "purpose": "Status and conditions, NSGC 2008 in black and white: 2008 with black and white patterns",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [
+        "affected-and-carrier:n",
+        "condition-not-recorded:gf",
+        "condition-not-recorded:gm",
+        "condition-not-recorded:n",
+        "condition-not-recorded:n:1",
+        "condition-not-recorded:s4",
+        "condition-not-recorded:u"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/status-affected-first.json",
+      "group": "drawn",
+      "purpose": "Status and conditions, affected first: sibling order: affected first",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 14,
+      "problems": [
+        "affected-and-carrier:n",
+        "condition-not-recorded:gf",
+        "condition-not-recorded:gm",
+        "condition-not-recorded:n",
+        "condition-not-recorded:n:1",
+        "condition-not-recorded:s4",
+        "condition-not-recorded:u"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/fills-mono.json",
+      "group": "drawn",
+      "purpose": "Pattern fills, black and white: every pattern in black, more conditions than patterns",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [
+        "condition-not-recorded:k4"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/fills-2008.json",
+      "group": "drawn",
+      "purpose": "Pattern fills, NSGC 2008: 2008 quarters with pattern fills",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [
+        "condition-not-recorded:k4"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/text-2008.json",
+      "group": "drawn",
+      "purpose": "Text under the symbol, NSGC 2008: 2008 evaluations (E1+, E2-)",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 13,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/text-sex.json",
+      "group": "drawn",
+      "purpose": "Text under the symbol, symbols by sex: Symbols show: biological sex, names cut to one line",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 13,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/couples-named.json",
+      "group": "drawn",
+      "purpose": "Couples and lines, relationships named: Name consanguineous relationships, relaxed width",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 23,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/couples-pinned.json",
+      "group": "drawn",
+      "purpose": "Couples and lines, pinned and snapped: pinned positions, an unlocked person, snap to grid, minimal width",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 23,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "drawn/collapsed-mono.json",
+      "group": "drawn",
+      "purpose": "Hidden descendants, black and white: group symbols beside patterned sections",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 27,
+      "problems": [
+        "condition-not-recorded:c9"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "text/markup-in-names.json",
+      "group": "text",
+      "purpose": "Names and text with <, >, & and quotes",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "text/scripts.json",
+      "group": "text",
+      "purpose": "Names in Greek, Cyrillic, Chinese, Arabic and Hebrew, and an emoji",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 6,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "text/dates-and-ages.json",
+      "group": "text",
+      "purpose": "Partial dates and free-text ages",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 8,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "text/long-text.json",
+      "group": "text",
+      "purpose": "Very long names, variant names, condition labels and a long title",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "text/ids.json",
+      "group": "text",
+      "purpose": "Ids that are UUIDs, numbers, and text with spaces and punctuation",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 5,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "problems/dates.json",
+      "group": "problems",
+      "purpose": "Dates that cannot be right, one person or family per rule",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 33,
+      "problems": [
+        "age-disagrees:h",
+        "born-after-mother-died:k4",
+        "born-long-after-father-died:k5",
+        "date-in-future:e",
+        "death-before-birth:c",
+        "dob-unparseable:a",
+        "dod-not-deceased:d",
+        "dod-unparseable:b",
+        "living-over-110:g",
+        "mother-too-old:e",
+        "mother-too-old:k3",
+        "parent-born-after-child:k1",
+        "parent-too-young:k2",
+        "siblings-out-of-order:h",
+        "siblings-out-of-order:s2",
+        "twins-born-apart:t2"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "problems/status.json",
+      "group": "problems",
+      "purpose": "Statuses that contradict each other, with two conditions defined",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 12,
+      "problems": [
+        "affected-and-carrier:s",
+        "affected-and-carrier:s2",
+        "condition-not-recorded:r",
+        "condition-not-recorded:r2",
+        "condition-not-recorded:s2",
+        "condition-not-recorded:s2:1",
+        "condition-not-recorded:t",
+        "consultand-deceased:q",
+        "evaluation-documented-no-result:w",
+        "evaluation-empty:v",
+        "onset-unaffected:u",
+        "onset-unaffected:u:1",
+        "presymptomatic-affected:t",
+        "proband-unaffected:p"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "problems/reproduction.json",
+      "group": "problems",
+      "purpose": "A pregnancy with a partner, a man who carried a child, roles linked to nobody, someone unconnected",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 9,
+      "problems": [
+        "carried-by-male:child1",
+        "not-connected:alone",
+        "pregnancy-with-family:preg",
+        "role-not-linked:donor",
+        "role-not-linked:surr",
+        "surrogate-male:surr"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "problems/missing-references.json",
+      "group": "problems",
+      "purpose": "References to a condition and a tag that are not defined: imported with a warning, then reported as a problem",
+      "import": [
+        "warning:DANGLING_REFERENCE"
+      ],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [
+        "missing-reference:x"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/no-notation.json",
+      "group": "old",
+      "purpose": "Saved before the notation setting: no canvasSettings, drawn as NSGC 2008",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/carrier-flag.json",
+      "group": "old",
+      "purpose": "The plain carrier flag with no conditions defined, as saved before carriers were per condition",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/placeholder-without-flag.json",
+      "group": "old",
+      "purpose": "An unknown-sex partner made for a single parent before placeholders were flagged",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/null-optionals.json",
+      "group": "old",
+      "purpose": "null for optional fields, which the format treats as absent",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/unknown-fields.json",
+      "group": "old",
+      "purpose": "Fields this version does not know, which must survive import and a save",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/stale-pin.json",
+      "group": "old",
+      "purpose": "A pinned position and an unlock for someone who no longer exists",
+      "import": [
+        "warning:DANGLING_REFERENCE"
+      ],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/bare-pedigree.json",
+      "group": "old",
+      "purpose": "A bare pedigree with no envelope and no siblingOrder",
+      "import": [
+        "info:BARE_PEDIGREE",
+        "warning:DEFAULT_APPLIED"
+      ],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "old/newer-version.json",
+      "group": "old",
+      "purpose": "An envelope from a newer version of the format",
+      "import": [
+        "warning:NEWER_VERSION"
+      ],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
+      "file": "refused/invalid-json.json",
+      "group": "refused",
+      "purpose": "Not JSON at all",
+      "import": [
+        "error:INVALID_JSON"
+      ],
+      "valid": false,
+      "server": "not-sent"
+    },
+    {
+      "file": "refused/not-an-object.json",
+      "group": "refused",
+      "purpose": "A JSON list, not an object",
+      "import": [
+        "error:NOT_AN_OBJECT"
+      ],
+      "valid": false,
+      "server": "not-sent"
+    },
+    {
+      "file": "refused/unknown-format.json",
+      "group": "refused",
+      "purpose": "An envelope of some other format",
+      "import": [
+        "error:UNKNOWN_FORMAT"
+      ],
+      "valid": false,
+      "server": "not-sent"
+    },
+    {
+      "file": "refused/missing-field.json",
+      "group": "refused",
+      "purpose": "A person with no sex",
+      "import": [
+        "error:MISSING_FIELD"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/wrong-type.json",
+      "group": "refused",
+      "purpose": "sibOrder as text, not a number",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/duplicate-id.json",
+      "group": "refused",
+      "purpose": "Two people with one id",
+      "import": [
+        "error:DUPLICATE_ID"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/unknown-individual.json",
+      "group": "refused",
+      "purpose": "A couple naming someone who does not exist",
+      "import": [
+        "error:UNKNOWN_INDIVIDUAL"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/unknown-partnership.json",
+      "group": "refused",
+      "purpose": "Children of a couple that does not exist",
+      "import": [
+        "error:UNKNOWN_PARTNERSHIP"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/self-partnership.json",
+      "group": "refused",
+      "purpose": "Someone as their own partner",
+      "import": [
+        "error:SELF_PARTNERSHIP"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/child-of-own-partnership.json",
+      "group": "refused",
+      "purpose": "Someone as a child of their own couple",
+      "import": [
+        "error:CHILD_OF_OWN_PARTNERSHIP"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/two-sets-of-parents.json",
+      "group": "refused",
+      "purpose": "A child with two sets of parents",
+      "import": [
+        "error:MULTIPLE_PARENT_SETS"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "refused/circular-ancestry.json",
+      "group": "refused",
+      "purpose": "Someone who is their own grandparent",
+      "import": [
+        "error:CIRCULAR_ANCESTRY"
+      ],
+      "valid": false,
+      "server": "accepted-unchecked"
+    },
+    {
+      "file": "size/family-200.json",
+      "group": "size",
+      "purpose": "A generated family of 238 people, for timing",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "timingOnly": true,
+      "people": 238,
+      "problems": [
+        "affected-and-carrier:45",
+        "affected-and-carrier:58",
+        "proband-unaffected:238"
+      ],
+      "lint": []
+    },
+    {
+      "file": "size/family-500.json",
+      "group": "size",
+      "purpose": "A generated family of 513 people, for timing",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "timingOnly": true,
+      "people": 513,
+      "problems": [
+        "affected-and-carrier:10",
+        "affected-and-carrier:167",
+        "affected-and-carrier:184",
+        "affected-and-carrier:23",
+        "affected-and-carrier:294",
+        "affected-and-carrier:295",
+        "affected-and-carrier:313",
+        "affected-and-carrier:39",
+        "affected-and-carrier:414",
+        "affected-and-carrier:430",
+        "affected-and-carrier:434",
+        "affected-and-carrier:477",
+        "affected-and-carrier:489",
+        "affected-and-carrier:96",
+        "proband-unaffected:513"
+      ],
+      "lint": []
+    }
+  ]
+}

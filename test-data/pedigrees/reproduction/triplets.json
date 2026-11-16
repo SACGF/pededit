@@ -1,0 +1,131 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Triplets of each zygosity",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "mza",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "mzb",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "mzc",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "dza",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "dzb",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4
+      },
+      {
+        "id": "dzc",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 5
+      },
+      {
+        "id": "uza",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 6
+      },
+      {
+        "id": "uzb",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 7
+      },
+      {
+        "id": "uzc",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 8
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "f",
+        "individual2": "m",
+        "twins": [
+          {
+            "members": [
+              "mza",
+              "mzb",
+              "mzc"
+            ],
+            "zygosity": "monozygotic"
+          },
+          {
+            "members": [
+              "dza",
+              "dzb",
+              "dzc"
+            ],
+            "zygosity": "dizygotic"
+          },
+          {
+            "members": [
+              "uza",
+              "uzb",
+              "uzc"
+            ],
+            "zygosity": "unknown"
+          }
+        ]
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "mza",
+        "mzb",
+        "mzc",
+        "dza",
+        "dzb",
+        "dzc",
+        "uza",
+        "uzb",
+        "uzc"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

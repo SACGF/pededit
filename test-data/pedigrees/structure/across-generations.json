@@ -1,0 +1,127 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A couple across generations, so someone is drawn twice",
+  "pedigree": {
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "individuals": [
+      {
+        "id": "GF",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "GM",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "P",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "S",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "GC",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "Z",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "GGC",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "W",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "GF+GM",
+        "individual1": "GF",
+        "individual2": "GM"
+      },
+      {
+        "id": "S+P",
+        "individual1": "S",
+        "individual2": "P"
+      },
+      {
+        "id": "GC+Z",
+        "individual1": "GC",
+        "individual2": "Z"
+      },
+      {
+        "id": "GF+Z",
+        "individual1": "GF",
+        "individual2": "Z"
+      }
+    ],
+    "parentOf": {
+      "GF+GM": [
+        "P"
+      ],
+      "S+P": [
+        "GC"
+      ],
+      "GC+Z": [
+        "GGC"
+      ],
+      "GF+Z": [
+        "W"
+      ]
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

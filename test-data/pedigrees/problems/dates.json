@@ -1,0 +1,351 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Dates that cannot be right, one person or family per rule",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f0",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1940"
+      },
+      {
+        "id": "m0",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1942"
+      },
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "sometime"
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "deceased": true,
+        "dob": "1970",
+        "dod": "later"
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "deceased": true,
+        "dob": "1972",
+        "dod": "1962"
+      },
+      {
+        "id": "d",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 3,
+        "dob": "1974",
+        "dod": "2001"
+      },
+      {
+        "id": "e",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 4,
+        "dob": "2090"
+      },
+      {
+        "id": "h",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 5,
+        "dob": "1980",
+        "age": "20"
+      },
+      {
+        "id": "g",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1900"
+      },
+      {
+        "id": "gw",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1990"
+      },
+      {
+        "id": "f1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1990"
+      },
+      {
+        "id": "m1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1960"
+      },
+      {
+        "id": "k1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1985"
+      },
+      {
+        "id": "f2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1970"
+      },
+      {
+        "id": "m2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1980"
+      },
+      {
+        "id": "k2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1988"
+      },
+      {
+        "id": "f3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1920",
+        "deceased": true
+      },
+      {
+        "id": "m3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1920",
+        "deceased": true
+      },
+      {
+        "id": "k3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1980"
+      },
+      {
+        "id": "f4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1950"
+      },
+      {
+        "id": "m4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1950",
+        "dod": "1980",
+        "deceased": true
+      },
+      {
+        "id": "k4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1985"
+      },
+      {
+        "id": "f5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1950",
+        "dod": "1980",
+        "deceased": true
+      },
+      {
+        "id": "m5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1952"
+      },
+      {
+        "id": "k5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1983"
+      },
+      {
+        "id": "f6",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1970"
+      },
+      {
+        "id": "m6",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1972"
+      },
+      {
+        "id": "t1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "2000-01-01"
+      },
+      {
+        "id": "t2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "dob": "2000-03-01"
+      },
+      {
+        "id": "f7",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1960"
+      },
+      {
+        "id": "m7",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1962"
+      },
+      {
+        "id": "s1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1990"
+      },
+      {
+        "id": "s2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "dob": "1985"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "f0",
+        "individual2": "m0"
+      },
+      {
+        "id": "pg",
+        "individual1": "g",
+        "individual2": "gw"
+      },
+      {
+        "id": "p1",
+        "individual1": "f1",
+        "individual2": "m1"
+      },
+      {
+        "id": "p2",
+        "individual1": "f2",
+        "individual2": "m2"
+      },
+      {
+        "id": "p3",
+        "individual1": "f3",
+        "individual2": "m3"
+      },
+      {
+        "id": "p4",
+        "individual1": "f4",
+        "individual2": "m4"
+      },
+      {
+        "id": "p5",
+        "individual1": "f5",
+        "individual2": "m5"
+      },
+      {
+        "id": "p6",
+        "individual1": "f6",
+        "individual2": "m6",
+        "twins": [
+          {
+            "members": [
+              "t1",
+              "t2"
+            ],
+            "zygosity": "dizygotic"
+          }
+        ]
+      },
+      {
+        "id": "p7",
+        "individual1": "f7",
+        "individual2": "m7"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "h"
+      ],
+      "p1": [
+        "k1"
+      ],
+      "p2": [
+        "k2"
+      ],
+      "p3": [
+        "k3"
+      ],
+      "p4": [
+        "k4"
+      ],
+      "p5": [
+        "k5"
+      ],
+      "p6": [
+        "t1",
+        "t2"
+      ],
+      "p7": [
+        "s1",
+        "s2"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Statuses that contradict each other, with two conditions defined",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "p",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "proband": true
+      },
+      {
+        "id": "q",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "consultand": true,
+        "deceased": true
+      },
+      {
+        "id": "r",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 2
+      },
+      {
+        "id": "r2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3,
+        "carrier": true
+      },
+      {
+        "id": "s",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4,
+        "tags": [
+          "c1"
+        ],
+        "carrierTags": [
+          "c1"
+        ]
+      },
+      {
+        "id": "s2",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 5,
+        "carrier": true
+      },
+      {
+        "id": "t",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 6,
+        "presymptomatic": true
+      },
+      {
+        "id": "u",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 7,
+        "onset": "40s",
+        "tagOnset": {
+          "c2": "50s"
+        }
+      },
+      {
+        "id": "v",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 8,
+        "evaluations": [
+          {}
+        ]
+      },
+      {
+        "id": "w",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 9,
+        "evaluations": [
+          {
+            "detail": "report seen",
+            "documented": true
+          }
+        ]
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "f",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "p",
+        "q",
+        "r",
+        "r2",
+        "s",
+        "s2",
+        "t",
+        "u",
+        "v",
+        "w"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "tags": [
+      {
+        "id": "c1",
+        "label": "Condition one",
+        "color": "#d62728",
+        "style": "quadrant"
+      },
+      {
+        "id": "c2",
+        "label": "Condition two",
+        "color": "#1f77b4",
+        "style": "quadrant"
+      }
+    ]
+  }
+}

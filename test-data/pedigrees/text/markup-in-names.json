@@ -1,0 +1,66 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Names and text with <, >, & and quotes",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "<b>Bold</b> & \"quoted\""
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "O'Hara <script>alert(1)</script>",
+        "notes": "5 < 6 && 7 > 6"
+      },
+      {
+        "id": "c",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 0,
+        "name": "A&B",
+        "age": "<1y",
+        "onset": "\"early\"",
+        "evaluations": [
+          {
+            "result": "positive",
+            "detail": "c.76A>T p.(Arg26*) <VUS>"
+          }
+        ]
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "a",
+        "individual2": "b"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "chartTitle": "Family <one> & \"two\"",
+    "clinicalDetails": {
+      "referralReason": "Risk > 50% & rising",
+      "historian": "Mother's \"sister\""
+    }
+  }
+}

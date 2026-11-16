@@ -1,0 +1,355 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Pregnancies, losses and assisted reproduction",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "h0",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w0",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "l1",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0,
+        "lifeStatus": "pregnancy",
+        "age": "20 wk"
+      },
+      {
+        "id": "l2",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 1,
+        "lifeStatus": "pregnancy"
+      },
+      {
+        "id": "l3",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 2,
+        "lifeStatus": "miscarriage",
+        "age": "8 wk"
+      },
+      {
+        "id": "l4",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 3,
+        "lifeStatus": "termination"
+      },
+      {
+        "id": "l5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4,
+        "lifeStatus": "stillbirth",
+        "age": "32 wk"
+      },
+      {
+        "id": "l6",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 5,
+        "lifeStatus": "ectopic"
+      },
+      {
+        "id": "l7",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 6,
+        "lifeStatus": "miscarriage",
+        "carrier": true
+      },
+      {
+        "id": "w9",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ph",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0,
+        "placeholder": true
+      },
+      {
+        "id": "c9",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "h1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Partner"
+      },
+      {
+        "id": "w1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "d1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "c1",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0,
+        "lifeStatus": "pregnancy",
+        "socialParents": [
+          "h1"
+        ]
+      },
+      {
+        "id": "h2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Partner"
+      },
+      {
+        "id": "d2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "c2",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 0,
+        "carriedBy": "w2"
+      },
+      {
+        "id": "gf3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "gm3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "h3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "s3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "surrogate"
+      },
+      {
+        "id": "c3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "carriedBy": "s3"
+      },
+      {
+        "id": "d4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "h4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c4",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0,
+        "lifeStatus": "pregnancy",
+        "carriedBy": "d4",
+        "socialParents": [
+          "w4"
+        ]
+      },
+      {
+        "id": "m5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "p5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Partner"
+      },
+      {
+        "id": "d5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "c5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "socialParents": [
+          "p5"
+        ]
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "pp0",
+        "individual1": "h0",
+        "individual2": "w0"
+      },
+      {
+        "id": "pp9",
+        "individual1": "ph",
+        "individual2": "w9"
+      },
+      {
+        "id": "pp1",
+        "individual1": "h1",
+        "individual2": "w1"
+      },
+      {
+        "id": "pd1",
+        "individual1": "d1",
+        "individual2": "w1",
+        "donorConception": true
+      },
+      {
+        "id": "pp2",
+        "individual1": "h2",
+        "individual2": "w2"
+      },
+      {
+        "id": "pd2",
+        "individual1": "h2",
+        "individual2": "d2",
+        "donorConception": true
+      },
+      {
+        "id": "pg3",
+        "individual1": "gf3",
+        "individual2": "gm3"
+      },
+      {
+        "id": "pp3",
+        "individual1": "h3",
+        "individual2": "w3"
+      },
+      {
+        "id": "pp4",
+        "individual1": "h4",
+        "individual2": "w4"
+      },
+      {
+        "id": "pd4",
+        "individual1": "h4",
+        "individual2": "d4",
+        "donorConception": true
+      },
+      {
+        "id": "pp5",
+        "individual1": "m5",
+        "individual2": "p5"
+      },
+      {
+        "id": "pd5",
+        "individual1": "d5",
+        "individual2": "m5",
+        "donorConception": true
+      }
+    ],
+    "parentOf": {
+      "pp0": [
+        "l1",
+        "l2",
+        "l3",
+        "l4",
+        "l5",
+        "l6",
+        "l7"
+      ],
+      "pp9": [
+        "c9"
+      ],
+      "pd1": [
+        "c1"
+      ],
+      "pd2": [
+        "c2"
+      ],
+      "pg3": [
+        "w3"
+      ],
+      "pp3": [
+        "c3"
+      ],
+      "pd4": [
+        "c4"
+      ],
+      "pd5": [
+        "c5"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

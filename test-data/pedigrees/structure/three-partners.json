@@ -1,0 +1,89 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "One person with three partners and a child by each",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "w3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "k1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "k2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "k3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p1",
+        "individual1": "a",
+        "individual2": "w1"
+      },
+      {
+        "id": "p2",
+        "individual1": "a",
+        "individual2": "w2"
+      },
+      {
+        "id": "p3",
+        "individual1": "a",
+        "individual2": "w3"
+      }
+    ],
+    "parentOf": {
+      "p1": [
+        "k1"
+      ],
+      "p2": [
+        "k2"
+      ],
+      "p3": [
+        "k3"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

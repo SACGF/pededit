@@ -1,0 +1,257 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Status and conditions, affected first",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "gf",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 0,
+        "name": "Alder",
+        "deceased": true,
+        "onset": "60s"
+      },
+      {
+        "id": "gm",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Briar",
+        "carrier": true
+      },
+      {
+        "id": "s1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Cedar",
+        "tags": [
+          "hcm"
+        ],
+        "tagOnset": {
+          "hcm": "45y"
+        }
+      },
+      {
+        "id": "w1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Dahlia",
+        "familyHistoryUnknown": true
+      },
+      {
+        "id": "s2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "name": "Elm",
+        "carrierTags": [
+          "bc"
+        ]
+      },
+      {
+        "id": "s3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "name": "Fern",
+        "presymptomatic": true
+      },
+      {
+        "id": "s4",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 3,
+        "name": "Gorse",
+        "tags": [
+          "hcm",
+          "bc"
+        ],
+        "tagOnset": {
+          "bc": "38y"
+        }
+      },
+      {
+        "id": "s5",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 4,
+        "name": "Hazel",
+        "tags": [
+          "lh",
+          "dna",
+          "apoe"
+        ]
+      },
+      {
+        "id": "s6",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 5,
+        "name": "Iris",
+        "tags": [
+          "bc"
+        ],
+        "carrierTags": [
+          "hcm"
+        ],
+        "deceased": true
+      },
+      {
+        "id": "p",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Juniper",
+        "proband": true,
+        "tags": [
+          "bc"
+        ],
+        "evaluations": [
+          {
+            "result": "positive",
+            "detail": "BRCA1",
+            "documented": true
+          }
+        ]
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "name": "Kale",
+        "consultand": true,
+        "evaluations": [
+          {
+            "result": "negative",
+            "detail": "BRCA1"
+          }
+        ]
+      },
+      {
+        "id": "u",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2,
+        "name": "Larch",
+        "carrier": true,
+        "deceased": true,
+        "evaluations": [
+          {
+            "result": "uninformative",
+            "detail": "BRCA1 VUS"
+          }
+        ]
+      },
+      {
+        "id": "n",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 3,
+        "name": "Maple",
+        "carrier": true,
+        "tags": [
+          "dna"
+        ]
+      },
+      {
+        "id": "d",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4,
+        "name": "Nettle",
+        "tags": [
+          "hcm",
+          "lh"
+        ],
+        "carrierTags": [
+          "bc"
+        ],
+        "proband": true,
+        "consultand": true
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p0",
+        "individual1": "gf",
+        "individual2": "gm"
+      },
+      {
+        "id": "p1",
+        "individual1": "s1",
+        "individual2": "w1"
+      }
+    ],
+    "parentOf": {
+      "p0": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6"
+      ],
+      "p1": [
+        "p",
+        "c",
+        "u",
+        "n",
+        "d"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": true
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "tags": [
+      {
+        "id": "hcm",
+        "label": "Hypertrophic cardiomyopathy",
+        "color": "#d62728",
+        "style": "quadrant",
+        "abbrev": "HCM"
+      },
+      {
+        "id": "bc",
+        "label": "Breast cancer",
+        "color": "#1f77b4",
+        "style": "quadrant",
+        "abbrev": "BC",
+        "fill": "diagonal",
+        "kind": "condition"
+      },
+      {
+        "id": "lh",
+        "label": "Left-handed",
+        "color": "#2ca02c",
+        "style": "quadrant",
+        "kind": "trait",
+        "fill": "dots"
+      },
+      {
+        "id": "dna",
+        "label": "DNA sample stored",
+        "color": "#9467bd",
+        "style": "dot"
+      },
+      {
+        "id": "apoe",
+        "label": "APOE e4 carrier",
+        "color": "#000000",
+        "style": "text",
+        "abbrev": "e4"
+      }
+    ]
+  }
+}

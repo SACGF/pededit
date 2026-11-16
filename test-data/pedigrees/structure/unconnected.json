@@ -1,0 +1,94 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Two unconnected families and two unconnected people",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "lone1",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "lone2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "pa",
+        "individual1": "a1",
+        "individual2": "a2"
+      },
+      {
+        "id": "pb",
+        "individual1": "b1",
+        "individual2": "b2"
+      }
+    ],
+    "parentOf": {
+      "pa": [
+        "a3"
+      ],
+      "pb": [
+        "b3",
+        "b4"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

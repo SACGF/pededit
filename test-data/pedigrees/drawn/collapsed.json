@@ -1,0 +1,302 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Hidden descendants",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "pgf",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "tags": [
+          "hcm"
+        ],
+        "deceased": true
+      },
+      {
+        "id": "pgm",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "fa",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "tags": [
+          "hcm"
+        ]
+      },
+      {
+        "id": "pa1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "descendantsHidden": true
+      },
+      {
+        "id": "pa1h",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "pa2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "tags": [
+          "dm"
+        ],
+        "descendantsHidden": true
+      },
+      {
+        "id": "pa2w",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "mgf",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "mgm",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "tags": [
+          "dm"
+        ]
+      },
+      {
+        "id": "mo",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "carrierTags": [
+          "hcm"
+        ]
+      },
+      {
+        "id": "ma1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "descendantsHidden": true
+      },
+      {
+        "id": "ma1w",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "pro",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "proband": true,
+        "tags": [
+          "hcm"
+        ],
+        "name": "Proband"
+      },
+      {
+        "id": "b1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "b2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "b3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3,
+        "tags": [
+          "dm"
+        ]
+      },
+      {
+        "id": "c1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "c3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "c4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "c6",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "tags": [
+          "dm"
+        ]
+      },
+      {
+        "id": "c7",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 3,
+        "carrierTags": [
+          "hcm"
+        ]
+      },
+      {
+        "id": "c8",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c8h",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g1",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c9",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 1
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "pg",
+        "individual1": "pgf",
+        "individual2": "pgm"
+      },
+      {
+        "id": "mg",
+        "individual1": "mgf",
+        "individual2": "mgm"
+      },
+      {
+        "id": "par",
+        "individual1": "fa",
+        "individual2": "mo"
+      },
+      {
+        "id": "a1",
+        "individual1": "pa1h",
+        "individual2": "pa1"
+      },
+      {
+        "id": "a2",
+        "individual1": "pa2",
+        "individual2": "pa2w"
+      },
+      {
+        "id": "a3",
+        "individual1": "ma1",
+        "individual2": "ma1w"
+      },
+      {
+        "id": "a4",
+        "individual1": "c8h",
+        "individual2": "c8"
+      }
+    ],
+    "parentOf": {
+      "pg": [
+        "pa1",
+        "pa2",
+        "fa"
+      ],
+      "mg": [
+        "mo",
+        "ma1"
+      ],
+      "par": [
+        "pro",
+        "b1",
+        "b2",
+        "b3"
+      ],
+      "a1": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "a2": [
+        "c4",
+        "c5",
+        "c6",
+        "c7"
+      ],
+      "a3": [
+        "c8",
+        "c9"
+      ],
+      "a4": [
+        "g1"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    },
+    "tags": [
+      {
+        "id": "hcm",
+        "label": "Hypertrophic cardiomyopathy",
+        "color": "#d62728",
+        "style": "quadrant",
+        "abbrev": "HCM"
+      },
+      {
+        "id": "dm",
+        "label": "Type 2 diabetes",
+        "color": "#1f77b4",
+        "style": "quadrant",
+        "abbrev": "T2D"
+      }
+    ]
+  }
+}

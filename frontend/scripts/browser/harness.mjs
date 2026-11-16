@@ -1016,7 +1016,7 @@ export async function openPage(context, { url, fixture, steps = [], flags = {} }
   const findings = collect(page);
   let sent = null;
   if (fixture) {
-    findings.fixtureWarnings.push(...(fixture.warnings ?? []));
+    if (!flags.expectedImportWarnings?.has(fixture.label)) findings.fixtureWarnings.push(...(fixture.warnings ?? []));
     if (flags["fixture-via-api"]) {
       const created = await postFixture(fixture, url, context.agentTokens ?? null);
       findings.created = { id: created.id, owned: !!context.agentTokens, deleted: false, note: null };
@@ -1085,18 +1085,30 @@ export function contextOptions(flags, extra = {}) {
 
 /** Work out the list of { url, fixtureSpec } targets from positional args and --fixture. */
 /** parseArgs spec for the two "every pedigree of a set" flags. */
-export const SET_FLAGS = { "all-examples": "bool", "all-fixtures": "bool" };
+export const SET_FLAGS = { "all-examples": "bool", "all-fixtures": "bool", "all-test-data": "bool" };
 
 export const SET_HELP = `  --all-examples      Every example in src/data/examples.ts, as if each were
                       given with --fixture example:N.
   --all-fixtures      Every feature fixture in src/fixtures/features.ts (#140),
-                      as if each were given with --fixture fixture:SLUG.`;
+                      as if each were given with --fixture fixture:SLUG.
+  --all-test-data     Every valid file of the test data set (#167,
+                      test-data/pedigrees/manifest.json), as if each were given
+                      with --fixture FILE.json. The feature fixtures are in it.`;
 
 /**
  * Turn --all-examples and --all-fixtures into --fixture specs. Both lists are
  * TypeScript served by Vite, so they are read there.
  */
 export async function expandSetFlags(flags) {
+  if (flags["all-test-data"]) {
+    const dir = path.join(REPO_ROOT, "test-data", "pedigrees");
+    const manifest = JSON.parse(readFileSync(path.join(dir, "manifest.json"), "utf8"));
+    const spec = f => path.relative(process.cwd(), path.join(dir, f.file));
+    const files = manifest.files.filter(f => f.valid && !f.timingOnly);
+    flags.fixture = [...(flags.fixture ?? []), ...files.map(spec)];
+    // Files that are there to be imported with a warning: the manifest expects it, so it is not a finding.
+    flags.expectedImportWarnings = new Set(files.filter(f => f.import.some(i => i.startsWith("warning:"))).map(spec));
+  }
   if (!flags["all-examples"] && !flags["all-fixtures"]) return;
   const base = resolveTarget("/", { allowRemote: flags["allow-remote"] });
   await assertServerUp(base);

@@ -1,0 +1,39 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A couple with no children",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "a",
+        "individual2": "b"
+      }
+    ],
+    "parentOf": {},
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

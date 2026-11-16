@@ -1,0 +1,99 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Partial dates and free-text ages",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "gf",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1921",
+        "dod": "1999-04",
+        "deceased": true
+      },
+      {
+        "id": "gm",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1925-06",
+        "dod": "2010-12-25",
+        "deceased": true
+      },
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "dob": "1950-03-14"
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "age": "70s"
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "age": "d. infancy",
+        "deceased": true
+      },
+      {
+        "id": "d",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 3,
+        "age": "3 mo"
+      },
+      {
+        "id": "e",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 4,
+        "age": "18 wk",
+        "lifeStatus": "pregnancy"
+      },
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 5,
+        "dob": "1958",
+        "age": "68"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "gf",
+        "individual2": "gm"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "birthDate",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

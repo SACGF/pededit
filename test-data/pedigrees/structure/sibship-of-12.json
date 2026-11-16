@@ -1,0 +1,126 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A sibship of twelve",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "k1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "k2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "k3",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "k4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "k5",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 4
+      },
+      {
+        "id": "k6",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 5
+      },
+      {
+        "id": "k7",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 6
+      },
+      {
+        "id": "k8",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 7
+      },
+      {
+        "id": "k9",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 8
+      },
+      {
+        "id": "k10",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 9
+      },
+      {
+        "id": "k11",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 10
+      },
+      {
+        "id": "k12",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 11
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "f",
+        "individual2": "m"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "k1",
+        "k2",
+        "k3",
+        "k4",
+        "k5",
+        "k6",
+        "k7",
+        "k8",
+        "k9",
+        "k10",
+        "k11",
+        "k12"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A brother and sister couple",
+  "pedigree": {
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "individuals": [
+      {
+        "id": "GF",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "GM",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "S",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "D",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "C",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "proband": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "GF+GM",
+        "individual1": "GF",
+        "individual2": "GM"
+      },
+      {
+        "id": "S+D",
+        "individual1": "S",
+        "individual2": "D",
+        "consanguineous": true
+      }
+    ],
+    "parentOf": {
+      "GF+GM": [
+        "S",
+        "D"
+      ],
+      "S+D": [
+        "C"
+      ]
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

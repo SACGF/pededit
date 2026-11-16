@@ -1,0 +1,86 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Two men with two children by one egg donor, carried by a surrogate",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Ash"
+      },
+      {
+        "id": "b",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Birch"
+      },
+      {
+        "id": "d",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "donor"
+      },
+      {
+        "id": "s",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "reproductiveRole": "surrogate"
+      },
+      {
+        "id": "k1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "carriedBy": "s",
+        "socialParents": [
+          "b"
+        ]
+      },
+      {
+        "id": "k2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 1,
+        "carriedBy": "s",
+        "socialParents": [
+          "b"
+        ]
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "pc",
+        "individual1": "a",
+        "individual2": "b"
+      },
+      {
+        "id": "pd",
+        "individual1": "a",
+        "individual2": "d",
+        "donorConception": true
+      }
+    ],
+    "parentOf": {
+      "pd": [
+        "k1",
+        "k2"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

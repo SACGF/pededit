@@ -1,0 +1,2519 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A generated family of 238 people, for timing",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "1",
+        "sex": "male",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "2",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "3",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "4",
+        "sex": "male",
+        "affected": true,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "5",
+        "sex": "male",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "6",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "7",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "8",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "9",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "10",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "11",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "12",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "13",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "14",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "15",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "16",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "17",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 3
+      },
+      {
+        "id": "18",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "19",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "20",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "21",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "22",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "23",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "24",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "25",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "26",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "27",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "28",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "29",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "30",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "31",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "32",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "33",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "34",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "35",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "36",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "37",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "38",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "39",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "40",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 2
+      },
+      {
+        "id": "41",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "42",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "43",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "44",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "45",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "46",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "47",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "48",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "49",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "50",
+        "sex": "male",
+        "affected": true,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "51",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "52",
+        "sex": "female",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "53",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "54",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "55",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "56",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 2
+      },
+      {
+        "id": "57",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "58",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "59",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "60",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "61",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "62",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "63",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "64",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "65",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "66",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "67",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "68",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "69",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "70",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "71",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "72",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "73",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 2
+      },
+      {
+        "id": "74",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "75",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "76",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "77",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "78",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "79",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "80",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 2
+      },
+      {
+        "id": "81",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "82",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "83",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "84",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "85",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "86",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "87",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "88",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "89",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "90",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "91",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "92",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "93",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "94",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "95",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "96",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "97",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "98",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "99",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "100",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "101",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "102",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "103",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "104",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "105",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "106",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "107",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "108",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "109",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "110",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "111",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "112",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "113",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "114",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "115",
+        "sex": "male",
+        "affected": false,
+        "deceased": true,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "116",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "117",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "118",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "119",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "120",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "121",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "122",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "123",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "124",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "125",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "126",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "127",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "128",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "129",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "130",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "131",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "132",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "133",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "134",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "135",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "136",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "137",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "138",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "139",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "140",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "141",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "142",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "143",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "144",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "145",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "146",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "147",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "148",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "149",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "150",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "151",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "152",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "153",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "154",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "155",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "156",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "157",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "158",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "159",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "160",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "161",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "162",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "163",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "164",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "165",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "166",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "167",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "168",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "169",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "170",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "171",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "172",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "173",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "174",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "175",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "176",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "177",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "178",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "179",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "180",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "181",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "182",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "183",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "184",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "185",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "186",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "187",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "188",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "189",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "190",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "191",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "192",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "193",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "194",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "195",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "196",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "197",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "198",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "199",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "200",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "201",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "202",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "203",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "204",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "205",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "206",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 3
+      },
+      {
+        "id": "207",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "208",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "209",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "210",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "211",
+        "sex": "male",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "212",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "213",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "214",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "215",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "216",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "217",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "218",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "219",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "220",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "221",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 3
+      },
+      {
+        "id": "222",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "223",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "224",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "225",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "226",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "227",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "228",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "229",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "230",
+        "sex": "female",
+        "affected": true,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "231",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 1
+      },
+      {
+        "id": "232",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "233",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "234",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1
+      },
+      {
+        "id": "235",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 2
+      },
+      {
+        "id": "236",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": true,
+        "sibOrder": 0
+      },
+      {
+        "id": "237",
+        "sex": "female",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "238",
+        "sex": "male",
+        "affected": false,
+        "deceased": false,
+        "carrier": false,
+        "sibOrder": 1,
+        "proband": true
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p1",
+        "individual1": "1",
+        "individual2": "2"
+      },
+      {
+        "id": "p2",
+        "individual1": "4",
+        "individual2": "6"
+      },
+      {
+        "id": "p3",
+        "individual1": "8",
+        "individual2": "10"
+      },
+      {
+        "id": "p4",
+        "individual1": "9",
+        "individual2": "13"
+      },
+      {
+        "id": "p5",
+        "individual1": "15",
+        "individual2": "18"
+      },
+      {
+        "id": "p6",
+        "individual1": "19",
+        "individual2": "21"
+      },
+      {
+        "id": "p7",
+        "individual1": "23",
+        "individual2": "25"
+      },
+      {
+        "id": "p8",
+        "individual1": "17",
+        "individual2": "28"
+      },
+      {
+        "id": "p9",
+        "individual1": "31",
+        "individual2": "32"
+      },
+      {
+        "id": "p10",
+        "individual1": "33",
+        "individual2": "37"
+      },
+      {
+        "id": "p11",
+        "individual1": "35",
+        "individual2": "41"
+      },
+      {
+        "id": "p12",
+        "individual1": "36",
+        "individual2": "44"
+      },
+      {
+        "id": "p13",
+        "individual1": "5",
+        "individual2": "49"
+      },
+      {
+        "id": "p14",
+        "individual1": "51",
+        "individual2": "53"
+      },
+      {
+        "id": "p15",
+        "individual1": "54",
+        "individual2": "57"
+      },
+      {
+        "id": "p16",
+        "individual1": "58",
+        "individual2": "62"
+      },
+      {
+        "id": "p17",
+        "individual1": "63",
+        "individual2": "65"
+      },
+      {
+        "id": "p18",
+        "individual1": "59",
+        "individual2": "70"
+      },
+      {
+        "id": "p19",
+        "individual1": "71",
+        "individual2": "74"
+      },
+      {
+        "id": "p20",
+        "individual1": "72",
+        "individual2": "77"
+      },
+      {
+        "id": "p21",
+        "individual1": "61",
+        "individual2": "82"
+      },
+      {
+        "id": "p22",
+        "individual1": "83",
+        "individual2": "86"
+      },
+      {
+        "id": "p23",
+        "individual1": "84",
+        "individual2": "89"
+      },
+      {
+        "id": "p24",
+        "individual1": "85",
+        "individual2": "93"
+      },
+      {
+        "id": "p25",
+        "individual1": "55",
+        "individual2": "97"
+      },
+      {
+        "id": "p26",
+        "individual1": "98",
+        "individual2": "101"
+      },
+      {
+        "id": "p27",
+        "individual1": "102",
+        "individual2": "105"
+      },
+      {
+        "id": "p28",
+        "individual1": "100",
+        "individual2": "108"
+      },
+      {
+        "id": "p29",
+        "individual1": "109",
+        "individual2": "112"
+      },
+      {
+        "id": "p30",
+        "individual1": "52",
+        "individual2": "115"
+      },
+      {
+        "id": "p31",
+        "individual1": "116",
+        "individual2": "120"
+      },
+      {
+        "id": "p32",
+        "individual1": "121",
+        "individual2": "125"
+      },
+      {
+        "id": "p33",
+        "individual1": "126",
+        "individual2": "128"
+      },
+      {
+        "id": "p34",
+        "individual1": "127",
+        "individual2": "133"
+      },
+      {
+        "id": "p35",
+        "individual1": "122",
+        "individual2": "138"
+      },
+      {
+        "id": "p36",
+        "individual1": "139",
+        "individual2": "142"
+      },
+      {
+        "id": "p37",
+        "individual1": "123",
+        "individual2": "146"
+      },
+      {
+        "id": "p38",
+        "individual1": "148",
+        "individual2": "150"
+      },
+      {
+        "id": "p39",
+        "individual1": "149",
+        "individual2": "155"
+      },
+      {
+        "id": "p40",
+        "individual1": "124",
+        "individual2": "158"
+      },
+      {
+        "id": "p41",
+        "individual1": "159",
+        "individual2": "162"
+      },
+      {
+        "id": "p42",
+        "individual1": "160",
+        "individual2": "165"
+      },
+      {
+        "id": "p43",
+        "individual1": "161",
+        "individual2": "168"
+      },
+      {
+        "id": "p44",
+        "individual1": "117",
+        "individual2": "173"
+      },
+      {
+        "id": "p45",
+        "individual1": "175",
+        "individual2": "177"
+      },
+      {
+        "id": "p46",
+        "individual1": "178",
+        "individual2": "181"
+      },
+      {
+        "id": "p47",
+        "individual1": "180",
+        "individual2": "185"
+      },
+      {
+        "id": "p48",
+        "individual1": "118",
+        "individual2": "190"
+      },
+      {
+        "id": "p49",
+        "individual1": "192",
+        "individual2": "195"
+      },
+      {
+        "id": "p50",
+        "individual1": "196",
+        "individual2": "199"
+      },
+      {
+        "id": "p51",
+        "individual1": "197",
+        "individual2": "202"
+      },
+      {
+        "id": "p52",
+        "individual1": "193",
+        "individual2": "207"
+      },
+      {
+        "id": "p53",
+        "individual1": "208",
+        "individual2": "212"
+      },
+      {
+        "id": "p54",
+        "individual1": "210",
+        "individual2": "217"
+      },
+      {
+        "id": "p55",
+        "individual1": "211",
+        "individual2": "222"
+      },
+      {
+        "id": "p56",
+        "individual1": "194",
+        "individual2": "226"
+      },
+      {
+        "id": "p57",
+        "individual1": "227",
+        "individual2": "229"
+      },
+      {
+        "id": "p58",
+        "individual1": "119",
+        "individual2": "232"
+      },
+      {
+        "id": "p59",
+        "individual1": "233",
+        "individual2": "236"
+      }
+    ],
+    "parentOf": {
+      "p1": [
+        "3",
+        "4",
+        "5"
+      ],
+      "p2": [
+        "7",
+        "8",
+        "9"
+      ],
+      "p3": [
+        "11",
+        "12"
+      ],
+      "p4": [
+        "14",
+        "15",
+        "16",
+        "17"
+      ],
+      "p5": [
+        "19",
+        "20"
+      ],
+      "p6": [
+        "22",
+        "23",
+        "24"
+      ],
+      "p7": [
+        "26",
+        "27"
+      ],
+      "p8": [
+        "29",
+        "30",
+        "31"
+      ],
+      "p9": [
+        "33",
+        "34",
+        "35",
+        "36"
+      ],
+      "p10": [
+        "38",
+        "39",
+        "40"
+      ],
+      "p11": [
+        "42",
+        "43"
+      ],
+      "p12": [
+        "45",
+        "46",
+        "47",
+        "48"
+      ],
+      "p13": [
+        "50",
+        "51",
+        "52"
+      ],
+      "p14": [
+        "54",
+        "55",
+        "56"
+      ],
+      "p15": [
+        "58",
+        "59",
+        "60",
+        "61"
+      ],
+      "p16": [
+        "63",
+        "64"
+      ],
+      "p17": [
+        "66",
+        "67",
+        "68",
+        "69"
+      ],
+      "p18": [
+        "71",
+        "72",
+        "73"
+      ],
+      "p19": [
+        "75",
+        "76"
+      ],
+      "p20": [
+        "78",
+        "79",
+        "80",
+        "81"
+      ],
+      "p21": [
+        "83",
+        "84",
+        "85"
+      ],
+      "p22": [
+        "87",
+        "88"
+      ],
+      "p23": [
+        "90",
+        "91",
+        "92"
+      ],
+      "p24": [
+        "94",
+        "95",
+        "96"
+      ],
+      "p25": [
+        "98",
+        "99",
+        "100"
+      ],
+      "p26": [
+        "102",
+        "103",
+        "104"
+      ],
+      "p27": [
+        "106",
+        "107"
+      ],
+      "p28": [
+        "109",
+        "110",
+        "111"
+      ],
+      "p29": [
+        "113",
+        "114"
+      ],
+      "p30": [
+        "116",
+        "117",
+        "118",
+        "119"
+      ],
+      "p31": [
+        "121",
+        "122",
+        "123",
+        "124"
+      ],
+      "p32": [
+        "126",
+        "127"
+      ],
+      "p33": [
+        "129",
+        "130",
+        "131",
+        "132"
+      ],
+      "p34": [
+        "134",
+        "135",
+        "136",
+        "137"
+      ],
+      "p35": [
+        "139",
+        "140",
+        "141"
+      ],
+      "p36": [
+        "143",
+        "144",
+        "145"
+      ],
+      "p37": [
+        "147",
+        "148",
+        "149"
+      ],
+      "p38": [
+        "151",
+        "152",
+        "153",
+        "154"
+      ],
+      "p39": [
+        "156",
+        "157"
+      ],
+      "p40": [
+        "159",
+        "160",
+        "161"
+      ],
+      "p41": [
+        "163",
+        "164"
+      ],
+      "p42": [
+        "166",
+        "167"
+      ],
+      "p43": [
+        "169",
+        "170",
+        "171",
+        "172"
+      ],
+      "p44": [
+        "174",
+        "175",
+        "176"
+      ],
+      "p45": [
+        "178",
+        "179",
+        "180"
+      ],
+      "p46": [
+        "182",
+        "183",
+        "184"
+      ],
+      "p47": [
+        "186",
+        "187",
+        "188",
+        "189"
+      ],
+      "p48": [
+        "191",
+        "192",
+        "193",
+        "194"
+      ],
+      "p49": [
+        "196",
+        "197",
+        "198"
+      ],
+      "p50": [
+        "200",
+        "201"
+      ],
+      "p51": [
+        "203",
+        "204",
+        "205",
+        "206"
+      ],
+      "p52": [
+        "208",
+        "209",
+        "210",
+        "211"
+      ],
+      "p53": [
+        "213",
+        "214",
+        "215",
+        "216"
+      ],
+      "p54": [
+        "218",
+        "219",
+        "220",
+        "221"
+      ],
+      "p55": [
+        "223",
+        "224",
+        "225"
+      ],
+      "p56": [
+        "227",
+        "228"
+      ],
+      "p57": [
+        "230",
+        "231"
+      ],
+      "p58": [
+        "233",
+        "234",
+        "235"
+      ],
+      "p59": [
+        "237",
+        "238"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

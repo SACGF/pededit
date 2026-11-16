@@ -1,0 +1,76 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Names in Greek, Cyrillic, Chinese, Arabic and Hebrew, and an emoji",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Αλέξανδρος Παπαδόπουλος"
+      },
+      {
+        "id": "b",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Екатерина"
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "王小明"
+      },
+      {
+        "id": "d",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 1,
+        "name": "فاطمة الزهراء"
+      },
+      {
+        "id": "e",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 2,
+        "name": "דוד בן־אברהם"
+      },
+      {
+        "id": "f",
+        "sex": "unknown",
+        "affected": false,
+        "sibOrder": 3,
+        "name": "Zoë 🧬 Ångström"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "a",
+        "individual2": "b"
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c",
+        "d",
+        "e",
+        "f"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

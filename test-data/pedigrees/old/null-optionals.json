@@ -1,0 +1,83 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Nulls",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "f",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": null,
+        "dob": null,
+        "dod": null,
+        "age": null,
+        "notes": null,
+        "deceased": null,
+        "carrier": null,
+        "proband": null,
+        "tags": null,
+        "carrierTags": null,
+        "evaluations": null,
+        "lifeStatus": null,
+        "adopted": null,
+        "genderIdentity": null,
+        "onset": null,
+        "tagOnset": null,
+        "reproductiveRole": null,
+        "carriedBy": null,
+        "socialParents": null,
+        "hpoTerms": null,
+        "descendantsHidden": null,
+        "placeholder": null,
+        "consultand": null,
+        "familyHistoryUnknown": null,
+        "presymptomatic": null
+      },
+      {
+        "id": "m",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "p",
+        "individual1": "f",
+        "individual2": "m",
+        "consanguineous": null,
+        "consanguinityLabel": null,
+        "childless": null,
+        "childlessReason": null,
+        "twins": null,
+        "ended": null,
+        "donorConception": null,
+        "leftPartner": null
+      }
+    ],
+    "parentOf": {
+      "p": [
+        "c"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "pinnedPositions": null,
+    "canvasSettings": null,
+    "unlockedIndividuals": null,
+    "tags": null,
+    "chartTitle": null,
+    "clinicalDetails": null,
+    "filters": null
+  }
+}

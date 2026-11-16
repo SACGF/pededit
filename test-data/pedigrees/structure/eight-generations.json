@@ -1,0 +1,169 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Eight generations in one line of descent",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "g1m",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g1f",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g2p",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g3p",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g4p",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g5p",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g6",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g6p",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g7",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g7p",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "g8",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "c1",
+        "individual1": "g1m",
+        "individual2": "g1f"
+      },
+      {
+        "id": "c2",
+        "individual1": "g2p",
+        "individual2": "g2"
+      },
+      {
+        "id": "c3",
+        "individual1": "g3",
+        "individual2": "g3p"
+      },
+      {
+        "id": "c4",
+        "individual1": "g4p",
+        "individual2": "g4"
+      },
+      {
+        "id": "c5",
+        "individual1": "g5",
+        "individual2": "g5p"
+      },
+      {
+        "id": "c6",
+        "individual1": "g6p",
+        "individual2": "g6"
+      },
+      {
+        "id": "c7",
+        "individual1": "g7",
+        "individual2": "g7p"
+      }
+    ],
+    "parentOf": {
+      "c1": [
+        "g2"
+      ],
+      "c2": [
+        "g3"
+      ],
+      "c3": [
+        "g4"
+      ],
+      "c4": [
+        "g5"
+      ],
+      "c5": [
+        "g6"
+      ],
+      "c6": [
+        "g7"
+      ],
+      "c7": [
+        "g8"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

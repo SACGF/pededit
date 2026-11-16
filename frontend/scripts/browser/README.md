@@ -231,9 +231,11 @@ being edited. Pass the URL it prints as `PEDEDIT_BASE`, or to `compare.mjs
 and frontend vitest, `tsc -b`, the backend tests, and the page checks on
 headless chromium: `lint.mjs --all-examples` (normal, then compact and
 de-identified) and `console.mjs --all-examples --fixture-via-api` against a
-SQLite Django, then the same three with `--all-fixtures`, so each example and
-feature fixture must load without JS errors, draw and export cleanly, and
-survive a save and reload. On failure the job prints the tail
+SQLite Django, then the lints with `--all-fixtures` and the console sweep
+with `--all-test-data` (every valid file of the test data set in
+`test-data/pedigrees/`, which includes the feature fixtures), so each of them
+must load without JS errors, draw and export cleanly, and survive a save and
+reload. On failure the job prints the tail
 of the Vite and Django logs. Reproduce a failing step locally with the same
 command after `servers.mjs up`.
 
@@ -260,8 +262,10 @@ does not look clean. Import errors stop the run.
 `shot.mjs`, `console.mjs` and `lint.mjs` accept `--fixture` several times and
 handle each in turn.
 
-`--all-examples` and `--all-fixtures` (all three tools) stand for every
-example and every feature fixture. The examples are real families and draw
+`--all-examples`, `--all-fixtures` and `--all-test-data` (all three tools)
+stand for every example, every feature fixture and every valid file of the
+test data set (`test-data/pedigrees/`, #167: the feature fixtures plus
+structures, awkward text, old saves and data with problems). The examples are real families and draw
 only part of what the renderers can; a change to drawing code should be
 checked on the fixtures too:
 

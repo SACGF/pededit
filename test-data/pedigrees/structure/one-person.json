@@ -1,0 +1,28 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "One person",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Solo"
+      }
+    ],
+    "partnerships": [],
+    "parentOf": {},
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

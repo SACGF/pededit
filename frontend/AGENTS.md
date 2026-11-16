@@ -229,6 +229,13 @@ stub so the app still builds without Google login.
   set by no fixture: a new drawn field needs a fixture person, a field that
   draws nothing goes in that test's `DRAWS_NOTHING`. A new setting that
   changes the drawing gets a variant in `VARIANTS`.
+  `fixtures/dataset.ts` is the source of the whole test data set (#167):
+  its test writes each case to `test-data/pedigrees/` with a
+  `manifest.json` of what the code does with it (importer issues, problems,
+  lint codes, what the server does), and the backend tests and page checks
+  read those files. Add awkward cases there, not inline in one test:
+  `test-data/pedigrees/README.md` says how. A new rule in `RULES` or a new
+  importer issue code fails its coverage test until a file triggers it.
 
 ## Conventions
 
