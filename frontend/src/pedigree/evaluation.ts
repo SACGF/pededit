@@ -14,11 +14,13 @@
  *  - Documented evaluation: a "*" at the symbol's lower right when any of
  *    the person's evaluations is marked documented.
  *  - Presymptomatic carrier: `Individual.presymptomatic`, a vertical line
- *    through the symbol. Like the carrier dot, not drawn on an affected
- *    (filled) symbol.
+ *    through the symbol. Not drawn on anyone affected (`isAffected`: the
+ *    flag or any condition), since presymptomatic means not affected now;
+ *    the "presymptomatic-affected" warning (#116) says so.
  */
 
-import type { Evaluation, EvaluationResult, Individual, LifeStatus, NotationEdition } from "@pedigree-editor/layout-engine";
+import { isAffected } from "@pedigree-editor/layout-engine";
+import type { Evaluation, EvaluationResult, Individual, LifeStatus, NotationEdition, Pedigree } from "@pedigree-editor/layout-engine";
 import { usesLossTriangle, symbolTopInset } from "./lifeStatus";
 import { ADOPTION_BRACKET_GAP } from "./adoption";
 
@@ -107,9 +109,13 @@ export function renderDocumentedMarkSvg(size: number, adopted: boolean, x: numbe
 
 // ── Presymptomatic carrier line ─────────────────────────────────────────────
 
-/** True when the vertical line is drawn: set, and not hidden by an affected fill. */
-export function drawsPresymptomatic(ind: Pick<Individual, "presymptomatic" | "affected">): boolean {
-  return !!ind.presymptomatic && !ind.affected;
+/**
+ * True when the vertical line is drawn: set, and the person is not affected
+ * with anything. Uses `isAffected`, as the "presymptomatic-affected" warning
+ * does, so the line is never drawn on someone that warning flags.
+ */
+export function drawsPresymptomatic(ind: Pick<Individual, "presymptomatic" | "affected" | "tags">, pedigree: Pick<Pedigree, "tags">): boolean {
+  return !!ind.presymptomatic && !isAffected(ind, pedigree);
 }
 
 /**
@@ -131,8 +137,8 @@ export const PRESYMPTOMATIC_RIM = 1.5;
 export const PRESYMPTOMATIC_STROKE = 2;
 
 /** The line as SVG markup for a symbol box with top-left (ox, oy); `rim` over tag colours. */
-export function renderPresymptomaticSvg(ind: Individual, size: number, ox: number, oy: number, rim = false): string {
-  if (!drawsPresymptomatic(ind)) return "";
+export function renderPresymptomaticSvg(ind: Individual, pedigree: Pick<Pedigree, "tags">, size: number, ox: number, oy: number, rim = false): string {
+  if (!drawsPresymptomatic(ind, pedigree)) return "";
   const l = presymptomaticLine(ind.lifeStatus, size, ox, oy);
   const attrs = `class="presymptomatic" x1="${l.x1}" y1="${l.y1}" x2="${l.x2}" y2="${l.y2}"`;
   return (rim ? `<line ${attrs} stroke="white" stroke-width="${PRESYMPTOMATIC_STROKE + 2 * PRESYMPTOMATIC_RIM}"/>` : "")
@@ -156,12 +162,12 @@ export const DOCUMENTED_LEGEND_LABEL = "Documented evaluation";
  * evaluation (the "E" needs defining). 2022: anyone with a result mark;
  * detail text alone ("echo") explains itself.
  */
-export function evaluationKeyInfo(inds: Individual[], notation: NotationEdition): { evaluated?: Individual; documented?: Individual; presymptomatic?: Individual } {
+export function evaluationKeyInfo(inds: Individual[], pedigree: Pick<Pedigree, "tags">, notation: NotationEdition): { evaluated?: Individual; documented?: Individual; presymptomatic?: Individual } {
   return {
     evaluated: notation === "nsgc2008"
       ? inds.find(i => evaluationsOf(i).length > 0)
       : inds.find(i => evaluationsOf(i).some(e => evaluationResultMark(e.result) !== "")),
     documented: inds.find(hasDocumentedEvaluation),
-    presymptomatic: inds.find(drawsPresymptomatic),
+    presymptomatic: inds.find(i => drawsPresymptomatic(i, pedigree)),
   };
 }

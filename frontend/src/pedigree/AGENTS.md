@@ -285,10 +285,15 @@ draws NSGC symbols.
   recorded) and "E" in 2008. Any documented evaluation puts a "*" just right of
   the symbol's lower right corner (outside adoption brackets), canvas and
   both exporters. `Individual.presymptomatic` is a
-  vertical line through the symbol, drawn inside `SymbolShape` and by `renderPresymptomaticSvg`; like the carrier dot
-  it is not drawn on an affected fill. The editor offers carrier and
-  presymptomatic as one "Carrier" select, and the store setters keep them
-  exclusive; old data with only `carrier` loads unchanged. De-identified
+  vertical line through the symbol, drawn inside `SymbolShape` (from
+  `SymbolPaint.line`) and by `renderPresymptomaticSvg`. It is not drawn on
+  anyone `isAffected` (the flag or any condition), the same test as the
+  "presymptomatic-affected" warning, so the warning never says a line is
+  hidden that is in fact drawn. With no conditions defined the editor
+  offers carrier and presymptomatic as one "Carrier" select; with
+  conditions, Status has a "Presymptomatic" checkbox and carriers are per
+  condition (#136). The store setters keep the plain carrier and
+  presymptomatic exclusive; old data with only `carrier` loads unchanged. De-identified
   exports keep the evaluations, details included, as they keep onset.
 
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected

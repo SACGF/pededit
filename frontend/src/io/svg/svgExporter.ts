@@ -365,7 +365,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   }
 
   return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0, paint.base)
-    + renderPresymptomaticSvg(ind, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId, paint)
+    + renderPresymptomaticSvg(ind, pedigree, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId, paint)
     + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
 }
 

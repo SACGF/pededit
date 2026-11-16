@@ -1414,7 +1414,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
       + `${geom} ${stroke} fill="none"/>`;
   }
   shape += renderCarrierDot(ind, sectors.length > 0, paint.dot);
-  shape += renderPresymptomaticSvg(ind, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
+  shape += renderPresymptomaticSvg(ind, pedigree, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
   const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
   // "D" or "S" (#45) is text, kept upright like the "P".

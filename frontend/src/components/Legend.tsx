@@ -396,7 +396,7 @@ export function Legend({ pedigree: full, onManageTags }: LegendProps) {
       label: status.carrierLabel,
     });
   }
-  const ev = evaluationKeyInfo(individuals, notationOf(pedigree));
+  const ev = evaluationKeyInfo(individuals, pedigree, notationOf(pedigree));
   const evLegend = evaluationLegend(notationOf(pedigree));
   if (ev.presymptomatic) indRows.push({ icon: <PresymptomaticSvg sex={shape(ev.presymptomatic)} />, label: PRESYMPTOMATIC_LEGEND_LABEL });
   if (deceasedInd) indRows.push({ icon: <DeceasedSvg sex={shape(deceasedInd)} />,        label: "Deceased" });

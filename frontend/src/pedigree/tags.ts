@@ -11,7 +11,7 @@ import { COLLAPSED_BRANCH_LABEL, collapseInfo, drawnPedigree } from "./collapse"
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import { arrowKind, renderArrowKeySwatchSvg, ARROW_LEGEND_LABEL } from "./proband";
 import { FAMILY_HISTORY_LEGEND_LABEL } from "./familyHistory";
-import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
+import { drawsPresymptomatic, evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
 import { symbolSex, assignedAtBirthInUse } from "./gender";
 import { tagPaint, carrierPaintFrom, renderRegionFillSvg, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
@@ -377,6 +377,8 @@ export interface SymbolPaint {
   base: "black" | "white";
   core: boolean;
   dot: boolean;
+  /** The presymptomatic vertical line (#101, `drawsPresymptomatic`). */
+  line?: boolean;
 }
 
 export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolPaint {
@@ -389,6 +391,7 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
       base: black ? "black" : "white",
       core: black && conditions.length > 0,
       dot: plainCarrierFlag && !black,
+      line: drawsPresymptomatic(individual, pedigree),
     };
   }
   const black = plainAffected(individual, pedigree);
@@ -404,6 +407,7 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
     base: black ? "black" : "white",
     core: black && sectors.length > 0,
     dot: false,
+    line: drawsPresymptomatic(individual, pedigree),
   };
 }
 
@@ -831,7 +835,7 @@ export function renderExportKeySvg(
     });
   }
   // Presymptomatic carrier and evaluation notation (#101).
-  const ev = evaluationKeyInfo(inds, notationOf(pedigree));
+  const ev = evaluationKeyInfo(inds, pedigree, notationOf(pedigree));
   const evLegend = evaluationLegend(notationOf(pedigree));
   if (ev.presymptomatic) {
     const sex = shape(ev.presymptomatic);

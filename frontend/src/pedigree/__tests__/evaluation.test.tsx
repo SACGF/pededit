@@ -175,9 +175,18 @@ describe("presymptomatic carrier (#101)", () => {
     const html = renderToStaticMarkup(<svg><SymbolShape individual={family().individuals[0]!} size={40} /></svg>);
     expect(html).toContain('data-presymptomatic="true"');
     expect(html).toMatch(/x1="20" y1="1" x2="20" y2="39"/);
-    expect(drawsPresymptomatic({ presymptomatic: true, affected: true })).toBe(false);
+    expect(drawsPresymptomatic({ presymptomatic: true, affected: true }, { tags: [] })).toBe(false);
     const affected = renderToStaticMarkup(<svg><SymbolShape individual={{ ...family().individuals[0]!, affected: true }} size={40} /></svg>);
     expect(affected).not.toContain("data-presymptomatic");
+  });
+
+  it("is not drawn on someone affected with a condition, as the warning says (#118)", () => {
+    const tags = [{ id: "t1", label: "BC", color: "#c00", style: "quadrant" as const }];
+    const ind = { presymptomatic: true, affected: false, tags: ["t1"] };
+    expect(drawsPresymptomatic(ind, { tags })).toBe(false);
+    // A dot or text tag is not a condition, so the line stays.
+    expect(drawsPresymptomatic(ind, { tags: [{ ...tags[0]!, style: "dot" as const }] })).toBe(true);
+    expect(drawsPresymptomatic({ presymptomatic: true, affected: false }, { tags })).toBe(true);
   });
 
   it("runs apex to base in a loss triangle", () => {

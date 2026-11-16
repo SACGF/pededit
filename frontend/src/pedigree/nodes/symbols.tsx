@@ -39,7 +39,11 @@ function symbolFill(paint: SymbolPaint): FillDescriptor {
  * the 2008 rules on the person alone. Canvas symbols pass `symbolPaint`.
  */
 export function standalonePaint(individual: Individual): SymbolPaint {
-  return { sectors: [], base: individual.affected ? "black" : "white", core: false, dot: !!individual.carrier && !individual.affected };
+  return {
+    sectors: [], base: individual.affected ? "black" : "white", core: false,
+    dot: !!individual.carrier && !individual.affected,
+    line: drawsPresymptomatic(individual, { tags: [] }),
+  };
 }
 
 // ── Shape props ────────────────────────────────────────────────────────────────
@@ -323,7 +327,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
           ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} />
           : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
-        {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
+        {paint.line && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
         {status === "stillbirth" && (
           <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
@@ -337,7 +341,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
       {brackets}
       <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
-      {drawsPresymptomatic(individual) && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
+      {paint.line && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
       <RoleLetter individual={individual} size={size} halo={sectors.length > 0} base={paint.base} />
     </g>
   );
