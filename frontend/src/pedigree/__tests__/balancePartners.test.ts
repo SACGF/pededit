@@ -34,7 +34,7 @@ const rowOf = (flow: ReturnType<typeof layoutToFlow>, name: string) => {
 };
 
 describe("spouse-hint balancing (#76)", () => {
-  const targaryen = corpus().find(([n]) => n.startsWith("fiction/targaryen"))![1];
+  const targaryen = corpus().find(([n]) => n === "fiction/targaryen.ped#TARG")![1];
 
   it("puts Rhaenyra between Daemon and Laenor with no pass-through line", () => {
     const on = layoutToFlow(targaryen);

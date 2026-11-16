@@ -737,7 +737,8 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Fetus_2",       F, "Tutankhamun", "KV21A", { name: "Fetus 2" }],
   ];
 
-  // Fiction: test-data/ped/fiction/targaryen.ped. Affected = the Targaryen madness.
+  // Fiction: test-data/ped/fiction/targaryen_example_order.ped (targaryen.ped with one
+  // row moved, see below). Affected = the Targaryen madness.
   const targaryen: Row[] = [
     // Conquest
     ["Aerion",             M, null, null, { name: "Aerion" }],
@@ -762,7 +763,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Aegon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aegon" }],
     ["Daenerys_JA",        F, "Jaehaerys_I", "Alysanne", { name: "Daenerys" }],
     ["Aemon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aemon" }],
-    // Daella is listed before Baelon, out of birth order and unlike the PED file (#179):
+    // Daella is listed before Baelon, out of birth order and unlike targaryen.ped (#179):
     // her daughter Aemma is then drawn on the Velaryon side of Viserys I, and Rhaenyra
     // beside both her husbands' other copies, with short dashed arcs. Sibling order is
     // a drawing choice; the example has no dates.

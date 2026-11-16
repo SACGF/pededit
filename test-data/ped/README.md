@@ -77,8 +77,10 @@ to Aerys II) and gives Harwin Strong as Jacaerys's father, so it was not used as
 - The in-app example lists Daella before Baelon so the Rhaenyra row draws short arcs
   (#179). This file keeps birth order: it is the case the spouse-side rule (#76) and the
   sibling-order work (#77) are tested on, and its kinship2 oracle output stays valid.
-  `kinship2Oracle.test.ts` (`EXAMPLE_ROW_MOVES`) compares the example with the file after
-  the same move.
+  `targaryen_example_order.ped` is this file in the example's order, with its own
+  kinship2 oracle, and `kinship2Oracle.test.ts` compares the example with it (#181).
+  It is generated from this file by moving the one row; regenerate it, and its oracle,
+  when this file changes.
 - Exercises: brother-sister, uncle-niece, first cousin and cousin-once-removed marriages,
   people drawn twice (Daemon, Viserys I, Rhaenyra), a 17-wide row (Jaehaerys I and
   Alysanne's 13 children), and a married-in spouse inside a sibship's span, which
@@ -164,6 +166,7 @@ Has a kinship2 oracle like `historic/`.
 | File | Individuals | Families | Description |
 |------|-------------|----------|-------------|
 | `targaryen.ped` | 96 | 1 | House Targaryen, 16 generations of sibling, uncle-niece and cousin marriages. |
+| `targaryen_example_order.ped` | 96 | 1 | `targaryen.ped` with Daella's row before Baelon's, the in-app example's order (#179, #181). |
 | `buendia.ped` | 30 | 1 | The Buendías, One Hundred Years of Solitude. Cousin and aunt-nephew marriages, two children with a pig's tail. |
 | `atreides.ped` | 33 | 1 | House Atreides, Dune. Jessica is Baron Harkonnen's daughter; one unknown-sex node for Ghanima's descendants. |
 
