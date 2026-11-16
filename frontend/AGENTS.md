@@ -316,6 +316,13 @@ reporting is off, and the dev server never reports.
   is sent again without a token, so a pedigree's link still opens (#191).
   It never navigates: going to the landing page lost the pedigree the link
   opened.
+- `api/errors.ts` — what to tell the user when a request failed (#184). A
+  429 from the rate limits (sign-in, token refresh, creating without an
+  account, `backend/api/throttling.py`) reads "Too many requests from your
+  network. Try again in 40 seconds." from `Retry-After`;
+  `requestErrorMessage(err, otherwise)` gives that or the caller's own
+  message. A rate-limited refresh keeps the tokens. The server never limits
+  a caller on the box, so the `rate-limited` flow sends `X-Forwarded-For`.
 - `data/examples.ts` — the example pedigrees on the landing page. Each has
   a `slug`, its name in `/example/<slug>` (#150). Those links are published,
   so a slug is never changed or reused; `data/__tests__/examples.test.ts`

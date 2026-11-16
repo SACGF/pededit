@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
+import { requestErrorMessage } from "../api/errors";
 
 export default function GitHubCallbackPage() {
   const [searchParams] = useSearchParams();
@@ -21,7 +22,7 @@ export default function GitHubCallbackPage() {
 
     githubLogin(code)
       .then(() => navigate("/", { replace: true }))
-      .catch(() => setError("GitHub sign-in failed. Please try again."));
+      .catch(err => setError(requestErrorMessage(err, "GitHub sign-in failed. Please try again.")));
   }, [searchParams, githubLogin, navigate]);
 
   if (error) {

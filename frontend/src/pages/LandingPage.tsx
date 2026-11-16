@@ -8,6 +8,7 @@ import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
 import { GOOGLE_CLIENT_ID } from "../config";
+import { requestErrorMessage } from "../api/errors";
 import type { ReactNode } from "react";
 
 export default function LandingPage() {
@@ -15,6 +16,8 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [importOpen, setImportOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  // Why the last create or import failed: the rate limit's wait (#184), or a plain failure.
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // Populate user state after a page reload. fetchMe will trigger the token
   // refresh interceptor if the access token is expired, so this also warms up
@@ -27,9 +30,12 @@ export default function LandingPage() {
 
   const handleCreateBlank = async () => {
     setLoading("blank");
+    setCreateError(null);
     try {
       const id = await createPedigree("Untitled pedigree");
       navigate(`/p/${id}`);
+    } catch (err) {
+      setCreateError(requestErrorMessage(err, "Could not create the pedigree. Check your connection and try again."));
     } finally {
       setLoading(null);
     }
@@ -38,15 +44,19 @@ export default function LandingPage() {
   const handleImport = async (pending: { title: string; pedigree: Pedigree }[]) => {
     if (!pending.length) return;
     setLoading("import");
+    setCreateError(null);
+    let lastId: string | null = null;
     try {
-      let lastId: string | null = null;
       for (const { title, pedigree } of pending) {
         lastId = await createPedigreeFromData(title, pedigree);
       }
-      if (lastId) navigate(`/p/${lastId}`);
+    } catch (err) {
+      setCreateError(requestErrorMessage(err, "Could not save the imported pedigree. Check your connection and try again."));
+      lastId = null;
     } finally {
       setLoading(null);
     }
+    if (lastId) navigate(`/p/${lastId}`);
   };
 
   return (
@@ -122,6 +132,9 @@ export default function LandingPage() {
               Import from PED or JSON file…
             </Button>
           </div>
+          {createError && (
+            <p role="alert" data-testid="create-error" className="-mt-8 mb-10 text-xs text-red-600 max-w-xl">{createError}</p>
+          )}
           {/* Pointer to the "Your data" section at the foot of the page (#178) */}
           <p className="-mt-7 mb-10 text-[10px] text-gray-400">
             Pedigrees are saved on this server.{" "}

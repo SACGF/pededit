@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { exampleBySlug, type ExamplePedigree } from "../data/examples";
+import { rateLimitMessage } from "../api/errors";
 
 /**
  * Copies being created, by slug. React StrictMode runs an effect twice on
@@ -29,7 +30,8 @@ export default function ExamplePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const example = exampleBySlug(slug);
-  const [failed, setFailed] = useState(false);
+  // null while the copy is being made; the rate limit's wait (#184) or "" when it failed otherwise.
+  const [failed, setFailed] = useState<string | null>(null);
 
   useEffect(() => {
     if (!example) return;
@@ -37,7 +39,7 @@ export default function ExamplePage() {
     createCopy(example).then(
       // replace: Back from the editor must not return here and make another copy.
       id => { if (!left) navigate(`/p/${id}`, { replace: true }); },
-      () => { if (!left) setFailed(true); },
+      err => { if (!left) setFailed(rateLimitMessage(err) ?? ""); },
     );
     return () => { left = true; };
   }, [example, navigate]);
@@ -46,9 +48,9 @@ export default function ExamplePage() {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-8">
-      {failed ? (
-        <p className="text-xs text-gray-500">
-          Could not open {example.label}. Check your connection and reload, or go to the{" "}
+      {failed !== null ? (
+        <p className="text-xs text-gray-500" role="alert">
+          Could not open {example.label}. {failed || "Check your connection and reload."} Or go to the{" "}
           <Link to="/" className="text-black underline underline-offset-2">home page</Link>.
         </p>
       ) : (

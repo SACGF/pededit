@@ -2,7 +2,7 @@
 // Start, stop or check the local dev servers the page checks talk to:
 // Vite on 5173 (proxying /api) and Django runserver on 8000. Servers that are
 // already running are left alone; `down` only stops the ones `up` started.
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -49,6 +49,9 @@ const SERVERS = {
       if (!python) {
         throw new Error("no backend/.venv; create it with `cd backend && uv venv && uv pip install -r requirements.txt` or set PEDEDIT_PYTHON");
       }
+      // The rate limit counters' table (#47): without it every request is let through and
+      // logged, so the rate-limited flow (#184) would test nothing. Idempotent and quick.
+      spawnSync(python, ["manage.py", "createcachetable"], { cwd: BACKEND_DIR, stdio: "ignore" });
       return [python, ["manage.py", "runserver", "127.0.0.1:8000"], BACKEND_DIR];
     },
   },

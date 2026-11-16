@@ -1,5 +1,6 @@
 import axios from "axios";
 import { withCurrentNotation } from "../pedigree/notation";
+import { isRateLimited } from "./errors";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 export const apiClient = axios.create({
@@ -63,7 +64,13 @@ apiClient.interceptors.response.use(
             tokenRefreshInProgress = null;
           });
       }
-      newToken = await tokenRefreshInProgress.catch(() => null);
+      try {
+        newToken = await tokenRefreshInProgress;
+      } catch (refreshError) {
+        // The refresh was rate limited (#184): the tokens may be fine, so stay
+        // signed in and pass the 429 on for the page to say wait and retry.
+        if (isRateLimited(refreshError)) return Promise.reject(refreshError);
+      }
     }
 
     if (newToken) {

@@ -15,6 +15,7 @@ import { useSmallScreen } from "../hooks/useSmallScreen";
 import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { forgetRecentPedigree } from "../utils/recentPedigrees";
+import { requestErrorMessage } from "../api/errors";
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -154,7 +155,13 @@ export default function CanvasPage() {
   }, [activeTitle]);
 
   const handleNew = async () => {
-    const newId = await createPedigree("Untitled pedigree");
+    let newId: string;
+    try {
+      newId = await createPedigree("Untitled pedigree");
+    } catch (err) {
+      setNotice({ kind: "error", text: requestErrorMessage(err, "Could not create the pedigree. Check your connection and try again.") });
+      return;
+    }
     navigate(`/p/${newId}`);
     setEditingId(newId);
     setEditingName("Untitled pedigree");
@@ -400,9 +407,13 @@ export default function CanvasPage() {
         onClose={() => setImportOpen(false)}
         onImport={async (pending: { title: string; pedigree: Pedigree }[]) => {
           let lastId: string | null = null;
-          for (const { title, pedigree: importedPedigree } of pending) {
-            const newId = await createPedigreeFromData(title, importedPedigree);
-            lastId = newId;
+          try {
+            for (const { title, pedigree: importedPedigree } of pending) {
+              lastId = await createPedigreeFromData(title, importedPedigree);
+            }
+          } catch (err) {
+            setNotice({ kind: "error", text: requestErrorMessage(err, "Could not save the imported pedigree. Check your connection and try again.") });
+            return;
           }
           if (lastId) navigate(`/p/${lastId}`);
         }}

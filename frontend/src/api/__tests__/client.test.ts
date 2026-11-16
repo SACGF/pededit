@@ -18,7 +18,7 @@ function memoryStorage() {
 
 interface Seen { url: string; auth: string | null }
 
-function fakeServer({ validAccess, refreshTo }: { validAccess: string; refreshTo: string | null }) {
+function fakeServer({ validAccess, refreshTo, refreshLimited = false }: { validAccess: string; refreshTo: string | null; refreshLimited?: boolean }) {
   const seen: Seen[] = [];
   const respond = (config: InternalAxiosRequestConfig, status: number, data: unknown) => {
     const response = { data, status, statusText: String(status), headers: {}, config };
@@ -30,6 +30,7 @@ function fakeServer({ validAccess, refreshTo }: { validAccess: string; refreshTo
     const auth = (config.headers?.Authorization as string | undefined) ?? null;
     seen.push({ url, auth });
     if (url.includes("token/refresh")) {
+      if (refreshLimited) return respond(config, 429, {});
       return refreshTo ? respond(config, 200, { access: refreshTo, refresh: `${refreshTo}-r` }) : respond(config, 401, {});
     }
     if (url.includes("/auth/me/")) return auth === `Bearer ${validAccess}` ? respond(config, 200, { id: 1 }) : respond(config, 401, {});
@@ -128,5 +129,15 @@ describe("API client on a 401 (#191)", () => {
     use(server);
     await expect(apiClient.get("/auth/me/")).rejects.toMatchObject({ response: { status: 401 } });
     expect(refreshes(server.seen)).toBe(1);
+  });
+
+  it("a rate-limited refresh keeps the tokens and passes the 429 on (#184)", async () => {
+    localStorage.setItem("access_token", "old");
+    localStorage.setItem("refresh_token", "r");
+    const server = fakeServer({ validAccess: "new", refreshTo: "new", refreshLimited: true });
+    use(server);
+    await expect(apiClient.get("/auth/me/")).rejects.toMatchObject({ response: { status: 429 } });
+    expect(localStorage.getItem("refresh_token")).toBe("r");
+    expect(signedOut).toBe(0);
   });
 });

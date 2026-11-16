@@ -85,6 +85,7 @@ jobs:
           uv venv --python 3.13 .venv
           uv pip install --python .venv -r requirements.txt
           .venv/bin/python manage.py migrate --noinput
+          .venv/bin/python manage.py createcachetable
       - name: Start Vite and Django
         run: node frontend/scripts/browser/servers.mjs up
       - name: Render and export lint, every example

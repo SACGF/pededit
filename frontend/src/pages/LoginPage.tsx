@@ -4,6 +4,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useAppStore } from "../store/useAppStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID } from "../config";
+import { requestErrorMessage } from "../api/errors";
 
 type CredentialResponse = { credential?: string };
 
@@ -24,8 +25,8 @@ export default function LoginPage() {
       try {
         await googleLogin(response.credential);
         navigate("/", { replace: true });
-      } catch {
-        setError("Google sign-in failed.");
+      } catch (err) {
+        setError(requestErrorMessage(err, "Google sign-in failed."));
       } finally {
         setLoading(false);
       }
