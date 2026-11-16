@@ -436,15 +436,18 @@ The layout algorithm is a translation into TypeScript of code from kinship2:
 > Sinnwell JP, Therneau TM, Schaid DJ. The kinship2 R package for pedigree
 > data. Human Heredity. 2014;78(2):91-93. doi:10.1159/000363105
 
-kinship2 is copyright its authors and licensed GPL (version 2 or later). If
-you publish figures laid out with this package, please cite their paper.
+kinship2 is copyright its authors and licensed under the GPL (version 2 or
+later). If you publish figures laid out with this package, please cite their
+paper.
 
-This package is licensed under the GNU General Public License, version 3 or
-(at your option) any later version (`GPL-3.0-or-later`), as allowed by
-kinship2's licence; the full text is in `LICENSE`. The GPL is a copyleft
-licence: if you distribute software that includes this package, and a web
-page that bundles it counts, you must offer its source under the GPL too.
-Read it before using this package in software you distribute under other
-terms.
+Because this package is built from kinship2's code, it has to be under the
+GPL too, and a permissive licence such as MIT is not possible for it. It is
+licensed under the GNU General Public License, version 3 or (at your option)
+any later version (`GPL-3.0-or-later`); the full text is in `LICENSE`.
+
+The GPL is a copyleft licence: if you distribute software that includes this
+package, and a web page that bundles it counts, you must offer its source
+under the GPL too. Read it before using this package in software you
+distribute under other terms.
 
 Bugs and questions: https://github.com/SACGF/pededit/issues
