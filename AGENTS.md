@@ -43,7 +43,7 @@ What exists:
 - Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification (per-field choices for evaluation detail, onset, consanguinity text and text tags, #111), PNG at 96/150/300/600 dpi with a pHYs chunk (#18), U-shape SVG export, CSV. Pedigree numbers (I-1, II-3, #8): a "Show pedigree numbers" setting draws them on their own line under each symbol, last in the NSGC label order, on the canvas and in figure exports, and the CSV always has a `pedigree_number` column; computed from the layout, never stored. `hpoTerms` exists on the data model with no UI (#46).
 - Agent page checks: `frontend/scripts/browser/` runs a page in headless chromium and reports JS errors with `frontend/src/...:line`, screenshots and measures, evaluates against the dev-only `window.__pededit` stores, lints what the canvas and the SVG export draw (`lint.mjs`), and with `--fixture-via-api` checks what survives a save and reload. `flows.mjs` runs the end-to-end flows (#167: build, select, drag, conditions, exports, imports, filters, problems, signed in) and `compare.mjs` compares the canvas and exports of two commits pixel for pixel (#142). Every report starts with the commit Vite serves. See its `README.md`.
 - Test data: `frontend/src/fixtures/features.ts` holds feature fixtures that between them draw every symbol, line and label (#140), with SVG snapshots of them and of every example (#69). `test-data/pedigrees/` is the whole test data set (#167), generated from `frontend/src/fixtures/dataset.ts` with a manifest of what the code does with each file, read by the frontend sweeps, the backend tests and the page checks.
-- CI: `.github/workflows/ci.yml` runs the unit tests, type check, backend tests, the page checks over every example and test data file and the end-to-end flows on each PR and push to main (#72, #167).
+- CI: `.github/workflows/ci.yml` runs the unit tests, type check, backend tests, the page checks over every example and test data file and the end-to-end flows on each PR and push to main (#72, #167). It also runs the dead code check (`npm run deadcode`, below) and reports what it finds as a warning without failing.
 - Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Hardening, backups, error reporting and a health check are open (#47 to #50).
 
 The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
@@ -161,6 +161,15 @@ node frontend/scripts/browser/shot.mjs --fixture example:2                      
 ```
 
 `--fixture` takes `example:N`, a `.ped` file or a Pedigree `.json` and needs no backend, so it cannot catch serializer bugs; check anything that must survive a save against `/p/<id>` with Django running. Use `--as-agent` for signed-in pages. These tools only drive localhost. Details in `frontend/scripts/browser/README.md`. Node 20+ is required.
+
+## Dead code
+
+`npm run deadcode` runs knip (`knip.json`) over the frontend, its scripts and the layout engine. It lists files nothing imports, exports nothing uses and dependencies nothing needs, and exits 1 when it finds any. Run it before finishing a change and leave it clean.
+
+- **Delete what it reports**, then run it again: removing one thing can leave another unused.
+- **It can be wrong** about code reached in a way it cannot follow: a file run by a shell script, the target of a Vite alias, a `/src/...` import inside a page check. That is why CI only warns. When the code is used, say how in `knip.json`: an `entry` for a file run or aliased from outside, `ignore` for vendored code (`src/components/ui/`).
+- **A test counts as a use.** `npx knip --production` leaves the tests out, so it also lists what only tests call. Read that list now and then: a wrapper only tests call is deleted and its tests pointed at what the app calls; deliberate test support stays (`resetProblemStep`, `readPngDpi`, `layoutCost.ts`, `uShapeLint.ts`, the fixtures).
+- **What it does not report:** an export used only in its own file, a field of an object that nothing reads, and anything that is not TypeScript or JavaScript.
 
 ## Writing Style
 

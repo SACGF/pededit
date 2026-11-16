@@ -1,4 +1,4 @@
-# Unit tests, type check and the agent page checks (#72) on every PR and push to main.
+# Unit tests, type check, a dead code report and the agent page checks (#72) on every PR and push to main.
 # The page checks are frontend/scripts/browser/: see its README.md.
 name: CI
 
@@ -33,6 +33,11 @@ jobs:
         run: npm -w frontend run typecheck
       - name: Frontend tests
         run: npm -w frontend run test
+      # Reported as a warning, never fails the build: knip can be wrong about
+      # code reached in a way it cannot follow. See "Dead code" in AGENTS.md.
+      - name: Dead code (knip)
+        continue-on-error: true
+        run: npm run deadcode || { echo "::warning title=Dead code::knip found unused files, exports or dependencies. Run 'npm run deadcode' and see Dead code in AGENTS.md."; exit 1; }
 
   backend:
     name: Backend tests
