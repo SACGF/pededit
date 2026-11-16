@@ -18,7 +18,6 @@ interface AppState {
   activeTitle: string | null;
 
   // ── Actions ────────────────────────────────────────────────────────────────
-  login: (username: string, password: string) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   githubLogin: (code: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -78,14 +77,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
   activePedigreeId: null,
   activeTitle: null,
   lastSaveFailed: false,
-
-  login: async (username, password) => {
-    const { data } = await authApi.login(username, password);
-    localStorage.setItem("access_token", data.access);
-    localStorage.setItem("refresh_token", data.refresh);
-    set({ isAuthenticated: true });
-    await get().fetchMe();
-  },
 
   googleLogin: async (credential) => {
     const { data } = await authApi.googleLogin(credential);

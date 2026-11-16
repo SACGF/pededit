@@ -102,12 +102,6 @@ export interface PedigreePayload {
 }
 
 export const authApi = {
-  register: (username: string, email: string, password: string) =>
-    apiClient.post<UserInfo>("/auth/register/", { username, email, password }),
-
-  login: (username: string, password: string) =>
-    apiClient.post<TokenPair>("/auth/token/", { username, password }),
-
   googleLogin: (credential: string) =>
     apiClient.post<TokenPair>("/auth/google/", { credential }),
 

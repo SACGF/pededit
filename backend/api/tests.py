@@ -502,3 +502,29 @@ class PedigreeDataSetTests(APITestCase):
                 resp = self.client.post("/api/pedigrees/", {"title": entry["file"], "data": data}, format="json")
                 self.assertEqual(resp.status_code, 201, entry["file"])
         self.assertGreater(seen, 5)
+
+
+class NoPasswordSignInTests(APITestCase):
+    """Sign-in is by Google or GitHub only (#51): no registration and no
+    token for a username and password, while a token can still be renewed."""
+
+    def test_register_and_password_token_are_gone(self):
+        User.objects.create_user("alice", password="pw12345678")
+        for url, body in [
+            ("/api/auth/register/", {"username": "new", "email": "n@example.com", "password": "pw12345678"}),
+            ("/api/auth/token/", {"username": "alice", "password": "pw12345678"}),
+            ("/api/auth/token/verify/", {"token": "x"}),
+        ]:
+            with self.subTest(url):
+                self.assertEqual(self.client.post(url, body, format="json").status_code, 404)
+        self.assertFalse(User.objects.filter(username="new").exists())
+
+    def test_a_token_can_still_be_renewed(self):
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        user = User.objects.create_user("bob")
+        refresh = RefreshToken.for_user(user)
+        resp = self.client.post("/api/auth/token/refresh/", {"refresh": str(refresh)}, format="json")
+        self.assertEqual(resp.status_code, 200, resp.data)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp.data['access']}")
+        self.assertEqual(self.client.get("/api/auth/me/").json()["username"], "bob")

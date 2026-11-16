@@ -4,18 +4,11 @@ from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from .models import Pedigree, TagPreset
 from .serializers import (
-    RegisterSerializer,
     UserSerializer,
     PedigreeSerializer,
     PedigreeListSerializer,
     TagPresetSerializer,
 )
-
-
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
 
 
 class MeView(generics.RetrieveAPIView):

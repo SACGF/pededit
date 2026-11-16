@@ -58,14 +58,18 @@ marks those `accepted-unchecked` and #170 is the decision to refuse them.
 - `api/social_auth.py` — Google (ID token verified server-side) and GitHub
   (code exchange) both find-or-create a Django user by email and return a
   token pair.
-- `auth/register/` and `auth/token/` (username + password) are legacy and
-  slated for removal (#51).
+- There is no username and password sign-in and no registration (#51,
+  removed: direct OAuth works, so the planned move to Clerk was dropped).
+  Tokens are issued only by the two social views and by the `agent_token`
+  management command for the page checks; `auth/token/refresh/` renews
+  them. Django admin still uses a password (`createsuperuser`), which gives
+  no API token. A server with no Google or GitHub client ID has no
+  accounts, only anonymous pedigrees, and the login page says so.
 
 ## URLs
 
-`peded/urls.py` mounts admin, the simplejwt token views, and `api/urls.py`
-(health, pedigrees, tag-presets, auth/me, auth/google, auth/github,
-auth/register).
+`peded/urls.py` mounts admin, simplejwt's token refresh view, and `api/urls.py`
+(health, pedigrees, tag-presets, auth/me, auth/google, auth/github).
 
 `GET /api/health/` (`api/health.py`, #50) has `authentication_classes = []`
 on purpose: with the default JWT authentication a stale token in the request

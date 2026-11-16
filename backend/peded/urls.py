@@ -1,17 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Auth
-    path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # Auth: tokens are issued only by the Google and GitHub sign-in views
+    # (api/social_auth.py). This renews one; there is no username and password
+    # sign-in and no registration (#51).
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/auth/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     # App
     path("api/", include("api.urls")),
 ]

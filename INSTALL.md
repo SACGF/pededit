@@ -83,12 +83,7 @@ Then open `http://localhost:5173`.
   For Google, add `http://localhost:5173` to "Authorized JavaScript origins" in the Google Cloud Console.
   For GitHub, set the callback URL to `http://localhost:5173/auth/github/callback`.
 
-- **Username/password:** Register an account via the API or Django admin:
-  ```bash
-  curl -s -X POST http://localhost:8000/api/auth/register/ \
-    -H "Content-Type: application/json" \
-    -d '{"username":"you","email":"you@example.com","password":"yourpassword"}'
-  ```
+With neither set up the app still works in full: nobody needs an account, each pedigree is reached by its own link, and the sign-in page says that sign-in is not set up. There is no username and password sign-in.
 
 ---
 
@@ -185,7 +180,7 @@ sudo -u pededit \
   npm -w @pedigree-editor/frontend run build
 ```
 
-If you don't set these, the social sign-in buttons simply won't appear — username/password login still works.
+If you don't set these, the social sign-in buttons do not appear and the sign-in page says that sign-in is not set up. The app works in full without accounts.
 
 This produces the SPA bundle in `frontend/dist/`.
 
@@ -226,7 +221,7 @@ The Django static files (admin CSS/JS) will be collected to `backend/staticfiles
 
 ### (Optional) Create a superuser for Django admin
 
-Only needed if you want access to the Django admin panel at `/admin/`. Not required for normal use — users register through the app.
+Only needed if you want access to the Django admin panel at `/admin/`. Not required for normal use. An admin account gives access to the admin panel only: it cannot sign in to the app, where sign-in is by Google or GitHub.
 
 ```bash
 sudo -u pededit .venv/bin/python manage.py createsuperuser

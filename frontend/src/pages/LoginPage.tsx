@@ -2,36 +2,16 @@ import { useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAppStore } from "../store/useAppStore";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GOOGLE_CLIENT_ID, GITHUB_CLIENT_ID } from "../config";
 
 type CredentialResponse = { credential?: string };
 
 export default function LoginPage() {
-  const { login, googleLogin } = useAppStore();
+  const { googleLogin } = useAppStore();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      await login(username, password);
-      navigate("/", { replace: true });
-    } catch {
-      setError("Invalid username or password.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleSuccess = useCallback(
     async (response: CredentialResponse) => {
@@ -97,53 +77,11 @@ export default function LoginPage() {
             )}
           </div>
 
-          {hasSocial && (
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-400">or</span>
-              </div>
-            </div>
-          )}
-
-          {/* Password login — collapsed by default when social is available */}
-          {hasSocial && !showPassword ? (
-            <button
-              type="button"
-              className="w-full text-xs text-gray-400 hover:text-gray-600 py-1"
-              onClick={() => setShowPassword(true)}
-            >
-              Sign in with username &amp; password
-            </button>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  autoComplete="username"
-                  required
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Signing in\u2026" : "Sign in"}
-              </Button>
-            </form>
+          {/* Sign-in is by Google or GitHub only (#51). A server with neither set up has no accounts. */}
+          {!hasSocial && (
+            <p className="text-sm text-gray-600" data-testid="no-sign-in">
+              Sign-in is not set up on this server. You do not need an account: every pedigree has its own link, which is all you need to come back to it.
+            </p>
           )}
 
           {error && <p className="text-sm text-red-500">{error}</p>}
