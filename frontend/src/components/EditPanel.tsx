@@ -12,7 +12,7 @@ import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { referenceRelatedness } from "../pedigree/referenceRelatedness";
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { chartTitle, ageText } from "../pedigree/labels";
 import { CLINICAL_DETAIL_OPTIONS, clinicalDetailLines } from "../pedigree/clinicalDetails";
@@ -36,43 +36,90 @@ interface EditPanelProps {
   onManageTags?: () => void;
 }
 
+type PanelTab = "person" | "pedigree";
+
 /**
- * The right-hand panel: the figure legend when nothing is selected, or the
- * selected individual's fields followed by the legend's tag rows as that
- * person's tag checkboxes (#75).
+ * The right-hand panel (#135): a Person tab (the selected individual's
+ * fields, or the batch panel for several) and a Pedigree tab (chart title,
+ * clinical details), with the figure legend under both. Any change of
+ * selection switches tab, to Person when someone is selected and to Pedigree
+ * when the selection is cleared, so clicking a person or the background is a
+ * shortcut. Every selection write makes a new `selectedIds` array, so
+ * clicking the person already selected switches back too. Choosing the
+ * Pedigree tab keeps the selection, so Person returns to the same people.
+ * Person is disabled while nobody is selected. On the Person tab the legend's
+ * tag rows are that person's tag checkboxes (#75); on the Pedigree tab it is
+ * the plain legend.
+ *
+ * Only the content under the tabs scrolls, with a stable scrollbar gutter, so
+ * switching between a short and a long tab never moves the tabs or the text.
  */
 export function EditPanel({ onManageTags }: EditPanelProps) {
   const { pedigree, selectedId, selectedIds, setIndividualTag, setOnset } = usePedigreeStore();
+  const anyone = selectedIds.length > 0;
+  const [tab, setTab] = useState<PanelTab>(anyone ? "person" : "pedigree");
+  useEffect(() => {
+    setTab(selectedIds.length > 0 ? "person" : "pedigree");
+  }, [selectedIds]);
   // Several selected (#21): the batch panel, and the legend without one person's tag checkboxes.
   const multiple = selectedIds.length > 1;
-  const individual = multiple ? undefined : pedigree.individuals.find(i => i.id === selectedId);
+  const onPerson = tab === "person" && anyone;
+  const individual = onPerson && !multiple ? pedigree.individuals.find(i => i.id === selectedId) : undefined;
 
   return (
-    <div className="p-4 space-y-4">
-      {multiple ? (
-        <SelectionPanel />
-      ) : individual ? (
-        <IndividualForm individual={individual} />
-      ) : (
-        <>
-          <ChartTitleField />
-          <ClinicalDetailsSection />
-          {/* How selecting works is in the left sidebar ("Using the canvas", #122). */}
-          <p className="text-xs text-gray-400">Select an individual to edit</p>
-        </>
-      )}
-      <div className="border-t pt-3">
-        <Legend
-          pedigree={pedigree}
-          individual={individual}
-          onToggleTag={individual ? (tagId, on) => setIndividualTag(individual.id, tagId, on) : undefined}
-          onSetTagOnset={individual ? (tagId, value) => setOnset(individual.id, tagId, value) : undefined}
-          onManageTags={onManageTags}
-        />
+    <div className="flex h-full flex-col">
+      <div role="tablist" aria-label="Side panel" className="flex shrink-0 border-b text-xs">
+        <PanelTabButton tab="person" current={onPerson ? "person" : "pedigree"} onSelect={setTab} disabled={!anyone}
+          title={anyone ? undefined : "Select someone on the chart to edit them"}>Person</PanelTabButton>
+        <PanelTabButton tab="pedigree" current={onPerson ? "person" : "pedigree"} onSelect={setTab}>Pedigree</PanelTabButton>
+      </div>
+      <div className="flex-1 overflow-y-auto [scrollbar-gutter:stable]" data-testid="panel-scroll">
+        <div className="p-4 space-y-4" role="tabpanel" data-testid={onPerson ? "panel-person" : "panel-pedigree"}>
+          {!onPerson ? (
+            <>
+              <ChartTitleField />
+              <ClinicalDetailsSection />
+            </>
+          ) : multiple ? (
+            <SelectionPanel />
+          ) : individual ? (
+            <IndividualForm individual={individual} />
+          ) : null}
+          <div className="border-t pt-3">
+            <Legend
+              pedigree={pedigree}
+              individual={individual}
+              onToggleTag={individual ? (tagId, on) => setIndividualTag(individual.id, tagId, on) : undefined}
+              onSetTagOnset={individual ? (tagId, value) => setOnset(individual.id, tagId, value) : undefined}
+              onManageTags={onManageTags}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+function PanelTabButton({ tab, current, onSelect, disabled, title, children }: {
+  tab: PanelTab; current: PanelTab; onSelect: (tab: PanelTab) => void; disabled?: boolean; title?: string; children: ReactNode;
+}) {
+  const active = tab === current;
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      disabled={disabled}
+      title={title}
+      data-testid={`panel-tab-${tab}`}
+      onClick={() => onSelect(tab)}
+      className={`flex-1 py-2 -mb-px border-b ${active ? "border-black text-black" : "border-transparent text-gray-500 hover:text-black"} disabled:text-gray-300 disabled:hover:text-gray-300 disabled:cursor-not-allowed`}
+    >
+      {children}
+    </button>
+  );
+}
+
 
 function IndividualForm({ individual }: { individual: Individual }) {
   const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand } = usePedigreeStore();
@@ -1015,7 +1062,7 @@ function ChartTitleField() {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * Clinical key fields (#102), under the chart title when nothing is selected.
+ * Clinical key fields (#102), under the chart title on the Pedigree tab (#135).
  * Folded by default so a new pedigree's panel stays short; the header says
  * how many are filled, and the legend below lists them.
  */

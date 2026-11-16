@@ -159,9 +159,13 @@ stub so the app still builds without Google login.
   `pedigree/batch.ts`.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.
 - `io/` — import and export. See `src/io/AGENTS.md`.
-- `components/` — Toolbar, EditPanel (the chart title field when nothing is
-  selected, #20, and under it the folded "Clinical details" section, #102,
-  whose fields, order and labels come from `pedigree/clinicalDetails.ts`; individual form with name, DOB, free-text age, the
+- `components/` — Toolbar, EditPanel (Person and Pedigree tabs, #135: any
+  change of selection switches tab, to Person when someone is selected, to
+  Pedigree when it is cleared, but choosing a tab never changes the
+  selection. Pedigree holds the chart title field, #20, and under it the
+  folded "Clinical details" section, #102, whose fields, order and labels
+  come from `pedigree/clinicalDetails.ts`. Whole-pedigree fields go on the
+  Pedigree tab, not in Settings, which is only how the chart is drawn; individual form with name, DOB, free-text age, the
   Relatedness section of #32 with the double-line checkbox of #85, plus the always-visible `Legend`, #75).
   The Status section edits sex, affected, proband and consultand with the
   more menu's store actions and rules (#120: refused sexes disabled with

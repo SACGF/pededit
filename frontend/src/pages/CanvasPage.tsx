@@ -325,7 +325,7 @@ export default function CanvasPage() {
             )}
           </div>
 
-          <div className="w-60 border-l bg-white shrink-0 overflow-y-auto">
+          <div className="w-60 border-l bg-white shrink-0 overflow-hidden">
             <EditPanel onManageTags={() => setTagsOpen(true)} />
           </div>
         </div>
