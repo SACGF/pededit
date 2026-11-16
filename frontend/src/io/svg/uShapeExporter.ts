@@ -1,11 +1,10 @@
 import { isAffected, placementParentOf, type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { deidentify } from "./deidentify";
-import { symbolSex } from "../../pedigree/gender";
-import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
+import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
+import { personGlyph, type PersonGlyph } from "../../pedigree/personGlyph";
 import {
-  renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
-  renderAffectedCoreSvg, symbolPaint,
-  hasAnnotationRow, ANNOTATION_ROW_HEIGHT,
+  renderSectorListSvg, renderAnnotationItemsSvg, renderExportKeySvg,
+  renderAffectedCoreSvg, ANNOTATION_ROW_HEIGHT,
 } from "../../pedigree/tags";
 import type { SvgExportOptions } from "./types";
 import { lossTriangleGeom, renderLifeStatusMarks, renderCarrierDot, childDropEndOffset, renderAdoptionBrackets, renderRoleLetterSvg } from "./svgExporter";
@@ -14,13 +13,12 @@ import { ADOPTION_DASH } from "../../pedigree/adoption";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../pedigree/ended";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { wrapLabel, labelMaxWidth, detailLines, nameLabelText, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
+import { labelMaxWidth, titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { labelNumbers } from "../../pedigree/layoutToFlow";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
-import { renderPresymptomaticSvg, renderDocumentedMarkSvg, hasDocumentedEvaluation } from "../../pedigree/evaluation";
-import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
+import { renderPresymptomaticLineSvg, renderDocumentedMarkSvg } from "../../pedigree/evaluation";
+import { renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
-import { lifeStatusCaption } from "../../pedigree/lifeStatus";
 import {
   consanguinityLabelText, consanguinityLabelWidth, CONSANGUINITY_LABEL_FONT_SIZE,
 } from "../../pedigree/consanguinityLabel";
@@ -931,10 +929,11 @@ function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
       const ind = byId.get(id);
       if (!ind) continue;
       // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
-      const nameLines = wrapLabel(nameLabelText(ind), labelMaxWidth(MAX_SLOT));
-      const details = detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree, labelNumbers(pedigree));
+      const glyph = glyphOf(ind, pedigree);
+      const nameLines = glyph.figureNameLines;
+      const details = glyph.detailLines;
       labelLines = Math.max(labelLines, nameLines.length + details.length
-        + (hasAnnotationRow(ind, pedigree) ? 1 : 0) + (lifeStatusCaption(ind.lifeStatus) ? 1 : 0));
+        + (glyph.annotations.length > 0 ? 1 : 0) + (glyph.caption ? 1 : 0));
       labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ...details.map(l => l.length));
     }
   });
@@ -1383,22 +1382,44 @@ function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedigree): s
 }
 
 /**
+ * What is drawn for each person (#144, `personGlyph`), worked out once per
+ * drawn pedigree. The U-shape has its own layout, so it has no flow nodes to
+ * read a glyph from; it asks for the same glyph the canvas and the standard
+ * figure draw, with names wrapped at its widest slot and nobody numbered as
+ * a copy (its copies are joined by dashed links, not numbers).
+ */
+const glyphCache = new WeakMap<Pedigree, { childIds: Set<string>; numbers: Map<string, string> | undefined; glyphs: Map<string, PersonGlyph> }>();
+function glyphOf(ind: Individual, pedigree: Pedigree): PersonGlyph {
+  let cache = glyphCache.get(pedigree);
+  if (!cache) {
+    cache = { childIds: new Set(Object.values(pedigree.parentOf).flat()), numbers: labelNumbers(pedigree), glyphs: new Map() };
+    glyphCache.set(pedigree, cache);
+  }
+  let glyph = cache.glyphs.get(ind.id);
+  if (!glyph) {
+    glyph = personGlyph(ind, pedigree, { labelMax: labelMaxWidth(MAX_SLOT), numbers: cache.numbers, hasParents: cache.childIds.has(ind.id) });
+    cache.glyphs.set(ind.id, glyph);
+  }
+  return glyph;
+}
+
+/**
  * The symbol, rotated with its group. The "P" of a pregnancy is text and
  * reads as a different letter once it lies on its side, so it is turned back
  * upright; the slashes of a termination and stillbirth stay with the symbol
  * like the deceased slash does.
  */
-function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotation: number): string {
-  // What fills the symbol, by the notation (#115), as on the canvas.
-  const paint = symbolPaint(ind, pedigree);
+function renderShape(ind: Individual, glyph: PersonGlyph, clipId: string, rotation: number): string {
+  // What fills the symbol, by the notation (#115), as on the canvas (#144).
+  const paint = glyph.paint;
   const fill = paint.base;
   const triangle = lossTriangleGeom(ind);
   let geom: string;
   if (triangle) {
     geom = triangle;
-  } else if (symbolSex(ind, pedigree) === "male") {
+  } else if (glyph.shape === "male") {
     geom = `<rect x="${-HALF}" y="${-HALF}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (symbolSex(ind, pedigree) === "female") {
+  } else if (glyph.shape === "female") {
     geom = `<circle cx="0" cy="0" r="${HALF - 1}"`;
   } else {
     const h = HALF - 1;
@@ -1409,13 +1430,13 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   const sectors = paint.sectors;
   if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
-      + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + renderSectorListSvg(sectors, NODE_SIZE, clipId)
       + (paint.core ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
   shape += renderCarrierDot(ind, sectors.length > 0, paint.dot);
-  shape += renderPresymptomaticSvg(ind, pedigree, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
-  const captionShift = lifeStatusCaption(ind.lifeStatus) ? LABEL_LINE_HEIGHT : 0;
+  if (paint.line) shape += renderPresymptomaticLineSvg(glyph.lifeStatus, NODE_SIZE, -HALF, -HALF, sectors.length > 0);
+  const captionShift = glyph.caption ? LABEL_LINE_HEIGHT : 0;
   shape = renderAdoptionBrackets(ind) + shape;
   // "D" or "S" (#45) is text, kept upright like the "P".
   const letter = renderRoleLetterSvg(ind, sectors.length > 0, paint.base);
@@ -1424,7 +1445,7 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string, rotati
   if (ind.lifeStatus === "pregnancy" && marks && rotation !== 0) {
     marks = `<g transform="rotate(${r(-rotation)})">${marks}</g>`;
   }
-  return shape + marks + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift);
+  return shape + marks + renderAnnotationItemsSvg(glyph.annotations, NODE_SIZE, captionShift);
 }
 
 function renderDeceasedSlash(): string {
@@ -1442,19 +1463,19 @@ function renderProbandArrow(kind: ArrowKind, rotation: number): string {
  * with children the descent line runs through that spot, so the text gets a
  * white backing to stay readable.
  */
-function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): string {
+function renderLabel(glyph: PersonGlyph, hasDescent: boolean): string {
   // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
   // by renderShape, over the white backing), name, then the detail lines in
   // NSGC order (age, onset, pedigree number).
-  const caption = lifeStatusCaption(ind.lifeStatus);
+  const caption = glyph.caption;
   // The pedigree number (#8) is the one the standard figure shows, so the
   // two exports agree, even though it need not read left to right here.
-  const below = [...wrapLabel(nameLabelText(ind), labelMaxWidth(MAX_SLOT)), ...detailLines(ind, labelMaxWidth(MAX_SLOT), pedigree, labelNumbers(pedigree))];
+  const below = [...glyph.figureNameLines, ...glyph.detailLines];
   const lines = caption ? [caption, ...below] : below;
   if (lines.length === 0) return "";
   const out: string[] = [];
   const top = HALF + 3;
-  const annotationGap = hasAnnotationRow(ind, pedigree) ? ANNOTATION_ROW_HEIGHT : 0;
+  const annotationGap = glyph.annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0;
   const lineY = (i: number) =>
     top + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT + (caption && i === 0 ? 0 : annotationGap);
   if (hasDescent) {
@@ -1471,7 +1492,6 @@ function renderLabel(ind: Individual, pedigree: Pedigree, hasDescent: boolean): 
 
 function renderSymbols(pedigree: Pedigree, b: Built): string[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
-  const childIds = new Set(Object.values(pedigree.parentOf).flat());
   const out: string[] = [];
   let seq = 0;
   walk(b.root, n => {
@@ -1483,17 +1503,18 @@ function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       if (!ind) return;
       const pos = nodeAt(n, i, b.geom);
       const clipId = `symbol-clip-${seq++}`;
-      const branch = branchOf(pedigree, ind.id);
+      // What is drawn for the person, as the standard figure and the canvas have it (#144).
+      const glyph = glyphOf(ind, pedigree);
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
-        renderLabel(ind, pedigree, solo && m.id === n.blood) +
-        renderShape(ind, pedigree, clipId, pos.rotation) +
-        (ind.deceased ? renderDeceasedSlash() : "") +
-        (arrowKind(ind) ? renderProbandArrow(arrowKind(ind)!, pos.rotation) : "") +
-        (ind.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -HALF, -HALF, -pos.rotation) : "") +
-        (hasDocumentedEvaluation(ind) ? renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -HALF, -HALF, -pos.rotation) : "") +
+        renderLabel(glyph, solo && m.id === n.blood) +
+        renderShape(ind, glyph, clipId, pos.rotation) +
+        (glyph.deceased ? renderDeceasedSlash() : "") +
+        (glyph.arrow ? renderProbandArrow(glyph.arrow, pos.rotation) : "") +
+        (glyph.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -HALF, -HALF, -pos.rotation) : "") +
+        (glyph.documented ? renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -HALF, -HALF, -pos.rotation) : "") +
         // The count in a collapsed-branch diamond (#1), kept upright.
-        (branch ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(branch.children.length, NODE_SIZE)}</g>` : "") +
+        (glyph.groupCount !== undefined ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(glyph.groupCount, NODE_SIZE)}</g>` : "") +
         `</g>`,
       );
     });

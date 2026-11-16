@@ -81,7 +81,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   positions from its nodes, couple and sibship lines from its edges through
   `pedigree/lineGeometry.ts`, assisted lines and duplicate arcs from theirs.
   It never calls the layout engine and imports only types from it (a test in
-  `svgExporter.test.ts` holds it to that). Anything the export needs that
+  `svgExporter.test.ts` holds it to that). What is drawn for each person
+  (shape, fill, marks, lines of text) is the node's `glyph` (#144,
+  `pedigree/personGlyph.ts`); `uShapeExporter.ts` gets the same glyph from
+  `personGlyph` through its `glyphOf`. Anything the export needs that
   the edge or node data lacks is added to that data in `layoutToFlow`, not
   worked out again here.
 - `svgExporter.ts` — standard layout as an SVG string, including the key

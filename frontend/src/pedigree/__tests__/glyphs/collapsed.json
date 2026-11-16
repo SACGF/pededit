@@ -1,0 +1,447 @@
+{
+ "pgf @ 0-0": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "hcm: 180 to 360, solid #d62728"
+   ]
+  },
+  "deceased": true,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pgm @ 0-1": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "mgf @ 0-2": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "mgm @ 0-3": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "dm: 0 to 180, solid #1f77b4"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pa1h @ 1-0": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pa1 @ 1-1": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pa2 @ 1-2": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "dm: 0 to 180, solid #1f77b4"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pa2w @ 1-3": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "fa @ 1-4": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "hcm: 180 to 360, solid #d62728"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "mo @ 1-5": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "hcm carrier: 180 to 360, diagonal #d62728"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "ma1 @ 1-6": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "ma1w @ 1-7": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "collapsed-branch:a1 @ 2-0": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false,
+  "groupCount": 3
+ },
+ "collapsed-branch:a2 @ 2-1": {
+  "shape": "unknown",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false,
+  "groupCount": 2
+ },
+ "c6 @ 2-2": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "dm: 0 to 180, solid #1f77b4"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "c7 @ 2-3": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "hcm carrier: 180 to 360, diagonal #d62728"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "pro @ 2-4": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "hcm: 180 to 360, solid #d62728"
+   ]
+  },
+  "deceased": false,
+  "arrow": "proband",
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Proband",
+  "nameLines": [
+   "Proband"
+  ],
+  "figureNameLines": [
+   "Proband"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "b1 @ 2-5": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "b2 @ 2-6": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "b3 @ 2-7": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": [
+    "dm: 0 to 180, solid #1f77b4"
+   ]
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "collapsed-branch:a3 @ 2-8": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false,
+  "groupCount": 1
+ },
+ "c9 @ 2-9": {
+  "shape": "male",
+  "paint": {
+   "base": "black",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "nameLines": [],
+  "figureNameLines": [],
+  "detailLines": [],
+  "detailsBacked": false
+ }
+}

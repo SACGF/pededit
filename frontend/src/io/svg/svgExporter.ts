@@ -1,33 +1,31 @@
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
-import { symbolSex } from "../../pedigree/gender";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { duplicateArcD } from "../../pedigree/couplePath";
 import { coupleLineGeometry, sibshipLineGeometry } from "../../pedigree/lineGeometry";
 import { TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { wrapLabel, labelMaxWidth, detailLines, detailsBacked, nameLabelText, linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
-import { layoutSpacing } from "../../pedigree/spacing";
+import { linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
 import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill, assistedEdgeSegment } from "../../pedigree/assisted";
 import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
-import { labelNumbers, layoutToFlow } from "../../pedigree/layoutToFlow";
+import { layoutToFlow } from "../../pedigree/layoutToFlow";
+import type { PersonGlyph } from "../../pedigree/personGlyph";
 import {
   CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestConsanguinityLabel,
 } from "../../pedigree/consanguinityLabel";
 import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT } from "../../pedigree/labelBlock";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
-import { drawnPedigree, branchOf, renderBranchCountSvg } from "../../pedigree/collapse";
+import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
-import { renderPresymptomaticSvg, renderDocumentedMarkSvg, hasDocumentedEvaluation } from "../../pedigree/evaluation";
-import { arrowKind, renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
+import { renderPresymptomaticLineSvg, renderDocumentedMarkSvg } from "../../pedigree/evaluation";
+import { renderArrowSvg, ARROW_TAIL, PROBAND_LETTER_SIZE, type ArrowKind } from "../../pedigree/proband";
 import type { SvgExportOptions } from "./types";
 import {
-  renderSectorsSvg, renderAnnotationRowSvg, renderExportKeySvg,
-  renderAffectedCoreSvg, symbolPaint,
-  hasAnnotationRow, type SymbolPaint,
+  renderSectorListSvg, renderAnnotationItemsSvg, renderExportKeySvg,
+  renderAffectedCoreSvg, type SymbolPaint,
 } from "../../pedigree/tags";
 import {
-  usesLossTriangle, lifeStatusCaption, CAPTION_FONT_SIZE,
+  usesLossTriangle, CAPTION_FONT_SIZE,
   lossTrianglePoints, lossSlashEnds, pregnancyFontSize, pregnancyBaselineY,
   carrierDot, symbolTopInset, CARRIER_RIM,
 } from "../../pedigree/lifeStatus";
@@ -78,6 +76,7 @@ interface CanvasBounds {
 
 function computeBounds(
   pedigree: Pedigree,
+  glyphs: PersonGlyph[],
   slotPos: SlotPos,
   options: SvgExportOptions,
   aboveTop = Infinity,
@@ -98,18 +97,15 @@ function computeBounds(
     if (y > rawMaxY) rawMaxY = y;
   }
 
-  const hasProband = pedigree.individuals.some(i => arrowKind(i));
+  const hasProband = glyphs.some(g => g.arrow);
   const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
 
-  const hasAnnotations = pedigree.individuals.some(i => hasAnnotationRow(i, pedigree));
-  const hasCaption = pedigree.individuals.some(i => lifeStatusCaption(i.lifeStatus));
+  const hasAnnotations = glyphs.some(g => g.annotations.length > 0);
+  const hasCaption = glyphs.some(g => g.caption);
   // Names wrap to the slot width (#68), the age or DOB takes a line (#20), so
   // does each age of onset (#93) and the pedigree number (#8), so allow for
   // the most lines anyone takes.
-  const labelMax = labelMaxWidth(layoutSpacing(options.compact).slotWidth);
-  const numbers = labelNumbers(pedigree);
-  const textLines = Math.max(1, ...pedigree.individuals.map(i =>
-    wrapLabel(nameLabelText(i), labelMax).length + detailLines(i, labelMax, pedigree, numbers).length));
+  const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
@@ -247,10 +243,10 @@ export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black"
 
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
-function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): string {
+function renderShape(ind: Individual, glyph: PersonGlyph, clipId: string): string {
   const half = NODE_SIZE / 2;
-  // What fills the symbol, by the notation (#115), shared with the canvas.
-  const paint = symbolPaint(ind, pedigree);
+  // What fills the symbol, by the notation (#115), as decided for the canvas (#144).
+  const paint = glyph.paint;
   const fill = paint.base;
 
   // Geometry without paint, reused for the clipPath, the filled base and the
@@ -259,9 +255,9 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   let geom: string;
   if (triangle) {
     geom = triangle;
-  } else if (symbolSex(ind, pedigree) === "male") {
+  } else if (glyph.shape === "male") {
     geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
-  } else if (symbolSex(ind, pedigree) === "female") {
+  } else if (glyph.shape === "female") {
     geom = `<circle cx="0" cy="0" r="${half - 1}"`;
   } else {
     const pts = `0,${-(half - 1)} ${half - 1},0 0,${half - 1} ${-(half - 1)},0`;
@@ -273,19 +269,14 @@ function renderShape(ind: Individual, pedigree: Pedigree, clipId: string): strin
   const sectors = paint.sectors;
   if (sectors.length > 0) {
     shape = `<clipPath id="${clipId}">${geom}/></clipPath>` + shape
-      + renderSectorsSvg(ind, pedigree, NODE_SIZE, clipId)
+      + renderSectorListSvg(sectors, NODE_SIZE, clipId)
       + (paint.core ? renderAffectedCoreSvg(geom) : "")
       + `${geom} ${stroke} fill="none"/>`;
   }
 
   return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + renderRoleLetterSvg(ind, sectors.length > 0, paint.base)
-    + renderPresymptomaticSvg(ind, pedigree, NODE_SIZE, -half, -half, sectors.length > 0) + renderLifeStatusMarks(ind, geom, clipId, paint)
-    + renderAnnotationRowSvg(ind, pedigree, NODE_SIZE, captionShift(ind));
-}
-
-/** Drop for everything under the symbol when it has an "SB" / "ECT" caption line. */
-function captionShift(ind: Individual): number {
-  return lifeStatusCaption(ind.lifeStatus) ? CAPTION_SHIFT : 0;
+    + (paint.line ? renderPresymptomaticLineSvg(glyph.lifeStatus, NODE_SIZE, -half, -half, sectors.length > 0) : "") + renderLifeStatusMarks(ind, geom, clipId, paint)
+    + renderAnnotationItemsSvg(glyph.annotations, NODE_SIZE, glyph.caption ? CAPTION_SHIFT : 0);
 }
 
 /**
@@ -385,29 +376,27 @@ function renderDuplicateMark(index: number): string {
   return `<text x="${half + 2}" y="${-half + 2}" font-family="sans-serif" font-size="10" fill="black">${index}</text>`;
 }
 
-function renderSymbols(pedigree: Pedigree, slotPos: SlotPos, flow: FlowData): string[] {
+function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
-  const childIds = new Set(Object.values(pedigree.parentOf).flat());
 
-  // One symbol for each node the canvas draws, in its order (row by row).
+  // One symbol for each node the canvas draws, in its order (row by row),
+  // from the node's glyph (#144): nothing here asks the pedigree what to draw.
   for (const node of flow.nodes) {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
     const ind = node.data.individual;
+    const glyph = node.data.glyph;
     const { x: cx, y: cy } = pos;
-    // Every drawn copy is numbered 1, 2, ... as on the canvas.
-    const dupIndex = node.data.isDuplicate ? node.data.duplicateIndex : undefined;
 
     elems.push(`<g transform="translate(${cx} ${cy})">`);
-    elems.push(renderShape(ind, pedigree, `symbol-clip-${node.id}`));
-    if (ind.deceased) elems.push(renderDeceasedSlash());
-    const arrow = arrowKind(ind);
-    if (arrow) elems.push(renderProbandArrow(arrow));
-    if (ind.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, childIds.has(ind.id), -NODE_SIZE / 2, -NODE_SIZE / 2));
-    if (hasDocumentedEvaluation(ind)) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!ind.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
-    if (dupIndex !== undefined) elems.push(renderDuplicateMark(dupIndex));
-    const branch = branchOf(pedigree, ind.id);
-    if (branch) elems.push(renderBranchCountSvg(branch.children.length, NODE_SIZE)); // collapsed branch (#1)
+    elems.push(renderShape(ind, glyph, `symbol-clip-${node.id}`));
+    if (glyph.deceased) elems.push(renderDeceasedSlash());
+    if (glyph.arrow) elems.push(renderProbandArrow(glyph.arrow));
+    if (glyph.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -NODE_SIZE / 2, -NODE_SIZE / 2));
+    if (glyph.documented) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
+    // Every drawn copy is numbered 1, 2, ... as on the canvas.
+    if (glyph.copy !== undefined) elems.push(renderDuplicateMark(glyph.copy));
+    if (glyph.groupCount !== undefined) elems.push(renderBranchCountSvg(glyph.groupCount, NODE_SIZE)); // collapsed branch (#1)
     elems.push(`</g>`);
   }
   return elems;
@@ -424,53 +413,50 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(pedigree: Pedigree, slotPos: SlotPos, flow: FlowData, labelMax: number, backed: Set<string> = new Set()): string[] {
+function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
   const seen = new Set<string>();
-  const numbers = labelNumbers(pedigree);
 
   // Text goes under the first drawn copy of each person only.
-  {
-    for (const node of flow.nodes) {
-      const pos = slotPos.get(node.id);
-      const ind = node.data.individual;
-      if (!pos || seen.has(ind.id)) continue;
-      seen.add(ind.id);
+  for (const node of flow.nodes) {
+    const pos = slotPos.get(node.id);
+    const ind = node.data.individual;
+    if (!pos || seen.has(ind.id)) continue;
+    seen.add(ind.id);
+    const glyph = node.data.glyph;
 
-      const { x: cx, y: cy } = pos;
-      // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
-      // row, name, then the detail lines in NSGC order (age, onset, number).
-      const caption = lifeStatusCaption(ind.lifeStatus);
-      if (caption) elems.push(renderLifeStatusCaption(caption, cx, cy + LABEL_OFFSET_Y));
-      const labelBaseY = cy + LABEL_OFFSET_Y + captionShift(ind)
-        + (hasAnnotationRow(ind, pedigree) ? ANNOTATION_SHIFT : 0);
+    const { x: cx, y: cy } = pos;
+    // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
+    // row, name, then the detail lines in NSGC order (age, onset, number).
+    if (glyph.caption) elems.push(renderLifeStatusCaption(glyph.caption, cx, cy + LABEL_OFFSET_Y));
+    const labelBaseY = cy + LABEL_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0)
+      + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0);
 
-      // The name wraps to the slot width (#68); the full text is kept as a <title>.
-      const text = nameLabelText(ind);
-      const lines = wrapLabel(text, labelMax);
-      // A line of descent runs down through this person's labels (#45): white backing, as on the canvas.
-      if (backed.has(ind.id) && lines.length > 0) {
-        const w = linesWidth(lines) + 4;
-        elems.push(`<rect x="${cx - w / 2}" y="${labelBaseY - LABEL_FONT_SIZE}" width="${w}" height="${lines.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
-      }
-      lines.forEach((line, k) => {
-        const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
-        elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
-      });
-      // Age or DOB (#20), ages of onset (#93), pedigree number (#8). Past the
-      // age line the block can reach the sibship bar of the person's
-      // children, so it gets a white backing then, as on the canvas.
-      const details = detailLines(ind, labelMax, pedigree, numbers);
-      if (details.length > 0 && (backed.has(ind.id) || detailsBacked(ind, labelMax, pedigree, numbers))) {
-        const w = linesWidth(details) + 4;
-        const top = labelBaseY + lines.length * LABEL_LINE_HEIGHT - LABEL_FONT_SIZE;
-        elems.push(`<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${details.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
-      }
-      details.forEach((line, k) => {
-        const y = labelBaseY + (lines.length + k) * LABEL_LINE_HEIGHT;
-        elems.push(`<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
-      });
+    // The name wraps to the slot width (#68); the full text is kept as a <title>.
+    const text = glyph.name;
+    const lines = glyph.figureNameLines;
+    // A line of descent runs down through this person's labels (#45): white backing, as on the canvas.
+    if (glyph.labelsBacked && lines.length > 0) {
+      const w = linesWidth(lines) + 4;
+      elems.push(`<rect x="${cx - w / 2}" y="${labelBaseY - LABEL_FONT_SIZE}" width="${w}" height="${lines.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
     }
+    lines.forEach((line, k) => {
+      const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
+      elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
+    });
+    // Age or DOB (#20), ages of onset (#93), pedigree number (#8). Past the
+    // age line the block can reach the sibship bar of the person's
+    // children, so it gets a white backing then, as on the canvas.
+    const details = glyph.detailLines;
+    if (details.length > 0 && (glyph.labelsBacked || glyph.detailsBacked)) {
+      const w = linesWidth(details) + 4;
+      const top = labelBaseY + lines.length * LABEL_LINE_HEIGHT - LABEL_FONT_SIZE;
+      elems.push(`<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${details.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
+    }
+    details.forEach((line, k) => {
+      const y = labelBaseY + (lines.length + k) * LABEL_LINE_HEIGHT;
+      elems.push(`<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
+    });
   }
   return elems;
 }
@@ -490,7 +476,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const flow    = layoutToFlow(working, { compact: options.compact });
   const slotPos = buildSlotPositions(flow);
   const duplicates = flow.duplicateEdges.length > 0;
-  const bounds  = computeBounds(working, slotPos, options, highestConsanguinityLabel(flow), duplicates);
+  const bounds  = computeBounds(working, flow.nodes.map(n => n.data.glyph), slotPos, options, highestConsanguinityLabel(flow), duplicates);
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [
@@ -514,9 +500,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   group("sibship-lines", renderSibshipLines(flow, slotPos));
   group("assisted-lines", renderAssistedLines(flow, slotPos));
   group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
-  group("symbols", renderSymbols(working, slotPos, flow));
-  const backed = new Set(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id));
-  group("labels", renderLabels(working, slotPos, flow, labelMaxWidth(layoutSpacing(options.compact).slotWidth), backed));
+  group("symbols", renderSymbols(slotPos, flow));
+  group("labels", renderLabels(slotPos, flow));
   group("consanguinity-labels", renderConsanguinityLabels(flow));
   lines.push(`</g>`);
 

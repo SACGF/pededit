@@ -533,7 +533,11 @@ function escapeXml(s: string): string {
  * that the caller has already emitted.
  */
 export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, size: number, clipId: string): string {
-  const sectors = symbolPaint(individual, pedigree).sectors;
+  return renderSectorListSvg(symbolPaint(individual, pedigree).sectors, size, clipId);
+}
+
+/** The same from the sectors themselves (`PersonGlyph.paint.sectors`, #144). */
+export function renderSectorListSvg(sectors: Sector[], size: number, clipId: string): string {
   if (sectors.length === 0) return "";
   const r = size; // beyond the half-diagonal, so the clip does the shaping
   const box = { x: -size / 2, y: -size / 2, size };
@@ -547,7 +551,11 @@ export function renderSectorsSvg(individual: Individual, pedigree: Pedigree, siz
  * moves the row down, e.g. past an "SB" / "ECT" caption.
  */
 export function renderAnnotationRowSvg(individual: Individual, pedigree: Pedigree, size: number, offsetY = 0): string {
-  const items = annotationRow(individual, pedigree);
+  return renderAnnotationItemsSvg(annotationRow(individual, pedigree), size, offsetY);
+}
+
+/** The same from the row's items (`PersonGlyph.annotations`, #144). */
+export function renderAnnotationItemsSvg(items: AnnotationItem[], size: number, offsetY = 0): string {
   if (items.length === 0) return "";
   const cy = size / 2 + ANNOTATION_Y + offsetY;
   return items

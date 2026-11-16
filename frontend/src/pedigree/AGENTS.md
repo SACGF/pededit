@@ -55,6 +55,21 @@ draws NSGC symbols.
   pedigree its 1px outlines covered sub-pixel symbols, so people looked
   black. Its strokes are in flow units (4 on a 40px symbol) so they shrink
   with the symbol. The chart title node is in its bounds but not drawn.
+- `personGlyph.ts` (#144): everything drawn at one person, as plain data
+  (`PersonGlyph`: shape, paint, brackets, letter, slash, arrow, "?", "*",
+  caption, annotation row, name and detail lines, white backings, copy
+  number, group count). `layoutToFlow` puts it on every node
+  (`RFNodeData.glyph`); `PedigreeSymbolNode` and `svgExporter` read it there,
+  and the U-shape export, which has its own layout, calls `personGlyph` per
+  person. None of the three imports `symbolPaint`, `annotationRow`,
+  `arrowKind`, `symbolSex` or the label functions any more (a test holds
+  them to that), so a renderer cannot decide differently from the others.
+  Add a new mark or line of text for a person as a field of the glyph first.
+  `__tests__/glyphs/<fixture>.json` records the glyph of every fixture
+  person: a change in what anyone is drawn with shows there as data. The
+  canvas node still reads the pedigree from the store, for the problem
+  marker only. `nameLines` is what the canvas draws (one line when names are
+  truncated), `figureNameLines` what a file writes (always wrapped).
 - `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, condition and trait sections and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
@@ -695,9 +710,10 @@ A two-line name plus the age line clears the sibship bar of the person's own
 children; anything past the age line can reach it, so then the detail block
 gets a white backing (`detailsBacked`: canvas div background, a `<rect>` in
 the export's labels group, which `exportLint` ignores) and the bar shows a
-gap under the text rather than running through it. The canvas
-(`PedigreeSymbolNode`), `svgExporter` and `uShapeExporter` each offset these
-by hand, so change all three together.
+gap under the text rather than running through it. Which lines there are comes from the
+person's glyph (#144); where they sit is still worked out by each renderer
+(`PedigreeSymbolNode`, `svgExporter`, `uShapeExporter`), so change all three
+together (#145 is to give the canvas the export's text geometry).
 
 - Chart title (#20): `chartTitle(pedigree, name)` in `labels.ts` is the one
   rule. `Pedigree.chartTitle` wins when set, `""` meaning no title; absent

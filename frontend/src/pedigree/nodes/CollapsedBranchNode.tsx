@@ -22,7 +22,8 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
   const setDescendantsHidden = usePedigreeStore(s => s.setDescendantsHidden);
   const picking = usePedigreeStore(s => s.picking);
   if (!branch) return null;
-  const n = branch.children.length;
+  // The number drawn is the glyph's (#144), the same one the exports write.
+  const n = data.glyph.groupCount ?? branch.children.length;
   const fs = branchCountFontSize(n, NODE_SIZE);
 
   return (

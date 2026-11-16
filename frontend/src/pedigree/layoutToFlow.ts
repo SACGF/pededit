@@ -16,7 +16,8 @@ import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { sibshipBarOffsets } from "./sibshipPath";
-import { wrapLabel, labelMaxWidth, nameLabelMode, canvasLabelLines, detailLines, detailsBacked, nameLabelText } from "./labels";
+import { labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
+import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
 import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint } from "./assisted";
@@ -25,6 +26,13 @@ import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint }
 
 export interface RFNodeData extends Record<string, unknown> {
   individual: Individual;
+  /**
+   * Everything drawn at this person, decided once (#144, `personGlyph`): the
+   * canvas node and the SVG export draw from it. `shape`, `hasParents`,
+   * `duplicateIndex`, `nameLines`, `detailLines`, `detailsBacked` and
+   * `labelsBacked` below repeat its fields for the lints and the minimap.
+   */
+  glyph: PersonGlyph;
   /**
    * True when the same individual is drawn in more than one slot (kinship2
    * could not place them both with their siblings and beside every partner).
@@ -302,7 +310,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
     const n = nodes.find(x => x.id === id);
-    if (n) n.data.labelsBacked = true;
+    if (n) { n.data.labelsBacked = true; n.data.glyph.labelsBacked = true; }
   }
 
   const duplicateEdges = buildDuplicateEdges(nodes, spacing);
@@ -498,6 +506,10 @@ function buildNodes(
       const isPinned = pinnedSlot.get(nid) === id;
       const pinnedPos = pedigree.pinnedPositions?.[individual.id];
       const branch = branchOf(pedigree, individual.id);
+      const glyph = personGlyph(individual, pedigree, {
+        labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines,
+        hasParents: childIds.has(individual.id), copy: isDuplicate ? copies.indexOf(id) + 1 : undefined,
+      });
 
       nodes.push({
         id,
@@ -511,15 +523,16 @@ function buildNodes(
         height: NODE_SIZE,
         data: {
           individual,
+          glyph,
           isDuplicate,
-          duplicateIndex: isDuplicate ? copies.indexOf(id) + 1 : undefined,
-          hasParents: childIds.has(individual.id),
+          duplicateIndex: glyph.copy,
+          hasParents: glyph.hasParents,
           isPinned,
-          shape: symbolSex(individual, pedigree),
+          shape: glyph.shape,
           ...(twins.get(individual.id) ?? {}),
-          nameLines: wrapLabel(nameLabelText(individual), labelMaxWidth(slotWidth), labelLines),
-          detailLines: detailLines(individual, labelMaxWidth(slotWidth), pedigree, numbers),
-          detailsBacked: detailsBacked(individual, labelMaxWidth(slotWidth), pedigree, numbers),
+          nameLines: glyph.nameLines,
+          detailLines: glyph.detailLines,
+          detailsBacked: glyph.detailsBacked,
           ...(branch ? { branch } : {}),
         },
       });

@@ -4,14 +4,12 @@ import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
-import { hasDocumentedEvaluation } from "../evaluation";
 import { HoverPill } from "./HoverPill";
-import { captionRowHeight } from "../lifeStatus";
+import { CAPTION_ROW_HEIGHT } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { symbolPaint, annotationRow, ANNOTATION_ROW_HEIGHT } from "../tags";
+import { ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
-import { arrowKind } from "../proband";
 import { worstSeverity } from "../validation";
 import { problemsOf } from "../../components/problemList";
 import { ProblemIcon } from "../../components/ProblemsMenu";
@@ -27,32 +25,35 @@ function shortDevId(id: string): string {
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
-  const { individual, isDuplicate, duplicateIndex, hasParents, isPinned, nameLines, shape } = data;
-  const details = data.detailLines ?? [];
+  // What to draw is decided once, in the layout (#144): the glyph. This
+  // component draws it and adds what only the editor shows (selection, the
+  // pin dot, the problem marker, the dev id, the hover pill).
+  const { individual, glyph, isPinned } = data;
+  const { nameLines, shape, paint, annotations, arrow } = glyph;
+  const details = glyph.detailLines;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual, problemHighlightId } = usePedigreeStore();
+  const hasParents = glyph.hasParents;
   // Hovering a problem in the toolbar's list outlines its person (#116).
   const isProblemHighlight = problemHighlightId === individual.id;
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
-  const nameCut = isLabelCut(nameLines, individual.name);
+  const nameCut = isLabelCut(nameLines, glyph.name);
   // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
   const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
   const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)
     || ((picking?.kind === "partner" || picking?.kind === "relatedness") && picking.individualId === individual.id);
-  const paint = symbolPaint(individual, pedigree);
-  const annotations = annotationRow(individual, pedigree);
-  const arrow = arrowKind(individual);
-  // Editor warnings (#116), memoised per pedigree so every node shares one pass.
+  // Editor warnings (#116), memoised per pedigree so every node shares one
+  // pass. The only thing here that reads the pedigree: it is an editor mark.
   const problems = problemsOf(pedigree).byIndividual.get(individual.id) ?? [];
   const problemSeverity = worstSeverity(problems);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
   // name, then the detail lines in NSGC order (age, onset, pedigree number).
-  const captionOffset = captionRowHeight(individual.lifeStatus);
+  const captionOffset = glyph.caption ? CAPTION_ROW_HEIGHT : 0;
   const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
 
   function scheduleHide() {
@@ -124,10 +125,10 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         overflow="visible"
       >
         <SymbolShape individual={individual} shape={shape} size={NODE_SIZE} paint={paint} clipId={`symbol-clip-${nodeId}`} />
-        {individual.deceased && <DeceasedSlash size={NODE_SIZE} />}
+        {glyph.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
-        {individual.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
-        {hasDocumentedEvaluation(individual) && <DocumentedMark size={NODE_SIZE} adopted={!!individual.adopted} />}
+        {glyph.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
+        {glyph.documented && <DocumentedMark size={NODE_SIZE} adopted={!!glyph.adopted} />}
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
@@ -150,7 +151,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: nameCut ? "auto" : "none",
-            ...(data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
+            ...(glyph.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {nameLines.map((line, i) => <div key={i}>{line}</div>)}
@@ -174,7 +175,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: `${LABEL_LINE_HEIGHT}px`,
             color: "#000",
             pointerEvents: "none",
-            ...(data.detailsBacked || data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
+            ...(glyph.detailsBacked || glyph.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {details.map((line, i) => <div key={i}>{line}</div>)}
@@ -199,7 +200,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
             lineHeight: 1.2,
             color: "#888",
             pointerEvents: "none",
-            ...(data.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
+            ...(glyph.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
           }}
         >
           {shortDevId(individual.id)}
@@ -235,8 +236,8 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       )}
 
       {/* Duplicate superscript */}
-      {isDuplicate && duplicateIndex !== undefined && (
-        <DuplicateSuperscript index={duplicateIndex} />
+      {glyph.copy !== undefined && (
+        <DuplicateSuperscript index={glyph.copy} />
       )}
 
       {/* React Flow edge handles — invisible */}
