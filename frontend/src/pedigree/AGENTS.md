@@ -39,7 +39,9 @@ draws NSGC symbols.
   `index.css`, and its delete key is off (the store deletes).
   `selection.ts` has the batch lock counts used by the more menu's
   "N selected" section and the edit panel's `SelectionPanel`.
-- The minimap (#6, #125) is React Flow's `<MiniMap pannable>`: always the
+- The minimap (#6, #125) is React Flow's `<MiniMap pannable>`, on by
+  default; Settings > "Show minimap" turns it off per browser (localStorage
+  `showMinimap`, read in `CanvasPage`, only `"false"` hides it). It is always the
   whole pedigree with the viewport as a rectangle; dragging pans the main
   view and a click centres it (a press that moved is a drag, not a click).
   It is only for a sense of where you are, so `MinimapNode` draws each

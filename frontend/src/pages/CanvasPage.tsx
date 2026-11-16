@@ -46,7 +46,7 @@ export default function CanvasPage() {
   } = useAppStore();
   const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") === "true");
+  const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") !== "false");
   const [compact, setCompact] = useState(() => {
     try { return localStorage.getItem("compactLayout") === "true"; } catch { return false; }
   });
