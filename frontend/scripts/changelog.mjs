@@ -52,8 +52,10 @@ for (const m of milestones) {
     description: m.description ?? "",
     url: m.html_url,
     released: m.state === "closed",
-    // A closed milestone is dated by when it closed, an open one by its due date.
-    date: m.state === "closed" ? m.closed_at : m.due_on,
+    // Dated by the due date, which is the release date. closed_at is only a
+    // fallback: milestones made after the fact (Initial deployment) were closed
+    // long after they shipped and would otherwise sort as the newest release.
+    date: m.due_on ?? m.closed_at,
     issues,
   });
 }

@@ -122,6 +122,11 @@ stub so the app still builds without Google login.
   page shows its "see GitHub" fallback. The footer link shows the build date
   (`utils/buildInfo.ts`, a Vite define), never the commit, for the reason in
   `backend/AGENTS.md` (health check).
+  A release is dated by its milestone's due date, so every milestone needs
+  one; "Initial deployment" and "U-shape export" were made after the fact for
+  work that predates issues (#152 to #166 are retrospective). The GitHub API
+  shifts a `due_on` back a day for this account's timezone: send noon UTC
+  (`2026-04-14T12:00:00Z`) to store that date.
 - `store/useAppStore.ts` — auth tokens (localStorage `access_token` /
   `refresh_token`), pedigree list, open/create/save/rename/delete. Saving
   reads the pedigree from `usePedigreeStore`. `CanvasPage` calls
