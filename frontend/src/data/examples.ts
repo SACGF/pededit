@@ -762,11 +762,15 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Aegon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aegon" }],
     ["Daenerys_JA",        F, "Jaehaerys_I", "Alysanne", { name: "Daenerys" }],
     ["Aemon_JA",           M, "Jaehaerys_I", "Alysanne", { name: "Aemon" }],
-    ["Baelon",             M, "Jaehaerys_I", "Alysanne", { name: "Baelon", notes: "The Brave" }],
+    // Daella is listed before Baelon, out of birth order and unlike the PED file (#179):
+    // her daughter Aemma is then drawn on the Velaryon side of Viserys I, and Rhaenyra
+    // beside both her husbands' other copies, with short dashed arcs. Sibling order is
+    // a drawing choice; the example has no dates.
+    ["Daella_JA",          F, "Jaehaerys_I", "Alysanne", { name: "Daella" }],
+    ["Baelon",            M, "Jaehaerys_I", "Alysanne", { name: "Baelon", notes: "The Brave" }],
     ["Alyssa",             F, "Jaehaerys_I", "Alysanne", { name: "Alyssa" }],
     ["Maegelle",           F, "Jaehaerys_I", "Alysanne", { name: "Maegelle" }],
     ["Vaegon",             M, "Jaehaerys_I", "Alysanne", { name: "Vaegon" }],
-    ["Daella_JA",          F, "Jaehaerys_I", "Alysanne", { name: "Daella" }],
     ["Saera",              F, "Jaehaerys_I", "Alysanne", { name: "Saera" }],
     ["Viserra",            F, "Jaehaerys_I", "Alysanne", { name: "Viserra" }],
     ["Gaemon_JA",          M, "Jaehaerys_I", "Alysanne", { name: "Gaemon" }],

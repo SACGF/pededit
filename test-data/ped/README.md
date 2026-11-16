@@ -74,6 +74,11 @@ to Aerys II) and gives Harwin Strong as Jacaerys's father, so it was not used as
   wives, Baelor I and Daena) are left out. Children are listed under their officially
   recorded father. Jon Snow's parents are Rhaegar and Lyanna, as confirmed in the TV series.
 - PHENO 2 = the "Targaryen madness" (Aerys II, Aerion Brightflame), for fun.
+- The in-app example lists Daella before Baelon so the Rhaenyra row draws short arcs
+  (#179). This file keeps birth order: it is the case the spouse-side rule (#76) and the
+  sibling-order work (#77) are tested on, and its kinship2 oracle output stays valid.
+  `kinship2Oracle.test.ts` (`EXAMPLE_ROW_MOVES`) compares the example with the file after
+  the same move.
 - Exercises: brother-sister, uncle-niece, first cousin and cousin-once-removed marriages,
   people drawn twice (Daemon, Viserys I, Rhaenyra), a 17-wide row (Jaehaerys I and
   Alysanne's 13 children), and a married-in spouse inside a sibship's span, which

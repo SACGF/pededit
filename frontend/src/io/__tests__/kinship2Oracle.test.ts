@@ -274,8 +274,35 @@ const EXAMPLE_FIXTURES: Record<string, string> = {
   "Two lineages joined twice": "two_lineages_joined_twice",
 };
 
+/**
+ * Examples whose rows are listed in another order than their PED file, on
+ * purpose: one row of the file moved before another. The file and its oracle
+ * stay as they are (the first block above checks them against R), so the
+ * example is compared with the file after the same move, and its slot
+ * structure is expected to differ from R's.
+ */
+const EXAMPLE_ROW_MOVES: Record<string, { move: string; before: string; why: string }> = {
+  "House Targaryen": {
+    move: "Daella_JA", before: "Baelon",
+    why: "#179: Aemma is drawn on the Velaryon side of Viserys I, so the dashed arcs to Rhaenyra's husbands are short. The file keeps the order #76 and #77 are tested on",
+  },
+};
+
+/** A PED file's text with the row of `move` put just before the row of `before`. */
+function moveRow(ped: string, move: string, before: string): string {
+  const lines = ped.split("\n");
+  const at = (id: string) => lines.findIndex(l => !l.startsWith("#") && l.split("\t")[1] === id);
+  const [row] = lines.splice(at(move), 1);
+  lines.splice(at(before), 0, row!);
+  return lines.join("\n");
+}
+
 describe("in-app historic and classic examples", () => {
   const grouped = EXAMPLES.filter(e => e.group);
+
+  it("every moved row is of a grouped example", () => {
+    for (const label of Object.keys(EXAMPLE_ROW_MOVES)) expect(Object.keys(EXAMPLE_FIXTURES)).toContain(label);
+  });
 
   it("every grouped example has a PED fixture", () => {
     expect(grouped.map(e => e.label).sort()).toEqual(Object.keys(EXAMPLE_FIXTURES).sort());
@@ -286,13 +313,24 @@ describe("in-app historic and classic examples", () => {
       const name = EXAMPLE_FIXTURES[ex.label]!;
       const oracle = readOracle(name);
       const R = Object.values(oracle.families)[0]!;
-      expect(ex.data.individuals.map(i => i.id)).toEqual(R.ids);
+      const moved = EXAMPLE_ROW_MOVES[ex.label];
+      const text = readFileSync(join(TEST_DATA, FIXTURES[name]!), "utf-8");
+      const fixture = importPed(moved ? moveRow(text, moved.move, moved.before) : text).pedigrees[0]!.pedigree;
+      const ids = ex.data.individuals.map(i => i.id);
+      expect(ids).toEqual(fixture.individuals.map(i => i.id));
 
       const ours = alignPedigree(ex.data);
       assertInvariants(ours, ex.data, ex.label);
-      expect(structureRows(ours, R.ids)).toEqual(structureRows(R, R.ids));
+      if (moved) {
+        // The same people as the file, in another order, and so not R's layout of the file.
+        expect([...ids].sort()).toEqual([...R.ids].sort());
+        expect(ids, `${ex.label} is in its file's order again; remove it from EXAMPLE_ROW_MOVES`).not.toEqual(R.ids);
+        expect(structureRows(ours, ids)).not.toEqual(structureRows(R, R.ids));
+      } else {
+        expect(ids).toEqual(R.ids);
+        expect(structureRows(ours, R.ids)).toEqual(structureRows(R, R.ids));
+      }
 
-      const fixture = importPed(readFileSync(join(TEST_DATA, FIXTURES[name]!), "utf-8")).pedigrees[0]!.pedigree;
       const fromPed = alignPedigree(fixture);
       expect(ours.pos).toEqual(fromPed.pos);
       // PED carries affected overall (#118): the flag or a condition; traits are not affected.
