@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Panel } from "@xyflow/react";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeFields } from "../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { setParentsProblem } from "./parents";
 import { linkPartnerProblem } from "./partners";
@@ -29,7 +29,7 @@ function matchRank(ind: Pedigree["individuals"][number], q: string): number {
  * (#36, and #84 for a partner) is active. Sits over the canvas as a React Flow panel.
  */
 export function PickingBanner() {
-  const { pedigree, picking, pickIndividual, applyPicking, cancelPicking } = usePedigreeStore();
+  const { pedigree, picking, pickIndividual, applyPicking, cancelPicking } = usePedigreeFields("pedigree", "picking", "pickIndividual", "applyPicking", "cancelPicking");
   const [query, setQuery] = useState("");
   if (!picking) return null;
 

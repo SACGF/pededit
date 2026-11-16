@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
+import { DEFAULT_SNAP_GRID_SIZE, usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import type { NotationEdition, SiblingOrderMode, SymbolsShowMode, TagFillMode } from "@pedigree-editor/layout-engine";
 import { TAG_FILL_MODE_OPTIONS, tagFillMode } from "../pedigree/tagFills";
@@ -19,7 +19,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, compact, onToggleCompact }: SettingsPanelProps) {
-  const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeStore();
+  const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeFields("pedigree", "updateSiblingOrderSettings", "updateCanvasSettings");
   const { mode, affectedFirst } = pedigree.siblingOrder;
   const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: DEFAULT_SNAP_GRID_SIZE };
   const { activePedigreeId, pedigrees, deletePedigree } = useAppStore();

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -48,7 +48,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: ToolbarProps) {
-  const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeStore();
+  const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeFields("addIndividual", "undo", "redo", "past", "future", "pedigree", "resetLayout");
   const { activePedigreeId } = useAppStore();
   const hasPedigree = activePedigreeId !== null;
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;

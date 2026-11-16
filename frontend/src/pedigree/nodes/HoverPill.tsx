@@ -8,6 +8,7 @@ interface HoverPillProps {
   individualId: string;    // pedigree Individual.id
   isVisible: boolean;
   hasParents: boolean;     // disable +parents if already has both parents filled
+  noChildren: boolean;     // a pregnancy or pregnancy loss, which cannot have children
   name?: string;           // full name, shown under the pill (the pill covers the name label)
   nameOnly?: boolean;      // a cut name label is hovered: show the full name without the buttons
   onPillEnter: () => void; // called when mouse enters pill (cancel hide timer)
@@ -15,12 +16,17 @@ interface HoverPillProps {
   onMenuClose?: () => void; // more menu closed (it gives no mouseleave, see MoreMenu)
 }
 
-export function HoverPill({ nodeId, individualId, isVisible, hasParents, name, nameOnly, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
-  const { addParent, addChild, addSibling, pedigree, unlockIndividual, lockIndividual } = usePedigreeStore();
-  const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
-  const isUnlocked = nodesMoveable || (pedigree.unlockedIndividuals ?? []).includes(individualId);
-  // A pregnancy or pregnancy loss cannot have children.
-  const noChildren = !!pedigree.individuals.find(i => i.id === individualId)?.lifeStatus;
+export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChildren, name, nameOnly, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
+  // Every node has a pill, shown or not, so it reads only this person's
+  // answers from the store: a whole-store read redrew every pill on a hover (#197).
+  const addParent = usePedigreeStore(s => s.addParent);
+  const addChild = usePedigreeStore(s => s.addChild);
+  const addSibling = usePedigreeStore(s => s.addSibling);
+  const unlockIndividual = usePedigreeStore(s => s.unlockIndividual);
+  const lockIndividual = usePedigreeStore(s => s.lockIndividual);
+  const nodesMoveable = usePedigreeStore(s => s.pedigree.canvasSettings?.nodesMoveable ?? false);
+  const isUnlocked = usePedigreeStore(s => nodesMoveable || (s.pedigree.unlockedIndividuals ?? []).includes(individualId));
+
 
   return (
     <NodeToolbar

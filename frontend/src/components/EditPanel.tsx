@@ -1,4 +1,4 @@
-import { usePedigreeStore, hasPartnerOrChild } from "../store/usePedigreeStore";
+import { hasPartnerOrChild, usePedigreeFields } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Legend, SectionHeader } from "./Legend";
@@ -63,7 +63,7 @@ type PanelTab = "person" | "pedigree";
  * switching between a short and a long tab never moves the tabs or the text.
  */
 export function EditPanel({ onManageTags, open = true, onOpenChange }: EditPanelProps) {
-  const { pedigree, selectedId, selectedIds } = usePedigreeStore();
+  const { pedigree, selectedId, selectedIds } = usePedigreeFields("pedigree", "selectedId", "selectedIds");
   const anyone = selectedIds.length > 0;
   const [tab, setTab] = useState<PanelTab>(anyone ? "person" : "pedigree");
   useEffect(() => {
@@ -137,7 +137,7 @@ function PanelTabButton({ tab, current, onSelect, disabled, title, children }: {
 
 
 function IndividualForm({ individual, onManageTags }: { individual: Individual; onManageTags?: () => void }) {
-  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand, setConditionStatus, setIndividualTag } = usePedigreeStore();
+  const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand, setConditionStatus, setIndividualTag } = usePedigreeFields("pedigree", "updateIndividual", "setDeceased", "setDateOfDeath", "setCarrier", "setPresymptomatic", "setFamilyHistoryUnknown", "setLifeStatus", "setAdopted", "setOnset", "setAffected", "setProband", "setConsultand", "setConditionStatus", "setIndividualTag");
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
   // With any condition defined, conditions are recorded only in "Conditions and tags" and
@@ -431,7 +431,7 @@ const SELECT = "w-full min-w-0 h-7 border rounded px-1 text-xs bg-white focus:ou
  * ("condition-not-recorded") and one-click fixes sit here.
  */
 function PlainStatusForm({ individual, problemsOn }: { individual: Individual; problemsOn: (field: ProblemField) => ProblemProps }) {
-  const { pedigree, updateIndividual, setCarrier, setPresymptomatic, setOnset } = usePedigreeStore();
+  const { pedigree, updateIndividual, setCarrier, setPresymptomatic, setOnset } = usePedigreeFields("pedigree", "updateIndividual", "setCarrier", "setPresymptomatic", "setOnset");
   const affected = plainAffected(individual, pedigree);
   // With one condition, the flag beside that condition adds nothing (plainAffected),
   // so the box could not tick: it is disabled instead.
@@ -516,7 +516,7 @@ function OnsetInput({ value, onChange }: { value: string | undefined; onChange: 
  * call site, so the draft goes when the selection changes.
  */
 function EvaluationsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
-  const { setEvaluations } = usePedigreeStore();
+  const { setEvaluations } = usePedigreeFields("setEvaluations");
   const [draft, setDraft] = useState(false);
   const saved = evaluationsOf(individual);
   const evs: Evaluation[] = draft ? [...saved, {}] : saved;
@@ -622,7 +622,7 @@ export function adjacentSibling(pedigree: Pedigree, individualId: string): strin
  * pairs them with the sibling drawn next to them.
  */
 function TwinsForm({ individual }: { individual: Individual }) {
-  const { pedigree, setTwins, removeTwin } = usePedigreeStore();
+  const { pedigree, setTwins, removeTwin } = usePedigreeFields("pedigree", "setTwins", "removeTwin");
   const [problem, setProblem] = useState<string | null>(null);
   const partnership = parentPartnershipOf(pedigree, individual.id);
   const siblings = partnership ? (pedigree.parentOf[partnership.id] ?? []).filter(id => id !== individual.id) : [];
@@ -719,7 +719,7 @@ function formatCoefficientX(x: number): string {
  * whose common ancestors are not drawn.
  */
 function RelatednessSection({ individual }: { individual: Individual }) {
-  const { pedigree, setPartnershipConsanguineous } = usePedigreeStore();
+  const { pedigree, setPartnershipConsanguineous } = usePedigreeFields("pedigree", "setPartnershipConsanguineous");
   const { inbreeding, inbreedingX, couples } = relatednessOf(pedigree, individual.id);
   const references = referenceRelatedness(pedigree, individual.id);
   if (!(inbreeding > 0) && couples.length === 0 && references.length === 0) return null;
@@ -802,7 +802,7 @@ function RelatednessSection({ individual }: { individual: Individual }) {
  * button fills it in.
  */
 function ConsanguinityLabelField({ partnershipId }: { partnershipId: string }) {
-  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeStore();
+  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeFields("pedigree", "setPartnershipConsanguinityLabel");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const named = namedCoupleRelationship(pedigree, partnership);
@@ -846,7 +846,7 @@ function capitalise(text: string): string {
  * A gamete donation pair (#45) is not a couple and is left out.
  */
 function PartnersForm({ individual }: { individual: Individual }) {
-  const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeStore();
+  const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason");
   const own = pedigree.partnerships.filter(p => (p.individual1 === individual.id || p.individual2 === individual.id) && !p.donorConception);
   if (own.length === 0) return null;
   return (
@@ -905,7 +905,7 @@ function PartnersForm({ individual }: { individual: Individual }) {
  * surrogates are added from the more menu.
  */
 function AssistedForm({ individual, problemsOn }: { individual: Individual; problemsOn: (field: ProblemField) => ProblemProps }) {
-  const { pedigree, setReproductiveRole, setCarriedBy, setSocialParents } = usePedigreeStore();
+  const { pedigree, setReproductiveRole, setCarriedBy, setSocialParents } = usePedigreeFields("pedigree", "setReproductiveRole", "setCarriedBy", "setSocialParents");
   const candidates = assistedCandidates(pedigree, individual.id);
   const label = (id: string) => {
     const ind = pedigree.individuals.find(i => i.id === id);
@@ -1015,7 +1015,7 @@ function probandTitle(pedigree: Pedigree, individual: Individual): string {
  * disabled button gets no hover in some browsers and so no tooltip.
  */
 function SexControl({ individual }: { individual: Individual }) {
-  const { pedigree, setSex } = usePedigreeStore();
+  const { pedigree, setSex } = usePedigreeFields("pedigree", "setSex");
   const sexes = ["male", "female", "unknown"] as const;
   const problemOf = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individual.id], sex);
   // Full width, with no label column: three buttons do not fit beside one (#138).
@@ -1103,7 +1103,7 @@ function ProblemHighlight({ children, problemFor, problemField, problems = [] }:
  * clearing it hides the title.
  */
 function ChartTitleField() {
-  const { pedigree, setChartTitle } = usePedigreeStore();
+  const { pedigree, setChartTitle } = usePedigreeFields("pedigree", "setChartTitle");
   const pedigreeName = useAppStore(s => s.activeTitle);
   return (
     <Field label="Chart title">
@@ -1127,7 +1127,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
  * how many are filled, and the legend below lists them.
  */
 function ClinicalDetailsSection() {
-  const { pedigree, setClinicalDetail } = usePedigreeStore();
+  const { pedigree, setClinicalDetail } = usePedigreeFields("pedigree", "setClinicalDetail");
   const [open, setOpen] = useState(false);
   const filled = clinicalDetailLines(pedigree).length;
   const details = pedigree.clinicalDetails ?? {};

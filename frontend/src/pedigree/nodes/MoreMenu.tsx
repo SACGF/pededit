@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Pedigree, Sex, Tag } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN } from "../../store/usePedigreeStore";
+import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN, usePedigreeFields } from "../../store/usePedigreeStore";
 import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
@@ -117,7 +117,9 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     startPickingSurrogate,
     detachFromParents,
     removePartnership,
-  } = usePedigreeStore();
+  } = usePedigreeFields(
+    "pedigree", "addPartner", "addChildren", "setAffected", "setDeceased", "setCarrier", "setPresymptomatic", "setProband", "setConsultand", "setFamilyHistoryUnknown", "setSex", "setLifeStatus", "moveSibLeft", "moveSibRight", "deleteIndividual", "setSelectedId", "unpinIndividual", "setIndividualTag", "setConditionStatus", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "setAdopted", "addDonor", "addSurrogate", "setTwins", "removeTwin", "removeWithDescendants", "removeWithAncestors", "setDescendantsHidden", "startPickingParents", "startPickingChild", "startPickingPartner", "startPickingDonor", "startPickingSurrogate", "detachFromParents", "removePartnership",
+  );
   const selectedIds = usePedigreeStore(s => s.selectedIds);
 
   const individual = pedigree.individuals.find(i => i.id === individualId);
@@ -572,7 +574,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
  * name. Enter or Apply sets it, an empty box clears it.
  */
 function ConsanguinityLabelItem({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeStore();
+  const { pedigree, setPartnershipConsanguinityLabel } = usePedigreeFields("pedigree", "setPartnershipConsanguinityLabel");
   const [value, setValue] = useState<string | null>(null);
   const state = coupleConsanguinity(pedigree, partnershipId);
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
@@ -642,7 +644,7 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeStore();
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "startPickingChild", "removePartnership");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
@@ -721,7 +723,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
  * `applySameSexChildren`). Opposite-sex couples never see this.
  */
 function SameSexChildItems({ partnershipId, action }: { partnershipId: string; action: (fn: () => void) => void }) {
-  const { pedigree, addChildren, startPickingChild } = usePedigreeStore();
+  const { pedigree, addChildren, startPickingChild } = usePedigreeFields("pedigree", "addChildren", "startPickingChild");
   const [open, setOpen] = useState(false);
   const [parent, setParent] = useState<string | undefined>();
   const p = pedigree.partnerships.find(x => x.id === partnershipId)!;
@@ -898,7 +900,7 @@ function AddChildrenPanel({ individualId, onAdd }: {
  * them) the batch unlock and lock (#21).
  */
 function SelectionMenuSection({ individualId, action }: { individualId: string; action: (fn: () => void) => void }) {
-  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness, setDescendantsHidden } = usePedigreeStore();
+  const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness, setDescendantsHidden } = usePedigreeFields("pedigree", "selectedIds", "selectDescendants", "unlockIndividuals", "lockIndividuals", "startPickingRelatedness", "setDescendantsHidden");
   const batch = selectedIds.length > 1 && selectedIds.includes(individualId);
   const { toUnlock, toLock } = batchLockState(pedigree, batch ? selectedIds : []);
   // Collapse a selection (#1): hide (or show) the descendants of every
@@ -958,7 +960,9 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
   const {
     pedigree, setAffectedMany, setDeceasedMany, setCarrierStatusMany, setSexMany, setIndividualTagMany, setConditionStatusMany,
     deleteIndividuals, removeWithDescendants, removeWithAncestors,
-  } = usePedigreeStore();
+  } = usePedigreeFields(
+    "pedigree", "setAffectedMany", "setDeceasedMany", "setCarrierStatusMany", "setSexMany", "setIndividualTagMany", "setConditionStatusMany", "deleteIndividuals", "removeWithDescendants", "removeWithAncestors",
+  );
   const st = batchStatus(pedigree, ids);
   const n = st.ids.length;
   const item = (show: boolean, text: string, fn: () => void, title?: string) =>

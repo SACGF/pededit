@@ -35,10 +35,31 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setHoveredId, setSelectedId, toggleSelected, pedigree, picking, pickIndividual, problemHighlightId } = usePedigreeStore();
-  const hasParents = glyph.hasParents;
+  // Each read from the store is a selector giving this person's own answer,
+  // so a change elsewhere in the store (a hover sets `hoveredId`) redraws
+  // only the people whose answer changed, not every symbol (#197).
+  const id = individual.id;
+  const setHoveredId = usePedigreeStore(s => s.setHoveredId);
+  const setSelectedId = usePedigreeStore(s => s.setSelectedId);
+  const toggleSelected = usePedigreeStore(s => s.toggleSelected);
+  const pickIndividual = usePedigreeStore(s => s.pickIndividual);
+  const isPicking = usePedigreeStore(s => s.picking !== null);
+  // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
+  const isPicked = usePedigreeStore(s => s.picking?.kind === "parents" && s.picking.picked.includes(id));
+  const isPickTarget = usePedigreeStore(s => {
+    const p = s.picking;
+    return (p?.kind === "parents" && p.childId === id)
+      || ((p?.kind === "partner" || p?.kind === "relatedness") && p.individualId === id);
+  });
   // Hovering a problem in the toolbar's list outlines its person (#116).
-  const isProblemHighlight = problemHighlightId === individual.id;
+  const isProblemHighlight = usePedigreeStore(s => s.problemHighlightId === id);
+  // Editor warnings (#116), memoised per pedigree so every node shares one
+  // pass. The only thing here that reads the pedigree: it is an editor mark.
+  // Selected as strings, which compare equal when nothing changed for this
+  // person even though every edit makes a new list.
+  const problemSeverity = usePedigreeStore(s => worstSeverity(problemsOf(s.pedigree).byIndividual.get(id) ?? []));
+  const problemTitle = usePedigreeStore(s => (problemsOf(s.pedigree).byIndividual.get(id) ?? []).map(p => p.message).join("\n"));
+  const hasParents = glyph.hasParents;
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection (#21) and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
@@ -49,14 +70,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isTouchPill, setIsTouchPill] = useState(false);
   useEffect(() => { if (!isSelected) setIsTouchPill(false); }, [isSelected]);
   const nameCut = isLabelCut(nameLines, glyph.name);
-  // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
-  const isPicked = picking?.kind === "parents" && picking.picked.includes(individual.id);
-  const isPickTarget = (picking?.kind === "parents" && picking.childId === individual.id)
-    || ((picking?.kind === "partner" || picking?.kind === "relatedness") && picking.individualId === individual.id);
-  // Editor warnings (#116), memoised per pedigree so every node shares one
-  // pass. The only thing here that reads the pedigree: it is an editor mark.
-  const problems = problemsOf(pedigree).byIndividual.get(individual.id) ?? [];
-  const problemSeverity = worstSeverity(problems);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
   // name, then the detail lines in NSGC order (age, onset, pedigree number).
   const captionOffset = glyph.caption ? CAPTION_ROW_HEIGHT : 0;
@@ -97,7 +110,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         height: NODE_SIZE,
         position: "relative",
         boxShadow: isPicked ? "0 0 0 3px #2563eb" : isPickTarget ? "0 0 0 2px #9ca3af" : isSelected ? "0 0 0 2px #ef4444" : undefined,
-        cursor: picking ? "crosshair" : undefined,
+        cursor: isPicking ? "crosshair" : undefined,
         outline: isProblemHighlight ? "2px dashed black" : undefined,
         outlineOffset: isProblemHighlight ? 6 : undefined,
       }}
@@ -111,8 +124,8 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         // drag moves just them; pressing on a selected one keeps the group
         // for a group drag (#21). Only for the symbol itself: the hover pill
         // and more menu are portals whose events bubble here too.
-        if (e.pointerType === "touch" && !picking && e.currentTarget.contains(e.target as Element)) setIsTouchPill(true);
-        if (picking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
+        if (e.pointerType === "touch" && !isPicking && e.currentTarget.contains(e.target as Element)) setIsTouchPill(true);
+        if (isPicking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
         if (e.currentTarget.contains(e.target as Element)) setSelectedId(individual.id);
       }}
       onClick={e => {
@@ -235,7 +248,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       {problemSeverity && (
         <div
           data-problem-marker={problemSeverity}
-          title={problems.map(p => p.message).join("\n")}
+          title={problemTitle}
           style={{ position: "absolute", top: -7, left: -7, width: 10, height: 10, lineHeight: 0 }}
         >
           <ProblemIcon severity={problemSeverity} size={10} />
@@ -257,8 +270,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       <HoverPill
         nodeId={nodeId}
         individualId={individual.id}
-        isVisible={(isPillVisible || (isTouchPill && isSelected)) && !picking}
+        isVisible={(isPillVisible || (isTouchPill && isSelected)) && !isPicking}
         hasParents={hasParents}
+        noChildren={!!individual.lifeStatus}
         name={individual.name}
         nameOnly={isNameHovered && nameCut}
         onPillEnter={cancelHide}

@@ -21,7 +21,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useDismissableLayerSurface } from "@radix-ui/react-dismissable-layer";
-import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../store/usePedigreeStore";
+import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE, usePedigreeFields } from "../store/usePedigreeStore";
 import { layoutToFlow } from "./layoutToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
@@ -279,7 +279,7 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false, compact = false }: PedigreeCanvasProps) {
-  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout, picking } = usePedigreeStore();
+  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout, picking } = usePedigreeFields("pedigree", "selectedIds", "setSelectedId", "setSelection", "pinIndividuals", "resetLayout", "picking");
   const [contextMenu, setContextMenu] = useState<ContextMenuTarget | null>(null);
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
     Object.keys(pedigree.pinnedPositions).length > 0;

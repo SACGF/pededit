@@ -246,6 +246,13 @@ reporting is off, and the dev server never reports.
   picking), flags, pinning,
   canvas settings, tags. All edits go through immer `produce` and push an undo
   snapshot. Add new edits here, not in components.
+  Components read it with `usePedigreeStore(s => s.field)` or
+  `usePedigreeFields("a", "b")` (a shallow pick), never the bare
+  `usePedigreeStore()`: that re-renders on any change to the store, and a
+  hover sets `hoveredId`, so it redrew every symbol on the canvas (#197, 160
+  ms a hover at 513 people). A canvas node or hover pill selects its own
+  person's answer (`s.problemHighlightId === id`, its problems as a string),
+  never a list or object that is new on every edit.
   Selection (#21) is `selectedIds` (every selected person) plus `selectedId`,
   the primary (last clicked) one that the Person tab and single-person menu
   items read. Change it only through `setSelectedId` / `toggleSelected` /

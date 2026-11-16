@@ -1,4 +1,4 @@
-import { usePedigreeStore, selectedPair } from "../store/usePedigreeStore";
+import { selectedPair, usePedigreeFields } from "../store/usePedigreeStore";
 import { batchLockState } from "../pedigree/selection";
 import { kinshipOf, kinshipXOf, formatCoefficient, degreeOfRelationship } from "../pedigree/relatedness";
 import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigree/relationship";
@@ -9,7 +9,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
  * batch lock / unlock, in place of one person's fields.
  */
 export function SelectionPanel() {
-  const { pedigree, selectedId, selectedIds, setSelectedId, unlockIndividuals, lockIndividuals } = usePedigreeStore();
+  const { pedigree, selectedId, selectedIds, setSelectedId, unlockIndividuals, lockIndividuals } = usePedigreeFields("pedigree", "selectedId", "selectedIds", "setSelectedId", "unlockIndividuals", "lockIndividuals");
   const { toUnlock, toLock } = batchLockState(pedigree, selectedIds);
   const moveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const pair = selectedPair({ selectedId, selectedIds });

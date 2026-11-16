@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ArrowUp, ArrowDown, Trash2, Plus, BookmarkPlus } from "lucide-react";
 import type { Tag, TagFill, TagStyle } from "@pedigree-editor/layout-engine";
 import { TAG_FILL_OPTIONS, fillLayers, tagFillMode } from "../pedigree/tagFills";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { tagPresetApi, type TagPresetPayload } from "../api/client";
 import {
@@ -85,7 +85,7 @@ function ColorPicker({ tag, onChange }: { tag: Tag; onChange: (color: string) =>
 // ── Main dialog ───────────────────────────────────────────────────────────────
 
 export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
-  const { pedigree, addTag, updateTag, deleteTag, moveTag } = usePedigreeStore();
+  const { pedigree, addTag, updateTag, deleteTag, moveTag } = usePedigreeFields("pedigree", "addTag", "updateTag", "deleteTag", "moveTag");
   const { isAuthenticated } = useAppStore();
   const tags = pedigreeTags(pedigree);
   const quads = quadrantTags(pedigree);

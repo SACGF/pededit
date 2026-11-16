@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
-import { usePedigreeStore } from "../store/usePedigreeStore";
+import { usePedigreeStore, usePedigreeFields } from "../store/usePedigreeStore";
 import { Button } from "@/components/ui/button";
 import { PedigreeCanvas } from "../pedigree/PedigreeCanvas";
 import { Toolbar } from "../components/Toolbar";
@@ -50,7 +50,7 @@ export default function CanvasPage() {
     loadPedigrees, createPedigree, createPedigreeFromData, openPedigree,
     logout, saveActivePedigree, renamePedigree, closePedigree,
   } = useAppStore();
-  const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeStore();
+  const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeFields("isDirty", "pedigree", "notice", "setNotice", "undo");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") !== "false");
   const [compact, setCompact] = useState(() => {

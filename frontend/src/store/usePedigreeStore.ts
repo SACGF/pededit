@@ -1,5 +1,6 @@
 import { applyFixEdit, type ProblemFix } from "../pedigree/validation";
 import { create } from "zustand";
+import { useShallow } from "zustand/react/shallow";
 import { produce } from "immer";
 import type {
   Pedigree, Individual, Sex, SiblingOrderSettings, Partnership, CanvasSettings, Tag, LifeStatus, ChildlessStatus, Adoption, ReproductiveRole, Zygosity, ClinicalDetails, ViewFilters
@@ -1908,3 +1909,17 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
   };
 });
+
+/**
+ * Several fields of the store, for a component that destructures them. It
+ * re-renders only when one of those fields changes, where
+ * `usePedigreeStore()` re-renders on any change, a hover included (#197).
+ * Use it, or `usePedigreeStore(s => s.field)`, never the bare call.
+ */
+export function usePedigreeFields<K extends keyof PedigreeState>(...keys: K[]): Pick<PedigreeState, K> {
+  return usePedigreeStore(useShallow((s: PedigreeState) => {
+    const picked = {} as Pick<PedigreeState, K>;
+    for (const k of keys) picked[k] = s[k];
+    return picked;
+  }));
+}
