@@ -85,7 +85,9 @@ function flowBounds(page) {
 async function canvasShot(page, b) {
   const width = Math.ceil(b.x2 - b.x1) + PAD * 2, height = Math.ceil(b.y2 - b.y1) + PAD * 2;
   // Room for the side panels round the pane; the pane then holds the whole drawing.
-  await page.setViewportSize({ width: width + 700, height: height + 200 });
+  // Never narrower than the desktop layout: below 1024px the editor is laid
+  // out for a small screen (#169), with the panels folded away.
+  await page.setViewportSize({ width: Math.max(width + 700, 1100), height: height + 200 });
   const clip = await page.evaluate(({ tx, ty, width, height }) => {
     const vp = document.querySelector(".react-flow__viewport");
     // React Flow writes this style only when its own pan or zoom changes.
