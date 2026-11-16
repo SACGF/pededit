@@ -385,7 +385,7 @@ const sized = (name: string, generations: number, seed: number): DatasetCase => 
   return { ...valid("size", name, `A generated family of ${p.individuals.length} people, for timing`, { ...p, canvasSettings: SETTINGS_2022 }), timingOnly: true };
 };
 
-const SIZE: DatasetCase[] = [sized("family-200", 7, 1), sized("family-500", 7, 13)];
+const SIZE: DatasetCase[] = [sized("family-100", 6, 4), sized("family-200", 7, 1), sized("family-500", 7, 13)];
 
 export const DATASET: DatasetCase[] = [...STRUCTURE, ...REPRODUCTION, ...DRAWN, ...TEXT, ...PROBLEMS, ...OLD, ...REFUSED, ...SIZE];
 

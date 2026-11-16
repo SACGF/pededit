@@ -867,6 +867,23 @@
       "server": "accepted-unchecked"
     },
     {
+      "file": "size/family-100.json",
+      "group": "size",
+      "purpose": "A generated family of 101 people, for timing",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "timingOnly": true,
+      "people": 101,
+      "problems": [
+        "affected-and-carrier:21",
+        "affected-and-carrier:65",
+        "affected-and-carrier:96",
+        "proband-unaffected:101"
+      ],
+      "lint": []
+    },
+    {
       "file": "size/family-200.json",
       "group": "size",
       "purpose": "A generated family of 238 people, for timing",

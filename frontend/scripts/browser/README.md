@@ -359,6 +359,89 @@ browser makes up after a tap behaves differently here. A clean run means
 nothing is broken that emulation can show; #169 still needs a person with a
 phone.
 
+### perf.mjs: how fast is it on a big pedigree?
+
+```bash
+node frontend/scripts/browser/perf.mjs                       # 96, 101, 238 and 513 people at 1x, 4x and 6x: about an hour, most of it the 513 people throttled
+node frontend/scripts/browser/perf.mjs --profile --throttle 1 --reps 3
+node frontend/scripts/browser/perf.mjs --fixture test-data/pedigrees/size/family-200.json --throttle 1,4 --reps 3
+node frontend/scripts/browser/perf.mjs --app http://localhost:5215/ --profile   # a production build, see below
+```
+
+```
+| pedigree | people | CPU | layout engine | layoutToFlow | problems | open | select | edit | hover | zoom | drag update | drop |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| House Targaryen | 96 | 1x | 27 (26 to 29) | 29 (28 to 31) | 0.8 (0.8 to 0.9) | 281 (270 to 301) | ... |
+```
+
+Measures the editor's speed (#180, for #42) and prints markdown tables to
+paste: milliseconds as the median of `--reps` page loads (default 5) with the
+lowest and highest run, per pedigree and per CPU throttling rate (`--throttle`,
+default `1,4,6`, set through CDP `Emulation.setCPUThrottlingRate` like the
+"4x slowdown" of Chrome's Performance panel). The default pedigrees are House
+Targaryen and the generated families in `test-data/pedigrees/size/`. It
+measures only and is not in CI: timings on a shared machine vary too much to
+pass or fail on. The header gives the commit, the machine and its load
+average; run it on a quiet machine and say so with the numbers.
+
+What the columns are:
+
+- `layout engine`, `layoutToFlow`, `problems`: the computation alone, called
+  three times in the page after it has loaded (dev build only, through
+  `__pededit`): `alignPedigreeByFamily` as the canvas calls it, `layoutToFlow`
+  (the engine plus turning its result into nodes and edges), and the editor's
+  problems. No rendering is in these, so `edit` minus `layoutToFlow` is
+  roughly what React and the browser cost.
+- `open`: from the pedigree's data arriving to every symbol being on the
+  page and visible. Loading the app's own code is left out (in the dev build
+  that is Vite serving hundreds of modules).
+- `select` (a click on the person nearest the middle), `edit` (the A key,
+  which like every edit reruns the whole layout), `hover` (the mouse moving
+  onto another person), `zoom` (one wheel notch), `drop` (releasing a dragged
+  person, which pins them and reruns the layout): from the input event,
+  before the app's handlers, until the page is quiet again, which is the end
+  of the last frame that took longer than 25 ms, or of the first frame when
+  none did. So nothing reads below about 10 ms, and work of under 25 ms that
+  starts after the first frame is not seen. A second table gives the time
+  to the first frame alone.
+- `drag update`: the person is dragged through 60 mouse moves, sent as fast
+  as the page takes them, and the frames that draw them somewhere new are
+  counted: the time per redraw. 17 ms is the full 60 frames a second; 100 ms is 10. (Counting
+  frames alone would not do: the page keeps drawing frames in which the
+  person has not caught up with the mouse.)
+
+A frame ends after its style, layout and paint on the main thread; raster and
+compositing on other threads are not measured. Each pedigree is drawn fitted
+to the window with every node unlocked (`canvasSettings.nodesMoveable`), so a
+drag needs no hover pill, with the minimap on as it is by default.
+
+`--profile` adds, for each pedigree and for open, edit, hover, zoom, drag and
+drop (unthrottled, one run): main thread time by kind of work (script, style,
+layout, paint, garbage collection) from a chromium trace, and from the CPU
+profiler the JavaScript time by npm package or source file, the top
+functions by their own time, and this repository's functions by time
+including what they call. That is where to look before deciding what to
+optimise. The profiler slows the page, so read shares from it, not totals.
+
+**Dev build or production.** The dev server runs unminified development
+React in StrictMode, which renders everything twice and checks props, so
+rendering is several times slower than what users get; the layout engine is
+about the same in both. For numbers that mean something to a user, build and
+measure that:
+
+```bash
+cd frontend && npx vite build --sourcemap --outDir /tmp/pededit-dist --emptyOutDir
+npx vite preview --outDir /tmp/pededit-dist --port 5215 --strictPort &
+node scripts/browser/perf.mjs --app http://localhost:5215/ --profile
+```
+
+`--app` is the page measured; fixtures are still read through the dev server
+(`PEDEDIT_BASE`), which must be running. A production build has no
+`__pededit`, so the three computation columns are left out, and its function
+names are minified: with `--sourcemap` the profile names packages and source
+files, and this repository's functions by source line
+(`layoutToFlow.ts`, "line 280").
+
 ## CI
 
 `.github/workflows/ci.yml` runs on every PR and push to main: layout engine

@@ -15,7 +15,7 @@ Invented names only. Each file is small and built round one thing.
 | `problems/` | Data that triggers every rule in `RULES` (`frontend/src/pedigree/validation.ts`) |
 | `old/` | Old and foreign data that must still open: no notation setting, the old carrier flag, `null` for optional fields, unknown fields, a stale pin, no envelope, a newer envelope version |
 | `refused/` | One file for each error the JSON importer reports. None of them may import |
-| `size/` | Generated families of about 200 and 500 people, for timing. Left out of the browser sweep |
+| `size/` | Generated families of about 100, 200 and 500 people (101, 238 and 513), for timing: `frontend/scripts/browser/perf.mjs` (#180) measures the editor on them. Left out of the browser sweep |
 
 ## The manifest
 
