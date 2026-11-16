@@ -20,6 +20,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .throttling import AuthLoginThrottle
+
 
 def _jwt_pair(user):
     refresh = RefreshToken.for_user(user)
@@ -35,6 +37,7 @@ class GoogleLoginSerializer(serializers.Serializer):
 
 class GoogleLoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthLoginThrottle]
 
     def post(self, request):
         ser = GoogleLoginSerializer(data=request.data)
@@ -80,6 +83,7 @@ class GitHubLoginSerializer(serializers.Serializer):
 
 class GitHubLoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthLoginThrottle]
 
     def post(self, request):
         ser = GitHubLoginSerializer(data=request.data)

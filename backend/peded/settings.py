@@ -120,7 +120,37 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # Whose address a rate limit counts: the X-Forwarded-For entry this many
+    # proxies from the end (api/throttling.py).
+    "NUM_PROXIES": _secrets.NUM_PROXIES,
 }
+
+# ── Rate limits (api/throttling.py, #47) ─────────────────────────────────────
+# Throttle classes are set on the views that need them, not as a default:
+# reading and saving a pedigree are deliberately not limited.
+THROTTLE_RATES = _secrets.THROTTLE_RATES
+
+# The throttle counters are in the database so the Gunicorn workers share
+# them (the default local-memory cache is one per worker) and a restart keeps
+# them. Only sign-in and anonymous create touch it, so the extra query is on
+# rare requests. `manage.py createcachetable` makes the table (deploy.sh runs
+# it). MAX_ENTRIES is far above the default 300: culling a full cache deletes
+# live counters, not only expired ones.
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "throttle": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "throttle_cache",
+        "OPTIONS": {"MAX_ENTRIES": 100000},
+    },
+}
+
+# ── HTTPS: redirect, secure cookies, HSTS (#47) ──────────────────────────────
+# Nothing is set unless the site config says "https": true.
+from peded.security import security_settings
+globals().update(security_settings(
+    _secrets.HTTPS, _secrets.HSTS_SECONDS, _secrets.HSTS_INCLUDE_SUBDOMAINS,
+))
 
 # ── JWT ───────────────────────────────────────────────────────────────────────
 SIMPLE_JWT = {

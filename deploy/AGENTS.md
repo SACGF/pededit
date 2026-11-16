@@ -59,5 +59,41 @@ Deployment" half).
   proxy or CDN in front of Nginx sees every pedigree in transit and belongs
   in that text too.
 
-Still to do (#47 to #49): Django security settings hardening, rate limiting,
-Sentry, automated database backups.
+## Production hardening (#47)
+
+- `deploy.sh` runs `manage.py check --deploy --fail-level WARNING` first,
+  before the build and the migration, so a refusal leaves the running site
+  alone. It passes only with `"https": true` in the site config
+  (`backend/peded/security.py`). A warning that is accepted on purpose is
+  silenced there by name with the reason; never loosen the fail level.
+- `SECURE_SSL_REDIRECT` and Nginx must agree. Django sees plain HTTP from
+  Gunicorn and learns the real scheme from `X-Forwarded-Proto`
+  (`SECURE_PROXY_SSL_HEADER`), which every proxied location sets from
+  `$scheme`. A new proxied location without that header redirects for ever.
+  The health check is exempt from the redirect because `deploy.sh` asks for
+  it over HTTP on loopback.
+- pededit.com answers through Cloudflare (`server: cloudflare` in the
+  response headers, seen 2026-11-16), which the install guide does not
+  assume. Two things follow. `$scheme` at Nginx is what Cloudflare used to
+  reach the origin, so the redirect loops unless Cloudflare fetches over
+  https. And `X-Forwarded-For` has two entries by the time it reaches
+  Gunicorn, so `"num_proxies"` must be 2 there (1 counts Cloudflare's
+  address, not the visitor's), unless Nginx is set up with `real_ip_header
+  CF-Connecting-IP`, in which case it stays 1.
+- HSTS is sent from two places: Django for `/api/` and `/admin/`
+  (`hsts_seconds`), Nginx for the frontend and `/djstatic/` (`add_header` in
+  each location with one of its own, because Nginx does not inherit
+  `add_header` into those). Not at server level, or proxied answers carry it
+  twice. Both start at 3600 and are raised together. No preload.
+- Rate limits are DRF throttles (`backend/api/throttling.py`), counted in a
+  database cache table that `deploy.sh` creates with `createcachetable`. No
+  Redis or memcached: the limited requests are rare, and one more service on
+  a single VPS is not worth it. Nginx `limit_req` is not configured; it is
+  the place for flood protection on the unlimited endpoints if that is ever
+  needed.
+- Static files stay with Nginx (decided, #47): it already serves the Vite
+  build, so `/djstatic/` is one more `location`, and `whitenoise` would add a
+  dependency and put static requests through Gunicorn's three workers for no
+  gain. Revisit only if Nginx goes away.
+
+Still to do (#48, #49): automated database backups, Sentry.

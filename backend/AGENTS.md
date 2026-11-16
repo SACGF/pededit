@@ -15,10 +15,41 @@ cd backend
 Use `uv` for environment work (`uv venv`, `uv pip install -r requirements.txt`),
 never pip directly. Config is read from `/etc/pededit/pededit.json` by
 `site_config.py` (database_url, cors_allowed_origins, allowed_hosts, debug,
-google_client_id, github_client_id, github_client_secret). The file must exist
+google_client_id, github_client_id, github_client_secret, and the production
+keys https, hsts_seconds, hsts_include_subdomains, throttle_rates,
+num_proxies). The file must exist
 or Django will not start. A SQLite `database_url` is fine for local dev. The
 secret key is generated into `backend/secret_key.txt` on first run if not
 supplied.
+
+## Production settings and rate limits (#47)
+
+- `"https": true` in the site config is the one switch for the HTTPS
+  redirect, secure cookies and HSTS (`peded/security.py`, a function of the
+  config values so tests can call it both ways). Off, it sets nothing and
+  development is untouched. `deploy.sh` runs `check --deploy --fail-level
+  WARNING`; a warning accepted on purpose is silenced by name in that file
+  with the reason (`security.W021`: no HSTS preload).
+- `api/health/` is in `SECURE_REDIRECT_EXEMPT`. `deploy.sh` asks Gunicorn for
+  it over plain HTTP on loopback, and a redirect there fails every deploy.
+- Rate limits are DRF throttles in `api/throttling.py`, set per view, never
+  as a DRF default: sign-in, token refresh and anonymous create only. GET,
+  PATCH and DELETE of a pedigree are deliberately unlimited (auto-save).
+  Rates are `settings.THROTTLE_RATES` (site config `throttle_rates`), not
+  DRF's `DEFAULT_THROTTLE_RATES`, which is copied at import and ignores
+  `override_settings`.
+- A caller on the box with no proxy headers (`is_local_request`, shared with
+  the health check) is never limited. That is what keeps the tests, local
+  development, CI, the page checks and the flows clear of the limits: Vite's
+  proxy adds no `X-Forwarded-*`. A throttle test must send
+  `HTTP_X_FORWARDED_FOR` or it tests nothing.
+- Counters are in the `throttle` cache, a `DatabaseCache` table
+  (`createcachetable`), so the Gunicorn workers share them; the default
+  local-memory cache counts per worker. The test runner creates the table
+  itself. If the table is missing the request is allowed and the error
+  logged. A new limited endpoint (the render endpoint, #38) takes a
+  `ClientAddressThrottle` subclass with its own scope and a default rate in
+  `site_config.DEFAULT_THROTTLE_RATES`.
 
 ## Data model (`api/models.py`)
 

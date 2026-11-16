@@ -214,10 +214,11 @@ The `secret_key` field is optional — if omitted, one is auto-generated and sav
 ```bash
 cd /opt/pededit/backend
 sudo -u pededit .venv/bin/python manage.py migrate
+sudo -u pededit .venv/bin/python manage.py createcachetable
 sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
 ```
 
-The Django static files (admin CSS/JS) will be collected to `backend/staticfiles/`.
+`createcachetable` makes the table the rate limit counters are kept in (step 8). The Django static files (admin CSS/JS) will be collected to `backend/staticfiles/`.
 
 ### (Optional) Create a superuser for Django admin
 
@@ -318,6 +319,50 @@ sudo nano /etc/pededit/pededit.json
 sudo systemctl restart pededit
 ```
 
+### Turn on the HTTPS settings
+
+Once `https://your-domain.example.com` loads, add `"https": true` to `/etc/pededit/pededit.json` and restart (`sudo systemctl restart pededit`). That one key turns on Django's redirect to https, secure cookies for the admin, and HSTS. `deploy.sh` runs `manage.py check --deploy --fail-level WARNING` before it changes anything and refuses to deploy until this is set.
+
+Check it straight away, because a proxy that does not tell Django the request was https makes every API call redirect for ever:
+
+```bash
+curl -sI https://your-domain.example.com/api/pedigrees/   # 401 is right; 301 back to the same URL is the loop
+curl -sI https://your-domain.example.com/api/health/ | grep -i strict-transport   # max-age=3600; includeSubDomains
+curl -sI https://your-domain.example.com/ | grep -i strict-transport              # the same, sent by Nginx
+```
+
+If the first answers 301, set `"https": false`, restart, and look at what reaches Gunicorn: each proxied `location` must have `proxy_set_header X-Forwarded-Proto $scheme;`, and the request must arrive at Nginx on 443. Behind a CDN that fetches from your server over plain HTTP (Cloudflare's "Flexible" mode), `$scheme` is `http` however the visitor connected, so switch the CDN to fetch over https ("Full (strict)") before turning this on.
+
+HSTS tells a browser to refuse plain HTTP for the site for `max-age` seconds, and there is no taking it back for a browser that has seen it. It starts at one hour. Once the site has run clean for a few days, raise it to a day and then a year, in both places:
+
+- `"hsts_seconds": 86400` (later `31536000`) in `/etc/pededit/pededit.json`, for `/api/` and `/admin/`.
+- `max-age=` in the three `add_header Strict-Transport-Security` lines of `/etc/nginx/sites-available/pededit`, for the frontend and `/djstatic/`.
+
+The header includes subdomains. If a subdomain of yours is still served over plain HTTP, set `"hsts_include_subdomains": false` and drop `; includeSubDomains` from the Nginx lines. Preload is not set and should stay a decision you make by hand: it takes months to undo.
+
+### Rate limits
+
+Sign-in, token refresh and creating a pedigree without an account are limited per client address (`backend/api/throttling.py`). Opening and saving a pedigree are never limited. The defaults suit a clinic or a class behind one address:
+
+| `throttle_rates` key | Default | Counts |
+|---|---|---|
+| `auth_login` | `20/min` | Google and GitHub sign-in |
+| `auth_refresh` | `60/min` | renewing a token |
+| `anon_create_burst` | `20/min` | new pedigrees with no account |
+| `anon_create_sustained` | `500/day` | the same, over a day |
+
+To change one, add for example `"throttle_rates": {"anon_create_sustained": "2000/day"}` to the config; `null` turns a limit off. A limited request gets HTTP 429.
+
+The client address comes from `X-Forwarded-For`, and `"num_proxies"` says how many proxies added to it: `1` for Nginx alone (the default), `2` when a CDN such as Cloudflare sits in front of Nginx. Get this wrong behind a CDN and everybody shares a handful of buckets, one per CDN address. To check, watch a request arrive:
+
+```bash
+sudo tcpdump -A -i lo -c 40 'tcp port 8000' | grep -i x-forwarded-for
+```
+
+The last address is whoever connected to Nginx. If that is your CDN and not you, use `2`. With `2`, also make the firewall accept ports 80 and 443 only from the CDN's addresses: anyone who can reach Nginx directly can otherwise put any address they like in the header.
+
+The counters are kept in a database table so the Gunicorn workers share them. `deploy.sh` creates it; by hand it is `manage.py createcachetable`.
+
 ## 9. Firewall
 
 ```bash
@@ -334,7 +379,7 @@ Use the deploy script, which pulls social login client IDs from `/etc/pededit/pe
 sudo bash /opt/pededit/deploy/deploy.sh
 ```
 
-This pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
+It first runs `manage.py check --deploy --fail-level WARNING` and stops, with the running site untouched, if Django has anything to say about the production settings (step 8). Then it pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
 
 The script does not install the service file or the Nginx config. If `deploy/pededit.service` changed, copy it into place again as in step 6. If `deploy/pededit-nginx.conf` changed, make the same edit by hand in `/etc/nginx/sites-available/pededit`, then `sudo nginx -t && sudo systemctl reload nginx`. Do not copy the file over the installed one: that loses your `server_name` and the TLS lines Certbot added.
 
@@ -352,6 +397,10 @@ Neither can tell that the app loads but then breaks in the browser. That needs e
 **`deploy.sh` says the health check did not return 200.** With no "last answer" line, Gunicorn failed to start. With one, the answer names the failing check: `"database": "unavailable"` or `"disk": "low"` (free some space, `df -h`). `sudo journalctl -u pededit -e` has the detail; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
 
 **`deploy.sh` says the health check is serving `''`.** The answer had no `version`, so the app did not see the request as local. The script must ask Gunicorn directly on `127.0.0.1:8000`, not through Nginx or another proxy.
+
+**`deploy.sh` says `check --deploy` reported problems.** `security.W004`, `W008`, `W012` and `W016` together mean `"https": true` is missing from `/etc/pededit/pededit.json` (step 8). `security.W018` means `"debug"` is true. Nothing was deployed; fix the config and run it again.
+
+**The browser says "too many redirects" on anything under `/api/`.** `"https": true` is set but Django is not being told the request was https. See "Turn on the HTTPS settings" in step 8.
 
 **502 Bad Gateway** — Gunicorn isn't running. Check `sudo systemctl status pededit` and `sudo journalctl -u pededit -e`.
 

@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 from .models import Pedigree, TagPreset
+from .throttling import AnonCreateBurstThrottle, AnonCreateSustainedThrottle
 from .serializers import (
     UserSerializer,
     PedigreeSerializer,
@@ -26,6 +27,9 @@ class PedigreeViewSet(viewsets.ModelViewSet):
     partial_update: PATCH /api/pedigrees/{id}/  → same access rules as retrieve
     destroy:        DELETE /api/pedigrees/{id}/ → same access rules as retrieve
     """
+
+    # Only an anonymous create is counted (api/throttling.py).
+    throttle_classes = [AnonCreateBurstThrottle, AnonCreateSustainedThrottle]
 
     def get_permissions(self):
         if self.action == "list":

@@ -29,6 +29,22 @@ if [[ -z "${PEDEDIT_DEPLOY_REEXEC:-}" && "$(sudo -u pededit git rev-parse HEAD:d
     PEDEDIT_DEPLOY_REEXEC=1 exec bash /opt/pededit/deploy/deploy.sh "$@"
 fi
 
+echo "==> Checking the production settings"
+# manage.py check --deploy, failing on warnings (#47). Run before anything is
+# built or migrated, so a refusal leaves the running site exactly as it was.
+# The dependencies go in first because the new settings may import a new one
+# (the same install further down is then a no-op). A warning that is accepted
+# on purpose is silenced by name with the reason, in backend/peded/security.py.
+cd /opt/pededit/backend
+sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
+if ! sudo -u pededit .venv/bin/python manage.py check --deploy --fail-level WARNING; then
+    echo "Error: manage.py check --deploy reported problems, nothing was deployed" >&2
+    echo "       security.W004, W008, W012 and W016 together mean \"https\": true is not in $CONFIG" >&2
+    echo "       (INSTALL.md, step 8)" >&2
+    exit 1
+fi
+cd /opt/pededit
+
 echo "==> Installing Node dependencies"
 sudo -u pededit npm ci
 
@@ -50,6 +66,8 @@ echo "==> Updating backend"
 cd /opt/pededit/backend
 sudo -u pededit uv pip install --python .venv/bin/python -r requirements.txt
 sudo -u pededit .venv/bin/python manage.py migrate
+# The table the rate limit counters live in (#47). Does nothing once it exists.
+sudo -u pededit .venv/bin/python manage.py createcachetable
 sudo -u pededit .venv/bin/python manage.py collectstatic --noinput
 
 echo "==> Restarting Gunicorn"

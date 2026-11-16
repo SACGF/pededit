@@ -4,6 +4,10 @@
   "cors_allowed_origins": ["https://your-domain.example.com"],
   "debug": false,
 
+  "https": false,
+  "hsts_seconds": 3600,
+  "num_proxies": 1,
+
   "google_client_id": "",
   "github_client_id": "",
   "github_client_secret": ""

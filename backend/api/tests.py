@@ -585,3 +585,235 @@ class NoPasswordSignInTests(APITestCase):
         self.assertEqual(resp.status_code, 200, resp.data)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp.data['access']}")
         self.assertEqual(self.client.get("/api/auth/me/").json()["username"], "bob")
+
+
+HTTPS_ON = dict(
+    DEBUG=False,
+    ALLOWED_HOSTS=["testserver", "pededit.example"],
+    SECRET_KEY="k9!vX2#pQ7mZ4@tR8wL1$eN6bH3^yU5&cJ0*fG-aS+dD=oI_test-only-key",
+)
+
+
+class HttpsSettingsTests(APITestCase):
+    """The site config's "https" switch (#47, peded/security.py)."""
+
+    def on(self, **kwargs):
+        from peded.security import security_settings
+
+        args = {"https": True, "hsts_seconds": 3600, "hsts_include_subdomains": True, **kwargs}
+        return self.settings(**HTTPS_ON, **security_settings(**args))
+
+    def deploy_check(self):
+        from io import StringIO
+        from django.core.management import call_command
+
+        call_command("check", deploy=True, fail_level="WARNING", stdout=StringIO(), stderr=StringIO())
+
+    def test_off_sets_nothing(self):
+        from peded.security import security_settings
+
+        self.assertEqual(security_settings(False, 3600, True), {})
+
+    def test_on_passes_the_deploy_check_and_off_fails_it(self):
+        from django.core.management.base import SystemCheckError
+
+        with self.on():
+            self.deploy_check()
+        # Subdomains left out by an explicit config value: still passes.
+        with self.on(hsts_include_subdomains=False):
+            self.deploy_check()
+        # What deploy.sh sees on a server that has not set "https": true.
+        with self.settings(**HTTPS_ON):
+            with self.assertRaises(SystemCheckError) as ctx:
+                self.deploy_check()
+        for check_id in ("security.W004", "security.W008", "security.W012", "security.W016"):
+            self.assertIn(check_id, str(ctx.exception))
+
+    def test_preload_is_never_set(self):
+        from django.conf import settings
+        from peded.security import security_settings
+
+        on = security_settings(True, 31536000, True)
+        self.assertNotIn("SECURE_HSTS_PRELOAD", on)
+        self.assertEqual(on["SILENCED_SYSTEM_CHECKS"], ["security.W021"])
+        with self.on():
+            self.assertFalse(settings.SECURE_HSTS_PRELOAD)
+
+    def test_redirect_follows_x_forwarded_proto(self):
+        with self.on():
+            # Plain HTTP reaching Django: sent to https.
+            resp = self.client.get("/api/pedigrees/")
+            self.assertEqual(resp.status_code, 301)
+            self.assertEqual(resp["Location"], "https://testserver/api/pedigrees/")
+            # What Nginx sends for an https request: served, no loop, HSTS on.
+            resp = self.client.get("/api/pedigrees/", HTTP_X_FORWARDED_PROTO="https")
+            self.assertEqual(resp.status_code, 401)
+            self.assertEqual(resp["Strict-Transport-Security"], "max-age=3600; includeSubDomains")
+            # Nginx saying the request was plain HTTP: redirected.
+            resp = self.client.get("/api/pedigrees/", HTTP_X_FORWARDED_PROTO="http")
+            self.assertEqual(resp.status_code, 301)
+
+    def test_health_check_on_loopback_is_not_redirected(self):
+        # deploy.sh asks http://127.0.0.1:8000/api/health/ with no proxy headers.
+        with self.on():
+            resp = self.client.get("/api/health/")
+            self.assertEqual(resp.status_code, 200, resp.content)
+            self.assertIn("version", resp.json())
+            self.assertEqual(self.client.head("/api/health/").status_code, 200)
+
+    def test_cookies_are_secure(self):
+        with self.on():
+            resp = self.client.get("/admin/login/", HTTP_X_FORWARDED_PROTO="https")
+            self.assertEqual(resp.status_code, 200)
+            self.assertTrue(resp.cookies["csrftoken"]["secure"])
+
+    def test_development_is_left_alone(self):
+        # No "https" in the config: no redirect, no HSTS, on plain HTTP.
+        from peded.security import security_settings
+
+        with self.settings(**security_settings(False, 3600, True)):
+            resp = self.client.get("/api/pedigrees/")
+            self.assertEqual(resp.status_code, 401)
+            self.assertNotIn("Strict-Transport-Security", resp)
+
+
+def _rates(**rates):
+    import site_config
+
+    return override_settings(THROTTLE_RATES={**site_config.DEFAULT_THROTTLE_RATES, **rates})
+
+
+def _num_proxies(n):
+    from django.conf import settings
+
+    return override_settings(REST_FRAMEWORK={**settings.REST_FRAMEWORK, "NUM_PROXIES": n})
+
+
+@_num_proxies(1)
+class ThrottleTests(APITestCase):
+    """Rate limits (#47, api/throttling.py). A request counts only when it
+    came through the proxy, so every limited request here carries
+    X-Forwarded-For the way Nginx sends it."""
+
+    CLIENT = {"HTTP_X_FORWARDED_FOR": "203.0.113.5", "HTTP_X_FORWARDED_PROTO": "https"}
+    BODY = {"title": "T", "data": {"individuals": [], "partnerships": [], "parentOf": {}}}
+
+    def setUp(self):
+        from django.core.cache import caches
+
+        caches["throttle"].clear()
+
+    def create(self, **extra):
+        return self.client.post("/api/pedigrees/", self.BODY, format="json", **{**self.CLIENT, **extra})
+
+    @_rates(anon_create_burst="3/min")
+    def test_anonymous_create_is_limited_per_address(self):
+        for _ in range(3):
+            self.assertEqual(self.create().status_code, 201)
+        resp = self.create()
+        self.assertEqual(resp.status_code, 429)
+        self.assertIn("Retry-After", resp)
+        self.assertEqual(Pedigree.objects.count(), 3)
+        # Another address has its own bucket.
+        self.assertEqual(self.create(HTTP_X_FORWARDED_FOR="198.51.100.7").status_code, 201)
+
+    @_rates(anon_create_burst=None, anon_create_sustained="2/day")
+    def test_the_daily_limit_applies_too_and_null_turns_a_scope_off(self):
+        self.assertEqual(self.create().status_code, 201)
+        self.assertEqual(self.create().status_code, 201)
+        self.assertEqual(self.create().status_code, 429)
+
+    @_rates(anon_create_burst="2/min")
+    def test_client_cannot_choose_its_bucket(self):
+        # Nginx appends the address it saw; whatever the client put in front
+        # of it is ignored with one proxy.
+        codes = [
+            self.create(HTTP_X_FORWARDED_FOR=f"{forged}, 203.0.113.5").status_code
+            for forged in ("10.0.0.1", "10.0.0.2", "10.0.0.3")
+        ]
+        self.assertEqual(codes, [201, 201, 429])
+
+    @_rates(anon_create_burst="2/min")
+    def test_two_proxies_count_the_address_before_the_cdn(self):
+        # Behind a CDN, Nginx appends the CDN's address, which changes from
+        # request to request. With "num_proxies": 2 the client is counted.
+        with _num_proxies(2):
+            codes = [
+                self.create(HTTP_X_FORWARDED_FOR=f"203.0.113.5, 172.68.0.{i}").status_code
+                for i in range(3)
+            ]
+            self.assertEqual(codes, [201, 201, 429])
+            self.assertEqual(self.create(HTTP_X_FORWARDED_FOR="198.51.100.7, 172.68.0.1").status_code, 201)
+
+    @_rates(anon_create_burst="1/min", anon_create_sustained="1/day")
+    def test_a_caller_on_the_box_is_not_limited(self):
+        # Tests, local development, the page checks and the flows: no proxy.
+        for _ in range(5):
+            self.assertEqual(self.client.post("/api/pedigrees/", self.BODY, format="json").status_code, 201)
+
+    @_rates(anon_create_burst="1/min", anon_create_sustained="1/day")
+    def test_signed_in_create_is_not_limited(self):
+        self.client.force_authenticate(User.objects.create_user("carol"))
+        for _ in range(5):
+            self.assertEqual(self.create().status_code, 201)
+
+    @_rates(anon_create_burst="1/min", anon_create_sustained="1/day", auth_login="1/min", auth_refresh="1/min")
+    def test_reading_and_saving_are_never_limited(self):
+        pid = self.create().json()["id"]
+        for i in range(30):
+            resp = self.client.patch(f"/api/pedigrees/{pid}/", {"title": f"T{i}"}, format="json", **self.CLIENT)
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(self.client.get(f"/api/pedigrees/{pid}/", **self.CLIENT).status_code, 200)
+        self.assertEqual(self.client.delete(f"/api/pedigrees/{pid}/", **self.CLIENT).status_code, 204)
+
+    @_rates()
+    def test_a_normal_session_stays_under_the_default_rates(self):
+        # A morning's work from one address: a handful of new pedigrees, each
+        # auto-saved many times, a sign-in and its token refreshes.
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        for _ in range(10):
+            resp = self.create()
+            self.assertEqual(resp.status_code, 201)
+            pid = resp.json()["id"]
+            for i in range(20):
+                resp = self.client.patch(f"/api/pedigrees/{pid}/", {"title": f"T{i}"}, format="json", **self.CLIENT)
+                self.assertEqual(resp.status_code, 200)
+        refresh = str(RefreshToken.for_user(User.objects.create_user("dave")))
+        for _ in range(10):
+            resp = self.client.post("/api/auth/token/refresh/", {"refresh": refresh}, format="json", **self.CLIENT)
+            self.assertEqual(resp.status_code, 200)
+            refresh = resp.data["refresh"]
+
+    @_rates()
+    def test_the_default_burst_rate_is_hit(self):
+        codes = [self.create().status_code for _ in range(21)]
+        self.assertEqual(codes, [201] * 20 + [429])
+
+    @_rates(auth_login="3/min", auth_refresh="2/min")
+    def test_auth_endpoints_are_limited(self):
+        # An empty body is refused before Google or GitHub is asked, and
+        # still counts.
+        for url in ("/api/auth/google/", "/api/auth/github/"):
+            self.setUp()
+            codes = [self.client.post(url, {}, format="json", **self.CLIENT).status_code for _ in range(4)]
+            self.assertEqual(codes, [400, 400, 400, 429], url)
+        codes = [
+            self.client.post("/api/auth/token/refresh/", {"refresh": "x"}, format="json", **self.CLIENT).status_code
+            for _ in range(3)
+        ]
+        self.assertEqual(codes, [401, 401, 429])
+        # The health check is never limited.
+        for _ in range(10):
+            self.assertEqual(self.client.get("/api/health/", **self.CLIENT).status_code, 200)
+
+    @_rates(anon_create_burst="1/min")
+    def test_a_broken_cache_lets_requests_through(self):
+        from unittest import mock
+        from django.db import DatabaseError
+        from rest_framework.throttling import SimpleRateThrottle
+
+        with mock.patch.object(SimpleRateThrottle, "allow_request", side_effect=DatabaseError("no such table")):
+            with self.assertLogs("api.throttling", level="ERROR"):
+                self.assertEqual(self.create().status_code, 201)
+                self.assertEqual(self.create().status_code, 201)
