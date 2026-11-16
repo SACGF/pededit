@@ -1,8 +1,9 @@
 # layout-engine/ — agent notes
 
-TypeScript port of the kinship2 R pedigree layout algorithm, published as the npm
-workspace package `@pedigree-editor/layout-engine`. It has no React or DOM
-dependency and is consumed by the frontend and by the exporters.
+TypeScript port of the kinship2 R pedigree layout algorithm, the npm
+workspace package `@pedigree-editor/layout-engine`, set up to be published to
+npm (#22, see "Publishing" below). It has no React or DOM dependency and is
+consumed by the frontend and by the exporters.
 
 Read `claude/layout_engine_guide.md` before touching anything here or in the
 renderer. It explains `LayoutResult` (n, nid, pos, fam, spouse), the 1-based
@@ -29,7 +30,9 @@ indexing convention inherited from R, and the three rendering rules.
   (`families.ts`). `tests/components.test.ts` pins this.
 - `alignped1.ts` to `alignped4.ts`, `alignPedigree.ts` — the kinship2 placement
   pipeline. alignped4 runs a quadratic program via the `quadprog` npm package.
-  Vite needs `optimizeDeps.include: ["quadprog"]` for that package to load.
+  The frontend's Vite needs `optimizeDeps.include: ["quadprog"]` for that
+  package to load, because it reads the engine from source (a CommonJS
+  dependency of linked source is not pre-bundled otherwise).
 - `families.ts` — `alignPedigreeByFamily`, which the canvas, SVG export and
   de-identification call instead of `alignPedigree` (#64). R's `align.pedigree`
   packs disconnected families into shared rows at ordinary spacing, so they
@@ -175,6 +178,86 @@ demonstrably worse, while keeping the port as the tested baseline:
   layout. Example: `tests/partner_chain.test.ts`.
 - R for the oracle without sudo: micromamba from micro.mamba.pm, then
   `micromamba create -p <dir> -c conda-forge r-base r-kinship2 r-jsonlite`.
+
+## Publishing (#22)
+
+- **`package.json` describes the published package**, so `main`, `types` and
+  `exports` point at `dist/`, which is not committed and which nothing in
+  this repository reads. The frontend imports `src/index.ts` through an
+  alias, in three places that must stay in step: `frontend/vite.config.ts`,
+  `frontend/vitest.config.ts` and `paths` in `frontend/tsconfig.app.json`.
+  So the dev server, the tests, the type check and the production build need
+  no build of the engine, and a checkout whose `node_modules` link points at
+  another checkout's engine still gets its own. Anything new that resolves
+  the package by name outside Vite and `tsc` (a Node script, another
+  workspace) needs the same alias, or it will look for `dist/`.
+- **Build**: `npm -w layout-engine run build` (`scripts/build.mjs`) runs
+  `tsc -p tsconfig.build.json` into `dist/` (ES modules and `.d.ts`, one file
+  per source file) and copies the root `LICENSE` beside it, since npm only
+  packs a licence from the package directory. `prepack` runs it, so
+  `npm pack` and `npm publish` cannot ship a stale build. ESM only:
+  `require()` of it works from Node 20.19, and a second CommonJS build was
+  not worth the dual-package trouble. CI runs
+  `npm -w layout-engine pack --dry-run` so the build is exercised on every
+  push, since nothing else uses it.
+- **The tarball** is `dist/`, `README.md`, `CHANGELOG.md`, `LICENSE` and
+  `package.json` (the `files` field). No source, tests or oracle data.
+- **Public API**: `src/index.ts` is grouped into layout, kinship, the data
+  model, and a last group exported only because the editor and its tests
+  call it (`kindepth`, `autohint`, `buildLayoutInput`, the partner side and
+  assisted reproduction hooks). The README lists the first three as the API
+  and the last as free to change. Put a new export in the right group and,
+  when it is public, in the README and `CHANGELOG.md`.
+- **README samples are run, not written.** Every code block in `README.md`
+  and the output under it came from a scratch project with the packed
+  tarball installed (`npm pack`, `npm install <tarball>`, `tsc`, `node`).
+  Run them again when the output of `alignPedigree` or the API changes. The
+  README ships in the tarball, so it cannot link to `claude/` for anything
+  it needs.
+- **Licence**: `AGPL-3.0-only`, the repository's `LICENSE`. kinship2 is
+  GPL (>= 2); the port is used under GPL 3, which may be combined with AGPL
+  3 work (section 13). A more permissive licence is not possible for the
+  ported code.
+- **Renaming the package** (the scope is the maintainer's choice): change
+  `name` in `package.json`, then the same string in `frontend/package.json`
+  (dependency), the three aliases above,
+  `frontend/scripts/browser/worktree.mjs`, the imports under `frontend/src`
+  (`grep -rl "@pedigree-editor/layout-engine" frontend/src | xargs sed -i
+  "s#@pedigree-editor/layout-engine#NEW#g"`), `README.md`, `CHANGELOG.md`,
+  this file and the root `AGENTS.md`, and run `npm install` to rewrite
+  `package-lock.json`.
+
+### Releasing
+
+Done by the maintainer, by hand. Nothing in CI publishes.
+
+1. Once only: the scope must exist on npm. Sign in at npmjs.com and create
+   the organisation `pedigree-editor` (Add Organization, the free plan for
+   public packages), or rename the package to a scope you already own.
+   `npm login` on the machine you publish from.
+2. Set the version in `layout-engine/package.json`
+   (`npm -w layout-engine version <patch|minor|major> --no-git-tag-version`,
+   which also updates `package-lock.json`) and add its section to
+   `CHANGELOG.md`. Commit.
+3. Check: `npm -w layout-engine run test`, `npm -w frontend run typecheck`,
+   `npm -w frontend run test`.
+4. Look at what would be published:
+   `npm -w layout-engine publish --dry-run`. Expect 38 files and about
+   66 kB, all under `dist/` apart from the README, changelog, licence and
+   `package.json`.
+5. Publish: `npm -w layout-engine publish`. `publishConfig.access` is
+   already `public`, which a scoped package needs. npm asks for the one-time
+   password.
+6. Tag the commit `layout-engine-v<version>` and push the tag.
+
+Provenance (a signed statement on npmjs.com that the tarball was built from
+this repository at that commit) needs the publish to run in GitHub Actions:
+a workflow triggered by hand or by the tag, with `permissions: id-token:
+write`, running `npm ci` and `npm -w layout-engine publish --provenance`,
+authenticated by npm trusted publishing (set on the package's npmjs.com
+settings page after the first release, so no token is stored) or an
+`NPM_TOKEN` secret. Worth adding after the first manual release; there is no
+such workflow yet, on purpose.
 
 ## Testing
 

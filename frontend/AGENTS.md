@@ -23,6 +23,12 @@ the stores via the dev-only `window.__pededit` (`src/devHooks.ts`). Every canvas
 symbol carries `data-individual-id` for selectors. See
 `scripts/browser/README.md`.
 
+The layout engine is imported as `@pedigree-editor/layout-engine` but read
+from `../layout-engine/src/index.ts`, never from a build: an alias in
+`vite.config.ts`, `vitest.config.ts` and `tsconfig.app.json` (`paths`), all
+three needed. Its `package.json` points at `dist/`, which exists only in the
+package published to npm (#22, `layout-engine/AGENTS.md` "Publishing").
+
 `src/config.ts` reads `VITE_GOOGLE_CLIENT_ID` and `VITE_GITHUB_CLIENT_ID`. If
 `@react-oauth/google` is not installed, `vite.config.ts` aliases it to a no-op
 stub so the app still builds without Google login.

@@ -9,5 +9,11 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: { globals: true, testTimeout: 30_000 },
   esbuild: { jsx: "automatic" },
-  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+      // As in vite.config.ts: the layout engine from source, no build (#22).
+      "@pedigree-editor/layout-engine": path.resolve(__dirname, "../layout-engine/src/index.ts"),
+    },
+  },
 });

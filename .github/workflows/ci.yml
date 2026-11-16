@@ -29,6 +29,10 @@ jobs:
       - run: npm ci
       - name: Layout engine tests
         run: npm -w layout-engine run test
+      # Builds dist/ and lists the npm tarball (#22). Nothing is published,
+      # and nothing else in CI uses the build: the frontend reads the source.
+      - name: Layout engine package build
+        run: npm -w layout-engine pack --dry-run
       - name: Frontend type check
         run: npm -w frontend run typecheck
       - name: Frontend tests

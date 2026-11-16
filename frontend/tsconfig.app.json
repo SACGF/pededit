@@ -19,7 +19,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@pedigree-editor/layout-engine": ["../layout-engine/src/index.ts"]
     }
   },
   "include": ["src"],

@@ -73,6 +73,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // The layout engine is read from source, so nothing here needs it
+      // built: its package.json points at dist/, which only exists in the
+      // published package (#22). Same alias in vitest.config.ts and
+      // tsconfig.app.json.
+      "@pedigree-editor/layout-engine": path.resolve(__dirname, "../layout-engine/src/index.ts"),
       ...googleOAuthAlias,
     },
   },

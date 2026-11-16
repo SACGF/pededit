@@ -1,19 +1,55 @@
 {
   "name": "@pedigree-editor/layout-engine",
   "version": "0.1.0",
+  "description": "Pedigree (genetic family tree) layout and kinship coefficients in TypeScript: a port of the layout algorithm of the kinship2 R package by Sinnwell, Therneau and Schaid.",
+  "keywords": [
+    "pedigree",
+    "kinship2",
+    "pedigree-layout",
+    "genetics",
+    "NSGC",
+    "family-tree",
+    "kinship",
+    "genogram"
+  ],
+  "license": "AGPL-3.0-only",
+  "author": "SACGF (https://github.com/SACGF)",
+  "homepage": "https://github.com/SACGF/pededit/tree/main/layout-engine#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SACGF/pededit.git",
+    "directory": "layout-engine"
+  },
+  "bugs": {
+    "url": "https://github.com/SACGF/pededit/issues"
+  },
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
-    }
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "build:types": "tsc --project tsconfig.json --noEmitOnError false"
+    "build": "node scripts/build.mjs",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "typescript": "^5.4",
