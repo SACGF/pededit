@@ -49,8 +49,8 @@ interface ToolbarProps {
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: ToolbarProps) {
   const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeFields("addIndividual", "undo", "redo", "past", "future", "pedigree", "resetLayout");
-  const { activePedigreeId } = useAppStore();
-  const hasPedigree = activePedigreeId !== null;
+  // An example drawn before its first edit (#151) is in the editor too.
+  const hasPedigree = useAppStore(s => s.activePedigreeId !== null || s.example !== null);
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
   const [pedMenuOpen, setPedMenuOpen] = useState(false);

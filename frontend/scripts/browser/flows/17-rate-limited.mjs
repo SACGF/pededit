@@ -31,10 +31,13 @@ export default {
     t.equal(new URL(t.page.url()).pathname, "/", "and stays on the landing page");
     t.ok(await t.page.locator('button:has-text("Create blank pedigree")').isEnabled(), "with the button ready to try again");
 
+    // An example is saved on its first edit (#151), so that is where the limit shows.
     await t.open("/example/simple-family");
-    await t.waitFor('[role="alert"]');
-    t.match(await t.text('[role="alert"]'), /Could not open Simple family\. Too many requests from your network\. Try again in/,
-      "an example link says the same");
+    await t.waitFor('button[title="Add male"]');
+    await t.click('button[title="Add male"]');
+    await t.waitFor('[data-testid="notice"]');
+    t.match(await t.text('[data-testid="notice"]'), /^Too many requests from your network\. Try again in .*Your changes are kept here/,
+      "editing an example says the same, keeping the edit");
 
     // Sign-in (auth_login) cannot be spent for real here: each try makes the server call
     // GitHub. The server's 429 is answered in the page instead; backend tests cover the limit.

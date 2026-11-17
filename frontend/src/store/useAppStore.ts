@@ -3,6 +3,7 @@ import { authApi, pedigreeApi, PedigreeMeta, UserInfo, setSignedOutHandler } fro
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore } from "./usePedigreeStore";
 import { recordRecentPedigree, renameRecentPedigree, forgetRecentPedigree } from "../utils/recentPedigrees";
+import type { ExamplePedigree } from "../data/examples";
 
 interface AppState {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -16,6 +17,12 @@ interface AppState {
   activePedigreeId: string | null;
   /** Server title of the active pedigree. Set on open for anonymous pedigrees too. */
   activeTitle: string | null;
+  /**
+   * A built-in example drawn from the bundle with no saved copy yet
+   * (`/example/<slug>`, #151). The first edit saves it as the visitor's own
+   * pedigree, which sets `activePedigreeId` and clears this.
+   */
+  example: { slug: string; label: string } | null;
 
   // ── Actions ────────────────────────────────────────────────────────────────
   googleLogin: (credential: string) => Promise<void>;
@@ -30,6 +37,8 @@ interface AppState {
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
+  /** Draw an example in the editor without saving anything. */
+  openExample: (example: ExamplePedigree) => void;
   /**
    * Leave the editor: save unsaved edits, then empty the editing store, so
    * the next pedigree opened starts from a blank canvas instead of flashing
@@ -39,6 +48,7 @@ interface AppState {
   createPedigree: (title: string) => Promise<string>;
   createPedigreeFromData: (title: string, data: Pedigree) => Promise<string>;
   deletePedigree: (id: string) => Promise<void>;
+  /** Save the edits; for an open example, create the visitor's copy first. */
   saveActivePedigree: () => Promise<void>;
   /**
    * Save unsaved edits now, as the page is hidden or unloading. Sent
@@ -70,6 +80,51 @@ const KEEPALIVE_MAX_BYTES = 60 * 1024;
 /** The pedigree object a keepalive save is in flight for, so hide and pagehide send it once. */
 let keepaliveFor: Pedigree | null = null;
 
+/** Old saves may lack the sibling order fields; fill them in place. */
+function normalise(pedigree: Pedigree): Pedigree {
+  if (!pedigree.siblingOrder) {
+    pedigree.siblingOrder = { mode: "insertion", affectedFirst: false };
+  }
+  pedigree.individuals.forEach((ind, i) => {
+    if (ind.sibOrder === undefined) ind.sibOrder = i;
+  });
+  return pedigree;
+}
+
+/** The create of an open example's copy in flight, so every save while it runs waits for the one request. */
+let copyRequest: Promise<void> | null = null;
+
+/**
+ * The pedigree the editor held when it was closed while a copy was being
+ * created, so edits made during that request are not lost.
+ */
+let closedDuringCopy: Pedigree | null = null;
+
+async function createExampleCopy() {
+  const { example, isAuthenticated } = useAppStore.getState();
+  if (!example) return;
+  const pedigree = usePedigreeStore.getState().getPedigree();
+  const seq = openSeq;
+  let created: PedigreeMeta;
+  try {
+    ({ data: created } = await pedigreeApi.createWithData(example.label, pedigree));
+  } catch (err) {
+    useAppStore.setState({ lastSaveFailed: true });
+    throw err;
+  }
+  recordRecentPedigree(created.id, created.title);
+  if (isAuthenticated) useAppStore.setState(s => ({ pedigrees: [created, ...s.pedigrees] }));
+  if (seq !== openSeq) {
+    // The editor was closed while the copy was being made: save what it held then.
+    const last = closedDuringCopy;
+    closedDuringCopy = null;
+    if (last && last !== pedigree) await pedigreeApi.update(created.id, { data: last });
+    return;
+  }
+  useAppStore.setState({ activePedigreeId: created.id, activeTitle: created.title, example: null });
+  markSaved(pedigree);
+}
+
 /** After a save of `saved`: clean only when nothing was edited while it ran. */
 function markSaved(saved: Pedigree) {
   if (usePedigreeStore.getState().pedigree === saved) usePedigreeStore.setState({ isDirty: false });
@@ -82,6 +137,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   pedigrees: [],
   activePedigreeId: null,
   activeTitle: null,
+  example: null,
   lastSaveFailed: false,
 
   googleLogin: async (credential) => {
@@ -101,14 +157,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   logout: async () => {
-    const { activePedigreeId } = get();
-    if (activePedigreeId && usePedigreeStore.getState().isDirty) {
+    const { activePedigreeId, example } = get();
+    if ((activePedigreeId || example) && usePedigreeStore.getState().isDirty) {
       await get().saveActivePedigree();
     }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();
-    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null });
+    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null, example: null });
   },
 
   deleteAccount: async () => {
@@ -119,7 +175,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();
-    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null });
+    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null, example: null });
   },
 
   fetchMe: async () => {
@@ -140,33 +196,32 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   openPedigree: async (id) => {
-    const { activePedigreeId } = get();
-    if (activePedigreeId && activePedigreeId !== id && usePedigreeStore.getState().isDirty) {
+    const { activePedigreeId, example } = get();
+    if ((example || (activePedigreeId && activePedigreeId !== id)) && usePedigreeStore.getState().isDirty) {
       await get().saveActivePedigree();
     }
     const seq = ++openSeq;
     const { data } = await pedigreeApi.get(id);
     if (seq !== openSeq) return;
-    const pedigree = data.data as Pedigree;
-    // Ensure siblingOrder is present (backwards compat)
-    if (!pedigree.siblingOrder) {
-      pedigree.siblingOrder = { mode: "insertion", affectedFirst: false };
-    }
-    // Ensure each individual has sibOrder
-    pedigree.individuals.forEach((ind, i) => {
-      if (ind.sibOrder === undefined) ind.sibOrder = i;
-    });
-    usePedigreeStore.getState().initialize(pedigree);
-    set({ activePedigreeId: id, activeTitle: data.title ?? null, lastSaveFailed: false });
+    usePedigreeStore.getState().initialize(normalise(data.data as Pedigree));
+    set({ activePedigreeId: id, activeTitle: data.title ?? null, example: null, lastSaveFailed: false });
     recordRecentPedigree(id, data.title ?? "Untitled pedigree");
   },
 
-  closePedigree: () => {
+  openExample: (ex) => {
     openSeq++;
+    usePedigreeStore.getState().initialize(normalise(structuredClone(ex.data)));
+    set({ activePedigreeId: null, activeTitle: ex.label, example: { slug: ex.slug, label: ex.label }, lastSaveFailed: false });
+  },
+
+  closePedigree: () => {
+    if (copyRequest) closedDuringCopy = usePedigreeStore.getState().pedigree;
     // Reads the pedigree before the reset below; the request carries on.
+    // Before the bump, so an example copy this starts knows it was closed.
     get().flushActivePedigree();
+    openSeq++;
     usePedigreeStore.getState().reset();
-    set({ activePedigreeId: null, activeTitle: null });
+    set({ activePedigreeId: null, activeTitle: null, example: null });
   },
 
   createPedigree: async (title) => {
@@ -196,7 +251,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   saveActivePedigree: async () => {
-    const { activePedigreeId } = get();
+    const { activePedigreeId, example } = get();
+    if (!activePedigreeId && example) {
+      copyRequest ??= createExampleCopy().finally(() => { copyRequest = null; });
+      await copyRequest;
+      return;
+    }
     if (!activePedigreeId) return;
     const pedigree = usePedigreeStore.getState().getPedigree();
     try {
@@ -209,9 +269,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
 
   flushActivePedigree: () => {
-    const { activePedigreeId } = get();
+    const { activePedigreeId, example } = get();
     const { isDirty, pedigree } = usePedigreeStore.getState();
-    if (!activePedigreeId || !isDirty) return "none";
+    if (!isDirty) return "none";
+    if (!activePedigreeId) {
+      if (!example) return "none";
+      // The copy's id is only known from the answer, so this cannot be a
+      // keepalive sent and forgotten.
+      void get().saveActivePedigree().catch(() => {});
+      return "request";
+    }
     if (keepaliveFor === pedigree) return "keepalive";
     const body = JSON.stringify({ data: pedigree });
     if (new TextEncoder().encode(body).length > KEEPALIVE_MAX_BYTES) {

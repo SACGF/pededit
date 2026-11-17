@@ -171,7 +171,7 @@ export default function LandingPage() {
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {EXAMPLES.map(ex => (ex.group ?? "") === group && (
-                    // A link, so it can be copied or opened in a new tab; ExamplePage makes the copy.
+                    // A link, so it can be copied or opened in a new tab; the copy is saved on its first edit.
                     <Link
                       key={ex.slug}
                       to={`/example/${ex.slug}`}
@@ -334,7 +334,8 @@ function MyPedigrees() {
  *   does not say. Add it under its own heading once the maintainer has.
  */
 function YourData() {
-  const host = window.location.host;
+  // The static copy built for search engines (prerender.tsx) knows no host.
+  const host = typeof window === "undefined" ? "this site" : window.location.host;
   const name = "text-gray-700";
   const rows: { term: string; text: ReactNode }[] = [
     {
@@ -342,8 +343,8 @@ function YourData() {
       text: (
         <>
           Each pedigree is saved on the server at {host}: the chart, its title and everything typed into it,
-          including names, dates and notes. Changes are saved as you make them. Opening an example or importing
-          a file saves a new pedigree there too.
+          including names, dates and notes. Changes are saved as you make them. Importing a file saves a new
+          pedigree there too, and so does the first change to an example.
         </>
       ),
     },

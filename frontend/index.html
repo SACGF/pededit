@@ -20,15 +20,16 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="https://pededit.com/" />
+    <!-- The static landing page is in every route's HTML; show it only on "/" until the app draws. -->
+    <script>if (location.pathname !== "/") document.documentElement.setAttribute("data-app-route", "");</script>
+    <style>[data-app-route] [data-prerendered] { display: none; }</style>
   </head>
   <body>
     <div id="root">
-      <!-- Static fallback so crawlers and users without JavaScript see what the app is. Replaced on mount. -->
+      <!-- The build writes the landing page here as static HTML (#25, prerenderLandingPlugin in vite.config.ts). The app draws over it. -->
+      <!--prerendered-landing-->
       <noscript>
-        <h1>PedEdit</h1>
-        <p>A free, open-source pedigree editor for clinical genetics, genetic counselling and research. No account required: each pedigree is saved at its own private URL that you bookmark or share.</p>
-        <p>Automatic layout ported from the kinship2 R package handles consanguinity, multiple partners and complex families. Drag-and-drop repositioning, standard NSGC symbols, PED import, and SVG, PNG, PDF and CSV export.</p>
-        <p>PedEdit needs JavaScript to run. Source code: <a href="https://github.com/SACGF/pededit">github.com/SACGF/pededit</a></p>
+        <p class="px-8 pb-4 text-center text-xs text-gray-500">PedEdit needs JavaScript to run. Source code: <a href="https://github.com/SACGF/pededit">github.com/SACGF/pededit</a></p>
       </noscript>
     </div>
     <script type="module" src="/src/main.tsx"></script>

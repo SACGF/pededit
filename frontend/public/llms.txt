@@ -1,0 +1,36 @@
+# PedEdit
+
+> PedEdit is a free, open-source pedigree editor for clinical genetics, genetic counselling and research, at https://pededit.com. It draws genetic family trees with the NSGC standard pedigree symbols and lays them out automatically with a TypeScript port of the kinship2 R package, so consanguinity, multiple partners and twins are drawn correctly. People can then be dragged to new places.
+
+No account is needed. Creating a pedigree while signed out saves it on the server at its own link, https://pededit.com/p/<id>, and that link is the only key: anyone who has it can open and change the pedigree, so it should be bookmarked and shared with care. Signing in with Google or GitHub is optional and only adds a list of your pedigrees and a saved library of conditions and tags.
+
+What it does:
+
+- Draws NSGC symbols (Bennett et al. 2008 and the 2022 revision): affected and carrier status for several conditions in one chart, deceased, pregnancies and losses, adoption, twins, consanguinity, donors and surrogates, proband and consultand, gender identity.
+- Imports PED files (the 6-column PLINK layout) and PedEdit JSON files.
+- Exports PedEdit JSON (lossless), PED, CSV, SVG, PNG and PDF, with a de-identify option on the figure exports. Exports are made in the browser.
+- Calculates kinship and inbreeding coefficients from the drawn family.
+
+To hand a family to PedEdit, write it as a PedEdit JSON file (format below) or a PED file and import it from the home page with "Import from PED or JSON file".
+
+Family histories are health information. Leave out names, dates of birth and other identifying details from anything you send through an assistant: a pedigree can be drawn with no names at all, and people can be named in PedEdit afterwards.
+
+## Docs
+
+- [PedEdit JSON format](https://pededit.com/docs/pedigree-json-format.md): every field of the pedigree data model, with the envelope a downloaded file uses
+- [PedEdit JSON schema](https://pededit.com/docs/pedigree-json-schema.json): JSON Schema (draft 2020-12) for the same format
+
+## Examples
+
+Each link opens a built-in example in the editor. Nothing is saved until it is changed, and then it is saved as the visitor's own copy.
+
+- [Three generations](https://pededit.com/example/three-generations)
+- [Uncle-niece](https://pededit.com/example/uncle-niece)
+- [Assisted reproduction](https://pededit.com/example/assisted-reproduction)
+- [Queen Victoria, haemophilia B](https://pededit.com/example/queen-victoria)
+- [Spanish Habsburgs](https://pededit.com/example/habsburgs)
+
+## Optional
+
+- [Source code](https://github.com/SACGF/pededit): AGPL-3.0, with the layout engine under GPL-3.0. A team that must keep pedigrees on its own systems can run its own copy (INSTALL.md)
+- [Changelog](https://pededit.com/changelog)

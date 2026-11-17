@@ -47,12 +47,14 @@ export default {
     t.equal(await t.count(`button:has-text("${name}")`), 0, "the home page no longer lists it, under Your pedigrees or Recent");
     t.equal((await fetch(new URL(`/api/pedigrees/${id}/`, t.base))).status, 404, "its link no longer works");
 
-    // An example link gives a signed-in visitor a copy they own (#150).
+    // An example's first edit gives a signed-in visitor a copy they own (#150, #151).
     await t.open("/example/simple-family");
     await t.waitFor('button[title="Add male"]');
+    await t.click('button[title="Add male"]');
+    await t.sleep(1500);
     const copy = new URL(t.page.url()).pathname.split("/").pop();
     const mineNow = (await (await api("/api/pedigrees/")).json()).filter(p => p.id === copy).map(p => p.title);
-    t.equal(mineNow, ["Simple family"], "an example link opens a copy that belongs to the signed-in user");
+    t.equal(mineNow, ["Simple family"], "an edited example is saved as a copy that belongs to the signed-in user");
     await api(`/api/pedigrees/${copy}/`, { method: "DELETE" });
   },
 };

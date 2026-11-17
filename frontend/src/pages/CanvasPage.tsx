@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { usePedigreeStore, usePedigreeFields } from "../store/usePedigreeStore";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import type { PedigreeMeta } from "../api/client";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { forgetRecentPedigree } from "../utils/recentPedigrees";
 import { requestErrorMessage } from "../api/errors";
+import { exampleBySlug } from "../data/examples";
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -42,14 +43,24 @@ const REPO_URL = "https://github.com/SACGF/pededit";
 const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom, tap a person to select them. Editing is easier on a computer.";
 const SMALL_SCREEN_NOTICE_KEY = "smallScreenNoticeDismissed";
 
+/**
+ * The editor, for `/p/<id>` and for `/example/<slug>` (#151). An example is
+ * drawn from the bundle and saved only by the first edit, which replaces
+ * the URL with the new copy's `/p/<id>`. Both routes render this component,
+ * so React keeps it mounted across that change and the undo history stays.
+ */
 export default function CanvasPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id: string; slug: string }>();
   const navigate = useNavigate();
   const {
-    isAuthenticated, pedigrees, activePedigreeId,
-    loadPedigrees, createPedigree, createPedigreeFromData, openPedigree,
+    isAuthenticated, pedigrees, activePedigreeId, example: openExampleInfo,
+    loadPedigrees, createPedigree, createPedigreeFromData, openPedigree, openExample,
     logout, saveActivePedigree, renamePedigree, closePedigree,
   } = useAppStore();
+  const example = slug === undefined ? undefined : exampleBySlug(slug);
+  const editorOpen = activePedigreeId !== null || openExampleInfo !== null;
+  // Failed creates of an example's copy so far, which spaces out the retries.
+  const [copyRetries, setCopyRetries] = useState(0);
   const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeFields("isDirty", "pedigree", "notice", "setNotice", "undo");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") !== "false");
@@ -93,9 +104,21 @@ export default function CanvasPage() {
     return () => clearTimeout(timer);
   }, [notice]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Draw the example named by the URL; nothing is saved until it is edited.
+  useEffect(() => {
+    if (example) openExample(example);
+  }, [example]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The first edit saved the example's copy: the URL becomes its link.
+  useEffect(() => {
+    if (slug !== undefined && activePedigreeId) navigate(`/p/${activePedigreeId}`, { replace: true });
+  }, [slug, activePedigreeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load the pedigree identified by the URL param
   useEffect(() => {
     if (!id) return;
+    // Already in the editor: the example copy just created.
+    if (useAppStore.getState().activePedigreeId === id) return;
     setNotFound(false);
     openPedigree(id).catch((err: unknown) => {
       setNotFound(true);
@@ -137,11 +160,26 @@ export default function CanvasPage() {
   }, []);
 
   // Auto-save: debounce 2 s after the last mutation so changes survive a reload.
+  // An example's first edit saves the copy at once, so the link is the
+  // visitor's own from then on; a failed create keeps the edits and retries.
   useEffect(() => {
-    if (!isDirty || !activePedigreeId) return;
+    if (!isDirty) return;
+    if (!activePedigreeId) {
+      if (!openExampleInfo) return;
+      const timer = setTimeout(() => {
+        saveActivePedigree().then(
+          () => setCopyRetries(0),
+          err => {
+            setNotice({ kind: "error", text: `${requestErrorMessage(err, "Could not save your copy of the example. Check your connection.")} Your changes are kept here and saving will be tried again.` });
+            setCopyRetries(n => n + 1);
+          },
+        );
+      }, copyRetries ? 10_000 : 0);
+      return () => clearTimeout(timer);
+    }
     const timer = setTimeout(() => { saveActivePedigree().catch(() => {}); }, 2000);
     return () => clearTimeout(timer);
-  }, [pedigree]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pedigree, activePedigreeId, copyRetries]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load pedigree list for authenticated users
   useEffect(() => {
@@ -178,6 +216,8 @@ export default function CanvasPage() {
     await renamePedigree(editingId, trimmed);
     setEditingId(null);
   };
+
+  if (slug !== undefined && !example) return <Navigate to="/" replace />;
 
   if (notFound) {
     return (
@@ -269,8 +309,10 @@ export default function CanvasPage() {
           ) : (
             <div className="text-[10px] text-gray-400 leading-relaxed">
               <p className="mb-2">
-                This pedigree is saved at this URL and nowhere else. Bookmark it or copy the link to come back to it.
-                The home page also lists it under "Recent on this device" in this browser.
+                {openExampleInfo
+                  ? "This example is not saved. Change anything and it is saved as your own copy, at a new URL that you can bookmark or share."
+                  : <>This pedigree is saved at this URL and nowhere else. Bookmark it or copy the link to come back to it.
+                    The home page also lists it under "Recent on this device" in this browser.</>}
               </p>
               <p>
                 <span
@@ -333,7 +375,7 @@ export default function CanvasPage() {
             onClick={saveActivePedigree}
             disabled={!isDirty}
           >
-            {isDirty ? "Save" : "Saved"}
+            {isDirty ? "Save" : openExampleInfo ? "Not saved (example)" : "Saved"}
           </Button>
         </div>
       </div>
@@ -345,6 +387,12 @@ export default function CanvasPage() {
           onExportSvgClick={() => setExportDialogOpen(true)}
           onMenuClick={() => setSidebarOpen(open => !open)}
         />
+
+        {openExampleInfo && (
+          <div className="px-3 py-1 border-b bg-white text-[11px] text-gray-600" data-testid="example-notice">
+            Example. Your own copy is saved when you change something.
+          </div>
+        )}
 
         {/* Small screens: how to move around by touch, and that editing wants a bigger screen. */}
         {!smallNoticeDismissed && (
@@ -419,7 +467,7 @@ export default function CanvasPage() {
         }}
       />
 
-      {activePedigreeId && (
+      {editorOpen && (
         <ExportDialog
           open={exportDialogOpen}
           onOpenChange={setExportDialogOpen}
@@ -429,7 +477,7 @@ export default function CanvasPage() {
         />
       )}
 
-      {activePedigreeId && (
+      {editorOpen && (
         <TagsDialog open={tagsOpen} onOpenChange={setTagsOpen} />
       )}
 

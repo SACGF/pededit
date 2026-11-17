@@ -1,6 +1,7 @@
-import { defineConfig } from "vite";
+import { createServer, defineConfig } from "vite";
 import type { Plugin } from "vite";
 import { execFileSync } from "child_process";
+import { readFileSync, writeFileSync } from "fs";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { createRequire } from "module";
@@ -19,6 +20,16 @@ function isInstalled(pkg: string): boolean {
 const googleOAuthAlias = isInstalled("@react-oauth/google")
   ? {}
   : { "@react-oauth/google": path.resolve(__dirname, "./src/lib/google-oauth-noop.tsx") };
+
+const aliases = {
+  "@": path.resolve(__dirname, "./src"),
+  // The layout engine is read from source, so nothing here needs it
+  // built: its package.json points at dist/, which only exists in the
+  // published package (#22). Same alias in vitest.config.ts and
+  // tsconfig.app.json.
+  "@pedigree-editor/layout-engine": path.resolve(__dirname, "../layout-engine/src/index.ts"),
+  ...googleOAuthAlias,
+};
 
 /**
  * What code this dev server is serving, so agent page checks can tell when a
@@ -80,10 +91,108 @@ function errorReportingReleasePlugin(buildDate: string): Plugin {
   };
 }
 
+/**
+ * The JSON format reference and its schema, published at pededit.com/docs/
+ * so an assistant with only web access can read them (#200, linked from
+ * public/llms.txt). Copied from the repository's docs/, the one source,
+ * into the build, and served from there by the dev server.
+ */
+const PUBLISHED_DOCS: Record<string, { file: string; type: string }> = {
+  "docs/pedigree-json-format.md": { file: "pedigree-json-format.md", type: "text/markdown; charset=utf-8" },
+  "docs/pedigree-json-schema.json": { file: "pedigree-json-schema.json", type: "application/json" },
+};
+const DOCS_DIR = path.resolve(__dirname, "../docs");
+
+function publishedDocsPlugin(): Plugin {
+  return {
+    name: "pededit-published-docs",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const doc = PUBLISHED_DOCS[(req.url ?? "").split("?")[0].replace(/^\//, "")];
+        if (!doc) return next();
+        res.setHeader("Content-Type", doc.type);
+        res.end(readFileSync(path.join(DOCS_DIR, doc.file)));
+      });
+    },
+    generateBundle() {
+      for (const [fileName, doc] of Object.entries(PUBLISHED_DOCS)) {
+        this.emitFile({ type: "asset", fileName, source: readFileSync(path.join(DOCS_DIR, doc.file)) });
+      }
+    },
+  };
+}
+
+/** Where index.html takes the prerendered landing page. */
+const PRERENDER_MARKER = "<!--prerendered-landing-->";
+
+/**
+ * Search engines and assistants read the landing page as HTML (#25):
+ * after the build, render `src/prerender.tsx` through Vite's SSR loader
+ * and write it into dist/index.html in place of the marker. Nginx serves
+ * that file for every app route, so index.html hides it on any path but
+ * "/" until the app draws over it.
+ */
+function prerenderLandingPlugin(): Plugin {
+  let outDir = "";
+  return {
+    name: "pededit-prerender-landing",
+    apply: "build",
+    configResolved(config) {
+      outDir = path.resolve(config.root, config.build.outDir);
+    },
+    async closeBundle() {
+      const server = await createServer({
+        configFile: false,
+        root: __dirname,
+        logLevel: "error",
+        server: { middlewareMode: true, hmr: false },
+        appType: "custom",
+        // react-router-dom's ESM build is under "module-sync"; without it
+        // Vite takes the CommonJS build, which hides its named exports.
+        ssr: { resolve: { externalConditions: ["module-sync"] } },
+        optimizeDeps: { noDiscovery: true, entries: [] },
+        // Its own cache: sharing node_modules/.vite would invalidate the
+        // dependencies of a dev server running from the same checkout.
+        cacheDir: "node_modules/.vite-prerender",
+        plugins: [react()],
+        define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(BUILD_DATE) },
+        resolve: { alias: aliases },
+      });
+      // The page is drawn for a first visit: no sign-in tokens, nothing recent.
+      const hadStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+      const memory = new Map<string, string>();
+      Object.defineProperty(globalThis, "localStorage", {
+        configurable: true,
+        value: {
+          getItem: (k: string) => memory.get(k) ?? null,
+          setItem: (k: string, v: string) => { memory.set(k, String(v)); },
+          removeItem: (k: string) => { memory.delete(k); },
+          clear: () => memory.clear(),
+          key: (i: number) => [...memory.keys()][i] ?? null,
+          get length() { return memory.size; },
+        },
+      });
+      try {
+        const { renderLanding } = await server.ssrLoadModule("/src/prerender.tsx");
+        const html = renderLanding() as string;
+        if (!html.includes("No account required")) throw new Error("prerendered landing page is missing its text");
+        const file = path.join(outDir, "index.html");
+        const page = readFileSync(file, "utf8");
+        if (!page.includes(PRERENDER_MARKER)) throw new Error(`index.html has no ${PRERENDER_MARKER}`);
+        writeFileSync(file, page.replace(PRERENDER_MARKER, `<div data-prerendered>${html}</div>`));
+      } finally {
+        if (hadStorage) Object.defineProperty(globalThis, "localStorage", hadStorage);
+        else delete (globalThis as { localStorage?: unknown }).localStorage;
+        await server.close();
+      }
+    },
+  };
+}
+
 const BUILD_DATE = new Date().toISOString();
 
 export default defineConfig({
-  plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE)],
+  plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE), publishedDocsPlugin(), prerenderLandingPlugin()],
   // Source maps are published beside the scripts (#49). The code is public
   // anyway, browsers fetch them only with developer tools open, and Rollbar
   // downloads them from the site (each report sets source_map_enabled) to
@@ -93,17 +202,7 @@ export default defineConfig({
   // Shown as "Last deployed" in the footer and on /changelog (#79). Production
   // builds run in deploy.sh, so build time is deploy time.
   define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(BUILD_DATE) },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      // The layout engine is read from source, so nothing here needs it
-      // built: its package.json points at dist/, which only exists in the
-      // published package (#22). Same alias in vitest.config.ts and
-      // tsconfig.app.json.
-      "@pedigree-editor/layout-engine": path.resolve(__dirname, "../layout-engine/src/index.ts"),
-      ...googleOAuthAlias,
-    },
-  },
+  resolve: { alias: aliases },
   optimizeDeps: {
     include: ["quadprog"],
   },

@@ -45,7 +45,10 @@ Deployment" half).
   change to `pededit-nginx.conf` is merged into it by hand, never copied over
   it.
 - `pededit-nginx.conf` — serves the Vite build, proxies `/api/` and `/admin/`
-  to Gunicorn, serves `/djstatic/`.
+  to Gunicorn, serves `/djstatic/`. `/llms.txt` and `/docs/` (#200) have
+  their own locations: a 404 instead of the app for a missing file, and
+  `.md` as `text/markdown`, which Nginx's mime.types lacks. They were added
+  after the installed vhost, so merge them in by hand.
 - `pededit.json.example` — template for the config file.
 - The landing page tells users what the server keeps (#178, `YourData` in
   `frontend/src/pages/LandingPage.tsx`): request logs with the time, the

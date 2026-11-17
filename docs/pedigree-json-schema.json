@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://pededit.com/schema/pedigree-json-v1.json",
+  "$id": "https://pededit.com/docs/pedigree-json-schema.json",
   "title": "PedEdit pedigree JSON document",
   "description": "Lossless JSON export of a PedEdit pedigree. The document root is the envelope; the importer also accepts a bare Pedigree object. See docs/pedigree-json-format.md.",
   "type": "object",
