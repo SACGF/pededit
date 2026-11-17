@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="442" height="659"
+     viewBox="0 0 442 659">
+<defs>
+  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+  </marker>
+</defs>
+<rect width="442" height="659" fill="white"/>
+<text class="chart-title" x="221" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Breast and ovarian cancer</text>
+<g transform="translate(294 -11.1)">
+<path d="M -40 147 L 40 147" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="0" y1="147" x2="0" y2="220" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -175 220 L 37 220" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-175" y1="220" x2="-175" y2="232" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-37" y1="220" x2="-37" y2="232" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="37" y1="220" x2="37" y2="232" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -117 252 L -37 252" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-77" y1="252" x2="-77" y2="325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -106 325 L -48 325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-106" y1="325" x2="-106" y2="337" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-48" y1="325" x2="-48" y2="337" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -186 357 L -106 357" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-146" y1="357" x2="-146" y2="430" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -175 430 L -117 430" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-175" y1="430" x2="-175" y2="442" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-117" y1="430" x2="-117" y2="442" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<g data-id="mgf" transform="translate(-40 147) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 80y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="mgm" transform="translate(40 147) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 52y</text><text x="0" y="46" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 50y</text><clipPath id="symbol-clip-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#d62728" clip-path="url(#symbol-clip-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="uncle" transform="translate(37 252) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">68y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="father" transform="translate(-117 252) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">72y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="mother" transform="translate(-37 252) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 61y</text><text x="0" y="46" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 41y</text><text x="0" y="59" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 58y</text><clipPath id="symbol-clip-4"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-4)"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#d62728" clip-path="url(#symbol-clip-4)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="sister" transform="translate(-48 357) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">35y</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="partner" transform="translate(-186 357) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">40y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="sarah" transform="translate(-106 357) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sarah</text><text x="0" y="46" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">38y</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/></g>
+<g data-id="son2" transform="translate(-117 462) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">8y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="son1" transform="translate(-175 462) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">10y</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="aunt" transform="translate(-175 252) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">70y</text><text x="0" y="46" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 47y</text><clipPath id="symbol-clip-10"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-10)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/></g>
+<g class="consanguinity-labels">
+</g>
+</g>
+<g class="pedigree-key" transform="translate(0 539)">
+<rect x="40" y="2" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="-1" x2="59" y2="21" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
+<line x1="47.2" y1="30.8" x2="52.46" y2="25.54" stroke="black" stroke-width="1.5"/><polygon points="56,22 54.23,27.3 50.7,23.77" fill="black"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Consultand (seeking counselling)</text>
+<clipPath id="legend-clip-bc"><rect x="40" y="42" width="16" height="16"/></clipPath><rect x="40" y="42" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 50 L 48 66 A 16 16 0 0 1 48 34 Z" fill="#1f77b4" clip-path="url(#legend-clip-bc)"/><rect x="40" y="42" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Breast cancer</text>
+<clipPath id="legend-clip-oc"><rect x="40" y="62" width="16" height="16"/></clipPath><rect x="40" y="62" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 70 L 48 54 A 16 16 0 0 1 48 86 Z" fill="#d62728" clip-path="url(#legend-clip-oc)"/><rect x="40" y="62" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Ovarian cancer</text>
+</g>
+</svg>

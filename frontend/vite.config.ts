@@ -1,7 +1,7 @@
 import { createServer, defineConfig } from "vite";
 import type { Plugin } from "vite";
 import { execFileSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { createRequire } from "module";
@@ -122,20 +122,18 @@ function publishedDocsPlugin(): Plugin {
   };
 }
 
-/** Where index.html takes the prerendered landing page. */
-const PRERENDER_MARKER = "<!--prerendered-landing-->";
-
 /**
- * Search engines and assistants read the landing page as HTML (#25):
- * after the build, render `src/prerender.tsx` through Vite's SSR loader
- * and write it into dist/index.html in place of the marker. Nginx serves
- * that file for every app route, so index.html hides it on any path but
- * "/" until the app draws over it.
+ * Search engines and assistants read the landing page and the guides as
+ * HTML (#25, #202): after the build, load `src/prerender.tsx` through Vite's
+ * SSR loader and write each of its `PRERENDERED_PAGES` into dist/, from
+ * the built index.html. Nginx serves dist/index.html for every other app
+ * route, so index.html hides the static page on any path but its own until
+ * the app draws over it.
  */
-function prerenderLandingPlugin(): Plugin {
+function prerenderPlugin(): Plugin {
   let outDir = "";
   return {
-    name: "pededit-prerender-landing",
+    name: "pededit-prerender",
     apply: "build",
     configResolved(config) {
       outDir = path.resolve(config.root, config.build.outDir);
@@ -158,7 +156,7 @@ function prerenderLandingPlugin(): Plugin {
         define: { __PEDEDIT_BUILD_DATE__: JSON.stringify(BUILD_DATE) },
         resolve: { alias: aliases },
       });
-      // The page is drawn for a first visit: no sign-in tokens, nothing recent.
+      // The pages are drawn for a first visit: no sign-in tokens, nothing recent.
       const hadStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
       const memory = new Map<string, string>();
       Object.defineProperty(globalThis, "localStorage", {
@@ -173,13 +171,15 @@ function prerenderLandingPlugin(): Plugin {
         },
       });
       try {
-        const { renderLanding } = await server.ssrLoadModule("/src/prerender.tsx");
-        const html = renderLanding() as string;
-        if (!html.includes("No account required")) throw new Error("prerendered landing page is missing its text");
-        const file = path.join(outDir, "index.html");
-        const page = readFileSync(file, "utf8");
-        if (!page.includes(PRERENDER_MARKER)) throw new Error(`index.html has no ${PRERENDER_MARKER}`);
-        writeFileSync(file, page.replace(PRERENDER_MARKER, `<div data-prerendered>${html}</div>`));
+        const { PRERENDERED_PAGES, renderPage, pageHtml } = await server.ssrLoadModule("/src/prerender.tsx");
+        const template = readFileSync(path.join(outDir, "index.html"), "utf8");
+        for (const page of PRERENDERED_PAGES as { path: string; file: string; mustContain: string }[]) {
+          const html = renderPage(page.path) as string;
+          if (!html.includes(page.mustContain)) throw new Error(`prerendered ${page.path} is missing its text`);
+          const file = path.join(outDir, page.file);
+          mkdirSync(path.dirname(file), { recursive: true });
+          writeFileSync(file, pageHtml(template, page, html) as string);
+        }
       } finally {
         if (hadStorage) Object.defineProperty(globalThis, "localStorage", hadStorage);
         else delete (globalThis as { localStorage?: unknown }).localStorage;
@@ -192,7 +192,7 @@ function prerenderLandingPlugin(): Plugin {
 const BUILD_DATE = new Date().toISOString();
 
 export default defineConfig({
-  plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE), publishedDocsPlugin(), prerenderLandingPlugin()],
+  plugins: [react(), servedCommitPlugin(), errorReportingReleasePlugin(BUILD_DATE), publishedDocsPlugin(), prerenderPlugin()],
   // Source maps are published beside the scripts (#49). The code is public
   // anyway, browsers fetch them only with developer tools open, and Rollbar
   // downloads them from the site (each report sets source_map_enabled) to

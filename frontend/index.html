@@ -20,13 +20,13 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="https://pededit.com/" />
-    <!-- The static landing page is in every route's HTML; show it only on "/" until the app draws. -->
+    <!-- The static page is in every route's HTML; show it only on its own path until the app draws. The build writes each page's path here. -->
     <script>if (location.pathname !== "/") document.documentElement.setAttribute("data-app-route", "");</script>
     <style>[data-app-route] [data-prerendered] { display: none; }</style>
   </head>
   <body>
     <div id="root">
-      <!-- The build writes the landing page here as static HTML (#25, prerenderLandingPlugin in vite.config.ts). The app draws over it. -->
+      <!-- The build writes the landing page, or a guide in its own file, here as static HTML (#25, #202, prerenderPlugin in vite.config.ts). The app draws over it. -->
       <!--prerendered-landing-->
       <noscript>
         <p class="px-8 pb-4 text-center text-xs text-gray-500">PedEdit needs JavaScript to run. Source code: <a href="https://github.com/SACGF/pededit">github.com/SACGF/pededit</a></p>

@@ -41,6 +41,10 @@ describe("example slugs (#150)", () => {
       "targaryen": "House Targaryen",
       "buendia": "The Buendías",
       "atreides": "House Atreides",
+      "practice-breast-ovarian-cancer": "Breast and ovarian cancer",
+      "practice-cystic-fibrosis": "Cystic fibrosis, first cousin parents",
+      "practice-duchenne": "Duchenne muscular dystrophy",
+      "practice-twins-and-pregnancies": "Twins, a pregnancy and a loss",
     });
   });
 

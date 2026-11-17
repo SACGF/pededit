@@ -49,6 +49,10 @@ Deployment" half).
   their own locations: a 404 instead of the app for a missing file, and
   `.md` as `text/markdown`, which Nginx's mime.types lacks. They were added
   after the installed vhost, so merge them in by hand.
+  The `location /` `try_files` has `$uri.html` (#202), which serves the
+  prerendered guides (`/guides/<slug>` from `dist/guides/<slug>.html`);
+  without it they still work, as the app, but crawlers get the landing page
+  HTML. Merge that by hand too.
 - `pededit.json.example` — template for the config file.
 - The landing page tells users what the server keeps (#178, `YourData` in
   `frontend/src/pages/LandingPage.tsx`): request logs with the time, the

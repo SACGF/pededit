@@ -20,6 +20,13 @@ Family histories are health information. Leave out names, dates of birth and oth
 - [PedEdit JSON format](https://pededit.com/docs/pedigree-json-format.md): every field of the pedigree data model, with the envelope a downloaded file uses
 - [PedEdit JSON schema](https://pededit.com/docs/pedigree-json-schema.json): JSON Schema (draft 2020-12) for the same format
 
+## Guides
+
+- [Pedigree symbols cheat sheet](https://pededit.com/guides/pedigree-symbols): the NSGC 2022 symbols and lines, with the 2008 forms where they differ
+- [How to draw a pedigree](https://pededit.com/guides/how-to-draw-a-pedigree): a three-generation pedigree step by step
+- [Consanguinity in a pedigree](https://pededit.com/guides/consanguinity): the double line, and kinship and inbreeding coefficients for common relationships
+- [Practice families for teaching](https://pededit.com/guides/practice-families): family histories to draw, with the answers
+
 ## Examples
 
 Each link opens a built-in example in the editor. Nothing is saved until it is changed, and then it is saved as the visitor's own copy.
@@ -29,6 +36,7 @@ Each link opens a built-in example in the editor. Nothing is saved until it is c
 - [Assisted reproduction](https://pededit.com/example/assisted-reproduction)
 - [Queen Victoria, haemophilia B](https://pededit.com/example/queen-victoria)
 - [Spanish Habsburgs](https://pededit.com/example/habsburgs)
+- [Practice: cystic fibrosis, first cousin parents](https://pededit.com/example/practice-cystic-fibrosis)
 
 ## Optional
 

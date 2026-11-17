@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://pededit.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://pededit.com/guides</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pededit.com/guides/pedigree-symbols</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pededit.com/guides/how-to-draw-a-pedigree</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pededit.com/guides/consanguinity</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://pededit.com/guides/practice-families</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://pededit.com/llms.txt</loc><changefreq>monthly</changefreq></url>
   <url><loc>https://pededit.com/docs/pedigree-json-format.md</loc><changefreq>monthly</changefreq></url>
   <url><loc>https://pededit.com/docs/pedigree-json-schema.json</loc><changefreq>monthly</changefreq></url>

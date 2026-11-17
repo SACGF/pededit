@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { DeleteAccountDialog } from "../components/DeleteAccountDialog";
 import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
+import { GUIDES, guidePath } from "../guides/guides";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
 import { GOOGLE_CLIENT_ID } from "../config";
@@ -189,6 +190,20 @@ export default function LandingPage() {
             ))}
           </div>
 
+          {/* Guides (#202) */}
+          <div className="mt-6" data-testid="guides">
+            <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+              Guides
+            </p>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+              {GUIDES.map(g => (
+                <li key={g.slug}>
+                  <Link to={guidePath(g.slug)} className="text-xs text-black underline underline-offset-2">{g.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* My pedigrees (authenticated) */}
           {isAuthenticated && <MyPedigrees />}
 
@@ -207,6 +222,8 @@ export default function LandingPage() {
         >
           GitHub
         </a>
+        <span className="mx-2 text-gray-300">·</span>
+        <Link to="/guides" className="hover:text-gray-600 transition-colors">Guides</Link>
         <span className="mx-2 text-gray-300">·</span>
         <Link to="/changelog" className="hover:text-gray-600 transition-colors" title="Changelog">
           {BUILD_DATE ? `Updated ${formatDate(BUILD_DATE)}` : "Changelog"}

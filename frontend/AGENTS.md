@@ -220,18 +220,33 @@ reporting is off, and the dev server never reports.
   `public/robots.txt` still disallows `/example/`. The landing page's
   examples are `<Link>`s to the same URLs. An unknown slug goes to the
   landing page.
-- Prerendered landing page (#25): after `vite build`,
-  `prerenderLandingPlugin` (vite.config.ts) loads `src/prerender.tsx`
-  through a Vite SSR server with a memory `localStorage` and writes the
-  page, as a signed-out first visit sees it, into `dist/index.html` at the
-  `<!--prerendered-landing-->` marker. It is not hydrated: `main.tsx`'s
-  `createRoot` replaces it. Nginx serves that file for every route, so an
-  inline script in `index.html` hides `[data-prerendered]` on any path but
-  `/`. Anything the landing page reads while rendering must work without a
-  browser (`window` is undefined there; `YourData` says "this site" for the
-  host); `src/__tests__/prerender.test.ts` checks it, since CI does not
-  build. The SSR server has its own `cacheDir`, or a build would invalidate
-  a running dev server's dependencies.
+- Prerendered pages (#25, #202): after `vite build`, `prerenderPlugin`
+  (vite.config.ts) loads `src/prerender.tsx` through a Vite SSR server
+  with a memory `localStorage` and writes each of its `PRERENDERED_PAGES`,
+  as a signed-out first visit sees it, from the built `index.html` at the
+  `<!--prerendered-landing-->` marker: the landing page into
+  `dist/index.html`, the guides into `dist/guides.html` and
+  `dist/guides/<slug>.html` with their own title, description and canonical
+  link (`pageHtml`). Nginx tries `$uri.html`, so `/guides/consanguinity`
+  gets its file. They are not hydrated: `main.tsx`'s `createRoot` replaces
+  them. Nginx serves `index.html` for every other route, so an inline
+  script hides `[data-prerendered]` on any path but the page's own.
+  Anything these pages read while rendering must work without a browser
+  (`window` is undefined there; `YourData` says "this site" for the host);
+  `src/__tests__/prerender.test.ts` checks it, since CI does not build. The
+  SSR server has its own `cacheDir`, or a build would invalidate a running
+  dev server's dependencies.
+- Guides (#202): `/guides` and `/guides/<slug>` (`pages/GuidePage.tsx`,
+  the text in `src/guides/`, slugs in `guides/guides.ts`). Every figure is
+  a hand-written pedigree drawn by `exportSvg` with `key: false` and shown
+  as an `<img>` data URL (`GuideFigure`): inline SVGs would share ids for
+  patterns and clip paths. The consanguinity table is computed by
+  `kinshipCoefficients`, so it cannot drift from what the editor shows. The
+  practice families (`data/practiceFamilies.ts`) are also examples, in the
+  "Practice" group. A new guide goes in `GUIDES`, `GuidePage`'s `BODIES`,
+  `public/sitemap.xml` and `public/llms.txt`. The text had a clinical read
+  only where the issue says so; change symbol descriptions together with
+  `claude/nsgc_nomenclature.md`.
 - `public/llms.txt` and `/docs/` (#200): the JSON format reference and
   schema are copied from the repository's `docs/` into the build by
   `publishedDocsPlugin` (and served by the dev server), so `docs/` stays the

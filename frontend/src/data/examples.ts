@@ -1,5 +1,6 @@
 import type { Pedigree, Individual, Partnership, Sex, Tag } from "@pedigree-editor/layout-engine";
 import { withCurrentNotation } from "../pedigree/notation";
+import { PRACTICE_FAMILIES } from "./practiceFamilies";
 
 export interface ExamplePedigree {
   /**
@@ -10,7 +11,7 @@ export interface ExamplePedigree {
   label: string;
   description: string;
   /** Heading in the example picker. Entries without a group come first, under no heading. */
-  group?: "Historic" | "Classic" | "Fiction";
+  group?: "Historic" | "Classic" | "Fiction" | "Practice";
   /** Primary source, shown under the description. */
   citation?: string;
   data: Pedigree;
@@ -511,6 +512,8 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
     },
   },
   ...historicAndClassicExamples(),
+  // Invented families to draw from a history, told on /guides/practice-families.
+  ...PRACTICE_FAMILIES.map(({ slug, label, description, data }): ExamplePedigree => ({ slug, label, description, group: "Practice", data })),
 ];
 
 /**

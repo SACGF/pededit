@@ -280,7 +280,8 @@ const EXAMPLE_FIXTURES: Record<string, string> = {
 };
 
 describe("in-app historic and classic examples", () => {
-  const grouped = EXAMPLES.filter(e => e.group);
+  // The practice families (#202) are written in code, not converted from a PED file.
+  const grouped = EXAMPLES.filter(e => e.group && e.group !== "Practice");
 
   it("every grouped example has a PED fixture", () => {
     expect(grouped.map(e => e.label).sort()).toEqual(Object.keys(EXAMPLE_FIXTURES).sort());

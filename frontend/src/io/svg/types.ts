@@ -35,6 +35,12 @@ export interface SvgExportOptions {
    */
   compact?: boolean;
 
+  /**
+   * Draw the key under the chart. Default: true. The guide pages' figures
+   * (`src/guides/`) leave it out, as their text says what each symbol is.
+   */
+  key?: boolean;
+
   /** Render as U-shape (horseshoe) layout instead of standard top-down. */
   uShape?: boolean;
 

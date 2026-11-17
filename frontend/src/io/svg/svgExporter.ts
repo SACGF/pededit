@@ -108,7 +108,7 @@ function computeBounds(
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
-  const legend = renderExportKeySvg(pedigree, 0, 0, { duplicates });
+  const legend = options.key === false ? { width: 0, height: 0 } : renderExportKeySvg(pedigree, 0, 0, { duplicates });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
 
   // A title wider than the drawing widens the figure; the drawing is then
@@ -347,7 +347,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;
-  const legend = renderExportKeySvg(working, padding, 0, { duplicates });
+  const legend = options.key === false ? { height: 0, markup: [] } : renderExportKeySvg(working, padding, 0, { duplicates });
   if (legend.height > 0) {
     lines.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`);
     lines.push(...legend.markup);
