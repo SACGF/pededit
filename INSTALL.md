@@ -446,7 +446,7 @@ That is not part of `deploy.sh`. Backend stack traces need nothing: Python sends
 
 ## 13. Database backups
 
-Pedigrees are family health data on one server. `deploy/backup.sh` dumps the database every night, keeps a rolling set, and copies it off the server.
+Pedigrees are family health data on one server. `deploy/backup.sh` dumps the database every night, keeps a week of dumps, and copies them off the server.
 
 ### Install
 
@@ -481,7 +481,7 @@ Set one or both of:
 - `BACKUP_RCLONE_DEST` for object storage (S3, Backblaze B2 and others): `sudo apt install rclone`, create a bucket and a key that can only write to it, run `sudo RCLONE_CONFIG=/etc/pededit/rclone.conf rclone config`, then `sudo chown root:pededit /etc/pededit/rclone.conf && sudo chmod 640 /etc/pededit/rclone.conf` and set `RCLONE_CONFIG` in `backup.env` as the example shows.
 - `BACKUP_RSYNC_DEST` for a second host over ssh. Make a key for it (`sudo ssh-keygen -t ed25519 -N '' -f /etc/pededit/backup_ssh_key`, then `sudo chown pededit /etc/pededit/backup_ssh_key`), add the `.pub` to the backup account on the other host, and record that host's key: `sudo -u pededit mkdir -p -m 700 ~pededit/.ssh && ssh-keyscan backup.example.org | sudo -u pededit tee -a ~pededit/.ssh/known_hosts`.
 
-Both mirror the kept dumps, so the copies follow the same retention as the server. Only files named `pededit-*.dump*` are touched at the destination, and a run that would delete more than 10 of them there stops instead (a sign the local set has gone missing). For protection against a compromised server deleting its own backups, turn on versioning or object lock on the bucket; then the bucket's own expiry rule decides how long a deleted pedigree stays in it.
+Both mirror the kept dumps, so the copies follow the same retention as the server. Only files named `pededit-*.dump*` are touched at the destination, and a mirror that would delete more than 10 of them there stops instead (a sign the local set has gone missing). For protection against a compromised server deleting its own backups, turn on versioning or object lock on the bucket; then the bucket's own expiry rule decides how long a deleted pedigree stays in it, and it must be no longer than `BACKUP_MAX_AGE_DAYS`, since the site tells users that number.
 
 **Encrypt what leaves the server.** The copies are family health data in someone else's storage. Make a GnuPG key pair on your own machine, not on the server, and put only the public key on the server:
 
@@ -500,13 +500,12 @@ Then run it and look: `sudo systemctl start pededit-backup; sudo journalctl -u p
 
 ### What is kept, and for how long
 
-- The newest dump of each of the last 14 days that have one.
-- The newest dump of each of the last 8 calendar weeks that have one.
-- The newest 5 pre-deploy dumps, none older than 14 days.
+- The newest dump of each day, for at most `BACKUP_MAX_AGE_DAYS` (default 7).
+- The newest 5 pre-deploy dumps (`BACKUP_KEEP_PREDEPLOY`), under the same limit.
 
-Change the numbers with `BACKUP_KEEP_DAILY`, `BACKUP_KEEP_WEEKLY` and `BACKUP_KEEP_PREDEPLOY` in `backup.env`.
+**This is also how long deleted data lives on, and the site says so.** A pedigree or account that a user deletes is removed from the database at once, but it stays in every dump taken while it existed, on the server and in the off-box copies, until those dumps are deleted. Nothing removes one pedigree from a dump. The landing page and the Delete account dialog tell users that backups are deleted within `BACKUP_MAX_AGE_DAYS` days and are never used to bring back a deleted pedigree or account: `deploy.sh` builds that number into the page while `pededit-backup.timer` is enabled, so after enabling the timer or changing the number, deploy again. Each run deletes dumps past the limit before it takes a new one, so even a run whose dump fails keeps the promise; after a week of failures there is no backup left, which is what `BACKUP_PING_URL` above is for.
 
-**This is also how long deleted data lives on.** A pedigree that a user deletes is removed from the database at once, but it stays in every dump taken while it existed, on the server and in the off-box copies, until those dumps are pruned: up to 8 weeks with the defaults. Nothing removes one pedigree from a dump. Say so wherever the site describes what happens to deleted data, and if you shorten or lengthen the retention, change that statement with it. If the nightly run stops, nothing is pruned either, so old dumps stay until it runs again.
+If you are moving from the older settings (`BACKUP_KEEP_DAILY`, `BACKUP_KEEP_WEEKLY`, no longer read), the first run deletes the weekly dumps off the box too, which can be more than the 10-file safety limit. Run it once by hand with a higher limit: `sudo -u pededit env BACKUP_MAX_REMOTE_DELETE=30 bash /opt/pededit/deploy/backup.sh`.
 
 ### Test the restore
 

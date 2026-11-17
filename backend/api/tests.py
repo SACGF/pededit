@@ -297,15 +297,85 @@ class TagPresetTests(APITestCase):
         self.assertEqual(resp.status_code, 400)
 
 
+class DeleteAccountTests(APITestCase):
+    """DELETE /api/auth/me/ (#183), stated on the landing page ("Signing in", `YourData`)."""
+
+    DATA = {"individuals": [], "partnerships": [], "parentOf": {}}
+
+    def setUp(self):
+        self.user = User.objects.create_user("leaver@example.com", email="leaver@example.com", first_name="Lee")
+        self.other = User.objects.create_user("stayer@example.com", email="stayer@example.com")
+
+    def _token(self, user):
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        return RefreshToken.for_user(user)
+
+    def test_deletes_the_account_its_pedigrees_and_library_only(self):
+        mine = Pedigree.objects.create(owner=self.user, title="Mine", data=self.DATA)
+        theirs = Pedigree.objects.create(owner=self.other, title="Theirs", data=self.DATA)
+        anonymous = Pedigree.objects.create(owner=None, title="Anon", data=self.DATA)
+        TagPreset.objects.create(owner=self.user, label="Mine", color="#000", style="dot")
+        TagPreset.objects.create(owner=self.other, label="Theirs", color="#000", style="dot")
+
+        self.client.force_authenticate(self.user)
+        self.assertEqual(self.client.delete("/api/auth/me/").status_code, 204)
+
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        self.assertFalse(User.objects.filter(email="leaver@example.com").exists())
+        self.assertFalse(Pedigree.objects.filter(pk=mine.pk).exists())
+        self.assertFalse(TagPreset.objects.filter(label="Mine").exists())
+        # Nobody else's data, and no anonymous pedigree, is touched.
+        self.assertTrue(Pedigree.objects.filter(pk=theirs.pk).exists())
+        self.assertTrue(Pedigree.objects.filter(pk=anonymous.pk).exists())
+        self.assertTrue(TagPreset.objects.filter(label="Theirs").exists())
+
+    def test_needs_sign_in(self):
+        self.assertEqual(self.client.delete("/api/auth/me/").status_code, 401)
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_tokens_stop_working(self):
+        refresh = self._token(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        self.assertEqual(self.client.delete("/api/auth/me/").status_code, 204)
+        self.assertEqual(self.client.get("/api/auth/me/").status_code, 401)
+        self.client.credentials()
+        resp = self.client.post("/api/auth/token/refresh/", {"refresh": str(refresh)}, format="json")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_signing_in_again_makes_a_new_empty_account(self):
+        Pedigree.objects.create(owner=self.user, title="Mine", data=self.DATA)
+        self.client.force_authenticate(self.user)
+        self.client.delete("/api/auth/me/")
+        again = User.objects.create_user("leaver@example.com", email="leaver@example.com")
+        self.client.force_authenticate(again)
+        self.assertEqual(self.client.get("/api/pedigrees/").data, [])
+
+    def test_refuses_an_admin_account(self):
+        admin = User.objects.create_user("admin@example.com", is_staff=True)
+        self.client.force_authenticate(admin)
+        self.assertEqual(self.client.delete("/api/auth/me/").status_code, 403)
+        self.assertTrue(User.objects.filter(pk=admin.pk).exists())
+
+
 class AgentTokenCommandTests(APITestCase):
-    def _mint(self):
+    def _mint(self, *args):
         import json
         from io import StringIO
         from django.core.management import call_command
 
         out = StringIO()
-        call_command("agent_token", stdout=out)
+        call_command("agent_token", *args, stdout=out)
         return json.loads(out.getvalue())
+
+    def test_throwaway_agent_is_a_separate_account(self):
+        from django.contrib.auth import get_user_model
+
+        tokens = self._mint("--throwaway")
+        self.assertEqual(tokens["username"], "claude_agent_throwaway")
+        self.assertFalse(get_user_model().objects.filter(username="claude_agent").exists())
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {tokens['access']}")
+        self.assertEqual(self.client.get("/api/auth/me/").json()["username"], "claude_agent_throwaway")
 
     def test_creates_passwordless_agent_and_tokens_work(self):
         from django.contrib.auth import get_user_model
@@ -468,6 +538,7 @@ class UsageStatsCommandTests(APITestCase):
         bob = User.objects.create_user("bob")
         User.objects.filter(pk=bob.pk).update(date_joined=timezone.now() - timedelta(days=30))
         agent = User.objects.create_user("claude_agent")
+        throwaway = User.objects.create_user("claude_agent_throwaway")
 
         self._pedigree(alice)                                         # created this week
         self._pedigree(bob, created_days_ago=30, updated_days_ago=2)  # old, edited this week
@@ -477,6 +548,7 @@ class UsageStatsCommandTests(APITestCase):
         self._pedigree(None, created_days_ago=20, updated_days_ago=1)
         self._pedigree(None, created_days_ago=20)
         self._pedigree(agent)                                         # ignored
+        self._pedigree(throwaway)                                     # ignored
 
         s = self._stats()
         self.assertEqual(s["days"], 7)

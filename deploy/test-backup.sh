@@ -73,15 +73,16 @@ for n in $(seq 1 70); do old_dump pededit-db "$NOW $n days ago"; done
 old_dump pededit-db "$NOW 2 days ago 1 hour ago"        # an earlier dump that day
 run
 check "nightly run succeeds" test $? -eq 0
-# 14 days: 16 Nov back to 3 Nov. Then the newest of each earlier ISO week
-# until 8 weeks are counted: Sundays 1 Nov, 25, 18, 11 and 4 Oct.
+# 7 days at most (#183): dumps 1 to 5 days old and today's. The one taken 6
+# days ago at this time is past the cut (6 days less an hour), so with the
+# nightly run no dump reaches 7 days.
 expected=""
-for n in 43 36 29 22 15 13 12 11 10 9 8 7 6 5 4 3 2 1; do
+for n in 5 4 3 2 1; do
     expected+="pededit-db-$(day "$n days ago")T023000Z.dump "
 done
 expected+="pededit-db-$(day "")T023000Z.dump "
-check "keeps 14 daily and 8 weekly, removes the rest" test "$(names "$DIR")" = "$expected"
-check "says what it kept" grep -q "retention: kept 19, removed 53" "$OUT"
+check "keeps the newest dump of each day under 7 days old, removes the rest" test "$(names "$DIR")" = "$expected"
+check "says what it kept" grep -q "retention: kept 5, removed 66" "$OUT"
 check "the new dump is the stub's 50000 bytes" test "$(stat -c %s "$DIR/pededit-db-$(day "")T023000Z.dump")" -eq 50000
 check "the password is not on the command line" grep -q "PGPASSWORD=s3cr@t args=--format=custom --compress=6 --file=" "$STUB_LOG.pg_dump"
 check "says the backup is local only" grep -q "LOCAL ONLY" "$OUT"
@@ -95,16 +96,38 @@ check "pre-deploy run succeeds" test $? -eq 0
 expected="pededit-db-$(day "1 day ago")T023000Z.dump "
 for n in 4 3 2 1; do expected+="pededit-predeploy-$(day "$n days ago")T023000Z.dump "; done
 expected+="pededit-predeploy-$(day "")T023000Z.dump "
-check "keeps 5 pre-deploy dumps, none older than 14 days, nightly ones untouched" test "$(names "$DIR")" = "$expected"
+check "keeps 5 pre-deploy dumps, none 7 days old" test "$(names "$DIR")" = "$expected"
 
-fresh "BACKUP_KEEP_DAILY=2" "BACKUP_KEEP_WEEKLY=1"
+fresh "BACKUP_MAX_AGE_DAYS=3" "BACKUP_KEEP_WEEKLY=8"
 for n in 1 2 3 9; do old_dump pededit-db "$NOW $n days ago"; done
+old_dump pededit-db "$NOW 2 days ago 50 minutes ago"     # the timer's random delay
 touch "$DIR/notes.txt"
 run
-check "retention settings are read, other files are left alone" test "$(names "$DIR")" = \
+check "the age limit is read, other files are left alone" test "$(names "$DIR")" = \
     "notes.txt pededit-db-$(day "1 day ago")T023000Z.dump pededit-db-$(day "")T023000Z.dump "
+check "an old retention setting is named as no longer read" grep -q "BACKUP_KEEP_DAILY and BACKUP_KEEP_WEEKLY .* are no longer read" "$OUT"
 
-# ── Failure paths: non-zero exit, nothing half-written, old dumps kept ───────
+fresh "BACKUP_MAX_AGE_DAYS=3"
+early=$(date -u -d "$NOW 2 days ago 30 minutes" +%Y%m%dT%H%M%SZ)   # 2 days less 30 minutes old
+late=$(date -u -d "$NOW 2 days ago 90 minutes" +%Y%m%dT%H%M%SZ)    # 2 days less 90 minutes old
+head -c 100 /dev/zero > "$DIR/pededit-db-$early.dump"
+head -c 100 /dev/zero > "$DIR/pededit-db-$late.dump"
+run
+check "a dump within an hour of N-1 days old goes, so the timer's delay cannot carry it to N days" bash -c \
+    "! ls '$DIR' | grep -q '$early' && ls '$DIR' | grep -q '$late'"
+
+fresh "BACKUP_MAX_AGE_DAYS=1"
+run; status=$?
+check "a limit under 2 days is refused" bash -c "test $status -ne 0 && grep -q 'must be a whole number of days, at least 2' '$OUT'"
+
+fresh "BACKUP_MAX_AGE_DAYS=10"
+check "--max-age-days prints the limit, with no database" bash -c \
+    "test \"\$(PEDEDIT_CONFIG=/nonexistent bash '$HERE/backup.sh' --max-age-days)\" = 10"
+fresh
+check "the default limit is 7 days" bash -c "test \"\$(bash '$HERE/backup.sh' --max-age-days)\" = 7"
+
+# ── Failure paths: non-zero exit, nothing half-written ───────────────────────
+# Dumps under the limit are kept; those past it are deleted even so (#183).
 failure() { # failure "name" "expected message" ENV=value...
     local name="$1" message="$2"; shift 2
     fresh
@@ -112,7 +135,7 @@ failure() { # failure "name" "expected message" ENV=value...
     env "$@" PEDEDIT_BACKUP_NOW="$(date -u -d "$NOW" +%s)" bash "$HERE/backup.sh" > "$OUT" 2>&1
     local status=$?
     if [[ $status -ne 0 ]] && grep -q "BACKUP FAILED: .*$message" "$OUT" \
-        && [[ $(find "$DIR" -name 'pededit-db-*' | wc -l) -eq 30 ]] \
+        && [[ $(find "$DIR" -name 'pededit-db-*' | wc -l) -eq 5 ]] \
         && [[ -z $(find "$DIR" -name '.tmp-*') ]]; then
         ok "$name"
     else
@@ -145,7 +168,7 @@ check "--check passes and writes nothing" bash -c "test $? -eq 0 && test -z \"\$
 # ── Off-box copy ─────────────────────────────────────────────────────────────
 if command -v rsync >/dev/null; then
     fresh "BACKUP_RSYNC_DEST=$WORK/remote"
-    for n in $(seq 1 20); do old_dump pededit-db "$NOW $n days ago"; done
+    for n in $(seq 1 10); do old_dump pededit-db "$NOW $n days ago"; done
     cp "$DIR"/pededit-db-* "$WORK/remote/"       # the remote as last night left it
     touch "$WORK/remote/someone-elses-file"
     run
@@ -157,15 +180,17 @@ if command -v rsync >/dev/null; then
     fresh "BACKUP_RSYNC_DEST=$WORK/remote/missing/deeper"
     run; status=$?
     check "a failed copy fails the run but keeps the local dump" bash -c \
-        "test $status -ne 0 && grep -q 'BACKUP FAILED: rsync could not mirror' '$OUT' && ls '$DIR' | grep -q pededit-db-"
+        "test $status -ne 0 && grep -q 'BACKUP FAILED: the off-box copy failed' '$OUT' && grep -q 'could not remove expired copies' '$OUT' && ls '$DIR' | grep -q pededit-db-"
 
     fresh "BACKUP_RSYNC_DEST=$WORK/remote" "BACKUP_MAX_REMOTE_DELETE=3"
     for n in $(seq 1 12); do old_dump pededit-db "$NOW $n days ago"; done
     cp "$DIR"/pededit-db-* "$WORK/remote/"
     rm "$DIR"/pededit-db-*                        # the local set vanished
     run; status=$?
+    # The cap is per mirror, and a run mirrors twice (before and after the
+    # dump): at most 3 + 3 of the 12 go.
     check "a mirror that would delete too much is refused" bash -c \
-        "test $status -ne 0 && test \$(ls '$WORK/remote' | wc -l) -ge 9"
+        "test $status -ne 0 && test \$(ls '$WORK/remote' | grep -c '^pededit-db-') -ge 6"
 else
     echo "skip  rsync is not installed"
 fi
@@ -176,7 +201,7 @@ check "rclone is asked to mirror the backup directory" bash -c \
     "test $? -eq 0 && grep -q '^sync $DIR b2:bucket/pededit --include /pededit-\*.dump\* --max-delete 10\$' '$STUB_LOG.rclone'"
 fresh "BACKUP_RCLONE_DEST=b2:bucket/pededit"
 STUB_RCLONE_FAILS=1 run; status=$?
-check "rclone failing fails the run" bash -c "test $status -ne 0 && grep -q 'BACKUP FAILED: rclone could not mirror' '$OUT'"
+check "rclone failing fails the run" bash -c "test $status -ne 0 && grep -q 'rclone could not mirror' '$OUT' && grep -q 'BACKUP FAILED: the off-box copy failed' '$OUT'"
 
 if command -v gpg >/dev/null && command -v rsync >/dev/null; then
     KEYS="$WORK/gnupg"; mkdir -m 700 "$KEYS"

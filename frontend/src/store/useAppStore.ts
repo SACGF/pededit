@@ -21,6 +21,12 @@ interface AppState {
   googleLogin: (credential: string) => Promise<void>;
   githubLogin: (code: string) => Promise<void>;
   logout: () => Promise<void>;
+  /**
+   * Delete the account on the server (#183): the server deletes its pedigrees
+   * and My library with it. Then forget those pedigrees in Recent on this
+   * device, since their links no longer work, and sign out.
+   */
+  deleteAccount: () => Promise<void>;
   fetchMe: () => Promise<void>;
   loadPedigrees: () => Promise<void>;
   openPedigree: (id: string) => Promise<void>;
@@ -99,6 +105,17 @@ export const useAppStore = create<AppState>()((set, get) => ({
     if (activePedigreeId && usePedigreeStore.getState().isDirty) {
       await get().saveActivePedigree();
     }
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    usePedigreeStore.getState().reset();
+    set({ user: null, isAuthenticated: false, pedigrees: [], activePedigreeId: null, activeTitle: null });
+  },
+
+  deleteAccount: async () => {
+    // Listed first: afterwards there is no account to ask.
+    const { data: owned } = await pedigreeApi.list();
+    await authApi.deleteAccount();
+    for (const p of owned) forgetRecentPedigree(p.id);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();

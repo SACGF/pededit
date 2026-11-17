@@ -4,7 +4,7 @@ Anonymous users have no identity on the server (the pedigree UUID is the only
 key), so they are counted through their pedigrees. Signed-in activity is the
 distinct owners of pedigrees created or edited in the window: social login
 issues JWTs without touching User.last_login, so last_login means nothing here.
-The claude_agent account used by the browser checks is left out.
+The claude_agent accounts used by the browser checks are left out.
 """
 import json
 from datetime import timedelta
@@ -14,15 +14,15 @@ from django.core.management.base import BaseCommand
 from django.db.models import F
 from django.utils import timezone
 
-from api.management.commands.agent_token import AGENT_USERNAME
+from api.management.commands.agent_token import AGENT_USERNAMES
 from api.models import Pedigree
 
 
 def usage_stats(days: int = 7) -> dict:
     User = get_user_model()
     since = timezone.now() - timedelta(days=days)
-    users = User.objects.exclude(username=AGENT_USERNAME)
-    pedigrees = Pedigree.objects.exclude(owner__username=AGENT_USERNAME)
+    users = User.objects.exclude(username__in=AGENT_USERNAMES)
+    pedigrees = Pedigree.objects.exclude(owner__username__in=AGENT_USERNAMES)
     owned = pedigrees.filter(owner__isnull=False)
     anon = pedigrees.filter(owner__isnull=True)
 

@@ -132,6 +132,9 @@ export const authApi = {
     apiClient.post<TokenPair>("/auth/github/", { code }),
 
   me: () => apiClient.get<UserInfo>("/auth/me/"),
+
+  /** Delete the signed-in account, its pedigrees and its My library (#183). */
+  deleteAccount: () => apiClient.delete("/auth/me/"),
 };
 
 export const pedigreeApi = {

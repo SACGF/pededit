@@ -90,8 +90,16 @@ marks those `accepted-unchecked` and #170 is the decision to refuse them.
   Change that text with any change to them.
 - There is no `api/admin.py`, so Django admin shows users only, not
   pedigrees. `Pedigree.data` is plain JSON in the database, readable by
-  whoever can read the database. Delete is a hard delete, and there is no
-  way to delete an account from the app.
+  whoever can read the database. Delete is a hard delete.
+- `DELETE /api/auth/me/` deletes the signed-in account (#183, `MeView`,
+  `DeleteAccountTests`). The cascade takes every pedigree it owns and its
+  My library. Owned pedigrees are deleted, not made anonymous: their links
+  never opened for anyone else, so making them anonymous would publish
+  them. Anonymous pedigrees belong to no account and stay. Staff and
+  superuser accounts are refused (delete those in Django admin).
+- simplejwt 5.5's refresh serializer calls `User.objects.get()` and turns a
+  deleted user into a 500, so `api/auth/token/refresh/` is our
+  `RefreshView`, which answers 401 instead.
 
 ## Auth
 

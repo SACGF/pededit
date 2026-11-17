@@ -17,3 +17,10 @@ export const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID ?? "";
  */
 export const ROLLBAR_ACCESS_TOKEN: string = import.meta.env.PROD ? (import.meta.env.VITE_ROLLBAR_ACCESS_TOKEN ?? "") : "";
 export const ROLLBAR_ENVIRONMENT: string = import.meta.env.VITE_ROLLBAR_ENVIRONMENT || "production";
+
+/**
+ * How long database backups are kept, in days (#48, #183), or 0 when the
+ * nightly backup is off. `deploy.sh` sets it from `backup.sh --max-age-days`
+ * only while `pededit-backup.timer` is enabled. Read by `backupStatement`.
+ */
+export const BACKUP_MAX_DAYS: number = Math.max(0, Math.floor(Number(import.meta.env.VITE_BACKUP_MAX_DAYS) || 0));

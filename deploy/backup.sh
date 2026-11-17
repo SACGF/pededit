@@ -5,15 +5,19 @@
 #   backup.sh              dump, prune, copy off the box
 #   backup.sh --predeploy  dump and prune only, kept apart from the nightly set
 #   backup.sh --check      check the setup, change nothing (deploy.sh preflight)
+#   backup.sh --max-age-days  print the retention limit in days (deploy.sh)
 #
 # What it does:
 #   1. pg_dump in custom format (compressed) to a temporary name, checks the
 #      dump is a readable archive of a plausible size that contains the
 #      pedigree table, then renames it into place. A half-written dump never
 #      has a final name.
-#   2. Retention: the newest dump of each of the last 14 days that have one
-#      and of each of the last 8 ISO weeks that have one. Pre-deploy dumps:
-#      the newest 5, none older than the daily window.
+#   2. Retention by age (#183): no dump is kept longer than
+#      BACKUP_MAX_AGE_DAYS (default 7), nightly or pre-deploy, here or off the
+#      box. The landing page states this limit to users, so it is a promise:
+#      a run deletes what is past it before it dumps, so a dump that fails
+#      every night still cannot keep an old one. Within the limit: the
+#      newest dump of each day, and the newest 5 pre-deploy dumps.
 #   3. Off-box copy: mirrors the kept set to an rclone remote and/or an
 #      rsync-over-ssh destination, encrypted first if a GnuPG public key is
 #      configured. With no destination it says so on every run: a backup on
@@ -36,7 +40,8 @@ case "${1:-}" in
     "") ;;
     --predeploy) MODE="predeploy" ;;
     --check) MODE="check" ;;
-    *) echo "usage: $0 [--predeploy | --check]" >&2; exit 2 ;;
+    --max-age-days) MODE="max-age" ;;
+    *) echo "usage: $0 [--predeploy | --check | --max-age-days]" >&2; exit 2 ;;
 esac
 
 fail() {
@@ -58,9 +63,14 @@ if [[ -e "$ENV_FILE" ]]; then
 fi
 
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/pededit}"
-BACKUP_KEEP_DAILY="${BACKUP_KEEP_DAILY:-14}"
-BACKUP_KEEP_WEEKLY="${BACKUP_KEEP_WEEKLY:-8}"
+BACKUP_MAX_AGE_DAYS="${BACKUP_MAX_AGE_DAYS:-7}"
 BACKUP_KEEP_PREDEPLOY="${BACKUP_KEEP_PREDEPLOY:-5}"
+[[ "$BACKUP_MAX_AGE_DAYS" =~ ^[0-9]+$ ]] && (( BACKUP_MAX_AGE_DAYS >= 2 )) \
+    || fail "BACKUP_MAX_AGE_DAYS is '$BACKUP_MAX_AGE_DAYS', must be a whole number of days, at least 2"
+if [[ -n "${BACKUP_KEEP_DAILY:-}${BACKUP_KEEP_WEEKLY:-}" ]]; then
+    echo "WARNING: BACKUP_KEEP_DAILY and BACKUP_KEEP_WEEKLY in $ENV_FILE are no longer read;" >&2
+    echo "WARNING: retention is BACKUP_MAX_AGE_DAYS ($BACKUP_MAX_AGE_DAYS days)." >&2
+fi
 # A dump of an empty PedEdit database (schema only) is about 30 kB. Anything
 # under this is a dump of nothing.
 BACKUP_MIN_BYTES="${BACKUP_MIN_BYTES:-20000}"
@@ -71,6 +81,7 @@ BACKUP_GPG_PUBLIC_KEY="${BACKUP_GPG_PUBLIC_KEY:-}"
 BACKUP_PING_URL="${BACKUP_PING_URL:-}"
 # A mirror run normally removes one or two old dumps. More than this in one
 # go means something is wrong locally, and the copies off the box are left.
+# It is per mirror, and a nightly run mirrors twice (before and after the dump).
 BACKUP_MAX_REMOTE_DELETE="${BACKUP_MAX_REMOTE_DELETE:-10}"
 
 DB_PATTERN='^pededit-db-[0-9]{8}T[0-9]{6}Z\.dump$'
@@ -186,34 +197,33 @@ stamp_of() {
     echo "${name##*-}"
 }
 
-prune() {
-    local name stamp day week keep days=0 weeks=0 kept=0 removed=0
-    local -A day_seen=() week_seen=()
+# Dumps older than this UTC stamp are past the limit. A day less than the
+# limit, less an hour for the timer's random delay: the nightly run then
+# deletes a dump about N-1 days after it was taken, and even with one night
+# missed it is gone before it is N days old.
+age_cutoff() {
+    date -u -d "@$(( $(now_epoch) - (BACKUP_MAX_AGE_DAYS - 1) * 86400 + 3600 ))" +%Y%m%dT%H%M%SZ
+}
 
+prune() {
+    local name stamp day cutoff kept=0 removed=0 count=0
+    local -A day_seen=()
+    cutoff=$(age_cutoff)
+
+    # Nightly dumps: the newest of each day, none past the limit.
     while read -r name; do
         [[ -n "$name" ]] || continue
         stamp=$(stamp_of "$name")
         day=${stamp:0:8}
-        week=$(date -u -d "${day:0:4}-${day:4:2}-${day:6:2}" +%G-%V)
-        keep=0
-        if [[ -z "${day_seen[$day]:-}" ]] && (( days < BACKUP_KEEP_DAILY )); then
-            day_seen[$day]=1; days=$((days + 1)); keep=1
-        fi
-        if [[ -z "${week_seen[$week]:-}" ]] && (( weeks < BACKUP_KEEP_WEEKLY )); then
-            week_seen[$week]=1; weeks=$((weeks + 1)); keep=1
-        fi
-        if (( keep )); then
-            kept=$((kept + 1))
+        if [[ -z "${day_seen[$day]:-}" && ! "$stamp" < "$cutoff" ]]; then
+            day_seen[$day]=1; kept=$((kept + 1))
         else
             rm -f "$BACKUP_DIR/$name"; removed=$((removed + 1))
         fi
     done < <(list_dumps "$DB_PATTERN")
 
-    # Pre-deploy dumps: a few recent ones for rolling a migration back. Never
-    # older than the daily window, so they do not stretch how long a deleted
-    # pedigree stays in a backup.
-    local count=0 cutoff
-    cutoff=$(date -u -d "@$(( $(now_epoch) - BACKUP_KEEP_DAILY * 86400 ))" +%Y%m%dT%H%M%SZ)
+    # Pre-deploy dumps: a few recent ones for rolling a migration back, under
+    # the same limit.
     while read -r name; do
         [[ -n "$name" ]] || continue
         count=$((count + 1))
@@ -256,6 +266,7 @@ encrypt_offsite() {
     done
 }
 
+# Returns non-zero when a mirror fails; the caller says what that means.
 copy_off_box() {
     local source="$BACKUP_DIR" what="unencrypted"
     if [[ -n "$BACKUP_GPG_PUBLIC_KEY" ]]; then
@@ -269,7 +280,7 @@ copy_off_box() {
     if [[ -n "$BACKUP_RCLONE_DEST" ]]; then
         rclone sync "$source" "$BACKUP_RCLONE_DEST" \
             --include '/pededit-*.dump*' --max-delete "$BACKUP_MAX_REMOTE_DELETE" \
-            || fail "rclone could not mirror to $BACKUP_RCLONE_DEST (the local dump was kept)"
+            || { echo "rclone could not mirror to $BACKUP_RCLONE_DEST" >&2; return 1; }
         echo "off-box: mirrored to $BACKUP_RCLONE_DEST with rclone ($what)"
     fi
     if [[ -n "$BACKUP_RSYNC_DEST" ]]; then
@@ -278,17 +289,22 @@ copy_off_box() {
         rsync --recursive --times --delete --max-delete="$BACKUP_MAX_REMOTE_DELETE" \
             --include='/pededit-*.dump*' --exclude='*' -e "$ssh" \
             "$source/" "$BACKUP_RSYNC_DEST/" \
-            || fail "rsync could not mirror to $BACKUP_RSYNC_DEST (the local dump was kept)"
+            || { echo "rsync could not mirror to $BACKUP_RSYNC_DEST" >&2; return 1; }
         echo "off-box: mirrored to $BACKUP_RSYNC_DEST with rsync ($what)"
     fi
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────
+if [[ "$MODE" == "max-age" ]]; then
+    echo "$BACKUP_MAX_AGE_DAYS"
+    exit 0
+fi
+
 load_database
 check_setup
 
 if [[ "$MODE" == "check" ]]; then
-    echo "backup setup looks right: $PGDATABASE to $BACKUP_DIR"
+    echo "backup setup looks right: $PGDATABASE to $BACKUP_DIR, kept at most $BACKUP_MAX_AGE_DAYS days"
     has_destination || warn_local_only
     exit 0
 fi
@@ -296,6 +312,13 @@ fi
 # One run at a time: the nightly timer and a deploy can meet.
 exec 9>"$BACKUP_DIR/.lock"
 flock --wait 600 9 || fail "another backup has held $BACKUP_DIR/.lock for 10 minutes"
+
+# Past the limit goes first, here and off the box, so a dump that fails
+# cannot leave an old one behind (the promise on the landing page).
+prune
+if [[ "$MODE" == "nightly" ]] && has_destination && ! copy_off_box; then
+    echo "WARNING: could not remove expired copies off the box yet; trying again after the dump" >&2
+fi
 
 if [[ "$MODE" == "predeploy" ]]; then
     dump "pededit-predeploy"
@@ -307,7 +330,7 @@ fi
 dump "pededit-db"
 prune
 if has_destination; then
-    copy_off_box
+    copy_off_box || fail "the off-box copy failed (the local dump was kept)"
 else
     warn_local_only
 fi

@@ -270,6 +270,7 @@ the flow. They run in CI.
 | `error-reporting-off` | with no Rollbar token, an uncaught error sends no request off the site and loads no reporter (#49) |
 | `rejected-token` | a sign-in token the server rejects: one refresh, then signed out on the same page, and a pedigree's link still opens (#191) |
 | `rate-limited` | spends a test address's anonymous-create allowance, then the landing page, an example link and GitHub sign-in say how long to wait (#184) |
+| `delete-account` | as `claude_agent_throwaway`: Delete account counts what goes, Cancel, then the account, its pedigrees, My library and its tokens are gone, an anonymous pedigree stays (#183) |
 | `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
@@ -279,6 +280,7 @@ export default {
   name: "swap-sides",
   about: "One line for --list: what journey, what it proves",
   // asAgent: true,   // signed in as claude_agent
+  // asAgent: "throwaway",   // as claude_agent_throwaway, which the flow may delete
   async run(t) {
     const id = await t.openFixture("test-data/pedigrees/structure/three-partners.json");
     await t.menu("[data-partnership-id=\"p1\"]", "Swap sides");
@@ -575,6 +577,11 @@ harness runs `manage.py agent_token`, which creates a `claude_agent` user
 with no usable password (if it does not exist) and mints a simplejwt pair,
 and seeds it into `localStorage` the way `useAppStore` keeps tokens. Needs
 Django running and `backend/.venv` (or `PEDEDIT_PYTHON`).
+
+A flow that deletes its account (`delete-account`, #183) runs as a second
+account, `claude_agent_throwaway` (`agent_token --throwaway`, flow
+`asAgent: "throwaway"`), so it never deletes the pedigrees of a check signed
+in as `claude_agent`. The next run creates it again.
 
 The tokens are signed with this checkout's `backend/secret_key.txt`, so the
 running Django must use the same key. A git worktree makes its own, and a

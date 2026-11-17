@@ -201,7 +201,8 @@ export async function launchBrowser() {
 }
 
 /**
- * A fresh context; with asAgent, localStorage carries a JWT pair for claude_agent.
+ * A fresh context; with asAgent, localStorage carries a JWT pair for claude_agent
+ * (asAgent "throwaway": for claude_agent_throwaway, an account a flow may delete, #183).
  * `device` is passed to playwright as it is (hasTouch, isMobile, userAgent: phone.mjs).
  */
 export async function newContext(browser, { asAgent = false, viewport, deviceScaleFactor = 1, localStorage: seed = [], device = {} } = {}) {
@@ -226,7 +227,7 @@ export async function newContext(browser, { asAgent = false, viewport, deviceSca
     }, pairs);
   }
   if (asAgent) {
-    const tokens = mintAgentTokens();
+    const tokens = mintAgentTokens({ throwaway: asAgent === "throwaway" });
     await assertAgentTokensAccepted(tokens);
     context.agentTokens = tokens;
     // Only seed when absent so a token the app refreshes mid-run survives reloads.
@@ -268,9 +269,9 @@ async function assertAgentTokensAccepted(tokens, base = DEFAULT_BASE) {
   }
 }
 
-export function mintAgentTokens() {
+export function mintAgentTokens({ throwaway = false } = {}) {
   const [cmd, ...pre] = backendPython();
-  const out = spawnSync(cmd, [...pre, "manage.py", "agent_token"], { cwd: BACKEND_DIR, encoding: "utf8" });
+  const out = spawnSync(cmd, [...pre, "manage.py", "agent_token", ...(throwaway ? ["--throwaway"] : [])], { cwd: BACKEND_DIR, encoding: "utf8" });
   if (out.status !== 0) {
     throw new UsageError(`manage.py agent_token failed: ${(out.stderr || out.error?.message || "").trim()}`);
   }

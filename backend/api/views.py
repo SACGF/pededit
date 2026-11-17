@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.views import TokenRefreshView
 from .models import Pedigree, TagPreset
 from .throttling import AnonCreateBurstThrottle, AnonCreateSustainedThrottle
 from .serializers import (
@@ -12,11 +15,49 @@ from .serializers import (
 )
 
 
-class MeView(generics.RetrieveAPIView):
+class MeView(generics.RetrieveDestroyAPIView):
+    """
+    GET    /api/auth/me/  -> the signed-in user
+    DELETE /api/auth/me/  -> delete the account (#183)
+
+    Deleting removes the User row, and with it (on_delete=CASCADE) every
+    pedigree the user owns and their My library. Owned pedigrees are deleted,
+    not made anonymous: their links never worked for anyone else, and turning
+    them into links anyone could open would publish them. Anonymous pedigrees
+    are not tied to any account, so they stay. Tokens already issued stop
+    working because simplejwt looks the user up on every request and refresh.
+    """
+
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
+
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_staff or user.is_superuser:
+            # An admin account holds the server's admin access; remove it in Django admin.
+            return Response(
+                {"detail": "An admin account cannot be deleted from the app."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        user.delete()  # one transaction with the cascade
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class _RefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        # simplejwt 5.5 looks the user up with .get() and lets DoesNotExist
+        # become a 500 when the account was deleted (#183). Answer 401, which
+        # the frontend takes as signed out.
+        try:
+            return super().validate(attrs)
+        except User.DoesNotExist:
+            raise AuthenticationFailed("No active account found for the given token.", "no_active_account")
+
+
+class RefreshView(TokenRefreshView):
+    serializer_class = _RefreshSerializer
 
 
 class PedigreeViewSet(viewsets.ModelViewSet):

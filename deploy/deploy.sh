@@ -53,6 +53,13 @@ echo "==> Checking the backup setup"
 # can be taken happens here, while stopping still leaves the site untouched.
 install -d -o pededit -g pededit -m 700 /var/backups/pededit
 sudo -u pededit bash /opt/pededit/deploy/backup.sh --check
+# The landing page states how long backups are kept only when the nightly run
+# is on (#183): without it nothing deletes old dumps on time, and the page
+# says only that a copy is taken at each update.
+BACKUP_MAX_DAYS=""
+if systemctl is-enabled --quiet pededit-backup.timer 2>/dev/null; then
+    BACKUP_MAX_DAYS=$(sudo -u pededit bash /opt/pededit/deploy/backup.sh --max-age-days)
+fi
 
 echo "==> Installing Node dependencies"
 sudo -u pededit npm ci
@@ -67,11 +74,13 @@ echo "==> Building frontend"
 echo "    VITE_GOOGLE_CLIENT_ID=${GOOGLE_CID:+(set)}"
 echo "    VITE_GITHUB_CLIENT_ID=${GITHUB_CID:+(set)}"
 echo "    VITE_ROLLBAR_ACCESS_TOKEN=${ROLLBAR_CLIENT_TOKEN:+(set)}"
+echo "    VITE_BACKUP_MAX_DAYS=${BACKUP_MAX_DAYS:-(nightly backups off)}"
 sudo -u pededit env \
     VITE_GOOGLE_CLIENT_ID="$GOOGLE_CID" \
     VITE_GITHUB_CLIENT_ID="$GITHUB_CID" \
     VITE_ROLLBAR_ACCESS_TOKEN="$ROLLBAR_CLIENT_TOKEN" \
     VITE_ROLLBAR_ENVIRONMENT="$ROLLBAR_ENV" \
+    VITE_BACKUP_MAX_DAYS="$BACKUP_MAX_DAYS" \
     npm -w @pedigree-editor/frontend run build
 
 echo "==> Updating backend"

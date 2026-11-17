@@ -4,17 +4,20 @@ import { BUILD_DATE, formatDate } from "../utils/buildInfo";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { ImportPedDialog } from "../components/ImportPedDialog";
+import { DeleteAccountDialog } from "../components/DeleteAccountDialog";
 import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
 import { GOOGLE_CLIENT_ID } from "../config";
 import { requestErrorMessage } from "../api/errors";
+import { backupStatement } from "../utils/backupStatement";
 import type { ReactNode } from "react";
 
 export default function LandingPage() {
   const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout } = useAppStore();
   const navigate = useNavigate();
   const [importOpen, setImportOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   // Why the last create or import failed: the rate limit's wait (#184), or a plain failure.
   const [createError, setCreateError] = useState<string | null>(null);
@@ -64,10 +67,11 @@ export default function LandingPage() {
       {/* Header */}
       <header className="border-b px-8 py-4 flex items-center justify-between">
         <h1 className="text-base font-medium tracking-tight">PedEdit</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           {isAuthenticated ? (
             <>
-              <span className="text-xs text-gray-500">
+              {/* Left out on a phone, where it squeezes against the name of the app. */}
+              <span className="hidden sm:inline text-xs text-gray-500">
                 {user?.first_name
                   ? `${user.first_name} ${user.last_name}`.trim()
                   : user?.email || user?.username}
@@ -79,6 +83,14 @@ export default function LandingPage() {
                 onClick={logout}
               >
                 Sign out
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs px-3 text-gray-400 hover:text-red-600"
+                onClick={() => setDeleteAccountOpen(true)}
+              >
+                Delete account
               </Button>
             </>
           ) : (
@@ -144,7 +156,8 @@ export default function LandingPage() {
           </p>
 
           {/* Recent on this device (#16): per browser, no account needed */}
-          <RecentOnThisDevice disabled={loading !== null} />
+          {/* Keyed on sign-in so Delete account's forgotten pedigrees (#183) leave the list. */}
+          <RecentOnThisDevice key={String(isAuthenticated)} disabled={loading !== null} />
 
           {/* Examples */}
           <div>
@@ -199,6 +212,8 @@ export default function LandingPage() {
           {BUILD_DATE ? `Updated ${formatDate(BUILD_DATE)}` : "Changelog"}
         </Link>
       </footer>
+
+      <DeleteAccountDialog open={deleteAccountOpen} onClose={() => setDeleteAccountOpen(false)} />
 
       <ImportPedDialog
         open={importOpen}
@@ -301,6 +316,8 @@ function MyPedigrees() {
  * - access rules: `backend/api/views.py` (`PedigreeViewSet.get_queryset`),
  *   pinned by `PedigreeAccessTests` in `backend/api/tests.py`;
  * - deleting: `SettingsPanel` ("Delete this pedigree"), a hard delete;
+ *   backups: `backupStatement` from `deploy/backup.sh`'s age limit (#48);
+ *   the account: `MeView.destroy` (`DeleteAccountTests`), `DeleteAccountDialog`;
  * - de-identified export: `io/svg/deidentify.ts`;
  * - browser storage: `utils/recentPedigrees.ts`, the tokens in
  *   `store/useAppStore.ts`, `showMinimap` and `compactLayout` in `CanvasPage`;
@@ -310,8 +327,6 @@ function MyPedigrees() {
  *   on, health check left out) and `manage.py usage_stats`.
  *
  * Still to revisit:
- * - #48 (database backups): once backups run on the server, "How to delete
- *   it" must say how long a deleted pedigree stays in them.
  * - #49 (error reporting): once errors are reported to an outside service,
  *   "What is not done" must name it and say what a report carries.
  * - #47 (hardening, rate limiting): check the sentence about request logs.
@@ -350,8 +365,7 @@ function YourData() {
         <>
           Open the pedigree, then <span className={name}>Pedigree settings</span> (the cog in the toolbar) and{" "}
           <span className={name}>Delete this pedigree</span>. No account is needed. This removes it from the
-          server&apos;s database at once and cannot be undone. A backup of the database made before then would
-          still hold it.
+          server&apos;s database at once and cannot be undone. {backupStatement()}
         </>
       ),
     },
@@ -381,7 +395,10 @@ function YourData() {
       text: (
         <>
           Optional. Signing in with Google or GitHub stores the name and email address of that account on the
-          server, along with any conditions and tags you save to <span className={name}>My library</span>.
+          server, along with any conditions and tags you save to <span className={name}>My library</span>.{" "}
+          <span className={name}>Delete account</span>, at the top of this page while signed in, deletes the
+          account, the pedigrees created while signed in and My library at once. Pedigrees created while signed
+          out are not part of the account and stay.
         </>
       ),
     },

@@ -12,15 +12,26 @@ from django.core.management.base import BaseCommand, CommandError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 AGENT_USERNAME = "claude_agent"
+# A second agent account for a check that deletes its own account (#183), so
+# deleting it never takes the pedigrees of checks running as claude_agent.
+THROWAWAY_USERNAME = "claude_agent_throwaway"
+AGENT_USERNAMES = (AGENT_USERNAME, THROWAWAY_USERNAME)
 
 
 class Command(BaseCommand):
     help = "Print a JSON {access, refresh} token pair for the passwordless claude_agent user."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--throwaway", action="store_true",
+            help=f"Mint for {THROWAWAY_USERNAME!r}, an account a check may delete.",
+        )
+
     def handle(self, *args, **options):
         User = get_user_model()
+        username = THROWAWAY_USERNAME if options["throwaway"] else AGENT_USERNAME
         user, created = User.objects.get_or_create(
-            username=AGENT_USERNAME,
+            username=username,
             defaults={"first_name": "Claude", "last_name": "Agent"},
         )
         if created:
@@ -28,7 +39,7 @@ class Command(BaseCommand):
             user.save(update_fields=["password"])
         elif user.has_usable_password() or user.is_staff or user.is_superuser:
             raise CommandError(
-                f"user {AGENT_USERNAME!r} has a password or admin rights, so it is not an agent account; "
+                f"user {username!r} has a password or admin rights, so it is not an agent account; "
                 "refusing to mint tokens for it"
             )
         refresh = RefreshToken.for_user(user)

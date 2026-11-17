@@ -51,8 +51,8 @@ Deployment" half).
   `frontend/src/pages/LandingPage.tsx`): request logs with the time, the
   address requested (an API address contains the pedigree's id, which for an
   anonymous pedigree is its key), the browser and the IP address, never the
-  request body; that deleting removes the row at once; and that an earlier
-  backup would still hold it. Nginx logs with its default format, Gunicorn
+  request body; that deleting removes the row at once; and what backups keep
+  (`backupStatement`, below). Nginx logs with its default format, Gunicorn
   to the journal, and how long either is kept is set on the box, not here.
   Change that text when backups (#48), error reporting (#49), rate limiting
   (#47) or anything else here changes what is kept or where it is sent. A
@@ -115,19 +115,29 @@ Deployment" half).
   scratch database and checks it. Like the other units, the service and
   timer are installed by hand (INSTALL.md step 13), not by `deploy.sh`,
   which only creates `/var/backups/pededit`.
-- **Privacy fact: a deleted pedigree stays in backups for up to 8 weeks.**
-  Deleting removes the row at once, but every dump taken while it existed
-  keeps it until pruned, on the server and off it. Retention is the newest
-  dump of each of the last 14 days and of each of the last 8 ISO weeks
-  (oldest kept dump: under 8 weeks), plus 5 pre-deploy dumps capped at the
-  daily window so they do not stretch that. Any text about deletion (the
-  landing page's data statement, #178) must agree with these numbers, and
-  whether the off-box copies are encrypted and where they are held is set on
-  the server (`/etc/pededit/backup.env`), not in this repo: ask the
-  maintainer before stating either.
-- Retention counts days and weeks that have a dump, by the UTC time in the
-  file name, never by file age. If backups stop for a month the newest
-  dumps are still kept, and a copied or touched file keeps its place.
+- **Privacy fact: no dump is kept longer than `BACKUP_MAX_AGE_DAYS` (7
+  days by default), and users are told so** (#183). Deleting removes the row
+  at once, but every dump taken while it existed keeps it until it is
+  deleted, on the server and off it. Retention is by age from the UTC time
+  in the file name: the newest dump of each day and the newest 5 pre-deploy
+  dumps, none past the limit. Each run deletes what is past it *before* it
+  dumps, and mirrors that off the box, so a dump that fails every night still
+  cannot keep an old one; the cost is that after a week of failures there
+  is no backup left, which `BACKUP_PING_URL` is there to catch. The cut is a
+  day less than the limit, less an hour for the timer's random delay, so a
+  dump is gone before it is N days old even with one night missed.
+- The landing page and the Delete account dialog state the limit
+  (`frontend/src/utils/backupStatement.ts`), and that backups are never used
+  to bring back a deleted pedigree or account (the maintainer does not
+  undelete). `deploy.sh` passes the limit to the build as
+  `VITE_BACKUP_MAX_DAYS` only while `pededit-backup.timer` is enabled; with
+  it off nothing deletes old dumps on time, so the page names no limit and
+  says only that a copy is taken at each update. Enabling or disabling the
+  timer changes the page at the next deploy. Whether the off-box copies are
+  encrypted and where they are held is set on the server
+  (`/etc/pededit/backup.env`), not in this repo: ask the maintainer before
+  stating either. A bucket with versioning or object lock keeps deleted
+  copies for its own expiry rule, which must not be longer than the limit.
 - The off-box copy mirrors (`rclone sync`, `rsync --delete`), so remote
   retention equals local. `BACKUP_MAX_REMOTE_DELETE` stops a run that would
   delete many remote dumps, which is what an emptied local directory looks
