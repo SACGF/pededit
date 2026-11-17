@@ -330,7 +330,14 @@ export default function CanvasPage() {
         {/* How to select and move around: there is no select mode (#122), so it is said here, always in view. */}
         <div className="px-3 py-2 border-t text-[11px] text-gray-500 leading-snug" data-testid="canvas-help">
           <p className="text-gray-700 mb-1">Using the canvas</p>
-          <ul className="space-y-0.5">
+          {/* By touch, in place of the list below. */}
+          <ul className="space-y-0.5 hidden pointer-coarse:block">
+            <li>Tap a person to select them, then the Person tab to edit them</li>
+            <li>Tap <b className="font-medium text-gray-700">···</b> under a selected person for more</li>
+            <li>Drag to pan, pinch to zoom</li>
+            <li>Selecting several people needs a mouse or keyboard</li>
+          </ul>
+          <ul className="space-y-0.5 pointer-coarse:hidden">
             <li>Click a person to select and edit them</li>
             <li><b className="font-medium text-gray-700">Shift+click</b> to add or remove from the selection</li>
             <li><b className="font-medium text-gray-700">Shift+drag</b> to select an area</li>

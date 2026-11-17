@@ -1,4 +1,5 @@
-import { NodeToolbar, Position } from "@xyflow/react";
+import { useLayoutEffect, useRef } from "react";
+import { NodeToolbar, Position, useStore } from "@xyflow/react";
 import { Lock, Unlock } from "lucide-react";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { MoreMenu } from "./MoreMenu";
@@ -34,11 +35,12 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChild
       isVisible={isVisible || !!nameOnly}
       position={Position.Bottom}
       offset={6}
-      className="flex flex-col items-center"
       // With only the name showing, clicks go through to the label underneath.
       style={isVisible ? undefined : { pointerEvents: "none" }}
     >
+      <KeepOnCanvas nodeId={nodeId}>
       <div
+        data-testid="hover-pill"
         className="flex items-center gap-0.5 bg-white border border-gray-300 rounded-full px-1.5 py-0.5 shadow-xs text-xs"
         style={isVisible ? undefined : { display: "none" }}
         onMouseEnter={onPillEnter}
@@ -121,8 +123,41 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChild
           {name.trim()}
         </div>
       )}
+      </KeepOnCanvas>
     </NodeToolbar>
   );
+}
+
+/** Gap kept between the pill and the canvas edge. */
+const CANVAS_EDGE_MARGIN = 4;
+
+/**
+ * Slides the pill sideways to keep it inside the canvas. It is centred on the
+ * person and wider than a phone, so beside an edge some of its buttons would
+ * be cut off. Mounted only while the pill shows (NodeToolbar renders nothing
+ * otherwise), so the store reads here cost nothing for the other nodes.
+ */
+function KeepOnCanvas({ nodeId, children }: { nodeId: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // What moves the person on the screen: pan, zoom, a drag, the canvas resizing.
+  useStore(s => s.transform);
+  useStore(s => s.nodeLookup.get(nodeId)?.internals.positionAbsolute);
+  useStore(s => s.width);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const flow = el?.closest(".react-flow");
+    if (!el || !flow) return;
+    el.style.transform = "";
+    const box = el.getBoundingClientRect();
+    const canvas = flow.getBoundingClientRect();
+    const min = canvas.left + CANVAS_EDGE_MARGIN, max = canvas.right - CANVAS_EDGE_MARGIN;
+    let dx = 0;
+    // Wider than the canvas: keep its start, where the add buttons are.
+    if (box.left < min || box.width > max - min) dx = min - box.left;
+    else if (box.right > max) dx = max - box.right;
+    if (dx) el.style.transform = `translateX(${dx}px)`;
+  });
+  return <div ref={ref} className="flex flex-col items-center">{children}</div>;
 }
 
 interface PillButtonProps {

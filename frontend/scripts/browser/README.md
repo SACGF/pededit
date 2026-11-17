@@ -387,7 +387,11 @@ page, a 4 person example and House Targaryen (96 people). Per editor page:
 the viewport meta tag, no sideways page scroll, the canvas keeps at least half
 the screen, everyone is in view on open, a tap selects a person, the Person
 tab opens and closes, More options opens from a tap on the pill's "···", the
-menu button opens the sidebar, a one-finger drag pans (from bare canvas and
+pill of the people nearest the left and right edges keeps every button on the
+canvas, the selected person stays in view when the Person tab opens, the
+toolbar fits without scrolling and its Export menu lists every export, the
+menu button opens the sidebar and its help is worded for touch (#182), a
+one-finger drag pans (from bare canvas and
 from a person), a two-finger pinch zooms out and back in, the page itself
 never scrolls or zooms (also when pinching on the toolbar), and no JavaScript
 errors or warnings. `--verbose` lists the passed checks and the notes (canvas

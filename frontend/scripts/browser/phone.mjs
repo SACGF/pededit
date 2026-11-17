@@ -278,6 +278,81 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   await page.keyboard.press("Escape");
   await page.keyboard.press("Escape");
 
+  // The pill of someone at the edge of the chart stays on the screen: it is
+  // wider than a phone and centred on the person.
+  const centreX = p => p.x + p.w / 2;
+  for (const [side, edgePerson] of [["left", inside.reduce((a, b) => (a && centreX(a) <= centreX(b) ? a : b), null)], ["right", inside.reduce((a, b) => (a && centreX(a) >= centreX(b) ? a : b), null)]]) {
+    at = edgePerson ? await tappable(page, `[data-individual-id="${CSS_ESCAPE(edgePerson.id)}"]`) : { problem: "nobody is drawn" };
+    let off = null;
+    if (!at.problem) {
+      await page.touchscreen.tap(at.x, at.y);
+      await page.waitForTimeout(400);
+      off = await page.evaluate(() => {
+        const pill = document.querySelector('[data-testid="hover-pill"]');
+        const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
+        if (!pill || !flow) return ["the pill is not shown"];
+        return [...pill.querySelectorAll("button")].filter(b => {
+          const r = b.getBoundingClientRect();
+          return r.left < flow.left - 0.5 || r.right > flow.right + 0.5;
+        }).map(b => b.title);
+      });
+      if (side === "left") await page.screenshot({ path: `${shotBase}.pill.png` });
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(GESTURE_GAP);
+    }
+    r.check(off && off.length === 0, `every button of the pill of the person nearest the ${side} edge is on the screen`, at.problem ?? `off the canvas: ${off.join(", ")}`);
+  }
+
+  // With the Person tab open the sheet takes half the screen: the person it
+  // is about must still be in view above it.
+  const lowest = inside.reduce((a, b) => (a && a.y >= b.y ? a : b), null);
+  at = lowest ? await tappable(page, `[data-individual-id="${CSS_ESCAPE(lowest.id)}"]`) : { problem: "nobody is drawn" };
+  let kept = null;
+  if (!at.problem) {
+    await page.touchscreen.tap(at.x, at.y);
+    await page.waitForTimeout(400);
+    const tab = await tappable(page, '[data-testid="panel-tab-person"]');
+    if (tab.problem) at = { problem: `the Person tab is ${tab.problem}` };
+    else {
+      await page.touchscreen.tap(tab.x, tab.y);
+      await page.waitForTimeout(700);
+      kept = await page.evaluate(id => {
+        const el = [...document.querySelectorAll("[data-individual-id]")].find(e => e.getAttribute("data-individual-id") === id);
+        const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
+        if (!el || !flow) return null;
+        const b = el.getBoundingClientRect();
+        return { inView: b.top >= flow.top && b.bottom <= flow.bottom && b.left >= flow.left && b.right <= flow.right, person: `${Math.round(b.top)} to ${Math.round(b.bottom)}`, canvas: `${Math.round(flow.top)} to ${Math.round(flow.bottom)}` };
+      }, lowest.id);
+      await page.screenshot({ path: `${shotBase}.person-in-view.png` });
+      const toggle = await tappable(page, '[data-testid="panel-toggle"]');
+      if (!toggle.problem) await page.touchscreen.tap(toggle.x, toggle.y);
+      await page.waitForTimeout(400);
+    }
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(GESTURE_GAP);
+  }
+  r.check(kept?.inView, "the selected person stays in view when the Person tab opens", at.problem ?? (kept ? `the person is at y ${kept.person}, the canvas is ${kept.canvas}` : "the person is not drawn"));
+
+  // The toolbar fits the screen, with the exports in one menu.
+  const barFit = await page.locator('[data-testid="toolbar"]').evaluate(el => ({ scroll: el.scrollWidth, client: el.clientWidth })).catch(() => null);
+  r.check(barFit && barFit.scroll <= barFit.client + 1, "the toolbar fits the screen without scrolling sideways", barFit ? `it is ${barFit.scroll} px wide in ${barFit.client} px` : "there is no toolbar");
+  at = await tappable(page, '[data-testid="export-menu"]');
+  let exportItems = [];
+  if (!at.problem) {
+    await page.touchscreen.tap(at.x, at.y);
+    await page.waitForTimeout(400);
+    exportItems = await page.locator('[data-testid="export-menu-items"] button').evaluateAll(all => all.filter(b => {
+      const q = b.getBoundingClientRect();
+      return q.width > 0 && q.left >= 0 && q.right <= window.innerWidth && q.top >= 0 && q.bottom <= window.innerHeight;
+    }).map(b => b.textContent.trim()));
+    await page.screenshot({ path: `${shotBase}.export.png` });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+  }
+  const wantExports = ["PED", "CSV", "JSON", "SVG"];
+  const missingExports = wantExports.filter(w => !exportItems.some(t => t.includes(w)));
+  r.check(!at.problem && missingExports.length === 0, "the Export menu lists every export", at.problem ? `the Export button is ${at.problem}` : `missing: ${missingExports.join(", ")} (it lists ${exportItems.join(" | ") || "nothing"})`);
+
   // The left sidebar (home, Save) is behind the toolbar's menu button.
   at = await tappable(page, '[data-testid="sidebar-toggle"]');
   let sidebar = false;
@@ -286,6 +361,10 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     await page.waitForTimeout(300);
     sidebar = await onScreen(page, '[data-testid="sidebar"]', 80);
     if (sidebar) await page.screenshot({ path: `${shotBase}.sidebar.png` });
+    // Its help is worded for touch: no click, Shift, scroll wheel or right-click.
+    const help = await page.locator('[data-testid="canvas-help"]').evaluate(el => el.innerText).catch(() => "");
+    const mouseWords = (help.match(/\b(click|shift|scroll|right-click)\b/gi) ?? []);
+    r.check(help.length > 0 && mouseWords.length === 0 && /tap/i.test(help), "\"Using the canvas\" is worded for touch", help ? `it says: ${[...new Set(mouseWords.map(w => w.toLowerCase()))].join(", ") || "nothing about tapping"}` : "the help is not shown");
     // Outside it, on the right edge of the screen.
     await page.touchscreen.tap(m.vw - 10, m.vh / 2);
     await page.waitForTimeout(300);
@@ -308,7 +387,12 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   };
   await dragged(await blankCanvasPoint(page, DX, DY), "a one-finger drag pans the canvas", "no bare canvas to drag on");
   // On a big chart fitted to a phone most of the canvas is people, so a drag starts on one as often as not.
-  at = personSel ? await tappable(page, personSel) : { problem: "nobody is drawn" };
+  // Whoever is on the screen now: keeping the selected person in view may have panned.
+  at = { problem: "nobody is on the screen" };
+  for (const p of (await measure(page)).people) {
+    const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
+    if (!here.problem) { at = here; break; }
+  }
   let after = await dragged(at.problem ? null : at, "a drag that starts on a person pans too", `the person is ${at.problem}`);
   r.check(after.scroll.x === 0 && after.scroll.y === 0 && after.pageScale === 1, "and the page itself does not scroll or zoom",
     `scroll ${after.scroll.x},${after.scroll.y}, page zoom ${after.pageScale}`);

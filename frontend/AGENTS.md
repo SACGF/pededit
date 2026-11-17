@@ -158,7 +158,13 @@ reporting is off, and the dev server never reports.
   the toolbar's menu button (it opens over the canvas), turns the side panel
   into a sheet under the canvas that is shut to its row of tabs until a tab
   is tapped (`EditPanel`'s `open` / `onOpenChange`; selecting someone does
-  not open it, so the chart stays in view), lets the toolbar scroll sideways,
+  not open it, so the chart stays in view; when it opens,
+  `KeepSelectedInView` in `PedigreeCanvas.tsx` pans the selected person back
+  onto the smaller canvas), folds the toolbar's exports into one "Export"
+  menu and drops its dividers so it fits 360px (it scrolls sideways once
+  "Reset layout" or the problems list is added), words the sidebar's "Using
+  the canvas" for touch under `pointer-coarse:` (multi-select has no touch
+  gesture and the help says so),
   leaves out the minimap and shows a dismissible line saying how to move
   around and that editing is easier on a computer (localStorage
   `smallScreenNoticeDismissed`). It is all `lg:` / `max-lg:` classes plus

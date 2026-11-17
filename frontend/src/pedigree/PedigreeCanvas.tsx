@@ -268,6 +268,35 @@ function RevealOnRequest() {
   return null;
 }
 
+/**
+ * Pans, keeping the zoom, when the canvas gets smaller and the selected
+ * person is no longer on it: on a small screen the Person tab opens as a
+ * sheet over the lower half, which is where the person tapped may be.
+ */
+function KeepSelectedInView() {
+  const { getNodes, getViewport, setViewport } = useReactFlow();
+  const width = useFlowStore(s => s.width);
+  const height = useFlowStore(s => s.height);
+  const before = useRef({ width, height });
+  useEffect(() => {
+    const shrank = width < before.current.width || height < before.current.height;
+    before.current = { width, height };
+    if (!shrank || !width || !height) return;
+    const id = usePedigreeStore.getState().selectedId;
+    const node = id && getNodes().find(n => (n.data as Partial<RFNodeData>)?.individual?.id === id);
+    if (!node) return;
+    const { x, y, zoom } = getViewport();
+    // The node's position is its centre (nodeOrigin). Room below for the labels.
+    const halfW = (node.width ?? NODE_SIZE) * zoom / 2, halfH = (node.height ?? NODE_SIZE) * zoom / 2;
+    const cx = node.position.x * zoom + x, cy = node.position.y * zoom + y;
+    const side = Math.min(40, width / 4), above = Math.min(40, height / 4), below = Math.min(70, height / 3);
+    const dx = Math.max(side + halfW - cx, 0) || Math.min(width - side - halfW - cx, 0);
+    const dy = Math.max(above + halfH - cy, 0) || Math.min(height - below - halfH - cy, 0);
+    if (dx || dy) void setViewport({ x: x + dx, y: y + dy, zoom }, { duration: 200 });
+  }, [width, height, getNodes, getViewport, setViewport]);
+  return null;
+}
+
 const MIN_ZOOM = 0.1;
 
 // ── Canvas ─────────────────────────────────────────────────────────────────────
@@ -510,6 +539,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
         <FitOnLayoutChange compact={compact} expected={fitExpected} />
         <RevealOnRequest />
+        <KeepSelectedInView />
         <Controls />
         {showMinimap && (
           <PedigreeMinimap pedigree={pedigree} />

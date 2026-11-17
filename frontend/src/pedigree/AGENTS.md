@@ -81,8 +81,9 @@ draws NSGC symbols.
   a tap: they differ between browsers (and chromium's emulation moves its
   mouse away again, which closed the pill at once). Its buttons are larger
   under `pointer-coarse:`. The pill is centred on the person and is wider
-  than a phone, so near a screen edge part of it is off screen until the
-  canvas is panned.
+  than a phone, so `KeepOnCanvas` slides it sideways to stay inside the
+  canvas (on any screen); it is not moved up when the person is at the
+  bottom edge, where it would cover the symbol.
 - The four invisible `Handle`s on a node only anchor edges. `index.css` gives
   them `pointer-events: none` (#169): React Flow marks handles `nopan` and
   lets them take the pointer, so a drag that began on one did not pan, and a

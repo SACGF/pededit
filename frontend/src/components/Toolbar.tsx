@@ -16,6 +16,7 @@ import { exportCsv } from "../io/csv/exporter";
 import { FilterMenu } from "./FilterMenu";
 import { ProblemsMenu } from "./ProblemsMenu";
 import { exportJson } from "../io/json/index.js";
+import { useSmallScreen } from "../hooks/useSmallScreen";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -54,6 +55,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
   const [pedMenuOpen, setPedMenuOpen] = useState(false);
+  // Small screens: the four export buttons, most of the toolbar's width, are one menu.
+  const small = useSmallScreen();
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   type PedDialect = NonNullable<ExportOptions["dialect"]>;
   // PED has no column for pregnancy / loss status, so warn before writing
@@ -120,8 +124,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   }
 
   return (
-    // Small screens: the buttons keep their size and the row scrolls sideways.
-    <div className="flex items-center gap-1 px-2 py-1 border-b bg-white max-lg:overflow-x-auto max-lg:*:shrink-0 max-lg:[scrollbar-width:none]" data-testid="toolbar">
+    // Small screens: no dividers and the exports in one menu, so the row fits a
+    // phone; with "Reset layout" or the problems list it scrolls sideways.
+    <div className="flex items-center gap-1 max-lg:gap-0.5 px-2 max-lg:px-1 py-1 border-b bg-white max-lg:overflow-x-auto max-lg:*:shrink-0 max-lg:[scrollbar-width:none]" data-testid="toolbar">
       <Button
         variant="ghost" size="sm"
         title="Menu"
@@ -182,7 +187,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         <UnknownIcon />
       </Button>
 
-      <div className="w-px h-5 bg-gray-200 mx-1" />
+      <div className="w-px h-5 bg-gray-200 mx-1 max-lg:hidden" />
 
       {/* Undo/redo */}
       <Button
@@ -224,70 +229,96 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
       {/* View filters */}
       <FilterMenu disabled={!hasPedigree} />
 
-      {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}
-      <Popover open={pedMenuOpen} onOpenChange={setPedMenuOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost" size="sm"
-            className="h-7 px-2 gap-1 text-xs"
-            title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
-            disabled={!hasPedigree}
-          >
-            <Download size={12} />
-            Export PED
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-64 p-1" side="bottom" align="end">
-          <PedFormatItem
-            label="PLINK"
-            detail="FID IID PAT MAT SEX PHENO, no header"
-            onClick={() => handleExportPedClick("plink")}
-          />
-          <PedFormatItem
-            label="R (pedtools, kinship2)"
-            detail="id fid mid sex aff, tabs, header"
-            onClick={() => handleExportPedClick("r")}
-          />
-        </PopoverContent>
-      </Popover>
+      {small ? (
+        <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost" size="sm"
+              className="h-7 px-2 gap-1 text-xs"
+              title="Export"
+              disabled={!hasPedigree}
+              data-testid="export-menu"
+            >
+              <Download size={12} />
+              Export
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-1" side="bottom" align="end" data-testid="export-menu-items">
+            <PedFormatItem label="SVG, PNG or PDF" detail="the chart as a figure" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
+            <PedFormatItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
+            <PedFormatItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
+            <PedFormatItem label="CSV" detail="one row per person" onClick={() => { setExportMenuOpen(false); handleExportCsv(); }} />
+            <PedFormatItem label="JSON" detail="lossless, re-importable" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <>
+        {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}
+        <Popover open={pedMenuOpen} onOpenChange={setPedMenuOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost" size="sm"
+              className="h-7 px-2 gap-1 text-xs"
+              title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
+              disabled={!hasPedigree}
+            >
+              <Download size={12} />
+              Export PED
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-1" side="bottom" align="end">
+            <PedFormatItem
+              label="PLINK"
+              detail="FID IID PAT MAT SEX PHENO, no header"
+              onClick={() => handleExportPedClick("plink")}
+            />
+            <PedFormatItem
+              label="R (pedtools, kinship2)"
+              detail="id fid mid sex aff, tabs, header"
+              onClick={() => handleExportPedClick("r")}
+            />
+          </PopoverContent>
+        </Popover>
 
-      {/* Export CSV */}
-      <Button
-        variant="ghost" size="sm"
-        className="h-7 px-2 gap-1 text-xs"
-        title="Export as CSV file"
-        disabled={!hasPedigree}
-        onClick={handleExportCsv}
-      >
-        <Download size={12} />
-        Export CSV
-      </Button>
+        {/* Export CSV */}
+        <Button
+          variant="ghost" size="sm"
+          className="h-7 px-2 gap-1 text-xs"
+          title="Export as CSV file"
+          disabled={!hasPedigree}
+          onClick={handleExportCsv}
+        >
+          <Download size={12} />
+          Export CSV
+        </Button>
 
-      {/* Download JSON (lossless, see docs/pedigree-json-format.md) */}
-      <Button
-        variant="ghost" size="sm"
-        className="h-7 px-2 gap-1 text-xs"
-        title="Download as JSON (lossless, re-importable)"
-        disabled={!hasPedigree}
-        onClick={handleExportJson}
-      >
-        <Download size={12} />
-        Download JSON
-      </Button>
+        {/* Download JSON (lossless, see docs/pedigree-json-format.md) */}
+        <Button
+          variant="ghost" size="sm"
+          className="h-7 px-2 gap-1 text-xs"
+          title="Download as JSON (lossless, re-importable)"
+          disabled={!hasPedigree}
+          onClick={handleExportJson}
+        >
+          <Download size={12} />
+          Download JSON
+        </Button>
 
-      {/* Export SVG/PNG */}
-      <Button
-        variant="ghost" size="sm"
-        className="h-7 px-2 gap-1 text-xs"
-        title="Export as SVG or PNG"
-        disabled={!hasPedigree}
-        onClick={onExportSvgClick}
-      >
-        <Image size={12} />
-        SVG/PNG
-      </Button>
+        {/* Export SVG/PNG */}
+        <Button
+          variant="ghost" size="sm"
+          className="h-7 px-2 gap-1 text-xs"
+          title="Export as SVG or PNG"
+          disabled={!hasPedigree}
+          onClick={onExportSvgClick}
+        >
+          <Image size={12} />
+          SVG/PNG
+        </Button>
+        </>
+      )}
 
-      <div className="w-px h-5 bg-gray-200 mx-0.5" />
+      <div className="w-px h-5 bg-gray-200 mx-0.5 max-lg:hidden" />
 
       {/* Settings */}
       <Button
