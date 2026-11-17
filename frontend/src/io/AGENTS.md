@@ -164,7 +164,11 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
   `symbols`, `labels`, `consanguinity-labels`, whose white `<rect>` marks a
   label the dashed arcs may pass behind, #109) and `class="mark"` on lines that join nobody
-  (childless and twin marks). The chart title is outside the `labels` group
+  (childless and twin marks). A dashed arc is read back with `pathPoints`
+  and checked against other people's symbols and text
+  (`arc-through-symbol`, `arc-through-label`, #192, the canvas lint's
+  `arcCollisions`), with the lines of text under a symbol taken as one
+  block. The chart title is outside the `labels` group
   on purpose (it is not a label), so it has a check of its own,
   `title-collides` (#172): the `class="chart-title"` text against the
   symbols, the dashed arcs and the consanguinity labels. The canvas title

@@ -4,6 +4,8 @@ import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { duplicateArcPoints, hopGeometry } from "./couplePath";
+import { chooseArcRoute } from "./duplicateArc";
+import type { ArcLine, ArcObstacle } from "./duplicateArc";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import { consanguinityTest } from "./consanguinity";
 import type { LayoutSpacing } from "./spacing";
@@ -174,8 +176,18 @@ export interface AssistedEdgeData extends Record<string, unknown> {
 
 /** Dashed arc joining two copies of the same person. */
 export interface DuplicateEdgeData extends Record<string, unknown> {
-  /** How far (px) the arc rises above the higher of the two symbol tops. */
+  /**
+   * How far (px) the arc rises above the higher of the two symbol tops
+   * (less than usual when text hangs in its way); for a routed arc
+   * (`legDx`), how far above the lower copy's top it runs.
+   */
   bulge: number;
+  /**
+   * Set when the arc joins copies on different rows and its usual curve
+   * would pass through someone: the arc goes down the gap this far (px,
+   * signed) from the upper copy's centre instead (`duplicateArcD`).
+   */
+  legDx?: number;
 }
 
 export interface FlowData {
@@ -186,6 +198,8 @@ export interface FlowData {
   duplicateEdges: Edge<DuplicateEdgeData>[];
   /** Lines of assisted reproduction: carrier and social parent to child. */
   assistedEdges: Edge<AssistedEdgeData>[];
+  /** The width (px) names and details under a symbol are wrapped to. */
+  labelMax: number;
 }
 
 export interface LayoutToFlowOptions {
@@ -282,7 +296,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   // Hidden descendants are not laid out or drawn.
   const pedigree = drawnPedigree(full);
   if (pedigree.individuals.length === 0) {
-    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] };
+    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [], labelMax: labelMaxWidth(layoutSpacing(options.compact).slotWidth) };
   }
   const result: LayoutResult = cachedLayout(pedigree, { improve: options.improveLayout ?? true });
   const spacing = layoutSpacing(options.compact);
@@ -314,14 +328,20 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
     if (n) { n.data.labelsBacked = true; n.data.glyph.labelsBacked = true; }
   }
 
-  const duplicateEdges = buildDuplicateEdges(nodes, spacing);
-  const blocks = [...textBlocks(pedigree, nodes, spacing), ...duplicateArcBlocks(duplicateEdges, slotPos), ...sibshipBlocks(sibshipEdges)];
+  const text = textBlocks(pedigree, nodes, spacing), bars = sibshipBlocks(sibshipEdges);
+  let coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...bars]);
+  // The arcs keep off the couple lines, and the couple labels off the arcs.
+  const duplicateEdges = buildDuplicateEdges(pedigree, nodes, spacing, sibshipEdges, coupleEdges);
+  if (duplicateEdges.length) {
+    coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...duplicateArcBlocks(duplicateEdges, slotPos), ...bars]);
+  }
   return {
     nodes,
-    coupleEdges:    buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, blocks),
+    coupleEdges,
     sibshipEdges,
     duplicateEdges,
     assistedEdges,
+    labelMax: labelMaxWidth(spacing.slotWidth),
   };
 }
 
@@ -545,8 +565,16 @@ function buildNodes(
 
 // ── Duplicate connectors ──────────────────────────────────────────────────────
 
-/** Joins consecutive drawn copies of one person, left to right (R: arcconnect). */
-function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing): Edge<DuplicateEdgeData>[] {
+/**
+ * Joins consecutive drawn copies of one person, left to right (R:
+ * arcconnect). An arc between rows whose curve would pass through someone is
+ * routed round them (`chooseArcRoute`); routed arcs that end on one row each
+ * run at their own height.
+ */
+function buildDuplicateEdges(
+  pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: LayoutSpacing,
+  sibshipEdges: Edge<SibshipEdgeData>[], coupleEdges: Edge<CoupleEdgeData>[],
+): Edge<DuplicateEdgeData>[] {
   const byPerson = new Map<string, Node<RFNodeData>[]>();
   for (const n of nodes) {
     if (!n.data.isDuplicate) continue;
@@ -554,17 +582,48 @@ function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing):
     if (!byPerson.has(pid)) byPerson.set(pid, []);
     byPerson.get(pid)!.push(n);
   }
+  if (byPerson.size === 0) return [];
+
+  const half = NODE_SIZE / 2;
+  const bulge = DUPLICATE_ARC_BULGE * (spacing.rowHeight / 2 - half);
+  const labelMax = labelMaxWidth(spacing.slotWidth);
+  const numbers = labelNumbers(pedigree);
+  const obstacles: ArcObstacle[] = nodes.map(n => ({
+    id: n.data.individual.id, x: n.position.x, y: n.position.y,
+    text: textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, labelMax, numbers),
+  }));
+  const at = new Map(nodes.map(n => [n.id, n.position]));
+  const lines: ArcLine[] = [
+    ...coupleEdges.flatMap((e): ArcLine[] => {
+      const s = at.get(e.source), t = at.get(e.target);
+      if (!s || !t) return [];
+      const hop = e.data?.hopHeight ?? 0;
+      return [[s.x, s.y - hop, t.x, t.y - hop]];
+    }),
+    ...sibshipEdges.flatMap((e): ArcLine[] => {
+      const d = e.data;
+      if (!d || d.childXs.length === 0) return [];
+      const xs = [d.coupleX, ...d.childXs];
+      return [
+        [d.coupleX, d.coupleY, d.coupleX, d.sibBarY],
+        [Math.min(...xs), d.sibBarY, Math.max(...xs), d.sibBarY],
+        ...d.childXs.map((x, i): ArcLine => [x, d.sibBarY, x, (d.childYs[i] ?? d.childY) - half]),
+      ];
+    }),
+  ];
+
   const edges: Edge<DuplicateEdgeData>[] = [];
+  const routedOnRow = new Map<number, number[]>();
   for (const [pid, copies] of byPerson) {
     const sorted = [...copies].sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y);
+    const others = obstacles.filter(o => o.id !== pid);
     for (let i = 0; i + 1 < sorted.length; i++) {
-      edges.push({
-        id:     `duplicate-${pid}-${i}`,
-        source: sorted[i]!.id,
-        target: sorted[i + 1]!.id,
-        type:   "duplicateEdge",
-        data:   { bulge: DUPLICATE_ARC_BULGE * (spacing.rowHeight / 2 - NODE_SIZE / 2) },
-      });
+      const a = sorted[i]!, b = sorted[i + 1]!;
+      const row = Math.round(Math.max(a.position.y, b.position.y));
+      const route = chooseArcRoute(a.position, b.position, bulge, half, spacing.slotWidth, others, lines, routedOnRow.get(row));
+      if (route?.legDx !== undefined) routedOnRow.set(row, [...(routedOnRow.get(row) ?? []), route.bulge]);
+      const data: DuplicateEdgeData = { bulge, ...route };
+      edges.push({ id: `duplicate-${pid}-${i}`, source: a.id, target: b.id, type: "duplicateEdge", data });
     }
   }
   return edges;
@@ -588,7 +647,7 @@ function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<strin
   return edges.flatMap(e => {
     const a = slotPos.get(e.source), b = slotPos.get(e.target);
     if (!a || !b) return [];
-    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? DUPLICATE_ARC_BULGE, NODE_SIZE / 2);
+    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? DUPLICATE_ARC_BULGE, NODE_SIZE / 2, 12, e.data?.legDx);
     return pts.slice(1).map(([x, y], i) => {
       const [px, py] = pts[i]!;
       return { x: (x + px) / 2, halfWidth: Math.abs(x - px) / 2 + 1, top: Math.min(y, py) - 2, bottom: Math.max(y, py) + 2, arc: true };

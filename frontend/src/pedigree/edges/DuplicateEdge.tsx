@@ -15,7 +15,7 @@ export function DuplicateEdge({ source, target, data }: EdgeProps<DuplicateEdgeT
   const half = NODE_SIZE / 2;
   return (
     <path
-      d={duplicateArcD(a.position.x, a.position.y, b.position.x, b.position.y, data?.bulge ?? 28, half)}
+      d={duplicateArcD(a.position.x, a.position.y, b.position.x, b.position.y, data?.bulge ?? 28, half, data?.legDx)}
       stroke="black"
       strokeWidth={1.5}
       strokeDasharray="6 4"

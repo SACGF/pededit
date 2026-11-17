@@ -99,9 +99,9 @@
 </g>
 <g class="duplicate-arcs">
 <path d="M 68 148 Q 170 117.2 272 148" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 139.76 252 Q 187.22 252 187.22 316" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 139.76 252 L 143.76 252 Q 153.76 252 153.76 262 L 153.76 290.6 Q 153.76 300.6 163.76 300.6 L 163.76 300.6 Q 181.36 300.6 187.22 316" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 354.12 252 Q 374.12 252 345.01 316" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 252.78 504 Q 298.25 504 298.25 568" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 252.78 504 L 256.78 504 Q 266.78 504 266.78 514 L 266.78 549.6 Q 266.78 559.6 276.78 559.6 L 276.78 559.6 Q 292.88 559.6 298.25 568" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 </g>
 <g class="symbols">
 <g transform="translate(122.2 0)">

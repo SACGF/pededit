@@ -17,6 +17,9 @@
  *   sibship-bars-overlap   two couples' sibship bars run along the same line, so they read as one sibship
  *   symbols-overlap        two symbols sit on top of each other, or touch
  *   labels-overlap         two name or date labels on one row run into each other
+ *   arc-through-symbol     the dashed arc between two copies of someone passes through
+ *                          another person's symbol
+ *   arc-through-label      the same arc passes through the text under someone else
  *   title-collides         the chart title runs into a symbol, a dashed arc between
  *                          two copies, a couple label or a hopping couple line;
  *                          only when `options.title` is given, as the canvas draws it
@@ -29,11 +32,14 @@ import { placementParentOf } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
+import { labelNumbers } from "./layoutToFlow";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
 import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth, highestAboveSymbols } from "./consanguinityLabel";
 import { duplicateArcPoints } from "./couplePath";
+import { textBlockUnder } from "./labelBlock";
+import { arcCollisions } from "./duplicateArc";
 
 export type LintCode =
   | "missing-individual"
@@ -49,6 +55,8 @@ export type LintCode =
   | "sibship-bars-overlap"
   | "symbols-overlap"
   | "labels-overlap"
+  | "arc-through-symbol"
+  | "arc-through-label"
   | "title-collides";
 
 export interface LintFinding {
@@ -300,6 +308,30 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     }
   }
 
+  // 6. Dashed arcs between two copies of someone: through nobody else's
+  // symbol and nobody else's text. Lines are crossed, as any arc must.
+  const half = NODE_SIZE / 2;
+  const numbers = labelNumbers(pedigree);
+  for (const e of flow.duplicateEdges) {
+    const s = nodeById.get(e.source), t = nodeById.get(e.target);
+    if (!s || !t) continue;
+    const who = s.data.individual.id;
+    const hit = arcCollisions(
+      duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx),
+      flow.nodes.filter(n => n.data.individual.id !== who).map(n => ({
+        id: n.data.individual.id, x: n.position.x, y: n.position.y,
+        text: textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, flow.labelMax, numbers),
+      })),
+      half,
+    );
+    for (const id of hit.symbols) {
+      out.push({ code: "arc-through-symbol", message: `the dashed arc between the copies of ${label(who)} runs through the symbol of ${label(id)}`, individuals: [who, id] });
+    }
+    for (const id of hit.labels) {
+      out.push({ code: "arc-through-label", message: `the dashed arc between the copies of ${label(who)} runs through the text under ${label(id)}`, individuals: [who, id] });
+    }
+  }
+
   if (options.title) out.push(...lintTitle(options.title, flow));
   return out;
 }
@@ -330,7 +362,7 @@ function lintTitle(title: string, flow: FlowData): LintFinding[] {
   const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
   for (const e of flow.duplicateEdges) {
     const a = pos.get(e.source), b = pos.get(e.target);
-    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 48).some(inBox)) return found("a dashed arc between two copies");
+    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx).some(inBox)) return found("a dashed arc between two copies");
   }
   for (const p of consanguinityLabelPlacements(flow)) {
     const lw = Math.max(...p.lines.map(consanguinityLabelWidth));

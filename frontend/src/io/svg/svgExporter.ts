@@ -52,7 +52,7 @@ function renderDuplicateArcs(flow: FlowData, slotPos: SlotPos): string[] {
   const half = NODE_SIZE / 2;
   return flow.duplicateEdges.map(e => {
     const a = slotPos.get(e.source)!, b = slotPos.get(e.target)!;
-    const d = duplicateArcD(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half);
+    const d = duplicateArcD(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, e.data?.legDx);
     return `<path d="${d}" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>`;
   });
 }

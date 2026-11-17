@@ -193,7 +193,7 @@
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
-<path d="M 218.86 600 Q 443.8 600 443.8 700" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 218.86 600 L 228.86 600 Q 238.86 600 238.86 610 L 238.86 662 Q 238.86 672 248.86 672 L 407.8 672 Q 434.8 672 443.8 700" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 443.8 700 Q 598.67 644 753.53 700" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 </g>
 <g class="symbols">

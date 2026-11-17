@@ -17,6 +17,9 @@
  *   child-wrong-parents    the line above someone leads to a couple who are not the parents
  *   assisted-not-drawn     a carrier or social parent has no line to the child
  *   labels-overlap         two label lines on one row run into each other
+ *   arc-through-symbol     the dashed arc between two copies of someone passes
+ *                          through another person's symbol
+ *   arc-through-label      the same arc passes through a line of text under someone else
  *   consanguinity-label-collides  the degree of relationship over a double line
  *                          runs into a symbol, a line, other text, a copy number
  *                          or a dashed arc between two copies (unless the label
@@ -39,6 +42,8 @@ import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { textWidth, titleWidth } from "../../pedigree/labels";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
+import { pathPoints } from "../../pedigree/couplePath";
+import { arcCollisions } from "../../pedigree/duplicateArc";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
 import { drawnPedigree } from "../../pedigree/collapse";
@@ -58,6 +63,8 @@ export type ExportLintCode =
   | "child-wrong-parents"
   | "assisted-not-drawn"
   | "labels-overlap"
+  | "arc-through-symbol"
+  | "arc-through-label"
   | "consanguinity-label-collides"
   | "title-collides";
 
@@ -176,14 +183,8 @@ export function parseExportSvg(svg: string): Parsed {
       out.coupleBackings.push([n("x") + ox, n("y") + oy, n("x") + n("width") + ox, n("y") + n("height") + oy]);
     }
     if (name === "path" && g === "duplicate-arcs" && !skipped()) {
-      const q = /^M\s*([-\d.e+]+)[\s,]+([-\d.e+]+)\s*Q\s*([-\d.e+]+)[\s,]+([-\d.e+]+)[\s,]+([-\d.e+]+)[\s,]+([-\d.e+]+)\s*$/.exec(attrs.d ?? "");
-      if (q) {
-        const [x0, y0, cx, cy, x1, y1] = q.slice(1).map(Number) as [number, number, number, number, number, number];
-        out.duplicateArcs.push(Array.from({ length: 13 }, (_, i) => {
-          const t = i / 12, u = 1 - t;
-          return [u * u * x0 + 2 * u * t * cx + t * t * x1 + ox, u * u * y0 + 2 * u * t * cy + t * t * y1 + oy] as Pt;
-        }));
-      }
+      const pts = pathPoints(attrs.d ?? "");
+      if (pts.length > 1) out.duplicateArcs.push(pts.map(([x, y]) => [x + ox, y + oy] as Pt));
     }
     if (skipped() || inSymbol()) continue;
     if (attrs.class === "mark") continue;
@@ -449,6 +450,36 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       if (Math.abs(A.x - B.x) - (A.w + B.w) / 2 < 2) {
         out.push({ code: "labels-overlap", message: `the export labels "${A.text}" and "${B.text}" overlap`, individuals: [] });
       }
+    }
+  }
+
+  // 4a. Dashed arcs between two copies of someone: through nobody else's
+  // symbol and not through the text under anybody else. A line of text
+  // belongs to the nearest symbol straight above it, and a symbol's lines
+  // make one block, as `textBlockUnder` has it for the canvas lint.
+  const blockUnder = new Map<{ pos: Pt; id: string }, { x: number; halfWidth: number; top: number; bottom: number }>();
+  for (const t of texts) {
+    if (!t.w) continue;
+    const [x, y] = toCanvas([t.x, t.y]);
+    const owner = symbols.filter(sym => Math.abs(sym.pos[0] - x) < 0.5 && sym.pos[1] < y).sort((a, b) => b.pos[1] - a.pos[1])[0];
+    if (!owner) continue;
+    const block = blockUnder.get(owner);
+    blockUnder.set(owner, {
+      x, halfWidth: Math.max(block?.halfWidth ?? 0, t.w / 2),
+      top: Math.min(block?.top ?? Infinity, y - 9), bottom: Math.max(block?.bottom ?? -Infinity, y + 3),
+    });
+  }
+  for (const raw of parsed.duplicateArcs) {
+    const pts = raw.map(toCanvas);
+    const who = symbolsAt(pts[0]!)[0]?.id;
+    if (!who) continue;
+    const hit = arcCollisions(pts, symbols.filter(sym => sym.id !== who).map(sym => (
+      { id: sym.id, x: sym.pos[0], y: sym.pos[1], text: blockUnder.get(sym) ?? null })), half);
+    for (const id of hit.symbols) {
+      once(`arc-s-${who}-${id}`, { code: "arc-through-symbol", message: `in the export the dashed arc between the copies of ${label(who)} runs through the symbol of ${label(id)}`, individuals: [who, id] });
+    }
+    for (const id of hit.labels) {
+      once(`arc-l-${who}-${id}`, { code: "arc-through-label", message: `in the export the dashed arc between the copies of ${label(who)} runs through the text under ${label(id)}`, individuals: [who, id] });
     }
   }
 

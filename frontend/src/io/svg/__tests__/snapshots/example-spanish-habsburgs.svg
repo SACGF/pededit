@@ -101,7 +101,7 @@
 <path d="M 80 220 Q 200 164 320 220" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 160.9 360 Q 220.26 360 220.26 460" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 413.08 360 Q 433.08 360 405.89 460" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 293.85 720 Q 350.88 720 350.88 820" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 293.85 720 L 303.85 720 Q 313.85 720 313.85 730 L 313.85 782 Q 313.85 792 323.85 792 L 323.85 792 Q 344.12 792 350.88 820" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 </g>
 <g class="symbols">
 <g transform="translate(143.76 0)">

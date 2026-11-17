@@ -161,6 +161,27 @@ draws NSGC symbols.
   `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
   the dashed arc between copies; its path is `duplicateArcD` in
   `couplePath.ts`, shared with the SVG exporter.
+- `duplicateArc.ts` — keeps a dashed arc off other people (#192). The usual
+  line is kept whenever it passes through nobody's symbol and nobody's text,
+  so most arcs are R's. Otherwise `chooseArcRoute` (called from
+  `layoutToFlow`, result on the edge data) picks: for copies on one row a
+  flatter arc (a smaller `bulge`) that passes under text hanging from the
+  row above; for copies on different rows `legDx`, which sends the arc out
+  of the upper copy's side, down the gap beside it and along above the lower
+  row's symbol tops, where an arc on that row runs. The usual cross-row
+  curve starts along the upper row, so it passes through everyone between
+  the copies. Crossing a line costs nothing (any arc must); running along
+  one does, which is what keeps a route off a sibship bar and off a couple
+  line leaving the same side of the symbol. Routed arcs ending on one row
+  each take their own height. The path is M, L and Q commands only:
+  `pathPoints` samples it for the lints, the title and the couple labels,
+  so a new command needs adding there. During a drag the route is as of the
+  last layout, as the sibship bar heights are. The lints report what is
+  left as `arc-through-symbol` and `arc-through-label` (`arcCollisions`,
+  shared by `renderLint.ts` and `exportLint.ts`); text that hangs to within
+  8px of the symbol tops the arc ends at is not counted, since no arc could
+  pass under it (compact rows with four lines of text). The U-shape export
+  has its own links and does not use any of this.
 - `snap.ts` — snap to grid. With snap on, `layoutToFlow` and `svgExporter`
   round every node to the grid, auto-placed ones included, so a dragged node
   can line up with them. Whole rows round together (couple lines stay flat)
