@@ -1,9 +1,8 @@
 /**
  * Render lint for the standard SVG export (#72). The canvas lint
  * (`pedigree/renderLint.ts`) checks layoutToFlow's output. `exportSvg` draws
- * from that same output since #143 (it used to run its own layout for the
- * lines), but it is still a second renderer writing its own SVG, so this
- * one parses the exported file and checks what it actually draws against
+ * from that same output, but it is a second renderer writing its own SVG,
+ * so this one parses the exported file and checks what it actually draws against
  * the pedigree:
  *
  *   missing-individual     someone in the pedigree has no symbol in the export

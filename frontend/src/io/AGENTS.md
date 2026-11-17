@@ -106,11 +106,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   turned along its track, where letters ("D", "S", "P") are turned back
   upright and slashes turn with the symbol. With `renderDeceasedSlashSvg`
   and `renderProbandArrowSvg` it is the only place a symbol is written as a
-  string: before #149 the U-shape had its own near copy, the one most often
-  missed. A symbol change is made here and in `SymbolShape`
+  string. A symbol change is made here and in `SymbolShape`
   (`pedigree/nodes/symbols.tsx`) for the canvas. Order inside the symbol:
-  the role letter is under the presymptomatic line in both exports (the
-  U-shape had them the other way round; nobody is both in practice).
+  the role letter is under the presymptomatic line in both exports.
 - `uShapeExporter.ts` — the public entry (`layoutUShape`,
   `exportUShapeSvg`): horseshoe layout for large families (partners,
   consanguinity, flat bottom, fan for small families). Plan in
@@ -267,5 +265,5 @@ pregnancy or loss). The `sex` column stays biological sex and decides
 father and mother. `dod` (#103), the date of death as stored ("2007",
 "2007-03-14"), after the assisted reproduction columns (#45).
 `carrier_of` (#115): the conditions the person carries, by
-label like `tags`. Since #115 the `carrier` column is 1 for any carrier,
+label like `tags`. The `carrier` column is 1 for any carrier,
 condition recorded or not.

@@ -1,7 +1,6 @@
 /**
  * U-shape export, step 4: the figure. Symbols and the text beside them, the
- * consanguinity labels, title and key, assembled into the SVG. Split out of
- * uShapeExporter.ts (#149).
+ * consanguinity labels, title and key, assembled into the SVG.
  */
 import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { deidentify } from "../deidentify";

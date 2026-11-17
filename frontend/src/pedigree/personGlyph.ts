@@ -1,14 +1,10 @@
 /**
- * Everything drawn at one person, as plain data (#144).
- *
- * What is drawn for a person used to be decided in three places, each from
- * the raw `Individual` and `Pedigree`: the canvas node, the SVG export and
- * the U-shape export each called `symbolPaint`, `annotationRow`, `arrowKind`
- * and the label functions for themselves. `personGlyph` decides it once.
- * `layoutToFlow` puts the result on every node (`RFNodeData.glyph`), where
- * the canvas node and `exportSvg` read it; the U-shape export, which has its
- * own layout, calls it per person. A renderer draws what the glyph says and
- * asks the pedigree nothing.
+ * Everything drawn at one person, as plain data (#144), decided once for
+ * the canvas node, the SVG export and the U-shape export. `layoutToFlow`
+ * puts the result on every node (`RFNodeData.glyph`), where the canvas node
+ * and `exportSvg` read it; the U-shape export, which has its own layout,
+ * calls it per person. A renderer draws what the glyph says and asks the
+ * pedigree nothing.
  *
  * Editor-only marks (pin dot, problem marker, selection and picking
  * outlines, the dev id) are not part of it: they belong to the canvas node.

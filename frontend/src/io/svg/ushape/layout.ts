@@ -2,7 +2,7 @@
  * U-shape export, step 2: the layout. The bent coordinate system (`Geom`:
  * u along the U, depth across it), packing the tree along the tracks, and
  * the public `UShapeLayout` of positions and rotations. No SVG in here, so it
- * could move beside the layout engine. Split out of uShapeExporter.ts (#149).
+ * could move beside the layout engine.
  */
 import { type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { personGlyph, type PersonGlyph } from "../../../pedigree/personGlyph";

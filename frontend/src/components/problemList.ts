@@ -1,6 +1,6 @@
 /**
  * What the editor needs on top of the rules in `pedigree/validation.ts`
- * (#116, split out by #126): the problems of the pedigree being edited,
+ * (#116): the problems of the pedigree being edited,
  * cached and indexed by person, who a problem is about, which person to
  * select for it, and which one F8 goes to next. Used by the Person tab, the
  * toolbar's problems list, the canvas marker and the dev hooks.

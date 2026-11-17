@@ -180,6 +180,8 @@ From a git worktree, start the servers with `servers.mjs up --here` and pass the
 
 No em-dashes. Use commas, periods, or rewrite the sentence instead.
 
+A code comment says what the code does now and why, where that is not obvious from reading it. How it used to work, what a change replaced and why a refactor was done belong in the commit message and the issue, not in the code or the `AGENTS.md` files. Cite an issue number only where the issue explains a decision the reader would otherwise question. Data saved by an older version is a present fact and can be described ("pedigrees saved before #85 may carry the flag").
+
 ## Visual Design Direction
 
 **Black and white minimalist.** The UI should look like a clinical pedigree chart — not a generic SaaS app. The pedigree symbols (squares, circles, filled/unfilled, slashes, connecting lines) are the visual language; the chrome around them should get out of the way.

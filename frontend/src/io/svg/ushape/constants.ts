@@ -1,6 +1,6 @@
 /**
  * U-shape export: the sizes and gaps every part of it shares, and two small
- * helpers for writing SVG. Split out of uShapeExporter.ts (#149).
+ * helpers for writing SVG.
  */
 import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "../../../pedigree/proband";
 import { ENDED_STROKE_DY } from "../../../pedigree/ended";

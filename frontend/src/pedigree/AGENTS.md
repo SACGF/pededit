@@ -141,9 +141,7 @@ draws NSGC symbols.
   the childless and ended marks) and for a sibship (`sibshipLineGeometry`),
   from the edge data `layoutToFlow` made and the positions of the symbols at
   the ends. The canvas edge components call it with live node positions and
-  `svgExporter` with the laid out ones, so the two cannot disagree; before
-  #143 the export ran its own layout and drew a hopping line's riser out of
-  the top of the symbol. A couple line runs between the facing edges of the
+  `svgExporter` with the laid out ones, so the two cannot disagree. A couple line runs between the facing edges of the
   two symbol boxes, never centre to centre. Add anything new on a line
   there, not in a renderer.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
@@ -317,7 +315,7 @@ draws NSGC symbols.
   `keyRows(pedigree, "legend" | "export")` gives the tag, symbol,
   relationship and clinical detail rows, each with a `kind`, a label and
   what its swatch shows. `components/Legend.tsx` (`KeySwatch`) and
-  `exportKey.ts` (`renderKeySwatchSvg`, moved out of `tags.ts`) each draw a
+  `exportKey.ts` (`renderKeySwatchSvg`) each draw a
   row through a switch on its kind ending in a `never` check, so a new kind
   does not compile until both draw it. A new row for the key is a member of
   `KeyRow`, a line in `keyRows` and a place in `SYMBOL_ORDER` or
@@ -484,7 +482,7 @@ draws NSGC symbols.
   (#92), which all read `coupleConsanguinity` and are ticked and disabled
   when the kinship already relates the couple. Do not set it when creating a
   partnership: a stored flag does not follow later edits, which is why
-  `linkPartner`, `setParents` and PED import stopped writing it. Pedigrees
+  `linkPartner`, `setParents` and PED import do not write it. Pedigrees
   saved before #85 may carry the flag on couples who are related anyway; it
   is harmless there and shows as a ticked, editable checkbox only if a later
   edit removes the relationship.

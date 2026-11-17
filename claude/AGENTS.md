@@ -3,9 +3,8 @@
 Planning and research documents. Nothing here is loaded automatically; read
 what you need.
 
-- Pending work is tracked in GitHub issues, not here. The old phase plan
-  (`overall_plan.md`) was removed; the status summary lives in the root
-  AGENTS.md.
+- Pending work is tracked in GitHub issues, not here. The status summary
+  lives in the root AGENTS.md.
 - `layout_engine_guide.md` — required reading before touching the layout
   engine or renderer.
 - `nsgc_nomenclature.md`: the NSGC pedigree standard we follow, rule by rule,

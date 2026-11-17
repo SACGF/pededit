@@ -6,8 +6,8 @@
  * Which rows there are, in what order and with what label comes from
  * `keyRows(pedigree, "export")` (#148), the list the in-app legend also
  * draws from. This module only draws each row's swatch, through a switch on
- * the row's kind that TypeScript checks for completeness. Moved out of
- * `tags.ts`. Framework-free: strings only.
+ * the row's kind that TypeScript checks for completeness. Framework-free:
+ * strings only.
  */
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { endedMarkSegments } from "./ended";

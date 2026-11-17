@@ -293,7 +293,6 @@ const shown = (text: string | undefined) => text?.trim() ?? "";
 /** The starter rules. Keep each small and uncontroversial: a warning nobody can clear trains people to ignore them. */
 export const RULES: Rule[] = [
   {
-    // Moved here from the edit panel's hint (#104).
     id: "dob-unparseable",
     individual: ind => unparseable(ind.dob) && {
       severity: "warning",
@@ -302,7 +301,6 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // Moved here from the edit panel's hint (#103).
     id: "dod-unparseable",
     individual: ind => unparseable(ind.dod) && {
       severity: "warning",

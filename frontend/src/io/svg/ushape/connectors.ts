@@ -1,8 +1,7 @@
 /**
  * U-shape export, step 3: the lines. Couple lines, sibship bars, descent
  * lines, twin forks, assisted reproduction lines and the dashed links between
- * copies, drawn along the tracks. This geometry is the U-shape's own. Split
- * out of uShapeExporter.ts (#149).
+ * copies, drawn along the tracks. This geometry is the U-shape's own.
  */
 import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { childDropEndOffset } from "../symbolSvg";

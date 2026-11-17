@@ -4,8 +4,7 @@
  * Pedigree tab (`components/Legend.tsx`) and the key of the SVG, PNG and PDF
  * exports (`exportKey.ts`) both draw from this list, each through a switch on
  * `KeyRow["kind"]` that TypeScript checks for completeness: a new kind of row
- * does not compile until both draw it, so a row can no longer be added to one
- * and forgotten in the other (the export key had no proband row until #99).
+ * does not compile until both draw it.
  *
  * The two are not the same list. Every difference is here, in
  * `SYMBOL_ORDER`, `RELATIONSHIP_ORDER` and the lines marked "Legend only" /

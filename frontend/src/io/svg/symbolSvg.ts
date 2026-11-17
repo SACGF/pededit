@@ -1,8 +1,6 @@
 /**
  * A person's symbol as SVG markup, for both figure exports (#149): the
- * standard export draws it upright, the U-shape turned along its track. It
- * used to be written twice, the U-shape's copy differing by a rotation, so
- * the U-shape was the place a symbol change was most often missed.
+ * standard export draws it upright, the U-shape turned along its track.
  *
  * Everything here draws from the person's glyph (`pedigree/personGlyph.ts`,
  * #144) and mirrors `SymbolShape` in `pedigree/nodes/symbols.tsx`, which

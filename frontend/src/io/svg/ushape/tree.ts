@@ -2,7 +2,7 @@
  * U-shape export, step 1: the tree. From the pedigree to a descendant chart of
  * one founder couple: nodes (a person with their partners), unions and their
  * children, with consanguineous and repeated people joined. No positions and
- * no SVG. Split out of uShapeExporter.ts (#149).
+ * no SVG.
  */
 import { isAffected, placementParentOf, type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "../../../pedigree/consanguinity";
