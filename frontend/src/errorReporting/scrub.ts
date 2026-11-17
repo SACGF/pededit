@@ -61,6 +61,9 @@ const ROUTES: [RegExp, string][] = [
   [/^\/login\/?$/, "/login"],
   [/^\/auth\/github\/callback\/?$/, "/auth/github/callback"],
   [/^\/changelog\/?$/, "/changelog"],
+  [/^\/guides\/?$/, "/guides"],
+  [/^\/guides\/[^/]+\/?$/, "/guides/[slug]"],
+  [/^\/example\/[^/]+\/?$/, "/example/[slug]"],
   [/^\/p\/[^/]+\/?$/, `/p/${ID_PLACEHOLDER}`],
 ];
 

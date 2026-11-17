@@ -3,7 +3,7 @@
 export default {
   name: "signed-in",
   asAgent: true,
-  about: "Signed in, a new pedigree is listed under Your pedigrees, renamed from the sidebar and deleted from Settings",
+  about: "Signed in, a new pedigree is listed under Your pedigrees, renamed from the sidebar and deleted from Settings, and signing out takes owned pedigrees off Recent",
   async run(t) {
     await t.open("/");
     t.ok(!!(await t.eval(() => localStorage.getItem("access_token"))), "the agent user is signed in");
@@ -55,6 +55,24 @@ export default {
     const copy = new URL(t.page.url()).pathname.split("/").pop();
     const mineNow = (await (await api("/api/pedigrees/")).json()).filter(p => p.id === copy).map(p => p.title);
     t.equal(mineNow, ["Simple family"], "an edited example is saved as a copy that belongs to the signed-in user");
+
+    // Signing out takes the account's pedigrees off Recent on this device
+    // (their links no longer open) and leaves the others (#187).
+    const other = "00000000-0000-4000-8000-000000000187";
+    await t.eval(other => {
+      const list = JSON.parse(localStorage.getItem("recentPedigrees") ?? "[]");
+      localStorage.setItem("recentPedigrees", JSON.stringify([...list, { id: other, title: "Made signed out", openedAt: new Date().toISOString() }]));
+    }, other);
+    await t.open("/");
+    const recent = pid => t.count(`[data-testid="recent-on-this-device"] button[title="/p/${pid}"]`);
+    await t.waitFor(`[data-testid="recent-on-this-device"] button[title="/p/${copy}"]`);
+    t.equal([await recent(copy), await recent(other)], [1, 1], "the owned copy and another pedigree are under Recent on this device");
+    await t.click('button:text-is("Sign out")');
+    await t.sleep(800);
+    t.ok(!(await t.eval(() => localStorage.getItem("access_token"))), "Sign out signs out");
+    await t.open("/");
+    await t.sleep(300);
+    t.equal([await recent(copy), await recent(other)], [0, 1], "signing out takes the account's pedigree off Recent and keeps the other");
     await api(`/api/pedigrees/${copy}/`, { method: "DELETE" });
   },
 };

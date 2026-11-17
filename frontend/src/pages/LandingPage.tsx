@@ -9,7 +9,7 @@ import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import { GUIDES, guidePath } from "../guides/guides";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
-import { GOOGLE_CLIENT_ID } from "../config";
+import { GOOGLE_CLIENT_ID, ROLLBAR_ACCESS_TOKEN } from "../config";
 import { requestErrorMessage } from "../api/errors";
 import { backupStatement } from "../utils/backupStatement";
 import type { ReactNode } from "react";
@@ -118,7 +118,7 @@ export default function LandingPage() {
           {!isAuthenticated && (
             <p className="text-sm text-gray-500 mb-8 max-w-xl">
               <span className="text-black font-medium">No account required.</span>{" "}
-              Click a button below to start drawing. Each pedigree is saved at its own private URL, so bookmark the link to come back to it or share it with a colleague.{" "}
+              Click a button below to start drawing. Each pedigree is saved at its own link, which is not listed anywhere: bookmark it to come back, or send it to a colleague. Anyone who has the link can open the pedigree.{" "}
               <span
                 className="text-black underline underline-offset-2 cursor-pointer"
                 onClick={() => navigate("/login")}
@@ -338,18 +338,23 @@ function MyPedigrees() {
  * - de-identified export: `io/svg/deidentify.ts`;
  * - browser storage: `utils/recentPedigrees.ts`, the tokens in
  *   `store/useAppStore.ts`, `showMinimap` and `compactLayout` in `CanvasPage`;
- * - other sites: `components/GoogleAuthProvider.tsx` wraps the whole app, so
- *   Google's script loads on every page when a Google client ID is built in;
+ * - other sites: `components/GoogleAuthProvider.tsx` wraps the sign-in page
+ *   only (`App.tsx`), so Google's script loads there and nowhere else, when
+ *   a Google client ID is built in; error reports go to Rollbar when the
+ *   build has a token, carrying what `errorReporting/scrub.ts` allows;
  * - logs: `deploy/pededit-nginx.conf`, `deploy/pededit.service` (access logs
  *   on, health check left out) and `manage.py usage_stats`.
  *
  * Still to revisit:
- * - #49 (error reporting): once errors are reported to an outside service,
- *   "What is not done" must name it and say what a report carries.
  * - #47 (hardening, rate limiting): check the sentence about request logs.
  * - Where the server is and who runs it is not said, because the repository
  *   does not say. Add it under its own heading once the maintainer has.
  */
+/** Follows `errorReporting/scrub.ts` and `backend/peded/error_reporting.py`: change them together. */
+const ERROR_REPORTS = "When the app or the server hits an error, a report goes to Rollbar, an error tracking service: "
+  + "the kind of error, where in the code it happened and the kind of page (a pedigree page, not which one). A "
+  + "report never carries what is in a pedigree, a pedigree's link, or who you are.";
+
 function YourData() {
   // The static copy built for search engines (prerender.tsx) knows no host.
   const host = typeof window === "undefined" ? "this site" : window.location.host;
@@ -404,7 +409,8 @@ function YourData() {
         <>
           This browser keeps the <span className={name}>Recent on this device</span> list (the links and titles
           of the last 20 pedigrees opened here), two display settings and, while you are signed in, your sign-in
-          tokens. On a shared computer, anyone using this browser can see that list and follow its links.
+          tokens. Signing out takes your account&apos;s pedigrees off that list. On a shared computer, anyone
+          using this browser can see the rest of it and follow its links.
         </>
       ),
     },
@@ -427,8 +433,9 @@ function YourData() {
           No analytics, advertising or tracking scripts. The app sends a pedigree only to {host}, and exports
           are made in your browser.{" "}
           {GOOGLE_CLIENT_ID
-            ? "One script comes from another site: Google's sign-in script, which loads with every page so that Sign in works. No pedigree is sent to it."
+            ? "One script comes from another site, on the Sign in page only: Google's sign-in script. No pedigree is sent to it."
             : "No scripts, fonts or other files are loaded from other sites."}{" "}
+          {ROLLBAR_ACCESS_TOKEN && ERROR_REPORTS}{" "}
           The server&apos;s request logs record the time, the address requested (which includes a
           pedigree&apos;s id, not its contents), the browser and the IP address. The server&apos;s usage
           figures count pedigrees and accounts, not what is in them.

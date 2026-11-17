@@ -4,13 +4,15 @@ import LoginPage from "./pages/LoginPage";
 import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import CanvasPage from "./pages/CanvasPage";
 import ChangelogPage from "./pages/ChangelogPage";
+import { GoogleAuthProvider } from "./components/GoogleAuthProvider";
 import GuidePage, { GuidesIndexPage } from "./pages/GuidePage";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      {/* The provider adds Google's script to the page, so it wraps the sign-in page only. */}
+      <Route path="/login" element={<GoogleAuthProvider><LoginPage /></GoogleAuthProvider>} />
       <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
       <Route path="/changelog" element={<ChangelogPage />} />
       <Route path="/guides" element={<GuidesIndexPage />} />

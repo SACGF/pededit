@@ -161,6 +161,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
     if ((activePedigreeId || example) && usePedigreeStore.getState().isDirty) {
       await get().saveActivePedigree();
     }
+    // The account's pedigrees leave "Recent on this device": their links no
+    // longer open, and their titles would stay for the next person here.
+    let owned: { id: string }[] = get().pedigrees;
+    try { owned = (await pedigreeApi.list()).data; } catch { /* offline: what the list last held */ }
+    for (const p of owned) forgetRecentPedigree(p.id);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     usePedigreeStore.getState().reset();

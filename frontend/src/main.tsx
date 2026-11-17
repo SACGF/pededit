@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { GoogleAuthProvider } from "./components/GoogleAuthProvider.tsx";
 import App from "./App.tsx";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { initErrorReporting } from "./errorReporting";
@@ -17,12 +16,10 @@ initErrorReporting();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <GoogleAuthProvider>
-      <BrowserRouter>
-        <ErrorBoundary>
-          <App />
-        </ErrorBoundary>
-      </BrowserRouter>
-    </GoogleAuthProvider>
+    <BrowserRouter>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </BrowserRouter>
   </StrictMode>
 );

@@ -199,11 +199,14 @@ reporting is off, and the dev server never reports.
   the server logs. It is not a privacy policy and must not be called one. It
   does not say where the server is or who runs it, because the repository
   does not.
-- **Google's sign-in script loads on every page**, not only `/login`, when
-  the build has a Google client ID: `GoogleAuthProvider` wraps the whole app
-  in `main.tsx` and `@react-oauth/google` adds the script tag on mount. It is
-  the only request to another site, and the landing page says so (the
-  sentence follows `GOOGLE_CLIENT_ID`).
+- **Google's sign-in script loads on the sign-in page only**, when the
+  build has a Google client ID: `GoogleAuthProvider` wraps `LoginPage` in
+  `App.tsx` and `@react-oauth/google` adds the script tag on mount. It is
+  the only script from another site, and the landing page says so (the
+  sentence follows `GOOGLE_CLIENT_ID`). Do not move the provider up the
+  tree. The landing page also says errors are reported to Rollbar when the
+  build has a token (`ERROR_REPORTS`), and that signing out takes the
+  account's pedigrees off "Recent on this device" (`logout`).
 
 ## Layout of src/
 

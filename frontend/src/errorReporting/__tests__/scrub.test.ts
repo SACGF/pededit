@@ -79,6 +79,9 @@ describe("routes and script URLs", () => {
     expect(routeOf(`/p/${UUID}`)).toBe("/p/[id]");
     expect(routeOf("/p/anything-at-all/")).toBe("/p/[id]");
     expect(routeOf("/")).toBe("/");
+    expect(routeOf("/example/targaryen")).toBe("/example/[slug]");
+    expect(routeOf(`/example/${NAME}`)).toBe("/example/[slug]");
+    expect(routeOf("/guides/consanguinity")).toBe("/guides/[slug]");
     expect(routeOf("/auth/github/callback")).toBe("/auth/github/callback");
     expect(routeOf(`/somewhere/${NAME}`)).toBe("[other]");
   });
