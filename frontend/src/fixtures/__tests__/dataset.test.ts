@@ -42,13 +42,12 @@ interface ManifestEntry {
   valid: boolean;
   /**
    * What POST /api/pedigrees/ does with the file's pedigree: "accepted" (and
-   * returned unchanged), "refused" (400), "not-sent" when the fault is in
-   * the file or its envelope, which the server never sees, or
-   * "accepted-unchecked": the importer refuses it but the server stores it,
-   * because the server checks the shape of each field and not the structure
-   * (ids that exist, no cycles). Whether it should is #170.
+   * returned unchanged), "refused" (400: a field missing or mistyped, or a
+   * structure that does not fit together, `structure_errors` in
+   * backend/api/serializers.py), or "not-sent" when the fault is in the file
+   * or its envelope, which the server never sees.
    */
-  server: "accepted" | "refused" | "not-sent" | "accepted-unchecked";
+  server: "accepted" | "refused" | "not-sent";
   /** Left out of the browser sweep. */
   timingOnly?: true;
   people?: number;
@@ -71,9 +70,6 @@ function serverPayload(c: DatasetCase): unknown {
 
 /** Importer errors that are about the file or envelope, not the pedigree in it. */
 const ENVELOPE_ERRORS = new Set<string>([JsonIssueCode.INVALID_JSON, JsonIssueCode.NOT_AN_OBJECT, JsonIssueCode.UNKNOWN_FORMAT]);
-/** Importer errors the server's serializers also raise: a field missing or of the wrong type. */
-const SHAPE_ERRORS = new Set<string>([JsonIssueCode.MISSING_FIELD, JsonIssueCode.WRONG_TYPE]);
-
 const imported = new Map<string, ReturnType<typeof importJson>>();
 const importOf = (c: DatasetCase) => {
   if (!imported.has(c.file)) imported.set(c.file, importJson(datasetFileText(c)));
@@ -87,8 +83,7 @@ function describeCase(c: DatasetCase): ManifestEntry {
     file: c.file, group: c.group, purpose: c.purpose,
     import: unique(result.issues.map(i => `${i.severity}:${i.code}`)),
     valid: !result.hasErrors,
-    server: !result.hasErrors ? "accepted" : errors.every(e => ENVELOPE_ERRORS.has(e)) ? "not-sent"
-      : errors.some(e => SHAPE_ERRORS.has(e)) ? "refused" : "accepted-unchecked",
+    server: !result.hasErrors ? "accepted" : errors.every(e => ENVELOPE_ERRORS.has(e)) ? "not-sent" : "refused",
     ...(c.timingOnly ? { timingOnly: true as const } : {}),
   };
   const p = result.pedigree;

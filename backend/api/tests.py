@@ -6,6 +6,7 @@ from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from .models import Pedigree, TagPreset
+from .serializers import structure_errors
 
 FULL_PEDIGREE = {
     "individuals": [
@@ -33,7 +34,7 @@ FULL_PEDIGREE = {
             ],
         },
         {"id": "c2", "sex": "unknown", "affected": False, "sibOrder": 2},
-        {"id": "c2", "sex": "unknown", "affected": False, "sibOrder": 2,
+        {"id": "c3", "sex": "unknown", "affected": False, "sibOrder": 2,
          "carriedBy": "s", "socialParents": ["w2"]},
         {"id": "d", "sex": "male", "affected": False, "sibOrder": 0, "reproductiveRole": "donor"},
         {"id": "s", "sex": "female", "affected": False, "sibOrder": 0, "reproductiveRole": "surrogate"},
@@ -617,20 +618,71 @@ class PedigreeDataSetTests(APITestCase):
                 self.assertEqual(resp.status_code, 400, entry["file"])
         self.assertGreater(seen, 1)
 
-    def test_structure_is_not_checked(self):
-        """Files the JSON importer refuses for their structure (an id that does
-        not exist, a cycle) are stored: the serializers check each field's
-        shape only. Whether the server should refuse them is #170; this test
-        records what it does, so a change is made on purpose."""
-        seen = 0
+    def test_broken_structure_is_refused_on_create_with_the_path(self):
+        """What the JSON importer refuses for its structure (an id that does
+        not exist, a cycle), the server refuses on create, naming the path so
+        a caller can fix its JSON (#201). The editor cannot lay these out."""
+        expected = {
+            "refused/duplicate-id.json": "individuals[",
+            "refused/unknown-individual.json": "partnerships[",
+            "refused/unknown-partnership.json": 'parentOf["',
+            "refused/self-partnership.json": "with itself",
+            "refused/child-of-own-partnership.json": "child of its own partnership",
+            "refused/two-sets-of-parents.json": "child of two partnerships",
+            "refused/circular-ancestry.json": "parentOf: circular ancestry",
+        }
+        seen = set()
         for entry, data in self.cases():
-            if entry["server"] != "accepted-unchecked":
+            if entry["file"] not in expected:
                 continue
-            seen += 1
+            seen.add(entry["file"])
             with self.subTest(entry["file"]):
-                resp = self.client.post("/api/pedigrees/", {"title": entry["file"], "data": data}, format="json")
-                self.assertEqual(resp.status_code, 201, entry["file"])
-        self.assertGreater(seen, 5)
+                self.assertEqual(entry["server"], "refused")
+                resp = self.client.post("/api/pedigrees/", {"title": "T", "data": data}, format="json")
+                self.assertEqual(resp.status_code, 400)
+                self.assertIn(expected[entry["file"]], " ".join(resp.json()["data"]))
+        self.assertEqual(seen, set(expected))
+
+    def test_broken_structure_is_stored_on_update(self):
+        """The editor auto-saves the whole pedigree, so an update is never
+        refused for its structure: a 400 there would lose every later edit
+        (#170)."""
+        broken = next(data for entry, data in self.cases() if entry["file"] == "refused/circular-ancestry.json")
+        resp = self.client.post(
+            "/api/pedigrees/", {"title": "T", "data": {"individuals": [], "partnerships": [], "parentOf": {}}}, format="json"
+        )
+        url = f"/api/pedigrees/{resp.data['id']}/"
+        for method in (self.client.patch, self.client.put):
+            with self.assertLogs("api.serializers", level="WARNING") as logs:
+                resp = method(url, {"title": "T", "data": broken}, format="json")
+            self.assertEqual(resp.status_code, 200, resp.content)
+            self.assertEqual(Pedigree.objects.get(pk=resp.data["id"]).data, broken)
+            # The log line carries a count, never the ids.
+            self.assertEqual([r.getMessage() for r in logs.records], ["Pedigree updated with 1 structure errors"])
+
+    def test_a_long_line_of_descent_is_not_a_cycle(self):
+        n = 3000
+        data = {
+            "individuals": [{"id": f"i{k}", "sex": "male", "affected": False} for k in range(n)]
+            + [{"id": f"s{k}", "sex": "female", "affected": False} for k in range(n)],
+            "partnerships": [{"id": f"p{k}", "individual1": f"i{k}", "individual2": f"s{k}"} for k in range(n)],
+            "parentOf": {f"p{k}": [f"i{k + 1}"] for k in range(n - 1)},
+        }
+        self.assertEqual(structure_errors(data), [])
+        data["parentOf"][f"p{n - 1}"] = ["i0"]
+        self.assertIn("circular ancestry", structure_errors(data)[0])
+
+    def test_the_documented_api_example_is_accepted(self):
+        """The curl example of docs/pedigree-json-format.md ("Creating a
+        pedigree through the API") is posted as written."""
+        doc = (self.DATA_DIR.parents[1] / "docs" / "pedigree-json-format.md").read_text()
+        section = doc[doc.index("## Creating a pedigree through the API"):]
+        body = section[section.index("-d '") + 4:]
+        body = json.loads(body[:body.index("\n'")])
+        self.assertEqual(body["data"]["canvasSettings"]["notation"], "nsgc2022")
+        resp = self.client.post("/api/pedigrees/", body, format="json")
+        self.assertEqual(resp.status_code, 201, resp.content)
+        self.assertEqual(self.client.get(f"/api/pedigrees/{resp.data['id']}/").json()["data"], body["data"])
 
 
 class NoPasswordSignInTests(APITestCase):

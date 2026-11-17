@@ -316,6 +316,7 @@ the flow. They run in CI.
 | `rate-limited` | spends a test address's anonymous-create allowance, then the landing page, an example link and GitHub sign-in say how long to wait (#184) |
 | `delete-account` | as `claude_agent_throwaway`: Delete account counts what goes, Cancel, then the account, its pedigrees, My library and its tokens are gone, an anonymous pedigree stays (#183) |
 | `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |
+| `api-created` | the `curl` example of `docs/pedigree-json-format.md` posted with no account: its link draws, an edit saves, a broken reference is refused with its path (#201) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

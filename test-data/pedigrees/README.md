@@ -26,10 +26,9 @@ fixed at the manifest's `today`), and the render and export lint codes. A file
 with expectations is a test: when any of those changes, the frontend test
 fails until the manifest is rewritten on purpose.
 
-`server` is `accepted` (stored and returned unchanged), `refused` (400),
-`not-sent` (the fault is in the file or its envelope, which the server never
-sees) or `accepted-unchecked` (the importer refuses it, the server stores it:
-see #170).
+`server` is what creating a pedigree from the file does: `accepted` (stored
+and returned unchanged), `refused` (400) or `not-sent` (the fault is in the
+file or its envelope, which the server never sees).
 
 ## The files are generated
 

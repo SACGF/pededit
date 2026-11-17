@@ -1,8 +1,12 @@
 import json
+import logging
 
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Pedigree, TagPreset
+
+
+logger = logging.getLogger(__name__)
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
@@ -162,9 +166,102 @@ class PedigreeDataSerializer(serializers.Serializer):
     filters = _opt(ViewFiltersSerializer)
 
 
+def structure_errors(data):
+    """How the parts of a field-valid pedigree fail to fit together, as
+    messages that start with the path. The same checks, in the same order, as
+    the errors of the JSON importer (frontend/src/io/json/importer.ts): the
+    editor cannot lay out a pedigree that fails them. Keep the two in step.
+    Ids are quoted with %r so error reporting scrubs them."""
+    errors = []
+
+    individual_ids = set()
+    for i, ind in enumerate(data["individuals"]):
+        if ind["id"] in individual_ids:
+            errors.append(f"individuals[{i}]: duplicate individual id {ind['id']!r}")
+        individual_ids.add(ind["id"])
+
+    partners = {}
+    partnership_ids = set()
+    for i, p in enumerate(data["partnerships"]):
+        pid, a, b = p["id"], p["individual1"], p["individual2"]
+        if pid in partnership_ids:
+            errors.append(f"partnerships[{i}]: duplicate partnership id {pid!r}")
+        partnership_ids.add(pid)
+        for key, member in (("individual1", a), ("individual2", b)):
+            if member not in individual_ids:
+                errors.append(f"partnerships[{i}].{key}: partnership {pid!r} refers to unknown individual {member!r}")
+        if a == b:
+            errors.append(f"partnerships[{i}]: partnership {pid!r} pairs individual {a!r} with itself")
+        partners[pid] = (a, b)
+
+    child_of = {}
+    for pid, children in data["parentOf"].items():
+        path = f'parentOf["{pid}"]'
+        if pid not in partnership_ids:
+            errors.append(f"{path}: parentOf key {pid!r} is not a partnership id")
+        seen = set()
+        for child in children:
+            if child not in individual_ids:
+                errors.append(f"{path}: child {child!r} of partnership {pid!r} does not exist")
+                continue
+            if child in seen:
+                errors.append(f"{path}: child {child!r} is listed twice under partnership {pid!r}")
+                continue
+            seen.add(child)
+            if child in partners.get(pid, ()):
+                errors.append(f"{path}: individual {child!r} is a child of its own partnership {pid!r}")
+            other = child_of.setdefault(child, pid)
+            if other != pid:
+                errors.append(f"{path}: individual {child!r} is a child of two partnerships ({other!r} and {pid!r})")
+
+    tag_ids = set()
+    for i, tag in enumerate(data.get("tags") or []):
+        if tag["id"] in tag_ids:
+            errors.append(f"tags[{i}]: duplicate tag id {tag['id']!r}")
+        tag_ids.add(tag["id"])
+
+    if not errors:
+        cycle = _ancestry_cycle(child_of, partners)
+        if cycle:
+            errors.append("parentOf: circular ancestry: " + " -> ".join(repr(x) for x in cycle))
+    return errors
+
+
+def _ancestry_cycle(child_of, partners):
+    """The first person found to be their own ancestor, as the chain of ids
+    from them up to themselves, or []. Walks without recursion: the depth is
+    whatever the caller sent."""
+    done = set()
+    for start in child_of:
+        if start in done:
+            continue
+        path, on_path = [start], {start}
+        stack = [iter(partners.get(child_of[start], ()))]
+        while stack:
+            parent = next(stack[-1], None)
+            if parent is None:
+                stack.pop()
+                finished = path.pop()
+                on_path.discard(finished)
+                done.add(finished)
+            elif parent in on_path:
+                return path[path.index(parent):] + [parent]
+            elif parent not in done:
+                path.append(parent)
+                on_path.add(parent)
+                stack.append(iter(partners.get(child_of.get(parent), ())))
+    return []
+
+
 class PedigreeDataField(serializers.Field):
     """Validates pedigree JSON with PedigreeDataSerializer, then stores the
-    submitted value untouched (lossless: unknown keys kept, nothing added)."""
+    submitted value untouched (lossless: unknown keys kept, nothing added).
+
+    A pedigree whose parts do not fit together (structure_errors) is refused
+    on create, where the caller is a script or an import and can fix its JSON.
+    On update it is stored: the editor auto-saves the whole pedigree, and
+    refusing would turn one bad edit into every later edit being lost (#170).
+    """
 
     def to_internal_value(self, data):
         if not isinstance(data, dict):
@@ -172,6 +269,12 @@ class PedigreeDataField(serializers.Field):
         checker = PedigreeDataSerializer(data=data)
         if not checker.is_valid():
             raise serializers.ValidationError(checker.errors)
+        errors = structure_errors(data)
+        if errors:
+            if getattr(self.parent, "instance", None) is None:
+                raise serializers.ValidationError(errors)
+            # No ids or messages: they are pedigree content.
+            logger.warning("Pedigree updated with %d structure errors", len(errors))
         # Round-trip through JSON so the stored value is plain JSON types and
         # does not alias the request body.
         return json.loads(json.dumps(data))

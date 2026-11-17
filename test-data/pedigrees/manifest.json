@@ -804,7 +804,7 @@
         "error:DUPLICATE_ID"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/unknown-individual.json",
@@ -814,7 +814,7 @@
         "error:UNKNOWN_INDIVIDUAL"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/unknown-partnership.json",
@@ -824,7 +824,7 @@
         "error:UNKNOWN_PARTNERSHIP"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/self-partnership.json",
@@ -834,7 +834,7 @@
         "error:SELF_PARTNERSHIP"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/child-of-own-partnership.json",
@@ -844,7 +844,7 @@
         "error:CHILD_OF_OWN_PARTNERSHIP"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/two-sets-of-parents.json",
@@ -854,7 +854,7 @@
         "error:MULTIPLE_PARENT_SETS"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "refused/circular-ancestry.json",
@@ -864,7 +864,7 @@
         "error:CIRCULAR_ANCESTRY"
       ],
       "valid": false,
-      "server": "accepted-unchecked"
+      "server": "refused"
     },
     {
       "file": "size/family-100.json",

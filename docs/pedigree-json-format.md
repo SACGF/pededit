@@ -1,6 +1,6 @@
 # PedEdit pedigree JSON format
 
-PedEdit can download any pedigree as a JSON file and import it again without loss. Unlike PED export (which drops names, notes, HPO terms and node positions by design), the JSON file contains every field of the data model, so it is the format to use when you want to keep a complete copy of a pedigree yourself or move it between PedEdit instances.
+PedEdit can download any pedigree as a JSON file and import it again without loss. The same pedigree object is what the API stores, so a script can create a pedigree and get a link to it ("Creating a pedigree through the API" below). Unlike PED export (which drops names, notes, HPO terms and node positions by design), the JSON file contains every field of the data model, so it is the format to use when you want to keep a complete copy of a pedigree yourself or move it between PedEdit instances.
 
 A machine-readable JSON Schema (draft 2020-12) for this format is in [`pedigree-json-schema.json`](pedigree-json-schema.json). The canonical TypeScript definition is the `Pedigree` interface in `layout-engine/src/types.ts`; the Django `JSONField` and the editor's in-memory store mirror it exactly.
 
@@ -158,6 +158,71 @@ Any other property on a partnership is preserved as-is.
 | `members` | string[] | yes | At least two ids, all children of the partnership in `parentOf`, each in at most one set. The layout keeps them side by side in this order. |
 | `zygosity` | `"monozygotic"`, `"dizygotic"` or `"unknown"` | yes | Drawn as a shared fork from the sibship bar, with a bar across the fork for monozygotic and a `?` for unknown. Monozygotic members must have the same sex; the editor changes the sex of all of them together. |
 
+## Creating a pedigree through the API
+
+A script or an AI assistant can create a pedigree without an account or the editor: post the JSON, get an id back, and open `https://pededit.com/p/<id>`. The layout is computed in the browser when the link is opened, so nothing about positions has to be sent.
+
+| Call | What it does |
+| --- | --- |
+| `POST /api/pedigrees/` | Create. Body `{ "title": string, "data": Pedigree }`; `title` is optional (it is the pedigree's name, and the chart title unless `chartTitle` is set). Answers `201` with `id`, `title`, `data`, `created` and `updated`. |
+| `GET /api/pedigrees/<id>/` | Read it back, in the same shape. |
+| `PATCH /api/pedigrees/<id>/` | Update. Send `title`, `data` or both; `data` replaces the whole pedigree. `PUT` needs both. |
+| `DELETE /api/pedigrees/<id>/` | Delete it. Answers `204`. |
+
+The API takes the bare `Pedigree` object under `data`, not the envelope of a downloaded file: sending `format`, `version` and `pedigree` there is refused as missing `individuals`.
+
+Sent with no `Authorization` header, the pedigree is anonymous. Its id is the only key: anyone who has the link can open, change and delete it, and it cannot be found without the link. Give the link to the person the pedigree is for, and treat it as you would the pedigree itself. Family histories are health information, so leave names and dates of birth out of what a script sends unless they are needed; people can be named in the editor afterwards.
+
+### What a minimal pedigree needs
+
+- `individuals`: each with `id`, `sex` and `affected`. Everything else is optional, `sibOrder` included: siblings are drawn in the order of their `parentOf` list.
+- `partnerships`: each with `id`, `individual1` and `individual2`. A person with one known parent needs a partnership too, with a second `"unknown"`-sex individual as the other parent.
+- `parentOf`: the children of each partnership, `{}` when there are none.
+- `canvasSettings` with `"notation": "nsgc2022"`, to draw the current NSGC style. A pedigree with no `notation` is drawn in the 2008 style, as pedigrees saved before the setting existed are. `canvasSettings` needs `nodesMoveable`, `snapToGrid` and `snapGridSize` whenever it is sent.
+
+Positions, pedigree numbers, kinship and the legend are computed. `siblingOrder` and the other settings take their defaults.
+
+### Example
+
+The family of the worked example below, without the envelope:
+
+```sh
+curl -X POST https://pededit.com/api/pedigrees/ \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "title": "Example family",
+  "data": {
+    "individuals": [
+      { "id": "i1", "sex": "male", "affected": false },
+      { "id": "i2", "sex": "female", "affected": false },
+      { "id": "i3", "sex": "female", "affected": true, "proband": true },
+      { "id": "i4", "sex": "male", "affected": false, "deceased": true }
+    ],
+    "partnerships": [
+      { "id": "p1", "individual1": "i1", "individual2": "i2" }
+    ],
+    "parentOf": { "p1": ["i3", "i4"] },
+    "canvasSettings": { "nodesMoveable": false, "snapToGrid": false, "snapGridSize": 5, "notation": "nsgc2022" }
+  }
+}
+'
+```
+
+The answer starts `{"id":"3f0c...","title":"Example family",...}`, and the pedigree is then at `https://pededit.com/p/3f0c...`.
+
+### What is refused
+
+A create answers `400` with the reasons under `data` when:
+
+- a required field is missing or a field has the wrong type or an unknown value. The reasons are nested as the document is: `{"data": {"individuals": {"2": {"sex": ["\"m\" is not a valid choice."]}}}}`.
+- the parts do not fit together: the errors listed under "Validation on import" below (a partnership naming someone who does not exist, a `parentOf` key that is not a partnership, a child of two partnerships, circular ancestry, duplicate ids). Each reason starts with its path: `{"data": ["partnerships[0].individual2: partnership 'p1' refers to unknown individual 'i9'"]}`.
+
+Fix the JSON and post it again. An update is checked for field types only, so that the editor's auto-save is never turned away.
+
+### Rate limits
+
+Creating pedigrees without an account is limited per client address, to 20 a minute and 500 a day on pededit.com (`anon_create_burst` and `anon_create_sustained`; a self-hosted copy sets its own). Over the limit the answer is `429` with a `Retry-After` header in seconds. Reading, updating and deleting are not limited.
+
 ## Validation on import
 
 The importer never throws. It returns the pedigree together with a list of issues, each with a severity, a code, a message and a dotted path into the document (for example `pedigree.individuals[2].sex`).
@@ -216,6 +281,7 @@ The same family as a bare pedigree is just the value of `"pedigree"` on its own.
 
 ## Where the code lives
 
+- API: `backend/api/views.py` (`PedigreeViewSet`), field and structure checks in `backend/api/serializers.py`, rate limits in `backend/api/throttling.py`
 - Exporter: `frontend/src/io/json/exporter.ts` (`exportJson`)
 - Importer and validator: `frontend/src/io/json/importer.ts` (`importJson`)
 - Issue codes and envelope type: `frontend/src/io/json/types.ts`
