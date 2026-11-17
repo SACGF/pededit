@@ -100,19 +100,6 @@ export function drawnLeftPartner(pedigree: Pedigree, layout: LayoutResult, partn
  */
 export function preferPartnerLineages(horder: Float64Array, input: LayoutInput, pedigree: Pedigree, depth: Int32Array): void {
   const idToIdx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
-  const hasParents = (x: number) => (input.findex[x] ?? 0) > 0;
-  const lineOf = (x: number): Set<number> => {
-    const out = new Set<number>([x]);
-    const stack = [x];
-    while (stack.length) {
-      const y = stack.pop()!;
-      for (const p of [input.findex[y] ?? 0, input.mindex[y] ?? 0]) {
-        if (p > 0 && !out.has(p)) { out.add(p); stack.push(p); }
-      }
-    }
-    return out;
-  };
-
   // [left, right] pairs whose lines should be drawn in that order.
   const pairs: [number, number][] = [];
   const sidesOf = new Map<number, { left: number[]; right: number[] }>(); // person -> partners left / right of them
@@ -132,6 +119,29 @@ export function preferPartnerLineages(horder: Float64Array, input: LayoutInput, 
   for (const { left, right } of sidesOf.values()) {
     for (const l of left) for (const r of right) pairs.push([l, r]);
   }
+
+  orderLineages(horder, input, depth, pairs);
+}
+
+/**
+ * For each `[left, right]` pair of people who both have parents, give the
+ * left one's line (the person and their ancestors) the earlier ranks among
+ * the slots the two lines hold at each generation. People on both lines or
+ * on neither keep their ranks. `horder` is changed in place.
+ */
+export function orderLineages(horder: Float64Array, input: LayoutInput, depth: Int32Array, pairs: [number, number][]): void {
+  const hasParents = (x: number) => (input.findex[x] ?? 0) > 0;
+  const lineOf = (x: number): Set<number> => {
+    const out = new Set<number>([x]);
+    const stack = [x];
+    while (stack.length) {
+      const y = stack.pop()!;
+      for (const p of [input.findex[y] ?? 0, input.mindex[y] ?? 0]) {
+        if (p > 0 && !out.has(p)) { out.add(p); stack.push(p); }
+      }
+    }
+    return out;
+  };
 
   for (const [left, right] of pairs) {
     if (!hasParents(left) || !hasParents(right)) continue;

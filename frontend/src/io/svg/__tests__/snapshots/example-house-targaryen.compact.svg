@@ -1,89 +1,89 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1208" height="1718"
-     viewBox="0 0 1208 1718">
+<svg xmlns="http://www.w3.org/2000/svg" width="1209" height="1718"
+     viewBox="0 0 1209 1718">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
           refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="1208" height="1718" fill="white"/>
-<text class="chart-title" x="604" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Targaryen</text>
+<rect width="1209" height="1718" fill="white"/>
+<text class="chart-title" x="604.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Targaryen</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
-<path d="M 383.16 0 L 411.16 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 349.16 82 L 377.16 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 349.16 86 L 377.16 86" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 417.16 82 L 445.16 82" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 417.16 86 L 445.16 86" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 349.16 168 L 377.16 168" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 73.12 250 L 101.12 250" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 73.12 254 L 101.12 254" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 499.18 250 L 527.18 250" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 499.18 254 L 527.18 254" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 292 336 L 320 336" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 372.54 0 L 400.54 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 338.54 82 L 366.54 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 338.54 86 L 366.54 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 406.54 82 L 434.54 82" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 406.54 86 L 434.54 86" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 338.54 168 L 366.54 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 71.41 250 L 99.41 250" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 71.41 254 L 99.41 254" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 482.62 250 L 510.62 250" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 482.62 254 L 510.62 254" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 292 334 L 320 334" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 292 338 L 320 338" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 428 336 L 456 336" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 564 334 L 592 334" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 564 338 L 592 338" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 224.94 420 L 286 420" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 462 418 L 494.37 418" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 462 422 L 494.37 422" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 534.37 420 L 562.37 420" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 144.19 502 L 172.19 502" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 144.19 506 L 172.19 506" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 391.19 502 L 419.19 502" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 391.19 506 L 419.19 506" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 459.19 502 L 487.19 502" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 459.19 506 L 487.19 506" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 595.19 502 L 623.19 502" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 595.19 506 L 623.19 506" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 233.43 588 L 261.43 588" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 369.43 588 L 397.43 588" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 326.79 670 L 354.79 670" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 326.79 674 L 354.79 674" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 394.79 670 L 422.79 670" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 394.79 674 L 422.79 674" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 400.63 756 L 428.63 756" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 536.63 840 L 564.63 840" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 661.29 924 L 689.29 924" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 627.29 1006 L 655.29 1006" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 627.29 1010 L 655.29 1010" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 627.29 1090 L 655.29 1090" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 627.29 1094 L 655.29 1094" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 479.96 1176 L 507.96 1176" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 547.96 1176 L 575.96 1176" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 564 336 L 592 336" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 325.03 420 L 353.03 420" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 393.03 418 L 422 418" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 393.03 422 L 422 422" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 557.7 420 L 585.7 420" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 125.23 502 L 153.23 502" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 125.23 506 L 153.23 506" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 397.23 502 L 425.23 502" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 397.23 506 L 425.23 506" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 465.23 502 L 493.23 502" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 465.23 506 L 493.23 506" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 660.5 502 L 688.5 502" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 660.5 506 L 688.5 506" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 252.91 588 L 280.91 588" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 388.91 588 L 416.91 588" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 346.27 670 L 374.27 670" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 346.27 674 L 374.27 674" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 414.27 670 L 442.27 670" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 414.27 674 L 442.27 674" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 420.1 756 L 448.1 756" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 556.1 840 L 584.1 840" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 680.77 924 L 708.77 924" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 646.77 1006 L 674.77 1006" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 646.77 1010 L 674.77 1010" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 646.77 1090 L 674.77 1090" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 646.77 1094 L 674.77 1094" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 499.44 1176 L 527.44 1176" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 567.44 1176 L 595.44 1176" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
-<line x1="397.16" y1="0" x2="397.16" y2="42" stroke="black" stroke-width="2"/>
-<line x1="329.16" y1="42" x2="465.16" y2="42" stroke="black" stroke-width="2"/>
-<line x1="329.16" y1="42" x2="329.16" y2="64" stroke="black" stroke-width="2"/>
-<line x1="397.16" y1="42" x2="397.16" y2="64" stroke="black" stroke-width="2"/>
-<line x1="465.16" y1="42" x2="465.16" y2="64" stroke="black" stroke-width="2"/>
-<line x1="363.16" y1="84" x2="363.16" y2="126" stroke="black" stroke-width="2"/>
-<line x1="329.16" y1="126" x2="363.16" y2="126" stroke="black" stroke-width="2"/>
-<line x1="329.16" y1="126" x2="329.16" y2="148" stroke="black" stroke-width="2"/>
-<line x1="431.16" y1="84" x2="431.16" y2="126" stroke="black" stroke-width="2"/>
-<line x1="431.16" y1="126" x2="465.16" y2="126" stroke="black" stroke-width="2"/>
-<line x1="465.16" y1="126" x2="465.16" y2="148" stroke="black" stroke-width="2"/>
-<line x1="363.16" y1="168" x2="363.16" y2="210" stroke="black" stroke-width="2"/>
-<line x1="53.12" y1="210" x2="615.18" y2="210" stroke="black" stroke-width="2"/>
-<line x1="53.12" y1="210" x2="53.12" y2="232" stroke="black" stroke-width="2"/>
-<line x1="121.12" y1="210" x2="121.12" y2="232" stroke="black" stroke-width="2"/>
-<line x1="363.16" y1="210" x2="363.16" y2="232" stroke="black" stroke-width="2"/>
-<line x1="479.18" y1="210" x2="479.18" y2="232" stroke="black" stroke-width="2"/>
-<line x1="547.18" y1="210" x2="547.18" y2="232" stroke="black" stroke-width="2"/>
-<line x1="615.18" y1="210" x2="615.18" y2="232" stroke="black" stroke-width="2"/>
-<line x1="87.12" y1="252" x2="87.12" y2="294" stroke="black" stroke-width="2"/>
-<line x1="0" y1="294" x2="87.12" y2="294" stroke="black" stroke-width="2"/>
+<line x1="386.54" y1="0" x2="386.54" y2="42" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="42" x2="454.54" y2="42" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="42" x2="318.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="386.54" y1="42" x2="386.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="454.54" y1="42" x2="454.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="352.54" y1="84" x2="352.54" y2="126" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="126" x2="352.54" y2="126" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="126" x2="318.54" y2="148" stroke="black" stroke-width="2"/>
+<line x1="420.54" y1="84" x2="420.54" y2="126" stroke="black" stroke-width="2"/>
+<line x1="420.54" y1="126" x2="454.54" y2="126" stroke="black" stroke-width="2"/>
+<line x1="454.54" y1="126" x2="454.54" y2="148" stroke="black" stroke-width="2"/>
+<line x1="352.54" y1="168" x2="352.54" y2="210" stroke="black" stroke-width="2"/>
+<line x1="51.41" y1="210" x2="598.62" y2="210" stroke="black" stroke-width="2"/>
+<line x1="51.41" y1="210" x2="51.41" y2="232" stroke="black" stroke-width="2"/>
+<line x1="119.41" y1="210" x2="119.41" y2="232" stroke="black" stroke-width="2"/>
+<line x1="352.54" y1="210" x2="352.54" y2="232" stroke="black" stroke-width="2"/>
+<line x1="462.62" y1="210" x2="462.62" y2="232" stroke="black" stroke-width="2"/>
+<line x1="530.62" y1="210" x2="530.62" y2="232" stroke="black" stroke-width="2"/>
+<line x1="598.62" y1="210" x2="598.62" y2="232" stroke="black" stroke-width="2"/>
+<line x1="85.41" y1="252" x2="85.41" y2="294" stroke="black" stroke-width="2"/>
+<line x1="0" y1="294" x2="85.41" y2="294" stroke="black" stroke-width="2"/>
 <line x1="0" y1="294" x2="0" y2="316" stroke="black" stroke-width="2"/>
 <line x1="68" y1="294" x2="68" y2="316" stroke="black" stroke-width="2"/>
-<line x1="513.18" y1="252" x2="513.18" y2="294" stroke="black" stroke-width="2"/>
+<line x1="496.62" y1="252" x2="496.62" y2="294" stroke="black" stroke-width="2"/>
 <line x1="136" y1="294" x2="1088" y2="294" stroke="black" stroke-width="2"/>
 <line x1="136" y1="294" x2="136" y2="316" stroke="black" stroke-width="2"/>
 <line x1="204" y1="294" x2="204" y2="316" stroke="black" stroke-width="2"/>
 <line x1="272" y1="294" x2="272" y2="316" stroke="black" stroke-width="2"/>
+<line x1="340" y1="294" x2="340" y2="316" stroke="black" stroke-width="2"/>
 <line x1="476" y1="294" x2="476" y2="316" stroke="black" stroke-width="2"/>
 <line x1="544" y1="294" x2="544" y2="316" stroke="black" stroke-width="2"/>
-<line x1="612" y1="294" x2="612" y2="316" stroke="black" stroke-width="2"/>
 <line x1="680" y1="294" x2="680" y2="316" stroke="black" stroke-width="2"/>
 <line x1="748" y1="294" x2="748" y2="316" stroke="black" stroke-width="2"/>
 <line x1="816" y1="294" x2="816" y2="316" stroke="black" stroke-width="2"/>
@@ -92,165 +92,164 @@
 <line x1="1020" y1="294" x2="1020" y2="316" stroke="black" stroke-width="2"/>
 <line x1="1088" y1="294" x2="1088" y2="316" stroke="black" stroke-width="2"/>
 <line x1="306" y1="336" x2="306" y2="378" stroke="black" stroke-width="2"/>
-<line x1="306" y1="378" x2="306" y2="378" stroke="black" stroke-width="2"/>
-<line x1="306" y1="378" x2="306" y2="400" stroke="black" stroke-width="2"/>
+<line x1="169.03" y1="378" x2="373.03" y2="378" stroke="black" stroke-width="2"/>
+<line x1="169.03" y1="378" x2="169.03" y2="400" stroke="black" stroke-width="2"/>
+<line x1="237.03" y1="378" x2="237.03" y2="400" stroke="black" stroke-width="2"/>
+<line x1="373.03" y1="378" x2="373.03" y2="400" stroke="black" stroke-width="2"/>
 <line x1="442" y1="336" x2="442" y2="378" stroke="black" stroke-width="2"/>
 <line x1="442" y1="378" x2="442" y2="378" stroke="black" stroke-width="2"/>
 <line x1="442" y1="378" x2="442" y2="400" stroke="black" stroke-width="2"/>
 <line x1="578" y1="336" x2="578" y2="378" stroke="black" stroke-width="2"/>
-<line x1="514.37" y1="378" x2="718.37" y2="378" stroke="black" stroke-width="2"/>
-<line x1="514.37" y1="378" x2="514.37" y2="400" stroke="black" stroke-width="2"/>
-<line x1="650.37" y1="378" x2="650.37" y2="400" stroke="black" stroke-width="2"/>
-<line x1="718.37" y1="378" x2="718.37" y2="400" stroke="black" stroke-width="2"/>
-<line x1="255.47" y1="420" x2="255.47" y2="462" stroke="black" stroke-width="2"/>
-<line x1="124.19" y1="462" x2="260.19" y2="462" stroke="black" stroke-width="2"/>
-<line x1="124.19" y1="462" x2="124.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="260.19" y1="462" x2="260.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="478.18" y1="420" x2="478.18" y2="462" stroke="black" stroke-width="2"/>
-<line x1="439.19" y1="462" x2="478.18" y2="462" stroke="black" stroke-width="2"/>
-<line x1="439.19" y1="462" x2="439.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="548.37" y1="420" x2="548.37" y2="462" stroke="black" stroke-width="2"/>
-<line x1="548.37" y1="462" x2="779.19" y2="462" stroke="black" stroke-width="2"/>
-<line x1="575.19" y1="462" x2="575.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="643.19" y1="462" x2="643.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="711.19" y1="462" x2="711.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="779.19" y1="462" x2="779.19" y2="484" stroke="black" stroke-width="2"/>
-<line x1="158.19" y1="504" x2="158.19" y2="546" stroke="black" stroke-width="2"/>
-<line x1="77.43" y1="546" x2="158.19" y2="546" stroke="black" stroke-width="2"/>
-<line x1="77.43" y1="546" x2="77.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="145.43" y1="546" x2="145.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="405.19" y1="504" x2="405.19" y2="546" stroke="black" stroke-width="2"/>
-<line x1="213.43" y1="546" x2="405.19" y2="546" stroke="black" stroke-width="2"/>
-<line x1="213.43" y1="546" x2="213.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="349.43" y1="546" x2="349.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="473.19" y1="504" x2="473.19" y2="558" stroke="black" stroke-width="2"/>
-<line x1="473.19" y1="558" x2="621.43" y2="558" stroke="black" stroke-width="2"/>
-<line x1="485.43" y1="558" x2="485.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="553.43" y1="558" x2="553.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="621.43" y1="558" x2="621.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="609.19" y1="504" x2="609.19" y2="546" stroke="black" stroke-width="2"/>
-<line x1="609.19" y1="546" x2="825.43" y2="546" stroke="black" stroke-width="2"/>
-<line x1="689.43" y1="546" x2="689.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="757.43" y1="546" x2="757.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="825.43" y1="546" x2="825.43" y2="568" stroke="black" stroke-width="2"/>
-<line x1="247.43" y1="588" x2="247.43" y2="630" stroke="black" stroke-width="2"/>
-<line x1="34.79" y1="630" x2="306.79" y2="630" stroke="black" stroke-width="2"/>
-<line x1="34.79" y1="630" x2="34.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="102.79" y1="630" x2="102.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="170.79" y1="630" x2="170.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="238.79" y1="630" x2="238.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="306.79" y1="630" x2="306.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="383.43" y1="588" x2="383.43" y2="630" stroke="black" stroke-width="2"/>
-<line x1="374.79" y1="630" x2="510.79" y2="630" stroke="black" stroke-width="2"/>
-<line x1="374.79" y1="630" x2="374.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="442.79" y1="630" x2="442.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="510.79" y1="630" x2="510.79" y2="652" stroke="black" stroke-width="2"/>
-<line x1="340.79" y1="672" x2="340.79" y2="714" stroke="black" stroke-width="2"/>
-<line x1="312.63" y1="714" x2="340.79" y2="714" stroke="black" stroke-width="2"/>
-<line x1="312.63" y1="714" x2="312.63" y2="736" stroke="black" stroke-width="2"/>
-<line x1="408.79" y1="672" x2="408.79" y2="714" stroke="black" stroke-width="2"/>
-<line x1="380.63" y1="714" x2="516.63" y2="714" stroke="black" stroke-width="2"/>
-<line x1="380.63" y1="714" x2="380.63" y2="736" stroke="black" stroke-width="2"/>
-<line x1="516.63" y1="714" x2="516.63" y2="736" stroke="black" stroke-width="2"/>
-<line x1="414.63" y1="756" x2="414.63" y2="798" stroke="black" stroke-width="2"/>
-<line x1="312.63" y1="798" x2="516.63" y2="798" stroke="black" stroke-width="2"/>
-<line x1="312.63" y1="798" x2="312.63" y2="820" stroke="black" stroke-width="2"/>
-<line x1="380.63" y1="798" x2="380.63" y2="820" stroke="black" stroke-width="2"/>
-<line x1="448.63" y1="798" x2="448.63" y2="820" stroke="black" stroke-width="2"/>
-<line x1="516.63" y1="798" x2="516.63" y2="820" stroke="black" stroke-width="2"/>
-<line x1="550.63" y1="840" x2="550.63" y2="882" stroke="black" stroke-width="2"/>
-<line x1="369.29" y1="882" x2="777.29" y2="882" stroke="black" stroke-width="2"/>
-<line x1="369.29" y1="882" x2="369.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="437.29" y1="882" x2="437.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="505.29" y1="882" x2="505.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="573.29" y1="882" x2="573.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="641.29" y1="882" x2="641.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="777.29" y1="882" x2="777.29" y2="904" stroke="black" stroke-width="2"/>
-<line x1="675.29" y1="924" x2="675.29" y2="966" stroke="black" stroke-width="2"/>
-<line x1="539.29" y1="966" x2="811.29" y2="966" stroke="black" stroke-width="2"/>
-<line x1="539.29" y1="966" x2="539.29" y2="988" stroke="black" stroke-width="2"/>
-<line x1="607.29" y1="966" x2="607.29" y2="988" stroke="black" stroke-width="2"/>
-<line x1="675.29" y1="966" x2="675.29" y2="988" stroke="black" stroke-width="2"/>
-<line x1="743.29" y1="966" x2="743.29" y2="988" stroke="black" stroke-width="2"/>
-<line x1="811.29" y1="966" x2="811.29" y2="988" stroke="black" stroke-width="2"/>
-<line x1="641.29" y1="1008" x2="641.29" y2="1050" stroke="black" stroke-width="2"/>
-<line x1="607.29" y1="1050" x2="675.29" y2="1050" stroke="black" stroke-width="2"/>
-<line x1="607.29" y1="1050" x2="607.29" y2="1072" stroke="black" stroke-width="2"/>
-<line x1="675.29" y1="1050" x2="675.29" y2="1072" stroke="black" stroke-width="2"/>
-<line x1="641.29" y1="1092" x2="641.29" y2="1134" stroke="black" stroke-width="2"/>
-<line x1="527.96" y1="1134" x2="731.96" y2="1134" stroke="black" stroke-width="2"/>
-<line x1="527.96" y1="1134" x2="527.96" y2="1156" stroke="black" stroke-width="2"/>
-<line x1="663.96" y1="1134" x2="663.96" y2="1156" stroke="black" stroke-width="2"/>
-<line x1="731.96" y1="1134" x2="731.96" y2="1156" stroke="black" stroke-width="2"/>
-<line x1="493.96" y1="1176" x2="493.96" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="440.04" y1="1218" x2="508.04" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="440.04" y1="1218" x2="440.04" y2="1240" stroke="black" stroke-width="2"/>
-<line x1="508.04" y1="1218" x2="508.04" y2="1240" stroke="black" stroke-width="2"/>
-<line x1="561.96" y1="1176" x2="561.96" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="561.96" y1="1218" x2="576.04" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="576.04" y1="1218" x2="576.04" y2="1240" stroke="black" stroke-width="2"/>
+<line x1="578" y1="378" x2="605.7" y2="378" stroke="black" stroke-width="2"/>
+<line x1="605.7" y1="378" x2="605.7" y2="400" stroke="black" stroke-width="2"/>
+<line x1="339.03" y1="420" x2="339.03" y2="462" stroke="black" stroke-width="2"/>
+<line x1="105.23" y1="462" x2="339.03" y2="462" stroke="black" stroke-width="2"/>
+<line x1="105.23" y1="462" x2="105.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="173.23" y1="462" x2="173.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="241.23" y1="462" x2="241.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="309.23" y1="462" x2="309.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="407.52" y1="420" x2="407.52" y2="462" stroke="black" stroke-width="2"/>
+<line x1="407.52" y1="462" x2="445.23" y2="462" stroke="black" stroke-width="2"/>
+<line x1="445.23" y1="462" x2="445.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="571.7" y1="420" x2="571.7" y2="462" stroke="black" stroke-width="2"/>
+<line x1="513.23" y1="462" x2="708.5" y2="462" stroke="black" stroke-width="2"/>
+<line x1="513.23" y1="462" x2="513.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="708.5" y1="462" x2="708.5" y2="484" stroke="black" stroke-width="2"/>
+<line x1="139.23" y1="504" x2="139.23" y2="546" stroke="black" stroke-width="2"/>
+<line x1="28.91" y1="546" x2="164.91" y2="546" stroke="black" stroke-width="2"/>
+<line x1="28.91" y1="546" x2="28.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="96.91" y1="546" x2="96.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="164.91" y1="546" x2="164.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="411.23" y1="504" x2="411.23" y2="546" stroke="black" stroke-width="2"/>
+<line x1="232.91" y1="546" x2="411.23" y2="546" stroke="black" stroke-width="2"/>
+<line x1="232.91" y1="546" x2="232.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="368.91" y1="546" x2="368.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="479.23" y1="504" x2="479.23" y2="546" stroke="black" stroke-width="2"/>
+<line x1="479.23" y1="546" x2="640.91" y2="546" stroke="black" stroke-width="2"/>
+<line x1="504.91" y1="546" x2="504.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="572.91" y1="546" x2="572.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="640.91" y1="546" x2="640.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="674.5" y1="504" x2="674.5" y2="546" stroke="black" stroke-width="2"/>
+<line x1="674.5" y1="546" x2="776.91" y2="546" stroke="black" stroke-width="2"/>
+<line x1="708.91" y1="546" x2="708.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="776.91" y1="546" x2="776.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="266.91" y1="588" x2="266.91" y2="630" stroke="black" stroke-width="2"/>
+<line x1="54.27" y1="630" x2="326.27" y2="630" stroke="black" stroke-width="2"/>
+<line x1="54.27" y1="630" x2="54.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="122.27" y1="630" x2="122.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="190.27" y1="630" x2="190.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="258.27" y1="630" x2="258.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="326.27" y1="630" x2="326.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="402.91" y1="588" x2="402.91" y2="630" stroke="black" stroke-width="2"/>
+<line x1="394.27" y1="630" x2="530.27" y2="630" stroke="black" stroke-width="2"/>
+<line x1="394.27" y1="630" x2="394.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="462.27" y1="630" x2="462.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="530.27" y1="630" x2="530.27" y2="652" stroke="black" stroke-width="2"/>
+<line x1="360.27" y1="672" x2="360.27" y2="714" stroke="black" stroke-width="2"/>
+<line x1="332.1" y1="714" x2="360.27" y2="714" stroke="black" stroke-width="2"/>
+<line x1="332.1" y1="714" x2="332.1" y2="736" stroke="black" stroke-width="2"/>
+<line x1="428.27" y1="672" x2="428.27" y2="714" stroke="black" stroke-width="2"/>
+<line x1="400.1" y1="714" x2="536.1" y2="714" stroke="black" stroke-width="2"/>
+<line x1="400.1" y1="714" x2="400.1" y2="736" stroke="black" stroke-width="2"/>
+<line x1="536.1" y1="714" x2="536.1" y2="736" stroke="black" stroke-width="2"/>
+<line x1="434.1" y1="756" x2="434.1" y2="798" stroke="black" stroke-width="2"/>
+<line x1="332.1" y1="798" x2="536.1" y2="798" stroke="black" stroke-width="2"/>
+<line x1="332.1" y1="798" x2="332.1" y2="820" stroke="black" stroke-width="2"/>
+<line x1="400.1" y1="798" x2="400.1" y2="820" stroke="black" stroke-width="2"/>
+<line x1="468.1" y1="798" x2="468.1" y2="820" stroke="black" stroke-width="2"/>
+<line x1="536.1" y1="798" x2="536.1" y2="820" stroke="black" stroke-width="2"/>
+<line x1="570.1" y1="840" x2="570.1" y2="882" stroke="black" stroke-width="2"/>
+<line x1="388.77" y1="882" x2="796.77" y2="882" stroke="black" stroke-width="2"/>
+<line x1="388.77" y1="882" x2="388.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="456.77" y1="882" x2="456.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="524.77" y1="882" x2="524.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="592.77" y1="882" x2="592.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="660.77" y1="882" x2="660.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="796.77" y1="882" x2="796.77" y2="904" stroke="black" stroke-width="2"/>
+<line x1="694.77" y1="924" x2="694.77" y2="966" stroke="black" stroke-width="2"/>
+<line x1="558.77" y1="966" x2="830.77" y2="966" stroke="black" stroke-width="2"/>
+<line x1="558.77" y1="966" x2="558.77" y2="988" stroke="black" stroke-width="2"/>
+<line x1="626.77" y1="966" x2="626.77" y2="988" stroke="black" stroke-width="2"/>
+<line x1="694.77" y1="966" x2="694.77" y2="988" stroke="black" stroke-width="2"/>
+<line x1="762.77" y1="966" x2="762.77" y2="988" stroke="black" stroke-width="2"/>
+<line x1="830.77" y1="966" x2="830.77" y2="988" stroke="black" stroke-width="2"/>
+<line x1="660.77" y1="1008" x2="660.77" y2="1050" stroke="black" stroke-width="2"/>
+<line x1="626.77" y1="1050" x2="694.77" y2="1050" stroke="black" stroke-width="2"/>
+<line x1="626.77" y1="1050" x2="626.77" y2="1072" stroke="black" stroke-width="2"/>
+<line x1="694.77" y1="1050" x2="694.77" y2="1072" stroke="black" stroke-width="2"/>
+<line x1="660.77" y1="1092" x2="660.77" y2="1134" stroke="black" stroke-width="2"/>
+<line x1="547.44" y1="1134" x2="751.44" y2="1134" stroke="black" stroke-width="2"/>
+<line x1="547.44" y1="1134" x2="547.44" y2="1156" stroke="black" stroke-width="2"/>
+<line x1="683.44" y1="1134" x2="683.44" y2="1156" stroke="black" stroke-width="2"/>
+<line x1="751.44" y1="1134" x2="751.44" y2="1156" stroke="black" stroke-width="2"/>
+<line x1="513.44" y1="1176" x2="513.44" y2="1218" stroke="black" stroke-width="2"/>
+<line x1="459.52" y1="1218" x2="527.52" y2="1218" stroke="black" stroke-width="2"/>
+<line x1="459.52" y1="1218" x2="459.52" y2="1240" stroke="black" stroke-width="2"/>
+<line x1="527.52" y1="1218" x2="527.52" y2="1240" stroke="black" stroke-width="2"/>
+<line x1="581.44" y1="1176" x2="581.44" y2="1218" stroke="black" stroke-width="2"/>
+<line x1="581.44" y1="1218" x2="595.52" y2="1218" stroke="black" stroke-width="2"/>
+<line x1="595.52" y1="1218" x2="595.52" y2="1240" stroke="black" stroke-width="2"/>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
-<path d="M 192.19 484 Q 281.69 453.2 371.19 484" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 630.37 420 Q 371.19 420 371.19 484" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 260.19 484 Q 383.69 453.2 507.19 484" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 189.03 420 Q 377.23 420 377.23 484" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 377.23 484 Q 508.87 453.2 640.5 484" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 </g>
 <g class="symbols">
-<g transform="translate(363.16 0)">
+<g transform="translate(352.54 0)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(431.16 0)">
+<g transform="translate(420.54 0)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(329.16 84)">
+<g transform="translate(318.54 84)">
 <clipPath id="symbol-clip-1-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-1-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(397.16 84)">
+<g transform="translate(386.54 84)">
 <clipPath id="symbol-clip-1-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-1-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(465.16 84)">
+<g transform="translate(454.54 84)">
 <clipPath id="symbol-clip-1-2"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-1-2)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(329.16 168)">
+<g transform="translate(318.54 168)">
 <clipPath id="symbol-clip-2-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-2-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(397.16 168)">
+<g transform="translate(386.54 168)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(465.16 168)">
+<g transform="translate(454.54 168)">
 <clipPath id="symbol-clip-2-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-2-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(53.12 252)">
+<g transform="translate(51.41 252)">
 <clipPath id="symbol-clip-3-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-3-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(121.12 252)">
+<g transform="translate(119.41 252)">
 <clipPath id="symbol-clip-3-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-3-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(363.16 252)">
+<g transform="translate(352.54 252)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(479.18 252)">
+<g transform="translate(462.62 252)">
 <clipPath id="symbol-clip-3-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-3-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(547.18 252)">
+<g transform="translate(530.62 252)">
 <clipPath id="symbol-clip-3-4"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-3-4)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(615.18 252)">
+<g transform="translate(598.62 252)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
@@ -271,7 +270,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(272 336)">
-<clipPath id="symbol-clip-4-4"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-4-4)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-4-4"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-4-4)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(340 336)">
@@ -287,7 +286,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(544 336)">
-<clipPath id="symbol-clip-4-8"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-4-8)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
+<clipPath id="symbol-clip-4-8"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-4-8)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(612 336)">
@@ -322,312 +321,306 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(204.94 420)">
+<g transform="translate(169.03 420)">
+<clipPath id="symbol-clip-5-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+</g>
+<g transform="translate(237.03 420)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(306 420)">
-<clipPath id="symbol-clip-5-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<g transform="translate(305.03 420)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(373.03 420)">
+<clipPath id="symbol-clip-5-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-3)"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-5-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(442 420)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(514.37 420)">
-<clipPath id="symbol-clip-5-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-3)"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-5-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(582.37 420)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(650.37 420)">
-<clipPath id="symbol-clip-5-5"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-5)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
-</g>
-<g transform="translate(718.37 420)">
+<g transform="translate(537.7 420)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(124.19 504)">
-<clipPath id="symbol-clip-6-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
+<g transform="translate(605.7 420)">
+<clipPath id="symbol-clip-5-6"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-5-6)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(192.19 504)">
-<clipPath id="symbol-clip-6-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<g transform="translate(105.23 504)">
+<clipPath id="symbol-clip-6-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(173.23 504)">
+<clipPath id="symbol-clip-6-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-1)"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-6-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(241.23 504)">
+<clipPath id="symbol-clip-6-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(309.23 504)">
+<clipPath id="symbol-clip-6-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(377.23 504)">
+<clipPath id="symbol-clip-6-4"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-4)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
-<g transform="translate(260.19 504)">
-<clipPath id="symbol-clip-6-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<g transform="translate(445.23 504)">
+<clipPath id="symbol-clip-6-5"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-5)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
-<g transform="translate(371.19 504)">
-<clipPath id="symbol-clip-6-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<g transform="translate(513.23 504)">
+<clipPath id="symbol-clip-6-6"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-6)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(640.5 504)">
+<clipPath id="symbol-clip-6-7"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-7)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">3</text>
 </g>
-<g transform="translate(439.19 504)">
-<clipPath id="symbol-clip-6-4"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-4)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
+<g transform="translate(708.5 504)">
+<clipPath id="symbol-clip-6-8"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-8)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(507.19 504)">
-<clipPath id="symbol-clip-6-5"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-5)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
-</g>
-<g transform="translate(575.19 504)">
-<clipPath id="symbol-clip-6-6"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-6)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
+<g transform="translate(28.91 588)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(643.19 504)">
-<clipPath id="symbol-clip-6-7"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-7)"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-6-7)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(711.19 504)">
-<clipPath id="symbol-clip-6-8"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-8)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(779.19 504)">
-<clipPath id="symbol-clip-6-9"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-6-9)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(77.43 588)">
-<clipPath id="symbol-clip-7-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(145.43 588)">
-<clipPath id="symbol-clip-7-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(213.43 588)">
-<clipPath id="symbol-clip-7-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(281.43 588)">
+<g transform="translate(96.91 588)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(349.43 588)">
+<g transform="translate(164.91 588)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(232.91 588)">
+<clipPath id="symbol-clip-7-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(300.91 588)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
+</g>
+<g transform="translate(368.91 588)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(417.43 588)">
+<g transform="translate(436.91 588)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(485.43 588)">
-<clipPath id="symbol-clip-7-6"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-6)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(553.43 588)">
+<g transform="translate(504.91 588)">
 <clipPath id="symbol-clip-7-7"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-7)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(621.43 588)">
+<g transform="translate(572.91 588)">
 <clipPath id="symbol-clip-7-8"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-8)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(689.43 588)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<g transform="translate(640.91 588)">
+<clipPath id="symbol-clip-7-9"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-9)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(757.43 588)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<g transform="translate(708.91 588)">
+<clipPath id="symbol-clip-7-10"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-10)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(825.43 588)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<g transform="translate(776.91 588)">
+<clipPath id="symbol-clip-7-11"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-7-11)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(34.79 672)">
+<g transform="translate(54.27 672)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(102.79 672)">
+<g transform="translate(122.27 672)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(170.79 672)">
+<g transform="translate(190.27 672)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(238.79 672)">
+<g transform="translate(258.27 672)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(306.79 672)">
+<g transform="translate(326.27 672)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(374.79 672)">
+<g transform="translate(394.27 672)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(442.79 672)">
+<g transform="translate(462.27 672)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(510.79 672)">
+<g transform="translate(530.27 672)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(312.63 756)">
+<g transform="translate(332.1 756)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(380.63 756)">
+<g transform="translate(400.1 756)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(448.63 756)">
+<g transform="translate(468.1 756)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(516.63 756)">
+<g transform="translate(536.1 756)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(312.63 840)">
+<g transform="translate(332.1 840)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(380.63 840)">
+<g transform="translate(400.1 840)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(448.63 840)">
+<g transform="translate(468.1 840)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(516.63 840)">
+<g transform="translate(536.1 840)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(584.63 840)">
+<g transform="translate(604.1 840)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(369.29 924)">
+<g transform="translate(388.77 924)">
 <clipPath id="symbol-clip-11-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-11-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(437.29 924)">
+<g transform="translate(456.77 924)">
 <clipPath id="symbol-clip-11-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#000000" clip-path="url(#symbol-clip-11-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(505.29 924)">
+<g transform="translate(524.77 924)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(573.29 924)">
+<g transform="translate(592.77 924)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(641.29 924)">
+<g transform="translate(660.77 924)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(709.29 924)">
+<g transform="translate(728.77 924)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(777.29 924)">
+<g transform="translate(796.77 924)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(539.29 1008)">
+<g transform="translate(558.77 1008)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(607.29 1008)">
+<g transform="translate(626.77 1008)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(675.29 1008)">
+<g transform="translate(694.77 1008)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(743.29 1008)">
+<g transform="translate(762.77 1008)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(811.29 1008)">
+<g transform="translate(830.77 1008)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(607.29 1092)">
+<g transform="translate(626.77 1092)">
 <clipPath id="symbol-clip-13-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#000000" clip-path="url(#symbol-clip-13-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(675.29 1092)">
+<g transform="translate(694.77 1092)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(459.96 1176)">
+<g transform="translate(479.44 1176)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(527.96 1176)">
+<g transform="translate(547.44 1176)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(595.96 1176)">
+<g transform="translate(615.44 1176)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(663.96 1176)">
+<g transform="translate(683.44 1176)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(731.96 1176)">
+<g transform="translate(751.44 1176)">
 <clipPath id="symbol-clip-14-4"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-14-4)"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#9467bd" clip-path="url(#symbol-clip-14-4)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="-4.6" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#ff7f0e">Fireproof</text><text x="25.4" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">?</text>
 </g>
-<g transform="translate(440.04 1260)">
+<g transform="translate(459.52 1260)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(508.04 1260)">
+<g transform="translate(527.52 1260)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
-<g transform="translate(576.04 1260)">
+<g transform="translate(595.52 1260)">
 <clipPath id="symbol-clip-15-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#d62728" clip-path="url(#symbol-clip-15-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
 </g>
 </g>
 <g class="labels">
-<text x="363.16" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text>
-<text x="431.16" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Valaena Velaryon</title>Valaena</text>
-<text x="431.16" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="329.16" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
-<text x="397.16" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon I</text>
-<text x="465.16" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Visenya</text>
-<text x="329.16" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aenys I</text>
-<text x="397.16" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alyssa Velaryon</title>Alyssa</text>
-<text x="397.16" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="465.16" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegor I</text>
-<text x="53.12" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
-<text x="121.12" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
-<text x="363.16" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text>
-<text x="479.18" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jaehaerys I</title>Jaehaerys</text>
-<text x="479.18" y="317" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">I</text>
-<text x="547.18" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alysanne</text>
-<text x="615.18" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Vaella</text>
+<text x="352.54" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text>
+<text x="420.54" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Valaena Velaryon</title>Valaena</text>
+<text x="420.54" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="318.54" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
+<text x="386.54" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon I</text>
+<text x="454.54" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Visenya</text>
+<text x="318.54" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aenys I</text>
+<text x="386.54" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alyssa Velaryon</title>Alyssa</text>
+<text x="386.54" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="454.54" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegor I</text>
+<text x="51.41" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
+<text x="119.41" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
+<text x="352.54" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text>
+<text x="462.62" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jaehaerys I</title>Jaehaerys</text>
+<text x="462.62" y="317" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">I</text>
+<text x="530.62" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alysanne</text>
+<text x="598.62" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Vaella</text>
 <text x="0" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerea</text>
 <text x="68" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text>
 <text x="136" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
 <text x="204" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
-<text x="272" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
-<text x="340" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jocelyn Baratheon</title>Jocelyn</text>
-<text x="340" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baratheon</text>
+<text x="272" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelon</text>
+<text x="340" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alyssa</text>
 <text x="408" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Rodrik Arryn</title>Rodrik</text>
 <text x="408" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arryn</text>
 <text x="476" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text>
-<text x="544" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelon</text>
-<text x="612" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alyssa</text>
+<text x="544" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
+<text x="612" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jocelyn Baratheon</title>Jocelyn</text>
+<text x="612" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baratheon</text>
 <text x="680" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegelle</text>
 <text x="748" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Vaegon</text>
 <text x="816" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Saera</text>
@@ -635,88 +628,88 @@
 <text x="952" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Gaemon</text>
 <text x="1020" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Valerion</text>
 <text x="1088" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Gael</text>
-<text x="204.94" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Corlys Velaryon</title>Corlys</text>
-<text x="204.94" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="306" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
+<text x="169.03" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
+<text x="237.03" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
+<text x="305.03" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alicent Hightower</title>Alicent</text>
+<text x="305.03" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Hightower</text>
+<text x="373.03" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys I</text>
 <text x="442" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aemma Arryn</title>Aemma</text>
 <text x="442" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arryn</text>
-<text x="514.37" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys I</text>
-<text x="582.37" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alicent Hightower</title>Alicent</text>
-<text x="582.37" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Hightower</text>
-<text x="650.37" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
-<text x="718.37" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
-<text x="124.19" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laena Velaryon</title>Laena</text>
-<text x="124.19" y="569" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="260.19" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laenor Velaryon</title>Laenor</text>
-<text x="260.19" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="439.19" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenyra</text>
-<text x="575.19" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon II</text>
-<text x="643.19" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helaena</text>
-<text x="711.19" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemond</text>
-<text x="779.19" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
-<text x="77.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baela</text>
-<text x="145.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
-<text x="213.43" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon III</text>
-<text x="281.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daenaera Velaryon</title>Daenaera</text>
-<text x="281.43" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="349.43" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys II</text>
-<text x="417.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Larra Rogare</title>Larra</text>
-<text x="417.43" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rogare</text>
-<text x="485.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jacaerys Velaryon</title>Jacaerys</text>
-<text x="485.43" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="553.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lucerys Velaryon</title>Lucerys</text>
-<text x="553.43" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="621.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Joffrey Velaryon</title>Joffrey</text>
-<text x="621.43" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
-<text x="689.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys</text>
-<text x="757.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaera</text>
-<text x="825.43" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maelor</text>
-<text x="34.79" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron I</text>
-<text x="102.79" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor I</text>
-<text x="170.79" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
-<text x="238.79" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elaena</text>
-<text x="306.79" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daena</text>
-<text x="374.79" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon IV</text>
-<text x="442.79" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Naerys</text>
-<text x="510.79" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
-<text x="312.63" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daemon Blackfyre</title>Daemon</text>
-<text x="312.63" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackfyre</text>
-<text x="380.63" y="808" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron II</text>
-<text x="448.63" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Myriah Martell</title>Myriah</text>
-<text x="448.63" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text>
-<text x="516.63" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
-<text x="312.63" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor</text>
-<text x="380.63" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys I</text>
-<text x="448.63" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegel</text>
-<text x="516.63" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maekar I</text>
-<text x="584.63" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Dyanna Dayne</title>Dyanna</text>
-<text x="584.63" y="885" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Dayne</text>
-<text x="369.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
-<text x="437.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text>
-<text x="505.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
-<text x="573.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text>
-<text x="641.29" y="976" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon V</text>
-<text x="709.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Betha Blackwood</title>Betha</text>
-<text x="709.29" y="969" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackwood</text>
-<text x="777.29" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhae</text>
-<text x="539.29" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duncan</text>
-<text x="607.29" y="1060" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jaehaerys II</title>Jaehaerys</text>
-<text x="607.29" y="1073" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II</text>
-<text x="675.29" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaera</text>
-<text x="743.29" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
-<text x="811.29" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaelle</text>
-<text x="607.29" y="1144" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys II</text>
-<text x="675.29" y="1124" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text>
-<text x="459.96" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Elia Martell</title>Elia</text>
-<text x="459.96" y="1221" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text>
-<text x="527.96" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegar</text>
-<text x="595.96" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lyanna Stark</title>Lyanna</text>
-<text x="595.96" y="1221" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Stark</text>
-<text x="663.96" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text>
-<text x="731.96" y="1228" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
-<text x="440.04" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
-<text x="508.04" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
-<text x="576.04" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jon Snow</text>
+<text x="537.7" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Corlys Velaryon</title>Corlys</text>
+<text x="537.7" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="605.7" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
+<text x="105.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon II</text>
+<text x="173.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helaena</text>
+<text x="241.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemond</text>
+<text x="309.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
+<text x="445.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenyra</text>
+<text x="513.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laenor Velaryon</title>Laenor</text>
+<text x="513.23" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="708.5" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laena Velaryon</title>Laena</text>
+<text x="708.5" y="569" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="28.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys</text>
+<text x="96.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaera</text>
+<text x="164.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maelor</text>
+<text x="232.91" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon III</text>
+<text x="300.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daenaera Velaryon</title>Daenaera</text>
+<text x="300.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="368.91" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys II</text>
+<text x="436.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Larra Rogare</title>Larra</text>
+<text x="436.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rogare</text>
+<text x="504.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jacaerys Velaryon</title>Jacaerys</text>
+<text x="504.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="572.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lucerys Velaryon</title>Lucerys</text>
+<text x="572.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="640.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Joffrey Velaryon</title>Joffrey</text>
+<text x="640.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="708.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baela</text>
+<text x="776.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
+<text x="54.27" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron I</text>
+<text x="122.27" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor I</text>
+<text x="190.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
+<text x="258.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elaena</text>
+<text x="326.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daena</text>
+<text x="394.27" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon IV</text>
+<text x="462.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Naerys</text>
+<text x="530.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
+<text x="332.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daemon Blackfyre</title>Daemon</text>
+<text x="332.1" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackfyre</text>
+<text x="400.1" y="808" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron II</text>
+<text x="468.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Myriah Martell</title>Myriah</text>
+<text x="468.1" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text>
+<text x="536.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
+<text x="332.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor</text>
+<text x="400.1" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys I</text>
+<text x="468.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegel</text>
+<text x="536.1" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maekar I</text>
+<text x="604.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Dyanna Dayne</title>Dyanna</text>
+<text x="604.1" y="885" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Dayne</text>
+<text x="388.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
+<text x="456.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text>
+<text x="524.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
+<text x="592.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text>
+<text x="660.77" y="976" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon V</text>
+<text x="728.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Betha Blackwood</title>Betha</text>
+<text x="728.77" y="969" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackwood</text>
+<text x="796.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhae</text>
+<text x="558.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duncan</text>
+<text x="626.77" y="1060" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jaehaerys II</title>Jaehaerys</text>
+<text x="626.77" y="1073" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II</text>
+<text x="694.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaera</text>
+<text x="762.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
+<text x="830.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaelle</text>
+<text x="626.77" y="1144" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys II</text>
+<text x="694.77" y="1124" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text>
+<text x="479.44" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Elia Martell</title>Elia</text>
+<text x="479.44" y="1221" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text>
+<text x="547.44" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegar</text>
+<text x="615.44" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lyanna Stark</title>Lyanna</text>
+<text x="615.44" y="1221" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Stark</text>
+<text x="683.44" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text>
+<text x="751.44" y="1228" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
+<text x="459.52" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
+<text x="527.52" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
+<text x="595.52" y="1292" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jon Snow</text>
 </g>
 <g class="consanguinity-labels">
 </g>

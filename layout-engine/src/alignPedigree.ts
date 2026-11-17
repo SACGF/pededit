@@ -14,8 +14,8 @@ export interface AlignOptions {
   hints?: Hints;      // if omitted, autohint() is called
   /**
    * Layout improvements beyond kinship2 (see layout-engine/AGENTS.md):
-   * currently the spouse-hint balancing of #76. Default false, so a plain
-   * call matches R; `alignPedigreeByFamily` turns it on.
+   * spouse-hint balancing and family swaps in `autohint`. Default false, so
+   * a plain call matches R; `alignPedigreeByFamily` turns it on.
    */
   improve?: boolean;
   /**
@@ -72,7 +72,7 @@ export function alignPedigree(
   // 3. Get ordering hints
   // The sides the user chose for couples override kinship2's own,
   // also inside autohint's trial runs, so its fixup works around them.
-  const hints = applyPartnerSides(options.hints ?? autohint(input, pedigree, { balancePartners: improve }), pedigree);
+  const hints = applyPartnerSides(options.hints ?? autohint(input, pedigree, { balancePartners: improve, swapFamilies: improve }), pedigree);
 
   // 4. Build spouselist
   const { spouselist, spouselistRows } = buildSpouseList(input, hints, pedigree);

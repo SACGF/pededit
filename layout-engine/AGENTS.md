@@ -153,8 +153,33 @@ demonstrably worse, while keeping the port as the tested baseline:
   is the cost function so far (duplicates, hops, arc length, width) and
   `frontend/src/pedigree/__tests__/balancePartners.test.ts` is the guard: no
   worse on every example and oracle fixture, every other fixture's node
-  positions identical, Targaryen's hop gone. `layoutToFlow(p, { improveLayout:
-  false })` gives the plain port for such comparisons.
+  positions identical unless a duplicate or a hop went, Targaryen's hop gone.
+  `layoutToFlow(p, { improveLayout: false })` gives the plain port for such
+  comparisons.
+- The second pass is `swapFamilies` in `autohint.ts` (#77). The fixup moves a
+  duplicate to the edge of its own sibship and never reorders the generation
+  above, yet the side each partner of a couple is on, when both have parents,
+  follows from the order of their families, and so does everything below
+  them. When duplicates remain, each such couple is tried the other way round
+  (`orderLineages` in `partnerSides.ts`, the same rank swap a chosen
+  `leftPartner` makes), the fixup is rerun, and the best swap of the round is
+  kept, up to three rounds and 40 trials. Things to know:
+  - It only runs when the fixup left a duplicate, so most pedigrees pay
+    nothing. A trial is a whole fixup without the quadratic program: about
+    10 ms on Targaryen (96 people, 14 such couples), 0.2 s for the pass.
+  - A swap is kept for fewer duplicates, or the same number with shorter
+    arcs. The arc-only step is needed: `targaryen.ped` takes one such swap
+    before the swap that draws Laenor once.
+  - Trial layouts are packed to the left (`align: false`), so columns of
+    different rows do not line up. `duplicateCost` therefore counts copies on
+    different rows as one slot apart. Measuring them by column moved
+    Amaranta Úrsula to the middle of her sibship in the Buendías, with her
+    arc drawn across her sister's marriage.
+  - Couples with `leftPartner` are never tried, and the chosen sides are
+    applied again after each trial swap, so they win.
+  - It picks whatever swap scores best, not the one a reader might expect:
+    on Targaryen it moves Corlys and Rhaenys to the right of Viserys, not
+    Aemma to his left, so Alicent still comes before Aemma.
 
 ## Speed (#42, #189)
 
@@ -162,7 +187,8 @@ demonstrably worse, while keeping the port as the tested baseline:
   513 people (0.45 s and 4.8 s in Node), growing about tenfold for twice the
   people because `quadprog` is a dense solver. Everything before it
   (`kindepth`, `autohint`, `alignped1` to `alignped3`) is tens of
-  milliseconds at 513 people.
+  milliseconds at 513 people. With `improve` on and duplicates left
+  after the fixup, `swapFamilies` adds up to 40 more fixups (see above).
 - The engine keeps nothing between calls. The editor keeps results itself
   (`frontend/src/pedigree/layoutCache.ts`), through `AlignOptions.alignFamily`,
   which `alignPedigreeByFamily` calls in place of `alignPedigree` for each

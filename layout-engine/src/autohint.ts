@@ -2,7 +2,7 @@ import type { LayoutInput, Hints, Pedigree, Individual, SiblingOrderMode, Layout
 import { kindepth } from "./kindepth.js";
 import { alignPedigree } from "./alignPedigree.js";
 import { buildPartnerSet, isPartnerPair } from "./couples.js";
-import { preferPartnerLineages } from "./partnerSides.js";
+import { preferPartnerLineages, orderLineages, drawnLeftPartner } from "./partnerSides.js";
 import { isAffected } from "./affected.js";
 
 /**
@@ -34,22 +34,138 @@ export interface AutohintOptions {
    * to R; `alignPedigreeByFamily` turns it on for the editor.
    */
   balancePartners?: boolean;
+  /**
+   * When the fixup leaves someone drawn more than once, try drawing each
+   * couple whose partners both have parents the other way round, by
+   * swapping their families, and keep a swap that leaves fewer duplicates
+   * or shorter dashed arcs (#77). Off by default, as `balancePartners` is.
+   */
+  swapFamilies?: boolean;
 }
 
 export function autohint(input: LayoutInput, pedigree: Pedigree, options: AutohintOptions = {}): Hints {
   const twins = twinSets(input, pedigree);
   const horder = initialOrder(input, pedigree, twins);
   // Chosen partner sides where both partners have parents swap families.
-  if (pedigree.partnerships.some(p => p.leftPartner)) preferPartnerLineages(horder, input, pedigree, kindepth(input, true));
-  try {
-    // fixupDuplicates shifts sibling ranks in place, so give it a copy.
-    return fixupDuplicates(pedigree, input, horder.slice(), twins, options);
-  } catch {
-    // R wraps autohint in try() and, when it fails, lays out with a plain
-    // ordering and no spouse hints. Discard any ranks the fixup had already
-    // shifted before failing, as R does: its changes were local to autohint.
-    return { order: horder, spouse: null };
+  const chosenSides = pedigree.partnerships.some(p => p.leftPartner);
+  const applyChosenSides = (order: Float64Array) => {
+    if (chosenSides) preferPartnerLineages(order, input, pedigree, kindepth(input, true));
+  };
+  applyChosenSides(horder);
+  const fixup = (order: Float64Array): Hints => {
+    try {
+      // fixupDuplicates shifts sibling ranks in place, so give it a copy.
+      return fixupDuplicates(pedigree, input, order.slice(), twins, options);
+    } catch {
+      // R wraps autohint in try() and, when it fails, lays out with a plain
+      // ordering and no spouse hints. Discard any ranks the fixup had already
+      // shifted before failing, as R does: its changes were local to autohint.
+      return { order, spouse: null };
+    }
+  };
+  const hints = fixup(horder);
+  if (!options.swapFamilies) return hints;
+  return swapFamilies(pedigree, input, horder, hints, fixup, applyChosenSides);
+}
+
+// ── Family swaps (#77) ─────────────────────────────────────────────────────────
+
+/**
+ * Rounds of swaps tried (each keeps the best single swap) and trial layouts
+ * run in all. A trial is a whole fixup, several layouts without the
+ * quadratic program, so the cap bounds the pass on a large inbred pedigree.
+ */
+const MAX_SWAP_ROUNDS = 3;
+const MAX_SWAP_TRIALS = 40;
+
+/**
+ * People drawn again and how far apart their copies are, in slots. Copies on
+ * different rows count one slot whatever lies between them: these trial
+ * layouts are packed to the left, so columns of different rows do not line up.
+ */
+function duplicateCost(plist: LayoutResult): { duplicates: number; arcLength: number } {
+  const copies = new Map<number, [number, number][]>();
+  for (let lev = 0; lev < plist.n.length; lev++) {
+    for (let s = 0; s < plist.n[lev]!; s++) {
+      const id = Math.floor(plist.nid[lev]![s]!);
+      if (!copies.has(id)) copies.set(id, []);
+      copies.get(id)!.push([lev, plist.pos[lev]![s]!]);
+    }
   }
+  let duplicates = 0, arcLength = 0;
+  for (const at of copies.values()) {
+    for (let k = 1; k < at.length; k++) {
+      duplicates++;
+      arcLength += at[k]![0] === at[k - 1]![0] ? Math.abs(at[k]![1] - at[k - 1]![1]) : 1;
+    }
+  }
+  return { duplicates, arcLength };
+}
+
+/**
+ * The duplicate fixup moves a person to the edge of their own sibship
+ * nearest their other copy and never reorders the generations above. Which
+ * side of a couple each partner is on, when both have parents, follows from
+ * the order of their families, and so does the order of everything below
+ * them: one cousin marriage drawn the wrong way round can leave a branch at
+ * the far end of its row from the people it marries into, joined by dashed
+ * arcs across the whole generation.
+ *
+ * So when duplicates remain, each such couple is tried the other way round
+ * (the lines of the two partners swap ranks, as for a chosen partner side),
+ * the fixup is run again, and the swap that most reduces the duplicates,
+ * then the length of their arcs, is kept. Couples with a side chosen by the
+ * user are left alone and their lines keep the order that choice needs.
+ */
+function swapFamilies(
+  pedigree: Pedigree,
+  input: LayoutInput,
+  horder: Float64Array,
+  hints: Hints,
+  fixup: (order: Float64Array) => Hints,
+  applyChosenSides: (order: Float64Array) => void,
+): Hints {
+  const layoutOf = (h: Hints): LayoutResult | null => {
+    try { return alignPedigree(pedigree, { hints: h, align: false }); } catch { return null; }
+  };
+  let layout = layoutOf(hints);
+  if (!layout) return hints;
+  let cost = duplicateCost(layout);
+  if (cost.duplicates === 0) return hints;
+
+  const idToIdx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
+  const hasParents = (id: string) => (input.findex[idToIdx.get(id) ?? 0] ?? 0) > 0;
+  const couples = pedigree.partnerships.filter(p =>
+    !p.leftPartner && p.individual1 !== p.individual2 && hasParents(p.individual1) && hasParents(p.individual2));
+  if (couples.length === 0) return hints;
+  const depth = kindepth(input, true);
+
+  let order = horder;
+  let trials = 0;
+  for (let round = 0; round < MAX_SWAP_ROUNDS && cost.duplicates > 0; round++) {
+    let best: { order: Float64Array; hints: Hints; layout: LayoutResult; cost: typeof cost } | null = null;
+    for (const p of couples) {
+      const left = drawnLeftPartner(pedigree, layout, p.id);
+      if (!left) continue;
+      const right = left === p.individual1 ? p.individual2 : p.individual1;
+      const trial = order.slice();
+      orderLineages(trial, input, depth, [[idToIdx.get(right)!, idToIdx.get(left)!]]);
+      applyChosenSides(trial);
+      if (trial.every((v, i) => v === order[i])) continue;
+      if (++trials > MAX_SWAP_TRIALS) break;
+      const h = fixup(trial);
+      const l = layoutOf(h);
+      if (!l) continue;
+      const c = duplicateCost(l);
+      const than = best?.cost ?? cost;
+      if (c.duplicates < than.duplicates || (c.duplicates === than.duplicates && c.arcLength < than.arcLength)) {
+        best = { order: trial, hints: h, layout: l, cost: c };
+      }
+    }
+    if (!best) break;
+    ({ order, hints, layout, cost } = best);
+  }
+  return hints;
 }
 
 // ── Twin sets (R: twinset, twinord, twinrel) ───────────────────────────────────

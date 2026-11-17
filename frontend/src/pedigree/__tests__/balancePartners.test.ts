@@ -7,7 +7,7 @@ import { lintFlow } from "../renderLint";
 import { layoutCost } from "../layoutCost";
 import { importPed } from "../../io/ped/index.js";
 import { EXAMPLES } from "../../data/examples";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { alignPedigreeByFamily, drawnLeftPartner, type Pedigree } from "@pedigree-editor/layout-engine";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PED = join(__dirname, "../../../../test-data/ped");
@@ -49,7 +49,7 @@ describe("spouse-hint balancing (#76)", () => {
     expect(rowOf(off, "Rhaenyra").slice(-3)).toEqual(["Daemon", "Laenor_Velaryon", "Rhaenyra"]);
   });
 
-  it("is no worse than the plain port on every fixture, and changes nothing else", () => {
+  it("every pass together is no worse than the plain port on every fixture, and moves nobody without a gain", () => {
     for (const [name, p] of corpus()) {
       const off = layoutToFlow(p, { improveLayout: false });
       const on = layoutToFlow(p);
@@ -57,8 +57,53 @@ describe("spouse-hint balancing (#76)", () => {
       expect(b.duplicates, name).toBeLessThanOrEqual(a.duplicates);
       expect(b.hops, name).toBeLessThanOrEqual(a.hops);
       expect(lintFlow(p, on).length, name).toBeLessThanOrEqual(lintFlow(p, off).length);
-      if (!/targaryen/i.test(name)) {
+      if (b.duplicates === a.duplicates && b.hops === a.hops) {
         expect(on.nodes.map(n => [n.id, n.position]), name).toEqual(off.nodes.map(n => [n.id, n.position]));
+      }
+    }
+  });
+});
+
+describe("family swaps (#77)", () => {
+  const all = corpus();
+  const named = (label: string) => all.find(([n]) => n === label)![1];
+  const copiesOf = (flow: ReturnType<typeof layoutToFlow>, name: string) =>
+    flow.nodes.filter(n => n.data.individual.name === name).length;
+
+  it("draws Rhaenyra's sibship beside the Velaryons, so Laenor is drawn once", () => {
+    const p = named("fiction/targaryen.ped#TARG");
+    const off = layoutToFlow(p, { improveLayout: false }), on = layoutToFlow(p);
+    expect(copiesOf(off, "Laenor_Velaryon")).toBe(2);
+    expect(copiesOf(on, "Laenor_Velaryon")).toBe(1);
+    // Laenor is in his parents' sibship and beside his wife: the two
+    // sibships touch.
+    const row = rowOf(on, "Rhaenyra");
+    expect(row.slice(row.indexOf("Daemon"), row.indexOf("Daemon") + 5))
+      .toEqual(["Daemon", "Rhaenyra", "Laenor_Velaryon", "Daemon", "Laena_Velaryon"]);
+    const a = layoutCost(off), b = layoutCost(on);
+    expect([a.duplicates, b.duplicates]).toEqual([5, 3]);
+    expect(b.arcLength).toBeLessThan(a.arcLength * 0.6);
+    expect(lintFlow(p, on)).toEqual([]);
+  });
+
+  it("removes a duplicate on the other examples it changes, and only on those", () => {
+    const fewer = all.filter(([, p]) =>
+      layoutCost(layoutToFlow(p)).duplicates < layoutCost(layoutToFlow(p, { improveLayout: false })).duplicates).map(([n]) => n);
+    expect(fewer.filter(n => !n.includes("/")).sort()).toEqual(["Double second cousins (A)", "House Targaryen", "The Buendías"]);
+    expect(fewer).toContain("large/kinship2_sample.ped#1");
+    const buendia = named("The Buendías");
+    expect(copiesOf(layoutToFlow(buendia, { improveLayout: false }), "Úrsula")).toBe(2);
+    expect(copiesOf(layoutToFlow(buendia), "Úrsula")).toBe(1);
+  });
+
+  it("leaves a couple whose side the user chose as it was drawn without the pass", () => {
+    const base = named("Double second cousins (A)");
+    const idx = new Set(Object.keys(base.parentOf).flatMap(k => base.parentOf[k]!));
+    for (const couple of base.partnerships.filter(c => idx.has(c.individual1) && idx.has(c.individual2))) {
+      for (const leftPartner of [couple.individual1, couple.individual2]) {
+        const p: Pedigree = { ...base, partnerships: base.partnerships.map(c => (c.id === couple.id ? { ...c, leftPartner } : c)) };
+        const plain = drawnLeftPartner(p, alignPedigreeByFamily(p, { improve: false }), couple.id);
+        expect(drawnLeftPartner(p, alignPedigreeByFamily(p), couple.id), `${couple.id} ${leftPartner}`).toBe(plain);
       }
     }
   });

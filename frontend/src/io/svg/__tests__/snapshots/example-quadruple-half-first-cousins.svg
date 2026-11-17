@@ -11,7 +11,7 @@
 <g transform="translate(60 128)">
 <g class="couple-lines">
 <path d="M 20 0 L 60 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 20 0 L 30 0 L 30 -28 L 130 -28 L 130 0 L 140 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 100 0 L 140 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 260 0 L 300 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 420 0 L 460 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 33.33 120 L 73.33 120" stroke="black" stroke-width="2" fill="none"/>
@@ -21,7 +21,7 @@
 <line x1="40" y1="0" x2="40" y2="60" stroke="black" stroke-width="2"/>
 <line x1="13.33" y1="60" x2="40" y2="60" stroke="black" stroke-width="2"/>
 <line x1="13.33" y1="60" x2="13.33" y2="100" stroke="black" stroke-width="2"/>
-<line x1="120" y1="-28" x2="120" y2="60" stroke="black" stroke-width="2"/>
+<line x1="120" y1="0" x2="120" y2="60" stroke="black" stroke-width="2"/>
 <line x1="120" y1="60" x2="173.33" y2="60" stroke="black" stroke-width="2"/>
 <line x1="173.33" y1="60" x2="173.33" y2="100" stroke="black" stroke-width="2"/>
 <line x1="280" y1="0" x2="280" y2="60" stroke="black" stroke-width="2"/>
@@ -40,7 +40,7 @@
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
-<path d="M 80 -20 Q 160 -76 240 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 0 -20 Q 120 -76 240 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 160 -20 Q 280 -76 400 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 320 -20 Q 400 -76 480 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 <path d="M 93.33 100 Q 266.67 44 440 100" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
@@ -48,36 +48,36 @@
 <g class="symbols">
 <g transform="translate(0 0)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(80 0)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(160 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(240 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(320 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(400 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(480 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(13.33 120)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(93.33 120)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(173.33 120)">
@@ -87,14 +87,14 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(440 120)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(53.33 240)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
 </g>
 <g transform="translate(226.67 240)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
 </g>
 </g>
 <g class="labels">
