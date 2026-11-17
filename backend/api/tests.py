@@ -208,8 +208,8 @@ class SerializerMatchesSchemaTests(APITestCase):
 
 class PedigreeAccessTests(APITestCase):
     """
-    Who can read, change and delete a pedigree. The landing page states these
-    rules to users (#178, `YourData` in frontend/src/pages/LandingPage.tsx):
+    Who can read, change and delete a pedigree. The /your-data page states these
+    rules to users (#178, `YourData` in frontend/src/pages/YourDataPage.tsx):
     change that text with any change here.
     """
 
@@ -299,7 +299,7 @@ class TagPresetTests(APITestCase):
 
 
 class DeleteAccountTests(APITestCase):
-    """DELETE /api/auth/me/ (#183), stated on the landing page ("Signing in", `YourData`)."""
+    """DELETE /api/auth/me/ (#183), stated on /your-data ("Signing in", `YourData`)."""
 
     DATA = {"individuals": [], "partnerships": [], "parentOf": {}}
 

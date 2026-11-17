@@ -19,6 +19,7 @@ Family histories are health information. Leave out names, dates of birth and oth
 
 - [PedEdit JSON format](https://pededit.com/docs/pedigree-json-format.md): every field of the pedigree data model, the envelope a downloaded file uses, and how to create a pedigree through the API
 - [PedEdit JSON schema](https://pededit.com/docs/pedigree-json-schema.json): JSON Schema (draft 2020-12) for the same format
+- [What happens to your pedigrees](https://pededit.com/your-data): what is stored, where the server is, who can read a pedigree and how to delete it
 
 ## Guides
 

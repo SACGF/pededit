@@ -27,13 +27,20 @@ describe("prerendered landing page", () => {
   it("says what PedEdit is and that no account is needed", () => {
     expect(html).toContain("No account required");
     expect(html).toContain("kinship2");
-    expect(html).toContain("What happens to your pedigrees");
+    expect(html).toContain('href="/your-data"');
   });
 
   it("links every example and guide and names no host", () => {
     expect(html).toContain('href="/example/targaryen"');
     expect(html).toContain('href="/guides/pedigree-symbols"');
-    expect(unmark(html)).toContain("saved on the server at this site");
+  });
+});
+
+describe("prerendered /your-data", () => {
+  it("names no host and says where the server is", () => {
+    const html = unmark(prerender.renderPage("/your-data"));
+    expect(html).toContain("saved on the server at this site");
+    expect(html).toContain("Nectar Research Cloud");
   });
 });
 

@@ -6,6 +6,7 @@ import CanvasPage from "./pages/CanvasPage";
 import ChangelogPage from "./pages/ChangelogPage";
 import { GoogleAuthProvider } from "./components/GoogleAuthProvider";
 import GuidePage, { GuidesIndexPage } from "./pages/GuidePage";
+import YourDataPage, { YOUR_DATA_PATH } from "./pages/YourDataPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Route path="/changelog" element={<ChangelogPage />} />
       <Route path="/guides" element={<GuidesIndexPage />} />
       <Route path="/guides/:slug" element={<GuidePage />} />
+      <Route path={YOUR_DATA_PATH} element={<YourDataPage />} />
       <Route path="/p/:id" element={<CanvasPage />} />
       {/* The same element as /p/:id, so saving an example's copy does not remount the editor. */}
       <Route path="/example/:slug" element={<CanvasPage />} />

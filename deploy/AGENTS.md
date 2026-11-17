@@ -54,17 +54,18 @@ Deployment" half).
   without it they still work, as the app, but crawlers get the landing page
   HTML. Merge that by hand too.
 - `pededit.json.example` — template for the config file.
-- The landing page tells users what the server keeps (#178, `YourData` in
-  `frontend/src/pages/LandingPage.tsx`): request logs with the time, the
+- `/your-data` tells users what the server keeps (#178, #203,
+  `frontend/src/pages/YourDataPage.tsx`): request logs with the time, the
   address requested (an API address contains the pedigree's id, which for an
   anonymous pedigree is its key), the browser and the IP address, never the
   request body; that deleting removes the row at once; and what backups keep
   (`backupStatement`, below). Nginx logs with its default format, Gunicorn
-  to the journal, and how long either is kept is set on the box, not here.
+  to the journal, and how long either is kept is set on the box, not here
+  (the page says 14 days, the server's logrotate for Nginx).
   Change that text when backups (#48), error reporting (#49), rate limiting
-  (#47) or anything else here changes what is kept or where it is sent. A
-  proxy or CDN in front of Nginx sees every pedigree in transit and belongs
-  in that text too.
+  (#47) or anything else here changes what is kept or where it is sent. pededit.com
+  is proxied by Cloudflare, which sees every pedigree in transit, and the
+  page says so; another proxy or CDN belongs in that text too.
 - Error reporting (#49) goes to Rollbar and is off until the config has
   `rollbar_access_token` (post_server_item, Django reads it) and
   `rollbar_client_access_token` (post_client_item, `deploy.sh` passes it to

@@ -9,10 +9,8 @@ import { EXAMPLES, EXAMPLE_GROUPS } from "../data/examples";
 import { GUIDES, guidePath } from "../guides/guides";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
-import { GOOGLE_CLIENT_ID, ROLLBAR_ACCESS_TOKEN } from "../config";
 import { requestErrorMessage } from "../api/errors";
-import { backupStatement } from "../utils/backupStatement";
-import type { ReactNode } from "react";
+import { YOUR_DATA_PATH } from "./YourDataPage";
 
 export default function LandingPage() {
   const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout } = useAppStore();
@@ -148,12 +146,12 @@ export default function LandingPage() {
           {createError && (
             <p role="alert" data-testid="create-error" className="-mt-8 mb-10 text-xs text-red-600 max-w-xl">{createError}</p>
           )}
-          {/* Pointer to the "Your data" section at the foot of the page */}
+          {/* Pointer to /your-data */}
           <p className="-mt-7 mb-10 text-[10px] text-gray-400">
             Pedigrees are saved on this server.{" "}
-            <a href="#your-data" className="underline underline-offset-2 hover:text-gray-600">
+            <Link to={YOUR_DATA_PATH} className="underline underline-offset-2 hover:text-gray-600">
               What is stored and who can read it
-            </a>
+            </Link>
           </p>
 
           {/* Recent on this device: per browser, no account needed */}
@@ -206,9 +204,6 @@ export default function LandingPage() {
 
           {/* My pedigrees (authenticated) */}
           {isAuthenticated && <MyPedigrees />}
-
-          {/* What is stored, who can read it, how to delete it */}
-          <YourData />
         </div>
       </main>
 
@@ -224,6 +219,8 @@ export default function LandingPage() {
         </a>
         <span className="mx-2 text-gray-300">·</span>
         <Link to="/guides" className="hover:text-gray-600 transition-colors">Guides</Link>
+        <span className="mx-2 text-gray-300">·</span>
+        <Link to={YOUR_DATA_PATH} className="hover:text-gray-600 transition-colors">Your data</Link>
         <span className="mx-2 text-gray-300">·</span>
         <Link to="/changelog" className="hover:text-gray-600 transition-colors" title="Changelog">
           {BUILD_DATE ? `Updated ${formatDate(BUILD_DATE)}` : "Changelog"}
@@ -321,158 +318,5 @@ function MyPedigrees() {
         ))}
       </ul>
     </div>
-  );
-}
-
-/**
- * What happens to a pedigree once it is drawn. Not a legal privacy
- * policy, and it must not be called one.
- *
- * Every sentence here states what the code and the deploy config do, so a
- * change to any of these needs the matching sentence changed with it:
- * - access rules: `backend/api/views.py` (`PedigreeViewSet.get_queryset`),
- *   pinned by `PedigreeAccessTests` in `backend/api/tests.py`;
- * - deleting: `SettingsPanel` ("Delete this pedigree"), a hard delete;
- *   backups: `backupStatement` from `deploy/backup.sh`'s age limit;
- *   the account: `MeView.destroy` (`DeleteAccountTests`), `DeleteAccountDialog`;
- * - de-identified export: `io/svg/deidentify.ts`;
- * - browser storage: `utils/recentPedigrees.ts`, the tokens in
- *   `store/useAppStore.ts`, `showMinimap` and `compactLayout` in `CanvasPage`;
- * - other sites: `components/GoogleAuthProvider.tsx` wraps the sign-in page
- *   only (`App.tsx`), so Google's script loads there and nowhere else, when
- *   a Google client ID is built in; error reports go to Rollbar when the
- *   build has a token, carrying what `errorReporting/scrub.ts` allows;
- * - logs: `deploy/pededit-nginx.conf`, `deploy/pededit.service` (access logs
- *   on, health check left out) and `manage.py usage_stats`.
- *
- * Still to revisit:
- * - #47 (hardening, rate limiting): check the sentence about request logs.
- * - Where the server is and who runs it is not said, because the repository
- *   does not say. Add it under its own heading once the maintainer has.
- */
-/** Follows `errorReporting/scrub.ts` and `backend/peded/error_reporting.py`: change them together. */
-const ERROR_REPORTS = "When the app or the server hits an error, a report goes to Rollbar, an error tracking service: "
-  + "the kind of error, where in the code it happened and the kind of page (a pedigree page, not which one). A "
-  + "report never carries what is in a pedigree, a pedigree's link, or who you are.";
-
-function YourData() {
-  // The static copy built for search engines (prerender.tsx) knows no host.
-  const host = typeof window === "undefined" ? "this site" : window.location.host;
-  const name = "text-gray-700";
-  const rows: { term: string; text: ReactNode }[] = [
-    {
-      term: "What is stored",
-      text: (
-        <>
-          Each pedigree is saved on the server at {host}: the chart, its title and everything typed into it,
-          including names, dates and notes. Changes are saved as you make them. Importing a file saves a new
-          pedigree there too, and so does the first change to an example.
-        </>
-      ),
-    },
-    {
-      term: "Who can read it",
-      text: (
-        <>
-          A pedigree created while signed out is open to anyone who has its link: they can read it, change it
-          and delete it. The server does not list it anywhere and search engines are asked not to index it, so
-          the link is the key. Share it as carefully as the chart itself. It stays that way if you sign in
-          later. A pedigree created while signed in opens only in your account, and its link does not work for
-          anyone else. Whoever runs the server can read everything stored on it.
-        </>
-      ),
-    },
-    {
-      term: "How to delete it",
-      text: (
-        <>
-          Open the pedigree, then <span className={name}>Pedigree settings</span> (the cog in the toolbar) and{" "}
-          <span className={name}>Delete this pedigree</span>. No account is needed. This removes it from the
-          server&apos;s database at once and cannot be undone. {backupStatement()}
-        </>
-      ),
-    },
-    {
-      term: "Names are optional",
-      text: (
-        <>
-          Names, dates and notes are optional: a chart can be drawn with none. The SVG, PNG and PDF exports have
-          a <span className={name}>De-identify</span> option, which replaces names with pedigree numbers (I-1,
-          II-2) and leaves out dates, notes, the chart title and the clinical details. The CSV, PED and JSON
-          exports have no such option.
-        </>
-      ),
-    },
-    {
-      term: "In this browser",
-      text: (
-        <>
-          This browser keeps the <span className={name}>Recent on this device</span> list (the links and titles
-          of the last 20 pedigrees opened here), two display settings and, while you are signed in, your sign-in
-          tokens. Signing out takes your account&apos;s pedigrees off that list. On a shared computer, anyone
-          using this browser can see the rest of it and follow its links.
-        </>
-      ),
-    },
-    {
-      term: "Signing in",
-      text: (
-        <>
-          Optional. Signing in with Google or GitHub stores the name and email address of that account on the
-          server, along with any conditions and tags you save to <span className={name}>My library</span>.{" "}
-          <span className={name}>Delete account</span>, at the top of this page while signed in, deletes the
-          account, the pedigrees created while signed in and My library at once. Pedigrees created while signed
-          out are not part of the account and stay.
-        </>
-      ),
-    },
-    {
-      term: "What is not done",
-      text: (
-        <>
-          No analytics, advertising or tracking scripts. The app sends a pedigree only to {host}, and exports
-          are made in your browser.{" "}
-          {GOOGLE_CLIENT_ID
-            ? "One script comes from another site, on the Sign in page only: Google's sign-in script. No pedigree is sent to it."
-            : "No scripts, fonts or other files are loaded from other sites."}{" "}
-          {ROLLBAR_ACCESS_TOKEN && ERROR_REPORTS}{" "}
-          The server&apos;s request logs record the time, the address requested (which includes a
-          pedigree&apos;s id, not its contents), the browser and the IP address. The server&apos;s usage
-          figures count pedigrees and accounts, not what is in them.
-        </>
-      ),
-    },
-    {
-      term: "Running your own",
-      text: (
-        <>
-          PedEdit is open source. A team that has to keep pedigrees on its own systems can{" "}
-          <a
-            href="https://github.com/SACGF/pededit/blob/main/INSTALL.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:text-black"
-          >
-            run its own copy
-          </a>.
-        </>
-      ),
-    },
-  ];
-
-  return (
-    <section id="your-data" className="mt-12 border-t pt-8" data-testid="your-data">
-      <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-4">
-        What happens to your pedigrees
-      </h2>
-      <dl className="max-w-2xl grid grid-cols-1 sm:grid-cols-[9rem_1fr] gap-x-6 gap-y-1 sm:gap-y-3 text-xs leading-relaxed">
-        {rows.map(({ term, text }) => (
-          <div key={term} className="contents">
-            <dt className="font-medium text-black mt-3 sm:mt-0">{term}</dt>
-            <dd className="text-gray-500">{text}</dd>
-          </div>
-        ))}
-      </dl>
-    </section>
   );
 }

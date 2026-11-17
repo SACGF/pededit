@@ -29,7 +29,7 @@ export default {
     t.equal(t.currentId(), id, "and the list opens it");
     t.equal(await t.people(), 1, "with the person in it");
 
-    // Deleting needs no account either, as the landing page says (#178).
+    // Deleting needs no account either, as /your-data says (#178).
     await t.click('button[title="Pedigree settings"]');
     await t.click('button:has-text("Delete this pedigree")');
     await t.click('button:text-is("Delete permanently")');
@@ -38,6 +38,8 @@ export default {
     await t.open("/");
     await t.sleep(500);
     t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${id}"]`), 0, "and from Recent on this device");
-    t.match(await t.text('[data-testid="your-data"]'), /No account is needed/, "the landing page says how to delete it");
+    await t.open("/your-data");
+    await t.sleep(500);
+    t.match(await t.text('[data-testid="your-data"]'), /No account is needed/, "/your-data says how to delete it");
   },
 };

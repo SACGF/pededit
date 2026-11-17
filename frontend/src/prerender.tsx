@@ -1,5 +1,5 @@
 /**
- * The landing page and the guides (#202) as static HTML (#25), so search
+ * The landing page, the guides (#202) and /your-data as static HTML (#25), so search
  * engines and assistants that do not run JavaScript read them.
  * `prerenderPlugin` in vite.config.ts writes each page of
  * `PRERENDERED_PAGES` into its file in dist/ after a build, from the built
@@ -12,6 +12,7 @@ import { Route, Routes, StaticRouter } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import GuidePage, { GuidesIndexPage } from "./pages/GuidePage";
 import { GUIDES, guidePath } from "./guides/guides";
+import YourDataPage, { YOUR_DATA_DESCRIPTION, YOUR_DATA_PATH, YOUR_DATA_TITLE } from "./pages/YourDataPage";
 
 const SITE = "https://pededit.com";
 
@@ -34,6 +35,12 @@ export const PRERENDERED_PAGES: PrerenderedPage[] = [
     head: { title: "Pedigree guides | PedEdit", description: "Short guides to drawing clinical pedigrees with the standard NSGC symbols: a symbols cheat sheet, how to draw a pedigree, consanguinity, and practice families." },
     mustContain: "Pedigree guides",
   },
+  {
+    path: YOUR_DATA_PATH,
+    file: `${YOUR_DATA_PATH.slice(1)}.html`,
+    head: { title: `${YOUR_DATA_TITLE} | PedEdit`, description: YOUR_DATA_DESCRIPTION },
+    mustContain: YOUR_DATA_TITLE,
+  },
   ...GUIDES.map(g => ({
     path: guidePath(g.slug),
     file: `${guidePath(g.slug).slice(1)}.html`,
@@ -49,6 +56,7 @@ export function renderPage(path: string): string {
         <Route path="/" element={<LandingPage />} />
         <Route path="/guides" element={<GuidesIndexPage />} />
         <Route path="/guides/:slug" element={<GuidePage />} />
+        <Route path={YOUR_DATA_PATH} element={<YourDataPage />} />
       </Routes>
     </StaticRouter>,
   );

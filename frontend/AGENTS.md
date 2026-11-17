@@ -190,15 +190,16 @@ reporting is off, and the dev server never reports.
   `PedigreeCanvas` installs `utils/mouseupOverDisabled.ts`, which sends the
   missing `mouseup`. shadcn's `Button` is `disabled:pointer-events-none`
   and never had the problem.
-- **The landing page tells users what is stored, who can read it and how to
-  delete it** (#178, `YourData` in `pages/LandingPage.tsx`, "What happens to
-  your pedigrees"). Each sentence states what the code does, and the comment
-  above it lists where. Change the sentence in the same commit as a change
+- **`/your-data` tells users what is stored, where, who can read it and how
+  to delete it** (#178, #203, `pages/YourDataPage.tsx`, "What happens to
+  your pedigrees", linked from the landing page and its footer). Each
+  sentence states what the code, the deploy config or the maintainer says,
+  and the comment above it lists where. Change the sentence in the same commit as a change
   to: the access rules, deleting, what de-identified export drops, anything
   kept in `localStorage`, a script, font or request to another site, or what
-  the server logs. It is not a privacy policy and must not be called one. It
-  does not say where the server is or who runs it, because the repository
-  does not.
+  the server logs. It is not a privacy policy and must not be called one. Where
+  the server is, who runs it, Cloudflare in front of it and the 14 days the
+  request logs are kept come from the maintainer, not the repository.
 - **Google's sign-in script loads on the sign-in page only**, when the
   build has a Google client ID: `GoogleAuthProvider` wraps `LoginPage` in
   `App.tsx` and `@react-oauth/google` adds the script tag on mount. It is

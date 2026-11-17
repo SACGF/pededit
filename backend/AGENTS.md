@@ -98,7 +98,7 @@ pedigree refused.
   not a way to share it. An anonymous pedigree stays anonymous when a
   signed-in user opens or edits it: nothing ever sets `owner` after create.
 - These rules are pinned by `PedigreeAccessTests` and stated to users on the
-  landing page (#178, `YourData` in `frontend/src/pages/LandingPage.tsx`).
+  `/your-data` page (#178, `frontend/src/pages/YourDataPage.tsx`).
   Change that text with any change to them.
 - There is no `api/admin.py`, so Django admin shows users only, not
   pedigrees. `Pedigree.data` is plain JSON in the database, readable by
