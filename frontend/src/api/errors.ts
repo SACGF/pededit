@@ -1,9 +1,9 @@
 import { isAxiosError } from "axios";
 
 /**
- * What to tell the user when a request failed (#184). The server limits how
+ * What to tell the user when a request failed. The server limits how
  * often one address may sign in, refresh a token or create a pedigree
- * without an account (`backend/api/throttling.py`, #47) and answers 429 with
+ * without an account (`backend/api/throttling.py`) and answers 429 with
  * a `Retry-After` header; saving an open pedigree is never limited.
  */
 

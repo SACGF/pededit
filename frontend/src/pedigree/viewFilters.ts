@@ -2,11 +2,11 @@ import { isConditionTag, type Individual, type Pedigree, type Tag, type ViewFilt
 import { ancestorsOf, descendantsOf } from "./removal";
 
 /**
- * View filters (#4): global switches, saved with the pedigree in
+ * View filters: global switches, saved with the pedigree in
  * `Pedigree.filters`, that simplify what is drawn without touching the data.
  * Each filter only says who is drawn; `collapse.ts` turns that into the drawn
- * pedigree, so the hidden people go the same way as a collapsed branch
- * (#1, #94): a drawn couple's children who are not drawn become one numbered
+ * pedigree, so the hidden people go the same way as a collapsed branch:
+ * a drawn couple's children who are not drawn become one numbered
  * group symbol, and every renderer, the legend, pedigree numbers and the
  * figure exports follow. JSON, PED and CSV keep everyone.
  *
@@ -17,7 +17,7 @@ import { ancestorsOf, descendantsOf } from "./removal";
  * draw only the people every one of them keeps.
  */
 
-/** True when the person is affected with a condition (a quadrant tag that is not a trait, #118). */
+/** True when the person is affected with a condition (a quadrant tag that is not a trait). */
 function hasConditionTag(individual: Individual, conditions: Set<string>): boolean {
   return (individual.tags ?? []).some(t => conditions.has(t));
 }
@@ -30,7 +30,7 @@ export function chosenCondition(pedigree: Pedigree): Tag | undefined {
 
 /**
  * The people "affected only" starts from: affected, carrying a condition
- * (quadrant) tag, carriers (plain, of a condition, #115, or presymptomatic),
+ * (quadrant) tag, carriers (plain, of a condition, or presymptomatic),
  * the proband and the consultand. With a condition chosen
  * (`affectedCondition`), only people affected with or carrying it, and the
  * proband and consultand.

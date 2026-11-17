@@ -1,5 +1,5 @@
 /**
- * Posts error reports to Rollbar (#49). This module and `scrub.ts` are loaded
+ * Posts error reports to Rollbar. This module and `scrub.ts` are loaded
  * by `index.ts` only when the build has an access token, so a build without
  * one carries and runs none of this.
  *

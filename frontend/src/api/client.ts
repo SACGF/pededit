@@ -67,7 +67,7 @@ apiClient.interceptors.response.use(
       try {
         newToken = await tokenRefreshInProgress;
       } catch (refreshError) {
-        // The refresh was rate limited (#184): the tokens may be fine, so stay
+        // The refresh was rate limited: the tokens may be fine, so stay
         // signed in and pass the 429 on for the page to say wait and retry.
         if (isRateLimited(refreshError)) return Promise.reject(refreshError);
       }
@@ -133,7 +133,7 @@ export const authApi = {
 
   me: () => apiClient.get<UserInfo>("/auth/me/"),
 
-  /** Delete the signed-in account, its pedigrees and its My library (#183). */
+  /** Delete the signed-in account, its pedigrees and its My library. */
   deleteAccount: () => apiClient.delete("/auth/me/"),
 };
 
@@ -145,7 +145,7 @@ export const pedigreeApi = {
   create: (title: string) =>
     apiClient.post<PedigreePayload>("/pedigrees/", {
       title,
-      // A new pedigree is drawn in the current NSGC edition (#115); absent would mean 2008.
+      // A new pedigree is drawn in the current NSGC edition; absent would mean 2008.
       data: withCurrentNotation<Pick<Pedigree, "individuals" | "partnerships" | "parentOf" | "canvasSettings">>({ individuals: [], partnerships: [], parentOf: {} }),
     }),
 

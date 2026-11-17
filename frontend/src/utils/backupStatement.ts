@@ -1,7 +1,7 @@
 import { BACKUP_MAX_DAYS } from "../config";
 
 /**
- * What the site says about deleted data and backups (#183), on the landing
+ * What the site says about deleted data and backups, on the landing
  * page ("How to delete it") and in the Delete account dialog. It must agree
  * with `deploy/backup.sh`: every dump, nightly or taken before a deploy, is
  * deleted within `BACKUP_MAX_AGE_DAYS`. With no nightly run nothing deletes

@@ -1,14 +1,14 @@
 import type { Individual, Pedigree, Tag } from "./types.js";
 
-/** A condition (#115): a quadrant tag that is not a trait (#118). */
+/** A condition: a quadrant tag that is not a trait. */
 export function isConditionTag(tag: Pick<Tag, "style" | "kind">): boolean {
   return tag.style === "quadrant" && tag.kind !== "trait";
 }
 
 
 /**
- * Affected overall (#118): the plain `affected` flag, or affected with any
- * condition (a quadrant tag in `Individual.tags`, #115; not a trait). The flag on its own
+ * Affected overall: the plain `affected` flag, or affected with any
+ * condition (a quadrant tag in `Individual.tags`; not a trait). The flag on its own
  * means affected with something not recorded; recording a condition does not
  * set it. Everything that asks "is this person affected?" (sibling order,
  * PED and CSV export, filters, warnings) reads this, not the flag.

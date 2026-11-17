@@ -1,5 +1,5 @@
 /**
- * Feature fixtures (#140): small, dense, artificial pedigrees that between
+ * Feature fixtures: small, dense, artificial pedigrees that between
  * them draw every symbol, line and label the renderers can draw. The built-in
  * examples (`data/examples.ts`) are real families for users and draw only a
  * part of it; these are the safety net for changes to the canvas and the

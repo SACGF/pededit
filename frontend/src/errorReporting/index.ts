@@ -1,5 +1,5 @@
 /**
- * Error reporting (#49): the part that is always in the bundle, a few lines.
+ * Error reporting: the part that is always in the bundle, a few lines.
  * With no Rollbar token in the build it does nothing: no listener, no request, and the
  * reporter chunk (`reporter.ts`, `scrub.ts`) is never fetched. What a report
  * contains is decided in `scrub.ts`, and only there.

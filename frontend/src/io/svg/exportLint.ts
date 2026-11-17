@@ -1,5 +1,5 @@
 /**
- * Render lint for the standard SVG export (#72). The canvas lint
+ * Render lint for the standard SVG export. The canvas lint
  * (`pedigree/renderLint.ts`) checks layoutToFlow's output. `exportSvg` draws
  * from that same output, but it is a second renderer writing its own SVG,
  * so this one parses the exported file and checks what it actually draws against
@@ -15,14 +15,14 @@
  *   line-through-symbol    a sibship line passes through a symbol it does not end at
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    the line above someone leads to a couple who are not the parents
- *   assisted-not-drawn     a carrier or social parent (#45) has no line to the child
+ *   assisted-not-drawn     a carrier or social parent has no line to the child
  *   labels-overlap         two label lines on one row run into each other
- *   consanguinity-label-collides  the degree of relationship over a double line (#97)
+ *   consanguinity-label-collides  the degree of relationship over a double line
  *                          runs into a symbol, a line, other text, a copy number
  *                          or a dashed arc between two copies (unless the label
- *                          is on a white backing, #109)
+ *                          is on a white backing)
  *   title-collides         the chart title is drawn through a dashed arc between
- *                          two copies, a consanguinity label or a symbol (#172)
+ *                          two copies, a consanguinity label or a symbol
  *
  * PNG and PDF are rasterised from this SVG, so the lint covers them too. The
  * U-shape export has its own geometry and its own lint (`uShapeLint.ts`).
@@ -79,18 +79,18 @@ interface Parsed {
   symbols: Pt[];
   couples: Pt[][];
   sibs: Seg[];
-  /** Lines of assisted reproduction (#45), group `assisted-lines`. */
+  /** Lines of assisted reproduction, group `assisted-lines`. */
   assisted: Seg[];
   texts: { x: number; y: number; text: string }[];
-  /** Lines of the consanguinity labels (#97), group `consanguinity-labels`. */
+  /** Lines of the consanguinity labels, group `consanguinity-labels`. */
   coupleTexts: { x: number; y: number; text: string }[];
-  /** Baselines of the "?" marks over symbols (#100). */
+  /** Baselines of the "?" marks over symbols. */
   questionMarks: Pt[];
   /** The dashed arcs between two copies of someone, as polylines (group `duplicate-arcs`). */
   duplicateArcs: Pt[][];
   /** Copy numbers beside a symbol drawn twice: where the text starts, on its baseline, and the text. */
   copyNumbers: { x: number; y: number; text: string }[];
-  /** White backings behind consanguinity labels on a dashed arc (#109), as [x1, y1, x2, y2]. */
+  /** White backings behind consanguinity labels on a dashed arc, as [x1, y1, x2, y2]. */
   coupleBackings: [number, number, number, number][];
   /** The chart title (`class="chart-title"`): its centre on the baseline, and the text. */
   titles: { x: number; y: number; text: string }[];
@@ -274,7 +274,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
    * The symbol a couple line ends at: the edge of its box facing the other
    * partner (`side` 1 for the line's left end, at the symbol's right edge, -1
    * for its right end), at the symbol's height or 2px off it for a double
-   * line. As the canvas draws it (`coupleLineGeometry`, #143).
+   * line. As the canvas draws it (`coupleLineGeometry`).
    */
   const endSymbol = ([px, py]: Pt, side: 1 | -1) =>
     symbols.find(s => Math.abs(s.pos[0] + side * half - px) < 0.5 && Math.abs(s.pos[1] - py) <= COUPLE_TOUCH);
@@ -311,7 +311,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   }
   for (const p of pedigree.partnerships) {
     if (!drawn.has(p.individual1) || !drawn.has(p.individual2)) continue;
-    if (p.donorConception) continue; // gamete donation (#45): not a couple, no line
+    if (p.donorConception) continue; // gamete donation: not a couple, no line
     if (!drawnPairs.has(pairKey(p.individual1, p.individual2))) {
       out.push({ code: "partnership-not-drawn", message: `partnership ${label(p.individual1)} = ${label(p.individual2)} has no couple line in the export`, individuals: [p.individual1, p.individual2] });
     }
@@ -357,7 +357,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   });
   const touches = (s: Seg, t: Seg) => ends(t).some(e => distToSeg(e, s) <= TOUCH) || ends(s).some(e => distToSeg(e, t) <= TOUCH);
   const parentsOf = new Map<string, string>();
-  // Where the child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  // Where the child is drawn: under the couple carrying it, for an egg donor's child.
   for (const [pid, kids] of Object.entries(placementParentOf(pedigree))) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   /** Every sibship segment joined to a line ending at any copy of the child. */
@@ -380,7 +380,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     const got = new Set<string>();
     for (const i of seen) for (const e of ends(sibs[i]!)) for (const c of onCouple(e)) if (c.key) got.add(c.key);
     if (got.has(want)) continue;
-    // Gamete donation (#45): no couple line; a line runs from each parent's symbol.
+    // Gamete donation: no couple line; a line runs from each parent's symbol.
     if (p.donorConception) {
       const reached = new Set<string>();
       for (const i of seen) for (const e of ends(sibs[i]!)) for (const sym of symbolsAt(e)) reached.add(sym.id);
@@ -402,7 +402,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     }
   }
 
-  // 3b. Lines of assisted reproduction (#45): from the carrier or social
+  // 3b. Lines of assisted reproduction: from the carrier or social
   // parent's symbol to the child's, through no other symbol.
   const assisted = parsed.assisted.map(([x1, y1, x2, y2]): Seg => {
     const [a, b] = [toCanvas([x1, y1]), toCanvas([x2, y2])];
@@ -452,7 +452,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     }
   }
 
-  // 5. Consanguinity labels (#97): the text box, from cap height to just
+  // 5. Consanguinity labels: the text box, from cap height to just
   // below the baseline, must touch no symbol (slash included), line or
   // other text.
   type Box = [number, number, number, number];
@@ -484,7 +484,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
     if (twin) hit(`the label "${twin.t.text}"`);
   });
 
-  // 6. The chart title (#172): nothing drawn over the top row may reach it.
+  // 6. The chart title: nothing drawn over the top row may reach it.
   for (const t of parsed.titles) {
     const box = textBox(t, titleWidth(t.text), 10);
     const hit = (what: string) => out.push({ code: "title-collides", message: `the chart title "${t.text}" is drawn through ${what}`, individuals: [] });

@@ -7,7 +7,7 @@ import { ADOPTION_DASH } from "../adoption";
 export type AssistedEdgeType = Edge<AssistedEdgeData, "assistedEdge">;
 
 /**
- * Assisted reproduction (#45): a solid line from the woman who carried the
+ * Assisted reproduction: a solid line from the woman who carried the
  * child, or a dashed one from a parent who is not genetic, to the child or
  * to where the sibship's line of descent meets the bar.
  */

@@ -4,7 +4,7 @@ import { errorReportingOn, reportError } from "../errorReporting";
 const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
 
 /**
- * The app's only error boundary (#49): without one a render error leaves a
+ * The app's only error boundary: without one a render error leaves a
  * blank white page. It replaces the whole app, so the page that failed is
  * unmounted, which is when `CanvasPage` saves unsaved edits.
  *

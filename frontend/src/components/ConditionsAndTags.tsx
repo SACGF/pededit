@@ -12,13 +12,13 @@ interface ConditionsAndTagsProps {
   individual: Individual;
   onConditionState: (tagId: string, state: ConditionState) => void;
   onToggleTag: (tagId: string, on: boolean) => void;
-  /** Age of onset of a condition the person is affected with (#93). */
+  /** Age of onset of a condition the person is affected with. */
   onSetTagOnset: (tagId: string, value: string) => void;
   onManageTags?: () => void;
 }
 
 /**
- * One person's conditions and tags on the Person tab (#136), the only place
+ * One person's conditions and tags on the Person tab, the only place
  * the panel records a condition, whatever the number of conditions: each
  * condition (`isConditionTag`) has a No / Affected / Carrier select, every
  * other tag (traits, dots, text) a checkbox. Conditions come first, then the

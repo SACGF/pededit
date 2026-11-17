@@ -4,7 +4,7 @@ import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } 
 import { filterHidden, withoutFilters } from "./viewFilters";
 
 /**
- * Hidden descendants (#94). `Individual.descendantsHidden` leaves everyone
+ * Hidden descendants. `Individual.descendantsHidden` leaves everyone
  * below that person out of the drawing without deleting them. Everything that
  * draws (layout, canvas, legend, render lint, SVG / PNG / PDF and U-shape
  * export) works from `drawnPedigree(pedigree)`, the pedigree with those people
@@ -20,7 +20,7 @@ import { filterHidden, withoutFilters } from "./viewFilters";
  *    partnership.
  *  - partners of hidden people who married in (no parents in the pedigree)
  *    and have no partnership with anyone drawn, the same rule as remove with
- *    descendants (#34). The collapsed person's own partner stays, since they
+ *    descendants. The collapsed person's own partner stays, since they
  *    partner someone drawn, so the couple line stays and only the children
  *    go.
  * Ancestors of a drawn person are never hidden (a hidden parent would make
@@ -31,7 +31,7 @@ import { filterHidden, withoutFilters } from "./viewFilters";
  * drawn collapsed person above them. A flag on someone with no descendants
  * hides nothing and is dropped from the drawn copy.
  *
- * A collapsed couple's children are drawn as NSGC 2008 Fig. 1 has it (#1):
+ * A collapsed couple's children are drawn as NSGC 2008 Fig. 1 has it:
  * a number inside a symbol means that many siblings, and affected people are
  * not grouped. Each child who is affected, or carries a condition tag (a
  * quadrant fill), stays drawn as themselves (`shown`), with their own
@@ -42,7 +42,7 @@ import { filterHidden, withoutFilters } from "./viewFilters";
  * by every renderer like anyone else; `CollapseInfo.placeholders` carries
  * what it stands for. It is never in the stored pedigree.
  *
- * View filters (#4, `viewFilters.ts`) hide people the same way. The people a
+ * View filters (`viewFilters.ts`) hide people the same way. The people a
  * filter leaves out are hidden along with any collapsed branch, and every
  * drawn couple whose children are not all drawn gets the same group symbol
  * for the ones that are not (their own partners and descendants not drawn).
@@ -60,17 +60,17 @@ export interface CollapseInfo {
    * collapsed people (descendants who intermarry) is listed under both.
    */
   branches: Map<string, Set<string>>;
-  /** The group symbols standing for hidden siblings (#1), by placeholder id. Their individuals are in `drawn`. */
+  /** The group symbols standing for hidden siblings, by placeholder id. Their individuals are in `drawn`. */
   placeholders: Map<string, CollapsedBranch>;
-  /** How many people the view filters (#4) leave out, collapsed branches aside. 0 when no filter is on. */
+  /** How many people the view filters leave out, collapsed branches aside. 0 when no filter is on. */
   filtered: number;
 }
 
-/** What one collapsed-branch group symbol stands for (#1). */
+/** What one collapsed-branch group symbol stands for. */
 export interface CollapsedBranch {
   /**
    * The collapsed partner (or both partners) whose flag hides these people;
-   * expanding clears it. Empty for a group made by a view filter (#4) alone,
+   * expanding clears it. Empty for a group made by a view filter alone,
    * which turning the filter off shows.
    */
   roots: string[];
@@ -112,10 +112,10 @@ export function branchOf(drawn: Pedigree, id: string): CollapsedBranch | undefin
 /**
  * True when a child of a collapsed couple is drawn as themselves rather than
  * counted in the group symbol: affected (plainly or with a condition), or a
- * carrier (plain, of a condition, #115, or presymptomatic). NSGC: affected
+ * carrier (plain, of a condition, or presymptomatic). NSGC: affected
  * people are not grouped; a known carrier is informative too, and grouping
  * them would also change which conditions are "in use" on the chart, and so
- * everyone else's sections (#115). The same people seed "Affected only" (#4).
+ * everyone else's sections. The same people seed "Affected only".
  */
 export function drawnIndividually(individual: Individual, pedigree: Pedigree): boolean {
   return isAffected(individual, pedigree) || isCarrier(individual, pedigree) || !!individual.presymptomatic;
@@ -221,7 +221,7 @@ function hiddenUnder(pedigree: Pedigree, people: Iterable<string>, hidden: Set<s
 }
 
 /**
- * Add a group symbol child (#1) under each collapsed couple that has
+ * Add a group symbol child under each collapsed couple that has
  * children to group (those not drawn as themselves). The symbol takes the
  * birth order (sibOrder and date of birth) of the first grouped child, so it
  * sits among the drawn affected siblings where that child would. A couple
@@ -322,7 +322,7 @@ export function rootsHidingNew(before: Pedigree, after: Pedigree): string[] {
 
 /**
  * True when an edit (not switching a filter on) leaves someone out of the
- * drawing who was drawn before or is new, because of a view filter (#4):
+ * drawing who was drawn before or is new, because of a view filter:
  * a child added to an affected person, or someone made unaffected. The store
  * then turns the filters off rather than let them vanish.
  */

@@ -13,12 +13,12 @@
  *   couple-line-slanted    partners sit on different rows (usually a pin moved vertically)
  *   child-without-parents  someone with parents has no line from those parents
  *   child-wrong-parents    a sibship line comes from a couple who are not the parents
- *   assisted-not-drawn     a carrier or social parent (#45) has no line to the child
+ *   assisted-not-drawn     a carrier or social parent has no line to the child
  *   sibship-bars-overlap   two couples' sibship bars run along the same line, so they read as one sibship
  *   symbols-overlap        two symbols sit on top of each other, or touch
  *   labels-overlap         two name or date labels on one row run into each other
  *   title-collides         the chart title runs into a symbol, a dashed arc between
- *                          two copies, a couple label or a hopping couple line (#188);
+ *                          two copies, a couple label or a hopping couple line;
  *                          only when `options.title` is given, as the canvas draws it
  *
  * Used by `__pededit.check()` (devHooks.ts), `scripts/browser/lint.mjs` and the
@@ -70,7 +70,7 @@ const MIN_SYMBOL_GAP = 8;
 const MIN_BAR_GAP = 4;
 
 export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: string } = {}): LintFinding[] {
-  const pedigree = drawnPedigree(full); // hidden descendants (#94) are meant to be missing
+  const pedigree = drawnPedigree(full); // hidden descendants are meant to be missing
   const out: LintFinding[] = [];
   const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
   const indOf = (nodeId: string) => nodeById.get(nodeId)?.data.individual.id;
@@ -153,7 +153,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   }
   for (const p of pedigree.partnerships) {
     if (!drawn.has(p.individual1) || !drawn.has(p.individual2)) continue; // already reported
-    if (p.donorConception) continue; // gamete donation (#45): not a couple, no line
+    if (p.donorConception) continue; // gamete donation: not a couple, no line
     if (!drawnPairs.has(pairKey(p.individual1, p.individual2))) {
       out.push({
         code: "partnership-not-drawn",
@@ -179,7 +179,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
 
   // 3. Children hang from their own parents.
   const parentsOf = new Map<string, string>(); // child id -> partnership id
-  // Where the child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  // Where the child is drawn: under the couple carrying it, for an egg donor's child.
   for (const [pid, kids] of Object.entries(placementParentOf(pedigree))) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const hasLineFrom = new Map<string, Set<string>>(); // child id -> pair keys of couples it hangs from
@@ -234,7 +234,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     }
   }
 
-  // 3a. Lines of assisted reproduction (#45).
+  // 3a. Lines of assisted reproduction.
   const linked = new Set(flow.assistedEdges.flatMap(e => (e.data?.children ?? []).map(c => `${indOf(e.source)}>${c}`)));
   for (const link of assistedLinks(pedigree)) {
     if (!drawn.has(link.from) || !drawn.has(link.child) || linked.has(`${link.from}>${link.child}`)) continue;
@@ -245,7 +245,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     });
   }
 
-  // 3b. Sibship bars of different couples along the same line (#80). Bars
+  // 3b. Sibship bars of different couples along the same line. Bars
   // that only meet end to end count too: they still read as one bar.
   const bars = flow.sibshipEdges.flatMap(e => {
     const d = e.data;
@@ -281,7 +281,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     }
   }
 
-  // 5. Labels on one row running into each other (#68). Names are wrapped to
+  // 5. Labels on one row running into each other. Names are wrapped to
   // the slot width, so this catches dragged nodes and long dates.
   const labelW = (n: FlowData["nodes"][0]) =>
     Math.max(linesWidth(n.data.nameLines ?? []), linesWidth(n.data.detailLines ?? []));
@@ -308,7 +308,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
 const SLASH_REACH = 4;
 
 /**
- * The canvas title (#188), placed as `chartTitleNode` places it, against
+ * The canvas title, placed as `chartTitleNode` places it, against
  * everything drawn near the top of the chart. The title is raised to clear
  * `highestAboveSymbols`, so a finding means that missed something.
  */

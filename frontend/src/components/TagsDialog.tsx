@@ -21,7 +21,7 @@ interface TagsDialogProps {
 
 const STYLES: TagStyle[] = ["quadrant", "dot", "text"];
 
-/** What the style select shows: the code's "quadrant" is a section, which can be the whole symbol or a half (#115). */
+/** What the style select shows: the code's "quadrant" is a section, which can be the whole symbol or a half. */
 const STYLE_NAMES: Record<TagStyle, string> = { quadrant: "section", dot: "dot", text: "text" };
 
 // ── Colour picker ─────────────────────────────────────────────────────────────

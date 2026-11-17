@@ -1,5 +1,5 @@
 /**
- * Render lint for the consanguinity labels of the U-shape export (#109).
+ * Render lint for the consanguinity labels of the U-shape export.
  * The standard export's lint (`exportLint.ts`) reads rows and columns; the
  * U-shape draws everything rotated with its track, so this one works on the
  * drawing itself: every line, arc, shape and piece of text in the SVG,
@@ -9,7 +9,7 @@
  *
  *   consanguinity-label-collides  a label runs into a line, a symbol or text
  *   title-collides                the chart title runs into anything drawn:
- *                                 a line or dashed arc, a symbol, a label (#188)
+ *                                 a line or dashed arc, a symbol, a label
  *
  * The one exception: a label the exporter wrote on a white backing (a
  * `<rect fill="white">` in its group) may have the thin dashed link between
@@ -167,7 +167,7 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
         titles.push({ text, box: [x - w / 2, y - 0.8 * fs, x + w / 2, y + 0.3 * fs] });
         continue;
       }
-      // The standard export writes each line straight into the group (#97).
+      // The standard export writes each line straight into the group.
       if (top().kind === "labels") { labels.push({ m, lines: [{ text, y: num(a, "y"), size }], backed: false, x: num(a, "x") }); continue; }
       if (inLabel) { labels[labels.length - 1]!.lines.push({ text, y: num(a, "y"), size }); continue; }
       const w = textWidth(text) * size / 10;
@@ -217,7 +217,7 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     const c: P[] = [[box[0], box[1]], [box[2], box[1]], [box[2], box[3]], [box[0], box[3]], [box[0], box[1]]];
     shapes.push({ what: `the label "${text}"`, pts: c.map(p => apply(l.m, p)), pad: 0 });
   }
-  // The chart title (#188): nothing drawn may reach it, the dashed links between copies included.
+  // The chart title: nothing drawn may reach it, the dashed links between copies included.
   for (const t of titles) {
     const [x1, y1, x2, y2] = t.box;
     const hit = shapes.find(s => s.pts.some((p, i) => (i > 0 && segHitsBox(s.pts[i - 1]!, p, t.box, s.pad))

@@ -60,7 +60,7 @@ interface ShapeProps {
   clipId?: string;
   /**
    * The shape to draw, when it is not `individual.sex`: a symbol drawn by
-   * gender identity (#26, `symbolSex` in gender.ts).
+   * gender identity (`symbolSex` in gender.ts).
    */
   shape?: Individual["sex"];
 }
@@ -77,7 +77,7 @@ function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; c
   return (
     <g clipPath={`url(#${clipId})`}>
       {sectors.map((s, i) => (
-        // data-carrier-sector (#115): which condition's carrier fill this is, for page checks.
+        // data-carrier-sector: which condition's carrier fill this is, for page checks.
         <g key={s.tag.id} data-carrier-sector={s.carrier ? s.tag.id : undefined}>
           <RegionFill
             fill={s.fill ?? "solid"} color={s.color ?? s.tag.color} box={box}
@@ -90,7 +90,7 @@ function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; c
 }
 
 /**
- * Fill the region `d` with pattern `fill` in `color` (#67): the React twin of
+ * Fill the region `d` with pattern `fill` in `color`: the React twin of
  * `renderRegionFillSvg` in tagFills.ts, from the same `fillLayers`. `clipId`
  * must be unique on the page; it clips the pattern marks to the region.
  * Clip to a symbol outline by wrapping this in a clipped <g>.
@@ -245,7 +245,7 @@ function CarrierDot({ size, status, rim }: { size: number; status: LifeStatus | 
 }
 
 /**
- * Presymptomatic carrier (#101): a vertical line through the symbol, with a
+ * Presymptomatic carrier: a vertical line through the symbol, with a
  * white rim over tag colours as the carrier dot has. Geometry in `evaluation.ts`.
  */
 function PresymptomaticLine({ size, status, rim }: { size: number; status: LifeStatus | undefined; rim: boolean }) {
@@ -348,7 +348,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
 }
 
 /**
- * "D" (gamete donor) or "S" (surrogate) inside the symbol (#45). White on a
+ * "D" (gamete donor) or "S" (surrogate) inside the symbol. White on a
  * filled symbol; with a white halo over tag colours so it stays legible.
  */
 export function RoleLetter({ individual, size, halo = false, base = "white" }: { individual: Individual; size: number; halo?: boolean; base?: "black" | "white" }) {
@@ -409,7 +409,7 @@ export function DeceasedSlash({ size }: { size: number }) {
 }
 
 /**
- * NSGC proband or consultand arrow (#99): solid arrowhead pointing up-right
+ * NSGC proband or consultand arrow: solid arrowhead pointing up-right
  * at the symbol's bottom-left corner, with a "P" at the tail for the proband
  * only. Geometry in `proband.ts`, shared with the exporters. The default
  * marker id is registered globally in PedigreeCanvas to avoid duplicate defs.
@@ -440,7 +440,7 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
   );
 }
 
-/** "?" above the symbol: family history not known (#100). Placement in `familyHistory.ts`. */
+/** "?" above the symbol: family history not known. Placement in `familyHistory.ts`. */
 export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParents: boolean }) {
   const p = familyHistoryMarkAt(size, hasParents);
   return (
@@ -455,7 +455,7 @@ export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParen
   );
 }
 
-/** "*" at the lower right: a documented evaluation (#101). Placement in `evaluation.ts`. */
+/** "*" at the lower right: a documented evaluation. Placement in `evaluation.ts`. */
 export function DocumentedMark({ size, adopted }: { size: number; adopted: boolean }) {
   const p = documentedMarkAt(size, adopted);
   return (

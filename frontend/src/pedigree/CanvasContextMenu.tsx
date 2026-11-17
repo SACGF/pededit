@@ -7,7 +7,7 @@ export type ContextMenuTarget =
   | { x: number; y: number; partnershipId: string };
 
 /**
- * The right-click menu (#95). A person gets the more menu's own item list,
+ * The right-click menu. A person gets the more menu's own item list,
  * a couple line the couple items, opened at the cursor. Radix closes it on
  * Escape and on a click outside, which calls `onClose`.
  */

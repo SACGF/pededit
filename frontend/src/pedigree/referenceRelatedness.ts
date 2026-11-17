@@ -3,7 +3,7 @@ import { formatCoefficient, kinshipOf, kinshipXOf } from "./relatedness";
 import { ALSO_RELATED_OTHERWISE, relationshipTermFor } from "./relationship";
 
 /**
- * How one person is related to the proband and the consultand (#134), for
+ * How one person is related to the proband and the consultand, for
  * the edit panel's Relatedness section: one short line per reference person,
  * "Proband's first cousin" with "Kinship 1/16 (0.0625), X-linked 0" under it.
  * Read-only and never drawn. Framework-free.

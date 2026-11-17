@@ -11,11 +11,10 @@
  *
  * What changes with "nsgc2008":
  * - evaluation results are written with the "E" prefix, numbered E1, E2
- *   ("E+ (BRCA1 c.5266dupC)", #101) instead of the 2022 "BRCA1 c.5266dupC +"
- *   (#114);
+ *   ("E+ (BRCA1 c.5266dupC)") instead of the 2022 "BRCA1 c.5266dupC +";
  * - a carrier with no condition recorded is the centre dot instead of half
  *   the symbol patterned, and an affected person with condition tags keeps
- *   the black centre (#115, `symbolPaint` in tags.ts).
+ *   the black centre (`symbolPaint` in tags.ts).
  */
 
 import type { NotationEdition, Pedigree } from "@pedigree-editor/layout-engine";

@@ -2,7 +2,7 @@ import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { briefCoefficient } from "./relatedness";
 
 /**
- * The name of the relationship between two people (#90): "first cousin once
+ * The name of the relationship between two people: "first cousin once
  * removed", "half-sister", "great-aunt". Framework-free.
  *
  * The relationship is read off the closest common ancestors: one person
@@ -225,7 +225,7 @@ function turnedTerm(pedigree: Pedigree, named: RelationshipName, personId: strin
 
 /**
  * The relationship of a couple as NSGC writes it above a consanguineous
- * double line (#97): "first cousins", "half second cousins once removed",
+ * double line: "first cousins", "half second cousins once removed",
  * "uncle and niece", "double first cousins". When they are more closely
  * related than that (`extra`), their kinship follows, as short as the figure
  * needs (`briefCoefficient`): "siblings (3/8)", "uncle and niece (0.36)".

@@ -7,7 +7,7 @@ import { VIEW_FILTERS, activeFilters, filterLabel } from "../pedigree/viewFilter
 import { conditionTags } from "../pedigree/conditions";
 
 /**
- * The view filters (#4) as a toolbar menu of switches, so they can be turned
+ * The view filters as a toolbar menu of switches, so they can be turned
  * on and off quickly. The button reads the active filter's name while one is
  * on, or how many are on. Further filters are rows in `VIEW_FILTERS`. With
  * two or more conditions, "Affected only" can be narrowed to one. Controls

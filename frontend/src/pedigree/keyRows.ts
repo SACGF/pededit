@@ -1,5 +1,5 @@
 /**
- * The rows of the chart's key, as plain data (#148): which rows, in what
+ * The rows of the chart's key, as plain data: which rows, in what
  * order, with what label, and what each swatch shows. The legend on the
  * Pedigree tab (`components/Legend.tsx`) and the key of the SVG, PNG and PDF
  * exports (`exportKey.ts`) both draw from this list, each through a switch on
@@ -63,7 +63,7 @@ export type KeyRow =
   | { kind: "twins"; zygosity: Zygosity; label: string }
   | { kind: "assistedLine"; line: "carrier" | "social"; label: string }
   | { kind: "duplicate"; label: string }
-  | { kind: "tag"; tag: Tag; /** The "<condition> carrier" row (#115). */ carrier: boolean; /** Someone drawn has it. */ inUse: boolean; label: string }
+  | { kind: "tag"; tag: Tag; /** The "<condition> carrier" row. */ carrier: boolean; /** Someone drawn has it. */ inUse: boolean; label: string }
   | { kind: "clinicalDetail"; field: string; label: string; value: string };
 
 export type KeyRowKind = KeyRow["kind"];
@@ -77,7 +77,7 @@ export interface KeyRows {
   symbols: KeyRow[];
   /** Lines between people. */
   relationships: KeyRow[];
-  /** Clinical details (#102): text, not swatches. */
+  /** Clinical details: text, not swatches. */
   details: KeyRow[];
 }
 
@@ -93,12 +93,12 @@ export const KEY_DIFFERENCES = {
   legendListsUnusedTags: true,
   /** A stillbirth and an ectopic pregnancy name their caption in the export key ("Stillbirth (SB)"). */
   exportLabels: { stillbirth: "Stillbirth (SB)", ectopic: "Ectopic pregnancy (ECT)" } as Partial<Record<LifeStatus, string>>,
-  /** The symbol rows keep one order, after the legend's shapes, and so do the relationship rows (#173). */
+  /** The symbol rows keep one order, after the legend's shapes, and so do the relationship rows. */
   symbolOrderDiffers: false,
 };
 
 /**
- * Order of the symbol rows, the same for both (#173): status first, then the
+ * Order of the symbol rows, the same for both: status first, then the
  * two arrows together, then family history, as NSGC's own key reads. The
  * legend begins with the shapes.
  */
@@ -119,7 +119,7 @@ const RELATIONSHIP_ORDER: Record<KeyTarget, KeyRowKind[]> = {
 
 export interface KeyRowsOptions {
   /**
-   * The drawing joins two copies of someone with a dashed arc (#124). An
+   * The drawing joins two copies of someone with a dashed arc. An
    * exporter knows from its own layout (the U-shape draws different copies);
    * left out, it is worked out from the standard layout.
    */
@@ -132,11 +132,11 @@ export interface KeyRowsOptions {
  * export); hidden descendants and filtered people add no rows.
  */
 export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsOptions = {}): KeyRows {
-  // Only what is drawn: hidden descendants (#94) add no entries, and the
-  // group symbols standing for collapsed siblings (#1) have their own row.
+  // Only what is drawn: hidden descendants add no entries, and the
+  // group symbols standing for collapsed siblings have their own row.
   const { drawn, placeholders } = collapseInfo(pedigree);
   const individuals = drawn.individuals.filter(i => !isBranchPlaceholderId(i.id));
-  // Swatches use the shape drawn, which is the gender identity's when shown (#26).
+  // Swatches use the shape drawn, which is the gender identity's when shown.
   const shape = (i: Individual) => symbolSex(i, drawn);
   const found: Partial<Record<KeyRowKind, KeyRow[]>> = {};
   const add = (row: KeyRow) => { (found[row.kind] ??= []).push(row); };
@@ -149,28 +149,28 @@ export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsO
   for (const sex of ["male", "female", "unknown"] as const) {
     if (individuals.some(i => shape(i) === sex)) add({ kind: "sex", shape: sex, label: sexLabels[sex] });
   }
-  // Sex assigned at birth under a symbol drawn by gender identity (#26).
+  // Sex assigned at birth under a symbol drawn by gender identity.
   for (const { code, label } of assignedAtBirthInUse(drawn)) add({ kind: "assignedAtBirth", code, label });
 
-  // Affected and carrier with no condition recorded, as drawn (#115, `statusKeyRows`).
+  // Affected and carrier with no condition recorded, as drawn (`statusKeyRows`).
   const status = statusKeyRows(drawn, individuals);
   if (status.affected) add({ kind: "affected", shape: shape(status.affected), label: status.affectedLabel });
   if (status.core) add({ kind: "affectedCore", shape: shape(status.core), label: status.coreLabel });
   if (status.carrier) add({ kind: "carrier", shape: shape(status.carrier), half: status.carrierHalf, label: status.carrierLabel });
 
-  // Presymptomatic carrier and evaluation notation (#101).
+  // Presymptomatic carrier and evaluation notation.
   const notation = notationOf(drawn);
   const ev = evaluationKeyInfo(individuals, drawn, notation);
   const evLegend = evaluationLegend(notation);
   if (ev.presymptomatic) add({ kind: "presymptomatic", shape: shape(ev.presymptomatic), label: PRESYMPTOMATIC_LEGEND_LABEL });
   const deceased = individuals.find(i => i.deceased);
   if (deceased) add({ kind: "deceased", shape: shape(deceased), label: "Deceased" });
-  // Proband and consultand arrows (#99).
+  // Proband and consultand arrows.
   for (const kind of ["proband", "consultand"] as const) {
     const ind = individuals.find(i => arrowKind(i) === kind);
     if (ind) add({ kind, shape: shape(ind), label: ARROW_LEGEND_LABEL[kind] });
   }
-  // Family history not known (#100).
+  // Family history not known.
   const history = individuals.find(i => i.familyHistoryUnknown);
   if (history) add({ kind: "familyHistoryUnknown", shape: shape(history), label: FAMILY_HISTORY_LEGEND_LABEL });
   if (ev.evaluated) add({ kind: "evaluation", mark: evLegend.mark, label: evLegend.label });
@@ -182,38 +182,38 @@ export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsO
     const label = target === "export" ? KEY_DIFFERENCES.exportLabels[o.value] ?? o.label : o.label;
     add({ kind: "lifeStatus", status: o.value, shape: shape(ind), label });
   }
-  // Adoption brackets (#12).
+  // Adoption brackets.
   for (const o of ADOPTION_OPTIONS) {
     const ind = individuals.find(i => i.adopted === o.value);
     if (ind) add({ kind: "adopted", adopted: o.value, shape: shape(ind), label: adoptionLegendLabel(o.value) });
   }
-  // Assisted reproduction (#45): the symbol with its "D" or "S".
+  // Assisted reproduction: the symbol with its "D" or "S".
   for (const o of REPRODUCTIVE_ROLE_OPTIONS) {
     const ind = individuals.find(i => symbolLetter(i) === o.letter);
     if (ind) add({ kind: "role", role: o.value, letter: o.letter, shape: shape(ind), label: roleLegendLabel(o.value) });
   }
-  // Collapsed branches (#1): the group symbol with a number in it.
+  // Collapsed branches: the group symbol with a number in it.
   if (placeholders.size > 0) add({ kind: "collapsedBranch", label: COLLAPSED_BRANCH_LABEL });
 
   // ── Relationships ──────────────────────────────────────────────────────────
-  // A donor pair (#45) has no couple line.
+  // A donor pair has no couple line.
   if (drawn.partnerships.some(p => !p.donorConception)) add({ kind: "couple", label: "Couple" });
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(drawn);
   if (drawn.partnerships.some(p => related(p.individual1, p.individual2))) add({ kind: "consanguineous", label: "Consanguineous couple" });
-  // Ended relationship (#98).
+  // Ended relationship.
   if (hasEndedPartnership(drawn)) add({ kind: "ended", label: ENDED_LABEL });
-  // Childless couple marks (#15).
+  // Childless couple marks.
   const childless = new Set(childlessPartnerships(drawn).map(p => p.childless!));
   for (const o of CHILDLESS_OPTIONS) if (childless.has(o.value)) add({ kind: "childless", status: o.value, label: o.label });
-  // Twin forks (#11).
+  // Twin forks.
   const zygosities = zygositiesInUse(drawn);
   for (const o of ZYGOSITY_OPTIONS) if (zygosities.has(o.value)) add({ kind: "twins", zygosity: o.value, label: twinLegendLabel(o.value) });
-  // Lines of assisted reproduction (#45).
+  // Lines of assisted reproduction.
   const linkKinds = new Set(assistedLinks(drawn).map(l => l.kind));
   if (linkKinds.has("carrier")) add({ kind: "assistedLine", line: "carrier", label: CARRIER_LINE_LEGEND });
   if (linkKinds.has("social")) add({ kind: "assistedLine", line: "social", label: SOCIAL_LINE_LEGEND });
-  // Someone drawn more than once (#124).
+  // Someone drawn more than once.
   if (options.duplicates ?? drawsDuplicates(pedigree)) add({ kind: "duplicate", label: DUPLICATE_LEGEND_LABEL });
 
   // ── Conditions and tags ────────────────────────────────────────────────────
@@ -222,7 +222,7 @@ export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsO
   const tags: KeyRow[] = [];
   if (target === "legend") {
     // Legend only: every defined tag, so an unused one can still be ticked. A
-    // condition with carriers gets its "<condition> carrier" row after it (#115).
+    // condition with carriers gets its "<condition> carrier" row after it.
     const carriersOf = new Set(inKey.filter(r => r.carrier).map(r => r.tag.id));
     for (const tag of pedigreeTags(drawn)) {
       tags.push({ kind: "tag", tag, carrier: false, inUse: used.has(tag.id), label: tag.label });

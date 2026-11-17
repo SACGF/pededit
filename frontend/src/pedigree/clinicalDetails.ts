@@ -1,7 +1,7 @@
 import type { ClinicalDetails, Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
- * Clinical key fields (#102): what the NSGC nomenclature (2008, Fig. 1
+ * Clinical key fields: what the NSGC nomenclature (2008, Fig. 1
  * instructions) asks a clinical pedigree's key to record besides the symbols.
  * The edit panel, the in-app legend and the export key all read this list, so
  * the order and wording are the same everywhere.

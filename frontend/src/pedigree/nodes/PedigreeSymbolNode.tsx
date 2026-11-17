@@ -25,7 +25,7 @@ function shortDevId(id: string): string {
 export type PedigreeSymbolNodeType = Node<RFNodeData, "pedigreeSymbol">;
 
 export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolNodeType>) {
-  // What to draw is decided once, in the layout (#144): the glyph. This
+  // What to draw is decided once, in the layout: the glyph. This
   // component draws it and adds what only the editor shows (selection, the
   // pin dot, the problem marker, the dev id, the hover pill).
   const { individual, glyph, isPinned } = data;
@@ -44,16 +44,16 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const toggleSelected = usePedigreeStore(s => s.toggleSelected);
   const pickIndividual = usePedigreeStore(s => s.pickIndividual);
   const isPicking = usePedigreeStore(s => s.picking !== null);
-  // On-canvas picking (#36): a click picks instead of selecting; picked people are outlined.
+  // On-canvas picking: a click picks instead of selecting; picked people are outlined.
   const isPicked = usePedigreeStore(s => s.picking?.kind === "parents" && s.picking.picked.includes(id));
   const isPickTarget = usePedigreeStore(s => {
     const p = s.picking;
     return (p?.kind === "parents" && p.childId === id)
       || ((p?.kind === "partner" || p?.kind === "relatedness") && p.individualId === id);
   });
-  // Hovering a problem in the toolbar's list outlines its person (#116).
+  // Hovering a problem in the toolbar's list outlines its person.
   const isProblemHighlight = usePedigreeStore(s => s.problemHighlightId === id);
-  // Editor warnings (#116), memoised per pedigree so every node shares one
+  // Editor warnings, memoised per pedigree so every node shares one
   // pass. The only thing here that reads the pedigree: it is an editor mark.
   // Selected as strings, which compare equal when nothing changed for this
   // person even though every edit makes a new list.
@@ -61,9 +61,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const problemTitle = usePedigreeStore(s => (problemsOf(s.pedigree).byIndividual.get(id) ?? []).map(p => p.message).join("\n"));
   const hasParents = glyph.hasParents;
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
-  // selection (#21) and which also shows a rubber band as it is drawn.
+  // selection and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
-  // Touch (#169): there is no hover, so a tap on the symbol opens the pill
+  // Touch: there is no hover, so a tap on the symbol opens the pill
   // and it stays for as long as the person is selected. The mouse events a
   // browser makes up after a tap differ between browsers and cannot be
   // relied on to open it or to close it.
@@ -90,7 +90,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   }
 
   function handleMouseEnter(e?: React.MouseEvent) {
-    // Over a cut name label only the full name shows (#68): the pill would
+    // Over a cut name label only the full name shows: the pill would
     // open under the cursor, where a click meant for the name hits a button.
     if (e && (e.target as Element).closest?.("[data-name-label]")) return;
     cancelHide();
@@ -122,7 +122,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       onPointerDown={e => {
         // Pressing on an unselected person selects them alone first, so a
         // drag moves just them; pressing on a selected one keeps the group
-        // for a group drag (#21). Only for the symbol itself: the hover pill
+        // for a group drag. Only for the symbol itself: the hover pill
         // and more menu are portals whose events bubble here too.
         if (e.pointerType === "touch" && !isPicking && e.currentTarget.contains(e.target as Element)) setIsTouchPill(true);
         if (isPicking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
@@ -152,7 +152,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
       </svg>
 
-      {/* Name label below symbol, fitted to the slot width (#68). A cut label
+      {/* Name label below symbol, fitted to the slot width. A cut label
           takes the mouse: hovering it shows the full name, clicking it selects. */}
       {nameLines.length > 0 && (
         <div
@@ -178,8 +178,8 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         </div>
       )}
 
-      {/* Under the name in NSGC order: age or DOB (#20), ages of onset (#93),
-          evaluations (#101), pedigree number (#8). Past the age line the block can reach the
+      {/* Under the name in NSGC order: age or DOB, ages of onset,
+          evaluations, pedigree number. Past the age line the block can reach the
           sibship bar of the person's children, so it gets a white backing. */}
       {details.length > 0 && (
         <div
@@ -244,7 +244,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         />
       )}
 
-      {/* Editor warning marker (#116): top left, canvas only (not the minimap or exports). */}
+      {/* Editor warning marker: top left, canvas only (not the minimap or exports). */}
       {problemSeverity && (
         <div
           data-problem-marker={problemSeverity}

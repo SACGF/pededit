@@ -1,5 +1,5 @@
 /**
- * "Recent on this device" (#16): the pedigrees opened in this browser, kept in
+ * "Recent on this device": the pedigrees opened in this browser, kept in
  * localStorage so an anonymous user who loses the link can find a pedigree
  * again from the landing page. Per browser, not per account; nothing here
  * reaches the server.

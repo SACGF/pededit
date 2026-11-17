@@ -1,10 +1,10 @@
 import type { Partnership, Pedigree, Sex } from "@pedigree-editor/layout-engine";
 
 /**
- * Same-sex couples (#105, NSGC 2022 Fig. 5, which draws them as ordinary
+ * Same-sex couples (NSGC 2022 Fig. 5, which draws them as ordinary
  * couples). Sex is biological sex, so two partners of the same known sex
  * have no genetic children together: their children are donor-conceived,
- * in the #45 model (`assisted.ts`). The child's partnership in `parentOf` is
+ * in the assisted reproduction model (`assisted.ts`). The child's partnership in `parentOf` is
  * one partner (the genetic parent) and a donor of the other sex, a
  * `donorConception` pair; the other partner is a social parent, who gets no
  * line of their own because their partner has one (NSGC 2022 Fig. 5,
@@ -44,7 +44,7 @@ export function donorPairFor(pedigree: Pedigree, geneticParentId: string, partne
 
 /**
  * The couple's children: those in `parentOf` and, for a couple whose
- * children are donor-conceived (a same-sex couple, #105), the children of
+ * children are donor-conceived (a same-sex couple), the children of
  * one partner's `donorConception` pair who have the other partner as a
  * social parent. The childless mark, its menu and Remove partnership go by
  * this, so a same-sex couple with children is not offered them.
@@ -124,8 +124,8 @@ export function applySameSexChildren(
 
 /**
  * Why giving `targets` the sexes in `sexOf` would leave a child with two
- * genetic parents of the same known sex, or null. Partners may be any sex
- * (#105); the genetic parents of a child (its partnership in `parentOf`)
+ * genetic parents of the same known sex, or null. Partners may be any sex;
+ * the genetic parents of a child (its partnership in `parentOf`)
  * may not, since sex is biological sex. A couple with children together is
  * made a same-sex couple by giving their children a donor first.
  */

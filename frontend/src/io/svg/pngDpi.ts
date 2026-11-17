@@ -1,5 +1,5 @@
 /**
- * PNG resolution (#18): the pixel size of a PNG export at a chosen DPI, and
+ * PNG resolution: the pixel size of a PNG export at a chosen DPI, and
  * the pHYs chunk that records that DPI so Word, journals' upload checks and
  * image editors read the intended physical size.
  *

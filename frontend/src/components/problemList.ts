@@ -1,6 +1,6 @@
 /**
- * What the editor needs on top of the rules in `pedigree/validation.ts`
- * (#116): the problems of the pedigree being edited,
+ * What the editor needs on top of the rules in `pedigree/validation.ts`:
+ * the problems of the pedigree being edited,
  * cached and indexed by person, who a problem is about, which person to
  * select for it, and which one F8 goes to next. Used by the Person tab, the
  * toolbar's problems list, the canvas marker and the dev hooks.
@@ -52,9 +52,9 @@ export function fieldProblems(pedigree: Pedigree, individualId: string, field: P
 }
 
 /**
- * Who a problem is about, for the problems list: the pedigree number (#8)
+ * Who a problem is about, for the problems list: the pedigree number
  * then the name, "II-2, Mary", or "II-2, unnamed female" with no name. The
- * number is left out for someone not drawn (a hidden branch, #94). The
+ * number is left out for someone not drawn (a hidden branch). The
  * numbers come from the layout, so they are only worked out when asked.
  */
 export function problemSubject(pedigree: Pedigree, problem: Problem, numbers: Map<string, string> = pedigreeNumbers(pedigree)): string {
@@ -77,7 +77,7 @@ export function problemTarget(pedigree: Pedigree, problem: Problem): string | un
 }
 
 /**
- * The problem to go to from the keyboard (#116), `dir` 1 for next and -1
+ * The problem to go to from the keyboard, `dir` 1 for next and -1
  * for previous, wrapping. `from` is the one gone to last: when it is still
  * listed the step is from it; when it has been fixed, the problem now in its
  * place is next. With none yet, the selected person's first problem, else

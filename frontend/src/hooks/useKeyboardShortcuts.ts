@@ -24,13 +24,13 @@ export function useKeyboardShortcuts() {
         if (document.activeElement?.tagName === "TEXTAREA") return;
         if (document.activeElement?.tagName === "SELECT") return;
         e.preventDefault();
-        // Shift: with descendants; Alt: with ancestors (#34). Every selected person (#21).
+        // Shift: with descendants; Alt: with ancestors. Every selected person.
         if (e.shiftKey) removeWithDescendants(selectedIds);
         else if (e.altKey) removeWithAncestors(selectedIds);
         else if (selectedIds.length === 1) deleteIndividual(selectedIds[0]!);
         else deleteIndividuals(selectedIds);
       }
-      // A and D (#35): toggle affected / deceased on everyone selected, as one
+      // A and D: toggle affected / deceased on everyone selected, as one
       // undo step. Mixed selections are all marked; all marked are all cleared.
       const letter = e.key.toLowerCase();
       if ((letter === "a" || letter === "d") && !meta && !e.altKey && !e.repeat && selectedIds.length > 0 && !typing()) {
@@ -43,7 +43,7 @@ export function useKeyboardShortcuts() {
           else setDeceasedMany(selectedIds, !people.every(i => i.deceased));
         }
       }
-      // F8 / Shift+F8 (#116): next / previous problem, also while typing in the
+      // F8 / Shift+F8: next / previous problem, also while typing in the
       // field the last one focused, so the list can be worked through there.
       if (e.key === "F8" && !meta && !e.altKey && !picking) {
         if (stepProblem(e.shiftKey ? -1 : 1)) e.preventDefault();

@@ -14,13 +14,13 @@ export function ConsanguineousEdge({ source, target, data }: EdgeProps<Consangui
   const targetNode = nodes.find(n => n.id === target);
   if (!sourceNode || !targetNode) return null;
 
-  // The geometry is shared with the SVG export (lineGeometry.ts, #143).
+  // The geometry is shared with the SVG export (lineGeometry.ts).
   const line = coupleLineGeometry(data, true, sourceNode.position, targetNode.position);
   const [outer, inner] = line.paths;
 
   return (
     <g data-partnership-id={data?.partnershipId}>
-      {/* Wide invisible stroke so the line can be right-clicked (#95). */}
+      {/* Wide invisible stroke so the line can be right-clicked. */}
       <path d={line.course} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
       <path d={outer} stroke="black" strokeWidth={2} fill="none" />
       <path d={inner} stroke="black" strokeWidth={2} fill="none" />

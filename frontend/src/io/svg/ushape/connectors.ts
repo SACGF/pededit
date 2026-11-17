@@ -55,7 +55,7 @@ export function tangentSeg(u: number, offset: number, halfLen: number, g: Geom):
   return `<line x1="${r(c.x - dx)}" y1="${r(c.y - dy)}" x2="${r(c.x + dx)}" y2="${r(c.y + dy)}" ${LINE_ATTRS}/>`;
 }
 
-/** The ended relationship strokes (#98) across the track at position u, leaning with the track. */
+/** The ended relationship strokes across the track at position u, leaning with the track. */
 export function endedSegs(u: number, offset: number, g: Geom): string[] {
   const eps = 0.01;
   const a = trackPoint(u - eps, offset, g), b = trackPoint(u + eps, offset, g);
@@ -109,7 +109,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const twins = twinMembership(pedigree);
   const out: string[] = [];
-  // Assisted reproduction (#45): carrier and social parent lines. One that
+  // Assisted reproduction: carrier and social parent lines. One that
   // covers a whole sibship goes to the bar under its line of descent.
   const links = assistedLinks(pedigree);
   const linkDone = new Set<string>();
@@ -122,14 +122,14 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
     const bar = childEdge - BAR_CLEARANCE;
 
     for (const w of n.unions) {
-      // Gamete donation (#45): no couple line; a line from each parent to the bar.
+      // Gamete donation: no couple line; a line from each parent to the bar.
       const donor = w.kind !== "solo" && w.pids.length === 1 && !!partnershipById.get(w.pids[0]!)?.donorConception;
       if (w.kind !== "solo" && !donor) {
         const uA = memberU(n, w.a, g);
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
         if (w.consang) out.push(trackPath(uA, uB, track - CONSANG_GAP / 2, g), trackPath(uA, uB, track + CONSANG_GAP / 2, g));
         else out.push(trackPath(uA, uB, track, g));
-        // Ended relationship (#98): two strokes across the line, aside from
+        // Ended relationship: two strokes across the line, aside from
         // the descent line or childless mark in its middle.
         const partnership = w.pids.length === 1 ? partnershipById.get(w.pids[0]!) : undefined;
         if (partnership?.ended) {
@@ -138,7 +138,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
         }
       }
       if (!w.kids.length) {
-        // Childless couple mark (#15): outward from the middle of the couple
+        // Childless couple mark: outward from the middle of the couple
         // line, one bar (by choice) or two (infertility), reason text beyond.
         const partnership = w.kind !== "solo" && w.pids.length === 1 ? partnershipById.get(w.pids[0]!) : undefined;
         const childless = partnership && activeChildless(partnership, pedigree);
@@ -164,12 +164,12 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
       } else {
         out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
       }
-      // Twins share one fork point on the bar, at the mean of their positions (#11).
+      // Twins share one fork point on the bar, at the mean of their positions.
       const forkU = new Map<string, number>();
       for (const [key, members] of groupBy(w.kids, c => twins.get(c.blood)?.twinSet)) {
         if (members.length >= 2) forkU.set(key, members.reduce((a, c) => a + c.u, 0) / members.length);
       }
-      // The bar ends where the outermost drops start, at a twin fork rather than over the twin (#104).
+      // The bar ends where the outermost drops start, at a twin fork rather than over the twin.
       const starts = w.kids.map(c => { const key = twins.get(c.blood)?.twinSet; return key !== undefined && forkU.has(key) ? forkU.get(key)! : c.u; });
       const lo = Math.min(uP, ...starts), hi = Math.max(uP, ...starts);
       if (hi - lo > 0.01) out.push(trackPath(lo, hi, bar, g));
@@ -183,7 +183,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
         out.push(diagonalPath(from.u, from.depth * g.ringGap + HALF, uP, bar, g, linkAttrs(l.kind)));
       }
       // A loss triangle's apex sits below the top of the symbol box. An
-      // adopted-in child's drop is dashed (#12).
+      // adopted-in child's drop is dashed.
       w.kids.forEach(c => {
         const ind = byId.get(c.blood);
         const attrs = ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS;
@@ -212,7 +212,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
     }
   });
 
-  // Assisted reproduction (#45): a line from the woman who carried the child
+  // Assisted reproduction: a line from the woman who carried the child
   // (solid) or a parent who is not genetic (dashed), when both are drawn.
   for (const link of links) {
     const from = layout.nodes.get(link.from), child = layout.nodes.get(link.child);

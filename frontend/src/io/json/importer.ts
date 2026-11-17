@@ -225,7 +225,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     if (isStringArray(raw.tags)) {
       for (const tagId of raw.tags) tagRefs.push({ tagId, path: `${ip}.tags` });
     }
-    // Conditions carried (#115): ids of quadrant tags, checked like `tags`.
+    // Conditions carried: ids of quadrant tags, checked like `tags`.
     c.optional(raw, "carrierTags", ip, "an array of tag ids", isStringArray);
     if (isStringArray(raw.carrierTags)) {
       for (const tagId of raw.carrierTags) tagRefs.push({ tagId, path: `${ip}.carrierTags` });
@@ -334,7 +334,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     }
   }
 
-  // ---- Twin sets (#11): members must be children of their partnership, in one set only ----
+  // ---- Twin sets: members must be children of their partnership, in one set only ----
   const inSet = new Set<string>();
   (ped.partnerships as unknown[]).forEach((raw, i) => {
     if (!isObject(raw) || !Array.isArray(raw.twins)) return;
@@ -361,7 +361,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
     }
   });
 
-  // ---- Assisted reproduction lines (#45): drop references to nobody ----
+  // ---- Assisted reproduction lines: drop references to nobody ----
   (ped.individuals as unknown[]).forEach((raw, i) => {
     if (!isObject(raw)) return;
     const ip = p(`individuals[${i}]`);

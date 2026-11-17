@@ -22,7 +22,7 @@ function createCopy(ex: ExamplePedigree): Promise<string> {
 }
 
 /**
- * /example/<slug> (#150): saves the example as the visitor's own pedigree
+ * /example/<slug>: saves the example as the visitor's own pedigree
  * and opens it. Every visit makes a new copy, so two visitors never share
  * one. An unknown slug goes to the landing page.
  */
@@ -30,7 +30,7 @@ export default function ExamplePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const example = exampleBySlug(slug);
-  // null while the copy is being made; the rate limit's wait (#184) or "" when it failed otherwise.
+  // null while the copy is being made; the rate limit's wait or "" when it failed otherwise.
   const [failed, setFailed] = useState<string | null>(null);
 
   useEffect(() => {

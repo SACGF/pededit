@@ -5,7 +5,7 @@ import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigre
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
- * The edit panel with several people selected (#21): how many, and the
+ * The edit panel with several people selected: how many, and the
  * batch lock / unlock, in place of one person's fields.
  */
 export function SelectionPanel() {
@@ -63,7 +63,7 @@ function capitalise(text: string): string {
 }
 
 /**
- * Exactly two selected (#90): how they are related, for any two people, not
+ * Exactly two selected: how they are related, for any two people, not
  * only partners. The relationship is named when the drawn tree gives one
  * name (`nameRelationship`), with "and related in other ways too" when they
  * are closer than it says; otherwise the coefficient and its degree say how

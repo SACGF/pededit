@@ -2,10 +2,10 @@ import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engi
 import { kinshipOf } from "./relatedness";
 
 /**
- * Whether the couple line between two partners is drawn double (#85).
+ * Whether the couple line between two partners is drawn double.
  *
  * A line is double when the two partners are related by blood in the
- * pedigree, which is to say their kinship coefficient is above 0 (#32). That
+ * pedigree, which is to say their kinship coefficient is above 0. That
  * follows blood, not the drawing: someone adopted in is not related to the
  * family they hang from. A partnership's stored `consanguineous` flag is an
  * override on top, for a couple known to be related whose common ancestors
@@ -29,7 +29,7 @@ export function consanguinityTest(pedigree: Pedigree): (id1: string, id2: string
 }
 
 /**
- * What the consanguinity override control shows for one couple (#92): the
+ * What the consanguinity override control shows for one couple: the
  * edit panel's checkbox and the "Consanguineous" entry of the more menu and
  * right-click menus. `related` is the pedigree showing they are related
  * (kinship above 0), when the control is ticked and fixed; `flagged` is the

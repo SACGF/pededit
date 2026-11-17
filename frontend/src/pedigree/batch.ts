@@ -4,12 +4,12 @@ import { geneticParentsSexProblem } from "./sameSex";
 import { affectedControlOn, conditionStateOf, conditionTags, soleCondition, type ConditionState } from "./conditions";
 
 /**
- * Batch status changes on a multiple selection (#35): what the more menu's
+ * Batch status changes on a multiple selection: what the more menu's
  * "N selected" items show and which of them are allowed. The store applies
  * the edits (`setAffectedMany` and friends), each as one undo step.
  */
 
-/** Carrier status is one choice (#101): a carrier dot, the presymptomatic line, or neither. */
+/** Carrier status is one choice: a carrier dot, the presymptomatic line, or neither. */
 export type CarrierStatus = "carrier" | "presymptomatic" | "none";
 
 export function carrierStatusOf(
@@ -18,7 +18,7 @@ export function carrierStatusOf(
 ): CarrierStatus {
   if (ind.presymptomatic) return "presymptomatic";
   if (ind.carrier) return "carrier";
-  // With one condition the Carrier control records it (#115), so a carrier of it counts.
+  // With one condition the Carrier control records it, so a carrier of it counts.
   const sole = pedigree && soleCondition(pedigree);
   return sole && conditionStateOf(ind, sole.id) === "carrier" ? "carrier" : "none";
 }
@@ -33,7 +33,7 @@ export interface BatchStatus {
   sex: Record<Sex, number>;
   /** Tag id to how many of the selected carry it. */
   tags: Record<string, number>;
-  /** Condition (quadrant tag) id to how many of the selected are in each state (#115). */
+  /** Condition (quadrant tag) id to how many of the selected are in each state. */
   conditions: Record<string, Record<ConditionState, number>>;
 }
 
@@ -64,7 +64,7 @@ export function batchStatus(pedigree: Pedigree, ids: string[]): BatchStatus {
 
 /**
  * Everyone whose sex setting `ids` to `sex` changes: the ids themselves plus
- * their monozygotic twins, who share a sex (#11), as the single-person
+ * their monozygotic twins, who share a sex, as the single-person
  * `setSex` does.
  */
 export function batchSexTargets(pedigree: Pedigree, ids: string[]): Set<string> {
@@ -80,10 +80,10 @@ export function batchSexTargets(pedigree: Pedigree, ids: string[]): Set<string> 
 
 /**
  * Why `ids` cannot all be given `sex`, or null. Partners may be of the same
- * sex (#105); the genetic parents of a child may not, so a change that
+ * sex; the genetic parents of a child may not, so a change that
  * would make two of them the same known sex is refused (see
  * `geneticParentsSexProblem`). Nor can anyone who carried a pregnancy, a
- * surrogate (S) or a child's "Carried by" (#45), be made male: sex is
+ * surrogate (S) or a child's "Carried by", be made male: sex is
  * biological sex, and a gender identity is the way to draw them as a man.
  * The single-person Sex menu uses this too.
  */
@@ -100,7 +100,7 @@ export function batchSexProblem(pedigree: Pedigree, ids: string[], sex: Sex): st
   return geneticParentsSexProblem(pedigree, targets, id => sexOf.get(id));
 }
 
-/** Why none of `targets` can be male: one carried a pregnancy (#45). Null when none did. */
+/** Why none of `targets` can be male: one carried a pregnancy. Null when none did. */
 function carriedPregnancyProblem(pedigree: Pedigree, targets: Set<string>): string | null {
   for (const id of targets) {
     const ind = pedigree.individuals.find(i => i.id === id);

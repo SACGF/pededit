@@ -1,6 +1,6 @@
 /**
- * Evaluation results and the presymptomatic carrier symbol (#101, NSGC 2008
- * Fig. 4 as revised in 2022, #114). Framework-free: the canvas (`nodes/symbols.tsx`), both
+ * Evaluation results and the presymptomatic carrier symbol (NSGC 2008
+ * Fig. 4 as revised in 2022). Framework-free: the canvas (`nodes/symbols.tsx`), both
  * SVG exporters, the legends, the CSV and the label stack (`labels.ts`) share
  * it.
  *
@@ -16,7 +16,7 @@
  *  - Presymptomatic carrier: `Individual.presymptomatic`, a vertical line
  *    through the symbol. Not drawn on anyone affected (`isAffected`: the
  *    flag or any condition), since presymptomatic means not affected now;
- *    the "presymptomatic-affected" warning (#116) says so.
+ *    the "presymptomatic-affected" warning says so.
  */
 
 import { isAffected } from "@pedigree-editor/layout-engine";

@@ -1,6 +1,6 @@
 /**
  * What is drawn for a couple line and for a sibship, from the edge data
- * `layoutToFlow` made and the positions of the symbols at its ends (#143).
+ * `layoutToFlow` made and the positions of the symbols at its ends.
  *
  * One function per kind of line, used by the canvas edge components (with
  * live node positions, so a line follows a drag) and by the SVG export (with
@@ -32,9 +32,9 @@ export interface CoupleLineGeometry {
   cy: number;
   /** Rise (px) of the line over the people between the partners; 0 when adjacent. */
   hop: number;
-  /** Childless couple mark (#15) hung from the middle of the line. */
+  /** Childless couple mark hung from the middle of the line. */
   childless?: { cx: number; topY: number; status: ChildlessStatus; segments: Segment[]; reason?: string; reasonY: number };
-  /** Ended relationship (#98): the two strokes across the line. */
+  /** Ended relationship: the two strokes across the line. */
   ended?: Segment[];
 }
 
@@ -77,9 +77,9 @@ export interface SibshipEnd {
 
 export interface SibshipLineGeometry {
   solid: Segment[];
-  /** Drops to adopted-in children (#12). */
+  /** Drops to adopted-in children. */
   dashed: Segment[];
-  /** Twin forks (#11): a bar across monozygotic drops, "?" between drops of unknown zygosity. */
+  /** Twin forks: a bar across monozygotic drops, "?" between drops of unknown zygosity. */
   marks: ReturnType<typeof twinForkMarks>;
 }
 
@@ -104,10 +104,10 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
     twinSet: c.data?.twinSet,
     zygosity: c.data?.zygosity,
   }));
-  // The bar's offset (#80) comes from the layout, so it is as of the last
+  // The bar's offset comes from the layout, so it is as of the last
   // layout while a node is being dragged.
   const barOffset = data.barOffset ?? 0;
-  // Parents who are not a couple (gamete donation, #45): a line from each.
+  // Parents who are not a couple (gamete donation): a line from each.
   const sexOf = (n: SibshipEnd) => n.data?.shape ?? n.data?.individual?.sex;
   const apart = data.apart
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]

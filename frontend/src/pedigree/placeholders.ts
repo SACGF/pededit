@@ -2,7 +2,7 @@ import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { removeIndividuals } from "./removal";
 
 /**
- * Placeholder partners (#107). kinship2 needs a child to have 0 or 2
+ * Placeholder partners. kinship2 needs a child to have 0 or 2
  * parents, so giving someone a single parent ("Add parent", "Add child" on
  * a person with no partner, "Set parents..." with one pick) also adds an
  * unnamed partner, created with `placeholder: true`. When an edit takes the

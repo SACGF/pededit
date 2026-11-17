@@ -24,7 +24,7 @@ export type LifeStatus = "pregnancy" | "miscarriage" | "termination" | "stillbir
 export type Adoption = "in" | "out";
 
 /**
- * Assisted reproduction (NSGC 2008 Fig. 3, #45): the letter drawn inside the
+ * Assisted reproduction (NSGC 2008 Fig. 3): the letter drawn inside the
  * symbol. "donor" (D) gave the sperm or egg; "surrogate" (S) carried a
  * pregnancy she is not the genetic mother of. A woman who is both egg donor
  * and carrier is a donor only.
@@ -36,7 +36,7 @@ export interface Individual {
   /** Biological sex (sex assigned at birth). Drives layout, kinship, PED and twins. */
   sex: Sex;
   /**
-   * Gender identity (#26). Only changes the symbol drawn, when
+   * Gender identity. Only changes the symbol drawn, when
    * `canvasSettings.symbolsShow` is "gender" (the default), with the sex
    * assigned at birth written under it. Ignored for pregnancies and losses.
    */
@@ -45,34 +45,34 @@ export interface Individual {
   deceased?: boolean;
   /**
    * Carrier with no condition recorded: the centre dot (NSGC 2008) or half
-   * the symbol patterned (NSGC 2022, #115). A carrier of a named condition
+   * the symbol patterned (NSGC 2022). A carrier of a named condition
    * is in `carrierTags` instead, and the editor clears this flag when one is
    * recorded.
    */
   carrier?: boolean;
   /**
-   * Asymptomatic or presymptomatic carrier (#101, NSGC 2008 Fig. 4):
+   * Asymptomatic or presymptomatic carrier (NSGC 2008 Fig. 4):
    * clinically unaffected now but may develop the condition, drawn as a
    * vertical line through the symbol. The editor keeps it and `carrier`
    * exclusive (one "carrier status" choice); absent means false.
    */
   presymptomatic?: boolean;
   /**
-   * Evaluations and test results (#101, NSGC 2008 Fig. 4), written under
-   * the symbol as "BRCA1 c.5266dupC +" (NSGC 2022 dropped the "E", #114).
+   * Evaluations and test results (NSGC 2008 Fig. 4), written under
+   * the symbol as "BRCA1 c.5266dupC +" (NSGC 2022 dropped the "E").
    * A documented one puts a "*" at the symbol's lower right.
    */
   evaluations?: Evaluation[];
   proband?: boolean;
-  /** Consultand (#99): the person seeking counselling, drawn with an arrow without the proband's "P". */
+  /** Consultand: the person seeking counselling, drawn with an arrow without the proband's "P". */
   consultand?: boolean;
-  /** Family history not known (#100): a "?" above the symbol. */
+  /** Family history not known: a "?" above the symbol. */
   familyHistoryUnknown?: boolean;
   sibOrder: number;      // 0-indexed position within sibling group
   name?: string;         // display name
   dob?: string;          // ISO date string "YYYY-MM-DD"
   /**
-   * Date of death (#103): "YYYY-MM-DD", or "YYYY-MM" / "YYYY" when only
+   * Date of death: "YYYY-MM-DD", or "YYYY-MM" / "YYYY" when only
    * part is known. Implies `deceased`, which alone means deceased with the
    * date unknown; the editor sets `deceased` with it and clears it when
    * `deceased` is unticked. Drawn as the age at death ("d. 72y") with a
@@ -81,7 +81,7 @@ export interface Individual {
   dod?: string;
   /**
    * The individual's age as free text, shown under the symbol in place of
-   * the DOB (#20): "50s", "d. 72", "34 y". For an approximate age, or one
+   * the DOB: "50s", "d. 72", "34 y". For an approximate age, or one
    * known without a date. Not an age of onset.
    */
   age?: string;
@@ -89,10 +89,10 @@ export interface Individual {
   hpoTerms?: string[];   // HPO term codes, e.g. ["HP:0001250"] — UI in Phase 7
   lifeStatus?: LifeStatus; // pregnancy / miscarriage / termination / stillbirth / ectopic; absent = born
   adopted?: Adoption;    // brackets round the symbol; "in" also dashes the line from the parents
-  /** Gamete donor "D" or surrogate "S" inside the symbol (#45). */
+  /** Gamete donor "D" or surrogate "S" inside the symbol. */
   reproductiveRole?: ReproductiveRole;
   /**
-   * Assisted reproduction (#45): the woman who carried this pregnancy when
+   * Assisted reproduction: the woman who carried this pregnancy when
    * she is not the genetic mother (a surrogate, or the mother of a child
    * conceived with a donor egg). Drawn as a solid line from her to the
    * child, since a pregnancy is a biological relationship (teratogens), but
@@ -101,14 +101,14 @@ export interface Individual {
    */
   carriedBy?: string;
   /**
-   * Assisted reproduction (#45): parents of this child who are not its
+   * Assisted reproduction: parents of this child who are not its
    * genetic parents, such as the intended father when donor sperm is used.
    * Drawn as a dashed line of descent; not parents for kinship or PED.
    */
   socialParents?: string[];
   tags?: string[];       // Tag.id values from Pedigree.tags applied to this individual
   /**
-   * Conditions (quadrant tags) this person is a carrier of (#115): the
+   * Conditions (quadrant tags) this person is a carrier of: the
    * condition's sector is drawn with its carrier pattern, keyed "<condition>
    * carrier". A quadrant tag in `tags` means affected with that condition;
    * the editor keeps a tag in at most one of the two lists. Ids of other
@@ -116,17 +116,17 @@ export interface Individual {
    */
   carrierTags?: string[];
   /**
-   * Age of onset of the affected status (#93), free text such as "45y",
+   * Age of onset of the affected status, free text such as "45y",
    * "40s" or "childhood". Used only while `affected` is true.
    */
   onset?: string;
   /**
-   * Age of onset per condition (#93): Tag.id of a quadrant tag this
+   * Age of onset per condition: Tag.id of a quadrant tag this
    * individual carries, to free text as for `onset`.
    */
   tagOnset?: Record<string, string>;
   /**
-   * Everyone below this person is left out of the drawing (#94): the canvas,
+   * Everyone below this person is left out of the drawing: the canvas,
    * the layout and the exports all work from the drawn subset (see the
    * frontend's `pedigree/collapse.ts`). Nothing is deleted; clearing the flag
    * brings the branch back.
@@ -134,14 +134,14 @@ export interface Individual {
   descendantsHidden?: boolean;
   /**
    * Made automatically as the second parent when someone was given a single
-   * parent (#107, frontend `pedigree/placeholders.ts`). While nothing is
+   * parent (frontend `pedigree/placeholders.ts`). While nothing is
    * recorded about them, they are removed with their couple line when the
    * couple loses its last child. Cleared when the user sets their sex.
    */
   placeholder?: boolean;
 }
 
-/** Result of an evaluation (#101): "+", "-" or "u" after the detail. Absent: no result recorded. */
+/** Result of an evaluation: "+", "-" or "u" after the detail. Absent: no result recorded. */
 export type EvaluationResult = "positive" | "negative" | "uninformative";
 
 export interface Evaluation {
@@ -167,14 +167,14 @@ export interface Evaluation {
 export type TagStyle = "quadrant" | "dot" | "text";
 
 /**
- * How a quadrant tag fills its sector (#67): "solid" in the tag's colour, or a
+ * How a quadrant tag fills its sector: "solid" in the tag's colour, or a
  * pattern drawn in the tag's colour on white (a black pattern is monochrome).
  * "shade" is a light tint of the colour (light grey for black).
  */
 export type TagFill = "solid" | "horizontal" | "vertical" | "diagonal" | "crosshatch" | "dots" | "shade";
 
 /**
- * Tag fills for the whole pedigree (#67): "color" draws each tag as set;
+ * Tag fills for the whole pedigree: "color" draws each tag as set;
  * "monochrome" draws every tag in black, each quadrant tag with a pattern
  * (its own, or one assigned automatically when its fill is solid).
  */
@@ -189,11 +189,11 @@ export interface Tag {
   style: TagStyle;
   /** Short canvas text for "text" style tags. Defaults to label. */
   abbrev?: string;
-  /** Fill of a quadrant tag's sector (#67). Absent means "solid". Ignored for dot and text tags. */
+  /** Fill of a quadrant tag's sector. Absent means "solid". Ignored for dot and text tags. */
   fill?: TagFill;
   /**
    * What a quadrant tag means (#118). Absent or "condition": a condition,
-   * affected with it (`Individual.tags`) or a carrier (`carrierTags`), #115.
+   * affected with it (`Individual.tags`) or a carrier (`carrierTags`).
    * "trait": only a coloured section, saying nothing about affected status
    * (a biobank sample, a cohort, a trait of the family); PED, CSV, filters
    * and warnings ignore it. Opt-in, beyond NSGC, where shading is a
@@ -214,7 +214,7 @@ export type ChildlessStatus = "infertility" | "byChoice";
 export type Zygosity = "monozygotic" | "dizygotic" | "unknown";
 
 /**
- * Twins (or triplets, ...) among one partnership's children (#11). Members are
+ * Twins (or triplets, ...) among one partnership's children. Members are
  * child ids of that partnership, at least two, each in at most one set.
  * Monozygotic members have the same sex. Drawn as a shared fork from the
  * sibship bar, a bar across the fork for monozygotic, "?" for unknown.
@@ -232,11 +232,11 @@ export interface Partnership {
   /**
    * Override: the couple are related although the pedigree does not show
    * how, so their line is drawn double. A couple the pedigree does show to
-   * be related needs no flag (the editor tests kinship above 0, #85).
+   * be related needs no flag (the editor tests kinship above 0).
    */
   consanguineous?: boolean;
   /**
-   * Text written above the double line (#97), e.g. "third cousins": the
+   * Text written above the double line, e.g. "third cousins": the
    * degree of relationship when the drawing does not show it. Only drawn
    * when the line is double.
    */
@@ -249,11 +249,11 @@ export interface Partnership {
   twins?: TwinSet[];
   /**
    * The relationship no longer exists (separated, divorced): two short
-   * strokes across the couple line (NSGC 2008, #98). Absent means false.
+   * strokes across the couple line (NSGC 2008). Absent means false.
    */
   ended?: boolean;
   /**
-   * Assisted reproduction (#45): the children were conceived with a donated
+   * Assisted reproduction: the children were conceived with a donated
    * sperm or egg, so the partners are their genetic parents but not a
    * couple. No relationship line is drawn between them (NSGC 2008 Fig. 3);
    * each partner's line of descent runs to the children instead. Kinship
@@ -261,7 +261,7 @@ export interface Partnership {
    */
   donorConception?: boolean;
   /**
-   * The partner drawn on the left of this couple (#106): the id of
+   * The partner drawn on the left of this couple: the id of
    * `individual1` or `individual2`. Absent means the layout chooses (kinship2:
    * the man on the left unless merging someone's copies needs otherwise).
    * Fed to kinship2 as a spouse hint, so it never pins anyone.
@@ -282,31 +282,31 @@ export interface CanvasSettings {
   snapToGrid: boolean;
   snapGridSize: number;
   /**
-   * How a name too long for its slot is shown on the canvas (#68): "wrap"
+   * How a name too long for its slot is shown on the canvas: "wrap"
    * onto two lines, or "truncate" to one line. Absent means "wrap".
    */
   nameLabels?: NameLabelMode;
   /**
-   * How wide the automatic layout may be (#82): "minimal" keeps it to the
+   * How wide the automatic layout may be: "minimal" keeps it to the
    * widest generation (the kinship2 default), "relaxed" lets it use a little
    * more so children sit more directly under their parents. Absent means
    * "minimal".
    */
   layoutWidth?: LayoutWidthMode;
   /**
-   * Draw each person's pedigree number ("II-3", #8) before their name, on the
+   * Draw each person's pedigree number ("II-3") before their name, on the
    * canvas and in exports. The numbers are computed from the layout, never
    * stored. Absent means false.
    */
   showNumbers?: boolean;
   /**
    * Write the relationship ("first cousins") above every consanguineous
-   * couple's double line that can be named and has no text of its own
-   * (#97). Absent means false.
+   * couple's double line that can be named and has no text of its own.
+   * Absent means false.
    */
   relationshipLabels?: boolean;
   /**
-   * What the symbol shapes show (#26): "gender" draws a person with a
+   * What the symbol shapes show: "gender" draws a person with a
    * recorded gender identity with that gender's symbol and writes AMAB /
    * AFAB / UAAB under it (NSGC 2022); "sex" draws biological sex for
    * everyone. Absent means "gender".
@@ -315,15 +315,15 @@ export interface CanvasSettings {
   /**
    * Edition of the NSGC nomenclature drawn: "nsgc2008" writes evaluation
    * results as "E+ (detail)", numbered E1, E2, and draws a carrier with no
-   * condition as the centre dot; "nsgc2022" writes "detail +" (#114) and
-   * draws that carrier as half the symbol patterned (#115). Absent means
+   * condition as the centre dot; "nsgc2022" writes "detail +" and
+   * draws that carrier as half the symbol patterned. Absent means
    * "nsgc2008", so pedigrees saved before the setting existed keep their
    * look; every new pedigree, PED import and built-in example is written
    * with "nsgc2022".
    */
   notation?: NotationEdition;
   /**
-   * Tag fills (#67): "monochrome" draws every tag in black, quadrant tags
+   * Tag fills: "monochrome" draws every tag in black, quadrant tags
    * with patterns, on the canvas and in exports, for print and journals.
    * Absent means "color".
    */
@@ -355,20 +355,20 @@ export interface Pedigree {
    */
   tags?: Tag[];
   /**
-   * Title drawn above the chart on the canvas and in exports (#20). Absent
+   * Title drawn above the chart on the canvas and in exports. Absent
    * means the pedigree's name (unless it is the default "Untitled pedigree");
    * an empty string means no title.
    */
   chartTitle?: string;
   /**
-   * What NSGC asks a clinical pedigree's key to record besides the symbols
-   * (#102): why it was taken, who took it and when, who gave the history,
+   * What NSGC asks a clinical pedigree's key to record besides the symbols:
+   * why it was taken, who took it and when, who gave the history,
    * and the ancestry of both sides. Shown in the legend and the export key
    * when filled; de-identified export drops all of it.
    */
   clinicalDetails?: ClinicalDetails;
   /**
-   * View filters (#4): simplify what is drawn without changing the data. The
+   * View filters: simplify what is drawn without changing the data. The
    * canvas, legend, pedigree numbers and SVG / PNG / PDF exports draw the
    * filtered pedigree; JSON, PED and CSV keep everyone. See the frontend's
    * `pedigree/viewFilters.ts`. Absent means no filter.
@@ -376,7 +376,7 @@ export interface Pedigree {
   filters?: ViewFilters;
 }
 
-/** View filters (#4). Each is off when absent. */
+/** View filters. Each is off when absent. */
 export interface ViewFilters {
   /**
    * Draw only affected people, carriers, people with a condition tag and the
@@ -404,7 +404,7 @@ export interface ViewFilters {
   side?: "maternal" | "paternal";
 }
 
-/** Free-text clinical key fields (#102). Absent or empty means not recorded. */
+/** Free-text clinical key fields. Absent or empty means not recorded. */
 export interface ClinicalDetails {
   /** Reason for taking the pedigree, e.g. "Family history of breast cancer". */
   referralReason?: string;

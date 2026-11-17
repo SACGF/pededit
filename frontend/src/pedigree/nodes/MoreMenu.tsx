@@ -73,7 +73,7 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
 
 /**
  * Everything the more menu offers for one person. The hover pill's "···"
- * and the right-click menu (#95) both show this list, so an item added here
+ * and the right-click menu both show this list, so an item added here
  * appears in both. `onDone` closes whichever popover holds it.
  */
 export function MoreMenuItems({ individualId, onDone }: { individualId: string; onDone: () => void }) {
@@ -125,7 +125,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
 
-  // Several selected, this person among them (#35): the menu acts on all of
+  // Several selected, this person among them: the menu acts on all of
   // them, and only offers what applies to a group.
   if (selectedIds.length > 1 && selectedIds.includes(individualId)) {
     const act = (fn: () => void) => { fn(); onDone(); };
@@ -140,20 +140,20 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
   const hasParentsAlready = Object.values(pedigree.parentOf).some(kids => kids.includes(individualId));
   const ownPartnerships = partnerChoices(pedigree, individualId);
-  // Gamete donation pairs (#45) have no couple line, so no line to mark.
+  // Gamete donation pairs have no couple line, so no line to mark.
   const couples = ownPartnerships.filter(c => !pedigree.partnerships.find(p => p.id === c.partnershipId)?.donorConception);
-  // Twins (#11): the current set, or the sibling drawn next to this person to pair with.
+  // Twins: the current set, or the sibling drawn next to this person to pair with.
   const twin = twinSetOf(pedigree, individualId);
   const twinPartnership = parentPartnershipOf(pedigree, individualId);
   const twinMembers = twin?.set.members ?? [individualId, adjacentSibling(pedigree, individualId) ?? ""].filter(Boolean);
-  // Partnerships of this person with no children: the childless mark applies to these (#15).
+  // Partnerships of this person with no children: the childless mark applies to these.
   const childlessCouples = partnerChoices(pedigree, individualId)
     .filter(c => coupleChildren(pedigree, c.partnershipId).length === 0)
     .map(c => ({ ...c, status: pedigree.partnerships.find(p => p.id === c.partnershipId)?.childless }));
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
 
-  // Partners may share a sex (#105); a child's two genetic parents may not.
+  // Partners may share a sex; a child's two genetic parents may not.
   const sexProblem = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individualId], sex);
 
   function action(fn: () => void) {
@@ -241,7 +241,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           <MenuItem onClick={() => action(() => setDeceased(individualId, !individual.deceased))}>
             {individual.deceased ? "Mark living" : "Mark deceased"}
           </MenuItem>
-          {/* With one condition, carrier is a carrier of it; with several, a plain flag the Conditions section replaces (#115). */}
+          {/* With one condition, carrier is a carrier of it; with several, a plain flag the Conditions section replaces. */}
           {(() => {
             const isCarrierNow = carrierStatusOf(individual, pedigree) === "carrier";
             const sole = soleCondition(pedigree);
@@ -569,7 +569,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
 }
 
 /**
- * "Text above line..." for a couple with a double line (#97): opens a text
+ * "Text above line..." for a couple with a double line: opens a text
  * box in the menu, filled with the couple's text or else the relationship's
  * name. Enter or Apply sets it, an empty box clears it.
  */
@@ -611,7 +611,7 @@ function ConsanguinityLabelItem({ partnershipId, onDone }: { partnershipId: stri
 const ENDED_TITLE = "Separated or divorced: two short strokes across the couple line";
 
 /**
- * The consanguinity override for one couple (#92), as a toggle. A couple the
+ * The consanguinity override for one couple, as a toggle. A couple the
  * pedigree already shows to be related is ticked and disabled, as in the
  * edit panel: their line is double whatever the flag says.
  */
@@ -640,7 +640,7 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
 }
 
 /**
- * The right-click menu of a couple line (#95, #92): what the more menu offers
+ * The right-click menu of a couple line: what the more menu offers
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
@@ -717,7 +717,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
 }
 
 /**
- * "Add child..." on a same-sex couple's line (#105): partners of the same
+ * "Add child..." on a same-sex couple's line: partners of the same
  * sex have no genetic children together, so the menu asks which of them is
  * the genetic parent and the child gets a donor of the other sex (see
  * `applySameSexChildren`). Opposite-sex couples never see this.
@@ -897,13 +897,13 @@ function AddChildrenPanel({ individualId, onAdd }: {
 
 /**
  * Select with descendants, and with several selected (this person among
- * them) the batch unlock and lock (#21).
+ * them) the batch unlock and lock.
  */
 function SelectionMenuSection({ individualId, action }: { individualId: string; action: (fn: () => void) => void }) {
   const { pedigree, selectedIds, selectDescendants, unlockIndividuals, lockIndividuals, startPickingRelatedness, setDescendantsHidden } = usePedigreeFields("pedigree", "selectedIds", "selectDescendants", "unlockIndividuals", "lockIndividuals", "startPickingRelatedness", "setDescendantsHidden");
   const batch = selectedIds.length > 1 && selectedIds.includes(individualId);
   const { toUnlock, toLock } = batchLockState(pedigree, batch ? selectedIds : []);
-  // Collapse a selection (#1): hide (or show) the descendants of every
+  // Collapse a selection: hide (or show) the descendants of every
   // selected person who has any.
   const { toHide, toShow } = batchCollapseState(pedigree, batch ? selectedIds : []);
   return (
@@ -950,7 +950,7 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
 }
 
 /**
- * The status items for a multiple selection (#35): each applies to every
+ * The status items for a multiple selection: each applies to every
  * selected person as one undo step, and is left out when it would change
  * nobody. Items that only make sense for one person (proband, add, twins,
  * sibling order, adoption, pregnancy, assisted reproduction, couples) are
@@ -974,7 +974,7 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
         {item(st.affected > 0, `Mark ${n} unaffected`, () => setAffectedMany(st.ids, false), "Shortcut: A")}
         {item(st.deceased < n, `Mark ${n} deceased`, () => setDeceasedMany(st.ids, true), "Shortcut: D")}
         {item(st.deceased > 0, `Mark ${n} living`, () => setDeceasedMany(st.ids, false), "Shortcut: D. Also clears their dates of death")}
-        {/* With several conditions, carriers are marked per condition below (#115). */}
+        {/* With several conditions, carriers are marked per condition below. */}
         {conditionMode(pedigree) !== "per-condition"
           && item(st.carrier.carrier < n, soleCondition(pedigree) ? `Mark ${n} ${n === 1 ? "carrier" : "carriers"} of ${soleCondition(pedigree)!.label}` : `Mark ${n} carrier`,
             () => setCarrierStatusMany(st.ids, "carrier"))}
@@ -1066,8 +1066,8 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
 
 /**
  * Tags listed in the menus' Tags sections: all of them, except that with two
- * or more conditions the condition tags have their own section (#115).
- * Traits (#118) stay here: they are plain tags.
+ * or more conditions the condition tags have their own section.
+ * Traits stay here: they are plain tags.
  */
 function menuTags(pedigree: Pedigree): Tag[] {
   const tags = pedigree.tags ?? [];

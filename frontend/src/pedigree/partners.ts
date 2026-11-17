@@ -4,7 +4,7 @@ import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 
 /**
- * Linking two existing individuals as partners (#84): the rules,
+ * Linking two existing individuals as partners: the rules,
  * framework-free so the store and the picking UI share them.
  */
 
@@ -16,7 +16,7 @@ function label(pedigree: Pedigree, id: string): string {
 /**
  * Why `aId` and `bId` cannot become partners, or null when they can.
  * Relatives are allowed, parent and child included: that is the point, and
- * the layout draws them. Any sexes are allowed: a same-sex couple (#105)
+ * the layout draws them. Any sexes are allowed: a same-sex couple
  * has no genetic children together, and adding a child to one goes through
  * a donor (`sameSex.ts`).
  */
@@ -34,7 +34,7 @@ export function linkPartnerProblem(pedigree: Pedigree, aId: string, bId: string)
   return null;
 }
 
-// ── Swap sides (#106) ─────────────────────────────────────────────────────────
+// ── Swap sides ──────────────────────────────────────────────────────────────
 
 function extraCopies(p: Pedigree, r: LayoutResult): number {
   return r.n.reduce((a, b) => a + b, 0) - p.individuals.length;

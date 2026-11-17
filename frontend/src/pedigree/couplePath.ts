@@ -61,7 +61,7 @@ export function duplicateArcD(
   return `M ${sx} ${uy} Q ${cx} ${uy} ${lx} ${ly - half}`;
 }
 
-/** Points along `duplicateArcD`'s curve, for keeping text off it (#109). */
+/** Points along `duplicateArcD`'s curve, for keeping text off it. */
 export function duplicateArcPoints(
   x1: number, y1: number, x2: number, y2: number,
   bulge: number, half: number, steps = 12,
@@ -98,7 +98,7 @@ export function consanguineousPathsD(
 /**
  * The highest point any dashed arc between two copies reaches, or Infinity
  * when there is none. An arc on one row rises `bulge` above the symbols, so
- * in the top row it is the highest thing drawn (#172).
+ * in the top row it is the highest thing drawn.
  */
 export function highestDuplicateArc(flow: {
   nodes: { id: string; position: { x: number; y: number } }[];

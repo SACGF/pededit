@@ -52,16 +52,16 @@ export interface Union {
   joinNode: TNode | null;
   /** Which side the partner is on, for join. For dup, which side is preferred. */
   joinSide: -1 | 1;
-  /** Degree of relationship written along a double line (#97), wrapped, and how wide it is. */
+  /** Degree of relationship written along a double line, wrapped, and how wide it is. */
   label?: string[];
   labelWidth?: number;
-  /** The relationship has ended (#98): its strokes cross the line under the label. */
+  /** The relationship has ended: its strokes cross the line under the label. */
   ended?: boolean;
 }
 
 /**
  * Centre-to-centre distance of a couple drawn side by side: COUPLE_GAP, or
- * more when the label between them needs it (#109). Joined couples get the
+ * more when the label between them needs it. Joined couples get the
  * same room from the packing. On a curve each symbol is turned towards the
  * label by the angle between them, which brings its inner top corner closer
  * by about HALF times that angle; the radius is at least `labelRadius`.
@@ -83,7 +83,7 @@ export function labelRadius(w: Union): number {
 }
 
 export interface TNode {
-  /** Twin set key (#11); the root sibship is never split between the arms inside a set. */
+  /** Twin set key; the root sibship is never split between the arms inside a set. */
   twinSet?: string;
   /** The individual whose parents place this node. For the root, the shared founder. */
   blood: string;
@@ -103,7 +103,7 @@ export interface TNode {
   side: -1 | 0 | 1;
   /** Signed position of the reference point along the U. */
   u: number;
-  /** Joined to a neighbour by a labelled double line (#109): their centre-to-centre distance. */
+  /** Joined to a neighbour by a labelled double line: their centre-to-centre distance. */
   joinGap?: number;
 }
 
@@ -178,7 +178,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const sexOf = (id: string) => byId.get(id)?.sex;
   const partnershipsOf = new Map<string, Partnership[]>();
   const hasParents = new Set<string>();
-  // Where each child is drawn: under the couple carrying it, for an egg donor's child (#45).
+  // Where each child is drawn: under the couple carrying it, for an egg donor's child.
   const placed = placementParentOf(pedigree);
   for (const p of pedigree.partnerships) {
     for (const id of [p.individual1, p.individual2]) {
@@ -225,7 +225,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const mkUnion = (kind: Union["kind"], pids: string[], partner: string | null, consang: boolean): Union => {
     const w: Union = { kind, order: nextOrder++, pids, partner, consang, kids: [], a: 0, b: null, joinNode: null, joinSide: 1 };
-    // The label between the partners (#109), on one line: the couple moves
+    // The label between the partners, on one line: the couple moves
     // apart for it when the usual gap is too narrow. A second line would
     // reach the dashed links and sibship bars that run along the track just
     // inside the symbols.
@@ -313,7 +313,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const o = mode === "birthDate" && ind.dob ? new Date(ind.dob).getTime() : ind.sibOrder ?? 0;
     return [a, o];
   };
-  // Twins (#11) sort by the mean of their set's keys, then by their place in
+  // Twins sort by the mean of their set's keys, then by their place in
   // the set, so they stay side by side as autohint keeps them on the canvas.
   const twinOf = twinMembership(pedigree);
   const sortSibs = (ids: string[]) => {
@@ -411,7 +411,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       if (tryJoin(root, host, w, other, sexOf, joins)) joins.push({ host, w });
     }
   }
-  // Room for the label between joined partners (#109), wherever the packing
+  // Room for the label between joined partners, wherever the packing
   // puts them: side by side, or either side of the centre.
   for (const { host, w } of joins) {
     if (w.kind !== "join" || !w.labelWidth) continue;

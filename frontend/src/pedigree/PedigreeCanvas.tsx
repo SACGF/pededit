@@ -59,7 +59,7 @@ const edgeTypes: EdgeTypes = {
 };
 
 // ── Minimap ─────────────────────────────────────────────────────────────────
-// React Flow's own minimap (#6, #125): always the whole pedigree, with the
+// React Flow's own minimap: always the whole pedigree, with the
 // viewport as a rectangle. Dragging pans the main view, a click centres it.
 // It only gives a sense of where you are, so people are plain shapes (filled
 // when affected) joined by plain lines: couple lines (doubled when
@@ -179,7 +179,7 @@ function PedigreeMinimap({ pedigree }: { pedigree: Pedigree }) {
 
 /**
  * Refits the view, once the new layout has rendered, when a pedigree is
- * loaded (#117), compact mode is toggled or Auto arrange / Reset layout
+ * loaded, compact mode is toggled or Auto arrange / Reset layout
  * clears the pins (#64: an auto layout of several families is often wider
  * than the hand-placed one).
  *
@@ -196,7 +196,7 @@ function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: 
   const { fitView } = useReactFlow();
   const flowStore = useStoreApi();
   const resetCount = usePedigreeStore(s => s.layoutResetCount);
-  // Switching a view filter (#4) changes the drawing's size a lot.
+  // Switching a view filter changes the drawing's size a lot.
   const filtered = usePedigreeStore(s => JSON.stringify(s.pedigree.filters ?? {}));
   const key = `${compact}-${resetCount}-${filtered}`;
   const prev = useRef(key);
@@ -230,7 +230,7 @@ function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: 
 
 /**
  * Pans, keeping the zoom, to bring a person into view when the store asks
- * (`revealRequest`: a toolbar add, #121, or going to a problem, #116) and
+ * (`revealRequest`: a toolbar add, or going to a problem) and
  * their node is off-screen. Waits
  * a few frames for the new layout to render the node.
  */
@@ -293,7 +293,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     [pedigree, compact],
   );
 
-  // Rubber band in progress (Shift+drag, #21): the React Flow node ids inside
+  // Rubber band in progress (Shift+drag): the React Flow node ids inside
   // it so far, or null. While set, React Flow's own select changes drive the
   // highlight; the store gets the result when the band ends. The band adds
   // to the selection it started with (Shift adds, as for a click).
@@ -352,7 +352,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
 
   const edges = [...duplicateEdges, ...coupleEdges, ...sibshipEdges, ...assistedEdges];
 
-  // The chart title (#20) rides along as one more node, above the layout.
+  // The chart title rides along as one more node, above the layout.
   const pedigreeName = useAppStore(s => s.activeTitle);
   const title = chartTitle(pedigree, pedigreeName);
   const titleNode = useMemo(
@@ -376,7 +376,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
     setSelectedId(null);
   }, [setSelectedId]);
 
-  // Right-click (#95): the more menu at the cursor on a person, the couple
+  // Right-click: the more menu at the cursor on a person, the couple
   // items on a couple line. The browser's own menu is kept everywhere else.
   // Not while picking, where clicks on people mean something else.
   const handleNodeContextMenu = useCallback((event: React.MouseEvent, node: Node<RFNodeData>) => {
@@ -394,7 +394,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
 
   const handleNodeDragStop: OnNodeDrag<Node<RFNodeData>> = useCallback(
     (_event, node, nodes) => {
-      // Every dragged node (the whole selection, #21) is pinned as one undo
+      // Every dragged node (the whole selection) is pinned as one undo
       // step. React Flow snaps a group's delta, not each node, so the group
       // keeps its shape. Pins are stored at normal spacing; map back. A
       // person drawn twice keeps the copy that was grabbed, else the first.
@@ -448,7 +448,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         nodeOrigin={[0.5, 0.5]}
         nodesDraggable={false}
         nodesConnectable={false}
-        // Selection is the store's (#21): Shift+click or Ctrl/Cmd+click
+        // Selection is the store's: Shift+click or Ctrl/Cmd+click
         // toggles, Shift+drag draws a rubber band, plain drag pans. React
         // Flow's own delete key would drop nodes from the canvas only.
         selectNodesOnDrag={false}
@@ -463,7 +463,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         onNodesChange={onNodesChange}
         fitView
         // React Flow's default (0.5) cannot fit a wide pedigree, such as
-        // a dozen families side by side (#64), so fit view would clip it.
+        // a dozen families side by side, so fit view would clip it.
         minZoom={MIN_ZOOM}
         onPaneClick={handlePaneClick}
         onNodeDragStop={handleNodeDragStop}

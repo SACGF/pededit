@@ -26,7 +26,7 @@ import type { SvgExportOptions } from "./types";
 
 const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 // Where the text under a symbol goes (pedigree/labelBlock.ts, shared with
-// the couple label placement, #109). The first baseline leaves a gap between
+// the couple label placement). The first baseline leaves a gap between
 // the symbol edge and the cap height of a 10px label.
 const LABEL_LINE_HEIGHT = EXPORT_LABEL_LINE_HEIGHT;
 const LABEL_OFFSET_Y = EXPORT_LABEL_OFFSET_Y;
@@ -94,15 +94,15 @@ function computeBounds(
 
   const hasAnnotations = glyphs.some(g => g.annotations.length > 0);
   const hasCaption = glyphs.some(g => g.caption);
-  // Names wrap to the slot width (#68), the age or DOB takes a line (#20), so
-  // does each age of onset (#93) and the pedigree number (#8), so allow for
+  // Names wrap to the slot width, the age or DOB takes a line, so
+  // does each age of onset and the pedigree number, so allow for
   // the most lines anyone takes.
   const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
   const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
-  // Consanguinity labels (#97) and the dashed arcs between two copies of
-  // someone (#172) over the top row reach above the symbols.
+  // Consanguinity labels and the dashed arcs between two copies of
+  // someone over the top row reach above the symbols.
   const aboveExtra = Math.max(0, Math.ceil(rawMinY - NODE_SIZE / 2 - aboveTop));
   const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
   const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
@@ -139,7 +139,7 @@ function svgDefs(): string {
 // ── Couple lines ──────────────────────────────────────────────────────────────
 
 /**
- * Couple lines, from the edges the canvas draws (#143): the same geometry
+ * Couple lines, from the edges the canvas draws: the same geometry
  * (`coupleLineGeometry`), so a line, its hop and the marks on it are where
  * the canvas has them.
  */
@@ -151,9 +151,9 @@ function renderCoupleLines(flow: FlowData, slotPos: SlotPos): string[] {
     if (!left || !right) continue;
     const line = coupleLineGeometry(edge.data, edge.type === "consanguineousEdge", left, right);
     for (const d of line.paths) lines.push(path(d));
-    // Ended relationship (#98): two strokes across the line.
+    // Ended relationship: two strokes across the line.
     for (const [x1, y1, x2, y2] of line.ended ?? []) lines.push(seg(x1, y1, x2, y2, false, true));
-    // Childless couple mark (#15), hung from the middle of the line.
+    // Childless couple mark, hung from the middle of the line.
     if (line.childless) {
       for (const [x1, y1, x2, y2] of line.childless.segments) lines.push(seg(x1, y1, x2, y2, false, true));
       if (line.childless.reason) {
@@ -164,11 +164,11 @@ function renderCoupleLines(flow: FlowData, slotPos: SlotPos): string[] {
   return lines;
 }
 
-/** Degree of relationship above double couple lines (#97), placed as on the canvas. */
+/** Degree of relationship above double couple lines, placed as on the canvas. */
 function renderConsanguinityLabels(flow: FlowData): string[] {
   return consanguinityLabelPlacements(flow).flatMap(({ x, cy, hop, dy, lines, backed }) => {
     const baselines = consanguinityLabelBaselines(cy, hop, lines.length, dy);
-    // On a dashed arc between two copies (#109): the arc passes behind it.
+    // On a dashed arc between two copies: the arc passes behind it.
     const b = backed ? consanguinityLabelBacking(x, baselines, lines) : null;
     return [...(b ? [`<rect x="${b.x}" y="${b.y}" width="${b.width}" height="${b.height}" fill="white"/>`] : []), ...lines.map((line, i) =>
       `<text x="${x}" y="${baselines[i]}" text-anchor="middle" font-family="sans-serif" font-size="${CONSANGUINITY_LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`)];
@@ -177,7 +177,7 @@ function renderConsanguinityLabels(flow: FlowData): string[] {
 
 // ── Sibship lines ─────────────────────────────────────────────────────────────
 
-/** Lines of descent, from the edges the canvas draws (#143, `sibshipLineGeometry`). */
+/** Lines of descent, from the edges the canvas draws (`sibshipLineGeometry`). */
 function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
@@ -197,7 +197,7 @@ function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
   return lines;
 }
 
-/** Lines of assisted reproduction (#45), from the same edges the canvas draws. */
+/** Lines of assisted reproduction, from the same edges the canvas draws. */
 function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
   const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
   return flow.assistedEdges.flatMap(e => {
@@ -221,7 +221,7 @@ function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
 
   // One symbol for each node the canvas draws, in its order (row by row),
-  // from the node's glyph (#144): nothing here asks the pedigree what to draw.
+  // from the node's glyph: nothing here asks the pedigree what to draw.
   for (const node of flow.nodes) {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
@@ -237,7 +237,7 @@ function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
     if (glyph.documented) elems.push(renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -NODE_SIZE / 2, -NODE_SIZE / 2));
     // Every drawn copy is numbered 1, 2, ... as on the canvas.
     if (glyph.copy !== undefined) elems.push(renderDuplicateMark(glyph.copy));
-    if (glyph.groupCount !== undefined) elems.push(renderBranchCountSvg(glyph.groupCount, NODE_SIZE)); // collapsed branch (#1)
+    if (glyph.groupCount !== undefined) elems.push(renderBranchCountSvg(glyph.groupCount, NODE_SIZE)); // collapsed branch
     elems.push(`</g>`);
   }
   return elems;
@@ -273,10 +273,10 @@ function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
     const labelBaseY = cy + LABEL_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0)
       + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0);
 
-    // The name wraps to the slot width (#68); the full text is kept as a <title>.
+    // The name wraps to the slot width; the full text is kept as a <title>.
     const text = glyph.name;
     const lines = glyph.figureNameLines;
-    // A line of descent runs down through this person's labels (#45): white backing, as on the canvas.
+    // A line of descent runs down through this person's labels: white backing, as on the canvas.
     if (glyph.labelsBacked && lines.length > 0) {
       const w = linesWidth(lines) + 4;
       elems.push(`<rect x="${cx - w / 2}" y="${labelBaseY - LABEL_FONT_SIZE}" width="${w}" height="${lines.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
@@ -285,7 +285,7 @@ function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
       const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
       elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
     });
-    // Age or DOB (#20), ages of onset (#93), pedigree number (#8). Past the
+    // Age or DOB, ages of onset, pedigree number. Past the
     // age line the block can reach the sibship bar of the person's
     // children, so it gets a white backing then, as on the canvas.
     const details = glyph.detailLines;
@@ -311,7 +311,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
 </svg>`;
   }
 
-  // What the canvas draws: hidden descendants (#94) left out.
+  // What the canvas draws: hidden descendants left out.
   // The one layout: everything below is drawn from what the canvas draws (#143).
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
   const flow    = layoutToFlow(working, { compact: options.compact });

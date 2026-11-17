@@ -7,7 +7,7 @@ import type { TextBlock } from "./consanguinityLabel";
 
 /**
  * Where the standard SVG export (`svgExporter.ts`) writes the text under a
- * symbol. Kept here so the couple label placement (#109) can stay off it.
+ * symbol. Kept here so the couple label placement can stay off it.
  * The export's text runs lower and in taller lines than the canvas's, so a
  * label clear of the export's text is clear of the canvas's too.
  */

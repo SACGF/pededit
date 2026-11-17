@@ -28,7 +28,7 @@ import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint }
 export interface RFNodeData extends Record<string, unknown> {
   individual: Individual;
   /**
-   * Everything drawn at this person, decided once (#144, `personGlyph`): the
+   * Everything drawn at this person, decided once (`personGlyph`): the
    * canvas node and the SVG export draw from it. `shape`, `hasParents`,
    * `duplicateIndex`, `nameLines`, `detailLines`, `detailsBacked` and
    * `labelsBacked` below repeat its fields for the lints and the minimap.
@@ -48,7 +48,7 @@ export interface RFNodeData extends Record<string, unknown> {
   /** True if individual has a parent partnership in the pedigree. */
   hasParents: boolean;
   /**
-   * The symbol shape drawn (#26): the gender identity's when shown, else the
+   * The symbol shape drawn: the gender identity's when shown, else the
    * sex (`symbolSex` in gender.ts). Never use it for genetics.
    */
   shape?: Sex;
@@ -57,30 +57,30 @@ export interface RFNodeData extends Record<string, unknown> {
    * someone drawn more than once only the copy nearest the pin is moved.
    */
   isPinned: boolean;
-  /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin (#11). */
+  /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin. */
   twinSet?: string;
   zygosity?: Zygosity;
   /**
-   * The name fitted to the slot width and cut with an ellipsis (#68): at most
+   * The name fitted to the slot width and cut with an ellipsis: at most
    * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
    */
   nameLines: string[];
   /**
    * The lines under the name, in NSGC order (`detailSections` in labels.ts):
-   * age or year of birth, ages of onset, then the pedigree number (#8) when shown.
+   * age or year of birth, ages of onset, then the pedigree number when shown.
    */
   detailLines: string[];
   /** The detail block runs past the age line, so it gets a white backing (`detailsBacked`). */
   detailsBacked?: boolean;
   /**
    * A line of descent leaves the bottom of this symbol straight down through
-   * its labels (#45: the woman carrying a pregnancy by assisted reproduction
+   * its labels (the woman carrying a pregnancy by assisted reproduction
    * has it below her, NSGC 2008 Fig. 3), so the labels get a white backing
    * and the line passes behind them (`labelsOverLines`).
    */
   labelsBacked?: boolean;
   /**
-   * Set on the diamond standing for a collapsed branch (#1), whose
+   * Set on the diamond standing for a collapsed branch, whose
    * `individual` is a stand-in that is not in the stored pedigree. Such a
    * node has type "collapsedBranch" and can be neither selected nor dragged.
    */
@@ -97,18 +97,18 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   hopHeight: number;
   /** Distance (px) from each symbol edge at which a hopping line turns up. */
   hopInset: number;
-  /** The partnership the line draws, for the couple line's right-click menu (#95). */
+  /** The partnership the line draws, for the couple line's right-click menu. */
   partnershipId?: string;
-  /** Childless couple mark under the line (#15), when the partnership has one and no children. */
+  /** Childless couple mark under the line, when the partnership has one and no children. */
   childless?: ChildlessStatus;
   childlessReason?: string;
-  /** Ended relationship (#98): two strokes across the line. */
+  /** Ended relationship: two strokes across the line. */
   ended?: boolean;
   /** A line of descent or a childless mark hangs from the middle of the line, so the break moves aside. */
   middleTaken?: boolean;
-  /** Degree of relationship written above a double line (#97), wrapped. */
+  /** Degree of relationship written above a double line, wrapped. */
   consanguinityLabel?: string[];
-  /** Where the label goes when its usual place is taken by text above (#109). */
+  /** Where the label goes when its usual place is taken by text above. */
   consanguinityLabelOffset?: ConsanguinityLabelOffset;
 }
 
@@ -135,7 +135,7 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   hopHeight: number;
   /** y (canvas px) of the sibship bar: halfway between the couple and the highest child, plus `barOffset`. */
   sibBarY: number;
-  /** How far (px) the bar is lowered so it does not overlap another couple's bar (#80); usually 0. */
+  /** How far (px) the bar is lowered so it does not overlap another couple's bar; usually 0. */
   barOffset: number;
   /** x (canvas px) of each child's slot centre, in slot order. */
   childXs: number[];
@@ -144,21 +144,21 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   /** y (canvas px) of the highest child row; the sibship bar sits halfway up to the couple. */
   childY: number;
   /**
-   * The parents are not a couple (`Partnership.donorConception`, #45): no
+   * The parents are not a couple (`Partnership.donorConception`): no
    * couple line, and a line from each parent's symbol down to the bar in
    * place of the drop from the couple line. The parents' positions as laid
    * out; the canvas edge reads the live node positions.
    */
   apart?: LinePoint[];
   /**
-   * An only child of a donor pair (#45): no bar, a line from each parent
+   * An only child of a donor pair: no bar, a line from each parent
    * runs straight to the top of its symbol (see `sibshipSegments`).
    */
   converge?: boolean;
 }
 
 /**
- * A line of assisted reproduction (#45) from a woman who carried the child
+ * A line of assisted reproduction from a woman who carried the child
  * (solid) or a parent who is not genetic (dashed). Source is that person's
  * node, target the child's. When the same person is linked the same way to
  * every child of a sibship, one line runs to the point where the sibship's
@@ -184,7 +184,7 @@ export interface FlowData {
   sibshipEdges: Edge<SibshipEdgeData>[];
   /** One per pair of consecutive copies of someone drawn more than once. */
   duplicateEdges: Edge<DuplicateEdgeData>[];
-  /** Lines of assisted reproduction (#45): carrier and social parent to child. */
+  /** Lines of assisted reproduction: carrier and social parent to child. */
   assistedEdges: Edge<AssistedEdgeData>[];
 }
 
@@ -248,14 +248,14 @@ function findLinelessCopies(result: LayoutResult): Set<string> {
   return out;
 }
 
-// ── Pedigree numbers (#8) ────────────────────────────────────────────────────
+// ── Pedigree numbers ────────────────────────────────────────────────────────
 
 const numbersCache = new WeakMap<Pedigree, Map<string, string>>();
 
 /**
  * Pedigree numbers ("II-3") of everyone drawn, from the same layout the
  * canvas and the SVG export draw, so the numbers read left to right in each
- * row. Hidden people (#94) and empty pedigrees get none. Cached per pedigree
+ * row. Hidden people and empty pedigrees get none. Cached per pedigree
  * object. See `numbering.ts`.
  */
 export function pedigreeNumbers(full: Pedigree): Map<string, string> {
@@ -271,7 +271,7 @@ export function pedigreeNumbers(full: Pedigree): Map<string, string> {
   return numbers;
 }
 
-/** The numbers to draw under the symbols (#8), or undefined when the pedigree does not show them. */
+/** The numbers to draw under the symbols, or undefined when the pedigree does not show them. */
 export function labelNumbers(pedigree: Pedigree): Map<string, string> | undefined {
   return showsNumbers(pedigree) ? pedigreeNumbers(pedigree) : undefined;
 }
@@ -279,7 +279,7 @@ export function labelNumbers(pedigree: Pedigree): Map<string, string> | undefine
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
-  // Hidden descendants (#94) are not laid out or drawn.
+  // Hidden descendants are not laid out or drawn.
   const pedigree = drawnPedigree(full);
   if (pedigree.individuals.length === 0) {
     return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] };
@@ -327,7 +327,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
 
 /**
  * Nodes with a line running straight down from the bottom of the symbol,
- * through the labels under it (#45): a parent of a donor pair's only child
+ * through the labels under it: a parent of a donor pair's only child
  * drawn below them (`converge`), or the source of a line of assisted
  * reproduction that leaves the symbol at the bottom middle.
  */
@@ -356,7 +356,7 @@ export function labelsOverLines(
   return out;
 }
 
-// ── Assisted reproduction lines (#45) ─────────────────────────────────────────
+// ── Assisted reproduction lines ─────────────────────────────────────────────
 
 /**
  * One edge per carrier or social parent and child, or per sibship when they
@@ -572,8 +572,7 @@ function buildDuplicateEdges(nodes: Node<RFNodeData>[], spacing: LayoutSpacing):
 
 /**
  * The text under every drawn symbol, as the export writes it, and the copy
- * number beside the top of a symbol drawn twice, for placing couple labels
- * (#109).
+ * number beside the top of a symbol drawn twice, for placing couple labels.
  */
 function textBlocks(pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: LayoutSpacing): TextBlock[] {
   const labelMax = labelMaxWidth(spacing.slotWidth);
@@ -584,7 +583,7 @@ function textBlocks(pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: Layo
   ]);
 }
 
-/** The dashed arcs between copies of someone, as a thin box per stretch, for placing couple labels (#109). */
+/** The dashed arcs between copies of someone, as a thin box per stretch, for placing couple labels. */
 function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<string, { x: number; y: number }>): TextBlock[] {
   return edges.flatMap(e => {
     const a = slotPos.get(e.source), b = slotPos.get(e.target);
@@ -597,7 +596,7 @@ function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<strin
   });
 }
 
-/** Sibship bars and the drops from them, as thin boxes, so a raised couple label stays under them (#109). */
+/** Sibship bars and the drops from them, as thin boxes, so a raised couple label stays under them. */
 function sibshipBlocks(edges: Edge<SibshipEdgeData>[]): TextBlock[] {
   return edges.flatMap(e => {
     const d = e.data;
@@ -626,7 +625,7 @@ function buildCoupleEdges(
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
-  // Partners with no parents drawn have nothing landing on their symbol tops (#97).
+  // Partners with no parents drawn have nothing landing on their symbol tops.
   const hasParents = new Set(Object.values(pedigree.parentOf).flat());
 
   for (let level = 0; level < result.n.length; level++) {
@@ -638,7 +637,7 @@ function buildCoupleEdges(
       // passing through to a further partner: connect the real partners and
       // hop over whatever sits between them.
       const rc = resolveCouple(result, partners, level, slot);
-      // Gamete donation (#45): the genetic parents are not a couple, so no line.
+      // Gamete donation: the genetic parents are not a couple, so no line.
       if (partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.donorConception) continue;
       const double = related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot));
 
@@ -683,7 +682,7 @@ function buildCoupleEdges(
     const [lx, rx] = l.x <= r.x ? [l.x, r.x] : [r.x, l.x];
     const [lt, rt] = l.x <= r.x ? [top(a), top(b)] : [top(b), top(a)];
     const lines = wrapConsanguinityLabel(text, consanguinityLabelRoom(lx, rx, lt, rt), rowHeight);
-    // Out of the way of the text under the people above (#109); not drawn
+    // Out of the way of the text under the people above; not drawn
     // when there is no room for it anywhere near the line.
     const offset = placeConsanguinityLabel({
       lx, rx, cy: (l.y + r.y) / 2, hop, lines, blocks,
@@ -704,7 +703,7 @@ function buildCoupleEdges(
 
 const pairKeyOf = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
-/** Partner pairs who are genetic parents through gamete donation, not a couple (#45). */
+/** Partner pairs who are genetic parents through gamete donation, not a couple. */
 function donorPairs(pedigree: Pedigree): Set<string> {
   return new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKeyOf(p.individual1, p.individual2)));
 }
@@ -780,7 +779,7 @@ function buildSibshipEdges(
     }
   }
 
-  // Bars that would run along the same line get a height each (#80).
+  // Bars that would run along the same line get a height each.
   const offsets = sibshipBarOffsets(edges.map(e => e.data!));
   edges.forEach((e, i) => {
     e.data!.barOffset = offsets[i]!;

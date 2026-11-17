@@ -1,5 +1,5 @@
 /**
- * What an error report contains (#49). A pedigree is family health data and
+ * What an error report contains. A pedigree is family health data and
  * the id in `/p/<id>` is the edit link of an anonymous pedigree, so a report
  * is built here from an allowlist, field by field: the error's type, its
  * message after `scrubText`, the stack (script URL on our own origin,

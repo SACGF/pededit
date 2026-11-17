@@ -35,7 +35,7 @@ export function importPed(text: string): ImportResult {
   const familyIds = [...new Set(rows.map(r => r.familyId))];
   const pedigrees = familyIds.map(fid => ({
     familyId: fid,
-    // A PED file has no settings: it is made now, so it gets the current NSGC edition (#115).
+    // A PED file has no settings: it is made now, so it gets the current NSGC edition.
     pedigree: withCurrentNotation(convertFamily(rows.filter(r => r.familyId === fid))),
   }));
 

@@ -13,7 +13,7 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   if (!data) return null;
 
   // Live node positions, so the lines follow a drag. The geometry is shared
-  // with the SVG export (lineGeometry.ts, #143).
+  // with the SVG export (lineGeometry.ts).
   const lines = sibshipLineGeometry(data, id => {
     const n = nodes.find(x => x.id === id);
     return n && { position: n.position, data: n.data as RFNodeData | undefined };

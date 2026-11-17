@@ -91,16 +91,16 @@ export interface Sector {
   tag: Tag;
   start: number;
   end: number;
-  /** Colour and fill drawn, after the monochrome setting (#67, `tagPaint`, or `carrierPaintFrom`). */
+  /** Colour and fill drawn, after the monochrome setting (`tagPaint`, or `carrierPaintFrom`). */
   color: string;
   fill: TagFill;
-  /** A carrier of this condition (#115), drawn with the carrier pattern; or the plain carrier half (`PLAIN_CARRIER_TAG`). */
+  /** A carrier of this condition, drawn with the carrier pattern; or the plain carrier half (`PLAIN_CARRIER_TAG`). */
   carrier?: boolean;
 }
 
 /**
  * Stand-in tag for the half symbol of a carrier with no condition recorded
- * in NSGC 2022 (#115), so it goes through the same sector renderers. Never
+ * in NSGC 2022, so it goes through the same sector renderers. Never
  * stored in a pedigree.
  */
 export const PLAIN_CARRIER_TAG: Tag = { id: "__plain-carrier", label: "Carrier", color: PLAIN_CARRIER_PAINT.color, style: "quadrant" };
@@ -123,7 +123,7 @@ export const PLAIN_CARRIER_ANGLES: readonly [number, number] = [0, 180];
  * and right halves (the 2022 paper's HEXA and CFTR carrier), three or four
  * these quarters, each in pedigree tag order among the conditions in use.
  * NSGC 2008 and pedigrees with no notation saved keep a quarter per defined
- * condition (#3).
+ * condition.
  *
  * A fifth or later quadrant tag has no quarter of its own. Someone who carries
  * one gets equal pie slices for the quadrant tags they carry, from 12
@@ -151,7 +151,7 @@ export const QUADRANT_NAMES = ["upper left", "upper right", "lower right", "lowe
 export const FIXED_QUADRANTS = QUADRANT_ANGLES.length;
 
 /**
- * How a pedigree divides its symbols among conditions: "quarters" (#3, NSGC
+ * How a pedigree divides its symbols among conditions: "quarters" (NSGC
  * 2008, and NSGC 2022 with three or more conditions in use), "halves" (NSGC
  * 2022, two in use) or "whole" (NSGC 2022, one in use).
  */
@@ -167,13 +167,13 @@ interface SectionInfo {
 const sectionCache = new WeakMap<Pedigree, SectionInfo>();
 
 /**
- * The conditions that own a section of the symbol (#115). NSGC 2008 (and no
+ * The conditions that own a section of the symbol. NSGC 2008 (and no
  * notation saved): every quadrant tag defined, as #3 always did, so old
  * pedigrees keep their look. NSGC 2022: only the conditions in use, that is
  * someone on the chart is affected with or a carrier of them, or has the
- * trait (#118: a trait takes a section like a condition), counted on the
- * drawn pedigree (`drawnPedigree`: people in a collapsed branch, #94, or
- * left out by a view filter, #4, do not count), since NSGC divides the
+ * trait (a trait takes a section like a condition), counted on the
+ * drawn pedigree (`drawnPedigree`: people in a collapsed branch or
+ * left out by a view filter do not count), since NSGC divides the
  * symbol by what the chart shows. Defining a second condition no one has yet
  * changes nothing. Cached per pedigree object; the full pedigree and its
  * drawn copy give the same answer.
@@ -190,7 +190,7 @@ function sectionInfo(pedigree: Pedigree): SectionInfo {
     const used = new Set<string>();
     let plainBlack = false;
     for (const i of drawn.individuals) {
-      // Affected conditions and traits alike (#118); `all` keeps only quadrant tags.
+      // Affected conditions and traits alike; `all` keeps only quadrant tags.
       for (const id of i.tags ?? []) used.add(id);
       const carried = carrierConditions(i, drawn);
       for (const t of carried) used.add(t.id);
@@ -267,7 +267,7 @@ export function sectionName(tag: Tag, pedigree: Pedigree): { name: string; title
 }
 
 /**
- * The paint of a condition's affected section (#67, #115): `tagPaint`,
+ * The paint of a condition's affected section: `tagPaint`,
  * except that in NSGC 2022 black and white mode a pedigree with a single
  * condition in use draws it solid black, the classic NSGC shading, keyed
  * with the condition's name. A pattern chosen for the tag itself is kept,
@@ -277,7 +277,7 @@ export function sectionName(tag: Tag, pedigree: Pedigree): { name: string; title
  */
 export function conditionPaint(tag: Tag, pedigree: Pedigree): TagPaint {
   const paint = tagPaint(tag, pedigree);
-  // A trait (#118) is never the solid black of NSGC affected shading.
+  // A trait is never the solid black of NSGC affected shading.
   if (!isConditionTag(tag) || tagFillMode(pedigree) !== "monochrome" || notationOf(pedigree) === "nsgc2008") return paint;
   if (tag.fill && tag.fill !== "solid") return paint;
   const { layout } = conditionSection(tag, pedigree);
@@ -292,7 +292,7 @@ export function conditionCarrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
 
 /**
  * Condition sectors on an individual's symbol, in pedigree tag order:
- * affected conditions in `conditionPaint`, carrier conditions (#115) in
+ * affected conditions in `conditionPaint`, carrier conditions in
  * `conditionCarrierPaint`, each in the condition's own section
  * (`sectionConditions`, `sectorAngles`).
  */
@@ -333,7 +333,7 @@ function covers(sectors: readonly Sector[], start: number, end: number): boolean
 }
 
 /**
- * Everything filled on a symbol beyond its outline (#3, #115), decided once
+ * Everything filled on a symbol beyond its outline, decided once
  * so the canvas, legend and both exporters agree:
  * - `sectors`: condition sectors, under them (NSGC 2022) the plain carrier's
  *   dotted right half;
@@ -350,7 +350,7 @@ function covers(sectors: readonly Sector[], start: number, end: number): boolean
  *
  * NSGC 2022: there is no dot. A recorded affected condition is its sector
  * alone, so the person is not filled black. The plain flag
- * (`plainAffected`: affected with something not recorded, #118) is the black
+ * (`plainAffected`: affected with something not recorded) is the black
  * fill with any sectors drawn over it and the black centre on top, so it
  * still reads as affected when the sectors cover the symbol or are black.
  * A carrier with no condition recorded is the right half dotted, unless the
@@ -365,7 +365,7 @@ export interface SymbolPaint {
   base: "black" | "white";
   core: boolean;
   dot: boolean;
-  /** The presymptomatic vertical line (#101, `drawsPresymptomatic`). */
+  /** The presymptomatic vertical line (`drawsPresymptomatic`). */
   line?: boolean;
 }
 
@@ -406,7 +406,7 @@ export function symbolPaint(individual: Individual, pedigree: Pedigree): SymbolP
  * solid black centre: the symbol's own outline scaled by this factor, drawn
  * over the sectors with a white rim. Without it, four quarters (or one
  * section covering the whole symbol) would hide the black fill and the
- * person would read as unaffected (#118). A black symbol with no sectors is
+ * person would read as unaffected. A black symbol with no sectors is
  * filled black as usual.
  */
 export const AFFECTED_CORE_SCALE = 0.55;
@@ -461,7 +461,7 @@ const ANNOTATION_GAP = 4;
 
 export interface AnnotationItem {
   tag: Tag;
-  /** Colour drawn, after the monochrome setting (#67). */
+  /** Colour drawn, after the monochrome setting. */
   color: string;
   /** x of the item's centre relative to the symbol's horizontal centre. */
   x: number;
@@ -586,7 +586,7 @@ export function renderTagLegendRowSvg(
   return parts.join("");
 }
 
-/** One key row for a tag: the tag itself, or (#115) a condition's carriers. */
+/** One key row for a tag: the tag itself, or a condition's carriers. */
 export interface KeyTagRow {
   tag: Tag;
   carrier: boolean;
@@ -596,7 +596,7 @@ export interface KeyTagRow {
 /**
  * The tag rows of a key, in pedigree tag order: each tag someone has, and
  * right after a condition the "<condition> carrier" row when someone is a
- * carrier of it (#115). A condition with carriers only lists just that row.
+ * carrier of it. A condition with carriers only lists just that row.
  */
 export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
   const affected = new Set(tagsInUse(pedigree).map(t => t.id));
@@ -627,7 +627,7 @@ export interface TagLegendBlock {
  * Tags offered in the tag manager to everyone, signed in or not. Gene test
  * results are written under the symbol as text, in the common "+/-" shorthand
  * (+ for the familial variant): "+/-" heterozygous, "+/+" homozygous, "-/-"
- * tested negative. They complement the carrier dot (#14).
+ * tested negative. They complement the carrier dot.
  */
 export const BUILTIN_TAG_SUGGESTIONS: readonly Omit<Tag, "id">[] = [
   { label: "Gene result +/-", abbrev: "+/-", color: "#000000", style: "text" },
@@ -644,14 +644,14 @@ export function unusedTagSuggestions(pedigree: Pedigree): Omit<Tag, "id">[] {
 // ── Key rows: affected and carrier ────────────────────────────────────────────
 
 /**
- * The Affected / Carrier rows of a key (#115), shared by the in-app legend
+ * The Affected / Carrier rows of a key, shared by the in-app legend
  * and the export key: who each row's swatch is drawn for (its shape), and its
  * label. Follows what is drawn (`symbolPaint`):
  * - NSGC 2008: "Affected" for a black fill, "Affected, with conditions (black
  *   centre)", "Carrier" for the dot, as before;
  * - NSGC 2022: "Affected" only for a solid black fill (affected with no
  *   condition recorded), "Affected, condition not recorded (black centre)"
- *   for the black fill under sectors (#118), "Carrier" for the dotted half.
+ *   for the black fill under sectors, "Carrier" for the dotted half.
  * With two or more conditions a plain flag's label adds "(condition not
  * recorded)" (`plainStatusLabel`).
  */

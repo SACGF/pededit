@@ -24,11 +24,11 @@ export const MIN_ASPECT = 0.5;         // a fan flatter than this is no better t
 export const MAX_PLACE_ATTEMPTS = 4;
 export const FAN_MAX_WIDTH = 1200;     // a fan wider than this is no longer a page-sized figure
 export const MAX_FLAT = 260;           // longest half flat bottom that generation 1 may claim
-// Consanguinity label (#97, #109): written along the double line between the
+// Consanguinity label: written along the double line between the
 // two symbols, on the inward side ("above" the line, as the symbols see it).
 export const CLABEL_PAD = 7;           // between the label and either symbol (clears a deceased slash and adoption brackets)
 export const CLABEL_BASELINE = CONSANG_GAP / 2 + 4;            // bottom line's baseline, inward of the track
-export const CLABEL_ENDED_BASELINE = ENDED_STROKE_DY + 4;      // above the strokes of an ended relationship (#98)
+export const CLABEL_ENDED_BASELINE = ENDED_STROKE_DY + 4;      // above the strokes of an ended relationship
 export const CLABEL_CAP = 9;           // from the baseline to above the cap height, with a pixel to spare
 export const CLABEL_REACH = 3;         // past the text's ends that the label keeps clear of the line
 // Smallest founder-track radius build() ever uses: 1.4 ringGaps of at least one label line.

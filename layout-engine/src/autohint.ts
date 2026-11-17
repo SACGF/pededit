@@ -21,7 +21,7 @@ import { isAffected } from "./affected.js";
  * level shifts everything below it.
  *
  * Twins (R: the `relation` matrix with codes 1 = MZ, 2 = DZ, 3 = unknown)
- * come from `Partnership.twins` (#11). As in R, the members of a twin set get
+ * come from `Partnership.twins`. As in R, the members of a twin set get
  * the mean of their ranks plus a small per-member offset, so they are drawn
  * side by side, and `shift` moves a whole twin set when the duplicate fixup
  * moves one of its members.
@@ -39,7 +39,7 @@ export interface AutohintOptions {
 export function autohint(input: LayoutInput, pedigree: Pedigree, options: AutohintOptions = {}): Hints {
   const twins = twinSets(input, pedigree);
   const horder = initialOrder(input, pedigree, twins);
-  // Chosen partner sides (#106) where both partners have parents swap families.
+  // Chosen partner sides where both partners have parents swap families.
   if (pedigree.partnerships.some(p => p.leftPartner)) preferPartnerLineages(horder, input, pedigree, kindepth(input, true));
   try {
     // fixupDuplicates shifts sibling ranks in place, so give it a copy.

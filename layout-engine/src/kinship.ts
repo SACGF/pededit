@@ -1,13 +1,13 @@
 import type { Pedigree } from "./types.js";
 
 /**
- * Relatedness coefficients from the pedigree structure (#32).
+ * Relatedness coefficients from the pedigree structure.
  *
  * The kinship coefficient of two people is the chance that an allele drawn
  * at random from one is identical by descent to one drawn from the other.
  * The inbreeding coefficient F of a person is the kinship of their parents.
  * Autosomal by default; `{ chromosome: "X" }` gives the X-linked
- * coefficients (#87).
+ * coefficients.
  */
 export interface KinshipCoefficients {
   /**
@@ -30,7 +30,7 @@ export interface KinshipCoefficients {
 }
 
 export interface KinshipOptions {
-  /** "autosomal" (the default) or "X" for X-linked kinship (#87). */
+  /** "autosomal" (the default) or "X" for X-linked kinship. */
   chromosome?: "autosomal" | "X";
 }
 

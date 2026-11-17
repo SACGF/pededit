@@ -1,5 +1,5 @@
 /**
- * Gender identity on the symbol (#26, NSGC 2022, Bennett et al., J Genet
+ * Gender identity on the symbol (NSGC 2022, Bennett et al., J Genet
  * Couns 31:1238). `Individual.sex` is biological sex and is what the layout,
  * kinship, PED export and twins use; nothing here changes that. This module
  * only decides which symbol shape is drawn and what is written under it.

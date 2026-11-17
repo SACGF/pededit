@@ -27,7 +27,7 @@ export interface AlignOptions {
   widthSlack?: number;
   /**
    * Called by `alignPedigreeByFamily` in place of `alignPedigree` for each
-   * family it lays out (#189), so a caller can keep the results of families
+   * family it lays out, so a caller can keep the results of families
    * that have not changed. It must return what `alignPedigree(family,
    * options)` returns. The engine itself keeps nothing between calls.
    */
@@ -52,7 +52,7 @@ export function alignPedigree(
   const { packed = true, width = 10, align = true, improve = false, widthSlack = 0 } = options;
 
   // 1. Convert to LayoutInput (1-based). A child of assisted reproduction may
-  // hang from the couple carrying it rather than its genetic parents (#45).
+  // hang from the couple carrying it rather than its genetic parents.
   pedigree = { ...pedigree, parentOf: placementParentOf(pedigree) };
   const input = pedigreeToLayoutInput(pedigree);
 
@@ -70,7 +70,7 @@ export function alignPedigree(
   for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
 
   // 3. Get ordering hints
-  // The sides the user chose for couples (#106) override kinship2's own,
+  // The sides the user chose for couples override kinship2's own,
   // also inside autohint's trial runs, so its fixup works around them.
   const hints = applyPartnerSides(options.hints ?? autohint(input, pedigree, { balancePartners: improve }), pedigree);
 
@@ -180,7 +180,7 @@ export function alignPedigree(
   // to centre parents over children.
   appendIsolated(input, level, rval, nidInt, spouseMatrix, pos, assistedLevels(pedigree, level));
 
-  // 8.8. A pregnancy by assisted reproduction goes under the woman carrying it (#45).
+  // 8.8. A pregnancy by assisted reproduction goes under the woman carrying it.
   shiftUnderCarrier(pedigree, pedigree.parentOf, rval, nidInt, pos);
 
   // 9. Convert to LayoutResult (0-based level arrays, but keeping 1-based individual indices)
@@ -188,8 +188,8 @@ export function alignPedigree(
 }
 
 /**
- * Rows for people joined to a child only by a line of assisted reproduction
- * (#45): a surrogate (`carriedBy`) or a social parent with no partner or
+ * Rows for people joined to a child only by a line of assisted reproduction:
+ * a surrogate (`carriedBy`) or a social parent with no partner or
  * parents of their own would otherwise land in the founder row, however far
  * down the child is. They go in the row above the child instead (1-based
  * levels, by 1-based index).
@@ -514,7 +514,7 @@ export function pedigreeToLayoutInput(pedigree: Pedigree): LayoutInput {
 }
 
 /**
- * Same-sex couples (#105) can leave someone in the father role of one couple
+ * Same-sex couples can leave someone in the father role of one couple
  * and the mother role of another: two women who each have a child by a man,
  * or a woman whose partner is a woman and whose child is by a sperm donor
  * (the chain donor - woman - woman - donor). alignped1 then sees only half

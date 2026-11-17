@@ -1,7 +1,7 @@
 import type { Pedigree, Partnership } from "./types.js";
 
 /**
- * Where a child of assisted reproduction (#45) is drawn, as opposed to who
+ * Where a child of assisted reproduction is drawn, as opposed to who
  * its genetic parents are. NSGC 2008 Fig. 3: "the pregnancy symbol and its
  * line of descent are positioned below the woman who is carrying the
  * pregnancy". `parentOf` keeps the genetic parents (kinship, PED); the

@@ -13,11 +13,11 @@ export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) 
   const targetNode = nodes.find(n => n.id === target);
   if (!sourceNode || !targetNode) return null;
 
-  // The geometry is shared with the SVG export (lineGeometry.ts, #143).
+  // The geometry is shared with the SVG export (lineGeometry.ts).
   const line = coupleLineGeometry(data, false, sourceNode.position, targetNode.position);
   return (
     <g data-partnership-id={data?.partnershipId}>
-      {/* Wide invisible stroke so the line can be right-clicked (#95). */}
+      {/* Wide invisible stroke so the line can be right-clicked. */}
       <path d={line.course} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
       <path
         d={line.paths[0]}

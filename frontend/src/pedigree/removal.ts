@@ -1,7 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
- * Branch removal (#34): which individuals go when someone is removed together
+ * Branch removal: which individuals go when someone is removed together
  * with their descendants or their ancestors. Pure set computations; the
  * store applies them. Framework-free so the rules are unit testable.
  */
@@ -49,7 +49,7 @@ export function ancestorsOf(pedigree: Pedigree, ids: string[]): Set<string> {
  * the pedigree) and have no partnership with anyone outside the set, repeated
  * until nothing changes. A partner who is a blood relative, or has a
  * partnership with someone outside the set, is not added. Shared by branch
- * removal (#34) and hiding descendants (#94, `collapse.ts`).
+ * removal and hiding descendants (`collapse.ts`).
  */
 export function withMarriedInPartners(pedigree: Pedigree, people: Iterable<string>): Set<string> {
   const out = new Set<string>(people);
@@ -119,7 +119,7 @@ export function removeIndividuals(draft: Pedigree, gone: Set<string>): void {
 }
 
 /**
- * Clear `carriedBy` and `socialParents` (#45) that name someone in `gone`,
+ * Clear `carriedBy` and `socialParents` that name someone in `gone`,
  * in place (an immer draft).
  */
 export function dropAssistedLinks(draft: Pedigree, gone: Set<string>): void {

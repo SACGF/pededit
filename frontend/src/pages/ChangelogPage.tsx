@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { BUILD_DATE, formatDate } from "../utils/buildInfo";
 
 /**
- * Release notes (#79). The data is `public/changelog.json`, written from the
+ * Release notes. The data is `public/changelog.json`, written from the
  * GitHub milestones by `scripts/changelog.mjs` at deploy time, so it is served
  * from our own origin and visitors never call GitHub.
  */

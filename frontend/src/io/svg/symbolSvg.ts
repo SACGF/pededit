@@ -1,9 +1,9 @@
 /**
- * A person's symbol as SVG markup, for both figure exports (#149): the
+ * A person's symbol as SVG markup, for both figure exports: the
  * standard export draws it upright, the U-shape turned along its track.
  *
- * Everything here draws from the person's glyph (`pedigree/personGlyph.ts`,
- * #144) and mirrors `SymbolShape` in `pedigree/nodes/symbols.tsx`, which
+ * Everything here draws from the person's glyph (`pedigree/personGlyph.ts`)
+ * and mirrors `SymbolShape` in `pedigree/nodes/symbols.tsx`, which
  * draws the same on the canvas. Framework-free: strings only.
  */
 import type { Individual } from "@pedigree-editor/layout-engine";
@@ -41,7 +41,7 @@ export function renderAdoptionBrackets(ind: Individual): string {
   return `<g data-adopted="${ind.adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
 }
 
-/** "D" or "S" inside the symbol (#45), centred on the origin. Shared with the U-shape exporter. */
+/** "D" or "S" inside the symbol, centred on the origin. Shared with the U-shape exporter. */
 export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black" | "white" = "white"): string {
   const letter = symbolLetter(ind);
   if (!letter) return "";
@@ -54,7 +54,7 @@ export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black"
  * The symbol of one person, centred on the origin: outline, fill, condition
  * sections, brackets, carrier dot, role letter, presymptomatic line, the
  * marks of a pregnancy or loss, and the annotation row under it. Drawn from
- * the person's glyph (#144). The one symbol renderer of both exports (#149).
+ * the person's glyph. The one symbol renderer of both exports.
  *
  * `rotation` (degrees) is how far the caller's group is turned, as along the
  * U-shape's track: letters ("D", "S", the "P" of a pregnancy) read as other
@@ -64,7 +64,7 @@ export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black"
  */
 export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId: string, { rotation = 0, captionShift }: { rotation?: number; captionShift: number }): string {
   const half = NODE_SIZE / 2;
-  // What fills the symbol, by the notation (#115), as decided for the canvas (#144).
+  // What fills the symbol, by the notation, as decided for the canvas.
   const paint = glyph.paint;
   const fill = paint.base;
 
@@ -106,7 +106,7 @@ export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId
 /**
  * Carrier dot (NSGC 2008), centred on the origin's symbol; `show` is
  * `symbolPaint(...).dot`, which leaves it off an affected fill and off a
- * carrier whose condition is recorded (#115). With `rim` (tag colours behind
+ * carrier whose condition is recorded. With `rim` (tag colours behind
  * it) it gets a white rim, as on the canvas. Shared with the U-shape exporter.
  */
 export function renderCarrierDot(ind: Individual, rim: boolean, show: boolean): string {
@@ -189,7 +189,7 @@ export function renderDeceasedSlashSvg(): string {
   return `<line x1="${-half - o}" y1="${-half - o}" x2="${half + o}" y2="${half + o}" stroke="black" stroke-width="${STROKE}"/>`;
 }
 
-/** Proband arrow with its "P" (kept upright when the symbol is turned by `rotation`), or the consultand's arrow without (#99). */
+/** Proband arrow with its "P" (kept upright when the symbol is turned by `rotation`), or the consultand's arrow without. */
 export function renderProbandArrowSvg(kind: ArrowKind, rotation = 0): string {
   const half = NODE_SIZE / 2;
   return renderArrowSvg(kind, NODE_SIZE, -half, -half, { stroke: STROKE, markerId: "proband-arrowhead", ...(rotation !== 0 ? { uprightDeg: -rotation } : {}) });

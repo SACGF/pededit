@@ -1,5 +1,5 @@
 /**
- * Proband and consultand arrows (NSGC 2008 Fig. 1, #99). The proband (the
+ * Proband and consultand arrows (NSGC 2008 Fig. 1). The proband (the
  * affected person through whom the family came to attention) gets an arrow
  * at the lower left with a "P" at its tail; a consultand (the person seeking
  * counselling, who may be unaffected) gets the same arrow without the "P".
@@ -36,7 +36,7 @@ export function arrowGeometry(size: number, x = 0, y = 0) {
   // their couple's line of descent drops half a slot gap left of the symbol
   // (x - 20), and the letter then sits just clear of it. A white box behind
   // the letter covers any line that does cross it (a pinned node), which
-  // then shows a gap rather than running through the P, as #93's label
+  // then shows a gap rather than running through the P, as the label
   // backing does.
   const letter = { x: tail.x - 4, y: tail.y + PROBAND_LETTER_SIZE - 1 };
   const letterBox = { x: letter.x - LETTER_WIDTH - 1, y: letter.y - PROBAND_LETTER_SIZE + 1, w: LETTER_WIDTH + 1.5, h: PROBAND_LETTER_SIZE };
@@ -73,7 +73,7 @@ export const ARROW_LEGEND_LABEL: Record<ArrowKind, string> = {
 };
 
 /**
- * The export key's swatch (#99): the arrow alone, pointing up-right across a
+ * The export key's swatch: the arrow alone, pointing up-right across a
  * `s`-px cell with top-left (x, y), its head drawn as a polygon so it does
  * not depend on the file's marker, and the "P" below-left of the tail for
  * the proband.

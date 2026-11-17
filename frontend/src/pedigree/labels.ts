@@ -1,5 +1,5 @@
 /**
- * Name labels under symbols (#68). Slots are 80px apart (68px compact) and a
+ * Name labels under symbols. Slots are 80px apart (68px compact) and a
  * long name at a fixed width runs into its neighbours, so names wrap onto up
  * to two lines at the slot width and are cut with an ellipsis beyond that.
  * The full name stays in the data and shows under the hover pill. Framework-free
@@ -94,7 +94,7 @@ function truncate(lines: string[], maxChars: number, _dropped: string): string[]
   return [...lines.slice(0, -1), kept + ELLIPSIS];
 }
 
-/** The text of the name label: the name alone. The pedigree number (#8) has its own line, last in `detailLines`. */
+/** The text of the name label: the name alone. The pedigree number has its own line, last in `detailLines`. */
 export function nameLabelText(ind: Individual): string | undefined {
   return ind.name;
 }
@@ -109,18 +109,18 @@ export function linesWidth(lines: string[]): number {
  * instructions: age or year of birth or death, then evaluation, then the
  * pedigree number), each cut to the label width:
  *
- *   1. `age`: the free-text age (#20) when set, otherwise birth and death
+ *   1. `age`: the free-text age when set, otherwise birth and death
  *      (`ageLines`: "b. 1978", "d. 72y", or "b. 1935" over "d. 2007"), as
  *      the standard prefers a year or age to a full date;
- *   2. `onset`: one line per age of onset (#93);
+ *   2. `onset`: one line per age of onset;
  *   3. `gender`: the sex assigned at birth ("AMAB", "AFAB", "UAAB") under
- *      a symbol drawn by gender identity (#26, NSGC 2022);
- *   4. `evaluation`: each evaluation (#101, #114), "BRCA1 ... +", up to two
+ *      a symbol drawn by gender identity (NSGC 2022);
+ *   4. `evaluation`: each evaluation, "BRCA1 ... +", up to two
  *      lines each;
- *   5. `number`: the pedigree number ("II-3", #8) when `numbers` has one,
+ *   5. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
- * A collapsed-branch group symbol (#1) has none. Shared by the canvas, both
+ * A collapsed-branch group symbol has none. Shared by the canvas, both
  * SVG exporters and the lints through `detailLines`.
  */
 export interface DetailSections {
@@ -163,7 +163,7 @@ export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedig
 }
 
 /**
- * The age lines (#20, #103), NSGC 2008 Fig. 1: "age, or year of birth /
+ * The age lines, NSGC 2008 Fig. 1: "age, or year of birth /
  * death", a year or an age rather than a full date, for privacy. The full
  * dates stay in the data, the edit panel and the CSV.
  *
@@ -174,7 +174,7 @@ export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedig
  *     both are (one line, "b. 1935, d. 2007", is wider than a slot).
  *
  * A date of birth that does not start with a year (the age range a
- * de-identified export puts there, #4) is shown as it is. A date of death
+ * de-identified export puts there) is shown as it is. A date of death
  * counts only while the person is marked deceased, and only when it reads
  * as a year, year-month or full date.
  */
@@ -200,7 +200,7 @@ export function ageText(ind: Pick<Individual, "age" | "dob" | "dod" | "deceased"
 
 export interface PartialDate { y: number; m?: number; d?: number }
 
-/** "2007", "2007-03" or "2007-03-14" (#103: often only the year of death is known); anything else is undefined. */
+/** "2007", "2007-03" or "2007-03-14" (often only the year of death is known); anything else is undefined. */
 export function parsePartialDate(text: string): PartialDate | undefined {
   const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(text);
   if (!m) return undefined;
@@ -227,7 +227,7 @@ export function ageAtDeath(birth: PartialDate, death: PartialDate): string | und
 }
 
 /**
- * Age of onset lines (#93), one per condition: "onset 40s" for the affected
+ * Age of onset lines, one per condition: "onset 40s" for the affected
  * status, the tag's canvas text then the age ("BC 45y") for a condition tag.
  * When a line is too wide the tag text is cut first, so the age survives.
  */
@@ -243,7 +243,7 @@ export function onsetLines(ind: Individual, pedigree: Pedigree, maxWidth: number
 }
 
 /**
- * Evaluation lines (#101, #114). A variant name rarely fits one slot, so
+ * Evaluation lines. A variant name rarely fits one slot, so
  * each evaluation may wrap onto a second line and is cut with an ellipsis
  * beyond that, never losing the result:
  *
@@ -278,7 +278,7 @@ export function evaluationLines(ind: Individual, maxWidth: number, notation: Not
 /** Lines one evaluation may take under the symbol. */
 export const EVALUATION_LINES = 2;
 
-// ── Chart title (#20) ───────────────────────────────────────────────────────
+// ── Chart title ───────────────────────────────────────────────────────
 
 /** The name a new pedigree gets. Never drawn as a chart title. */
 export const DEFAULT_PEDIGREE_NAME = "Untitled pedigree";
@@ -308,13 +308,13 @@ export function titleWidth(title: string): number {
 export const TITLE_LINE_HEIGHT = TITLE_FONT_SIZE + 4;
 
 /**
- * Where the canvas draws the chart title (#20): the centre of its line box,
+ * Where the canvas draws the chart title: the centre of its line box,
  * centred over the symbols with its baseline TITLE_GAP (plus room for a
  * deceased slash) above the highest one, as in the SVG export, and raised
  * further to clear `aboveTop`, the highest point of anything drawn over the
- * symbols (`highestAboveSymbols`, #97, #172). Null with no title or no
+ * symbols (`highestAboveSymbols`). Null with no title or no
  * symbols. `half` is half a symbol. Shared by `chartTitleNode` and the
- * canvas lint (#188).
+ * canvas lint.
  */
 export function chartTitlePlace(
   title: string,

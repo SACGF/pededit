@@ -36,7 +36,7 @@ import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
 interface EditPanelProps {
   onManageTags?: () => void;
   /**
-   * Small screens only (#169): the panel is a sheet under the canvas, shut to
+   * Small screens only: the panel is a sheet under the canvas, shut to
    * its row of tabs until a tab is tapped. From `lg` up it is always open and
    * these do nothing.
    */
@@ -47,7 +47,7 @@ interface EditPanelProps {
 type PanelTab = "person" | "pedigree";
 
 /**
- * The right-hand panel (#135): a Person tab (the selected individual's
+ * The right-hand panel: a Person tab (the selected individual's
  * fields, or the batch panel for several) and a Pedigree tab (chart title,
  * clinical details), with the figure legend under both. Any change of
  * selection switches tab, to Person when someone is selected and to Pedigree
@@ -57,7 +57,7 @@ type PanelTab = "person" | "pedigree";
  * Pedigree tab keeps the selection, so Person returns to the same people.
  * Person is disabled while nobody is selected. The figure legend is on the
  * Pedigree tab only; the Person tab has the person's own conditions and tags
- * with the same swatches (#136).
+ * with the same swatches.
  *
  * Only the content under the tabs scrolls, with a stable scrollbar gutter, so
  * switching between a short and a long tab never moves the tabs or the text.
@@ -69,11 +69,11 @@ export function EditPanel({ onManageTags, open = true, onOpenChange }: EditPanel
   useEffect(() => {
     setTab(selectedIds.length > 0 ? "person" : "pedigree");
   }, [selectedIds]);
-  // Several selected (#21): the batch panel.
+  // Several selected: the batch panel.
   const multiple = selectedIds.length > 1;
   const onPerson = tab === "person" && anyone;
   const individual = onPerson && !multiple ? pedigree.individuals.find(i => i.id === selectedId) : undefined;
-  // Small screens (#169): tapping a tab opens the sheet; selecting someone
+  // Small screens: tapping a tab opens the sheet; selecting someone
   // on the chart does not, so the chart stays in view while looking around.
   const selectTab = (next: PanelTab) => { setTab(next); onOpenChange?.(true); };
 
@@ -141,18 +141,18 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
   // With any condition defined, conditions are recorded only in "Conditions and tags" and
-  // Status keeps the plain flags, affected or carrier with no condition recorded (#136).
+  // Status keeps the plain flags, affected or carrier with no condition recorded.
   const withConditions = conditionMode(pedigree) !== "plain";
-  // Editor warnings (#116) on a field: highlighted, with the message under it.
+  // Editor warnings on a field: highlighted, with the message under it.
   const problemsOn = (field: ProblemField) => ({ problemFor: individual.id, problemField: field, problems: fieldProblems(pedigree, individual.id, field) });
   // The rarely set fields fold to one line while none is set for this person
-  // (#138). Opening them stays open across selections, since the form is
+  // Opening them stays open across selections, since the form is
   // not keyed by person. A warning on one of them opens them too.
   const [detailsOpen, setDetailsOpen] = useState(false);
   const showDetails = detailsOpen || hasDetails(pedigree, individual)
     || (["lifeStatus", "reproductiveRole", "carriedBy"] as ProblemField[]).some(f => fieldProblems(pedigree, individual.id, f).length > 0);
 
-  // One list, most used first (#138): who and their status, then dates, then
+  // One list, most used first: who and their status, then dates, then
   // conditions, then the rarer fields. Headings only where a section is a
   // list (conditions, evaluations, partners) or read-only (relatedness).
   return (
@@ -175,7 +175,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
             <PlainStatusForm individual={individual} problemsOn={problemsOn} />
           ) : (
             <>
-              {/* Same rule as A and the more menu (#120). */}
+              {/* Same rule as A and the more menu. */}
               <ProblemHighlight {...problemsOn("affected")}>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -191,7 +191,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
               {affectedControlOn(individual, pedigree) && (
                 <OnsetInput value={individual.onset} onChange={v => setOnset(individual.id, null, v)} />
               )}
-              {/* One carrier status (#101): the plain carrier, or the presymptomatic vertical line. */}
+              {/* One carrier status: the plain carrier, or the presymptomatic vertical line. */}
               <ProblemHighlight {...problemsOn("carrier")}>
               <div className="flex items-center gap-2">
                 <span className="shrink-0">Carrier</span>
@@ -215,14 +215,14 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
               </ProblemHighlight>
             </>
           )}
-          {/* Affected and a plain carrier is a warning (#116), which says the mark is hidden. */}
+          {/* Affected and a plain carrier is a warning, which says the mark is hidden. */}
           {plainCarrier(individual, pedigree) && !problemsOn("carrier").problems.concat(problemsOn("conditions").problems).some(p => p.rule === "affected-and-carrier") && !symbolPaint(individual, pedigree).dot
             && !symbolPaint(individual, pedigree).sectors.some(x => x.tag === PLAIN_CARRIER_TAG) && (
             <p className="text-[10px] text-gray-500 pl-5">
               Not drawn: the affected fill replaces the carrier mark. Use a gene result tag to show it.
             </p>
           )}
-          {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date (#103). */}
+          {/* Deceased alone means date unknown; a date of death ticks it, unticking clears the date. */}
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -269,7 +269,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
           </div>
         </div>
 
-        {/* Text, not the browser date picker, so a year alone can be entered (#104), as for death (#103). */}
+        {/* Text, not the browser date picker, so a year alone can be entered, as for death. */}
         <Field inline label="Born" {...problemsOn("dob")}>
           <Input
             value={individual.dob ?? ""}
@@ -411,7 +411,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
   );
 }
 
-/** True when any of the folded fields (#138) is set for this person, so they show. */
+/** True when any of the folded fields is set for this person, so they show. */
 function hasDetails(pedigree: Pedigree, individual: Individual): boolean {
   return !!(individual.lifeStatus || individual.adopted || individual.genderIdentity || individual.reproductiveRole
     || individual.carriedBy || individual.socialParents?.length || twinSetOf(pedigree, individual.id)
@@ -422,7 +422,7 @@ function hasDetails(pedigree: Pedigree, individual: Individual): boolean {
 const SELECT = "w-full min-w-0 h-7 border rounded px-1 text-xs bg-white focus:outline-hidden focus:ring-1 focus:ring-black";
 
 /**
- * Status when the pedigree defines any condition (#115, #136): only the
+ * Status when the pedigree defines any condition: only the
  * plain flags, affected or carrier with no condition recorded, since each
  * condition is recorded in "Conditions and tags". The Affected box sets the
  * flag itself, never the one condition as A and the more menu do, so the two
@@ -437,7 +437,7 @@ function PlainStatusForm({ individual, problemsOn }: { individual: Individual; p
   // so the box could not tick: it is disabled instead.
   const sole = soleCondition(pedigree);
   const covered = !affected && !!sole && !!individual.tags?.includes(sole.id);
-  // The affected status's own onset (#93) while it is drawn: under the flag, or
+  // The affected status's own onset while it is drawn: under the flag, or
   // with one condition, an onset recorded before #136 under that condition.
   const ownOnset = affected || (affectedControlOn(individual, pedigree) && !!individual.onset?.trim());
   return (
@@ -488,7 +488,7 @@ function PlainStatusForm({ individual, problemsOn }: { individual: Individual; p
   );
 }
 
-/** Age of onset of the affected status (#93), under the Affected box. */
+/** Age of onset of the affected status, under the Affected box. */
 function OnsetInput({ value, onChange }: { value: string | undefined; onChange: (value: string) => void }) {
   return (
     <div className="flex items-center gap-2 pl-5">
@@ -505,14 +505,14 @@ function OnsetInput({ value, onChange }: { value: string | undefined; onChange: 
 }
 
 /**
- * Evaluations and test results (#101, NSGC): each drawn under the symbol as
- * "detail +" (NSGC 2022, no "E", #114); a documented one
+ * Evaluations and test results (NSGC): each drawn under the symbol as
+ * "detail +" (NSGC 2022, no "E"); a documented one
  * adds a "*" at the symbol's lower right.
  */
 /**
  * "Add evaluation" opens a draft row that lives only here until something is
  * entered, so a row just added and not yet typed into is not saved empty and
- * does not raise the empty evaluation warning (#116). Keyed by person at the
+ * does not raise the empty evaluation warning. Keyed by person at the
  * call site, so the draft goes when the selection changes.
  */
 function EvaluationsForm({ individual, problems }: { individual: Individual; problems: ProblemProps }) {
@@ -617,7 +617,7 @@ export function adjacentSibling(pedigree: Pedigree, individualId: string): strin
 }
 
 /**
- * Twins (#11): zygosity for the selected person's twin set and which
+ * Twins: zygosity for the selected person's twin set and which
  * siblings are in it. Choosing a zygosity when the person is not a twin yet
  * pairs them with the sibling drawn next to them.
  */
@@ -699,21 +699,21 @@ export function partnerLabel(pedigree: Pedigree, individualId: string, partnersh
   return name || `partner ${i + 1} (${sexLabel})`;
 }
 
-/** An X-linked coefficient, which is NaN when it turns on someone's unknown sex (#87). */
+/** An X-linked coefficient, which is NaN when it turns on someone's unknown sex. */
 function formatCoefficientX(x: number): string {
   return Number.isNaN(x) ? "unknown (a sex is not recorded)" : formatCoefficient(x);
 }
 
 /**
- * Relatedness worked out from the drawn structure (#32): one line for how
- * the person is related to the proband and the consultand (#134), the person's
+ * Relatedness worked out from the drawn structure: one line for how
+ * the person is related to the proband and the consultand, the person's
  * inbreeding coefficient, and for each partner the couple's kinship
  * coefficient, which is what their children's inbreeding coefficient will
- * be. Each has its X-linked value beside it (#87). The coefficients are
+ * be. Each has its X-linked value beside it. The coefficients are
  * read-only.
  *
- * Each couple also has the double-line checkbox (#85), labelled
- * "Consanguineous with" so it can be found (#92). When the pedigree
+ * Each couple also has the double-line checkbox, labelled
+ * "Consanguineous with" so it can be found. When the pedigree
  * shows the two are related it is ticked and fixed, since the line follows
  * the kinship. Otherwise it is the override for a couple known to be related
  * whose common ancestors are not drawn.
@@ -796,7 +796,7 @@ function RelatednessSection({ individual }: { individual: Individual }) {
 }
 
 /**
- * The text above a couple's double line (#97). NSGC writes the degree of
+ * The text above a couple's double line. NSGC writes the degree of
  * relationship there when the drawing does not show it, so it matters most
  * for the manual override. When the pedigree names the relationship, a
  * button fills it in.
@@ -840,10 +840,10 @@ function capitalise(text: string): string {
 }
 
 /**
- * Partners (#138): one block per couple this person is in, with the ended
- * mark (#98: two short strokes across the couple line for a separation or
- * divorce) and, while the couple has no children, the childless mark (#15).
- * A gamete donation pair (#45) is not a couple and is left out.
+ * Partners: one block per couple this person is in, with the ended
+ * mark (two short strokes across the couple line for a separation or
+ * divorce) and, while the couple has no children, the childless mark.
+ * A gamete donation pair is not a couple and is left out.
  */
 function PartnersForm({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason");
@@ -900,7 +900,7 @@ function PartnersForm({ individual }: { individual: Individual }) {
 }
 
 /**
- * Assisted reproduction (#45): the letter in this person's symbol, and for
+ * Assisted reproduction: the letter in this person's symbol, and for
  * a child, who carried them and who are their social parents. Donors and
  * surrogates are added from the more menu.
  */
@@ -918,7 +918,7 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
   const [expanded, setExpanded] = useState(false);
   const social = individual.socialParents ?? [];
   const carriers = candidates.filter(c => c.sex !== "male" || c.id === individual.carriedBy);
-  // An egg donor who also carried the child (#104) is a genetic parent, so not a candidate: keep her shown.
+  // An egg donor who also carried the child is a genetic parent, so not a candidate: keep her shown.
   const carrierInd = pedigree.individuals.find(i => i.id === individual.carriedBy);
   if (carrierInd && !carriers.some(c => c.id === carrierInd.id)) carriers.unshift(carrierInd);
   const addable = candidates.filter(c => !social.includes(c.id) && c.id !== individual.carriedBy);
@@ -1009,7 +1009,7 @@ function probandTitle(pedigree: Pedigree, individual: Individual): string {
 }
 
 /**
- * Sex (#120), with the more menu's rules: a choice `batchSexProblem` refuses
+ * Sex, with the more menu's rules: a choice `batchSexProblem` refuses
  * is greyed out, and the reason is its tooltip, so it shows only when someone
  * reaches for that choice. `aria-disabled` rather than `disabled`, because a
  * disabled button gets no hover in some browsers and so no tooltip.
@@ -1018,7 +1018,7 @@ function SexControl({ individual }: { individual: Individual }) {
   const { pedigree, setSex } = usePedigreeFields("pedigree", "setSex");
   const sexes = ["male", "female", "unknown"] as const;
   const problemOf = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individual.id], sex);
-  // Full width, with no label column: three buttons do not fit beside one (#138).
+  // Full width, with no label column: three buttons do not fit beside one.
   const atBirth = !!individual.genderIdentity && !individual.lifeStatus;
   return (
     <div className="space-y-1 text-xs text-gray-600">
@@ -1047,7 +1047,7 @@ function SexControl({ individual }: { individual: Individual }) {
 
 /**
  * A labelled field. `inline` puts the label in a narrow column beside the
- * control (#138), for single-line controls, so each takes one row; a long
+ * control, for single-line controls, so each takes one row; a long
  * label wraps. Messages and warnings go under the control.
  */
 function Field({ label, inline, children, ...problem }: { label: string; inline?: boolean; children: React.ReactNode } & ProblemProps) {
@@ -1070,7 +1070,7 @@ function Field({ label, inline, children, ...problem }: { label: string; inline?
 }
 
 /**
- * Editor warnings (#116): a thin outline round the field (black for a
+ * Editor warnings: a thin outline round the field (black for a
  * warning, red for an error, as notices are) and each message under it,
  * with its one-click fix when the rule has one. Nothing when there are none.
  */
@@ -1098,7 +1098,7 @@ function ProblemHighlight({ children, problemFor, problemField, problems = [] }:
 }
 
 /**
- * The chart title (#20), shown when nothing is selected. Until edited it
+ * The chart title, shown when nothing is selected. Until edited it
  * shows the pedigree's name, which is what the canvas and exports draw;
  * clearing it hides the title.
  */
@@ -1122,7 +1122,7 @@ function ChartTitleField() {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * Clinical key fields (#102), under the chart title on the Pedigree tab (#135).
+ * Clinical key fields, under the chart title on the Pedigree tab.
  * Folded by default so a new pedigree's panel stays short; the header says
  * how many are filled, and the legend below lists them.
  */

@@ -23,8 +23,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
     }
   }
 
-  // Pedigree numbers (#8) link the figure back to these rows, whether or not
-  // the figure shows them. People hidden under a collapsed branch (#94) are
+  // Pedigree numbers link the figure back to these rows, whether or not
+  // the figure shows them. People hidden under a collapsed branch are
   // not drawn, so they have none.
   const numbers = pedigreeNumbers(pedigree);
   const tagLabels = new Map((pedigree.tags ?? []).map(t => [t.id, t.label]));
@@ -40,7 +40,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.age ?? "",
       isAffected(ind, pedigree) ? "1" : "0",
       ind.deceased ? "1" : "0",
-      // Any carrier (#115): no condition recorded, or the conditions in carrier_of.
+      // Any carrier: no condition recorded, or the conditions in carrier_of.
       isCarrier(ind, pedigree) ? "1" : "0",
       ind.proband ? "1" : "0",
       p?.f ?? "",
@@ -52,24 +52,24 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.adopted ?? "",
       twins.get(ind.id)?.zygosity ?? "",
       twins.has(ind.id) ? (twinSetOf(pedigree, ind.id)?.set.members ?? []).filter(m => m !== ind.id).join(";") : "",
-      // Age of onset (#93): "Affected: 45y;Breast cancer: 52y"
+      // Age of onset: "Affected: 45y;Breast cancer: 52y"
       onsetsOf(ind, pedigree).map(o => `${onsetSubject(o)}: ${o.onset}`).join(";"),
       numbers.get(ind.id) ?? "",
       // Added after pedigree_number so earlier columns keep their positions.
       ind.consultand ? "1" : "0",
       ind.familyHistoryUnknown ? "1" : "0",
       ind.presymptomatic ? "1" : "0",
-      // "BRCA1 c.5266dupC + *; echo -" (#101, #114), as under the symbol, " *" for documented.
+      // "BRCA1 c.5266dupC + *; echo -", as under the symbol, " *" for documented.
       evaluationsCsv(ind, notationOf(pedigree)),
-      // Gender identity (#26); sex stays in its own column and drives father/mother.
+      // Gender identity; sex stays in its own column and drives father/mother.
       genderIdentityOf(ind) ?? "",
-      // Assisted reproduction (#45); father_id and mother_id are the genetic parents.
+      // Assisted reproduction; father_id and mother_id are the genetic parents.
       ind.reproductiveRole ?? "",
       ind.carriedBy ?? "",
       (ind.socialParents ?? []).join(";"),
-      // Date of death (#103), last so earlier columns keep their positions.
+      // Date of death, last so earlier columns keep their positions.
       ind.dod ?? "",
-      // Conditions carried (#115), by label like tags: "Cystic fibrosis;Tay-Sachs".
+      // Conditions carried, by label like tags: "Cystic fibrosis;Tay-Sachs".
       carrierConditions(ind, pedigree).map(t => t.label).join(";"),
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });

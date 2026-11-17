@@ -19,7 +19,7 @@ export default function LandingPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
-  // Why the last create or import failed: the rate limit's wait (#184), or a plain failure.
+  // Why the last create or import failed: the rate limit's wait, or a plain failure.
   const [createError, setCreateError] = useState<string | null>(null);
 
   // Populate user state after a page reload. fetchMe will trigger the token
@@ -147,7 +147,7 @@ export default function LandingPage() {
           {createError && (
             <p role="alert" data-testid="create-error" className="-mt-8 mb-10 text-xs text-red-600 max-w-xl">{createError}</p>
           )}
-          {/* Pointer to the "Your data" section at the foot of the page (#178) */}
+          {/* Pointer to the "Your data" section at the foot of the page */}
           <p className="-mt-7 mb-10 text-[10px] text-gray-400">
             Pedigrees are saved on this server.{" "}
             <a href="#your-data" className="underline underline-offset-2 hover:text-gray-600">
@@ -155,8 +155,8 @@ export default function LandingPage() {
             </a>
           </p>
 
-          {/* Recent on this device (#16): per browser, no account needed */}
-          {/* Keyed on sign-in so Delete account's forgotten pedigrees (#183) leave the list. */}
+          {/* Recent on this device: per browser, no account needed */}
+          {/* Keyed on sign-in so Delete account's forgotten pedigrees leave the list. */}
           <RecentOnThisDevice key={String(isAuthenticated)} disabled={loading !== null} />
 
           {/* Examples */}
@@ -171,7 +171,7 @@ export default function LandingPage() {
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {EXAMPLES.map(ex => (ex.group ?? "") === group && (
-                    // A link, so it can be copied or opened in a new tab; ExamplePage makes the copy (#150).
+                    // A link, so it can be copied or opened in a new tab; ExamplePage makes the copy.
                     <Link
                       key={ex.slug}
                       to={`/example/${ex.slug}`}
@@ -192,7 +192,7 @@ export default function LandingPage() {
           {/* My pedigrees (authenticated) */}
           {isAuthenticated && <MyPedigrees />}
 
-          {/* What is stored, who can read it, how to delete it (#178) */}
+          {/* What is stored, who can read it, how to delete it */}
           <YourData />
         </div>
       </main>
@@ -308,7 +308,7 @@ function MyPedigrees() {
 }
 
 /**
- * What happens to a pedigree once it is drawn (#178). Not a legal privacy
+ * What happens to a pedigree once it is drawn. Not a legal privacy
  * policy, and it must not be called one.
  *
  * Every sentence here states what the code and the deploy config do, so a
@@ -316,7 +316,7 @@ function MyPedigrees() {
  * - access rules: `backend/api/views.py` (`PedigreeViewSet.get_queryset`),
  *   pinned by `PedigreeAccessTests` in `backend/api/tests.py`;
  * - deleting: `SettingsPanel` ("Delete this pedigree"), a hard delete;
- *   backups: `backupStatement` from `deploy/backup.sh`'s age limit (#48);
+ *   backups: `backupStatement` from `deploy/backup.sh`'s age limit;
  *   the account: `MeView.destroy` (`DeleteAccountTests`), `DeleteAccountDialog`;
  * - de-identified export: `io/svg/deidentify.ts`;
  * - browser storage: `utils/recentPedigrees.ts`, the tokens in

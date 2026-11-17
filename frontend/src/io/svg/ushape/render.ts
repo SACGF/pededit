@@ -41,7 +41,7 @@ export function renderLabel(glyph: PersonGlyph, hasDescent: boolean): string {
   // by the symbol renderer, over the white backing), name, then the detail lines in
   // NSGC order (age, onset, pedigree number).
   const caption = glyph.caption;
-  // The pedigree number (#8) is the one the standard figure shows, so the
+  // The pedigree number is the one the standard figure shows, so the
   // two exports agree, even though it need not read left to right here.
   const below = [...glyph.figureNameLines, ...glyph.detailLines];
   const lines = caption ? [caption, ...below] : below;
@@ -76,7 +76,7 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       if (!ind) return;
       const pos = nodeAt(n, i, b.geom);
       const clipId = `symbol-clip-${seq++}`;
-      // What is drawn for the person, as the standard figure and the canvas have it (#144).
+      // What is drawn for the person, as the standard figure and the canvas have it.
       const glyph = glyphOf(ind, pedigree);
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
@@ -87,7 +87,7 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         (glyph.arrow ? renderProbandArrowSvg(glyph.arrow, pos.rotation) : "") +
         (glyph.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -HALF, -HALF, -pos.rotation) : "") +
         (glyph.documented ? renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -HALF, -HALF, -pos.rotation) : "") +
-        // The count in a collapsed-branch diamond (#1), kept upright.
+        // The count in a collapsed-branch diamond, kept upright.
         (glyph.groupCount !== undefined ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(glyph.groupCount, NODE_SIZE)}</g>` : "") +
         `</g>`,
       );

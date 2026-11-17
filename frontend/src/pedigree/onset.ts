@@ -3,7 +3,7 @@ import { tagsOf } from "./tags";
 import { affectedControlOn, isConditionTag } from "./conditions";
 
 /**
- * Age of onset (#93). An individual records it for the affected status
+ * Age of onset. An individual records it for the affected status
  * (`Individual.onset`) and per condition, that is per quadrant tag they carry
  * (`Individual.tagOnset`). Values are free text ("45y", "40s", "childhood")
  * because onset is often known only roughly.
@@ -13,7 +13,7 @@ import { affectedControlOn, isConditionTag } from "./conditions";
  * so every reader (edit panel, canvas, exports, CSV) agrees on what is shown.
  */
 
-/** Only condition tags (quadrant tags that are not traits, #118) take an age of onset. */
+/** Only condition tags (quadrant tags that are not traits) take an age of onset. */
 export function tagTakesOnset(tag: Tag): boolean {
   return isConditionTag(tag);
 }
@@ -28,7 +28,7 @@ export interface OnsetItem {
 export function onsetsOf(individual: Individual, pedigree: Pedigree): OnsetItem[] {
   const items: OnsetItem[] = [];
   const own = individual.onset?.trim();
-  // The affected status's own onset goes with the plain Affected control (#118).
+  // The affected status's own onset goes with the plain Affected control.
   if (own && affectedControlOn(individual, pedigree)) items.push({ onset: own });
   const byTag = individual.tagOnset;
   if (byTag) {

@@ -1,5 +1,5 @@
 /**
- * Editor warnings (#116): one pure pass from a pedigree to the problems in
+ * Editor warnings: one pure pass from a pedigree to the problems in
  * it, so the edit panel, the toolbar's problems list, the canvas marker and
  * the tests all agree. Problems never block saving or editing: they point
  * at something the UI allows but that is probably a mistake.
@@ -8,11 +8,11 @@
  * (`individual`) or one couple (`partnership`) and return a draft, which
  * `problemsOf` turns into a problem with a stable id and the person or
  * couple attached. `context` is computed once per pedigree for checks that
- * need the whole pedigree (for example "two or more conditions", #115).
+ * need the whole pedigree (for example "two or more conditions").
  *
  * `field` names the edit panel field to highlight and focus; the panel
  * wraps each such field in `data-problem-field` (see `PROBLEM_FIELDS`).
- * `fix` is an optional one-click repair, as data (`FixEdit`, #126): the
+ * `fix` is an optional one-click repair, as data (`FixEdit`): the
  * store's `applyFix` makes the edit.
  *
  * This module is the rules only. It knows the data model, the conditions
@@ -42,7 +42,7 @@ export type ProblemField =
 export interface FixActions {
   setAffected: (id: string, affected: boolean) => void;
   setDeceased: (id: string, deceased: boolean) => void;
-  /** Record a condition's state (#115). */
+  /** Record a condition's state. */
   setConditionStatus: (id: string, tagId: string, state: ConditionState) => void;
   setCarrier: (id: string, carrier: boolean) => void;
   setPresymptomatic: (id: string, presymptomatic: boolean) => void;
@@ -55,7 +55,7 @@ export interface FixActions {
 }
 
 /**
- * What a fix does, as data (#126): one named edit with its arguments, so a
+ * What a fix does, as data: one named edit with its arguments, so a
  * fix can be compared in a test, listed, sent somewhere or applied in bulk
  * without holding a function. Most are a plain change to one person
  * (`updateIndividual`); the named ones go through the store's setter of the
@@ -109,7 +109,7 @@ export interface Problem {
   field?: ProblemField;
   message: string;
   fix?: ProblemFix;
-  /** Further one-click fixes when there is a choice, offered after `fix` (one per condition, #115). */
+  /** Further one-click fixes when there is a choice, offered after `fix` (one per condition). */
   moreFixes?: ProblemFix[];
 }
 
@@ -119,12 +119,12 @@ export type ProblemDraft = Pick<Problem, "severity" | "message"> & { field?: Pro
 /** Facts about the whole pedigree, worked out once per pass for rules that need them. */
 export interface RuleContext {
   pedigree: Pedigree;
-  /** The pedigree's conditions (quadrant tags, #115), in order. */
+  /** The pedigree's conditions (quadrant tags), in order. */
   conditions: Tag[];
   /** Today, for dates in the future and ages. */
   today: PartialDate;
   byId: Map<string, Individual>;
-  /** Each child's partnership in `parentOf`: their genetic parents (#45, #105). */
+  /** Each child's partnership in `parentOf`: their genetic parents. */
   parentsOf: Map<string, Partnership>;
   /** Everyone linked to someone else: a partner, a parent or child, or a carrier or social parent line. */
   connected: Set<string>;
@@ -176,10 +176,10 @@ function parentWords(parent: Individual): string {
 }
 
 /**
- * The genetic parents of a child, as people (#45: a donor is one, a social
- * parent or the woman who carried the pregnancy is not; #105: a same-sex
- * couple's child has one partner and a donor). None for someone adopted in
- * (#12), whose parents shown are the adoptive ones.
+ * The genetic parents of a child, as people (a donor is one, a social
+ * parent or the woman who carried the pregnancy is not; a same-sex
+ * couple's child has one partner and a donor). None for someone adopted in,
+ * whose parents shown are the adoptive ones.
  */
 function geneticParentsOf(ind: Individual, ctx: RuleContext): Individual[] {
   if (ind.adopted === "in") return [];
@@ -199,7 +199,7 @@ function parentBirths(ind: Individual, ctx: RuleContext): { birth: PartialDate; 
 }
 
 /**
- * A free-text age (#20) that clearly reads as whole years: "34", "34y",
+ * A free-text age that clearly reads as whole years: "34", "34y",
  * "34 years", "d. 72". Anything else ("50s", "~40", "4 mo") is undefined,
  * and is never checked.
  */
@@ -320,7 +320,7 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // The editor ticks deceased with a date of death (#103), so this comes from imported or older data.
+    // The editor ticks deceased with a date of death, so this comes from imported or older data.
     id: "dod-not-deceased",
     individual: ind => !!ind.dod?.trim() && !ind.deceased && {
       severity: "warning",
@@ -332,7 +332,7 @@ export const RULES: Rule[] = [
   {
     // NSGC 2022: the proband is the affected person through whom the family comes to attention.
     id: "proband-unaffected",
-    // Affected with a condition (#115) counts, as the drawing fills its sector.
+    // Affected with a condition counts, as the drawing fills its sector.
     individual: (ind, ctx) => !!ind.proband && !isAffected(ind, ctx.pedigree) && {
       severity: "warning",
       field: "affected",
@@ -362,14 +362,14 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // #115: with two or more conditions, a plain flag does not say which one.
+    // With two or more conditions, a plain flag does not say which one.
     // With one, the editor records it; with none there is nothing to choose.
     id: "condition-not-recorded",
     individual: (ind, ctx) => {
       if (ctx.conditions.length < 2) return null;
       const out: ProblemDraft[] = [];
       if (plainAffected(ind, ctx.pedigree)) {
-        // #118: the flag beside recorded conditions is drawn black under them, so say what it adds.
+        // The flag beside recorded conditions is drawn black under them, so say what it adds.
         const recorded = affectedConditions(ind, ctx.pedigree);
         const others = ctx.conditions.filter(t => !recorded.includes(t));
         const record = (t: Tag): ProblemFix => ({ label: `Record as ${t.label}`, edit: { op: "updateIndividual", id: ind.id, updates: resolvePlainAffected(ind, t.id, ctx.pedigree) } });
@@ -426,7 +426,7 @@ export const RULES: Rule[] = [
       })),
   },
   {
-    // 2. The genetic mother over 55 at the birth (an egg donor's age is what counts, #45).
+    // 2. The genetic mother over 55 at the birth (an egg donor's age is what counts).
     id: "mother-too-old",
     individual: (ind, ctx) => parentBirths(ind, ctx)
       .filter(({ parent, birth, parentBirth }) => parent.sex === "female" && ageRange(parentBirth, birth).min > 55)
@@ -437,7 +437,7 @@ export const RULES: Rule[] = [
       })),
   },
   {
-    // 3. The woman who gave birth: the one who carried the pregnancy (#45), else the genetic mother.
+    // 3. The woman who gave birth: the one who carried the pregnancy, else the genetic mother.
     id: "born-after-mother-died",
     individual: (ind, ctx) => {
       const birth = parsed(ind.dob);
@@ -453,7 +453,7 @@ export const RULES: Rule[] = [
   },
   {
     // 3. More than a year: a child is born up to nine months after the father dies. A
-    // sperm donor (#45) is left out, since donated sperm is often used years later.
+    // sperm donor is left out, since donated sperm is often used years later.
     id: "born-long-after-father-died",
     individual: (ind, ctx) => {
       const birth = parsed(ind.dob);
@@ -494,7 +494,7 @@ export const RULES: Rule[] = [
   },
   {
     // 6. Only an age that clearly reads as years, against the date of birth: at death
-    // for someone deceased with a date, else at the date recorded (#102) or today.
+    // for someone deceased with a date, else at the date recorded or today.
     id: "age-disagrees",
     individual: (ind, ctx) => {
       const age = ageInYears(ind.age), birth = parsed(ind.dob);
@@ -562,7 +562,7 @@ export const RULES: Rule[] = [
     individual: (ind, ctx) => {
       const out: ProblemDraft[] = [];
       const perCondition = conditionMode(ctx.pedigree) === "per-condition";
-      // With any condition the panel's Status has the plain flags block, not the carrier select (#136).
+      // With any condition the panel's Status has the plain flags block, not the carrier select.
       const field = conditionMode(ctx.pedigree) === "plain" ? "carrier" : "conditions";
       if (isAffected(ind, ctx.pedigree) && plainCarrier(ind, ctx.pedigree) && (!perCondition || plainAffected(ind, ctx.pedigree))) {
         out.push({
@@ -586,7 +586,7 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // 10. Presymptomatic means clinically unaffected now (#101).
+    // 10. Presymptomatic means clinically unaffected now.
     id: "presymptomatic-affected",
     individual: (ind, ctx) => !!ind.presymptomatic && isAffected(ind, ctx.pedigree) && {
       severity: "warning",
@@ -600,7 +600,7 @@ export const RULES: Rule[] = [
     id: "onset-unaffected",
     individual: (ind, ctx) => {
       const out: ProblemDraft[] = [];
-      // The affected status's own onset goes with the plain Affected control (#118).
+      // The affected status's own onset goes with the plain Affected control.
       if (ind.onset?.trim() && !affectedControlOn(ind, ctx.pedigree)) {
         out.push({
           severity: "warning",
@@ -648,7 +648,7 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // 13. Biological sex (#26): a man cannot have carried a pregnancy.
+    // 13. Biological sex: a man cannot have carried a pregnancy.
     id: "carried-by-male",
     individual: (ind, ctx) => {
       const carrier = ind.carriedBy ? ctx.byId.get(ind.carriedBy) : undefined;
@@ -671,7 +671,7 @@ export const RULES: Rule[] = [
     },
   },
   {
-    // 13. A donor is a genetic parent of a child; a surrogate carried one (#45).
+    // 13. A donor is a genetic parent of a child; a surrogate carried one.
     id: "role-not-linked",
     individual: (ind, ctx) => {
       const role = ind.reproductiveRole;

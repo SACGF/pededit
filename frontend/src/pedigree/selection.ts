@@ -3,7 +3,7 @@ import { descendantsOf } from "./removal";
 import { hasDescendants } from "./collapse";
 
 /**
- * Batch lock and unlock for a multiple selection (#21), shared by the more
+ * Batch lock and unlock for a multiple selection, shared by the more
  * menu and the edit panel. `toUnlock` are the selected people still locked;
  * `toLock` are those unlocked or pinned, which locking returns to the auto
  * layout. With "nodes moveable" on in settings everyone drags, so there is
@@ -20,7 +20,7 @@ export function batchLockState(pedigree: Pedigree, ids: string[]): { toUnlock: s
 }
 
 /**
- * Hiding and showing descendants for a multiple selection (#1): `toHide`
+ * Hiding and showing descendants for a multiple selection: `toHide`
  * are the selected people with descendants whose descendants are drawn,
  * leaving out anyone below another of them (their flag would hide nothing
  * more, and would linger after the branch above is shown again); `toShow`

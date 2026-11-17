@@ -22,7 +22,7 @@ interface AppState {
   githubLogin: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   /**
-   * Delete the account on the server (#183): the server deletes its pedigrees
+   * Delete the account on the server: the server deletes its pedigrees
    * and My library with it. Then forget those pedigrees in Recent on this
    * device, since their links no longer work, and sign out.
    */
@@ -41,7 +41,7 @@ interface AppState {
   deletePedigree: (id: string) => Promise<void>;
   saveActivePedigree: () => Promise<void>;
   /**
-   * Save unsaved edits now, as the page is hidden or unloading (#123). Sent
+   * Save unsaved edits now, as the page is hidden or unloading. Sent
    * with fetch keepalive when the body fits, so it finishes after the tab
    * closes. Returns "keepalive" when that was sent (or one is in flight for
    * these edits), "request" for an ordinary save that a close may cut off,

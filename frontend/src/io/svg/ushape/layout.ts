@@ -127,7 +127,7 @@ export function packSide(tops: TNode[], side: -1 | 1, g: Geom, uC: number, first
     const prevJoins = !!prev && prev.unions.some(w => w.kind === "join" && w.joinNode === n);
     const clear = BAR_CLEARANCE;
     if (prev && joinsPrev && last[n.depth + 1] !== undefined) need = Math.max(need, 2 * (last[n.depth + 1] + clear) - prev.v);
-    // Room for the label between joined partners (#109).
+    // Room for the label between joined partners.
     const joinUnion = !prev ? undefined
       : n.unions.find(w => w.kind === "join" && w.joinNode === prev) ?? prev.unions.find(w => w.kind === "join" && w.joinNode === n);
     if (joinUnion?.labelWidth) need = Math.max(need, step(prev!.v, offset, coupleGap(joinUnion)));
@@ -215,7 +215,7 @@ export function packTree(root: TNode, g: Geom, slide: boolean): number {
   const splits: number[] = [];
   if (groups.length > 1) splits.push(groups[0].kids.length);
   else for (let i = 1; i < kids.length; i++) {
-    // Twins stay on one arm (#11).
+    // Twins stay on one arm.
     if (kids[i - 1].twinSet !== undefined && kids[i - 1].twinSet === kids[i].twinSet) continue;
     splits.push(i);
   }
@@ -338,7 +338,7 @@ export interface UShapeLayout {
   founders: string[];
   /** Individuals in the pedigree that are not drawn. */
   omitted: string[];
-  /** Consanguinity labels (#97, #109), see `UShapeCoupleLabel`. */
+  /** Consanguinity labels, see `UShapeCoupleLabel`. */
   coupleLabels: UShapeCoupleLabel[];
 }
 
@@ -391,7 +391,7 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
     for (const { id } of n.members) {
       const ind = byId.get(id);
       if (!ind) continue;
-      // Names wrap at the widest slot (#68), so a long name adds a line rather than width.
+      // Names wrap at the widest slot, so a long name adds a line rather than width.
       const glyph = glyphOf(ind, pedigree);
       const nameLines = glyph.figureNameLines;
       const details = glyph.detailLines;
@@ -408,7 +408,7 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
   const slot = Math.min(MAX_SLOT, Math.max(MIN_SLOT, labelChars * LABEL_CHAR_WIDTH + 12));
   let minR0 = Math.max(1.4 * ringGap, Math.max(...root.members.map(m => m.dx)) - Math.min(...root.members.map(m => m.dx)) + NODE_SIZE);
   // A straight label on a curve is lifted clear of the line at its ends
-  // (coupleLabels); the curve must be gentle enough for that lift (#109).
+  // (coupleLabels); the curve must be gentle enough for that lift.
   walk(root, n => {
     for (const w of n.unions) {
       if (!w.labelWidth) continue;
@@ -593,7 +593,7 @@ export function layoutUShape(pedigree: Pedigree, opts: UShapeOptions = {}): USha
 }
 
 /**
- * What is drawn for each person (#144, `personGlyph`), worked out once per
+ * What is drawn for each person (`personGlyph`), worked out once per
  * drawn pedigree. The U-shape has its own layout, so it has no flow nodes to
  * read a glyph from; it asks for the same glyph the canvas and the standard
  * figure draw, with names wrapped at its widest slot and nobody numbered as

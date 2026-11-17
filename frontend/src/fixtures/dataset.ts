@@ -1,5 +1,5 @@
 /**
- * The test data set (#167): pedigree JSON documents covering the edge cases,
+ * The test data set: pedigree JSON documents covering the edge cases,
  * for unit sweeps, the backend tests and the end-to-end checks alike.
  *
  * This file is the source. `__tests__/dataset.test.ts` writes every case to
@@ -139,7 +139,7 @@ const REPRODUCTION: DatasetCase[] = [
     { kinship: [["k1", "k2", 0.25], ["b", "k1", 0]] }),
 ];
 
-// ── Drawn features: the feature fixtures of #140 ─────────────────────────────
+// ── Drawn features: the feature fixtures ─────────────────────────────────────
 
 const DRAWN: DatasetCase[] = FEATURE_FIXTURES.map(f => ({
   file: `drawn/${f.slug}.json`, group: "drawn", purpose: `${f.label}: ${f.covers}`, document: envelope(f.label, f.data),

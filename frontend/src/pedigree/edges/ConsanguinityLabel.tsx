@@ -1,9 +1,9 @@
 import { CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, type ConsanguinityLabelOffset } from "../consanguinityLabel";
 
 /**
- * The degree of relationship above a double couple line (#97), centred on
+ * The degree of relationship above a double couple line, centred on
  * cx over a line at height cy that rises `hop` px, moved by `offset` when
- * text above is in the way (#109). The SVG exporter draws the same text at
+ * text above is in the way. The SVG exporter draws the same text at
  * the same place.
  */
 export function ConsanguinityLabel({ cx, cy, hop, lines, offset }: { cx: number; cy: number; hop: number; lines: string[]; offset?: ConsanguinityLabelOffset }) {

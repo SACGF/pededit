@@ -10,7 +10,7 @@ import { branchCountFontSize, branchTooltip } from "../collapse";
 export type CollapsedBranchNodeType = Node<RFNodeData, "collapsedBranch">;
 
 /**
- * A collapsed branch (#1): the symbol standing for a collapsed couple's
+ * A collapsed branch: the symbol standing for a collapsed couple's
  * unaffected children, with their number inside (NSGC: a diamond, or a
  * square or circle when they share a sex). Affected children are drawn
  * beside it as themselves. Clicking it shows the branch again. It is no one
@@ -22,7 +22,7 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
   const setDescendantsHidden = usePedigreeStore(s => s.setDescendantsHidden);
   const picking = usePedigreeStore(s => s.picking);
   if (!branch) return null;
-  // The number drawn is the glyph's (#144), the same one the exports write.
+  // The number drawn is the glyph's, the same one the exports write.
   const n = data.glyph.groupCount ?? branch.children.length;
   const fs = branchCountFontSize(n, NODE_SIZE);
 

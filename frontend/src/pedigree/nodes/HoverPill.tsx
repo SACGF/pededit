@@ -111,7 +111,7 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChild
         <MoreMenu individualId={individualId} onClose={onMenuClose} />
       </div>
       {/* The pill sits over the name label, and the label may be cut to fit its
-          slot (#68), so the full name is repeated here. */}
+          slot, so the full name is repeated here. */}
       {name?.trim() && (
         <div
           data-full-name

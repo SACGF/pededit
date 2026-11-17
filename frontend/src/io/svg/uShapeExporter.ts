@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// U-shape (horseshoe) pedigree export. Issue #2.
+// U-shape (horseshoe) pedigree export.
 //
 // Very wide pedigrees do not fit a journal figure. Bending the pedigree around
 // a U lets the long bottom generation run up both arms and around the curve.
@@ -30,7 +30,7 @@
 // in the outer generations, where the nodes actually are.
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// The code is in ushape/ (#149): tree.ts builds the descendant tree, layout.ts
+// The code is in ushape/: tree.ts builds the descendant tree, layout.ts
 // packs it along the tracks (no SVG), connectors.ts draws the lines along
 // them, render.ts draws the symbols and text and assembles the figure.
 // This file is the public entry.

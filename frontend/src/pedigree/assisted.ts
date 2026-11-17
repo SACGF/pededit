@@ -5,7 +5,7 @@ import { symbolTopInset } from "./lifeStatus";
 import { descendantsOf } from "./removal";
 
 /**
- * Assisted reproduction (NSGC 2008 Fig. 3, #45). Framework-free, shared by the
+ * Assisted reproduction (NSGC 2008 Fig. 3). Framework-free, shared by the
  * canvas, the SVG and U-shape exporters, the legends and the store.
  *
  * The model keeps genetics in the ordinary structure, so kinship, X-linked
@@ -219,7 +219,7 @@ export function assistedEdgeSegment(
 ): Segment | null {
   const a = nodeAt(edge.source), b = nodeAt(edge.target);
   if (!a || !b) return null;
-  // The shape drawn (gender identity, #26), which the line leaves from.
+  // The shape drawn (gender identity), which the line leaves from.
   const from: LinePoint = { ...a.position, sex: a.shape ?? a.individual?.sex };
   const bar = edge.data?.bar;
   if (bar) {
@@ -233,7 +233,7 @@ export function assistedEdgeSegment(
   return assistedLinkSegment(from, b.position, symbolTopInset(b.individual?.lifeStatus, NODE_SIZE));
 }
 
-// ── Editing (#45): the store applies these to an immer draft ─────────────────
+// ── Editing: the store applies these to an immer draft ─────────────────
 
 export type Gamete = "sperm" | "egg";
 
@@ -255,7 +255,7 @@ function replacedParent(pedigree: Pedigree, p: Partnership, gamete: Gamete): str
 
 /**
  * Why a donor of this gamete cannot be added for the child, or null when one
- * can. With `donorId`, the donor is someone already on the tree (#104), such
+ * can. With `donorId`, the donor is someone already on the tree, such
  * as the mother's sister giving an egg: then also why that person cannot be
  * the donor.
  */
@@ -284,7 +284,7 @@ export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gam
  * woman who carried it for an egg donor (unless someone else is recorded as
  * carrying it), otherwise as a social parent. A donor partnership left with
  * no children is removed, since it is not a couple. Returns the donor's id.
- * `donorId` is a new id, or the id of someone already on the tree (#104),
+ * `donorId` is a new id, or the id of someone already on the tree,
  * who becomes the donor; an existing donor pair with the same other parent
  * is reused, so two children of one donor are full siblings.
  */
@@ -297,7 +297,7 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
   const child = draft.individuals.find(i => i.id === childId)!;
 
   if (existing) {
-    // Someone already on the tree (#104): they become a donor, keeping everything else.
+    // Someone already on the tree: they become a donor, keeping everything else.
     existing.reproductiveRole = "donor";
     if (existing.sex === "unknown") existing.sex = gamete === "sperm" ? "male" : "female";
   } else {
@@ -343,7 +343,7 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
 
 /**
  * Why a surrogate cannot be added for the child, or null when one can. With
- * `surrogateId`, the surrogate is someone already on the tree (#104), such
+ * `surrogateId`, the surrogate is someone already on the tree, such
  * as the mother's sister: then also why she cannot be.
  */
 export function addSurrogateProblem(pedigree: Pedigree, childId: string, surrogateId?: string): string | null {
@@ -368,14 +368,14 @@ export function addSurrogateProblem(pedigree: Pedigree, childId: string, surroga
  * Add a surrogate who carried this child, in place. A woman recorded as
  * carrying it before (the mother of a child from a donor egg) becomes a
  * social parent. Returns the surrogate's id. `surrogateId` is a new id, or
- * the id of a woman already on the tree (#104).
+ * the id of a woman already on the tree.
  */
 export function applyAddSurrogate(draft: Pedigree, childId: string, surrogateId: string): string | null {
   const existing = draft.individuals.find(i => i.id === surrogateId);
   if (addSurrogateProblem(draft, childId, existing ? surrogateId : undefined)) return null;
   const child = draft.individuals.find(i => i.id === childId)!;
   if (existing) {
-    // Someone already on the tree (#104). A donor stays a donor (D wins over S).
+    // Someone already on the tree. A donor stays a donor (D wins over S).
     if (existing.reproductiveRole !== "donor") existing.reproductiveRole = "surrogate";
     if (existing.sex === "unknown") existing.sex = "female";
   } else {
@@ -407,7 +407,7 @@ export function assistedCandidates(pedigree: Pedigree, childId: string): Individ
   return pedigree.individuals.filter(i => i.id !== childId && !genetic.has(i.id) && !own.has(i.id) && !i.lifeStatus);
 }
 
-/** What Export PED drops for this individual (#45), for its warning. */
+/** What Export PED drops for this individual, for its warning. */
 export function assistedLossText(ind: Individual, nameOf: (id: string) => string): string {
   const parts: string[] = [];
   if (ind.reproductiveRole) parts.push(ind.reproductiveRole === "donor" ? "donor (D)" : "surrogate (S)");

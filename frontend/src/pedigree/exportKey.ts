@@ -4,7 +4,7 @@
  * conditions and tags in use, and the clinical details.
  *
  * Which rows there are, in what order and with what label comes from
- * `keyRows(pedigree, "export")` (#148), the list the in-app legend also
+ * `keyRows(pedigree, "export")`, the list the in-app legend also
  * draws from. This module only draws each row's swatch, through a switch on
  * the row's kind that TypeScript checks for completeness. Framework-free:
  * strings only.
@@ -106,13 +106,13 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
       return `${swatchGeom(row.shape, x, sy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
         + `<line x1="${fmt(x + s / 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + s / 2)}" y2="${fmt(sy + s - 1)}" stroke="black" stroke-width="1.5"/>`;
     case "deceased": return renderStatusSwatchSvg("deceased", row.shape, false, x, sy);
-    // Sex assigned at birth under a symbol drawn by gender identity (#26).
+    // Sex assigned at birth under a symbol drawn by gender identity.
     case "assignedAtBirth":
       return `<text x="${fmt(x)}" y="${fmt(sy + s / 2 + 3)}" font-family="sans-serif" font-size="7" textLength="${s}" lengthAdjust="spacingAndGlyphs" fill="black">${row.code}</text>`;
-    // Proband and consultand arrows (#99).
+    // Proband and consultand arrows.
     case "proband":
     case "consultand": return renderArrowKeySwatchSvg(row.kind, x, sy, s);
-    // Family history not known (#100): a "?" over a small symbol.
+    // Family history not known: a "?" over a small symbol.
     case "familyHistoryUnknown": {
       const k = s * 0.6, ox = x + (s - k) / 2, oy = sy + s - k;
       return `${swatchGeom(row.shape, ox, oy, k)} fill="white" stroke="black" stroke-width="1.5"/>`
@@ -126,7 +126,7 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
         + `<text x="${fmt(ox + k + 0.5)}" y="${fmt(oy + k + 5)}" font-family="sans-serif" font-size="11" fill="black">*</text>`;
     }
     case "lifeStatus": return renderLifeStatusSwatchSvg(row.status, row.shape, x, sy);
-    // Adoption brackets (#12), drawn a little smaller so they fit the swatch column.
+    // Adoption brackets, drawn a little smaller so they fit the swatch column.
     case "adopted": {
       const k = s * 0.7, ox = x + (s - k) / 2, oy = sy + (s - k) / 2;
       const geom = swatchGeom(row.shape, ox, oy, k);
@@ -135,11 +135,11 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
         .join("");
       return brackets + `${geom} fill="white" stroke="black" stroke-width="1.5"/>`;
     }
-    // Assisted reproduction (#45): the symbol with its "D" or "S".
+    // Assisted reproduction: the symbol with its "D" or "S".
     case "role":
       return `${swatchGeom(row.shape, x, sy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
         + `<text x="${fmt(x + s / 2)}" y="${fmt(sy + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">${row.letter}</text>`;
-    // Collapsed branches (#1): a diamond with "n" in it.
+    // Collapsed branches: a diamond with "n" in it.
     case "collapsedBranch":
       return `${swatchGeom("unknown", x, sy, s)} fill="white" stroke="black" stroke-width="1.5"/>`
         + `<text x="${fmt(x + s / 2)}" y="${fmt(sy + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-style="italic" fill="black">n</text>`;
@@ -148,20 +148,20 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
       const flat = (y: number) => `<line x1="${fmt(x)}" y1="${fmt(y)}" x2="${fmt(x + s)}" y2="${fmt(y)}" stroke="black" stroke-width="1.5"/>`;
       return flat(cy - 2) + flat(cy + 2);
     }
-    // Ended relationship (#98): a couple line with the two strokes across it.
+    // Ended relationship: a couple line with the two strokes across it.
     case "ended": {
       const cy = sy + s / 2;
       return line(x, cy, x + s, cy)
         + endedMarkSegments(x + s / 2, cy, 0.7).map(([x1, y1, x2, y2]) => line(x1, y1, x2, y2)).join("");
     }
-    // Childless couple marks (#15): a short couple line with the mark under it.
+    // Childless couple marks: a short couple line with the mark under it.
     case "childless": {
       const cx = x + s / 2, top = sy + 2, bar = sy + s - 2;
       let out = line(x, top, x + s, top) + line(cx, top, cx, bar) + line(cx - 4, bar, cx + 4, bar);
       if (row.status === "infertility") out += line(cx - 4, bar - 3, cx + 4, bar - 3);
       return out;
     }
-    // Twin forks (#11).
+    // Twin forks.
     case "twins": {
       const cx = x + s / 2, top = sy + 1, bottom = sy + s;
       let out = line(x + 2, top, x + s - 2, top) + line(cx, top, x + 1, bottom) + line(cx, top, x + s - 1, bottom);
@@ -170,10 +170,10 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
       if (row.zygosity === "unknown") out += `<text x="${fmt(cx)}" y="${fmt(my + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text>`;
       return out;
     }
-    // Lines of assisted reproduction (#45): a slanting line, dashed for a social parent.
+    // Lines of assisted reproduction: a slanting line, dashed for a social parent.
     case "assistedLine":
       return `<line x1="${fmt(x + 2)}" y1="${fmt(sy + 1)}" x2="${fmt(x + s - 2)}" y2="${fmt(sy + s - 1)}" stroke="black" stroke-width="1.5"${row.line === "social" ? ` stroke-dasharray="4 2"` : ""}/>`;
-    // Someone drawn more than once (#124): a dashed arc, as between the copies.
+    // Someone drawn more than once: a dashed arc, as between the copies.
     case "duplicate":
       return `<path d="M ${fmt(x + 1)} ${fmt(sy + s - 2)} Q ${fmt(x + s / 2)} ${fmt(sy - 4)} ${fmt(x + s - 1)} ${fmt(sy + s - 2)}" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/>`;
     default: {
@@ -192,7 +192,7 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
  */
 export function renderExportKeySvg(
   pedigree: Pedigree, x: number, y: number,
-  /** The drawing joins two copies of someone with a dashed arc (#124); the exporter knows from its layout. */
+  /** The drawing joins two copies of someone with a dashed arc; the exporter knows from its layout. */
   { duplicates = false }: { duplicates?: boolean } = {},
 ): TagLegendBlock {
   const key = keyRows(pedigree, "export", { duplicates });
@@ -212,7 +212,7 @@ export function renderExportKeySvg(
 
   const longest = Math.max(0, ...rows.map(r => r.label.length), ...tagRows.map(r => r.label.length));
   const symbolsHeight = (rows.length + tagRows.length) * LEGEND_ROW_HEIGHT;
-  // The clinical details (#102) go under the symbol rows, a half row apart.
+  // The clinical details go under the symbol rows, a half row apart.
   const gap = symbolsHeight > 0 && details.height > 0 ? LEGEND_ROW_HEIGHT / 2 : 0;
   if (details.height > 0) {
     markup.push(`<g class="clinical-details" transform="translate(0 ${fmt(y + symbolsHeight + gap)})">`, ...details.markup, `</g>`);
@@ -230,7 +230,7 @@ const DETAIL_LINE_HEIGHT = 14;
 const DETAIL_INDENT = 12;
 
 /**
- * The filled clinical key fields (#102) as "Label: value" text lines, top-left
+ * The filled clinical key fields as "Label: value" text lines, top-left
  * at (x, y), long values wrapped. Empty when none is filled.
  */
 export function renderClinicalDetailsSvg(pedigree: Pedigree, x: number, y: number): TagLegendBlock {

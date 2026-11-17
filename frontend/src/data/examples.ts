@@ -3,7 +3,7 @@ import { withCurrentNotation } from "../pedigree/notation";
 
 export interface ExamplePedigree {
   /**
-   * The example's name in its link, /example/<slug> (#150). Links are
+   * The example's name in its link, /example/<slug>. Links are
    * published, so never change or reuse one; a new example gets a new slug.
    */
   slug: string;
@@ -18,7 +18,7 @@ export interface ExamplePedigree {
 
 const siblingOrder = { mode: "insertion" as const, affectedFirst: false };
 
-/** Built-in examples, all drawn in the current NSGC edition (#115): see the end of the list. */
+/** Built-in examples, all drawn in the current NSGC edition: see the end of the list. */
 const EXAMPLE_LIST: ExamplePedigree[] = [
   {
     slug: "simple-family",
@@ -480,7 +480,7 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
         { id: "ar_h4", sex: "male",    affected: false, sibOrder: 0 },
         { id: "ar_w4", sex: "female",  affected: false, sibOrder: 0 },
         { id: "ar_c4", sex: "unknown", affected: false, sibOrder: 0, lifeStatus: "pregnancy", carriedBy: "ar_d4", socialParents: ["ar_w4"] },
-        // 5. NSGC 2022 Fig. 5 (1b), same-sex couple (#105): two women, one
+        // 5. NSGC 2022 Fig. 5 (1b), same-sex couple: two women, one
         // carrying a pregnancy by donor sperm. As in 1, the partner who is
         // not a genetic parent is linked by the couple line only.
         { id: "ar_m5", sex: "female",  affected: false, sibOrder: 0 },
@@ -516,11 +516,11 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
 /**
  * The examples, each written with `canvasSettings.notation` "nsgc2022": a
  * pedigree without the setting is drawn in NSGC 2008 (pedigrees saved before
- * it existed), and an example opened now is new (#115).
+ * it existed), and an example opened now is new.
  */
 export const EXAMPLES: ExamplePedigree[] = EXAMPLE_LIST.map(e => ({ ...e, data: withCurrentNotation(e.data) }));
 
-/** The example a /example/<slug> link names (#150), whatever the case of the letters typed. */
+/** The example a /example/<slug> link names, whatever the case of the letters typed. */
 export function exampleBySlug(slug: string | undefined): ExamplePedigree | undefined {
   const wanted = slug?.toLowerCase();
   return EXAMPLES.find(e => e.slug === wanted);

@@ -39,5 +39,5 @@ export const COUPLE_HOP_INSET_MIN = 3;
  */
 export const DUPLICATE_ARC_BULGE = 0.7;
 
-/** Key row for the dashed arc joining copies of someone drawn more than once (#124). */
+/** Key row for the dashed arc joining copies of someone drawn more than once. */
 export const DUPLICATE_LEGEND_LABEL = "Same person drawn more than once";

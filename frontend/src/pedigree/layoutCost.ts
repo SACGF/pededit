@@ -1,7 +1,7 @@
 import type { FlowData } from "./layoutToFlow";
 
 /**
- * Cheap measures of how readable a drawn layout is (#76): people drawn more
+ * Cheap measures of how readable a drawn layout is: people drawn more
  * than once, couple lines that hop over someone, the total length of the
  * dashed arcs joining copies, and the drawing's width. The regression guard
  * for layout passes beyond kinship2: no worse than the plain port on every

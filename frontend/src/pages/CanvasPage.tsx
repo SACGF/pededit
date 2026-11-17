@@ -30,15 +30,15 @@ function formatDate(iso: string): string {
 }
 
 
-/** The issue tracker, not the new-issue form, so people can search for an existing report first (#113). */
+/** The issue tracker, not the new-issue form, so people can search for an existing report first. */
 const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
 /**
- * The repository, for self-hosting with clinical data (#113). Clinicians
+ * The repository, for self-hosting with clinical data. Clinicians
  * hand this to whoever runs their servers, who finds INSTALL.md from there.
  */
 const REPO_URL = "https://github.com/SACGF/pededit";
 
-/** Shown on small screens until dismissed (#169): viewing works by touch, editing is built for a mouse and keyboard. */
+/** Shown on small screens until dismissed: viewing works by touch, editing is built for a mouse and keyboard. */
 const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom, tap a person to select them. Editing is easier on a computer.";
 const SMALL_SCREEN_NOTICE_KEY = "smallScreenNoticeDismissed";
 
@@ -62,7 +62,7 @@ export default function CanvasPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [notFound, setNotFound] = useState(false);
-  // Small screens (#169): the sidebar opens over the canvas from the
+  // Small screens: the sidebar opens over the canvas from the
   // toolbar's menu button, and the side panel is a sheet under the canvas
   // that stays shut until one of its tabs is tapped. Neither state does
   // anything from `lg` up, where both are always shown.
@@ -111,7 +111,7 @@ export default function CanvasPage() {
   useEffect(() => () => closePedigree(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save at once when the tab is hidden or closed, rather than losing the
-  // last 2 s of edits (#123). The browser's own "Leave site?" prompt shows
+  // last 2 s of edits. The browser's own "Leave site?" prompt shows
   // only when the edits may not reach the server: the last save failed, or
   // the pedigree is too big for a keepalive request and the save is still
   // running when the page unloads.
@@ -297,7 +297,7 @@ export default function CanvasPage() {
           </ul>
         </div>
 
-        {/* Feedback and self-hosting (#113) */}
+        {/* Feedback and self-hosting */}
         <div className="px-3 py-2 border-t text-[10px] text-gray-400 leading-relaxed" data-testid="feedback-links">
           <p>
             Found a bug or want a feature?{" "}
@@ -346,7 +346,7 @@ export default function CanvasPage() {
           onMenuClick={() => setSidebarOpen(open => !open)}
         />
 
-        {/* Small screens: how to move around by touch, and that editing wants a bigger screen (#169). */}
+        {/* Small screens: how to move around by touch, and that editing wants a bigger screen. */}
         {!smallNoticeDismissed && (
           <div className="lg:hidden flex items-start gap-2 px-3 py-1.5 border-b bg-white text-[11px] leading-snug text-gray-600" data-testid="small-screen-notice">
             <p className="flex-1">{SMALL_SCREEN_NOTICE}</p>

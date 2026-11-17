@@ -168,7 +168,7 @@ export function alignped4(
     const eps = 1e-8;
     // Each penalty row has a handful of non-zero entries, so D is filled from
     // those: the same sums in the same order as the full product, without
-    // visiting every pair of variables for every row (#189).
+    // visiting every pair of variables for every row.
     const D: number[][] = Array.from({ length: nTotal + 1 }, () => new Array<number>(nTotal + 1).fill(0));
     for (let k = 0; k <= npenal; k++) {
       const row = pmat[k]!;

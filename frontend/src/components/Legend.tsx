@@ -14,10 +14,10 @@ import { Tags } from "lucide-react";
 import { keyRows, type KeyRow } from "@/pedigree/keyRows";
 
 /**
- * The figure legend, on the edit panel's Pedigree tab (#75, #135). A
+ * The figure legend, on the edit panel's Pedigree tab. A
  * person's own conditions and tags, with the same swatches, are edited on the
- * Person tab (`ConditionsAndTags`, #136). Which rows it has comes from `keyRows`
- * (`pedigree/keyRows.ts`, #148), the list the exported key draws from too;
+ * Person tab (`ConditionsAndTags`). Which rows it has comes from `keyRows`
+ * (`pedigree/keyRows.ts`), the list the exported key draws from too;
  * this file draws their swatches.
  */
 
@@ -72,7 +72,7 @@ function DeceasedSvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** Symbol with the "?" above it: family history not known (#100). */
+/** Symbol with the "?" above it: family history not known. */
 function FamilyHistorySvg({ sex }: { sex: Sex }) {
   return (
     <svg width="36" height="36" viewBox="-6 -14 36 42">
@@ -82,7 +82,7 @@ function FamilyHistorySvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** Carrier with no condition recorded in NSGC 2022 (#115): the canvas's own dotted right half. */
+/** Carrier with no condition recorded in NSGC 2022: the canvas's own dotted right half. */
 function PlainCarrierSvg({ sex }: { sex: Sex }) {
   const [start, end] = PLAIN_CARRIER_ANGLES;
   return (
@@ -97,7 +97,7 @@ function PlainCarrierSvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** Presymptomatic carrier (#101): the canvas's own symbol with its vertical line. */
+/** Presymptomatic carrier: the canvas's own symbol with its vertical line. */
 function PresymptomaticSvg({ sex }: { sex: Sex }) {
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
@@ -106,7 +106,7 @@ function PresymptomaticSvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** "+/-" (2022) or "E" (2008) for the result marks row (#101, #114). */
+/** "+/-" (2022) or "E" (2008) for the result marks row. */
 function EvaluationSvg({ mark }: { mark: string }) {
   return (
     <svg width="28" height="28" viewBox="0 0 28 28">
@@ -115,7 +115,7 @@ function EvaluationSvg({ mark }: { mark: string }) {
   );
 }
 
-/** Symbol with the "*" at its lower right: documented evaluation (#101). */
+/** Symbol with the "*" at its lower right: documented evaluation. */
 function DocumentedSvg({ sex }: { sex: Sex }) {
   const s = 18;
   return (
@@ -126,7 +126,7 @@ function DocumentedSvg({ sex }: { sex: Sex }) {
   );
 }
 
-/** Proband arrow with its "P", or the consultand's without (#99), drawn by the canvas's own ProbandArrow. */
+/** Proband arrow with its "P", or the consultand's without, drawn by the canvas's own ProbandArrow. */
 function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
   const cx = SZ / 2, cy = SZ / 2, r = SZ / 2 - 1;
   return (
@@ -155,7 +155,7 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
 
 /**
  * How a tag looks on a symbol: its section of a square, a dot, or coloured
- * text. `carrier`: the condition's carrier fill (#115).
+ * text. `carrier`: the condition's carrier fill.
  */
 export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; pedigree: Pedigree; carrier?: boolean }) {
   const s = 16, x = 6, y = 6, cx = x + s / 2, cy = y + s / 2;
@@ -214,7 +214,7 @@ function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
   );
 }
 
-/** "D" or "S" inside the symbol (#45), from the canvas renderer. */
+/** "D" or "S" inside the symbol, from the canvas renderer. */
 function RoleSvg({ sex, role }: { sex: Sex; role: ReproductiveRole }) {
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
@@ -223,7 +223,7 @@ function RoleSvg({ sex, role }: { sex: Sex; role: ReproductiveRole }) {
   );
 }
 
-/** A slanting line of assisted reproduction (#45), dashed for a social parent. */
+/** A slanting line of assisted reproduction, dashed for a social parent. */
 function AssistedLineSvg({ dashed }: { dashed: boolean }) {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -232,7 +232,7 @@ function AssistedLineSvg({ dashed }: { dashed: boolean }) {
   );
 }
 
-/** A collapsed branch (#1): a diamond with "n" in it. */
+/** A collapsed branch: a diamond with "n" in it. */
 function CollapsedBranchSvg() {
   const c = SZ / 2;
   return (
@@ -261,7 +261,7 @@ function CoupleSvg() {
   );
 }
 
-/** Couple line with the childless mark under it (#15). */
+/** Couple line with the childless mark under it. */
 function ChildlessSvg({ status }: { status: ChildlessStatus }) {
   return (
     <svg width="48" height="28" viewBox="0 0 48 28">
@@ -273,7 +273,7 @@ function ChildlessSvg({ status }: { status: ChildlessStatus }) {
   );
 }
 
-/** Twin fork (#11): two drops from one point on the bar, a bar across for MZ, "?" for unknown. */
+/** Twin fork: two drops from one point on the bar, a bar across for MZ, "?" for unknown. */
 function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
   return (
     <svg width="48" height="28" viewBox="0 0 48 28">
@@ -286,8 +286,8 @@ function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
   );
 }
 
-/** Couple line with the ended relationship break (#98). */
-/** The dashed arc joining two copies of someone drawn more than once (#124). */
+/** Couple line with the ended relationship break. */
+/** The dashed arc joining two copies of someone drawn more than once. */
 function DuplicateArcSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
@@ -381,9 +381,9 @@ function KeySwatch({ row }: { row: SwatchRow }): React.ReactNode {
 }
 
 export function Legend({ pedigree: full, onManageTags }: LegendProps) {
-  // Which rows, in what order and with what label: `keyRows` (#148), the
+  // Which rows, in what order and with what label: `keyRows`, the
   // list the export key draws from too. Only what is drawn is listed: hidden
-  // descendants (#94) add no entries.
+  // descendants add no entries.
   const key = keyRows(full, "legend");
   const pedigree = key.pedigree;
   const indRows = key.symbols as SwatchRow[];

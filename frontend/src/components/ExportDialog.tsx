@@ -34,7 +34,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
-  // Free text a de-identified export keeps (#111). Like the other choices
+  // Free text a de-identified export keeps. Like the other choices
   // here, they last while the page is open and are not saved.
   const [keep, setKeep]             = useState<DeidentifyKeep>(DEIDENTIFY_KEEP_DEFAULTS);
   const setKept = (key: keyof DeidentifyKeep, value: boolean) => setKeep(k => ({ ...k, [key]: value }));
@@ -71,14 +71,14 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
       deidentify: deident,
       ageBuckets: deident && ageBuckets,
       deidentifyKeep: keep,
-      // The chart title (#20), as on the canvas. A de-identified export has none.
+      // The chart title, as on the canvas. A de-identified export has none.
       title: deident ? undefined : chartTitle(pedigree, title) || undefined,
       uShapePartners: uPartners,
       compact,
     });
   }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact]);
 
-  // Which free-text choices this pedigree has anything for (#111).
+  // Which free-text choices this pedigree has anything for.
   const freeText = useMemo(() => (open && deident ? deidentifiableText(pedigree) : null), [open, deident, pedigree]);
   const keepBox = (key: keyof DeidentifyKeep, label: string, indent = "ml-5") => (
     <label className={`flex items-center gap-2 text-xs cursor-pointer ${indent}`}>
@@ -147,7 +147,7 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
             </div>
           </div>
 
-          {/* PNG resolution (#18), only when PNG selected */}
+          {/* PNG resolution, only when PNG selected */}
           {format === "png" && (
             <div className="space-y-1.5">
               <div className="text-xs font-medium text-gray-700">Resolution</div>

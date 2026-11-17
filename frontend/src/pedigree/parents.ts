@@ -2,7 +2,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { descendantsOf } from "./removal";
 
 /**
- * Linking a child to existing parents (#36): the rules, framework-free so
+ * Linking a child to existing parents: the rules, framework-free so
  * the store and the picking UI share them.
  */
 
@@ -16,7 +16,7 @@ function label(pedigree: Pedigree, id: string): string {
  * `childId`, or null when they can. A single parent gets a placeholder
  * partner. Unknown sex is always allowed; two parents of the same known sex
  * are not: these are the genetic parents, and sex is biological sex. A
- * same-sex couple's children are donor-conceived (`sameSex.ts`, #105).
+ * same-sex couple's children are donor-conceived (`sameSex.ts`).
  */
 export function setParentsProblem(pedigree: Pedigree, childId: string, parentIds: string[]): string | null {
   const unique = [...new Set(parentIds)];

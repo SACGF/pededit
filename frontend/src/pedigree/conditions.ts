@@ -4,9 +4,9 @@ import type { Individual, Pedigree, Tag } from "@pedigree-editor/layout-engine";
 export { isAffected, isConditionTag };
 
 /**
- * Affected and carrier status per condition (#115).
+ * Affected and carrier status per condition.
  *
- * A condition is a quadrant tag (#3). Each person has one state per
+ * A condition is a quadrant tag. Each person has one state per
  * condition: affected (the tag id is in `Individual.tags`), carrier (in
  * `Individual.carrierTags`) or neither. The plain flags stay:
  * `Individual.affected` is affected with something not recorded (#118), and
@@ -38,7 +38,7 @@ export type ConditionState = "affected" | "carrier" | "none";
 
 export type ConditionMode = "plain" | "single" | "per-condition";
 
-/** The pedigree's conditions (quadrant tags that are not traits, #118), in order. */
+/** The pedigree's conditions (quadrant tags that are not traits), in order. */
 export function conditionTags(pedigree: Pick<Pedigree, "tags">): Tag[] {
   return (pedigree.tags ?? []).filter(isConditionTag);
 }
@@ -78,7 +78,7 @@ export function carrierConditions(ind: Pick<Individual, "tags" | "carrierTags">,
 
 /**
  * The plain flag says something the recorded conditions do not: affected with
- * something not recorded (#118), drawn as the black fill (under any condition
+ * something not recorded, drawn as the black fill (under any condition
  * sections in NSGC 2022). With two or more conditions that is so even beside
  * a recorded condition, and the editor warns ("condition-not-recorded"). With
  * one condition, the flag beside that condition adds nothing.
@@ -93,7 +93,7 @@ export function plainAffected(ind: Individual, pedigree: Pick<Pedigree, "tags">)
  * The state of the plain Affected control (A, the more menu, batch): the
  * flag, or with one condition, that condition. With two or more conditions
  * someone affected only with a recorded condition shows "Mark affected",
- * which sets the flag (#118).
+ * which sets the flag.
  */
 export function affectedControlOn(ind: Individual, pedigree: Pick<Pedigree, "tags">): boolean {
   if (ind.affected) return true;
@@ -113,7 +113,7 @@ export function isCarrier(ind: Individual, pedigree: Pick<Pedigree, "tags">): bo
 
 /**
  * The umbrella name, wherever the user sees one, for what the tags dialog
- * defines (#136): conditions, and traits, dots and text tags, which are not.
+ * defines: conditions, and traits, dots and text tags, which are not.
  */
 export const CONDITIONS_AND_TAGS = "Conditions and tags";
 
@@ -180,7 +180,7 @@ export function applyConditionState(
 }
 
 /**
- * The update that resolves a plain flag the conditions do not explain (#118),
+ * The update that resolves a plain flag the conditions do not explain,
  * for a warning's one-click fix (one `updateIndividual`, so one undo step):
  * record it as condition `tagId`, or with `tagId` null drop the flag because
  * the recorded conditions say it all. The affected status's own onset moves
@@ -199,8 +199,8 @@ export function resolvePlainAffected(ind: Individual, tagId: string | null, pedi
 
 /**
  * The plain Affected control (checkbox, more menu, "A" shortcut, batch). With
- * one condition it records that condition; otherwise it sets the plain flag
- * (#118). Unticking removes the flag and every affected condition, since a
+ * one condition it records that condition; otherwise it sets the plain flag.
+ * Unticking removes the flag and every affected condition, since a
  * condition section on an unaffected person would contradict the box.
  * Returns whether anything changed.
  */
@@ -225,7 +225,7 @@ export function applyAffected(ind: Individual, affected: boolean, pedigree: Pick
  * flag only (with two or more conditions, carriers of a condition are set per
  * condition; unlike affected, nothing requires the flag to follow them).
  * Presymptomatic is cleared when set, as the one carrier status select has
- * always done (#101). Returns whether anything changed.
+ * always done. Returns whether anything changed.
  */
 export function applyCarrier(ind: Individual, carrier: boolean, pedigree: Pick<Pedigree, "tags">): boolean {
   const sole = soleCondition(pedigree);

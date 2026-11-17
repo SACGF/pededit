@@ -1,7 +1,7 @@
 import type { Hints, LayoutInput, LayoutResult, Pedigree } from "./types.js";
 
 /**
- * Which side a partner is drawn on (#106).
+ * Which side a partner is drawn on.
  *
  * kinship2 decides the left to right order of a couple: the father-role
  * member on the left unless a spouse hint says otherwise, and `autohint`

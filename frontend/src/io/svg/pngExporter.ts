@@ -7,7 +7,7 @@ export function svgPixelSize(svgString: string): { width: number; height: number
 }
 
 /**
- * Rasterise an SVG string to a PNG Blob at `dpi` (#18), taking the SVG's CSS
+ * Rasterise an SVG string to a PNG Blob at `dpi`, taking the SVG's CSS
  * pixels as 96 to the inch, and record the DPI in a pHYs chunk so the image
  * keeps its printed size in Word and journal systems. When the pedigree is
  * too large for a browser canvas at that DPI it is drawn at the highest DPI

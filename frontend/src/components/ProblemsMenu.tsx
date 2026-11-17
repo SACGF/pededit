@@ -13,7 +13,7 @@ let lastProblem: { id: string; index: number } | null = null;
 
 /**
  * Select the person a problem is about, pan the canvas to them if they
- * are off-screen, and focus their field in the edit panel (#116). The
+ * are off-screen, and focus their field in the edit panel. The
  * panel renders after the selection changes, so this waits a few frames
  * for the field to appear.
  */
@@ -39,7 +39,7 @@ export function focusProblem(problem: Problem): void {
 
 /**
  * Go to the next (1) or previous (-1) problem from the keyboard (F8 and
- * Shift+F8, #116), selecting the person and focusing the field, so the
+ * Shift+F8), selecting the person and focusing the field, so the
  * list can be worked through in the edit panel. False when there are none.
  */
 export function stepProblem(dir: 1 | -1): boolean {
@@ -68,7 +68,7 @@ export function ProblemIcon({ severity, size = 12 }: { severity: Problem["severi
 }
 
 /**
- * The toolbar's problems count and list (#116). Hidden while there are none,
+ * The toolbar's problems count and list. Hidden while there are none,
  * so a clean pedigree shows nothing. Clicking an item selects the person and
  * focuses the field.
  */

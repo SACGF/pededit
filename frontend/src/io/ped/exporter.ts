@@ -114,13 +114,13 @@ export function pedLostLifeStatus(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.lifeStatus);
 }
 
-/** Individuals whose adoption brackets (#12) PED cannot carry. */
+/** Individuals whose adoption brackets PED cannot carry. */
 export function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.adopted);
 }
 
 /**
- * Individuals with assisted reproduction details (#45) PED cannot carry: the
+ * Individuals with assisted reproduction details PED cannot carry: the
  * D or S in the symbol, who carried them, their social parents. The genetic
  * parents (a donor included) are written as the parents.
  */
@@ -128,7 +128,7 @@ export function pedLostAssisted(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.reproductiveRole || !!i.carriedBy || !!i.socialParents?.length);
 }
 
-/** Twin sets (#11) PED cannot carry, as [partnership, members, zygosity]. */
+/** Twin sets PED cannot carry, as [partnership, members, zygosity]. */
 export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
   const out: { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] = [];
   for (const p of pedigree.partnerships) {
@@ -141,18 +141,18 @@ export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partn
   return out;
 }
 
-/** Partnerships marked ended (#98), which PED cannot carry. */
+/** Partnerships marked ended, which PED cannot carry. */
 export function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.ended);
 }
 
-/** Partnerships whose childless mark (#15) PED cannot carry. */
+/** Partnerships whose childless mark PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);
 }
 
 /**
- * Couples whose consanguinity PED cannot carry (#97, #92): the text above
+ * Couples whose consanguinity PED cannot carry: the text above
  * the double line, and the manual override for a couple the drawn structure
  * does not show to be related. A double line worked out from kinship comes
  * back on import, since it follows from the parents.

@@ -1,8 +1,8 @@
 /**
- * Pedigree numbers (#8): generation in Roman numerals, then the person's
+ * Pedigree numbers: generation in Roman numerals, then the person's
  * place in that generation counting left to right, "II-3". Computed from the
  * layout every time, never stored, so adding a sibling renumbers everyone to
- * their right. Only drawn people are numbered (hidden descendants, #94, get
+ * their right. Only drawn people are numbered (hidden descendants get
  * none), so the figure reads I-1, I-2, I-3 with no gaps.
  *
  * `pedigreeNumbers` in `layoutToFlow.ts` is the entry point for a whole
@@ -28,7 +28,7 @@ export function toRoman(n: number): string {
 
 /**
  * Number everyone in `result` (a layout of `pedigree`, already the drawn
- * pedigree), level by level in slot order. Collapsed-branch diamonds (#1)
+ * pedigree), level by level in slot order. Collapsed-branch diamonds
  * get no number. Someone drawn twice keeps the
  * number of their first copy; slots in `skip` ("level-slot", copies the
  * canvas leaves out) are passed over.
@@ -46,7 +46,7 @@ export function numberFromLayout(
       if (skip.has(`${level}-${slot}`)) continue;
       const individual = pedigree.individuals[result.nid[level][slot] - 1];
       if (!individual || assigned.has(individual.id)) continue;
-      if (isBranchPlaceholderId(individual.id)) continue; // a collapsed-branch diamond (#1) is nobody
+      if (isBranchPlaceholderId(individual.id)) continue; // a collapsed-branch diamond is nobody
       if (count === 0) generation++;
       assigned.set(individual.id, `${toRoman(generation)}-${++count}`);
     }

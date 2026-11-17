@@ -24,14 +24,14 @@ import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type 
 
 
 /**
- * On-canvas picking (#36): clicks choose existing individuals instead of
+ * On-canvas picking: clicks choose existing individuals instead of
  * selecting. "parents" collects one or two parents for a child; "child"
  * takes one click, the individual who becomes a child of the partnership
- * (of `geneticParentId` and a donor, for a same-sex couple, #105).
- * "partner" (#84) takes one click, the existing individual who becomes the
- * partner of individualId. "relatedness" (#90) takes one click and selects
+ * (of `geneticParentId` and a donor, for a same-sex couple).
+ * "partner" takes one click, the existing individual who becomes the
+ * partner of individualId. "relatedness" takes one click and selects
  * that person with individualId, so the panel shows how the two are related.
- * "donor" and "surrogate" (#104) take one click, an existing person who
+ * "donor" and "surrogate" take one click, an existing person who
  * becomes the child's sperm or egg donor or the surrogate who carried them.
  */
 export type Picking =
@@ -140,7 +140,7 @@ function makeIndividual(sex: Sex, sibOrder: number): Individual {
   };
 }
 
-/** The automatic second parent of a single parent's child (#107, `pedigree/placeholders.ts`). */
+/** The automatic second parent of a single parent's child (`pedigree/placeholders.ts`). */
 function makePlaceholder(sex: Sex): Individual {
   return { ...makeIndividual(sex, 0), placeholder: true };
 }
@@ -171,7 +171,7 @@ function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferr
   return partnership.id;
 }
 
-/** Take an individual out of any twin set; a set left with one member is dropped (#11). */
+/** Take an individual out of any twin set; a set left with one member is dropped. */
 function removeFromTwinSets(draft: Pedigree, individualId: string): void {
   for (const p of draft.partnerships) {
     if (!p.twins) continue;
@@ -182,7 +182,7 @@ function removeFromTwinSets(draft: Pedigree, individualId: string): void {
   }
 }
 
-/** Drop an individual's age of onset for one tag (#93), and the map when it empties. */
+/** Drop an individual's age of onset for one tag, and the map when it empties. */
 /** Whether an in-place edit would change the person, tried on a copy (store state is frozen). */
 function dryRun(ind: Individual, edit: (copy: Individual) => boolean): boolean {
   return edit(JSON.parse(JSON.stringify(ind)) as Individual);
@@ -194,7 +194,7 @@ function removeTagOnset(ind: Individual, tagId: string): void {
   if (Object.keys(ind.tagOnset).length === 0) delete ind.tagOnset;
 }
 
-/** A child contradicts a childless mark, so adding one removes the mark (#15). */
+/** A child contradicts a childless mark, so adding one removes the mark. */
 function clearChildless(draft: Pedigree, partnershipId: string): void {
   const p = draft.partnerships.find(x => x.id === partnershipId);
   if (!p) return;
@@ -205,7 +205,7 @@ function clearChildless(draft: Pedigree, partnershipId: string): void {
 /**
  * Selection fields for selecting exactly `id` (or nothing). Every store write
  * of the selection goes through here or `selectionOf`, so `selectedId` is
- * always the primary member of `selectedIds` (#21).
+ * always the primary member of `selectedIds`.
  */
 function selectOnly(id: string | null): { selectedId: string | null; selectedIds: string[] } {
   return { selectedId: id, selectedIds: id ? [id] : [] };
@@ -220,7 +220,7 @@ function selectionOf(ids: string[], primary?: string | null): { selectedId: stri
 
 /**
  * The two selected individuals when exactly two are selected, else null:
- * the primary (last clicked) second. For pairwise views such as #90.
+ * the primary (last clicked) second. For pairwise views such as how two people are related.
  */
 export function selectedPair(state: { selectedId: string | null; selectedIds: string[] }): [string, string] | null {
   if (state.selectedIds.length !== 2 || !state.selectedId) return null;
@@ -239,7 +239,7 @@ interface PedigreeState {
   future: Pedigree[];  // redo stack, newest last
 
   /**
-   * Selection (#21). `selectedIds` holds every selected individual id;
+   * Selection. `selectedIds` holds every selected individual id;
    * `selectedId` is the primary one (the last clicked), which the edit
    * panel and single-person actions use. With nothing selected they are
    * [] and null; with one, [id] and id. Kept in step by the actions below,
@@ -248,11 +248,11 @@ interface PedigreeState {
   selectedId: string | null;
   selectedIds: string[];
   hoveredId: string | null;
-  /** The person outlined on the canvas while a problem is hovered in the problems list (#116). Not undoable. */
+  /** The person outlined on the canvas while a problem is hovered in the problems list. Not undoable. */
   problemHighlightId: string | null;
   isDirty: boolean;
   /**
-   * Bumped by resetLayout (#64) and by initialize so the canvas refits the
+   * Bumped by resetLayout and by initialize so the canvas refits the
    * view. React Flow's fitView prop fits only once, on mount, and the canvas
    * mounts while the previous pedigree is still here: opening an example
    * after another pedigree was fitted to the old one. Not undoable.
@@ -260,8 +260,8 @@ interface PedigreeState {
   layoutResetCount: number;
   /**
    * A person the canvas should bring into view, panning but not zooming,
-   * if their node is off-screen: set by a toolbar add (#121) and by going to
-   * a problem (#116). `n` changes on
+   * if their node is off-screen: set by a toolbar add and by going to
+   * a problem. `n` changes on
    * every request so the same id can be asked for twice. Not undoable.
    */
   revealRequest: { id: string; n: number } | null;
@@ -275,7 +275,7 @@ interface PedigreeState {
   startPickingChild: (partnershipId: string, geneticParentId?: string) => void;
   startPickingPartner: (individualId: string) => void;
   startPickingRelatedness: (individualId: string) => void;
-  /** Pick an existing person as the child's sperm or egg donor, or as the surrogate (#104). */
+  /** Pick an existing person as the child's sperm or egg donor, or as the surrogate. */
   startPickingDonor: (childId: string, gamete: Gamete) => void;
   startPickingSurrogate: (childId: string) => void;
   cancelPicking: () => void;
@@ -297,7 +297,7 @@ interface PedigreeState {
   // Tool + selection
   /** Select only this individual, or clear the selection with null. */
   setSelectedId: (id: string | null) => void;
-  /** Select one person and pan to them if their node is off-screen (`revealRequest`): going to a problem (#116). */
+  /** Select one person and pan to them if their node is off-screen (`revealRequest`): going to a problem. */
   selectAndReveal: (id: string) => void;
   /** Shift / Ctrl / Cmd+click: add id to the selection (as primary) or take it out. */
   toggleSelected: (id: string) => void;
@@ -305,7 +305,7 @@ interface PedigreeState {
   setSelection: (ids: string[], primary?: string | null) => void;
   /**
    * Select a person, their descendants and the partners who married into
-   * that branch (the "remove with descendants" set, #34), with the person
+   * that branch (the "remove with descendants" set), with the person
    * as primary. Returns how many are selected.
    */
   selectDescendants: (id: string) => number;
@@ -316,12 +316,12 @@ interface PedigreeState {
   undo: () => void;
   redo: () => void;
   /**
-   * Run several edits as one undo step ("Fix all like this", #116): the
+   * Run several edits as one undo step ("Fix all like this"): the
    * snapshots they push are folded into the first, so one undo restores
    * the pedigree as it was before all of them.
    */
   groupEdits: (run: () => void) => void;
-  /** Make a problem's one-click fix (#116). A fix is data (`FixEdit`, #126); this is where it becomes an edit. */
+  /** Make a problem's one-click fix. A fix is data (`FixEdit`); this is where it becomes an edit. */
   applyFix: (fix: ProblemFix) => void;
   /** Several fixes as one undo step ("Fix all like this"). */
   applyFixes: (fixes: ProblemFix[]) => void;
@@ -334,7 +334,7 @@ interface PedigreeState {
   addSibling: (individualId: string) => void;
   addPartner: (individualId: string) => void;
   /**
-   * Make two existing individuals partners (#84), which is how a marriage
+   * Make two existing individuals partners, which is how a marriage
    * between relatives is drawn. The new partnership has no children, keeps
    * the father role first. Nothing records that they are related: the double
    * line comes from their kinship (#85). Returns the reason when refused,
@@ -344,26 +344,26 @@ interface PedigreeState {
   deleteIndividual: (individualId: string) => void;
   /**
    * Delete several individuals as one undo step (Delete with a multiple
-   * selection, #21); children stay, as founders. Refused, with an error
+   * selection); children stay, as founders. Refused, with an error
    * notice, when nobody would be left. Returns how many were removed.
    */
   deleteIndividuals: (individualIds: string[]) => number;
   /**
    * Remove these individuals with everyone below them, plus partners who
-   * married in and have no other link (#34). Refused, with an error notice,
+   * married in and have no other link. Refused, with an error notice,
    * when nobody would be left. Returns how many were removed.
    */
   removeWithDescendants: (individualIds: string[]) => number;
-  /** Remove these individuals with everyone above them; their descendants become founders (#34). */
+  /** Remove these individuals with everyone above them; their descendants become founders. */
   removeWithAncestors: (individualIds: string[]) => number;
   /**
-   * Hide or show everyone below these individuals (#94); see
+   * Hide or show everyone below these individuals; see
    * `pedigree/collapse.ts` for who that takes. One undo step. Hidden people
    * are dropped from the selection.
    */
   setDescendantsHidden: (individualIds: string[], hidden: boolean) => void;
   /**
-   * Set a view filter field (#4), see `pedigree/viewFilters.ts`; `false` or
+   * Set a view filter field, see `pedigree/viewFilters.ts`; `false` or
    * `undefined` removes it, and switching off `affectedOnly` drops its
    * `affectedCondition` too.
    * Saved with the pedigree, one undo step. Hidden people are dropped from
@@ -375,7 +375,7 @@ interface PedigreeState {
   /** Switch every view filter off, one undo step. */
   clearViewFilters: () => void;
   /**
-   * Make one or two existing individuals the parents of childId (#36). Uses
+   * Make one or two existing individuals the parents of childId. Uses
    * their existing partnership or creates one; a single parent gets a new
    * unknown-sex partner. A
    * child who already has parents is moved. Returns the reason when
@@ -383,19 +383,19 @@ interface PedigreeState {
    */
   setParents: (childId: string, parentIds: string[]) => string | null;
   /**
-   * Take childId out of their parents' sibship (#104): they become a founder
+   * Take childId out of their parents' sibship: they become a founder
    * and the parents stay, as a couple (a gamete donor pair left with no
    * children is removed, as it is not a couple).
    */
   /**
-   * Make an existing person a child of a same-sex couple (#105): of
+   * Make an existing person a child of a same-sex couple: of
    * `geneticParentId` and a donor, the other partner a social parent (see
    * `applySameSexChildren`). Returns the reason when refused.
    */
   setSameSexChild: (childId: string, partnershipId: string, geneticParentId: string) => string | null;
   detachFromParents: (childId: string) => void;
   /**
-   * Remove a partnership without removing either person (#104), for a
+   * Remove a partnership without removing either person, for a
    * partner linked by mistake. Refused, with the reason, while it has
    * children: they would lose a parent, so move them first.
    */
@@ -407,36 +407,36 @@ interface PedigreeState {
   updateIndividual: (id: string, updates: Partial<Individual>) => void;
   /**
    * The plain Affected status. With exactly one condition tag it records that
-   * condition too; unticking clears every affected condition (#115,
-   * `applyAffected`).
+   * condition too; unticking clears every affected condition
+   * (`applyAffected`).
    */
   setAffected: (id: string, affected: boolean) => void;
   /**
-   * One person's state for one condition (quadrant tag, #115): affected,
+   * One person's state for one condition (quadrant tag): affected,
    * carrier or neither (`applyConditionState`).
    */
   setConditionStatus: (id: string, tagId: string, state: ConditionState) => void;
-  /** Unticking deceased also clears the date of death (#103). */
+  /** Unticking deceased also clears the date of death. */
   setDeceased: (id: string, deceased: boolean) => void;
-  /** Date of death (#103), "YYYY", "YYYY-MM" or "YYYY-MM-DD"; a non-empty one also ticks deceased, empty removes it. */
+  /** Date of death, "YYYY", "YYYY-MM" or "YYYY-MM-DD"; a non-empty one also ticks deceased, empty removes it. */
   setDateOfDeath: (id: string, dod: string | undefined) => void;
   /**
    * Carrier with no condition recorded (the dot in 2008, the dotted half in
-   * 2022); with exactly one condition tag, a carrier of it (#115). Setting it
-   * clears `presymptomatic`: the two are one carrier status (#101).
+   * 2022); with exactly one condition tag, a carrier of it. Setting it
+   * clears `presymptomatic`: the two are one carrier status.
    */
   setCarrier: (id: string, carrier: boolean) => void;
-  /** Presymptomatic carrier, a vertical line through the symbol (#101). Setting it clears `carrier`. */
+  /** Presymptomatic carrier, a vertical line through the symbol. Setting it clears `carrier`. */
   setPresymptomatic: (id: string, presymptomatic: boolean) => void;
-  /** Replace the person's evaluations (#101); an empty list removes the field. */
+  /** Replace the person's evaluations; an empty list removes the field. */
   setEvaluations: (id: string, evaluations: Evaluation[]) => void;
   setProband: (id: string) => void;
-  /** Consultand arrow without the "P" (#99). Several people may be consultands. */
+  /** Consultand arrow without the "P". Several people may be consultands. */
   setConsultand: (id: string, consultand: boolean) => void;
-  /** "?" above the symbol: family history not known (#100). */
+  /** "?" above the symbol: family history not known. */
   setFamilyHistoryUnknown: (id: string, unknown: boolean) => void;
   setSex: (id: string, sex: Sex) => void;
-  // Batch status changes on a multiple selection (#35). Each is one undo step
+  // Batch status changes on a multiple selection. Each is one undo step
   // and a no-op (no undo step) when nobody would change; the rules are the
   // single-person setters' applied to each person.
   setAffectedMany: (ids: string[], affected: boolean) => void;
@@ -446,18 +446,18 @@ interface PedigreeState {
   /** Refused with the reason (see `batchSexProblem`); monozygotic twins follow. */
   setSexMany: (ids: string[], sex: Sex) => string | null;
   setIndividualTagMany: (ids: string[], tagId: string, on: boolean) => void;
-  /** `setConditionStatus` for several people, one undo step (#115). */
+  /** `setConditionStatus` for several people, one undo step. */
   setConditionStatusMany: (ids: string[], tagId: string, state: ConditionState) => void;
   /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
   setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
-  /** Adoption brackets (#12): "in", "out" or none. */
+  /** Adoption brackets: "in", "out" or none. */
   setAdopted: (id: string, status: Adoption | undefined) => void;
   /**
-   * Assisted reproduction (#45). addDonor makes a new sperm or egg donor the
+   * Assisted reproduction. addDonor makes a new sperm or egg donor the
    * child's genetic parent in place of one parent, who stays linked to the
    * child (see `applyAddDonor` in pedigree/assisted.ts); addSurrogate adds
    * the woman who carried the child. Both return a reason when refused.
-   * `existingId` makes someone already on the tree the donor or surrogate (#104).
+   * `existingId` makes someone already on the tree the donor or surrogate.
    */
   addDonor: (childId: string, gamete: Gamete, existingId?: string) => string | null;
   addSurrogate: (childId: string, existingId?: string) => string | null;
@@ -467,7 +467,7 @@ interface PedigreeState {
   /** Parents of the child who are not genetic parents (dashed line). */
   setSocialParents: (childId: string, parentIds: string[]) => void;
   /**
-   * Make (or replace) a twin set (#11) among the children of partnershipId.
+   * Make (or replace) a twin set among the children of partnershipId.
    * Members already in another set of that partnership are moved into this
    * one. Returns the reason when refused (fewer than two members, not all
    * children of the couple, different sexes for monozygotic), else null.
@@ -478,24 +478,24 @@ interface PedigreeState {
 
   // Partnership property mutations
   /**
-   * Childless couple mark (#15). Refused (no-op) when the partnership has
+   * Childless couple mark. Refused (no-op) when the partnership has
    * children. Clearing with undefined also drops the reason.
    */
   setPartnershipChildless: (partnershipId: string, status: ChildlessStatus | undefined) => void;
   /** Reason under the mark; empty clears it. */
   setPartnershipChildlessReason: (partnershipId: string, reason: string) => void;
   /**
-   * The double-line override (#85): mark a couple as related when the
+   * The double-line override: mark a couple as related when the
    * pedigree does not show how. False removes the flag; a couple the
    * pedigree shows to be related keeps its double line either way.
    */
   setPartnershipConsanguineous: (partnershipId: string, related: boolean) => void;
-  /** Text above the double line (#97); empty clears it. */
+  /** Text above the double line; empty clears it. */
   setPartnershipConsanguinityLabel: (partnershipId: string, label: string) => void;
-  /** Ended relationship (#98): two strokes across the couple line. False removes the flag. */
+  /** Ended relationship: two strokes across the couple line. False removes the flag. */
   setPartnershipEnded: (partnershipId: string, ended: boolean) => void;
   /**
-   * Draw the couple's partners the other way round (#106), by setting
+   * Draw the couple's partners the other way round, by setting
    * `Partnership.leftPartner` (and the partner's other couple's, when they
    * have exactly two partners). One undo step, nobody pinned. Returns the
    * reason when refused, also shown as a notice.
@@ -507,7 +507,7 @@ interface PedigreeState {
 
   // Pin / drag
   pinIndividual: (individualId: string, pos: { x: number; y: number }) => void;
-  /** Pin several individuals as one undo step (a group drag, #21). Positions in normal spacing. */
+  /** Pin several individuals as one undo step (a group drag). Positions in normal spacing. */
   pinIndividuals: (positions: Record<string, { x: number; y: number }>) => void;
   unpinIndividual: (individualId: string) => void;
   resetLayout: () => void;
@@ -515,16 +515,16 @@ interface PedigreeState {
   // Lock / unlock per-node
   unlockIndividual: (individualId: string) => void;
   lockIndividual: (individualId: string) => void;
-  /** Unlock several individuals as one undo step (#21). No-op when all are unlocked already. */
+  /** Unlock several individuals as one undo step. No-op when all are unlocked already. */
   unlockIndividuals: (individualIds: string[]) => void;
   /** Lock several individuals as one undo step, dropping their pins (back to auto layout). */
   lockIndividuals: (individualIds: string[]) => void;
 
   // Canvas settings
   updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
-  /** Title above the chart (#20). "" hides it; undefined falls back to the pedigree's name. */
+  /** Title above the chart. "" hides it; undefined falls back to the pedigree's name. */
   setChartTitle: (title: string | undefined) => void;
-  /** Set one clinical key field (#102); an empty value removes it, and the block goes when empty. */
+  /** Set one clinical key field; an empty value removes it, and the block goes when empty. */
   setClinicalDetail: (field: keyof ClinicalDetails, value: string) => void;
 
   // Tags (definitions live on the pedigree; individuals reference them by id)
@@ -534,7 +534,7 @@ interface PedigreeState {
   moveTag: (id: string, direction: -1 | 1) => void;
   setIndividualTag: (individualId: string, tagId: string, on: boolean) => void;
   /**
-   * Age of onset (#93) of the affected status (tagId null) or of a condition
+   * Age of onset of the affected status (tagId null) or of a condition
    * tag. An empty or blank value removes it.
    */
   setOnset: (individualId: string, tagId: string | null, value: string) => void;
@@ -554,8 +554,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
    * Mutate pedigree with an Immer recipe, after snapshotting. Only
    * setDescendantsHidden and setViewFilter may hide people (`hides`): after
    * any other edit, a collapsed branch that would swallow someone added or
-   * moved is shown (#94), and if a view filter would still leave someone new
-   * out of the drawing, the filters are turned off (#4).
+   * moved is shown, and if a view filter would still leave someone new
+   * out of the drawing, the filters are turned off.
    */
   function mutate(recipe: (draft: Pedigree) => void, hides = false) {
     snapshot();
@@ -570,7 +570,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
   }
 
   /**
-   * Say what adding a child to a same-sex couple did (#105): the donor is
+   * Say what adding a child to a same-sex couple did: the donor is
    * new on the canvas, so the user should know where it came from.
    */
   function noticeDonorChildren(geneticParentId: string, pairId: string, n: number) {
@@ -587,7 +587,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
   }
 
   /**
-   * One undo step applying `apply` to each of `ids` that `changes` (#35),
+   * One undo step applying `apply` to each of `ids` that `changes`,
    * then an undoable notice saying how many changed. Nothing happens when
    * nobody would change.
    */
@@ -609,7 +609,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     if (kept.length !== selectedIds.length) set(selectionOf(kept, selectedId));
   }
 
-  /** Shared body of removeWithDescendants / removeWithAncestors (#34). */
+  /** Shared body of removeWithDescendants / removeWithAncestors. */
   function removeBranch(
     individualIds: string[],
     chooser: (pedigree: Pedigree, ids: string[]) => Set<string>,
@@ -623,7 +623,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       get().setNotice({ kind: "error", text: `Not removed: removing ${ids.length === 1 ? "this person" : "these people"}${what ? ` with their ${what}` : ""} would leave an empty pedigree. Delete individuals one at a time, or start a new pedigree.` });
       return 0;
     }
-    // Couples losing a child here may leave a placeholder partner with none (#107).
+    // Couples losing a child here may leave a placeholder partner with none.
     // and partners of removed people may be left alone.
     const candidates = partnersIn(pedigree, pedigree.partnerships
       .filter(p => gone.has(p.individual1) || gone.has(p.individual2) || (pedigree.parentOf[p.id] ?? []).some(c => gone.has(c)))
@@ -747,8 +747,8 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     selectDescendants: (id) => {
       const { pedigree } = get();
       if (!pedigree.individuals.some(i => i.id === id)) return 0;
-      // Only people who are drawn: someone hidden in a collapsed branch (#94)
-      // or by a view filter (#4) would otherwise be moved, deleted or edited
+      // Only people who are drawn: someone hidden in a collapsed branch
+      // or by a view filter would otherwise be moved, deleted or edited
       // without being seen.
       const hidden = collapseInfo(pedigree).hidden;
       const ids = [...removeWithDescendantsSet(pedigree, [id])].filter(x => !hidden.has(x));
@@ -796,7 +796,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
     // ── Structural mutations ─────────────────────────────────────────────────
 
-    /** Selects the new person and asks the canvas to show them (#121): the layout puts them at the end of the top generation. */
+    /** Selects the new person and asks the canvas to show them: the layout puts them at the end of the top generation. */
     addIndividual: (sex) => {
       let id = "";
       mutate(draft => {
@@ -830,7 +830,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           const ind2 = draft.individuals.find(i => i.id === p.individual2)!;
 
           // If there's an unknown-sex placeholder, convert it
-          // The user has now asked for this parent, so it is no longer a placeholder (#107).
+          // The user has now asked for this parent, so it is no longer a placeholder.
           if (ind1.sex === "unknown" && sex !== "unknown") {
             ind1.sex = sex;
             delete ind1.placeholder;
@@ -898,7 +898,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         const child = makeIndividual(sex, nextSibOrderInFamily(draft, partnershipId));
         draft.individuals.push(child);
-        // A same-sex couple's child is this person's and a donor's (#105).
+        // A same-sex couple's child is this person's and a donor's.
         if (isSameSexCouple(draft, draft.partnerships.find(p => p.id === partnershipId))) {
           viaDonor = applySameSexChildren(draft, partnershipId, individualId, [child.id], { donor: newId(), pair: newId() }) ?? undefined;
           return;
@@ -930,7 +930,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       mutate(draft => {
         if (!draft.individuals.some(i => i.id === individualId)) return;
         const pid = ensureChildPartnershipId(draft, individualId, partnershipId);
-        // A same-sex couple's children are this person's and a donor's (#105).
+        // A same-sex couple's children are this person's and a donor's.
         if (isSameSexCouple(draft, draft.partnerships.find(p => p.id === pid))) {
           const kids = Array.from({ length: n }, () => makeIndividual(sex, 0));
           draft.individuals.push(...kids);
@@ -961,7 +961,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
 
         const sibling = makeIndividual("unknown", nextSibOrderInFamily(draft, parentPId));
         // A donor-conceived child's sibling by the same donor is raised by
-        // the same social parents (the other partner of a same-sex couple, #105).
+        // the same social parents (the other partner of a same-sex couple).
         const source = draft.individuals.find(i => i.id === individualId);
         if (draft.partnerships.find(p => p.id === parentPId)?.donorConception && source?.socialParents?.length) {
           sibling.socialParents = [...source.socialParents];
@@ -1036,7 +1036,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
      * - Remove from parentOf (as a child) in their parent partnership
      */
     deleteIndividual: (individualId) => {
-      // Placeholder partners of the couples this person is a child or partner of (#107).
+      // Placeholder partners of the couples this person is a child or partner of.
       const ped0 = get().pedigree;
       const candidates = partnersIn(ped0, [
         ...Object.keys(ped0.parentOf).filter(pid => ped0.parentOf[pid]!.includes(individualId)),
@@ -1062,7 +1062,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         draft.individuals = draft.individuals.filter(i => i.id !== individualId);
         removeFromTwinSets(draft, individualId);
         dropAssistedLinks(draft, new Set([individualId]));
-        // A placeholder left with no children, or alone, goes too (#107).
+        // A placeholder left with no children, or alone, goes too.
         dropLeftoverPlaceholders(draft, candidates);
 
         // Drop their pin and unlock entries, which would otherwise dangle
@@ -1097,7 +1097,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
           }
         }
         applySameSexChildren(draft, partnershipId, geneticParentId, [childId], { donor: newId(), pair: newId() });
-        // An empty donor pair left behind is not a couple; nor is a placeholder left alone (#107).
+        // An empty donor pair left behind is not a couple; nor is a placeholder left alone.
         if (before?.donorConception && (draft.parentOf[before.id] ?? []).length === 0) {
           draft.partnerships = draft.partnerships.filter(p => p.id !== before.id);
           delete draft.parentOf[before.id];
@@ -1143,7 +1143,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (kids.length > 0) {
         return `Not removed: this couple has ${kids.length === 1 ? "a child" : `${kids.length} children`}. Use Replace parents or Detach from parents on ${kids.length === 1 ? "the child" : "each child"} first.`;
       }
-      // An untouched placeholder partner would be left alone on the canvas, so it goes too (#107).
+      // An untouched placeholder partner would be left alone on the canvas, so it goes too.
       mutate(draft => {
         draft.partnerships = draft.partnerships.filter(x => x.id !== partnershipId);
         delete draft.parentOf[partnershipId];
@@ -1192,7 +1192,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         child.sibOrder = nextSibOrderInFamily(draft, partnership.id);
         draft.parentOf[partnership.id] = [...(draft.parentOf[partnership.id] ?? []), childId];
         clearChildless(draft, partnership.id);
-        // The previous couple's placeholder partner, if this was their last child (#107).
+        // The previous couple's placeholder partner, if this was their last child.
         if (before) dropLeftoverPlaceholders(draft, [before.individual1, before.individual2]);
       });
       const after = currentParentsOf(get().pedigree, childId)!;
@@ -1321,7 +1321,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       if (!current || !dryRun(current, ind => applyAffected(ind, affected, get().pedigree))) return;
       mutate(draft => {
         const ind = draft.individuals.find(i => i.id === id);
-        // Onset belongs to the affected status (#93); conditions follow it (#115).
+        // Onset belongs to the affected status; conditions follow it.
         if (ind) applyAffected(ind, affected, draft);
       });
     },
@@ -1367,7 +1367,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;
         if (presymptomatic) {
-          // One carrier status (#101): with one condition, its carrier state goes too (#115).
+          // One carrier status: with one condition, its carrier state goes too.
           applyCarrier(ind, false, draft);
           ind.presymptomatic = true;
         } else delete ind.presymptomatic;
@@ -1415,7 +1415,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       });
     },
 
-    /** Monozygotic twins share a sex, so changing one changes the whole set (#11). */
+    /** Monozygotic twins share a sex, so changing one changes the whole set. */
     setSex: (id, sex) => {
       const problem = batchSexProblem(get().pedigree, [id], sex);
       if (problem) { get().setNotice({ kind: "error", text: problem }); return; }
@@ -1423,7 +1423,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const ind = draft.individuals.find(i => i.id === id);
         if (!ind) return;
         ind.sex = sex;
-        delete ind.placeholder; // a sex the user chose is a recorded fact (#107)
+        delete ind.placeholder; // a sex the user chose is a recorded fact
         const twin = twinSetOf(draft as Pedigree, id);
         if (twin?.set.zygosity === "monozygotic") {
           for (const m of twin.set.members) {
@@ -1451,7 +1451,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setCarrierStatusMany: (ids, status) => {
       const { pedigree } = get();
       mutateEach(ids, ind => carrierStatusOf(ind, pedigree) !== status, ind => {
-        // With one condition, carrier records it (#115, `applyCarrier`).
+        // With one condition, carrier records it (`applyCarrier`).
         if (status === "carrier") applyCarrier(ind, true, pedigree);
         else if (status === "presymptomatic") { applyCarrier(ind, false, pedigree); ind.presymptomatic = true; }
         else { applyCarrier(ind, false, pedigree); delete ind.presymptomatic; }
@@ -1471,7 +1471,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     setIndividualTagMany: (ids, tagId, on) => {
       const tag = get().pedigree.tags?.find(t => t.id === tagId);
       if (!tag) return;
-      // A condition tag is "affected with it" (#115): same rule as setConditionStatus. A trait (#118) is a plain tag.
+      // A condition tag is "affected with it": same rule as setConditionStatus. A trait is a plain tag.
       if (isConditionTag(tag)) {
         const { pedigree } = get();
         const state: ConditionState = on ? "affected" : "none";
@@ -1823,7 +1823,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     },
 
     setIndividualTag: (individualId, tagId, on) => {
-      // A condition tag means affected with it (#115): ticking sets affected, unticking the last clears it.
+      // A condition tag means affected with it: ticking sets affected, unticking the last clears it.
       if (get().pedigree.tags?.some(t => t.id === tagId && isConditionTag(t))) {
         get().setConditionStatus(individualId, tagId, on ? "affected" : "none");
         return;

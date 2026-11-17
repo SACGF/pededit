@@ -7,7 +7,7 @@ import { requestErrorMessage } from "../api/errors";
 import { backupStatement } from "../utils/backupStatement";
 
 /**
- * "Delete account" (#183). Says what goes before it goes: the account, every
+ * "Delete account". Says what goes before it goes: the account, every
  * pedigree it owns and its My library, all at once (`DELETE /api/auth/me/`).
  * Pedigrees made while signed out belong to no account and are kept.
  */

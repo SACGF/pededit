@@ -10,22 +10,22 @@ export type Segment = [number, number, number, number];
  *
  * The sibship bar sits halfway between the couple line and the highest child
  * row, lowered by `barOffset` when it would otherwise run into another
- * couple's bar (`sibshipBarOffsets`, #80). Each child gets its own drop to
+ * couple's bar (`sibshipBarOffsets`). Each child gets its own drop to
  * its own symbol, so a child pinned above or below its siblings' row is still
  * reached. The bar spans from the couple drop to the outermost child so the
  * two always meet.
  *
  * `topInset` is how far below the top of the symbol box the symbol starts:
- * a loss triangle's apex sits lower than a square's top edge (#13).
+ * a loss triangle's apex sits lower than a square's top edge.
  *
- * `converge` (a donor pair's only child, #45): no bar; the line from each
+ * `converge` (a donor pair's only child): no bar; the line from each
  * parent in `apart` runs straight to the top of the child's symbol, where
  * any other line of assisted reproduction meets it too, as NSGC 2008 Fig. 3
  * draws them (the child sits under the woman carrying it, so her line is
  * vertical). The result is then just those lines.
  *
  * The result is the couple drop, the bar, then one drop per child in input
- * order; `sibshipPaths` splits off the drops of adopted-in children (#12),
+ * order; `sibshipPaths` splits off the drops of adopted-in children,
  * which are drawn dashed.
  */
 export interface SibshipChild {
@@ -33,7 +33,7 @@ export interface SibshipChild {
   y: number;
   topInset?: number;
   dashed?: boolean;
-  /** Key of the twin set this child is in (#11): members share one fork from the bar. */
+  /** Key of the twin set this child is in: members share one fork from the bar. */
   twinSet?: string;
   zygosity?: "monozygotic" | "dizygotic" | "unknown";
 }
@@ -73,7 +73,7 @@ export function sibshipSegments(
   const fromXs = children.map(c => c.twinSet !== undefined ? (forks.get(c.twinSet) ?? c.x) : c.x);
   const segs: Segment[] = [
     // Drop from the couple line (raised when it hops) to the bar. Parents
-    // who are not a couple (gamete donation, #45) each get a line to the
+    // who are not a couple (gamete donation) each get a line to the
     // bar instead (`apart`).
     ...(apart ? donorDescentSegments(apart, coupleX, sibBarY) : [[coupleX, coupleY - hopHeight, coupleX, sibBarY] as Segment]),
     // The bar ends where the outermost drops start: at a twin fork, not over
@@ -94,7 +94,7 @@ export interface TwinMark { kind: "bar"; segment: Segment }
 export interface TwinQuestion { kind: "question"; x: number; y: number }
 
 /**
- * Marks drawn on twin forks (#11), as R's plot.pedigree does: for each pair
+ * Marks drawn on twin forks, as R's plot.pedigree does: for each pair
  * of neighbouring members, the points halfway down their two drops are joined
  * by a bar (monozygotic) or get a "?" between them (unknown zygosity).
  */
@@ -144,7 +144,7 @@ export function sibshipPaths(
   converge = false,
 ): { solid: Segment[]; dashed: Segment[] } {
   const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset, apart, converge);
-  // A converged only child (#45) has no drop of its own to dash.
+  // A converged only child has no drop of its own to dash.
   const ownDrops = segs.length - children.length >= 2;
   if (segs.length === 0 || !ownDrops || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };
   const fixed = segs.length - children.length; // couple drop and bar
@@ -153,7 +153,7 @@ export function sibshipPaths(
   return { solid, dashed };
 }
 
-// ── Bars that would overlap (#80) ─────────────────────────────────────────────
+// ── Bars that would overlap ─────────────────────────────────────────────────
 
 /** What `sibshipBarOffsets` needs to know about one sibship. */
 export interface SibshipBar {

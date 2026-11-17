@@ -43,7 +43,7 @@ function UnknownIcon() {
 interface ToolbarProps {
   onSettingsClick: () => void;
   onExportSvgClick: () => void;
-  /** Small screens (#169): opens the left sidebar, which is hidden there. */
+  /** Small screens: opens the left sidebar, which is hidden there. */
   onMenuClick: () => void;
 }
 
@@ -120,7 +120,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   }
 
   return (
-    // Small screens (#169): the buttons keep their size and the row scrolls sideways.
+    // Small screens: the buttons keep their size and the row scrolls sideways.
     <div className="flex items-center gap-1 px-2 py-1 border-b bg-white max-lg:overflow-x-auto max-lg:*:shrink-0 max-lg:[scrollbar-width:none]" data-testid="toolbar">
       <Button
         variant="ghost" size="sm"
@@ -218,10 +218,10 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         </Button>
       )}
 
-      {/* Editor warnings (#116): shown only while there are some */}
+      {/* Editor warnings: shown only while there are some */}
       {hasPedigree && <ProblemsMenu />}
 
-      {/* View filters (#4) */}
+      {/* View filters */}
       <FilterMenu disabled={!hasPedigree} />
 
       {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}

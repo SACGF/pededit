@@ -26,7 +26,7 @@ function matchRank(ind: Pedigree["individuals"][number], q: string): number {
 
 /**
  * Instructions, the picks so far and a name search while on-canvas picking
- * (#36, and #84 for a partner) is active. Sits over the canvas as a React Flow panel.
+ * is active. Sits over the canvas as a React Flow panel.
  */
 export function PickingBanner() {
   const { pedigree, picking, pickIndividual, applyPicking, cancelPicking } = usePedigreeFields("pedigree", "picking", "pickIndividual", "applyPicking", "cancelPicking");
@@ -44,7 +44,7 @@ export function PickingBanner() {
     ? pedigree.individuals
       .filter(i => !excluded.has(i.id) && ((i.name ?? "").toLowerCase().includes(q) || i.id.toLowerCase().includes(q)))
       // Best match first: a name equal to the query, then one starting with it, then the rest
-      // (ids are UUIDs, so a short query such as "9" matches many of them, #104).
+      // (ids are UUIDs, so a short query such as "9" matches many of them).
       .sort((a, b) => matchRank(a, q) - matchRank(b, q))
       .filter(i => !isParents || !setParentsProblem(pedigree, picking.childId, [...picked, i.id]))
       .filter(i => !isPartner || !linkPartnerProblem(pedigree, picking.individualId, i.id))

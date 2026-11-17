@@ -1,6 +1,6 @@
 /**
- * Arithmetic on partial dates ("2007", "2007-03", "2007-03-14", #103) for
- * the editor warnings (#116). A partial date stands for every day it could
+ * Arithmetic on partial dates ("2007", "2007-03", "2007-03-14") for
+ * the editor warnings. A partial date stands for every day it could
  * be, so each comparison asks what is certain: 2007 is not certainly before
  * 2007-03-14, and someone born in 1950 is 55 or 56 in 2006. A check flags
  * only what holds for every day the dates could be.

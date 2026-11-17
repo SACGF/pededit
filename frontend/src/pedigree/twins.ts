@@ -1,7 +1,7 @@
 import type { Pedigree, Partnership, TwinSet, Zygosity } from "@pedigree-editor/layout-engine";
 
 /**
- * Twins (#11, NSGC 2008): a twin set's members share one fork from the
+ * Twins (NSGC 2008): a twin set's members share one fork from the
  * sibship bar. Monozygotic twins get a bar across the fork, unknown zygosity
  * a "?". The sets live on the partnership (`Partnership.twins`), so members
  * always share both parents. Framework-free helpers shared by the store, the

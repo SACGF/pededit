@@ -7,7 +7,7 @@ import { nameCoupleRelationship } from "./relationship";
 
 /**
  * The degree of relationship written above a consanguineous couple's double
- * line (#97, NSGC 2008 Fig. 2.2b: "if the degree of relationship is not
+ * line (NSGC 2008 Fig. 2.2b: "if the degree of relationship is not
  * obvious from the pedigree, it should be stated above the relationship
  * line"). Framework-free: the canvas edges, `svgExporter`, the export lint
  * and the chart title placement share it.
@@ -49,14 +49,14 @@ export function namedCoupleRelationship(pedigree: Pedigree, partnership: Partner
   return nameCoupleRelationship(pedigree, a, b, kinshipOf(pedigree).kinship(a, b));
 }
 
-/** What sits on a partner's symbol top: a line of descent from their parents, a "?" (#100). */
+/** What sits on a partner's symbol top: a line of descent from their parents, a "?". */
 export interface SymbolTop { hasParents: boolean; familyHistoryUnknown: boolean }
 
 /**
  * The span (px) the label, over partners at x `lx` and `rx`, must stay
  * inside. It keeps clear of what lands on each symbol top: the line of
  * descent in the middle of the top, and the "?" for family history not known
- * (#100), centred or, with a line of descent, left of it. A bare top can be
+ * centred or, with a line of descent, left of it. A bare top can be
  * written over.
  */
 export function consanguinityLabelLimits(lx: number, rx: number, left: SymbolTop, right: SymbolTop): [number, number] {
@@ -135,8 +135,8 @@ export interface TextBlock { x: number; top: number; bottom: number; halfWidth: 
 const MAX_RAISE = 12;
 
 /**
- * Where a couple's label can go without touching anything drawn near it
- * (#109). In compact rows the name and details of a person in the row
+ * Where a couple's label can go without touching anything drawn near it.
+ * In compact rows the name and details of a person in the row
  * above can hang down to the symbol tops of the row below, right where the
  * label goes; a copy number or a dashed arc between two copies can sit
  * there in any layout. In order, the first place that is clear:
@@ -149,7 +149,7 @@ const MAX_RAISE = 12;
  *      among the `blocks`, so it is never crossed);
  *   4. low, just above the double line between the two symbols, when the
  *      gap between them is wide enough, the line is straight (no hop) and
- *      not ended (#98, whose strokes cross it there);
+ *      not ended (the two strokes of an ended one cross it there);
  *   5. all of that again with the dashed arcs between copies of someone
  *      left out of the way: the label goes on a white backing and the arc
  *      passes behind it (`backed`), as in the U-shape export;
@@ -227,8 +227,8 @@ export function highestConsanguinityLabel(flow: Parameters<typeof consanguinityL
 
 /**
  * The highest point of anything drawn over the symbols, or Infinity when
- * there is nothing: the couple labels (#97) and the dashed arcs between two
- * copies of someone (#172). The chart title is raised to clear it, on the
+ * there is nothing: the couple labels and the dashed arcs between two
+ * copies of someone. The chart title is raised to clear it, on the
  * canvas (`chartTitleNode`) and in the export (`computeBounds`).
  */
 export function highestAboveSymbols(flow: Parameters<typeof consanguinityLabelPlacements>[0] & Parameters<typeof highestDuplicateArc>[0]): number {

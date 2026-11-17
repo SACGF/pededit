@@ -14,7 +14,7 @@ export interface SvgExportOptions {
 
   /**
    * When deidentify=true: which free text the de-identified copy keeps
-   * (#111). Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
+   *. Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
    * free-text age, notes, the chart title and the clinical key fields always
    * go.
    */
@@ -25,7 +25,7 @@ export interface SvgExportOptions {
 
   /**
    * Optional title line rendered above the pedigree. Default: none. Callers
-   * pass `chartTitle(pedigree, name)` from `pedigree/labels.ts` (#20).
+   * pass `chartTitle(pedigree, name)` from `pedigree/labels.ts`.
    */
   title?: string;
 
@@ -48,9 +48,9 @@ export interface SvgExportOptions {
   debugSpine?: boolean;
 }
 
-/** The free text a de-identified export can keep or drop (#111). */
+/** The free text a de-identified export can keep or drop. */
 export interface DeidentifyKeep {
-  /** Evaluation detail text, "BRCA1 c.5266dupC" in "BRCA1 c.5266dupC +" (#101, #114). */
+  /** Evaluation detail text, "BRCA1 c.5266dupC" in "BRCA1 c.5266dupC +". */
   evaluationDetail: boolean;
   /**
    * With the detail dropped: keep each evaluation's result mark ("+", "E1-")
@@ -58,11 +58,11 @@ export interface DeidentifyKeep {
    * while `evaluationDetail` is true.
    */
   evaluationMarks: boolean;
-  /** Ages of onset under the symbol (#93, `onset` and `tagOnset`). */
+  /** Ages of onset under the symbol (`onset` and `tagOnset`). */
   onset: boolean;
-  /** Text above a double line (#97): `consanguinityLabel` and the named relationship. */
+  /** Text above a double line: `consanguinityLabel` and the named relationship. */
   consanguinityLabels: boolean;
-  /** Text-style tags (#3), such as a genotype, under the symbol and in the key. */
+  /** Text-style tags, such as a genotype, under the symbol and in the key. */
   textTags: boolean;
 }
 

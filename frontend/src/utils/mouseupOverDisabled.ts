@@ -1,5 +1,5 @@
 /**
- * Ends mouse gestures that are let go over a disabled control (#185).
+ * Ends mouse gestures that are let go over a disabled control.
  *
  * Browsers send no mouse events to a disabled button, input or select, only
  * pointer events. React Flow's node drag and pan (d3-drag, d3-zoom) end on a

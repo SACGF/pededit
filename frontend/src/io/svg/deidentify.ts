@@ -18,7 +18,7 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
 }
 
 /**
- * The optional free text of #111, dropped from one individual as `keep` says.
+ * The optional free text (`DeidentifyKeep`), dropped from one individual as `keep` says.
  * Evaluation detail and onset can carry a test result or date a relative
  * did not know; text tags are often genotypes.
  */
@@ -46,7 +46,7 @@ function dropFreeText(ind: Individual, keep: DeidentifyKeep, textTagIds: Set<str
   return out;
 }
 
-/** The consanguinity text (#97) leaves the couple; the named relationship goes via canvasSettings. */
+/** The consanguinity text leaves the couple; the named relationship goes via canvasSettings. */
 function dropCoupleLabel(p: Partnership): Partnership {
   if (p.consanguinityLabel === undefined) return p;
   const out = { ...p };
@@ -55,22 +55,22 @@ function dropCoupleLabel(p: Partnership): Partnership {
 }
 
 /**
- * The drawn pedigree (hidden descendants left out, #94) with names replaced by
+ * The drawn pedigree (hidden descendants left out) with names replaced by
  * generation numbers, dates bucketed or dropped (the date of death always),
  * and free-text age, notes,
- * chart title and clinical key fields dropped. The free text of #111
+ * chart title and clinical key fields dropped. The optional free text
  * (evaluation detail, onset, consanguinity text, text tags) goes as
  * `options.deidentifyKeep` says, by default the detail and onset.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
-  // The pedigree numbers (#8), so a de-identified figure reads like the
+  // The pedigree numbers, so a de-identified figure reads like the
   // numbered one.
   const notations = pedigreeNumbers(pedigree);
 
-  // The chart title and the free-text age (#20) can name or date someone, so
+  // The chart title and the free-text age can name or date someone, so
   // both go; age ranges come from the DOB only.
-  // The clinical key fields (#102) name the recorder and historian and date
+  // The clinical key fields name the recorder and historian and date
   // the visit; the reason and ancestry are free text that can name people
   // too, so the whole block goes.
   const rest: Pedigree = { ...pedigree };
@@ -93,7 +93,7 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     individuals: pedigree.individuals.map(ind => ({
       ...dropFreeText(ind, keep, textTagIds),
       name:  isBranchPlaceholderId(ind.id) ? undefined : notations.get(ind.id) ?? ind.id,
-      // A date of death (#103) dates someone like a DOB does, so it goes;
+      // A date of death dates someone like a DOB does, so it goes;
       // with age ranges, someone with both dates gets the range at death.
       dob:   options.ageBuckets && ind.dob ? (ind.deceased && ind.dod && parsePartialDate(ind.dod.trim()) ? `d. ${ageBucket(ind.dob, new Date(ind.dod))}` : ageBucket(ind.dob)) : undefined,
       dod:   undefined,
@@ -104,7 +104,7 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
 }
 
 /**
- * Which of the #111 choices the drawn pedigree has anything for, so the
+ * Which of the `DeidentifyKeep` choices the drawn pedigree has anything for, so the
  * export dialog offers only those. `evaluationDetail` is evaluation detail
  * text; the marks choice goes with it.
  */

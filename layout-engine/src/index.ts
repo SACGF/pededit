@@ -25,7 +25,7 @@ export { isAffected, isConditionTag } from "./affected.js";
 
 // ---- For the PedEdit editor: not a stable API ----
 // Steps of the kinship2 pipeline and their 1-based working types, and the
-// editor's hooks into the layout (#45, #106). Exported because the editor
+// editor's hooks into the layout. Exported because the editor
 // and its tests call them; they follow the editor's needs, not semver.
 export { kindepth } from "./kindepth.js";
 export { autohint } from "./autohint.js";

@@ -1,4 +1,4 @@
-// The layout, kept while the structure it was computed from is unchanged (#189).
+// The layout, kept while the structure it was computed from is unchanged.
 //
 // The engine's quadratic program (alignped4) is nearly all of the cost of an
 // edit on a large pedigree, and most edits cannot move anyone: marking someone

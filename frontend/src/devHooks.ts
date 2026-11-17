@@ -10,11 +10,11 @@
  *   __pededit.layout().nodes.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
  *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
- *   __pededit.problems()       // editor warnings (#116): [] when nothing looks wrong
+ *   __pededit.problems()       // editor warnings: [] when nothing looks wrong
  *   __pededit.exportSvg({ uShape: true })   // the export as an SVG string, for shot.mjs FILE.svg
  *   __pededit.align().pos      // raw kinship2 LayoutResult
- *   __pededit.kinship().kinship("a", "b")   // kinship coefficient (#32)
- *   __pededit.kinship(undefined, { chromosome: "X" }).inbreeding("a")   // X-linked (#87)
+ *   __pededit.kinship().kinship("a", "b")   // kinship coefficient
+ *   __pededit.kinship(undefined, { chromosome: "X" }).inbreeding("a")   // X-linked
  */
 import { usePedigreeStore } from "./store/usePedigreeStore";
 import { useAppStore } from "./store/useAppStore";
@@ -60,7 +60,7 @@ const hooks = {
     layoutToFlow(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
   /** The raw kinship2 LayoutResult (alignPedigree) for a pedigree, default the current one. */
   align: (pedigree?: Pedigree) => alignPedigree(pedigree ?? usePedigreeStore.getState().getPedigree()),
-  /** Kinship and inbreeding coefficients (#32): `.kinship(a, b)` and `.inbreeding(id)`; `{ chromosome: "X" }` for X-linked (#87). */
+  /** Kinship and inbreeding coefficients: `.kinship(a, b)` and `.inbreeding(id)`; `{ chromosome: "X" }` for X-linked. */
   kinship: (pedigree?: Pedigree, options?: KinshipOptions) =>
     kinshipCoefficients(pedigree ?? usePedigreeStore.getState().getPedigree(), options),
   /**
@@ -69,7 +69,7 @@ const hooks = {
    */
   check: (pedigree?: Pedigree, options?: LayoutToFlowOptions) => {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
-    // With the chart title the canvas draws (#20, #188).
+    // With the chart title the canvas draws.
     const title = chartTitle(p, useAppStore.getState().activeTitle) || undefined;
     return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }), { title });
   },
@@ -79,7 +79,7 @@ const hooks = {
    */
   checkExport: (pedigree?: Pedigree, options?: SvgExportOptions) => {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
-    // With the chart title the export dialog would draw (#20); none when de-identified.
+    // With the chart title the export dialog would draw; none when de-identified.
     const title = options?.deidentify ? undefined : chartTitle(p, useAppStore.getState().activeTitle) || undefined;
     return lintExport(p, { ...canvasOptions(), title, ...options });
   },
@@ -88,7 +88,7 @@ const hooks = {
     const p = usePedigreeStore.getState().getPedigree();
     return (options?.uShape ? exportUShapeSvg : exportSvg)(p, { ...canvasOptions(), ...options });
   },
-  /** Editor warnings (#116, pedigree/validation.ts), without the fix functions so they print as JSON. */
+  /** Editor warnings (pedigree/validation.ts), without the fix functions so they print as JSON. */
   problems: (pedigree?: Pedigree) =>
     problemsOf(pedigree ?? usePedigreeStore.getState().getPedigree()).all.map(({ fix, moreFixes, ...p }) => ({
       ...p, ...(fix ? { fix: fix.label } : {}), ...(moreFixes ? { moreFixes: moreFixes.map(f => f.label) } : {}),

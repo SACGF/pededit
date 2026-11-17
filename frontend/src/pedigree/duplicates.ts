@@ -4,7 +4,7 @@ import { layoutToFlow } from "./layoutToFlow";
 const cache = new WeakMap<Pedigree, boolean>();
 
 /**
- * Whether the canvas draws anyone twice, joined by the dashed arc (#124),
+ * Whether the canvas draws anyone twice, joined by the dashed arc,
  * for the in-app legend. Exporters know from their own layout instead: the
  * U-shape draws different copies from the canvas. Compact mode and pins move
  * symbols, never which people are drawn twice, so the default layout answers.

@@ -1,5 +1,5 @@
 /**
- * "Family history not known" (#100, NSGC 2008 Fig. 2): a "?" above the
+ * "Family history not known" (NSGC 2008 Fig. 2): a "?" above the
  * individual's symbol, for someone whose family history is unavailable
  * (adopted with no records, a donor, a partner who married in and knows
  * nothing of their family). Stored as `Individual.familyHistoryUnknown`.

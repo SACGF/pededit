@@ -3,7 +3,7 @@ import { NODE_SIZE } from "../constants";
 import { TITLE_FONT_SIZE, TITLE_LINE_HEIGHT, chartTitlePlace } from "../labels";
 
 /**
- * The chart title above the pedigree (#20). It is a React Flow node so that
+ * The chart title above the pedigree. It is a React Flow node so that
  * it pans and zooms with the drawing and fit view keeps it in sight; it
  * cannot be selected or dragged and lets clicks through to the pane.
  */
@@ -19,8 +19,8 @@ export const CHART_TITLE_NODE_ID = "__chart-title";
  * The title node centred over the symbols, its baseline TITLE_GAP (plus room
  * for a deceased slash) above the highest one, as in the SVG export.
  * `aboveTop` is the highest point of anything drawn over the symbols
- * (`highestAboveSymbols`: the consanguinity labels of #97 and the dashed
- * arcs between two copies of someone, #172); the title is raised to clear it.
+ * (`highestAboveSymbols`: the consanguinity labels and the dashed
+ * arcs between two copies of someone); the title is raised to clear it.
  */
 export function chartTitleNode(
   title: string,

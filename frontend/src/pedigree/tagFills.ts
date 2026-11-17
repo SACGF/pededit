@@ -1,7 +1,7 @@
 import type { Pedigree, Tag, TagFill, TagFillMode } from "@pedigree-editor/layout-engine";
 
 /**
- * Pattern fills for tag sectors (#67), and the monochrome setting.
+ * Pattern fills for tag sectors, and the monochrome setting.
  *
  * A pattern is plain geometry (one stroked path of lines, or one filled path
  * of small dots) in the tag's colour over a white base, clipped to the region
@@ -12,13 +12,13 @@ import type { Pedigree, Tag, TagFill, TagFillMode } from "@pedigree-editor/layou
  *
  * The textures are fine (4px apart on a 40px symbol) so they read as a fill,
  * not as a mark: a single vertical line through a symbol is the
- * presymptomatic carrier (#101), a centre dot the carrier (NSGC 2008), and a
+ * presymptomatic carrier, a centre dot the carrier (NSGC 2008), and a
  * "\" slash deceased, which is why the diagonal hatch runs the other way.
  *
  * `renderRegionFillSvg` / `fillLayers` are the reusable entry points: fill a
  * region (any SVG path, normally a sector from `sectorPath`) with pattern P
  * in colour C. The canvas (`RegionFill` in nodes/symbols.tsx), the legend and
- * both exporters call them; per-condition carrier fills (#115) should too.
+ * both exporters call them; per-condition carrier fills should too.
  */
 
 export interface TagFillOption {
@@ -111,7 +111,7 @@ export function tagPaint(tag: Tag, pedigree: Pedigree): TagPaint {
 }
 
 /**
- * How a condition's carriers are drawn (#115): the condition's sector, in a
+ * How a condition's carriers are drawn: the condition's sector, in a
  * fill that differs from the affected one. A condition drawn solid (the usual
  * colour case) or shaded has hatched carriers in its colour. One already
  * drawn with a pattern (its own, or every condition in black and white) keeps
@@ -128,7 +128,7 @@ export function carrierPaintFrom(affected: TagPaint): TagPaint {
 }
 
 /**
- * The fill of a carrier with no condition recorded in NSGC 2022 (#115): half
+ * The fill of a carrier with no condition recorded in NSGC 2022: half
  * the symbol dotted in black, the dots a reminder of the 2008 carrier dot.
  */
 export const PLAIN_CARRIER_PAINT: TagPaint = { color: MONOCHROME_COLOR, fill: "dots" };

@@ -2,7 +2,7 @@ import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
- * Relatedness shown in the edit panel (#32): how to write a coefficient, the
+ * Relatedness shown in the edit panel: how to write a coefficient, the
  * degree of relationship it corresponds to, and what there is to say about
  * one person. Framework-free; the numbers come from the layout engine's
  * `kinshipCoefficients`.
@@ -22,7 +22,7 @@ export function kinshipOf(pedigree: Pedigree): KinshipCoefficients {
   return coefficients;
 }
 
-/** The X-linked coefficients (#87), cached like `kinshipOf`. */
+/** The X-linked coefficients, cached like `kinshipOf`. */
 export function kinshipXOf(pedigree: Pedigree): KinshipCoefficients {
   let coefficients = xCache.get(pedigree);
   if (!coefficients) { coefficients = kinshipCoefficients(pedigree, { chromosome: "X" }); xCache.set(pedigree, coefficients); }
@@ -48,7 +48,7 @@ export function formatCoefficient(x: number): string {
 }
 
 /**
- * A coefficient short enough to draw on the figure (#97): a fraction up to
+ * A coefficient short enough to draw on the figure: a fraction up to
  * /64 ("3/8"), else two significant figures ("0.30"), which is as much as a
  * reader of a chart needs. The panels give it in full.
  */
@@ -102,7 +102,7 @@ export interface CoupleRelatedness {
 export interface IndividualRelatedness {
   /** Inbreeding coefficient F of the individual. */
   inbreeding: number;
-  /** X-linked F (#87). NaN for a male, who has one X, and for unknown sex. */
+  /** X-linked F. NaN for a male, who has one X, and for unknown sex. */
   inbreedingX: number;
   /** One entry per partnership of the individual, in pedigree order. */
   couples: CoupleRelatedness[];

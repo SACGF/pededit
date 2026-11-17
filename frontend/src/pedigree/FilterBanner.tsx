@@ -4,7 +4,7 @@ import { collapseInfo } from "./collapse";
 import { filterBannerText } from "./viewFilters";
 
 /**
- * A chip over the canvas while a view filter (#4) is on, so a filtered
+ * A chip over the canvas while a view filter is on, so a filtered
  * pedigree is never mistaken for the whole family. Clicking it turns the
  * filters off. Hidden while picking, which uses the same spot.
  */
