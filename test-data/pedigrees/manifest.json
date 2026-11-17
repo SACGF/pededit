@@ -457,7 +457,7 @@
     {
       "file": "drawn/couples-named.json",
       "group": "drawn",
-      "purpose": "Couples and lines, relationships named: Name consanguineous relationships, relaxed width",
+      "purpose": "Couples and lines, relationships named: Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width",
       "import": [],
       "valid": true,
       "server": "accepted",

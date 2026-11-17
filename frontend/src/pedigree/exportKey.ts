@@ -120,6 +120,10 @@ function renderKeySwatchSvg(row: SwatchRow, x: number, sy: number): string {
     }
     case "evaluation":
       return `<text x="${fmt(x + s / 2)}" y="${fmt(sy + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">${row.mark}</text>`;
+    // The letters the coefficients are written with.
+    case "inbreeding":
+    case "kinship":
+      return `<text x="${fmt(x + s / 2)}" y="${fmt(sy + s / 2 + 3.5)}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">${row.kind === "inbreeding" ? "F" : "φ"}</text>`;
     case "documented": {
       const k = s * 0.6, ox = x + (s - k) / 2 - 2, oy = sy + (s - k) / 2;
       return `${swatchGeom(row.shape, ox, oy, k)} fill="white" stroke="black" stroke-width="1.5"/>`

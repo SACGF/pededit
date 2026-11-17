@@ -18,6 +18,7 @@ import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "./c
 import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "./gender";
 import { statusKeyRows, keyTagRows, pedigreeTags, tagsInUse } from "./tags";
 import { carrierLabel } from "./conditions";
+import { inbreedingLabel, kinshipLabel } from "./relatedness";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
 import { arrowKind, ARROW_LEGEND_LABEL } from "./proband";
@@ -52,12 +53,14 @@ export type KeyRow =
   | { kind: "familyHistoryUnknown"; shape: Sex; label: string }
   | { kind: "evaluation"; /** "+/-" (2022) or "E" (2008). */ mark: string; label: string }
   | { kind: "documented"; shape: Sex; label: string }
+  | { kind: "inbreeding"; label: string }
   | { kind: "lifeStatus"; status: LifeStatus; shape: Sex; label: string }
   | { kind: "adopted"; adopted: Adoption; shape: Sex; label: string }
   | { kind: "role"; role: ReproductiveRole; letter: string; shape: Sex; label: string }
   | { kind: "collapsedBranch"; label: string }
   | { kind: "couple"; label: string }
   | { kind: "consanguineous"; label: string }
+  | { kind: "kinship"; label: string }
   | { kind: "ended"; label: string }
   | { kind: "childless"; status: ChildlessStatus; label: string }
   | { kind: "twins"; zygosity: Zygosity; label: string }
@@ -67,6 +70,10 @@ export type KeyRow =
   | { kind: "clinicalDetail"; field: string; label: string; value: string };
 
 export type KeyRowKind = KeyRow["kind"];
+
+/** What the "F" under a symbol and the "φ" above a double line stand for. */
+export const INBREEDING_LEGEND_LABEL = "Inbreeding coefficient";
+export const KINSHIP_LEGEND_LABEL = "Kinship coefficient of the couple";
 
 export interface KeyRows {
   /** The pedigree as drawn (hidden people left out), which tag swatches are painted from. */
@@ -104,7 +111,7 @@ export const KEY_DIFFERENCES = {
  */
 const EXPORT_SYMBOL_ORDER: KeyRowKind[] = [
   "affected", "affectedCore", "carrier", "presymptomatic", "deceased", "assignedAtBirth",
-  "proband", "consultand", "familyHistoryUnknown", "evaluation", "documented",
+  "proband", "consultand", "familyHistoryUnknown", "evaluation", "documented", "inbreeding",
   "lifeStatus", "adopted", "role", "collapsedBranch",
 ];
 const SYMBOL_ORDER: Record<KeyTarget, KeyRowKind[]> = {
@@ -113,8 +120,8 @@ const SYMBOL_ORDER: Record<KeyTarget, KeyRowKind[]> = {
 };
 
 const RELATIONSHIP_ORDER: Record<KeyTarget, KeyRowKind[]> = {
-  legend: ["couple", "consanguineous", "ended", "childless", "twins", "assistedLine", "duplicate"],
-  export: ["consanguineous", "ended", "childless", "twins", "assistedLine", "duplicate"],
+  legend: ["couple", "consanguineous", "kinship", "ended", "childless", "twins", "assistedLine", "duplicate"],
+  export: ["consanguineous", "kinship", "ended", "childless", "twins", "assistedLine", "duplicate"],
 };
 
 export interface KeyRowsOptions {
@@ -201,6 +208,11 @@ export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsO
   // Double couple line, by the same rule the canvas and exporter draw it with.
   const related = consanguinityTest(drawn);
   if (drawn.partnerships.some(p => related(p.individual1, p.individual2))) add({ kind: "consanguineous", label: "Consanguineous couple" });
+  // The coefficients, where the pedigree draws them and someone has one.
+  if (drawn.partnerships.some(p => related(p.individual1, p.individual2) && kinshipLabel(drawn, p.individual1, p.individual2))) {
+    add({ kind: "kinship", label: KINSHIP_LEGEND_LABEL });
+  }
+  if (individuals.some(i => inbreedingLabel(drawn, i.id))) add({ kind: "inbreeding", label: INBREEDING_LEGEND_LABEL });
   // Ended relationship.
   if (hasEndedPartnership(drawn)) add({ kind: "ended", label: ENDED_LABEL });
   // Childless couple marks.

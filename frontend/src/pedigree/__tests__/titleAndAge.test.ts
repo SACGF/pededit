@@ -12,9 +12,12 @@ import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
 import { deidentify } from "../../io/svg/deidentify";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 
 const max = labelMaxWidth(SLOT_WIDTH);
+/** The lines under someone with these fields, in a pedigree with no settings. */
+const under = (fields: Partial<Individual>) =>
+  detailLines({ id: "x", sex: "unknown", affected: false, sibOrder: 0, ...fields }, max, family());
 
 function family(): Pedigree {
   return {
@@ -33,21 +36,21 @@ function family(): Pedigree {
 
 describe("approximate age under the symbol (#20)", () => {
   it("the age takes the line under the name, in place of the DOB", () => {
-    expect(detailLines({ dob: "1931-02-03", age: "d. 72" }, max)).toEqual(["d. 72"]);
-    expect(detailLines({ dob: "1931-02-03" }, max)).toEqual(["b. 1931"]);
-    expect(detailLines({ dob: "1931-02-03", age: "  " }, max)).toEqual(["b. 1931"]);
-    expect(detailLines({}, max)).toEqual([]);
+    expect(under({ dob: "1931-02-03", age: "d. 72" })).toEqual(["d. 72"]);
+    expect(under({ dob: "1931-02-03" })).toEqual(["b. 1931"]);
+    expect(under({ dob: "1931-02-03", age: "  " })).toEqual(["b. 1931"]);
+    expect(under({})).toEqual([]);
   });
 
   it("shows the year of birth, not the full date (NSGC privacy)", () => {
-    expect(detailLines({ dob: "1978" }, max)).toEqual(["b. 1978"]);
+    expect(under({ dob: "1978" })).toEqual(["b. 1978"]);
     // A de-identified export's age range is shown as it is.
-    expect(detailLines({ dob: "30s" }, max)).toEqual(["30s"]);
+    expect(under({ dob: "30s" })).toEqual(["30s"]);
     expect(exportSvg(family())).not.toContain("1962-07-04");
   });
 
   it("a long age is cut to one line within the slot", () => {
-    const [line, ...rest] = detailLines({ age: "approximately fifty-five" }, max);
+    const [line, ...rest] = under({ age: "approximately fifty-five" });
     expect(rest).toEqual([]);
     expect(line!.endsWith(ELLIPSIS)).toBe(true);
     expect(line!.length).toBeLessThanOrEqual(12);

@@ -406,8 +406,10 @@
   "annotations": [],
   "nameLines": [],
   "figureNameLines": [],
-  "detailLines": [],
-  "detailsBacked": false
+  "detailLines": [
+   "F = 1/16"
+  ],
+  "detailsBacked": true
  },
  "z2 @ 3-1": {
   "shape": "male",
@@ -445,7 +447,9 @@
   "annotations": [],
   "nameLines": [],
   "figureNameLines": [],
-  "detailLines": [],
-  "detailsBacked": false
+  "detailLines": [
+   "F = 1/16"
+  ],
+  "detailsBacked": true
  }
 }

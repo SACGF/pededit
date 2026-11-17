@@ -1,99 +1,101 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="971" height="807"
-     viewBox="0 0 971 807">
+<svg xmlns="http://www.w3.org/2000/svg" width="971" height="869"
+     viewBox="0 0 971 869">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="971" height="807" fill="white"/>
+<rect width="971" height="869" fill="white"/>
 <text class="chart-title" x="485.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Couples and lines, relationships named</text>
-<g transform="translate(525 280.1)">
-<path d="M -56.1 120 L 23.9 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-16.1" y1="120" x2="-16.1" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -227 -144.2 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 211.9 69.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-227" y1="-144.2" x2="-239" y2="-144.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-201.8" y1="88.3" x2="-211.9" y2="94.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -109.5 159.5 L -124.7 157.2 L -139.8 153.5 L -154.9 148.2 L -169.6 141.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -109.5 159.5 L -95.6 166.2 L -81 171.7 L -65.6 175.9 L -53.1 179" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 117.5 156.8 L 107.5 166.3 L 96.5 175.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 117.5 156.8 L 131.2 157.7 L 145.3 157.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 211.9 69.4 L 207.8 84.1 L 202.2 98.5 L 195.3 112.6 L 187 126.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 211.9 69.4 L 220.2 56.8 L 227.5 43.2 L 233.6 28.7 L 238.5 13.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-139.8" y1="153.5" x2="-81" y2="171.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="214.9" y="74.7" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<path d="M 236.8 91.4 A 199 199 0 0 0 258.4 15" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="254.6" y1="64.6" x2="244.9" y2="55.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="256.1" y1="59.8" x2="246.3" y2="50.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="251.4" y1="54.3" x2="296.7" y2="67.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 296.7 67.1 A 246 246 0 0 0 304.1 30.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="304.1" y1="30.1" x2="316.1" y2="31.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 256.4 14.8 A 197 197 0 0 0 257 0 L 257 -143.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 260.4 15.1 A 201 201 0 0 0 261 0 L 261 -143.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="259" y1="-67.1" x2="306" y2="-67.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 306 -23.8 L 306 -67.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="306" y1="-23.8" x2="318" y2="-23.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 20.9 199 L 60 199 A 199 199 0 0 0 100.6 194.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="52.8" y1="199" x2="52.8" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="45.8" y1="217" x2="59.8" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="45.8" y1="213" x2="59.8" y2="213" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="52.8" y="228" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
-<path d="M -181.8 157.4 A 199 199 0 0 0 -110.5 192.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-158.6" y1="179.8" x2="-147.8" y2="171.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-154.2" y1="182.1" x2="-143.4" y2="174.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-148" y1="178.5" x2="-155.9" y2="194.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-162.2" y1="191.6" x2="-149.6" y2="197.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -256.6 30.7 A 199 199 0 0 0 -228.9 105.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-246.5" y1="69.4" x2="-290.6" y2="85.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-290.6" y1="85.7" x2="-301.8" y2="89.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -259 -144.2 L -259 -64.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-259" y1="-104.2" x2="-306" y2="-104.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-306" y1="-104.2" x2="-318" y2="-104.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -336 -104.2 L -336 0 A 276 276 0 0 0 -318.7 96.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -340 -104.2 L -340 0 A 280 280 0 0 0 -322.4 97.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-338" y1="-30.7" x2="-385" y2="-30.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -125.2 L -385 -30.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-385" y1="-125.2" x2="-397" y2="-125.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -38.2 L -389 -47.8 L -393 -57.5 L -397 -67.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>
-<path d="M -385 -38.2 L -389 -28.5 L -393 -18.8 L -397 -9.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="-391" y="-34.3" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<g data-id="gf" transform="translate(-56.1 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="gm" transform="translate(23.9 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y6a" transform="translate(236.8 91.4) rotate(-62.6)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t6" transform="translate(258.4 15) rotate(-85.7)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
-<g data-id="y6b" transform="translate(259 -143.2) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="h2" transform="translate(338 -23.8) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="h1" transform="translate(335.9 34.1) rotate(-83)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t5" transform="translate(201.1 140.3) rotate(-45.2)"><polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t4" transform="translate(154.9 174.9) rotate(-28.5)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y3" transform="translate(20.9 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t3" transform="translate(100.6 194.8) rotate(-11.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t2" transform="translate(-53.1 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t1" transform="translate(-181.8 157.4) rotate(37.7)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y1" transform="translate(-110.5 192.5) rotate(14.7)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="x2" transform="translate(-256.6 30.7) rotate(81.1)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="s2" transform="translate(-228.9 105.2) rotate(58.1)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="k2" transform="translate(-320.6 96.9) rotate(69.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="s1" transform="translate(-259 -144.2) rotate(90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="x1" transform="translate(-259 -64.2) rotate(90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="k1" transform="translate(-338 -104.2) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z3" transform="translate(-417 -9.2) rotate(90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z2" transform="translate(-417 -67.2) rotate(90)"><g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z1" transform="translate(-417 -125.2) rotate(90)"><g data-adopted="out"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g transform="translate(525 301.4)">
+<path d="M -42.2 120 L 37.8 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-2.2" y1="120" x2="-2.2" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -227 -165.5 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 218.3 53.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-227" y1="-165.5" x2="-239" y2="-165.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-193" y1="101" x2="-202.6" y2="108.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -94.9 163.3 L -111.2 162.1 L -127.6 159.3 L -143.9 154.7 L -159.9 148.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -94.9 163.3 L -79.5 168.9 L -63.4 173 L -50.9 176 L -39.4 179" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 128.5 152.3 L 119.3 162.5 L 108.8 172.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 128.5 152.3 L 142.4 152.1 L 156.5 150.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 218.3 53.3 L 215.2 69.4 L 210.5 85.4 L 204.1 101.1 L 196 116.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 218.3 53.3 L 225.6 38.6 L 231.5 23 L 235.9 6.6 L 239 -7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-127.6" y1="159.3" x2="-63.4" y2="173" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="221" y="58.1" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
+<path d="M 245.7 71.4 A 199 199 0 0 0 259 0 L 259 -7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="260.8" y1="41.6" x2="250.1" y2="33.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="261.7" y1="36.7" x2="250.9" y2="28.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="256.6" y1="30.6" x2="303.1" y2="37.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 303.1 37.9 A 246 246 0 0 0 306 3.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="306" y1="3.3" x2="318" y2="3.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 257 -7 L 257 -165.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 261 -7 L 261 -165.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="259" y1="-86.1" x2="306" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 306 -54.6 L 306 -86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="306" y1="-54.6" x2="318" y2="-54.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 35 199 L 60 199 A 199 199 0 0 0 114.3 191.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="66.7" y1="198.9" x2="67.3" y2="216.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="60.3" y1="217.1" x2="74.3" y2="216.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="60.2" y1="213.1" x2="74.2" y2="212.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="67.7" y="227.9" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
+<path d="M -171.1 165.1 A 199 199 0 0 0 -97.6 195.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-146.4" y1="186" x2="-136.2" y2="177.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-141.9" y1="188" x2="-131.6" y2="179.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-135.9" y1="184" x2="-142.7" y2="200.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-149.2" y1="197.9" x2="-136.3" y2="203.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -252.9 48.7 A 199 199 0 0 0 -218.5 120.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-239.3" y1="86.3" x2="-281.7" y2="106.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-281.7" y1="106.7" x2="-292.5" y2="111.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -259 -165.5 L -259 -85.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-259" y1="-125.5" x2="-306" y2="-125.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-306" y1="-125.5" x2="-318" y2="-125.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -336 -125.5 L -336 0 A 276 276 0 0 0 -308.7 119.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -340 -125.5 L -340 0 A 280 280 0 0 0 -312.3 121.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-338" y1="-35.8" x2="-385" y2="-35.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -385 -146.7 L -385 -35.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-385" y1="-146.7" x2="-397" y2="-146.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -385 -59.1 L -389 -68.8 L -393 -78.6 L -397 -88.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>
+<path d="M -385 -59.1 L -389 -49.4 L -393 -39.6 L -397 -29.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="-391" y="-55.3" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
+<g data-id="gf" transform="translate(-42.2 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="gm" transform="translate(37.8 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y6a" transform="translate(245.7 71.4) rotate(-69)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t6" transform="translate(259 -7) rotate(-90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="y6b" transform="translate(259 -165.2) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="h2" transform="translate(338 -54.6) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="h1" transform="translate(338 3.8) rotate(-89.2)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t5" transform="translate(211.2 129.4) rotate(-49.5)"><polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t4" transform="translate(167.3 167.6) rotate(-32.6)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y3" transform="translate(35 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t3" transform="translate(114.3 191.5) rotate(-15.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t2" transform="translate(-39.4 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t1" transform="translate(-171.1 165.1) rotate(33.9)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y1" transform="translate(-97.6 195.4) rotate(10.9)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="x2" transform="translate(-252.9 48.7) rotate(75.8)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="s2" transform="translate(-218.5 120.3) rotate(52.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="k2" transform="translate(-310.5 120.5) rotate(64.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="s1" transform="translate(-259 -165.5) rotate(90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="x1" transform="translate(-259 -85.5) rotate(90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="k1" transform="translate(-338 -125.5) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z3" transform="translate(-417 -29.9) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z2" transform="translate(-417 -88.3) rotate(90)"><g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z1" transform="translate(-417 -146.7) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><g data-adopted="out"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g class="consanguinity-labels">
-<g transform="translate(259 -64.1) rotate(-90)"><text x="0" y="-6" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant cousins</text></g>
-<g transform="translate(-338 -2.6) rotate(90)"><text x="0" y="-8.5" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins</text></g>
+<g transform="translate(259 -86.1) rotate(-90)"><text x="0" y="-6" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant cousins</text></g>
+<g transform="translate(-338 -0.4) rotate(90)"><text x="0" y="-13.8" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins (φ = 1/16)</text></g>
 </g>
 </g>
-<g class="pedigree-key" transform="translate(0 567)">
+<g class="pedigree-key" transform="translate(0 589)">
 <circle cx="48" cy="10" r="8" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<line x1="38.4" y1="22.4" x2="38.4" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="22.4" x2="43.4" y2="22.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="37.6" x2="43.4" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="22.4" x2="57.6" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="22.4" x2="52.6" y2="22.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="37.6" x2="52.6" y2="37.6" stroke="black" stroke-width="1.5"/><rect x="42.4" y="24.4" width="11.2" height="11.2" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
-<line x1="38.4" y1="42.4" x2="38.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="42.4" x2="43.4" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="57.6" x2="43.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="57.6" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="52.6" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="57.6" x2="52.6" y2="57.6" stroke="black" stroke-width="1.5"/><circle cx="48" cy="50" r="5.6" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
-<line x1="40" y1="68" x2="56" y2="68" stroke="black" stroke-width="1.5"/><line x1="40" y1="72" x2="56" y2="72" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<line x1="40" y1="90" x2="56" y2="90" stroke="black" stroke-width="1.5"/><line x1="44.15" y1="94.2" x2="48.35" y2="85.8" stroke="black" stroke-width="1.5"/><line x1="47.65" y1="94.2" x2="51.85" y2="85.8" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
-<line x1="40" y1="104" x2="56" y2="104" stroke="black" stroke-width="1.5"/><line x1="48" y1="104" x2="48" y2="116" stroke="black" stroke-width="1.5"/><line x1="44" y1="116" x2="52" y2="116" stroke="black" stroke-width="1.5"/><line x1="44" y1="113" x2="52" y2="113" stroke="black" stroke-width="1.5"/><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
-<line x1="40" y1="124" x2="56" y2="124" stroke="black" stroke-width="1.5"/><line x1="48" y1="124" x2="48" y2="136" stroke="black" stroke-width="1.5"/><line x1="44" y1="136" x2="52" y2="136" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
-<line x1="42" y1="143" x2="54" y2="143" stroke="black" stroke-width="1.5"/><line x1="48" y1="143" x2="41" y2="158" stroke="black" stroke-width="1.5"/><line x1="48" y1="143" x2="55" y2="158" stroke="black" stroke-width="1.5"/><line x1="44" y1="150.5" x2="52" y2="150.5" stroke="black" stroke-width="1.5"/><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
-<line x1="42" y1="163" x2="54" y2="163" stroke="black" stroke-width="1.5"/><line x1="48" y1="163" x2="41" y2="178" stroke="black" stroke-width="1.5"/><line x1="48" y1="163" x2="55" y2="178" stroke="black" stroke-width="1.5"/><text x="64" y="174" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
-<line x1="42" y1="183" x2="54" y2="183" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="41" y2="198" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="55" y2="198" stroke="black" stroke-width="1.5"/><text x="48" y="194" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text><text x="64" y="194" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
+<text x="48" y="33.5" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Inbreeding coefficient</text>
+<line x1="38.4" y1="42.4" x2="38.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="42.4" x2="43.4" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="57.6" x2="43.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="57.6" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="52.6" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="57.6" x2="52.6" y2="57.6" stroke="black" stroke-width="1.5"/><rect x="42.4" y="44.4" width="11.2" height="11.2" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
+<line x1="38.4" y1="62.4" x2="38.4" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="62.4" x2="43.4" y2="62.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="77.6" x2="43.4" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="62.4" x2="57.6" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="62.4" x2="52.6" y2="62.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="77.6" x2="52.6" y2="77.6" stroke="black" stroke-width="1.5"/><circle cx="48" cy="70" r="5.6" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
+<line x1="40" y1="88" x2="56" y2="88" stroke="black" stroke-width="1.5"/><line x1="40" y1="92" x2="56" y2="92" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+<text x="48" y="113.5" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">φ</text><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Kinship coefficient of the couple</text>
+<line x1="40" y1="130" x2="56" y2="130" stroke="black" stroke-width="1.5"/><line x1="44.15" y1="134.2" x2="48.35" y2="125.8" stroke="black" stroke-width="1.5"/><line x1="47.65" y1="134.2" x2="51.85" y2="125.8" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
+<line x1="40" y1="144" x2="56" y2="144" stroke="black" stroke-width="1.5"/><line x1="48" y1="144" x2="48" y2="156" stroke="black" stroke-width="1.5"/><line x1="44" y1="156" x2="52" y2="156" stroke="black" stroke-width="1.5"/><line x1="44" y1="153" x2="52" y2="153" stroke="black" stroke-width="1.5"/><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
+<line x1="40" y1="164" x2="56" y2="164" stroke="black" stroke-width="1.5"/><line x1="48" y1="164" x2="48" y2="176" stroke="black" stroke-width="1.5"/><line x1="44" y1="176" x2="52" y2="176" stroke="black" stroke-width="1.5"/><text x="64" y="174" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
+<line x1="42" y1="183" x2="54" y2="183" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="41" y2="198" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="55" y2="198" stroke="black" stroke-width="1.5"/><line x1="44" y1="190.5" x2="52" y2="190.5" stroke="black" stroke-width="1.5"/><text x="64" y="194" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
+<line x1="42" y1="203" x2="54" y2="203" stroke="black" stroke-width="1.5"/><line x1="48" y1="203" x2="41" y2="218" stroke="black" stroke-width="1.5"/><line x1="48" y1="203" x2="55" y2="218" stroke="black" stroke-width="1.5"/><text x="64" y="214" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
+<line x1="42" y1="223" x2="54" y2="223" stroke="black" stroke-width="1.5"/><line x1="48" y1="223" x2="41" y2="238" stroke="black" stroke-width="1.5"/><line x1="48" y1="223" x2="55" y2="238" stroke="black" stroke-width="1.5"/><text x="48" y="234" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text><text x="64" y="234" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
 </g>
 </svg>

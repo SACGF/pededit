@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1161" height="785"
-     viewBox="0 0 1161 785">
+<svg xmlns="http://www.w3.org/2000/svg" width="1161" height="825"
+     viewBox="0 0 1161 825">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
           refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="1161" height="785" fill="white"/>
+<rect width="1161" height="825" fill="white"/>
 <text class="chart-title" x="580.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Couples and lines, relationships named</text>
 <g transform="translate(60 100)">
 <g class="couple-lines">
@@ -141,23 +141,29 @@
 <g class="labels">
 <text x="40" y="272" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text>
 <text x="200" y="272" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text>
+<rect x="14.8" y="382" width="50.4" height="13" fill="white"/>
+<text x="40" y="392" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text>
+<rect x="174.8" y="382" width="50.4" height="13" fill="white"/>
+<text x="200" y="392" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text>
 </g>
 <g class="consanguinity-labels">
 <text x="1000" y="82" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant</text>
 <text x="1000" y="93" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">cousins</text>
-<text x="120" y="213" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins</text>
+<text x="120" y="213" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins (φ = 1/16)</text>
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 545)">
 <circle cx="48" cy="10" r="8" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<line x1="38.4" y1="22.4" x2="38.4" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="22.4" x2="43.4" y2="22.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="37.6" x2="43.4" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="22.4" x2="57.6" y2="37.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="22.4" x2="52.6" y2="22.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="37.6" x2="52.6" y2="37.6" stroke="black" stroke-width="1.5"/><rect x="42.4" y="24.4" width="11.2" height="11.2" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
-<line x1="38.4" y1="42.4" x2="38.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="42.4" x2="43.4" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="57.6" x2="43.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="57.6" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="52.6" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="57.6" x2="52.6" y2="57.6" stroke="black" stroke-width="1.5"/><circle cx="48" cy="50" r="5.6" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
-<line x1="40" y1="68" x2="56" y2="68" stroke="black" stroke-width="1.5"/><line x1="40" y1="72" x2="56" y2="72" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<line x1="40" y1="90" x2="56" y2="90" stroke="black" stroke-width="1.5"/><line x1="44.15" y1="94.2" x2="48.35" y2="85.8" stroke="black" stroke-width="1.5"/><line x1="47.65" y1="94.2" x2="51.85" y2="85.8" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
-<line x1="40" y1="104" x2="56" y2="104" stroke="black" stroke-width="1.5"/><line x1="48" y1="104" x2="48" y2="116" stroke="black" stroke-width="1.5"/><line x1="44" y1="116" x2="52" y2="116" stroke="black" stroke-width="1.5"/><line x1="44" y1="113" x2="52" y2="113" stroke="black" stroke-width="1.5"/><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
-<line x1="40" y1="124" x2="56" y2="124" stroke="black" stroke-width="1.5"/><line x1="48" y1="124" x2="48" y2="136" stroke="black" stroke-width="1.5"/><line x1="44" y1="136" x2="52" y2="136" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
-<line x1="42" y1="143" x2="54" y2="143" stroke="black" stroke-width="1.5"/><line x1="48" y1="143" x2="41" y2="158" stroke="black" stroke-width="1.5"/><line x1="48" y1="143" x2="55" y2="158" stroke="black" stroke-width="1.5"/><line x1="44" y1="150.5" x2="52" y2="150.5" stroke="black" stroke-width="1.5"/><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
-<line x1="42" y1="163" x2="54" y2="163" stroke="black" stroke-width="1.5"/><line x1="48" y1="163" x2="41" y2="178" stroke="black" stroke-width="1.5"/><line x1="48" y1="163" x2="55" y2="178" stroke="black" stroke-width="1.5"/><text x="64" y="174" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
-<line x1="42" y1="183" x2="54" y2="183" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="41" y2="198" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="55" y2="198" stroke="black" stroke-width="1.5"/><text x="48" y="194" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text><text x="64" y="194" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
+<text x="48" y="33.5" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Inbreeding coefficient</text>
+<line x1="38.4" y1="42.4" x2="38.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="42.4" x2="43.4" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="57.6" x2="43.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="57.6" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="52.6" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="57.6" x2="52.6" y2="57.6" stroke="black" stroke-width="1.5"/><rect x="42.4" y="44.4" width="11.2" height="11.2" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
+<line x1="38.4" y1="62.4" x2="38.4" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="62.4" x2="43.4" y2="62.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="77.6" x2="43.4" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="62.4" x2="57.6" y2="77.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="62.4" x2="52.6" y2="62.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="77.6" x2="52.6" y2="77.6" stroke="black" stroke-width="1.5"/><circle cx="48" cy="70" r="5.6" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
+<line x1="40" y1="88" x2="56" y2="88" stroke="black" stroke-width="1.5"/><line x1="40" y1="92" x2="56" y2="92" stroke="black" stroke-width="1.5"/><text x="64" y="94" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+<text x="48" y="113.5" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">φ</text><text x="64" y="114" font-family="sans-serif" font-size="10" fill="black">Kinship coefficient of the couple</text>
+<line x1="40" y1="130" x2="56" y2="130" stroke="black" stroke-width="1.5"/><line x1="44.15" y1="134.2" x2="48.35" y2="125.8" stroke="black" stroke-width="1.5"/><line x1="47.65" y1="134.2" x2="51.85" y2="125.8" stroke="black" stroke-width="1.5"/><text x="64" y="134" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
+<line x1="40" y1="144" x2="56" y2="144" stroke="black" stroke-width="1.5"/><line x1="48" y1="144" x2="48" y2="156" stroke="black" stroke-width="1.5"/><line x1="44" y1="156" x2="52" y2="156" stroke="black" stroke-width="1.5"/><line x1="44" y1="153" x2="52" y2="153" stroke="black" stroke-width="1.5"/><text x="64" y="154" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
+<line x1="40" y1="164" x2="56" y2="164" stroke="black" stroke-width="1.5"/><line x1="48" y1="164" x2="48" y2="176" stroke="black" stroke-width="1.5"/><line x1="44" y1="176" x2="52" y2="176" stroke="black" stroke-width="1.5"/><text x="64" y="174" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
+<line x1="42" y1="183" x2="54" y2="183" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="41" y2="198" stroke="black" stroke-width="1.5"/><line x1="48" y1="183" x2="55" y2="198" stroke="black" stroke-width="1.5"/><line x1="44" y1="190.5" x2="52" y2="190.5" stroke="black" stroke-width="1.5"/><text x="64" y="194" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
+<line x1="42" y1="203" x2="54" y2="203" stroke="black" stroke-width="1.5"/><line x1="48" y1="203" x2="41" y2="218" stroke="black" stroke-width="1.5"/><line x1="48" y1="203" x2="55" y2="218" stroke="black" stroke-width="1.5"/><text x="64" y="214" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
+<line x1="42" y1="223" x2="54" y2="223" stroke="black" stroke-width="1.5"/><line x1="48" y1="223" x2="41" y2="238" stroke="black" stroke-width="1.5"/><line x1="48" y1="223" x2="55" y2="238" stroke="black" stroke-width="1.5"/><text x="48" y="234" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="black">?</text><text x="64" y="234" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
 </g>
 </svg>

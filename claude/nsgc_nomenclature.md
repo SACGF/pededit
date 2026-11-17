@@ -68,6 +68,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 |---|---|
 | Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the Person tab and CSV. "Deceased" alone means date unknown. |
 | Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
+| Nothing about an inbreeding coefficient | Adds, off by default (#86): with "Show kinship and inbreeding coefficients" the line "F = 1/16" under anyone whose parents are related, after the evaluations and before the pedigree number, with a key row saying what F is. |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |
 
 ### Lines (Fig. 2)
@@ -80,7 +81,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Previous partners need not be shown if they do not affect the genetic assessment. | Up to the user. |
 | Male partner on the left "if possible" (2008). Dropped as a rule in 2022 ("Both sides now"). | No rule enforced, which matches 2022. |
 | A break (two slashes) in the relationship line means the relationship has ended. | Follows (#98): `Partnership.ended`. |
-| Consanguinity: double relationship line. **If the degree of relationship is not obvious from the pedigree, write it above the line** (e.g. "third cousins"). | Follows: double line (#85, #92), text above it (#97), set per couple or named automatically with a setting (with the kinship after the name when the couple are more closely related than it says, "siblings (3/8)"). |
+| Consanguinity: double relationship line. **If the degree of relationship is not obvious from the pedigree, write it above the line** (e.g. "third cousins"). | Follows: double line (#85, #92), text above it (#97), set per couple or named automatically with a setting (with the kinship after the name when the couple are more closely related than it says, "siblings (3/8)"). With "Show kinship and inbreeding coefficients" (#86, off by default) the couple's kinship is written there too, alone or after the words: "first cousins (φ = 1/16)". NSGC asks for the degree of relationship, not a number; the number is PedEdit's addition and has its own key row. |
 | Twins: monozygotic with a horizontal bar between the individual's lines (not between the symbols), dizygotic without, "?" when unknown. Triplets and more share the fork the same way. An asterisk marks zygosity that has been proven. | Follows (#11), except the "proven" asterisk, which has no field. |
 | No children by choice: one bar under the line of descent. Infertility: two bars. Reason written below. | Follows (#15). |
 | Adoption: brackets around every adopted person; dashed line from adoptive parents, solid from biological. Three cases are drawn: adopted in, adopted out, and adopted by a relative. | Follows (#12) for in and out. "By a relative" is not a separate option. |

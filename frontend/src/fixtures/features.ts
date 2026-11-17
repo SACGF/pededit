@@ -376,7 +376,7 @@ const VARIANTS: FeatureFixture[] = [
   { slug: "fills-2008", label: "Pattern fills, NSGC 2008", covers: "2008 quarters with pattern fills", data: withSettings(fills, { notation: "nsgc2008", tagFills: "color" }) },
   { slug: "text-2008", label: "Text under the symbol, NSGC 2008", covers: "2008 evaluations (E1+, E2-)", data: withSettings(text, { notation: "nsgc2008" }) },
   { slug: "text-sex", label: "Text under the symbol, symbols by sex", covers: "Symbols show: biological sex, names cut to one line", data: withSettings(text, { symbolsShow: "sex", nameLabels: "truncate" }) },
-  { slug: "couples-named", label: "Couples and lines, relationships named", covers: "Name consanguineous relationships, relaxed width", data: withSettings(couples, { relationshipLabels: true, layoutWidth: "relaxed" }) },
+  { slug: "couples-named", label: "Couples and lines, relationships named", covers: "Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width", data: withSettings(couples, { relationshipLabels: true, showCoefficients: true, layoutWidth: "relaxed" }) },
   {
     slug: "couples-pinned", label: "Couples and lines, pinned and snapped",
     covers: "pinned positions, an unlocked person, snap to grid, minimal width",

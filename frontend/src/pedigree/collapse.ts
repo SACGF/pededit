@@ -122,6 +122,18 @@ export function drawnIndividually(individual: Individual, pedigree: Pedigree): b
 }
 
 const cache = new WeakMap<Pedigree, CollapseInfo>();
+const wholeOf = new WeakMap<Pedigree, Pedigree>();
+
+/**
+ * The pedigree with everyone in it that a drawn pedigree (`drawnPedigree`,
+ * or a copy passed through `asDrawn`) was made from; the pedigree itself
+ * when it is nobody's drawn copy. A view filter can leave out a couple's
+ * common ancestors, so anything stated as a number about the family
+ * (`relatedness.ts`) is worked out on this, not on the people drawn.
+ */
+export function wholePedigree(pedigree: Pedigree): Pedigree {
+  return wholeOf.get(pedigree) ?? pedigree;
+}
 
 function partnersOf(pedigree: Pedigree, id: string): string[] {
   const out: string[] = [];
@@ -207,6 +219,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   // The drawn copy is already drawn: asking again hands back the same answer,
   // with the branch counts, so callers can pass either object.
   cache.set(drawn, { drawn, hidden: new Set(), branches, placeholders, filtered: filtered.size });
+  wholeOf.set(drawn, wholePedigree(pedigree));
   return info;
 }
 
@@ -284,6 +297,7 @@ function addPlaceholders(
 export function asDrawn(derived: Pedigree, source: Pedigree): Pedigree {
   const { branches, placeholders, filtered } = collapseInfo(source);
   cache.set(derived, { drawn: derived, hidden: new Set(), branches, placeholders, filtered });
+  wholeOf.set(derived, wholePedigree(source));
   return derived;
 }
 

@@ -124,6 +124,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     layoutWidth = _opt(serializers.ChoiceField, choices=["minimal", "relaxed"])
     showNumbers = _opt(serializers.BooleanField)
     relationshipLabels = _opt(serializers.BooleanField)
+    showCoefficients = _opt(serializers.BooleanField)
     symbolsShow = _opt(serializers.ChoiceField, choices=["gender", "sex"])
     notation = _opt(serializers.ChoiceField, choices=["nsgc2022", "nsgc2008"])
     tagFills = _opt(serializers.ChoiceField, choices=["color", "monochrome"])

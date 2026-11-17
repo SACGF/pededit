@@ -1,5 +1,6 @@
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
+import { wholePedigree } from "./collapse";
 
 /**
  * Relatedness shown in the edit panel: how to write a coefficient, the
@@ -55,6 +56,30 @@ export function formatCoefficient(x: number): string {
 export function briefCoefficient(x: number): string {
   if (!(x > EPS)) return "0";
   return asFraction(x, 64) ?? x.toPrecision(2);
+}
+
+/** True when the pedigree draws its coefficients ("Show kinship and inbreeding coefficients" in Settings). */
+export function showsCoefficients(pedigree: Pedigree): boolean {
+  return pedigree.canvasSettings?.showCoefficients === true;
+}
+
+/**
+ * "F = 1/16", the line under the symbol of someone whose parents are
+ * related, or undefined when the pedigree does not draw coefficients or the
+ * person is not inbred. `pedigree` may be the drawn one: the number is that
+ * of the whole pedigree, which a view filter does not change.
+ */
+export function inbreedingLabel(pedigree: Pedigree, individualId: string): string | undefined {
+  if (!showsCoefficients(pedigree)) return undefined;
+  const f = kinshipOf(wholePedigree(pedigree)).inbreeding(individualId);
+  return f > EPS ? `F = ${briefCoefficient(f)}` : undefined;
+}
+
+/** "φ = 1/16" for a couple who are related, as `inbreedingLabel`. Their children's F is the same number. */
+export function kinshipLabel(pedigree: Pedigree, id1: string, id2: string): string | undefined {
+  if (!showsCoefficients(pedigree)) return undefined;
+  const k = kinshipOf(wholePedigree(pedigree)).kinship(id1, id2);
+  return k > EPS ? `φ = ${briefCoefficient(k)}` : undefined;
 }
 
 /** "3/8" (or "1"), when `x` is a whole number of 1/2^k for a denominator up to `maxDen`. */

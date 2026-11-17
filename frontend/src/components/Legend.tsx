@@ -361,6 +361,8 @@ function KeySwatch({ row }: { row: SwatchRow }): React.ReactNode {
     case "consultand": return <ProbandSvg sex={row.shape} kind={row.kind} />;
     case "familyHistoryUnknown": return <FamilyHistorySvg sex={row.shape} />;
     case "evaluation": return <EvaluationSvg mark={row.mark} />;
+    case "inbreeding": return <EvaluationSvg mark="F" />;
+    case "kinship": return <EvaluationSvg mark="φ" />;
     case "documented": return <DocumentedSvg sex={row.shape} />;
     case "lifeStatus": return <LifeStatusSvg sex={row.shape} lifeStatus={row.status} />;
     case "adopted": return <AdoptedSvg sex={row.shape} adopted={row.adopted} />;

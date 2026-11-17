@@ -2,7 +2,7 @@ import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, ROW_HEIGHT } from "./constants";
 import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
 import { highestDuplicateArc } from "./couplePath";
-import { kinshipOf } from "./relatedness";
+import { kinshipLabel, kinshipOf } from "./relatedness";
 import { nameCoupleRelationship } from "./relationship";
 
 /**
@@ -17,6 +17,9 @@ import { nameCoupleRelationship } from "./relationship";
  * common ancestors are not drawn); otherwise, when the pedigree's
  * `canvasSettings.relationshipLabels` is on, the relationship's name from
  * `nameCoupleRelationship` ("first cousins"), if it can be named for certain.
+ * When the pedigree draws coefficients (`canvasSettings.showCoefficients`,
+ * #86) the kinship of a related couple follows, "first cousins (φ = 1/16)",
+ * or stands alone when there is no other text.
  * Nothing is written on a single line.
  */
 
@@ -35,12 +38,26 @@ export function consanguinityLabelWidth(text: string): number {
   return textWidth(text) * SCALE;
 }
 
-/** The text to write above this couple's double line, or undefined for none. */
-export function consanguinityLabelText(pedigree: Pedigree, partnership: Partnership): string | undefined {
+/**
+ * The words above this couple's double line: their own text, or the named
+ * relationship when the pedigree names them. Undefined for none. This is the
+ * part a de-identified export can leave out.
+ */
+export function consanguinityWording(pedigree: Pedigree, partnership: Partnership): string | undefined {
   const own = partnership.consanguinityLabel?.trim();
   if (own) return own;
-  if (!pedigree.canvasSettings?.relationshipLabels) return undefined;
-  return namedCoupleRelationship(pedigree, partnership) ?? undefined;
+  return (pedigree.canvasSettings?.relationshipLabels && namedCoupleRelationship(pedigree, partnership)) || undefined;
+}
+
+/** The text to write above this couple's double line, or undefined for none: the words, then the kinship when coefficients are drawn. */
+export function consanguinityLabelText(pedigree: Pedigree, partnership: Partnership): string | undefined {
+  const words = consanguinityWording(pedigree, partnership);
+  const phi = kinshipLabel(pedigree, partnership.individual1, partnership.individual2);
+  if (!phi) return words;
+  if (!words) return phi;
+  // A named relationship that ends with the kinship ("siblings (3/8)") gives the number once.
+  const named = !partnership.consanguinityLabel?.trim();
+  return `${named ? words.replace(/ \([^()\s]+\)$/, "") : words} (${phi})`;
 }
 
 /** The relationship's name, for the panel's suggestion and the setting. */
@@ -81,7 +98,8 @@ export function consanguinityLabelRoom(lx: number, rx: number, left: SymbolTop, 
  * The label's lines for `maxWidth` px of room (`consanguinityLabelRoom`).
  * One line when rows are compact: the sibship bar above is then too close
  * for two. A closing "(...)", the kinship of a couple more closely related
- * than their name says ("first cousins once removed (25/256)"), is what the
+ * than their name says ("first cousins once removed (25/256)") or the
+ * kinship the pedigree is set to draw ("(φ = 1/16)"), is what the
  * label exists to add, so when everything does not fit on two lines it keeps
  * the last line to itself and the name is cut instead.
  */
@@ -89,7 +107,7 @@ export function wrapConsanguinityLabel(text: string, maxWidth: number, rowHeight
   const maxLines = rowHeight >= ROW_HEIGHT ? 2 : 1;
   const width = maxWidth / SCALE;
   const lines = wrapLabel(text, width, maxLines);
-  const suffix = /^(.+) (\([^()\s]+\))$/.exec(text.trim());
+  const suffix = /^(.+) (\((?:φ = )?[^()\s]+\))$/.exec(text.trim());
   if (maxLines < 2 || !suffix || lines.join(" ") === text.trim().replace(/\s+/g, " ")) return lines;
   const [, name, kinship] = suffix;
   const last = wrapLabel(kinship, width, 1);

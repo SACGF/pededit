@@ -74,7 +74,7 @@ describe("legend and export key: one list of rows (#148)", () => {
     expect([...seen].sort()).toEqual([
       "adopted", "affected", "affectedCore", "assignedAtBirth", "assistedLine", "carrier", "childless", "clinicalDetail", "collapsedBranch",
       "consanguineous", "consultand", "couple", "deceased", "documented", "duplicate", "ended", "evaluation", "familyHistoryUnknown",
-      "lifeStatus", "presymptomatic", "proband", "role", "sex", "tag", "twins",
+      "inbreeding", "kinship", "lifeStatus", "presymptomatic", "proband", "role", "sex", "tag", "twins",
     ]);
   });
 });

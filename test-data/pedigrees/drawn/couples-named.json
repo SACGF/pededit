@@ -269,6 +269,7 @@
       "snapGridSize": 5,
       "notation": "nsgc2022",
       "relationshipLabels": true,
+      "showCoefficients": true,
       "layoutWidth": "relaxed"
     }
   }

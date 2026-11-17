@@ -566,7 +566,7 @@ describe("data (#115)", () => {
     const [header, ...rows] = exportCsv(family()).split("\n");
     const cols = header!.split(",");
     const at = (row: string, col: string) => JSON.parse(`[${row}]`)[cols.indexOf(col)];
-    expect(cols.at(-1)).toBe("carrier_of");
+    expect(cols.at(-2)).toBe("carrier_of");
     expect(at(rows[1]!, "carrier_of")).toBe("Cystic fibrosis;Tay-Sachs");
     expect(at(rows[1]!, "carrier")).toBe("1");
     expect(at(rows[6]!, "carrier")).toBe("1");

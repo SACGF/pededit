@@ -139,6 +139,20 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 </div>
               </div>
             </label>
+            <label className="flex items-center gap-2 cursor-pointer mt-2">
+              <input
+                type="checkbox"
+                name="showCoefficients"
+                checked={pedigree.canvasSettings?.showCoefficients === true}
+                onChange={e => updateCanvasSettings({ showCoefficients: e.target.checked })}
+              />
+              <div>
+                <div className="text-sm">Show kinship and inbreeding coefficients</div>
+                <div className="text-xs text-gray-400">
+                  Write the inbreeding coefficient under anyone whose parents are related ("F = 1/16") and the kinship coefficient above a related couple's double line ("φ = 1/16"), on the canvas and in exports. Worked out from the pedigree as drawn, so they change as relatives are added.
+                </div>
+              </div>
+            </label>
             <div className="mt-2">
               <div className="text-sm">Symbols show</div>
               <select

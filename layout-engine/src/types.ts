@@ -306,6 +306,13 @@ export interface CanvasSettings {
    */
   relationshipLabels?: boolean;
   /**
+   * Draw the coefficients worked out from the pedigree: the inbreeding
+   * coefficient under anyone whose parents are related ("F = 1/16") and the
+   * kinship coefficient above a related couple's double line ("φ = 1/16").
+   * Computed, never stored. Absent means false.
+   */
+  showCoefficients?: boolean;
+  /**
    * What the symbol shapes show: "gender" draws a person with a
    * recorded gender identity with that gender's symbol and writes AMAB /
    * AFAB / UAAB under it (NSGC 2022); "sex" draws biological sex for

@@ -211,7 +211,11 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   maintainer's call on #111): evaluation detail and age of onset are dropped,
   the result marks with the documented "*", the consanguinity text (own and
   named, by turning `relationshipLabels` off on the copy) and text tags are
-  kept. Dropping the marks drops the evaluations entirely. Everything is
+  kept. Dropping the marks drops the evaluations entirely. The coefficients
+  of `showCoefficients` (#86) are always kept: they come from the structure
+  the figure already shows, so with the consanguinity text dropped a double
+  line still reads "φ = 1/16", and `deidentifiableText` asks
+  `consanguinityWording`, not the whole label, whether there is text to offer. Everything is
   dropped from the data, not the drawing, so the key loses its rows with no
   code of its own (it lists tags in use, evaluation rows from what is left).
   The export dialog shows one checkbox per kind the drawn pedigree has
@@ -270,4 +274,6 @@ father and mother. `dod` (#103), the date of death as stored ("2007",
 "2007-03-14"), after the assisted reproduction columns (#45).
 `carrier_of` (#115): the conditions the person carries, by
 label like `tags`. The `carrier` column is 1 for any carrier,
-condition recorded or not.
+condition recorded or not. `inbreeding_coefficient` (#86): the autosomal F
+from the pedigree as a decimal ("0.0625"), 0 for someone whose parents are
+unrelated or not recorded; always written, whatever the figure shows.

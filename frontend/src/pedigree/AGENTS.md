@@ -475,6 +475,24 @@ draws NSGC symbols.
   must build a fresh one. The section appears for anyone who is
   inbred or has a partner, since each couple carries the double-line
   checkbox.
+  Drawn on the figure only with `canvasSettings.showCoefficients` ("Show
+  kinship and inbreeding coefficients" in Settings, off by default, #86):
+  `inbreedingLabel` is the "F = 1/16" detail line under anyone whose
+  parents are related and `kinshipLabel` the "φ = 1/16" that
+  `consanguinityLabelText` writes above a related couple's double line,
+  alone or after the words ("first cousins (φ = 1/16)"; a named
+  relationship that already ends with the kinship, "siblings (3/8)", gives
+  the number once). Both are autosomal, written with `briefCoefficient`,
+  and never drawn for 0, so a couple marked consanguineous by hand gets no
+  number. Both read `wholePedigree(pedigree)` (`collapse.ts`): the drawn
+  pedigree can lack a couple's common ancestors under a view filter, and a
+  number on the chart must not change with the view. The double line itself
+  still follows the drawn pedigree, so under such a filter a child can have
+  an F while the parents' line is single and carries no φ. Since the label
+  functions are shared, the canvas, both SVG exporters, the lints and the
+  key (rows `inbreeding` and `kinship`, only when someone drawn has one)
+  follow with no code of their own. `consanguinityWording` is the label
+  without the number: what a de-identified export may leave out.
 - `relationship.ts` — `nameRelationship` (#90), the plain-language name for
   any two people ("great-aunt", "half first cousin once removed", "identical
   twin brother"), shown by the pair panel (`components/SelectionPanel.tsx`)
@@ -761,7 +779,9 @@ renderer:
    free-text age still wins over all of it;
 2. one line per age of onset (#93, `onsetLines`);
 3. (gender identity #26 and evaluation #101 belong here, before the number);
-4. the pedigree number (#8), last, on its own line.
+4. the inbreeding coefficient, "F = 1/16" (#86, `inbreedingLabel`), only
+   when the pedigree draws coefficients and the person's parents are related;
+5. the pedigree number (#8), last, on its own line.
 
 A two-line name plus the age line clears the sibship bar of the person's own
 children; anything past the age line can reach it, so then the detail block

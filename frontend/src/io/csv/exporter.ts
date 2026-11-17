@@ -6,9 +6,10 @@ import { evaluationsCsv } from "../../pedigree/evaluation";
 import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";
 import { carrierConditions, isAffected, isCarrier } from "../../pedigree/conditions";
+import { kinshipOf } from "../../pedigree/relatedness";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
-  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids,dod,carrier_of";
+  const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids,dod,carrier_of,inbreeding_coefficient";
   const twins = twinMembership(pedigree);
 
   // Build parent lookup: childId → { f: fatherId, m: motherId }
@@ -27,6 +28,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
   // the figure shows them. People hidden under a collapsed branch are
   // not drawn, so they have none.
   const numbers = pedigreeNumbers(pedigree);
+  const coefficients = kinshipOf(pedigree);
   const tagLabels = new Map((pedigree.tags ?? []).map(t => [t.id, t.label]));
 
   const rows = pedigree.individuals.map(ind => {
@@ -71,6 +73,8 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.dod ?? "",
       // Conditions carried, by label like tags: "Cystic fibrosis;Tay-Sachs".
       carrierConditions(ind, pedigree).map(t => t.label).join(";"),
+      // Inbreeding coefficient F from the pedigree, as a decimal; 0 when the parents are unrelated or not recorded.
+      String(Number(coefficients.inbreeding(ind.id).toPrecision(6))),
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
 

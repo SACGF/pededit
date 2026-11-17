@@ -18,6 +18,7 @@ import { evaluationsOf, evaluationParts, evaluationText } from "./evaluation";
 import { notationOf } from "./notation";
 import type { NotationEdition } from "@pedigree-editor/layout-engine";
 import { assignedAtBirthText } from "./gender";
+import { inbreedingLabel } from "./relatedness";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -117,7 +118,11 @@ export function linesWidth(lines: string[]): number {
  *      a symbol drawn by gender identity (NSGC 2022);
  *   4. `evaluation`: each evaluation, "BRCA1 ... +", up to two
  *      lines each;
- *   5. `number`: the pedigree number ("II-3") when `numbers` has one,
+ *   5. `inbreeding`: the inbreeding coefficient ("F = 1/16") of someone
+ *      whose parents are related, when the pedigree draws coefficients
+ *      (#86). NSGC has no place for it; it goes with what was worked
+ *      out about the person, above the number that only locates them;
+ *   6. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
  * A collapsed-branch group symbol has none. Shared by the canvas, both
@@ -128,18 +133,20 @@ export interface DetailSections {
   onset: string[];
   gender: string[];
   evaluation: string[];
+  inbreeding: string[];
   number: string[];
 }
 
 export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
   const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
   const branch = branchOf(pedigree, ind.id);
-  if (branch) return { age: [], onset: [], gender: [], evaluation: [], number };
+  if (branch) return { age: [], onset: [], gender: [], evaluation: [], inbreeding: [], number };
   return {
     age: ageLines(ind).flatMap(l => wrapLabel(l, maxWidth, 1)),
     onset: onsetLines(ind, pedigree, maxWidth),
     gender: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1),
     evaluation: evaluationLines(ind, maxWidth, notationOf(pedigree)),
+    inbreeding: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1),
     number,
   };
 }
@@ -147,7 +154,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
 /** Every line under the name, top to bottom (see `detailSections`). */
 export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): string[] {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return [...s.age, ...s.onset, ...s.gender, ...s.evaluation, ...s.number];
+  return [...s.age, ...s.onset, ...s.gender, ...s.evaluation, ...s.inbreeding, ...s.number];
 }
 
 /**
@@ -159,7 +166,7 @@ export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigre
  */
 export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
   const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return s.age.length > 1 || s.onset.length + s.gender.length + s.evaluation.length + s.number.length > 0;
+  return s.age.length > 1 || s.onset.length + s.gender.length + s.evaluation.length + s.inbreeding.length + s.number.length > 0;
 }
 
 /**

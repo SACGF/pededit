@@ -4,7 +4,7 @@ import { DEIDENTIFY_KEEP_DEFAULTS } from "./types";
 import type { DeidentifyKeep, SvgExportOptions } from "./types";
 import { parsePartialDate } from "../../pedigree/labels";
 import { onsetsOf } from "../../pedigree/onset";
-import { consanguinityLabelText } from "../../pedigree/consanguinityLabel";
+import { consanguinityWording } from "../../pedigree/consanguinityLabel";
 import { asDrawn, drawnPedigree, isBranchPlaceholderId } from "../../pedigree/collapse";
 
 function ageBucket(dob: string, referenceDate = new Date()): string {
@@ -115,7 +115,7 @@ export function deidentifiableText(full: Pedigree): Record<Exclude<keyof Deident
   return {
     evaluationDetail: inds.some(i => i.evaluations?.some(e => e.detail?.trim())),
     onset: inds.some(i => onsetsOf(i, pedigree).length > 0),
-    consanguinityLabels: pedigree.partnerships.some(p => !!consanguinityLabelText(pedigree, p)),
+    consanguinityLabels: pedigree.partnerships.some(p => !!consanguinityWording(pedigree, p)),
     textTags: inds.some(i => i.tags?.some(id => textTagIds.has(id))),
   };
 }
