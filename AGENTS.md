@@ -163,11 +163,13 @@ node frontend/scripts/browser/console.mjs --fixture example:2 [--click SEL ...] 
 node frontend/scripts/browser/shot.mjs --fixture example:2                        # then read the PNG
 ```
 
+From a git worktree, start the servers with `servers.mjs up --here` and pass the `PEDEDIT_BASE` it prints: the servers on 5173 and 8000 serve the main checkout's code. It shares the main checkout's `node_modules`, virtualenv and secret key, so `--as-agent` works there (README, "Working in a git worktree").
+
 `--fixture` takes `example:N`, a `.ped` file or a Pedigree `.json` and needs no backend, so it cannot catch serializer bugs; check anything that must survive a save against `/p/<id>` with Django running. Use `--as-agent` for signed-in pages. These tools only drive localhost. Details in `frontend/scripts/browser/README.md`. Node 20+ is required.
 
 ## Dead code
 
-`npm run deadcode` runs knip (`knip.json`) over the frontend, its scripts and the layout engine. It lists files nothing imports, exports nothing uses and dependencies nothing needs, and exits 1 when it finds any. Run it before finishing a change and leave it clean.
+`npm run deadcode` runs knip (`knip.json`) over the frontend, its scripts and the layout engine. It lists files nothing imports, exports nothing uses and dependencies nothing needs, and exits 1 when it finds any. Run it before finishing a change and leave it clean. If it says knip is not installed, run `npm install`: an install made before knip was added does not have it.
 
 - **Delete what it reports**, then run it again: removing one thing can leave another unused.
 - **It can be wrong** about code reached in a way it cannot follow: a file run by a shell script, the target of a Vite alias, a `/src/...` import inside a page check. That is why CI only warns. When the code is used, say how in `knip.json`: an `entry` for a file run or aliased from outside, `ignore` for vendored code (`src/components/ui/`).

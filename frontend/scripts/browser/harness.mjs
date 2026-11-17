@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { BACKEND_DIR, SECRET_KEY_FILE, backendEnv, backendPython } from "./checkout.mjs";
 
 const major = Number(process.versions.node.split(".")[0]);
 if (major < 20) {
@@ -19,7 +20,6 @@ const { chromium } = await import("playwright");
 export const BROWSER_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const FRONTEND_DIR = path.resolve(BROWSER_DIR, "../..");
 export const REPO_ROOT = path.resolve(FRONTEND_DIR, "..");
-export const BACKEND_DIR = path.join(REPO_ROOT, "backend");
 export const CACHE_DIR = path.join(REPO_ROOT, "node_modules", ".cache", "pededit-browser");
 export const DEFAULT_BASE = process.env.PEDEDIT_BASE ?? "http://localhost:5173";
 export const FIXTURE_ID = "fixture";
@@ -241,18 +241,11 @@ export async function newContext(browser, { asAgent = false, viewport, deviceSca
   return context;
 }
 
-function backendPython() {
-  if (process.env.PEDEDIT_PYTHON) return [process.env.PEDEDIT_PYTHON];
-  const venv = path.join(BACKEND_DIR, ".venv", "bin", "python");
-  if (existsSync(venv)) return [venv];
-  return ["uv", "run", "python"];
-}
-
 /**
  * Stop when the running Django rejects the agent's tokens, instead of
- * running the page signed out (#191). They are signed with this checkout's
- * `backend/secret_key.txt`, so a server started from another checkout (a git
- * worktree makes its own key, #194) does not accept them. A server that is
+ * running the page signed out (#191). They are signed with the main checkout's
+ * `backend/secret_key.txt` (also from a worktree, `checkout.mjs`), so a
+ * server started with another key does not accept them. A server that is
  * not up is left for the other checks to report.
  */
 async function assertAgentTokensAccepted(tokens, base = DEFAULT_BASE) {
@@ -264,14 +257,15 @@ async function assertAgentTokensAccepted(tokens, base = DEFAULT_BASE) {
   } catch { return; }
   if (res.status === 401) {
     throw new UsageError(`the server at ${base} rejected the agent's token (401 from /api/auth/me/). `
-      + `It was minted with ${displayPath(path.join(BACKEND_DIR, "secret_key.txt"))}; a Django started from another `
-      + "checkout, such as a git worktree with its own secret key, signs with a different one (#194).");
+      + `It was minted with ${displayPath(SECRET_KEY_FILE)}; that Django signs with a different key, such as `
+      + "a checkout's own backend/secret_key.txt or a DJANGO_SECRET_KEY of its own. From a worktree, serve it with "
+      + "`servers.mjs up --here` (README, \"Working in a git worktree\").");
   }
 }
 
 export function mintAgentTokens({ throwaway = false } = {}) {
   const [cmd, ...pre] = backendPython();
-  const out = spawnSync(cmd, [...pre, "manage.py", "agent_token", ...(throwaway ? ["--throwaway"] : [])], { cwd: BACKEND_DIR, encoding: "utf8" });
+  const out = spawnSync(cmd, [...pre, "manage.py", "agent_token", ...(throwaway ? ["--throwaway"] : [])], { cwd: BACKEND_DIR, env: backendEnv(), encoding: "utf8" });
   if (out.status !== 0) {
     throw new UsageError(`manage.py agent_token failed: ${(out.stderr || out.error?.message || "").trim()}`);
   }

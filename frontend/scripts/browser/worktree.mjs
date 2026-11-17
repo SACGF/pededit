@@ -19,7 +19,7 @@ const FRONTEND_DIR = path.resolve(HERE, "../..");
 const REPO_ROOT = path.resolve(FRONTEND_DIR, "..");
 const CACHE_DIR = path.join(REPO_ROOT, "node_modules", ".cache", "pededit-browser");
 export const WORKTREES_DIR = path.join(REPO_ROOT, ".worktrees");
-const CONFIG_NAME = "vite.worktree.config.ts";
+export const CONFIG_NAME = "vite.worktree.config.ts";
 
 const git = (args, cwd = REPO_ROOT) =>
   execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
@@ -30,14 +30,14 @@ export function resolveCommit(ref) {
   catch { throw new Error(`"${ref}" is not a commit in this repository`); }
 }
 
-function freePort(from) {
+export function freePort(from, host = "localhost") {
   return new Promise((resolve, reject) => {
     const tryPort = port => {
       if (port > from + 200) { reject(new Error(`no free port from ${from}`)); return; }
       const server = net.createServer();
       server.once("error", () => tryPort(port + 1));
       // Vite listens on localhost, which may be IPv6; test the same name.
-      server.listen(port, "localhost", () => server.close(() => resolve(port)));
+      server.listen(port, host, () => server.close(() => resolve(port)));
     };
     tryPort(from);
   });
@@ -58,20 +58,27 @@ export function ensureWorktree(ref, { own = false } = {}) {
     git(["worktree", "prune"]);
     git(["worktree", "add", "--detach", dir, sha]);
   }
-  // The other commit's own vite.config.ts, plus what a checkout without its
-  // own node_modules needs: its own layout engine (the workspace link in
-  // node_modules points at the working tree's), its own dependency cache, and
-  // leave to serve files from this checkout's node_modules.
+  writeViteConfig(dir, REPO_ROOT);
+  return { sha, dir };
+}
+
+/**
+ * Write frontend/vite.worktree.config.ts in the checkout at `dir`: its own
+ * vite.config.ts, plus what a checkout without its own node_modules needs:
+ * its own layout engine (the workspace link in node_modules points at the
+ * main checkout's), its own dependency cache, and leave to serve files from
+ * the node_modules under `modulesRoot`. The file is in .gitignore.
+ */
+export function writeViteConfig(dir, modulesRoot) {
   writeFileSync(path.join(dir, "frontend", CONFIG_NAME), `// Written by frontend/scripts/browser/worktree.mjs.
 import { mergeConfig } from "vite";
 import base from "./vite.config";
 export default mergeConfig(base, {
   cacheDir: ${JSON.stringify(path.join(dir, ".vite"))},
   resolve: { alias: { "@pedigree-editor/layout-engine": ${JSON.stringify(path.join(dir, "layout-engine", "src", "index.ts"))} } },
-  server: { fs: { allow: [${JSON.stringify(REPO_ROOT)}] } },
+  server: { fs: { allow: [${JSON.stringify(dir)}, ${JSON.stringify(modulesRoot)}] } },
 });
 `);
-  return { sha, dir };
 }
 
 /**

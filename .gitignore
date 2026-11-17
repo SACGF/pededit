@@ -230,3 +230,7 @@ __marimo__/
 
 # Private pedigree data, never commit
 /test-data/real_example_not_public/
+
+# Vite config written by frontend/scripts/browser/worktree.mjs (servers.mjs up --here or --worktree)
+/frontend/vite.worktree.config.ts
+/.vite/

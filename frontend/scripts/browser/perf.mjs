@@ -41,7 +41,12 @@ rate, and prints markdown tables of the median with the lowest and highest run.
   --app URL           Measure the page served here, for a production build
                       (vite build, then vite preview). Fixtures are still read
                       through the dev server at ${DEFAULT_BASE}.
-  --out FILE          Also write every number as JSON.
+  --out FILE          Also write every number as JSON, rewritten after each
+                      row and each profile, so a run that is stopped keeps
+                      what it had measured ("complete": false until the end).
+
+Each row is also written to stderr as a markdown table row as soon as its
+runs are done, with every column of the first table.
 
 What is timed, each from the input event until the page is quiet again (the
 end of the last frame that took longer than 25 ms, or of the first frame when
@@ -531,8 +536,19 @@ await main(async () => {
   const specs = flags.fixture ?? DEFAULT_FIXTURES;
 
   const browser = await launchBrowser();
+  const chromium = browser.version();
   const rows = [], profiles = [];
   let build;
+  const cpus = os.cpus();
+  const headerLines = () => [
+    ...(flags.app ? [`app: ${appBase} (${build}); fixtures read through the dev server`] : [`app: ${build}`]),
+    ...servedLines(served),
+    `machine: ${cpus.length} x ${cpus[0]?.model ?? "unknown CPU"}, load average ${os.loadavg().map(x => x.toFixed(2)).join(" ")} when this was written`,
+    `chromium ${chromium}, headless, ${flags.viewport ?? "1440x900"}; ${reps} page loads per row; ${new Date().toISOString()}`,
+  ];
+  const writeOut = complete => {
+    if (flags.out) writeFileSync(path.resolve(flags.out), JSON.stringify({ complete, header: headerLines(), rows, profiles }, null, 2) + "\n");
+  };
   try {
     const context = await newContext(browser, contextOptions(flags));
     const fixtures = [];
@@ -551,23 +567,21 @@ await main(async () => {
           process.stderr.write(`${fixture.title} ${rate}x ${i + 1}/${reps}: open ${fmt(row.reps[i].open)} ms, edit ${fmt(row.reps[i].edit)} ms\n`);
         }
         build ??= row.reps[0].layoutToFlow === undefined ? "production build" : "development build (unminified React in StrictMode, slower than production)";
+        const lines = table([row], COLUMNS).split("\n");
+        process.stderr.write(`${(rows.length === 1 ? lines : lines.slice(-1)).join("\n")}\n`);
+        writeOut(false);
       }
       if (flags.profile) {
         profiles.push({ title: fixture.title, people: fixture.pedigree.individuals.length, results: await profileFixture(browser, context, fixture, appBase) });
         process.stderr.write(`${fixture.title}: profiled\n`);
+        writeOut(false);
       }
     }
   } finally {
     await closeBrowser(browser);
   }
 
-  const cpus = os.cpus();
-  const header = [
-    ...(flags.app ? [`app: ${appBase} (${build}); fixtures read through the dev server`] : [`app: ${build}`]),
-    ...servedLines(served),
-    `machine: ${cpus.length} x ${cpus[0]?.model ?? "unknown CPU"}, load average ${os.loadavg().map(x => x.toFixed(2)).join(" ")} at the end of the run`,
-    `chromium ${browser.version()}, headless, ${flags.viewport ?? "1440x900"}; ${reps} page loads per row; ${new Date().toISOString()}`,
-  ];
+  const header = headerLines();
   if (flags.json) {
     console.log(JSON.stringify({ header, rows, profiles }, null, 2));
   } else {
@@ -578,6 +592,6 @@ await main(async () => {
     console.log(table(rows, FIRST_FRAME));
     for (const p of profiles) console.log(profileReport(p.title, p.people, p.results, top));
   }
-  if (flags.out) writeFileSync(path.resolve(flags.out), JSON.stringify({ header, rows, profiles }, null, 2) + "\n");
+  writeOut(true);
   return 0;
 }, HELP);

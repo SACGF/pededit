@@ -8,7 +8,7 @@
   "scripts": {
     "test:layout": "npm -w layout-engine run test",
     "test:frontend": "npm -w frontend run test",
-    "deadcode": "knip",
+    "deadcode": "command -v knip >/dev/null || { echo 'knip is not installed: run npm install (Dead code in AGENTS.md)' >&2; exit 1; }; knip",
     "dev:frontend": "npm -w frontend run dev",
     "browser:up": "node frontend/scripts/browser/servers.mjs up",
     "browser:down": "node frontend/scripts/browser/servers.mjs down",

@@ -15,6 +15,11 @@ npm install
 npx -w frontend playwright install chromium-headless-shell
 ```
 
+Run `npm install` again after a pull that changes `package-lock.json`: a new
+devDependency (knip, for `npm run deadcode`) is missing from an install made
+before it was added, and `servers.mjs up` says when the lock file is newer
+than the install.
+
 `playwright` is pinned to an exact version on purpose: `playwright install`
 prunes browser builds that other playwright versions downloaded, so every
 install on the machine should agree on the version.
@@ -32,6 +37,45 @@ Servers already running are reused. Logs go to `node_modules/.cache/pededit-brow
 Starting Django also runs `manage.py createcachetable`, the table the rate
 limit counters are kept in (#47); without it every request is let through.
 `status` also says which checkout and commit Vite serves.
+
+## Working in a git worktree
+
+An agent working in a git worktree (Claude Code puts them under
+`.claude/worktrees/`) should serve that worktree, not the servers of the main
+checkout on 5173 and 8000, which serve the main checkout's code:
+
+```bash
+node frontend/scripts/browser/servers.mjs up --here      # from inside the worktree
+PEDEDIT_BASE=http://localhost:5180 node frontend/scripts/browser/flows.mjs signed-in
+node frontend/scripts/browser/servers.mjs down           # from the worktree: stops only its servers
+```
+
+`up --here` starts a Vite from 5180 and a Django from 8001, each on the
+first free port, serving the worktree's own frontend and backend as it is
+edited (Vite proxies `/api` to that Django through `PEDEDIT_API_TARGET`), and
+prints the `PEDEDIT_BASE` to use. `--frontend-only` starts only the Vite,
+proxying to the Django on 8000. What a worktree borrows from the main
+checkout (`checkout.mjs`, used by `servers.mjs` and the harness):
+
+- **node_modules.** A worktree inside the main checkout finds its
+  `node_modules` by walking up, so nothing is installed. A worktree
+  elsewhere has none and needs its own `npm ci`. The worktree's Vite runs
+  from `frontend/vite.worktree.config.ts` (in `.gitignore`), which lets it
+  serve files from the main checkout's `node_modules` and reads the
+  worktree's own layout engine.
+- **Python.** `manage.py` runs with `PEDEDIT_PYTHON`, else the worktree's
+  `backend/.venv`, else the main checkout's, else `uv run`.
+- **The secret key.** Django would make the worktree its own
+  `backend/secret_key.txt`, and a token minted with one key is rejected by
+  a Django signing with another (#191). From a worktree every `manage.py`
+  the scripts run, `agent_token` included, gets the main checkout's key as
+  `DJANGO_SECRET_KEY`, so tokens work against either checkout's Django.
+- **The site config and database** are `/etc/pededit/pededit.json`, the same
+  for every checkout, so a pedigree saved through one Django is there in the
+  other.
+
+`up --worktree REF` (below, with `compare.mjs`) is for a commit that should
+not change under the check; `--here` is for the worktree being edited.
 
 ## What code is being served
 
@@ -388,7 +432,9 @@ default `1,4,6`, set through CDP `Emulation.setCPUThrottlingRate` like the
 "4x slowdown" of Chrome's Performance panel). The default pedigrees are House
 Targaryen and the generated families in `test-data/pedigrees/size/`. It
 measures only and is not in CI: timings on a shared machine vary too much to
-pass or fail on. The header gives the commit, the machine and its load
+pass or fail on. Each row goes to stderr as a table row as soon as its runs
+are done, and `--out FILE` is rewritten after each row (`"complete": false`
+until the end), so a run that is stopped keeps what it measured. The header gives the commit, the machine and its load
 average; run it on a quiet machine and say so with the numbers.
 
 What the columns are:
@@ -583,11 +629,11 @@ account, `claude_agent_throwaway` (`agent_token --throwaway`, flow
 `asAgent: "throwaway"`), so it never deletes the pedigrees of a check signed
 in as `claude_agent`. The next run creates it again.
 
-The tokens are signed with this checkout's `backend/secret_key.txt`, so the
-running Django must use the same key. A git worktree makes its own, and a
-Django of the main checkout rejects tokens minted there (#194): the harness
-checks the tokens against `/api/auth/me/` first and stops with a message
-saying so, rather than running the page signed out (#191).
+The tokens are signed with the main checkout's `backend/secret_key.txt`, also
+from a git worktree (see "Working in a git worktree"), so the running Django
+must use the same key. The harness checks the tokens against `/api/auth/me/`
+first and stops with a message saying so when they are rejected, rather than
+running the page signed out (#191).
 
 ## Base URL
 
