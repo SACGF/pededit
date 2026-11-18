@@ -1,15 +1,31 @@
-import type { Sex } from "@pedigree-editor/layout-engine";
+import type { HopLineConstants, Sex } from "@pedigree-editor/layout-engine";
+import {
+  couplePortHeights as engineCouplePortHeights, hopHeight as engineHopHeight,
+  hopTurn as engineHopTurn, symbolSideDx as engineSymbolSideDx,
+} from "@pedigree-editor/layout-engine";
 import {
   COUPLE_HOP, COUPLE_HOP_STEP, COUPLE_HOP_CLEARANCE, COUPLE_HOP_NEST_STEP,
   COUPLE_PORT_STEP, COUPLE_PORT_MAX, COUPLE_PORT_DOUBLE_EXTRA, NODE_SIZE,
 } from "./constants";
+
+/** The editor's sizes for the engine's hop line geometry (layout-engine/src/hopLine.ts). */
+const HOP_CONSTANTS: HopLineConstants = {
+  nodeSize: NODE_SIZE,
+  coupleHop: COUPLE_HOP,
+  coupleHopStep: COUPLE_HOP_STEP,
+  coupleHopClearance: COUPLE_HOP_CLEARANCE,
+  coupleHopNestStep: COUPLE_HOP_NEST_STEP,
+  couplePortStep: COUPLE_PORT_STEP,
+  couplePortMax: COUPLE_PORT_MAX,
+  couplePortDoubleExtra: COUPLE_PORT_DOUBLE_EXTRA,
+};
 
 /**
  * Rise of a couple line whose partners are `span` slots apart (1 = adjacent,
  * no hop). Wider hops rise higher, so nested hops never run along each other.
  */
 export function hopGeometry(span: number): { hopHeight: number } {
-  return { hopHeight: span <= 1 ? 0 : COUPLE_HOP + (span - 2) * COUPLE_HOP_STEP };
+  return { hopHeight: engineHopHeight(span, HOP_CONSTANTS) };
 }
 
 /**
@@ -23,9 +39,7 @@ export function hopGeometry(span: number): { hopHeight: number } {
  * room.
  */
 export function couplePortHeights(count: number, double = false): number[] {
-  const extra = double ? COUPLE_PORT_DOUBLE_EXTRA : 0;
-  const step = Math.min(COUPLE_PORT_STEP + extra, (COUPLE_PORT_MAX + extra) / Math.max(1, count - 1));
-  return Array.from({ length: count }, (_, i) => i * step);
+  return engineCouplePortHeights(count, double, HOP_CONSTANTS);
 }
 
 /**
@@ -35,32 +49,17 @@ export function couplePortHeights(count: number, double = false): number[] {
  * circle or a diamond off its centre has to start to touch it.
  */
 export function symbolSideDx(shape: Sex | undefined, dy: number, size = NODE_SIZE): number {
-  const r = size / 2 - 1;
-  const a = Math.min(Math.abs(dy), r);
-  if (shape === "female")  return Math.sqrt(r * r - a * a);
-  if (shape === "unknown") return r - a;
-  return r;
+  return engineSymbolSideDx(shape, dy, size, 1);
 }
 
 /**
  * Where a hopping line turns between the row and its raised part, beside one
  * of its partners, whose centre is `distance` px from the centre of the
- * person next to them (the first the line passes over from that end): `turn`
- * px from the partner's centre, COUPLE_HOP_CLEARANCE of the gap short of that
- * person. The same at both ends, so the line is symmetrical about the people
- * it passes. A hop over more slots (`span`) turns a little further from them
- * (COUPLE_HOP_NEST_STEP).
- *
- * `drop`: beside the further partner the line runs level from the turn into
- * their side, and what hangs from the couple (the line to their children, a
- * childless mark) hangs from that stretch `drop` px from their centre, in the
- * middle of the gap.
+ * person next to them: see the engine's `hopTurn`. The further partner's end
+ * takes span 2.
  */
 export function hopTurn(distance: number, span = 2): { turn: number; drop: number } {
-  const half = NODE_SIZE / 2;
-  const gap = Math.max(8, distance - NODE_SIZE);
-  const turn = half + gap * (1 - COUPLE_HOP_CLEARANCE) - Math.max(0, span - 2) * COUPLE_HOP_NEST_STEP;
-  return { turn: Math.max(half + 3, turn), drop: half + gap / 2 };
+  return engineHopTurn(distance, span, HOP_CONSTANTS);
 }
 
 /**

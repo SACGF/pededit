@@ -91,20 +91,56 @@ describe("resolveCouple", () => {
 });
 
 describe("pedigreeToGeometry with a hopping couple line", () => {
-  it("joins the real partners, raises the line, and starts the sibship drop from the raised line", () => {
+  it("joins the real partners, leaves the side above the near line, and hangs the children from the level end", () => {
+    // Layout 2~ 1~ 3~ 4: man 1's line to wife 4 hops over wife 3.
     const ped = buildPedigreeFromFlat([F(1, 1), F(2), F(3), F(4), C(5, 1, 2, 1), C(6, 1, 3, 2), C(7, 1, 4, 1)]);
     const geo = pedigreeToGeometry(ped);
+    const x = (id: string) => geo.nodes.find(n => n.id === id && n.level === 0)!.cx;
     const hop = geo.couples.find(c => c.hopHeight > 0)!;
     expect(hop).toBeDefined();
     expect([hop.leftId, hop.rightId]).toEqual(["1", "4"]);
     expect(hop.hopHeight).toBe(28);
-    expect(geo.couples.filter(c => c.hopHeight === 0).map(c => [c.leftId, c.rightId])).toEqual([["2", "1"], ["1", "3"]]);
+    const flat = geo.couples.filter(c => c.hopHeight === 0);
+    expect(flat.map(c => [c.leftId, c.rightId])).toEqual([["2", "1"], ["1", "3"]]);
+    for (const c of flat) {
+      expect(c.hop).toBeUndefined();
+      expect(c.points).toEqual([[c.x1, c.y], [c.x2, c.y]]);
+    }
 
-    // Child 7 hangs from the raised segment between wife 3 and wife 4.
-    const raised = geo.sibships.filter(s => s.hopHeight > 0);
-    expect(raised).toHaveLength(1);
-    expect(raised[0]!.childXs).toHaveLength(1);
-    expect(raised[0]!.hopHeight).toBe(28);
+    // Leaves man 1's side 8px above his line to wife 3; wife 4 has one line.
+    expect(hop.hop).toMatchObject({ leftPort: 8, rightPort: 0, far: "right" });
+    expect(hop.x1).toBeCloseTo(x("1") + 20);
+    expect(hop.x2).toBeCloseTo(x("4") - 20);
+    // Turns a quarter of the gap short of wife 3 at both ends: symmetrical.
+    const gap = x("3") - x("1") - 40;
+    expect(hop.hop!.leftTurnX).toBeCloseTo(x("1") + 20 + 0.75 * gap);
+    expect(hop.hop!.rightTurnX).toBeCloseTo(x("4") - 20 - 0.75 * gap);
+    expect(x("3") - 20 - hop.hop!.leftTurnX).toBeCloseTo(hop.hop!.rightTurnX - (x("3") + 20));
+    expect(hop.points).toEqual([
+      [hop.x1, -8], [hop.hop!.leftTurnX, -8], [hop.hop!.leftTurnX, -28],
+      [hop.hop!.rightTurnX, -28], [hop.hop!.rightTurnX, 0], [hop.x2, 0],
+    ]);
+
+    // Child 7 hangs from the level stretch between wife 3 and wife 4, not
+    // from the raised part.
+    const sib = geo.sibships.find(s => Math.abs(s.coupleX - (x("3") + x("4")) / 2) < 1e-6)!;
+    expect(sib.childXs).toHaveLength(1);
+    expect(sib.coupleX).toBeGreaterThan(hop.hop!.rightTurnX);
+    expect(sib.coupleX).toBeLessThan(hop.x2);
+    expect(sib.dropY).toBe(0);
+    for (const s of geo.sibships) expect(s.dropY).toBe(s.coupleY);
+  });
+
+  it("a hop leaving a circle above its centre starts on the outline", () => {
+    // Wife 1 with three husbands: the line to husband 4 leaves her side.
+    const ped = buildPedigreeFromFlat([F(1, 2), F(2, 1), F(3, 1), F(4, 1), C(5, 2, 1, 1), C(6, 3, 1, 2), C(7, 4, 1, 1)]);
+    const geo = pedigreeToGeometry(ped);
+    const hop = geo.couples.find(c => c.hopHeight > 0)!;
+    const wife = geo.nodes.find(n => n.id === "1")!;
+    const port = hop.leftId === "1" ? hop.hop!.leftPort : hop.hop!.rightPort;
+    expect(port).toBe(8);
+    const dx = Math.sqrt(20 * 20 - 8 * 8);
+    expect(hop.leftId === "1" ? hop.x1 : hop.x2).toBeCloseTo(wife.cx + (hop.leftId === "1" ? dx : -dx));
   });
 
   it("nested hops rise further so they do not overlap", () => {

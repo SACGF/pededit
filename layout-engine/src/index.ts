@@ -9,7 +9,9 @@ export { alignPedigreeByFamily, splitFamilies, FAMILY_GAP, RELAXED_WIDTH_SLACK }
 export { buildPartnerSet, buildPartnerSetFromPedigree, isPartnerPair, resolveCouple } from "./couples.js";
 export type { PartnerSet, ResolvedCouple } from "./couples.js";
 export { pedigreeToGeometry } from "./pedigreeToGeometry.js";
-export type { PedigreeGeometry, NodeGeometry, CoupleGeometry, SibshipGeometry, RenderingConstants } from "./pedigreeToGeometry.js";
+export type { PedigreeGeometry, NodeGeometry, CoupleGeometry, CoupleHop, SibshipGeometry, RenderingConstants } from "./pedigreeToGeometry.js";
+export { couplePortHeights, hopHeight, hopTurn, symbolSideDx } from "./hopLine.js";
+export type { HopLineConstants } from "./hopLine.js";
 export { buildPedigreeFromFlat } from "./utils.js";
 export type { FlatPedRow } from "./utils.js";
 

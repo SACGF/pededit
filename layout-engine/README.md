@@ -256,7 +256,8 @@ The layout it draws from, `JSON.stringify(alignPedigree(cousins))`:
 
 The third row is the two cousins, `spouse` 2 between them. The example
 leaves out what a full renderer adds: the dashed arc between two copies of a
-person, the raised line for three or more partners, and twins.
+person, the raised line for three or more partners (`pedigreeToGeometry`
+below gives its route), and twins.
 
 ## React
 
@@ -275,10 +276,11 @@ export function PedigreeSvg({ pedigree }: { pedigree: Pedigree }) {
   return (
     <svg viewBox={viewBox} width={bounds.width + 2 * pad} stroke="black" strokeWidth={2} fill="none">
       {couples.map((c, i) =>
-        c.kind === "consanguineous" ? (
+        c.kind === "consanguineous" && !c.hop ? (
           <path key={i} d={`M${c.x1},${c.y - 3} H${c.x2} M${c.x1},${c.y + 3} H${c.x2}`} />
         ) : (
-          <path key={i} d={`M${c.x1},${c.y} H${c.x2}`} />
+          // A straight line, or the route of a line that hops over a partner.
+          <path key={i} d={"M" + c.points.map(([x, y]) => `${x},${y}`).join(" L")} />
         ),
       )}
       {sibships.map((s, i) => {
@@ -288,7 +290,7 @@ export function PedigreeSvg({ pedigree }: { pedigree: Pedigree }) {
         return (
           <path
             key={i}
-            d={`M${s.coupleX},${s.coupleY} V${s.sibBarY} M${Math.min(...xs)},${s.sibBarY} H${Math.max(...xs)} ${drops}`}
+            d={`M${s.coupleX},${s.dropY} V${s.sibBarY} M${Math.min(...xs)},${s.sibBarY} H${Math.max(...xs)} ${drops}`}
           />
         );
       })}
@@ -312,9 +314,31 @@ export function PedigreeSvg({ pedigree }: { pedigree: Pedigree }) {
 `<PedigreeSvg pedigree={cousins} />` draws the same chart as `drawSvg`
 above. Sizes come from the second argument,
 `pedigreeToGeometry(pedigree, { slotWidth: 80, rowHeight: 120, nodeSize: 40 })`
-being the defaults. Each couple and sibship also has a `hopHeight`, above 0
-when the couple line has to rise over someone in between (three or more
-partners); this component ignores it.
+being the defaults.
+
+A couple line between partners who are not side by side (three or more
+partners) hops over the people between them, and `points` is its route,
+drawn as PedEdit draws it:
+
+- It leaves the side of each symbol, never its top, which is where the line
+  from the parents lands. On a side shared with the line to a nearer
+  partner it leaves a little higher (`hop.leftPort`, `hop.rightPort`, px
+  above the row), trimmed to the outline of a circle or a diamond (`x1`,
+  `x2`), so the two lines share nothing.
+- It turns up a quarter of the gap before the first person it passes
+  (`hop.leftTurnX`), crosses at `y - hopHeight`, and comes down the same
+  distance after the last (`hop.rightTurnX`), then runs level into the
+  further partner's side (`hop.far`).
+- The line to the couple's children hangs from that level stretch:
+  `sibship.coupleX` is on it and `sibship.dropY` is its height, never the
+  raised part.
+
+This component draws a consanguineous hop as one line; to double it, draw
+the route twice a few px apart, risers moved apart as the line moves up.
+The sizes are in the second argument (`coupleHop`, `coupleHopClearance`,
+`couplePortStep` and the rest), and `hopTurn`, `couplePortHeights`,
+`hopHeight` and `symbolSideDx` are exported for a renderer that moves
+people and needs the numbers again.
 
 ## Several families
 
@@ -371,7 +395,8 @@ Stable, and covered by semantic versioning from 1.0:
 - `alignPedigreeByFamily(pedigree, options?)`, `splitFamilies(pedigree)`,
   `FAMILY_GAP`.
 - `pedigreeToGeometry(pedigree, constants?)`: pixel geometry, built on
-  `alignPedigree`.
+  `alignPedigree`, and the hop line helpers `hopHeight`, `hopTurn`,
+  `couplePortHeights`, `symbolSideDx`.
 - `resolveCouple`, `buildPartnerSetFromPedigree`: which slots a `spouse`
   mark joins.
 - `kinshipCoefficients(pedigree, options?)`.

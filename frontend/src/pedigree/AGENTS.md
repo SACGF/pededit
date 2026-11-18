@@ -165,7 +165,10 @@ draws NSGC symbols.
   shapes and turns on the edge (`CoupleEdgeData.hopEnds`) and the drop on
   the sibship (`SibshipEdgeData.hopDrop`), both measured from the far
   partner, so the two stay joined while a node is dragged and the renderers
-  need nothing new.
+  need nothing new. The numbers (`hopHeight`, `couplePortHeights`, `hopTurn`,
+  `symbolSideDx`) are the layout engine's (`layout-engine/src/hopLine.ts`),
+  which `couplePath.ts` calls with this directory's constants, so the
+  engine's `pedigreeToGeometry` describes the same route (#206).
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. The segments come from
   `sibshipPath.ts`: the bar sits

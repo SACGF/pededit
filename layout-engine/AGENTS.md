@@ -123,6 +123,11 @@ indexing convention inherited from R, and the three rendering rules.
 - `pedigreeToGeometry.ts` — turns a Pedigree into pixel coordinates using the
   same constants as the frontend (slot 80, row 120, node 40). Useful for tests
   and headless export; the U-shape exporter and SVG exporter build on this.
+  A hopping couple line's route (#206) comes from `hopLine.ts`, which the
+  frontend's `couplePath.ts` calls with its own constants, so the package
+  and the editor draw it the same way;
+  `frontend/src/pedigree/__tests__/engineGeometry.test.ts` checks the two
+  agree. Keep `DEFAULT_CONSTANTS` equal to `frontend/src/pedigree/constants.ts`.
 - `utils.ts` — `buildLayoutInput` (graph to 1-based flat arrays) and
   `buildPedigreeFromFlat`.
 - `quadprog.d.ts` — hand-written typings for the untyped quadprog package.
