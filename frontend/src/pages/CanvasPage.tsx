@@ -17,6 +17,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { forgetRecentPedigree } from "../utils/recentPedigrees";
 import { requestErrorMessage } from "../api/errors";
 import { exampleBySlug } from "../data/examples";
+import { PageZoomNotice } from "../components/PageZoomNotice";
 
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -85,17 +86,6 @@ export default function CanvasPage() {
   });
 
   useKeyboardShortcuts();
-
-  // The editor is a canvas: two fingers zoom the chart, not the page. A page
-  // zoomed from the toolbar or a panel could not be zoomed back out from the
-  // canvas, which takes every touch itself. Scrolling inside panels is kept.
-  // On the root element so dialogs, which are portals, are covered too.
-  useEffect(() => {
-    const root = document.documentElement;
-    const before = root.style.touchAction;
-    root.style.touchAction = "pan-x pan-y";
-    return () => { root.style.touchAction = before; };
-  }, []);
 
   // Notices (what an edit did, or why it was refused) fade after a few seconds.
   useEffect(() => {
@@ -394,6 +384,8 @@ export default function CanvasPage() {
           onExportSvgClick={() => setExportDialogOpen(true)}
           onMenuClick={() => setSidebarOpen(open => !open)}
         />
+
+        <PageZoomNotice />
 
         {openExampleInfo && (
           <div className="px-3 py-1 border-b bg-white text-[11px] text-gray-600" data-testid="example-notice">

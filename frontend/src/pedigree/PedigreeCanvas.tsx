@@ -496,6 +496,9 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         onNodeContextMenu={handleNodeContextMenu}
         onEdgeContextMenu={handleEdgeContextMenu}
         proOptions={{ hideAttribution: true }}
+        // Every touch on the canvas is the chart's: two fingers zoom the
+        // chart, not the page. Off the canvas the browser zooms the page.
+        style={{ touchAction: "none" }}
       >
         {pedigree.individuals.length === 0 && (
           <div

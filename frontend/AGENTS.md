@@ -187,10 +187,14 @@ reporting is off, and the dev server never reports.
   around and that editing is easier on a computer (localStorage
   `smallScreenNoticeDismissed`). It is all `lg:` / `max-lg:` classes plus
   `hooks/useSmallScreen.ts` for what CSS cannot do, and nothing changes from
-  `lg` up: check desktop screenshots are identical after touching it. While
-  the editor is mounted the root element has `touch-action: pan-x pan-y`, so
-  the browser never zooms the page there: the canvas takes every touch, so a
-  page zoomed from the toolbar could not be zoomed back out. Fields are 16px
+  `lg` up: check desktop screenshots are identical after touching it. The
+  canvas has `touch-action: none` and takes every touch for the chart; a
+  pinch anywhere else zooms the page, so small text can be magnified (#193).
+  A page zoomed until the canvas fills the screen could not be zoomed back
+  out from the canvas, so while `visualViewport.scale` is above 1
+  `PageZoomNotice` draws a strip at the top of what is on screen saying how,
+  and the strip takes a pinch itself. It follows the visual viewport by
+  transform because fixed elements stay with the unzoomed page. Fields are 16px
   on touch screens (`index.css`) because iOS Safari zooms into smaller ones
   on focus. The height is `h-app` (100dvh), not `h-screen`: 100vh is taller
   than a phone shows while its address bar is out. Check with

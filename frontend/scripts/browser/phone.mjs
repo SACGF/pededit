@@ -415,12 +415,42 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   r.check(after.scroll.x === 0 && after.scroll.y === 0 && after.pageScale === 1, "and the browser does not zoom the page instead",
     `scroll ${after.scroll.x},${after.scroll.y}, page zoom ${after.pageScale}`);
 
-  // Off the canvas too: a page zoomed from the toolbar could not be zoomed
-  // back out from the canvas, which keeps every touch for itself.
+  // Off the canvas the browser zooms the page, so small text can be
+  // magnified (#193). The canvas keeps every touch for the chart, so while
+  // the page is zoomed a notice says how to zoom it back out, and takes a
+  // pinch itself.
+  const chartZoom = after.transform?.zoom;
   const bar = await page.locator('[data-testid="toolbar"]').boundingBox().catch(() => null);
   if (bar) await pinch(page, cdp, { x: m.vw / 2, y: bar.y + bar.height / 2 }, 60, 180);
+  await page.waitForTimeout(300);
   after = await measure(page);
-  r.check(bar && after.pageScale === 1, "a pinch on the toolbar does not zoom the page either", bar ? `page zoom ${after.pageScale.toFixed(2)}` : "there is no toolbar");
+  r.check(bar && after.pageScale > 1.2 && after.transform?.zoom === chartZoom, "a pinch on the toolbar zooms the page, not the chart",
+    bar ? `page zoom ${after.pageScale.toFixed(2)}, chart zoom ${chartZoom?.toFixed(2)} to ${after.transform?.zoom?.toFixed(2)}` : "there is no toolbar");
+  const zoomNotice = await page.evaluate(() => {
+    const el = document.querySelector('[data-testid="page-zoom-notice"]');
+    if (!el) return null;
+    const b = el.getBoundingClientRect(), vv = window.visualViewport;
+    // Client rects are in layout pixels; on screen is what lies inside the visual viewport.
+    const onScreen = b.left >= vv.offsetLeft - 1 && b.top >= vv.offsetTop - 1 && b.right <= vv.offsetLeft + vv.width + 1 && b.bottom <= vv.offsetTop + vv.height;
+    // Its centre in screen coordinates, for a pinch there.
+    return { text: el.textContent, onScreen, x: (b.left + b.width / 2 - vv.offsetLeft) * vv.scale, y: (b.top + b.height / 2 - vv.offsetTop) * vv.scale };
+  });
+  r.check(zoomNotice?.onScreen && /zoom it back out/.test(zoomNotice.text), "while the page is zoomed a notice on screen says how to zoom back out",
+    zoomNotice ? `the notice is ${zoomNotice.onScreen ? "on" : "off"} screen` : "no notice");
+  for (let i = 0; zoomNotice && i < 3 && (await measure(page)).pageScale > 1.01; i++) {
+    const at = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="page-zoom-notice"]');
+      const b = el?.getBoundingClientRect(), vv = window.visualViewport;
+      return b ? { x: (b.left + b.width / 2 - vv.offsetLeft) * vv.scale, y: (b.top + b.height / 2 - vv.offsetTop) * vv.scale } : null;
+    });
+    if (!at) break;
+    await pinch(page, cdp, at, 200, 20);
+    await page.waitForTimeout(300);
+  }
+  after = await measure(page);
+  const shown = await page.locator('[data-testid="page-zoom-notice"]').count();
+  r.check(zoomNotice && after.pageScale <= 1.01 && shown === 0, "a pinch on the notice zooms the page back out, and the notice goes",
+    `page zoom ${after.pageScale.toFixed(2)}, notice ${shown ? "still shown" : "gone"}`);
 
   await resolveFindings(run.findings);
   jsChecks(r, run.findings);
