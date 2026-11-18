@@ -3,15 +3,16 @@ set -euo pipefail
 
 usage() {
     cat <<'USAGE'
-Usage: sudo bash /opt/pededit/deploy/deploy.sh               deploy the latest main
-       sudo bash /opt/pededit/deploy/deploy.sh --back-to [REF]  go back to a release
+Usage: sudo bash /opt/pededit/deploy/deploy.sh                      deploy the latest main
+       sudo bash /opt/pededit/deploy/deploy.sh --back-to [TAG|SHA]  go back to a release
 
---back-to checks out REF (a release tag such as 2026-11-16-family-business, or
-a commit), then builds, installs and restarts as a deploy does, but does not
-migrate. With no REF it goes back to the commit the last deploy (or --back-to)
-replaced, from /var/lib/pededit/deploys.log, so running it twice returns. It refuses when the database has migrations REF
-does not have, or lacks ones it needs, and says how to fix that. A plain
-deploy afterwards returns to main.
+--back-to checks out a release tag (git tag -n1 lists them, such as
+2026-11-16-family-business) or a commit sha, then builds, installs and
+restarts as a deploy does, but does not migrate. With neither it goes back to
+the commit the last deploy (or --back-to) replaced, from
+/var/lib/pededit/deploys.log, so running it twice returns. It refuses when
+the database has migrations the release does not have, or lacks ones it
+needs, and says how to fix that. A plain deploy afterwards returns to main.
 USAGE
 }
 
