@@ -1,7 +1,8 @@
 import type { Hints, LayoutInput, LayoutResult, Pedigree } from "./types.js";
 
 /**
- * Which side a partner is drawn on.
+ * Which side a partner is drawn on, and which partner a couple is drawn
+ * beside.
  *
  * kinship2 decides the left to right order of a couple: the father-role
  * member on the left unless a spouse hint says otherwise, and `autohint`
@@ -11,15 +12,32 @@ import type { Hints, LayoutInput, LayoutResult, Pedigree } from "./types.js";
  * `applyPartnerSides` turns it into a spouse hint row `[left, right, anchor]`,
  * the same input kinship2 itself uses. Nobody is pinned.
  *
- * A row autohint already wrote for the couple keeps its anchor (which
- * member's family the marriage hangs from), flipped with the row so it stays
- * on the same person; otherwise the row is unanchored, as a plain parent
- * pair is. kinship2 honours the side whenever the couple is drawn side by
- * side; where the hint conflicts with merging someone's copies the layout
- * stays a valid kinship2 layout but may keep a duplicate (dashed arc) instead.
+ * The anchor says whose place the couple is drawn at: alignped1 draws a
+ * couple when it places the anchored partner and not when it places the
+ * other, who is drawn again beside them if already placed elsewhere. So in
+ * a family with a loop the anchor decides who is drawn twice, and
+ * `Partnership.drawnBeside` sets it. A row needs a side to carry an anchor:
+ * with no `leftPartner` the couple keeps the side of the row autohint wrote
+ * for it, or has `individual1` on the left.
+ *
+ * With no `drawnBeside`, a row autohint already wrote for the couple keeps
+ * its anchor, flipped with the row so it stays on the same person;
+ * otherwise the row is unanchored, as a plain parent pair is. kinship2
+ * honours the side whenever the couple is drawn side by side; where the
+ * hint conflicts with merging someone's copies the layout stays a valid
+ * kinship2 layout but may keep a duplicate (dashed arc) instead.
+ *
+ * `canAnchor(person, partner)` says whether the couple can be anchored on
+ * `person` (1-based indices). An anchor on someone alignped1 never places
+ * in their own right is a couple nobody draws, so `drawnBeside` is ignored
+ * where it answers no. See `anchorablePartners` in `alignPedigree.ts`.
  */
-export function applyPartnerSides(hints: Hints, pedigree: Pedigree): Hints {
-  const chosen = pedigree.partnerships.filter(p => p.leftPartner);
+export function applyPartnerSides(
+  hints: Hints,
+  pedigree: Pedigree,
+  canAnchor: (person: number, partner: number) => boolean = () => false,
+): Hints {
+  const chosen = pedigree.partnerships.filter(p => p.leftPartner || p.drawnBeside);
   if (chosen.length === 0) return hints;
   const idToIdx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
 
@@ -34,18 +52,26 @@ export function applyPartnerSides(hints: Hints, pedigree: Pedigree): Hints {
     const a = idToIdx.get(p.individual1) ?? 0;
     const b = idToIdx.get(p.individual2) ?? 0;
     if (a === 0 || b === 0 || a === b) continue;
-    const left = p.leftPartner === p.individual1 ? a : p.leftPartner === p.individual2 ? b : 0;
-    if (left === 0) continue;
-    const right = left === a ? b : a;
+    const partner = (id: string | undefined) => id === p.individual1 ? a : id === p.individual2 ? b : 0;
+    const chosenLeft = partner(p.leftPartner);
+    let beside = partner(p.drawnBeside);
+    if (beside !== 0 && !canAnchor(beside, beside === a ? b : a)) beside = 0;
+    if (chosenLeft === 0 && beside === 0) continue;
     const key = Math.min(a, b) * (n + 1) + Math.max(a, b);
     if (done.has(key)) continue;
     done.add(key);
-    let anchor = 0;
+    // The couple's own rows give way to the user's. The first of them is
+    // the one buildSpouseList would have used.
+    let hinted: [number, number, number] | null = null;
     for (let r = rows.length - 1; r >= 0; r--) {
-      const [l, rt, an] = rows[r]!;
-      if (l === left && rt === right) { anchor = an; rows.splice(r, 1); }
-      else if (l === right && rt === left) { anchor = an === 0 ? 0 : 3 - an; rows.splice(r, 1); }
+      const [l, rt] = rows[r]!;
+      if ((l === a && rt === b) || (l === b && rt === a)) { hinted = rows[r]!; rows.splice(r, 1); }
     }
+    const left = chosenLeft || (hinted ? hinted[0] : a);
+    const right = left === a ? b : a;
+    let anchor = 0;
+    if (beside !== 0) anchor = beside === left ? 1 : 2;
+    else if (hinted && hinted[2] !== 0) anchor = hinted[0] === left ? hinted[2] : 3 - hinted[2];
     userRows.push([left, right, anchor]);
   }
   if (userRows.length === 0) return hints;

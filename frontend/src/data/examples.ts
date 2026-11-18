@@ -632,6 +632,18 @@ function withTags(
   return { ...ped, tags: tags.map(({ members: _members, ...tag }) => tag) };
 }
 
+/**
+ * Set how couples are drawn: `Partnership.leftPartner` and `drawnBeside`, by
+ * partnership id ("father+mother" as `fromRows` names them). Throws on an
+ * unknown id so a typo fails the example tests.
+ */
+function withCouples(ped: Pedigree, drawn: Record<string, Pick<Partnership, "leftPartner" | "drawnBeside">>): Pedigree {
+  for (const id of Object.keys(drawn)) {
+    if (!ped.partnerships.some(p => p.id === id)) throw new Error(`withCouples: no partnership ${id}`);
+  }
+  return { ...ped, partnerships: ped.partnerships.map(p => (drawn[p.id] ? { ...p, ...drawn[p.id] } : p)) };
+}
+
 function historicAndClassicExamples(): ExamplePedigree[] {
   const M: Sex = "male";
   const F: Sex = "female";
@@ -998,7 +1010,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
 
 
   const focal = { affected: true };
-  const classic: Array<[slug: string, label: string, description: string, rows: Row[]]> = [
+  const classic: Array<[slug: string, label: string, description: string, rows: Row[], couples?: Parameters<typeof withCouples>[1]]> = [
     ["three-quarter-siblings", "3/4 siblings", "share a mother; fathers are brothers. Kinship 3/16", [
       ["GF", M, null, null], ["GM", F, null, null],
       ["F1", M, "GF", "GM"], ["F2", M, "GF", "GM"], ["M", F, null, null],
@@ -1042,7 +1054,13 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       ["A", M, null, null], ["B", F, null, null], ["C", M, null, null], ["D", F, null, null],
       ["F1", M, "A", "B"], ["M1", F, "C", "D"], ["F2", M, "A", "D"], ["M2", F, "C", "B"],
       ["X", M, "F1", "M1", focal], ["Y", F, "F2", "M2", focal],
-    ]],
+    ], {
+      // The four grandparents are a ring of couples, so three people are
+      // drawn twice whatever the order. These choices keep all three in the
+      // top row, with both cousin couples drawn once below.
+      "C+D": { leftPartner: "D" },
+      "C+B": { leftPartner: "C", drawnBeside: "C" },
+    }],
     ["grandparent-and-grandchilds-partner", "Grandparent and grandchild's partner", "a couple spanning two generations", [
       ["GF", M, null, null], ["GM", F, null, null],
       ["P", F, "GF", "GM"], ["S", M, null, null],
@@ -1083,12 +1101,12 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       citation: "Hawass et al. (2010) JAMA 303(7): 638, Fig. 2",
       data: fromRows(tutankhamun, { deceased: true }),
     },
-    ...classic.map(([slug, label, description, rows]): ExamplePedigree => ({
+    ...classic.map(([slug, label, description, rows, couples]): ExamplePedigree => ({
       slug,
       label,
       description: `${rows.length} individuals · ${description}`,
       group: "Classic",
-      data: fromRows(rows),
+      data: couples ? withCouples(fromRows(rows), couples) : fromRows(rows),
     })),
     {
       slug: "targaryen",

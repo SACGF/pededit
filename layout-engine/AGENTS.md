@@ -78,6 +78,30 @@ indexing convention inherited from R, and the three rendering rules.
   oracle is unaffected. `drawnLeftPartner` reads the side back from a
   layout. Where kinship2 still cannot draw a chosen side without a
   duplicate, the editor refuses the swap (`frontend/src/pedigree/partners.ts`).
+- `Partnership.drawnBeside` (#205) is the anchor of that same hint row:
+  which partner's place the couple is drawn at, so who is drawn twice in a
+  family with a loop. alignped1 draws a couple anchored on someone only when
+  it places that person in their own right, so three things keep a choice
+  from losing a couple:
+  - `anchorablePartners` (`alignPedigree.ts`) ignores an anchor on someone
+    who is only ever drawn as a partner (married in, or a founder the
+    traversal does not start from) or who is in the higher of two
+    generations. Without it, about a third of all couple and partner
+    choices over the examples drew no couple line or threw.
+    `drawnBesideChoices` gives the partners that pass, for the editor's menu.
+  - A row needs a side to carry an anchor (`sl3` is 1 or 2), so with no
+    `leftPartner` the couple takes the side of autohint's row for it, else
+    `individual1` on the left. The editor always stores a side with it.
+  - Several anchors on one run of partners can still give a marker that
+    `resolveCouple` reads as another couple's (`D A C B` with A and B a
+    couple hopping over C, and D a partner of C). `alignPedigree` checks the
+    slots before the quadratic program (`drawsEveryCouple`) and, when a
+    couple or a child's line is lost, lays the family out again with every
+    `drawnBeside` dropped, calling `AlignOptions.onChoicesIgnored`.
+    `drawnBesideConflict` (`families.ts`) asks that without the quadratic
+    program; the editor refuses a choice that would cause it.
+  Nothing changes when no partnership has `drawnBeside`, so the R oracle is
+  unaffected. Tests: `tests/drawnBeside.test.ts`.
 - `kinship.ts` — `kinshipCoefficients` (#32): kinship of any two people and
   the inbreeding coefficient, by the same parents-first recursion as
   kinship2's `kinship()`. Not part of the layout. It follows blood rather

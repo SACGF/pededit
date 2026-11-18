@@ -123,6 +123,17 @@ reporting is off, and the dev server never reports.
   only draw by adding a duplicate, ignoring, or moving another chosen side:
   about 1 couple in 9 across the examples, mostly inbred or partner-chain
   families. A pinned partner keeps its pin and the notice says so.
+  "Draw this couple beside" (#205, `setCoupleDrawnBeside`, a section of the
+  couple line menu) sets `Partnership.drawnBeside`: which partner's place
+  the couple is drawn at, so who is drawn twice in a family with a loop.
+  The section shows only when both partners have a place of their own
+  (`drawBesideOptions`), which no couple in an ordinary family has.
+  `drawBesidePlan` stores a side with the choice (the one swapped to if any,
+  else whichever of the two draws fewer people twice), stores nothing when
+  the drawing would not change, and refuses a choice the layout cannot draw
+  together with the others (`drawnBesideConflict`); "Automatic" clears the
+  choice and the side. It is meant to draw people twice, so unlike a swap it
+  is never refused for that: the notice gives the count before and after.
   "Add existing partner..." (#84, `linkPartner`) joins two people already
   on the tree, relatives included, and of any sex; "Add partner" always
   makes a new person, of the opposite sex (unknown for an unknown-sex

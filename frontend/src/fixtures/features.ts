@@ -316,6 +316,31 @@ const hide = (p: Pedigree, ids: string[]): Pedigree =>
 
 const collapsed = hide(family(), ["pa1", "pa2", "ma1"]);
 
+// ── A loop: people drawn twice ───────────────────────────────────────────────
+
+/**
+ * Two men who each have a child with the same two women, and those children
+ * marry: the four grandparents are a ring of couples, so three people are
+ * drawn twice whatever the order. `drawnBeside` keeps all three in the top
+ * row.
+ */
+const loop = build(
+  [
+    M("la", { name: "Larch" }), F("ma", { name: "Maple" }), M("ne", { name: "Nettle" }), F("ol", { name: "Olive" }),
+    M("pr", { name: "Privet" }), F("qu", { name: "Quince" }), M("ro", { name: "Rowan" }), F("so", { name: "Sorrel" }),
+    M("th", { name: "Thistle", affected: true }), F("ya", { name: "Yarrow", affected: true }),
+  ],
+  [
+    couple("q1", "la", "ma"),
+    couple("q2", "ne", "ol", { leftPartner: "ol" }),
+    couple("q3", "la", "ol"),
+    couple("q4", "ne", "ma", { leftPartner: "ne", drawnBeside: "ne" }),
+    couple("q5", "pr", "qu"),
+    couple("q6", "ro", "so"),
+  ],
+  { q1: ["pr"], q2: ["qu"], q3: ["ro"], q4: ["so"], q5: ["th"], q6: ["ya"] },
+);
+
 // ── The list ─────────────────────────────────────────────────────────────────
 
 const BASE: FeatureFixture[] = [
@@ -363,6 +388,11 @@ const BASE: FeatureFixture[] = [
     slug: "filter-paternal", label: "Filter: father's side",
     covers: "Father's side only",
     data: family({ filters: { side: "paternal" } }),
+  },
+  {
+    slug: "loop", label: "A loop: people drawn twice",
+    covers: "people drawn twice with numbered copies and dashed arcs, and a couple drawn beside a chosen partner",
+    data: loop,
   },
 ];
 

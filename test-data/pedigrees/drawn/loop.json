@@ -1,0 +1,144 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "A loop: people drawn twice",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "la",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Larch"
+      },
+      {
+        "id": "ma",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Maple"
+      },
+      {
+        "id": "ne",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Nettle"
+      },
+      {
+        "id": "ol",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Olive"
+      },
+      {
+        "id": "pr",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Privet"
+      },
+      {
+        "id": "qu",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Quince"
+      },
+      {
+        "id": "ro",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Rowan"
+      },
+      {
+        "id": "so",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0,
+        "name": "Sorrel"
+      },
+      {
+        "id": "th",
+        "sex": "male",
+        "affected": true,
+        "sibOrder": 0,
+        "name": "Thistle"
+      },
+      {
+        "id": "ya",
+        "sex": "female",
+        "affected": true,
+        "sibOrder": 0,
+        "name": "Yarrow"
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "q1",
+        "individual1": "la",
+        "individual2": "ma"
+      },
+      {
+        "id": "q2",
+        "individual1": "ne",
+        "individual2": "ol",
+        "leftPartner": "ol"
+      },
+      {
+        "id": "q3",
+        "individual1": "la",
+        "individual2": "ol"
+      },
+      {
+        "id": "q4",
+        "individual1": "ne",
+        "individual2": "ma",
+        "leftPartner": "ne",
+        "drawnBeside": "ne"
+      },
+      {
+        "id": "q5",
+        "individual1": "pr",
+        "individual2": "qu"
+      },
+      {
+        "id": "q6",
+        "individual1": "ro",
+        "individual2": "so"
+      }
+    ],
+    "parentOf": {
+      "q1": [
+        "pr"
+      ],
+      "q2": [
+        "qu"
+      ],
+      "q3": [
+        "ro"
+      ],
+      "q4": [
+        "so"
+      ],
+      "q5": [
+        "th"
+      ],
+      "q6": [
+        "ya"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

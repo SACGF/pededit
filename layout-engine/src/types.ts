@@ -267,6 +267,16 @@ export interface Partnership {
    * Fed to kinship2 as a spouse hint, so it never pins anyone.
    */
   leftPartner?: string;
+  /**
+   * The partner this couple is drawn beside: the id of `individual1` or
+   * `individual2`. The couple is drawn where that partner is placed (with
+   * their brothers and sisters, or for someone with no parents drawn, with
+   * their other couples), and the other partner is drawn again there when
+   * their own place is elsewhere. So it chooses who is drawn twice in a
+   * family with a loop. Absent means the layout chooses. Fed to kinship2 as
+   * the anchor of the couple's spouse hint, so it never pins anyone.
+   */
+  drawnBeside?: string;
 }
 
 export type SiblingOrderMode = "insertion" | "manual" | "birthDate";

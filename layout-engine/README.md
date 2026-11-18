@@ -85,8 +85,9 @@ Everything else on these types is optional. Most of it is what the PedEdit
 editor records and draws (names, dates, conditions, settings) and does not
 change the layout. The fields that do are `Individual.dob` (with the
 `"birthDate"` order), `Partnership.twins`, `Partnership.leftPartner` (which
-partner is drawn on the left), and `Individual.carriedBy` and
-`socialParents` (assisted reproduction).
+partner is drawn on the left), `Partnership.drawnBeside` (which partner the
+couple is drawn beside, and so who is drawn twice in a family with a loop),
+and `Individual.carriedBy` and `socialParents` (assisted reproduction).
 
 For data in PED form (id, father, mother, sex), `buildPedigreeFromFlat` makes
 the `Pedigree`:

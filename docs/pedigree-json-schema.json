@@ -127,6 +127,7 @@
         },
         "ended": { "type": "boolean", "description": "The relationship no longer exists (separated, divorced): two short strokes across the couple line." },
         "leftPartner": { "type": "string", "description": "Id of the partner drawn on the left of this couple: individual1 or individual2. Absent means the layout chooses." },
+        "drawnBeside": { "type": "string", "description": "Id of the partner this couple is drawn beside: individual1 or individual2. In a family with a loop the other partner is then the one drawn twice. Absent means the layout chooses." },
         "donorConception": { "type": "boolean", "description": "The children were conceived with a donated sperm or egg: the partners are the genetic parents but not a couple, so no couple line is drawn and each partner's line runs to the children (NSGC)." }
       },
       "additionalProperties": true

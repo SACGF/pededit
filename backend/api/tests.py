@@ -41,7 +41,7 @@ FULL_PEDIGREE = {
     ],
     "partnerships": [
         {"id": "p1", "individual1": "f", "individual2": "m", "consanguineous": True,
-         "leftPartner": "m",
+         "leftPartner": "m", "drawnBeside": "m",
          "consanguinityLabel": "third cousins",
          "twins": [{"members": ["c1", "c2"], "zygosity": "monozygotic"}]},
         {"id": "p2", "individual1": "f", "individual2": "w2", "childless": "infertility",

@@ -60,7 +60,8 @@
         "twins": null,
         "ended": null,
         "donorConception": null,
-        "leftPartner": null
+        "leftPartner": null,
+        "drawnBeside": null
       }
     ],
     "parentOf": {

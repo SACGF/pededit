@@ -14,7 +14,10 @@ const PED = join(__dirname, "../../../../test-data/ped");
 
 /** Every example and every PED fixture the oracle covers, as [name, pedigree]. */
 function corpus(): [string, Pedigree][] {
-  const out: [string, Pedigree][] = EXAMPLES.map(e => [e.label, e.data]);
+  // The passes are measured on the family alone: an example's own choices of
+  // how its couples are drawn (leftPartner, drawnBeside) are not theirs.
+  const out: [string, Pedigree][] = EXAMPLES.map(e =>
+    [e.label, { ...e.data, partnerships: e.data.partnerships.map(({ leftPartner: _l, drawnBeside: _b, ...c }) => c) }]);
   for (const dir of ["historic", "fiction", "classic", "consanguineous", "large"]) {
     for (const f of readdirSync(join(PED, dir))) {
       if (!f.endsWith(".ped")) continue;

@@ -10,7 +10,7 @@ import { twinSetProblem, twinSetOf } from "../pedigree/twins";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals, dropAssistedLinks } from "../pedigree/removal";
 import { setParentsProblem, currentParentsOf } from "../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../pedigree/placeholders";
-import { linkPartnerProblem, swapSidesPlan } from "../pedigree/partners";
+import { linkPartnerProblem, swapSidesPlan, drawBesidePlan, couplePartnerLabel } from "../pedigree/partners";
 import { kinshipOf } from "../pedigree/relatedness";
 import { activeSnapGrid, snapPoint } from "../pedigree/snap";
 import { collapseInfo, filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
@@ -501,6 +501,14 @@ interface PedigreeState {
    * reason when refused, also shown as a notice.
    */
   swapPartnerSides: (partnershipId: string) => string | null;
+  /**
+   * Draw the couple where `individualId` (one of its partners) is placed, so
+   * the other partner is the one drawn twice if someone must be; null hands
+   * the choice back to the layout. Sets `Partnership.drawnBeside` and the
+   * side it acts on. One undo step, nobody pinned. A notice says who is now
+   * drawn twice, or why nothing changed (also returned).
+   */
+  setCoupleDrawnBeside: (partnershipId: string, individualId: string | null) => string | null;
 
   // Pedigree-level settings
   updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
@@ -1669,6 +1677,28 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         const name = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim() || "a partner";
         get().setNotice({ kind: "info", text: `Sides swapped, but ${pinned.map(name).join(" and ")} ${pinned.length === 1 ? "is" : "are"} pinned and stay${pinned.length === 1 ? "s" : ""} where dragged: unpin to see the swap.`, undoable: true });
       }
+      return null;
+    },
+
+    setCoupleDrawnBeside: (partnershipId, individualId) => {
+      const { pedigree } = get();
+      const plan = drawBesidePlan(pedigree, partnershipId, individualId);
+      if ("unchanged" in plan) {
+        get().setNotice({ kind: "info", text: plan.unchanged });
+        return plan.unchanged;
+      }
+      mutate(draft => {
+        const p = draft.partnerships.find(x => x.id === partnershipId)!;
+        if (plan.drawnBeside) p.drawnBeside = plan.drawnBeside; else delete p.drawnBeside;
+        if (plan.leftPartner) p.leftPartner = plan.leftPartner; else delete p.leftPartner;
+      });
+      const p = pedigree.partnerships.find(x => x.id === partnershipId)!;
+      const pinned = [p.individual1, p.individual2].filter(id => pedigree.pinnedPositions?.[id]);
+      const pinnedText = pinned.length > 0
+        ? `${pinned.map(id => couplePartnerLabel(pedigree, partnershipId, id)).join(" and ")} ${pinned.length === 1 ? "is" : "are"} pinned and stay${pinned.length === 1 ? "s" : ""} where dragged: unpin to see the change.`
+        : null;
+      const text = [plan.notice, pinnedText].filter(Boolean).join(" ");
+      if (text) get().setNotice({ kind: "info", text: text.charAt(0).toUpperCase() + text.slice(1), undoable: true });
       return null;
     },
 

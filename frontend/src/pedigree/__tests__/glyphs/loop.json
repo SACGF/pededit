@@ -1,0 +1,320 @@
+{
+ "ma @ 0-0": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Maple",
+  "nameLines": [
+   "Maple"
+  ],
+  "figureNameLines": [
+   "Maple"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 1
+ },
+ "la @ 0-1": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Larch",
+  "nameLines": [
+   "Larch"
+  ],
+  "figureNameLines": [
+   "Larch"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 1
+ },
+ "ol @ 0-2": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Olive",
+  "nameLines": [
+   "Olive"
+  ],
+  "figureNameLines": [
+   "Olive"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 1
+ },
+ "ne @ 0-3": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Nettle",
+  "nameLines": [
+   "Nettle"
+  ],
+  "figureNameLines": [
+   "Nettle"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "ma @ 0-4": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Maple",
+  "nameLines": [
+   "Maple"
+  ],
+  "figureNameLines": [
+   "Maple"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 2
+ },
+ "la @ 0-5": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Larch",
+  "nameLines": [
+   "Larch"
+  ],
+  "figureNameLines": [
+   "Larch"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 2
+ },
+ "ol @ 0-6": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": false,
+  "documented": false,
+  "annotations": [],
+  "name": "Olive",
+  "nameLines": [
+   "Olive"
+  ],
+  "figureNameLines": [
+   "Olive"
+  ],
+  "detailLines": [],
+  "detailsBacked": false,
+  "copy": 2
+ },
+ "pr @ 1-0": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Privet",
+  "nameLines": [
+   "Privet"
+  ],
+  "figureNameLines": [
+   "Privet"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "qu @ 1-1": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Quince",
+  "nameLines": [
+   "Quince"
+  ],
+  "figureNameLines": [
+   "Quince"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "so @ 1-2": {
+  "shape": "female",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Sorrel",
+  "nameLines": [
+   "Sorrel"
+  ],
+  "figureNameLines": [
+   "Sorrel"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "ro @ 1-3": {
+  "shape": "male",
+  "paint": {
+   "base": "white",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Rowan",
+  "nameLines": [
+   "Rowan"
+  ],
+  "figureNameLines": [
+   "Rowan"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "th @ 2-0": {
+  "shape": "male",
+  "paint": {
+   "base": "black",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Thistle",
+  "nameLines": [
+   "Thistle"
+  ],
+  "figureNameLines": [
+   "Thistle"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ },
+ "ya @ 2-1": {
+  "shape": "female",
+  "paint": {
+   "base": "black",
+   "core": false,
+   "dot": false,
+   "line": false,
+   "sectors": []
+  },
+  "deceased": false,
+  "familyHistoryUnknown": false,
+  "hasParents": true,
+  "documented": false,
+  "annotations": [],
+  "name": "Yarrow",
+  "nameLines": [
+   "Yarrow"
+  ],
+  "figureNameLines": [
+   "Yarrow"
+  ],
+  "detailLines": [],
+  "detailsBacked": false
+ }
+}

@@ -1,69 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="601" height="533"
-     viewBox="0 0 601 533">
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="533"
+     viewBox="0 0 600 533">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
           refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="601" height="533" fill="white"/>
-<text class="chart-title" x="300.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
+<rect width="600" height="533" fill="white"/>
+<text class="chart-title" x="300" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Quadruple half first cousins</text>
 <g transform="translate(60 128)">
 <g class="couple-lines">
 <path d="M 20 0 L 60 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 100 0 L 140 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 180 0 L 220 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 260 0 L 300 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 420 0 L 460 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 33.33 120 L 73.33 120" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 193.33 120 L 260 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 60 120 L 180 120" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 300 120 L 420 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
 <line x1="40" y1="0" x2="40" y2="60" stroke="black" stroke-width="2"/>
-<line x1="13.33" y1="60" x2="40" y2="60" stroke="black" stroke-width="2"/>
-<line x1="13.33" y1="60" x2="13.33" y2="100" stroke="black" stroke-width="2"/>
-<line x1="120" y1="0" x2="120" y2="60" stroke="black" stroke-width="2"/>
-<line x1="120" y1="60" x2="173.33" y2="60" stroke="black" stroke-width="2"/>
-<line x1="173.33" y1="60" x2="173.33" y2="100" stroke="black" stroke-width="2"/>
+<line x1="40" y1="60" x2="40" y2="60" stroke="black" stroke-width="2"/>
+<line x1="40" y1="60" x2="40" y2="100" stroke="black" stroke-width="2"/>
+<line x1="200" y1="0" x2="200" y2="60" stroke="black" stroke-width="2"/>
+<line x1="200" y1="60" x2="200" y2="60" stroke="black" stroke-width="2"/>
+<line x1="200" y1="60" x2="200" y2="100" stroke="black" stroke-width="2"/>
 <line x1="280" y1="0" x2="280" y2="60" stroke="black" stroke-width="2"/>
 <line x1="280" y1="60" x2="280" y2="60" stroke="black" stroke-width="2"/>
 <line x1="280" y1="60" x2="280" y2="100" stroke="black" stroke-width="2"/>
 <line x1="440" y1="0" x2="440" y2="60" stroke="black" stroke-width="2"/>
 <line x1="440" y1="60" x2="440" y2="60" stroke="black" stroke-width="2"/>
 <line x1="440" y1="60" x2="440" y2="100" stroke="black" stroke-width="2"/>
-<line x1="53.33" y1="120" x2="53.33" y2="180" stroke="black" stroke-width="2"/>
-<line x1="53.33" y1="180" x2="53.33" y2="180" stroke="black" stroke-width="2"/>
-<line x1="53.33" y1="180" x2="53.33" y2="220" stroke="black" stroke-width="2"/>
-<line x1="226.67" y1="120" x2="226.67" y2="180" stroke="black" stroke-width="2"/>
-<line x1="226.67" y1="180" x2="226.67" y2="180" stroke="black" stroke-width="2"/>
-<line x1="226.67" y1="180" x2="226.67" y2="220" stroke="black" stroke-width="2"/>
+<line x1="120" y1="120" x2="120" y2="180" stroke="black" stroke-width="2"/>
+<line x1="120" y1="180" x2="120" y2="180" stroke="black" stroke-width="2"/>
+<line x1="120" y1="180" x2="120" y2="220" stroke="black" stroke-width="2"/>
+<line x1="360" y1="120" x2="360" y2="180" stroke="black" stroke-width="2"/>
+<line x1="360" y1="180" x2="360" y2="180" stroke="black" stroke-width="2"/>
+<line x1="360" y1="180" x2="360" y2="220" stroke="black" stroke-width="2"/>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
-<path d="M 0 -20 Q 120 -76 240 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 160 -20 Q 280 -76 400 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 320 -20 Q 400 -76 480 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 93.33 100 Q 266.67 44 440 100" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 0 -20 Q 160 -76 320 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 80 -20 Q 240 -76 400 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 160 -20 Q 320 -76 480 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
 </g>
 <g class="symbols">
 <g transform="translate(0 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(80 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(160 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(240 0)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(320 0)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
+<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(400 0)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
@@ -73,28 +72,23 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
-<g transform="translate(13.33 120)">
+<g transform="translate(40 120)">
+<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+</g>
+<g transform="translate(200 120)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(93.33 120)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
-</g>
-<g transform="translate(173.33 120)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(280 120)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(440 120)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
-<g transform="translate(53.33 240)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
-</g>
-<g transform="translate(226.67 240)">
+<g transform="translate(120 240)">
 <rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+</g>
+<g transform="translate(360 240)">
+<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
 </g>
 </g>
 <g class="labels">

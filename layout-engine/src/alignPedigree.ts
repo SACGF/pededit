@@ -6,6 +6,7 @@ import { alignped3 } from "./alignped3.js";
 import { alignped4 } from "./alignped4.js";
 import { placementParentOf, carrierAbove } from "./assisted.js";
 import { applyPartnerSides } from "./partnerSides.js";
+import { buildPartnerSet, isPartnerPair, resolveCouple } from "./couples.js";
 
 export interface AlignOptions {
   packed?: boolean;   // default true
@@ -32,6 +33,8 @@ export interface AlignOptions {
    * options)` returns. The engine itself keeps nothing between calls.
    */
   alignFamily?: (family: Pedigree, options: AlignOptions) => LayoutResult;
+  /** Called when a family's `Partnership.drawnBeside` choices had to be ignored (see `drawnBesideConflict`). */
+  onChoicesIgnored?: () => void;
 }
 
 /**
@@ -53,26 +56,18 @@ export function alignPedigree(
 
   // 1. Convert to LayoutInput (1-based). A child of assisted reproduction may
   // hang from the couple carrying it rather than its genetic parents.
+  const asGiven = pedigree;
   pedigree = { ...pedigree, parentOf: placementParentOf(pedigree) };
   const input = pedigreeToLayoutInput(pedigree);
 
   // 2. Assign generations
-  let depth: Int32Array;
-  try {
-    depth = kindepth(input, true);
-  } catch {
-    // Inbred pedigree that fails the couple-alignment pass.
-    // Fall back to depth-only: parents may end up at different depths,
-    // but the layout will not crash. Rare in practice.
-    depth = kindepth(input, false);
-  }
-  const level = new Int32Array(input.n + 1);
-  for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
+  const level = generationLevels(input);
 
   // 3. Get ordering hints
   // The sides the user chose for couples override kinship2's own,
   // also inside autohint's trial runs, so its fixup works around them.
-  const hints = applyPartnerSides(options.hints ?? autohint(input, pedigree, { balancePartners: improve, swapFamilies: improve }), pedigree);
+  const ownHints = options.hints ?? autohint(input, pedigree, { balancePartners: improve, swapFamilies: improve });
+  const hints = applyPartnerSides(ownHints, pedigree, anchorablePartners(input, level, ownHints));
 
   // 4. Build spouselist
   const { spouselist, spouselistRows } = buildSpouseList(input, hints, pedigree);
@@ -117,6 +112,16 @@ export function alignPedigree(
     }
     return a;
   });
+
+  // 6.5. Choices of where couples are drawn (`drawnBeside`) are hints kinship2
+  // was not written to take in any combination: several on one run of
+  // partners can leave a couple line that reads as another couple's. Such
+  // a set is dropped whole, and the family laid out as the layout chooses.
+  if (options.hints === undefined && pedigree.partnerships.some(p => p.drawnBeside)
+      && !drawsEveryCouple(input, toLayoutResult(rval, nidInt, rval.pos, spouseMatrix, maxlev))) {
+    options.onChoicesIgnored?.();
+    return alignPedigree({ ...asGiven, partnerships: asGiven.partnerships.map(({ drawnBeside: _dropped, ...p }) => p) }, options);
+  }
 
   // 7. Mark consanguineous couples with spouse=2
   function getAncestors(me: number): Set<number> {
@@ -651,6 +656,107 @@ function buildSpouseList(
   }
 
   return { spouselist, spouselistRows: unique.length };
+}
+
+/**
+ * Whether a layout draws every couple and hangs every child from its own
+ * parents, as a renderer reads it: a spouse marker stands for the couple
+ * `resolveCouple` gives, and a child's `fam` names the marker of its parents.
+ */
+function drawsEveryCouple(input: LayoutInput, layout: LayoutResult): boolean {
+  const partners = buildPartnerSet(input);
+  const key = (a: number, b: number) => Math.min(a, b) * (input.n + 1) + Math.max(a, b);
+  const drawn = new Set<number>();
+  const at = new Map<string, number>(); // "level-slot" of a marker → the couple it stands for
+  for (let lev = 0; lev < layout.n.length; lev++) {
+    for (let s = 0; s < layout.n[lev]! - 1; s++) {
+      if (layout.spouse[lev]![s]! === 0) continue;
+      const rc = resolveCouple(layout, partners, lev, s);
+      const a = layout.nid[lev]![rc.leftSlot]!, b = layout.nid[lev]![rc.rightSlot]!;
+      if (!isPartnerPair(partners, a, b)) return false;
+      drawn.add(key(a, b));
+      at.set(`${lev}-${s}`, key(a, b));
+    }
+  }
+  const hung = new Set<number>();
+  for (let lev = 1; lev < layout.n.length; lev++) {
+    for (let s = 0; s < layout.n[lev]!; s++) {
+      const f = layout.fam[lev]![s]!;
+      if (f === 0) continue;
+      const child = layout.nid[lev]![s]!;
+      if (at.get(`${lev - 1}-${f - 1}`) !== key(input.findex[child]!, input.mindex[child]!)) return false;
+      hung.add(child);
+    }
+  }
+  for (let i = 1; i <= input.n; i++) {
+    const d = input.findex[i]!, m = input.mindex[i]!;
+    if (d > 0 && m > 0 && (!hung.has(i) || !drawn.has(key(d, m)))) return false;
+  }
+  const cc = input.childlessCouples;
+  if (cc) for (let k = 0; k + 1 < cc.length; k += 2) if (!drawn.has(key(cc[k]!, cc[k + 1]!))) return false;
+  return true;
+}
+
+/** The 1-based generation of each individual (index 0 unused). */
+function generationLevels(input: LayoutInput): Int32Array {
+  let depth: Int32Array;
+  try {
+    depth = kindepth(input, true);
+  } catch {
+    // Inbred pedigree that fails the couple-alignment pass.
+    // Fall back to depth-only: parents may end up at different depths,
+    // but the layout will not crash. Rare in practice.
+    depth = kindepth(input, false);
+  }
+  const level = new Int32Array(input.n + 1);
+  for (let i = 1; i <= input.n; i++) level[i] = depth[i]! + 1;
+  return level;
+}
+
+/**
+ * The partners a couple can be drawn beside: the values
+ * `Partnership.drawnBeside` can take with any effect. With fewer than two
+ * there is no choice to make, since the couple is drawn at the only place
+ * it can be.
+ */
+export function drawnBesideChoices(pedigree: Pedigree, partnershipId: string): string[] {
+  const p = pedigree.partnerships.find(q => q.id === partnershipId);
+  if (!p || p.individual1 === p.individual2) return [];
+  const laidOut = { ...pedigree, parentOf: placementParentOf(pedigree) };
+  const input = pedigreeToLayoutInput(laidOut);
+  const idx = new Map(pedigree.individuals.map((ind, i) => [ind.id, i + 1]));
+  const a = idx.get(p.individual1), b = idx.get(p.individual2);
+  if (!a || !b) return [];
+  const canAnchor = anchorablePartners(input, generationLevels(input), { order: new Float64Array(input.n + 1), spouse: null });
+  return [...(canAnchor(a, b) ? [p.individual1] : []), ...(canAnchor(b, a) ? [p.individual2] : [])];
+}
+
+/**
+ * Whether a couple can be drawn at `person`'s place (`Partnership.drawnBeside`).
+ *
+ * alignped1 draws a couple anchored on someone only when it places that
+ * person in their own right: as a child in their parents' sibship, or as
+ * one of the founders the traversal starts from. Anyone else is only ever
+ * drawn as somebody's partner, so a couple anchored on them is never drawn.
+ * A couple across two generations is drawn by the partner in the lower
+ * one, whatever the anchor says. Which founders the traversal starts from
+ * does not depend on the spouse hints, only their order does.
+ */
+function anchorablePartners(
+  input: LayoutInput,
+  level: Int32Array,
+  hints: Hints,
+): (person: number, partner: number) => boolean {
+  let starts: Set<number> | null = null;
+  return (person, partner) => {
+    if (level[person]! < level[partner]!) return false;
+    if (input.findex[person]! > 0 || input.mindex[person]! > 0) return true;
+    if (!starts) {
+      const { spouselist, spouselistRows } = buildSpouseList(input, { order: hints.order, spouse: null });
+      starts = new Set(findFounders(input, spouselist, spouselistRows, hints).founders);
+    }
+    return starts.has(person);
+  };
 }
 
 /**

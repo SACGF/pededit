@@ -22,6 +22,9 @@ First release on npm.
   X-linked.
 - `buildPedigreeFromFlat`: PED-style rows to a `Pedigree`.
 - ES modules and TypeScript declarations, Node 20 or later and browsers.
+- `Partnership.drawnBeside`: which partner a couple is drawn beside, so who
+  is drawn twice in a family with a loop. `AlignOptions.onChoicesIgnored` is
+  called when a family's choices cannot be drawn together and are dropped.
 - `AlignOptions.alignFamily`: called by `alignPedigreeByFamily` for each
   family, so a caller can keep the layouts of families that have not
   changed. The engine itself keeps nothing between calls.

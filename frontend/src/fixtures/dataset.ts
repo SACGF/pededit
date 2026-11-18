@@ -315,7 +315,7 @@ const OLD: DatasetCase[] = [
         ...trio().individuals.slice(1),
       ],
       partnerships: [{ id: "p", individual1: "f", individual2: "m", consanguineous: null, consanguinityLabel: null, childless: null, childlessReason: null,
-        twins: null, ended: null, donorConception: null, leftPartner: null }],
+        twins: null, ended: null, donorConception: null, leftPartner: null, drawnBeside: null }],
       pinnedPositions: null, canvasSettings: null, unlockedIndividuals: null, tags: null, chartTitle: null, clinicalDetails: null, filters: null,
     }),
   },

@@ -15,6 +15,7 @@ import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
 import { CONDITIONS_AND_TAGS, CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { coupleChildren, donorPairFor, sameSexCouple } from "../sameSex";
+import { couplePartnerLabel, drawBesideOptions } from "../partners";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -644,13 +645,17 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "startPickingChild", "removePartnership");
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, setCoupleDrawnBeside, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "setCoupleDrawnBeside", "startPickingChild", "removePartnership");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
   const childless = coupleChildren(pedigree, partnershipId).length === 0;
   const sameSex = !!sameSexCouple(pedigree, partnershipId);
+  // Offered only where there is a choice to make; a stored choice the
+  // structure no longer allows can still be handed back to the layout.
+  const besideOptions = drawBesideOptions(pedigree, partnershipId);
+  const besideChoices = besideOptions.length > 0 ? besideOptions : partnership.drawnBeside ? [partnership.drawnBeside] : [];
 
   function action(fn: () => void) {
     fn();
@@ -696,6 +701,29 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           Remove partnership
         </MenuItem>
       </MenuSection>
+      {besideChoices.length > 0 && (
+        <MenuSection label="Draw this couple beside">
+          {besideChoices.map(id => (
+            <MenuItem
+              key={id}
+              onClick={() => action(() => setCoupleDrawnBeside(partnershipId, id))}
+              active={partnership.drawnBeside === id}
+              checked={partnership.drawnBeside === id}
+              title={DRAW_BESIDE_TITLE}
+            >
+              {capitalised(couplePartnerLabel(pedigree, partnershipId, id))}
+            </MenuItem>
+          ))}
+          <MenuItem
+            onClick={() => action(() => setCoupleDrawnBeside(partnershipId, null))}
+            active={!partnership.drawnBeside}
+            checked={!partnership.drawnBeside}
+            title="The layout chooses where this couple is drawn and who is on the left"
+          >
+            Automatic
+          </MenuItem>
+        </MenuSection>
+      )}
       {childless && (
         <MenuSection label="Couple without children">
           <MenuItem onClick={() => action(() => setPartnershipChildless(partnershipId, undefined))} active={!partnership.childless}>
@@ -782,7 +810,9 @@ function SameSexChildItems({ partnershipId, action }: { partnershipId: string; a
 }
 
 const SWAP_SIDES_TITLE = "Draw the partners the other way round. Partner order is free under NSGC 2022; nobody is pinned";
-const REMOVE_PARTNERSHIP_TITLE = "Remove the couple line, keeping both people (for a partner linked by mistake)";
+const DRAW_BESIDE_TITLE = "Draw the couple where this partner is placed. In a family with a loop the other partner is then the one drawn twice. Nobody is pinned";
+const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const REMOVE_PARTNERSHIP_TITLE ="Remove the couple line, keeping both people (for a partner linked by mistake)";
 
 /** Partners of individualId, one per partnership, in partnership order. */
 function partnerChoices(pedigree: ReturnType<typeof usePedigreeStore.getState>["pedigree"], individualId: string) {

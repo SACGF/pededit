@@ -143,3 +143,16 @@ export function alignPedigreeByFamily(pedigree: Pedigree, options: AlignOptions 
   }
   return merged;
 }
+
+/**
+ * Whether the layout has to ignore the pedigree's `Partnership.drawnBeside`
+ * choices because together they leave a couple undrawn (`alignPedigree`
+ * then lays that family out as if none were set). The editor asks before
+ * storing a choice. Runs without the quadratic program, so it is cheap.
+ */
+export function drawnBesideConflict(pedigree: Pedigree): boolean {
+  if (!pedigree.partnerships.some(p => p.drawnBeside)) return false;
+  let ignored = false;
+  alignPedigreeByFamily(pedigree, { align: false, onChoicesIgnored: () => { ignored = true; } });
+  return ignored;
+}

@@ -323,6 +323,18 @@
       "exportLint": []
     },
     {
+      "file": "drawn/loop.json",
+      "group": "drawn",
+      "purpose": "A loop: people drawn twice: people drawn twice with numbered copies and dashed arcs, and a couple drawn beside a chosen partner",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 10,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
       "file": "drawn/status-2008.json",
       "group": "drawn",
       "purpose": "Status and conditions, NSGC 2008: 2008: carrier dot, a quarter per condition, black base",

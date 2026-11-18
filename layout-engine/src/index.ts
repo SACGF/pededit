@@ -33,4 +33,6 @@ export type { AutohintOptions } from "./autohint.js";
 export { buildLayoutInput } from "./utils.js";
 export type { Hints, LayoutInput } from "./types.js";
 export { applyPartnerSides, drawnLeftPartner } from "./partnerSides.js";
+export { drawnBesideChoices } from "./alignPedigree.js";
+export { drawnBesideConflict } from "./families.js";
 export { placementParentOf, carrierAbove } from "./assisted.js";

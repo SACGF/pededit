@@ -317,6 +317,7 @@ the flow. They run in CI.
 | `delete-account` | as `claude_agent_throwaway`: Delete account counts what goes, Cancel, then the account, its pedigrees, My library and its tokens are gone, an anonymous pedigree stays (#183) |
 | `drop-on-disabled-button` | a drag let go over a disabled hover pill button still drops and pins the person (#185) |
 | `api-created` | the `curl` example of `docs/pedigree-json-format.md` posted with no account: its link draws, an edit saves, a broken reference is refused with its path (#201) |
+| `draw-couple-beside` | "Draw this couple beside" on a couple line in a family with a loop: who is drawn twice changes, the notice, undo, saved and reloaded; not offered for a couple with a partner who married in (#205) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

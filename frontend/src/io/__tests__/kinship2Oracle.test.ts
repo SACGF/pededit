@@ -296,7 +296,10 @@ describe("in-app historic and classic examples", () => {
       const ids = ex.data.individuals.map(i => i.id);
       expect(ids).toEqual(fixture.individuals.map(i => i.id));
 
-      const ours = alignPedigree(ex.data);
+      // R is given the family alone: where an example chooses how its couples
+      // are drawn (leftPartner, drawnBeside), that is the editor's, not kinship2's.
+      const asR: typeof ex.data = { ...ex.data, partnerships: ex.data.partnerships.map(({ leftPartner: _l, drawnBeside: _b, ...c }) => c) };
+      const ours = alignPedigree(asR);
       assertInvariants(ours, ex.data, ex.label);
       expect(ids).toEqual(R.ids);
       expect(structureRows(ours, R.ids)).toEqual(structureRows(R, R.ids));
