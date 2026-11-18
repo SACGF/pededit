@@ -9,8 +9,9 @@ export type Segment = [number, number, number, number];
  * `svgExporter`. Framework-free.
  *
  * The sibship bar sits halfway between the couple line and the highest child
- * row, lowered by `barOffset` when it would otherwise run into another
- * couple's bar (`sibshipBarOffsets`). Each child gets its own drop to
+ * row, but never more than `maxDrop` below the couple line (`sibBarHeight`),
+ * lowered by `barOffset` when it would otherwise run into another couple's
+ * bar (`sibshipBarOffsets`). Each child gets its own drop to
  * its own symbol, so a child pinned above or below its siblings' row is still
  * reached. The bar spans from the couple drop to the outermost child so the
  * two always meet.
@@ -50,6 +51,18 @@ function forkXs(children: SibshipChild[]): Map<string, number> {
   return new Map([...sums].map(([k, e]) => [k, e.n >= 2 ? e.sum / e.n : NaN]).filter(([, x]) => !Number.isNaN(x)) as [string, number][]);
 }
 
+/**
+ * y of a sibship bar: halfway down from the couple line to the highest child,
+ * or `maxDrop` below the couple line if that is higher. With `maxDrop` half a
+ * row this is the same for children one row down; for a child dragged further
+ * down the bar stays in the gap under the parents' row instead of running
+ * along the row in between, so the drop from the couple line does not pass
+ * through the people there.
+ */
+export function sibBarHeight(coupleY: number, childRowY: number, barOffset = 0, maxDrop = Infinity): number {
+  return coupleY + Math.min((childRowY - coupleY) / 2, maxDrop) + barOffset;
+}
+
 export function sibshipSegments(
   coupleX: number,
   coupleY: number,
@@ -57,6 +70,7 @@ export function sibshipSegments(
   barOffset = 0,
   apart?: LinePoint[],
   converge = false,
+  maxDrop = Infinity,
 ): Segment[] {
   if (children.length === 0) return [];
   const half = NODE_SIZE / 2;
@@ -65,8 +79,7 @@ export function sibshipSegments(
     const top = c.y - half + (c.topInset ?? 0);
     if (top > coupleY + half) return donorDescentSegments(apart, c.x, top);
   }
-  const childRowY = Math.min(...children.map(c => c.y));
-  const sibBarY = (coupleY + childRowY) / 2 + barOffset;
+  const sibBarY = sibBarHeight(coupleY, Math.min(...children.map(c => c.y)), barOffset, maxDrop);
   const forks = forkXs(children);
   // Twins: every member's drop starts at the set's shared point on the bar.
   const fromXs = children.map(c => c.twinSet !== undefined ? (forks.get(c.twinSet) ?? c.x) : c.x);
@@ -100,11 +113,11 @@ export function twinForkMarks(
   coupleY: number,
   children: SibshipChild[],
   barOffset = 0,
+  maxDrop = Infinity,
 ): (TwinMark | TwinQuestion)[] {
   const out: (TwinMark | TwinQuestion)[] = [];
   const half = NODE_SIZE / 2;
-  const childRowY = Math.min(...children.map(c => c.y));
-  const sibBarY = (coupleY + childRowY) / 2 + barOffset;
+  const sibBarY = sibBarHeight(coupleY, Math.min(...children.map(c => c.y)), barOffset, maxDrop);
   const forks = forkXs(children);
   const bySet = new Map<string, SibshipChild[]>();
   for (const c of children) {
@@ -139,8 +152,9 @@ export function sibshipPaths(
   barOffset = 0,
   apart?: LinePoint[],
   converge = false,
+  maxDrop = Infinity,
 ): { solid: Segment[]; dashed: Segment[] } {
-  const segs = sibshipSegments(coupleX, coupleY, children, barOffset, apart, converge);
+  const segs = sibshipSegments(coupleX, coupleY, children, barOffset, apart, converge, maxDrop);
   // A converged only child has no drop of its own to dash.
   const ownDrops = segs.length - children.length >= 2;
   if (segs.length === 0 || !ownDrops || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };

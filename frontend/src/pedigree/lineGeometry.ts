@@ -132,7 +132,7 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;
   return {
-    ...sibshipPaths(coupleX, coupleY, kids, barOffset, apart, data.converge),
-    marks: twinForkMarks(coupleY, kids, barOffset),
+    ...sibshipPaths(coupleX, coupleY, kids, barOffset, apart, data.converge, data.maxDrop),
+    marks: twinForkMarks(coupleY, kids, barOffset, data.maxDrop),
   };
 }

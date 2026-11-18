@@ -114,6 +114,7 @@ function MinimapEdges() {
         data.barOffset ?? 0,
         apart,
         data.converge,
+        data.maxDrop,
       )));
     } else if (edge.type === "assistedEdge") {
       const seg = assistedEdgeSegment(edge as Edge<AssistedEdgeData>, nodeAt);

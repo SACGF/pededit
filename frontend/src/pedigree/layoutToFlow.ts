@@ -18,7 +18,7 @@ import { copyNumberBlock, textBlockUnder } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
-import { sibshipBarOffsets } from "./sibshipPath";
+import { sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
 import { labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
@@ -153,8 +153,10 @@ export interface SibshipEdgeData extends Record<string, unknown> {
    * the centre of the further partner (`parentId`, one of the two above).
    */
   hopDrop?: { parentId: string; dx: number };
-  /** y (canvas px) of the sibship bar: halfway between the couple and the highest child, plus `barOffset`. */
+  /** y (canvas px) of the sibship bar (`sibBarHeight`), plus `barOffset`. */
   sibBarY: number;
+  /** Furthest (px) the bar hangs below the couple line before `barOffset`: half a row (`sibBarHeight`). */
+  maxDrop: number;
   /** How far (px) the bar is lowered so it does not overlap another couple's bar; usually 0. */
   barOffset: number;
   /** x (canvas px) of each child's slot centre, in slot order. */
@@ -338,7 +340,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   }
 
   const partners = buildPartnerSetFromPedigree(pedigree);
-  const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos);
+  const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos, spacing.rowHeight);
 
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
@@ -828,8 +830,10 @@ function buildSibshipEdges(
   result: LayoutResult,
   partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
+  rowHeight: number,
 ): Edge<SibshipEdgeData>[] {
   const edges: Edge<SibshipEdgeData>[] = [];
+  const maxDrop = rowHeight / 2;
   const apart = donorPairs(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]?.id ?? "";
   const shapeAt = (level: number, slot: number) => {
@@ -865,7 +869,7 @@ function buildSibshipEdges(
       const childXs  = resolvedChildIds.map(id => slotPos.get(id)?.x ?? 0);
       const childYs  = resolvedChildIds.map(id => slotPos.get(id)?.y ?? firstChildPos.y);
       const childY   = Math.min(...childYs);
-      const sibBarY  = (coupleY + childY) / 2;
+      const sibBarY  = sibBarHeight(coupleY, childY, 0, maxDrop);
       const rc = resolveCouple(result, partners, level - 1, leftParentSlot);
       // The real parents are not side by side: the further one is the one
       // beside the marker, and the drop hangs from the level end of their line.
@@ -888,7 +892,7 @@ function buildSibshipEdges(
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
-          coupleX, coupleY, sibBarY, barOffset: 0, childXs, childYs, childY,
+          coupleX, coupleY, sibBarY, maxDrop, barOffset: 0, childXs, childYs, childY,
           ...(hopDrop ? { hopDrop } : {}),
           ...(isApart ? { apart: [
             { ...leftPos, sex: shapeAt(level - 1, leftParentSlot) },
