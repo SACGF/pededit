@@ -124,10 +124,17 @@ reporting is off, and the dev server never reports.
   about 1 couple in 9 across the examples, mostly inbred or partner-chain
   families. A pinned partner keeps its pin and the notice says so.
   "Draw this couple beside" (#205, `setCoupleDrawnBeside`, a section of the
-  couple line menu) sets `Partnership.drawnBeside`: which partner's place
+  couple line menu and of each partner's own menu, `DrawBesideSection`) sets
+  `Partnership.drawnBeside`: which partner's place
   the couple is drawn at, so who is drawn twice in a family with a loop.
   The section shows only when both partners have a place of their own
   (`drawBesideOptions`), which no couple in an ordinary family has.
+  A couple's items are reached three ways, since a line is a small target
+  and nothing says it can be right-clicked: the couple line's menu
+  (`CoupleMenuItems`), the menu of both partners selected together, which
+  shows the same items above the batch ones (`coupleOfPair`), and one
+  partner's own menu, which lists them per couple ("Swap sides with X").
+  A new couple item goes in `CoupleMenuItems` and in the person menu.
   `drawBesidePlan` stores a side with the choice (the one swapped to if any,
   else whichever of the two draws fewer people twice), stores nothing when
   the drawing would not change, and refuses a choice the layout cannot draw

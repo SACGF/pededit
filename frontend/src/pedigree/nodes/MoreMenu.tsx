@@ -15,7 +15,7 @@ import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
 import { CONDITIONS_AND_TAGS, CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { coupleChildren, donorPairFor, sameSexCouple } from "../sameSex";
-import { couplePartnerLabel, drawBesideOptions } from "../partners";
+import { coupleOfPair, couplePartnerLabel, drawBesideOptions } from "../partners";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -130,9 +130,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   // them, and only offers what applies to a group.
   if (selectedIds.length > 1 && selectedIds.includes(individualId)) {
     const act = (fn: () => void) => { fn(); onDone(); };
+    // The two partners of a couple: selecting both is another way to reach
+    // what the couple line's menu offers.
+    const couple = coupleOfPair(pedigree, selectedIds);
     return (
       <>
         <SelectionMenuSection individualId={individualId} action={act} />
+        {couple && <CoupleMenuItems partnershipId={couple.id} onDone={onDone} />}
         <BatchMenuItems ids={selectedIds} action={act} />
       </>
     );
@@ -490,6 +494,15 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           </MenuSection>
         )}
 
+        {couples.map(c => (
+          <DrawBesideSection
+            key={c.partnershipId}
+            partnershipId={c.partnershipId}
+            label={couples.length > 1 ? `Draw the couple with ${c.label} beside` : "Draw this couple beside"}
+            action={action}
+          />
+        ))}
+
         {childlessCouples.length > 0 && (
           <MenuSection label="Couple without children">
             {childlessCouples.map(c => (
@@ -645,18 +658,13 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
  * for one partnership, without the person items.
  */
 export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
-  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, setCoupleDrawnBeside, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "setCoupleDrawnBeside", "startPickingChild", "removePartnership");
+  const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "startPickingChild", "removePartnership");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
   const childless = coupleChildren(pedigree, partnershipId).length === 0;
   const sameSex = !!sameSexCouple(pedigree, partnershipId);
-  // Offered only where there is a choice to make; a stored choice the
-  // structure no longer allows can still be handed back to the layout.
-  const besideOptions = drawBesideOptions(pedigree, partnershipId);
-  const besideChoices = besideOptions.length > 0 ? besideOptions : partnership.drawnBeside ? [partnership.drawnBeside] : [];
-
   function action(fn: () => void) {
     fn();
     onDone();
@@ -701,29 +709,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           Remove partnership
         </MenuItem>
       </MenuSection>
-      {besideChoices.length > 0 && (
-        <MenuSection label="Draw this couple beside">
-          {besideChoices.map(id => (
-            <MenuItem
-              key={id}
-              onClick={() => action(() => setCoupleDrawnBeside(partnershipId, id))}
-              active={partnership.drawnBeside === id}
-              checked={partnership.drawnBeside === id}
-              title={DRAW_BESIDE_TITLE}
-            >
-              {capitalised(couplePartnerLabel(pedigree, partnershipId, id))}
-            </MenuItem>
-          ))}
-          <MenuItem
-            onClick={() => action(() => setCoupleDrawnBeside(partnershipId, null))}
-            active={!partnership.drawnBeside}
-            checked={!partnership.drawnBeside}
-            title="The layout chooses where this couple is drawn and who is on the left"
-          >
-            Automatic
-          </MenuItem>
-        </MenuSection>
-      )}
+      <DrawBesideSection partnershipId={partnershipId} label="Draw this couple beside" action={action} />
       {childless && (
         <MenuSection label="Couple without children">
           <MenuItem onClick={() => action(() => setPartnershipChildless(partnershipId, undefined))} active={!partnership.childless}>
@@ -741,6 +727,46 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
         </MenuSection>
       )}
     </>
+  );
+}
+
+/**
+ * "Draw this couple beside": the partner at whose place a couple is drawn,
+ * which decides who is drawn twice in a family with a loop. Renders nothing
+ * for a couple with no choice to make; a stored choice the structure no
+ * longer allows can still be handed back to the layout.
+ */
+function DrawBesideSection({ partnershipId, label, action }: { partnershipId: string; label: string; action: (fn: () => void) => void }) {
+  const { pedigree, setCoupleDrawnBeside } = usePedigreeFields("pedigree", "setCoupleDrawnBeside");
+  const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
+  if (!partnership) return null;
+  const options = drawBesideOptions(pedigree, partnershipId);
+  const choices = options.length > 0 ? options : partnership.drawnBeside ? [partnership.drawnBeside] : [];
+  if (choices.length === 0) return null;
+  return (
+    <div data-draw-beside={partnershipId}>
+      <MenuSection label={label}>
+        {choices.map(id => (
+          <MenuItem
+            key={id}
+            onClick={() => action(() => setCoupleDrawnBeside(partnershipId, id))}
+            active={partnership.drawnBeside === id}
+            checked={partnership.drawnBeside === id}
+            title={DRAW_BESIDE_TITLE}
+          >
+            {capitalised(couplePartnerLabel(pedigree, partnershipId, id))}
+          </MenuItem>
+        ))}
+        <MenuItem
+          onClick={() => action(() => setCoupleDrawnBeside(partnershipId, null))}
+          active={!partnership.drawnBeside}
+          checked={!partnership.drawnBeside}
+          title="The layout chooses where this couple is drawn and who is on the left"
+        >
+          Automatic
+        </MenuItem>
+      </MenuSection>
+    </div>
   );
 }
 
@@ -983,8 +1009,8 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
  * The status items for a multiple selection: each applies to every
  * selected person as one undo step, and is left out when it would change
  * nobody. Items that only make sense for one person (proband, add, twins,
- * sibling order, adoption, pregnancy, assisted reproduction, couples) are
- * not offered; click one person to get them.
+ * sibling order, adoption, pregnancy, assisted reproduction) are not
+ * offered; click one person to get them.
  */
 function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => void) => void }) {
   const {

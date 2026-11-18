@@ -1,4 +1,4 @@
-import type { LayoutResult, Pedigree } from "@pedigree-editor/layout-engine";
+import type { LayoutResult, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import { drawnBesideChoices, drawnBesideConflict, drawnLeftPartner } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
@@ -100,6 +100,16 @@ export function swapSidesPlan(pedigree: Pedigree, partnershipId: string): { side
   const n2 = pedigree.individuals.find(i => i.id === p.individual2)?.name?.trim();
   const who = n1 && n2 ? `${n1} and ${n2}` : "These partners";
   return { problem: `${who} cannot swap sides in this layout without drawing someone twice or moving another couple. Dragging moves them instead, and pins them.` };
+}
+
+/**
+ * The couple these people are, when they are exactly the two partners of
+ * one drawn with a couple line (so not a donor and the parent they share a
+ * child with).
+ */
+export function coupleOfPair(pedigree: Pedigree, ids: string[]): Partnership | undefined {
+  if (ids.length !== 2 || ids[0] === ids[1]) return undefined;
+  return pedigree.partnerships.find(p => !p.donorConception && ids.includes(p.individual1) && ids.includes(p.individual2));
 }
 
 // ── Draw this couple beside ─────────────────────────────────────────────────

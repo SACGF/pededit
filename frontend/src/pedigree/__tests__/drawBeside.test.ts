@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { drawnBesideConflict } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { couplePartnerLabel, drawBesideOptions, drawBesidePlan } from "../partners";
+import { coupleOfPair, couplePartnerLabel, drawBesideOptions, drawBesidePlan } from "../partners";
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
@@ -177,5 +177,22 @@ describe("drawnBeside on every couple of every example and fixture", () => {
       }
     }
     expect(offered).toBeGreaterThan(20);
+  });
+});
+
+describe("the couple two selected people are", () => {
+  it("is found for the two partners in either order, and for nobody else", () => {
+    const p = example();
+    expect(coupleOfPair(p, ["C", "B"])?.id).toBe("C+B");
+    expect(coupleOfPair(p, ["B", "C"])?.id).toBe("C+B");
+    expect(coupleOfPair(p, ["A", "C"])).toBeUndefined();
+    expect(coupleOfPair(p, ["C"])).toBeUndefined();
+    expect(coupleOfPair(p, ["C", "B", "D"])).toBeUndefined();
+  });
+
+  it("is not a donor and the parent they share a child with, who have no couple line", () => {
+    const p = example();
+    const donor = { ...p, partnerships: p.partnerships.map(q => q.id === "C+B" ? { ...q, donorConception: true } : q) };
+    expect(coupleOfPair(donor, ["C", "B"])).toBeUndefined();
   });
 });

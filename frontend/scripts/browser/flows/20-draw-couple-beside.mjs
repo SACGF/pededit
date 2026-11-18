@@ -1,6 +1,7 @@
-// "Draw this couple beside" (#205) on the couple line's right-click menu, in
-// a family with a loop: it chooses who is drawn twice, shows on the canvas,
-// is one undo step and is saved.
+// "Draw this couple beside" (#205) on the couple line's right-click menu, a
+// partner's own menu and the menu of both partners selected (#207), in a
+// family with a loop: it chooses who is drawn twice, shows on the canvas, is one
+// undo step and is saved.
 export default {
   name: "draw-couple-beside",
   about: "Draw this couple beside a partner: who is drawn twice changes on the canvas, undo, saved and reloaded",
@@ -49,9 +50,41 @@ export default {
     await t.reload();
     t.equal(await twicePerRow(), [3, 0, 0], "and the reloaded pedigree is drawn the same way");
 
+    // The same choice without the couple line: on a partner's own menu,
+    // named by the other partner when they have more than one couple, and
+    // on the menu of the two partners selected together.
+    // Whoever is drawn twice has two symbols; either copy will do.
+    const node = id => `[data-individual-id="${id}"] >> nth=0`;
+    await t.rightClick(node("B"));
+    t.match(await t.text("[data-context-menu]"), /Draw the couple with [^\n]* beside/i, "a partner's own menu offers it for each of their couples");
+    t.equal(await t.count('[data-context-menu] [data-draw-beside="C+B"] [aria-checked="true"]:has-text("The man")'), 1, "with the same tick as the couple line's menu");
+    t.equal(await t.count("[data-context-menu] [data-draw-beside]"), 2, "B is in two couples that have the choice");
+    await t.click('[data-context-menu] [data-draw-beside="C+B"] >> text=Automatic');
+    t.equal(await twicePerRow(), [2, 2, 0], "and choosing there redraws the couple");
+    await t.press("Control+z");
+
+    await t.click(node("B"));
+    await t.holding("Shift", () => t.click(node("C")));
+    await t.rightClick(node("C"));
+    const both = await t.text("[data-context-menu]");
+    t.match(both, /2 selected/i, "with both partners selected the menu is still about the two");
+    t.match(both, /Draw this couple beside/i, "and offers what their couple line does");
+    t.match(both, /Swap sides/, "the other couple items with it");
+    await t.click("[data-context-menu] >> text=Automatic");
+    t.equal((await couple()).drawnBeside, undefined, "choosing there acts on their couple");
+    await t.press("Control+z");
+    await t.click(node("A"));
+    await t.holding("Shift", () => t.click(node("C")));
+    await t.rightClick(node("C"));
+    t.equal(await t.count("[data-context-menu] >> text=Swap sides"), 0, "two people who are not a couple get no couple items");
+    await t.press("Escape");
+
     // A couple where one partner married in has nowhere else to be drawn.
     await t.openFixture("example:Three generations");
     await t.rightClick('[data-partnership-id="pp2"]');
     t.equal(await t.count('[data-context-menu] >> text=Draw this couple beside'), 0, "a couple with a partner who married in is not offered the choice");
+    await t.press("Escape");
+    await t.rightClick(node("g1m"));
+    t.equal(await t.count('[data-context-menu] >> text=/Draw (this|the) couple/i'), 0, "nor is either of them on their own menu");
   },
 };
