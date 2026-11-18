@@ -233,7 +233,9 @@ export function consanguinityLabelPlacements(flow: {
     const s = pos.get(e.source), t = pos.get(e.target);
     if (!lines?.length || !s || !t) continue;
     const off = e.data?.consanguinityLabelOffset ?? { dx: 0, dy: 0 };
-    out.push({ x: (s.x + t.x) / 2 + off.dx, cy: (s.y + t.y) / 2, hop: e.data?.hopHeight ?? 0, dy: off.dy, lines, backed: !!off.backed });
+    const hop = e.data?.hopHeight ?? 0;
+    // Over a hop the label sits on its raised part, level above the higher partner.
+    out.push({ x: (s.x + t.x) / 2 + off.dx, cy: hop > 0 ? Math.min(s.y, t.y) : (s.y + t.y) / 2, hop, dy: off.dy, lines, backed: !!off.backed });
   }
   return out;
 }

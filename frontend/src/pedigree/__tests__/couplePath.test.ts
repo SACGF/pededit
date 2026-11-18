@@ -83,6 +83,21 @@ describe("couplePathD", () => {
     expect(back.slice(0, 3)).toEqual([[100 + half, 50], [100 + turn, 50], [100 + turn, 22]]);
   });
 
+  it("a hop stays level above the higher partner when one is dragged to another height", () => {
+    // The left partner dragged down a row: the raised part must still clear
+    // the person in between, who stays on the right partner's row.
+    for (const dy of [90, -30]) {
+      const from = { x: 100, y: 50 + dy, shape: "female" as const, port: 0 }, to = { ...right, shape: "male" as const, port: 8 };
+      const pts = pathPoints(couplePathD(from, to, 28));
+      const top = Math.min(50 + dy, 50) - 28;
+      expect(pts[2]).toEqual([100 + half + 10, top]);
+      expect(pts[3]).toEqual([260 - half - 10, top]);
+      // Each end still leaves its own symbol's side at its own height.
+      expect(pts[0]![1]).toBe(50 + dy);
+      expect(pts.at(-1)![1]).toBe(42);
+    }
+  });
+
   it("the two lines of a double line that hops stay 4px apart all the way", () => {
     const from = { ...left, shape: "female" as const, port: 12 }, to = { ...right, shape: "male" as const, port: 0 };
     const [outer, inner] = consanguineousPathsD(from, to, 28, 4).map(pathPoints);

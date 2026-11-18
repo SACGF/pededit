@@ -89,10 +89,12 @@ export function hopRisers(left: CoupleEnd, right: CoupleEnd): [number, number] {
  * boxes. Otherwise (someone with three or more partners, whose line to a far
  * partner must clear the near one) the line leaves the side at each end's
  * `port` height, runs level to that end's `turn`, rises to hopHeight above
- * the row and passes over whatever sits between the partners. It comes back
- * down as soon as it is past them and runs level into the further partner's
- * side, so the line to the couple's children hangs from a level couple line
- * like any other.
+ * the row and passes over whatever sits between the partners. The raised
+ * part is level at hopHeight above the higher of the two partners, so it
+ * still clears the people in between when one partner has been dragged to
+ * another height. It comes back down as soon as it is past them and runs
+ * level into the further partner's side, so the line to the couple's
+ * children hangs from a level couple line like any other.
  *
  * `shift` moves the whole line outwards (up, and its risers apart) by that
  * many px, for the two lines of a double line.
@@ -105,8 +107,8 @@ export function couplePathD(left: CoupleEnd, right: CoupleEnd, hopHeight = 0, sh
   const y1 = left.y - (left.port ?? 0) - shift, y2 = right.y - (right.port ?? 0) - shift;
   const [a, b] = hopRisers(left, right);
   const ax = a - shift, bx = b + shift;
-  const rise = hopHeight + shift;
-  return `M ${left.x + reach(left)} ${y1} L ${ax} ${y1} L ${ax} ${left.y - rise} L ${bx} ${right.y - rise} L ${bx} ${y2} L ${right.x - reach(right)} ${y2}`;
+  const top = Math.min(left.y, right.y) - hopHeight - shift;
+  return `M ${left.x + reach(left)} ${y1} L ${ax} ${y1} L ${ax} ${top} L ${bx} ${top} L ${bx} ${y2} L ${right.x - reach(right)} ${y2}`;
 }
 
 /** Corner radius (px) of a dashed arc routed between two rows. */

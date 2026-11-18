@@ -79,7 +79,7 @@ export function coupleLineGeometry(data: CoupleEdgeData | undefined, double: boo
     // the middle of the raised part of a hopping line, which nothing hangs from.
     const [ax, bx] = hopRisers(from, to);
     const x = hop > 0 ? (ax + bx) / 2 : endedBreakX(sx, tx, !!data.middleTaken);
-    out.ended = endedMarkSegments(x, cy - hop);
+    out.ended = endedMarkSegments(x, hop > 0 ? Math.min(left.y, right.y) - hop : cy);
   }
   return out;
 }

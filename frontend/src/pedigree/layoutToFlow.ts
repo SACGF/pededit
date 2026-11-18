@@ -612,7 +612,9 @@ function buildDuplicateEdges(
       const s = at.get(e.source), t = at.get(e.target);
       if (!s || !t) return [];
       const hop = e.data?.hopHeight ?? 0;
-      return [[s.x, s.y - hop, t.x, t.y - hop]];
+      if (hop <= 0) return [[s.x, s.y, t.x, t.y]];
+      const top = Math.min(s.y, t.y) - hop;
+      return [[s.x, top, t.x, top]];
     }),
     ...sibshipEdges.flatMap((e): ArcLine[] => {
       const d = e.data;
