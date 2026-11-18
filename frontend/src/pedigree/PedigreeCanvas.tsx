@@ -315,9 +315,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
   useEffect(() => endMouseGesturesOverDisabled(), []);
 
   const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges, assistedEdges } = useMemo(
-    () => pedigree.individuals.length > 0
-      ? layoutToFlow(pedigree, { compact })
-      : { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [] },
+    () => layoutToFlow(pedigree, { compact }),
     [pedigree, compact],
   );
 
