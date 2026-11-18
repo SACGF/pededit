@@ -1,0 +1,259 @@
+{
+  "format": "pededit-pedigree",
+  "version": 1,
+  "title": "Three or more partners",
+  "pedigree": {
+    "individuals": [
+      {
+        "id": "a",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a4",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "a5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ak1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ak2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ak3",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ak4",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ak5",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0,
+        "genderIdentity": "nonbinary"
+      },
+      {
+        "id": "b1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "b3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "bk1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "bk2",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "bk3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c1",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "c3",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ck1",
+        "sex": "male",
+        "affected": false,
+        "sibOrder": 0
+      },
+      {
+        "id": "ck2",
+        "sex": "female",
+        "affected": false,
+        "sibOrder": 0
+      }
+    ],
+    "partnerships": [
+      {
+        "id": "pa1",
+        "individual1": "a1",
+        "individual2": "a"
+      },
+      {
+        "id": "pa2",
+        "individual1": "a2",
+        "individual2": "a"
+      },
+      {
+        "id": "pa3",
+        "individual1": "a3",
+        "individual2": "a"
+      },
+      {
+        "id": "pa4",
+        "individual1": "a4",
+        "individual2": "a"
+      },
+      {
+        "id": "pa5",
+        "individual1": "a5",
+        "individual2": "a"
+      },
+      {
+        "id": "pb1",
+        "individual1": "b",
+        "individual2": "b1"
+      },
+      {
+        "id": "pb2",
+        "individual1": "b",
+        "individual2": "b2"
+      },
+      {
+        "id": "pb3",
+        "individual1": "b",
+        "individual2": "b3",
+        "ended": true
+      },
+      {
+        "id": "pc1",
+        "individual1": "c",
+        "individual2": "c1",
+        "consanguineous": true
+      },
+      {
+        "id": "pc2",
+        "individual1": "c",
+        "individual2": "c2",
+        "consanguineous": true
+      },
+      {
+        "id": "pc3",
+        "individual1": "c",
+        "individual2": "c3",
+        "consanguineous": true,
+        "ended": true,
+        "childless": "byChoice"
+      }
+    ],
+    "parentOf": {
+      "pa1": [
+        "ak1"
+      ],
+      "pa2": [
+        "ak2"
+      ],
+      "pa3": [
+        "ak3"
+      ],
+      "pa4": [
+        "ak4"
+      ],
+      "pa5": [
+        "ak5"
+      ],
+      "pb1": [
+        "bk1"
+      ],
+      "pb2": [
+        "bk2"
+      ],
+      "pb3": [
+        "bk3"
+      ],
+      "pc1": [
+        "ck1"
+      ],
+      "pc2": [
+        "ck2"
+      ]
+    },
+    "siblingOrder": {
+      "mode": "insertion",
+      "affectedFirst": false
+    },
+    "canvasSettings": {
+      "nodesMoveable": false,
+      "snapToGrid": false,
+      "snapGridSize": 5,
+      "notation": "nsgc2022"
+    }
+  }
+}

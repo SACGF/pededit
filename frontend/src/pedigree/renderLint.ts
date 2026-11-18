@@ -206,11 +206,14 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     let lp = indOf(d.leftParentId), rp = indOf(d.rightParentId);
     if (!lp || !rp) continue;
     // The parent slots are adjacent; when the parents' couple line hops over
-    // a partner in between, the drop hangs from the hopping line instead.
+    // a partner in between, the drop hangs from the level end of the hopping
+    // line, beside the further partner. Several hops can pass over one gap
+    // (five or more partners), but only one of them ends at that partner.
     if (!partnerPairs.has(pairKey(lp, rp))) {
       const l = nodeById.get(d.leftParentId)!, r = nodeById.get(d.rightParentId)!;
       const mid = (l.position.x + r.position.x) / 2, y = (l.position.y + r.position.y) / 2;
-      const hop = couples.find(c => c.hop > 0 && Math.abs(c.y - y) < EPS && c.x1 < mid && c.x2 > mid);
+      const far = d.hopDrop && indOf(d.hopDrop.parentId);
+      const hop = couples.find(c => c.hop > 0 && !!far && c.ids.includes(far) && Math.abs(c.y - y) < EPS && c.x1 < mid && c.x2 > mid);
       if (hop) [lp, rp] = hop.ids;
     }
     for (const cid of d.childIds) {

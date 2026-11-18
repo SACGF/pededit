@@ -3,7 +3,8 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../fixtures/consanguineous";
-import { SLOT_WIDTH, ROW_HEIGHT, COUPLE_HOP } from "../constants";
+import { SLOT_WIDTH, ROW_HEIGHT, COUPLE_HOP, COUPLE_PORT_STEP, NODE_SIZE } from "../constants";
+import { sibshipLineGeometry } from "../lineGeometry";
 
 // The sibship bar is drawn halfway between a couple and their children.
 const SIB_BAR_FACTOR = 0.5;
@@ -448,6 +449,18 @@ describe("layoutToFlow — man with three wives", () => {
     expect(far.hop).toBe(COUPLE_HOP);
   });
 
+  it("the hop leaves the man's side above the line to the wife beside him, and meets the far wife at her centre (#177)", () => {
+    const far = coupleEdges.find(e => e.data!.hopHeight > 0)!;
+    const ends = far.data!.hopEnds!;
+    const [manEnd, wifeEnd] = idOf(far.source) === "m" ? [ends.source, ends.target] : [ends.target, ends.source];
+    expect(manEnd).toMatchObject({ shape: "male", port: COUPLE_PORT_STEP });
+    expect(wifeEnd).toMatchObject({ shape: "female", port: 0 });
+    // It turns up as far before the wife it passes as it comes down after her.
+    expect(manEnd.turn).toBe(wifeEnd.turn);
+    // A line between neighbours is straight, at the centre.
+    expect(coupleEdges.filter(e => e.data!.hopHeight === 0).every(e => e.data!.hopEnds === undefined)).toBe(true);
+  });
+
   it("never draws a couple edge between two wives", () => {
     for (const e of coupleEdges) {
       expect([idOf(e.source), idOf(e.target)]).toContain("m");
@@ -467,7 +480,7 @@ describe("layoutToFlow — man with three wives", () => {
     expect(types).toEqual({ "m-w1": "coupleEdge", "m-w2": "coupleEdge", "m-w3": "consanguineousEdge" });
   });
 
-  it("with five wives, two hops from the man on one side rise at different x", () => {
+  it("with five wives, two hops from the man on one side leave it at different heights and rise at different x", () => {
     const five: Pedigree = {
       individuals: [ind("m", "male"), ...[1, 2, 3, 4, 5].map(i => ind(`w${i}`, "female")),
                     ...[1, 2, 3, 4, 5].map(i => ind(`k${i}`, "male"))],
@@ -483,16 +496,40 @@ describe("layoutToFlow — man with three wives", () => {
     const sides = [right, left].filter(s => s.length > 1);
     expect(sides.length).toBeGreaterThan(0);
     for (const side of sides) {
-      const insets = side.map(e => e.data!.hopInset);
-      expect(new Set(insets).size).toBe(insets.length);
+      const turns = side.map(e => (e.source === man ? e.data!.hopEnds!.source : e.data!.hopEnds!.target).turn);
+      expect(new Set(turns).size).toBe(turns.length);
+      const ports = side.map(e => (e.source === man ? e.data!.hopEnds!.source : e.data!.hopEnds!.target).port);
+      expect(new Set(ports).size).toBe(ports.length);
+      expect(Math.min(...ports)).toBeGreaterThan(0);
     }
+    // Two hops pass over one gap: each child's drop reaches its own parents' line.
+    expect(lintFlow(five, flow)).toEqual([]);
   });
 
-  it("the far wife's child drops from the raised line", () => {
-    const raised = sibshipEdges.filter(e => e.data!.hopHeight > 0);
-    expect(raised).toHaveLength(1);
-    expect(raised[0]!.data!.childIds.map(idOf)).toEqual(["c3"]);
-    expect(sibshipEdges.filter(e => e.data!.hopHeight === 0)).toHaveLength(2);
+  it("the far wife's child hangs from the level end of the hop, beside her", () => {
+    const hopping = sibshipEdges.filter(e => e.data!.hopDrop);
+    expect(hopping).toHaveLength(1);
+    expect(hopping[0]!.data!.childIds.map(idOf)).toEqual(["c3"]);
+    const { parentId, dx } = hopping[0]!.data!.hopDrop!;
+    expect(idOf(parentId)).toBe("w3");
+
+    // The couple line comes down past the wife in between, before the drop.
+    const far = coupleEdges.find(e => e.data!.hopHeight > 0)!;
+    const wifeEnd = far.source === parentId ? far.data!.hopEnds!.source : far.data!.hopEnds!.target;
+    const wife = nodes.find(n => n.id === parentId)!;
+    const gapToBetween = Math.min(...nodes
+      .filter(n => n !== wife && n.position.y === wife.position.y)
+      .map(n => Math.abs(wife.position.x - n.position.x)));
+    expect(Math.abs(dx)).toBe(gapToBetween / 2);
+    expect(wifeEnd.drop).toBe(Math.abs(dx));
+    expect(wifeEnd.turn!).toBeGreaterThan(Math.abs(dx) + 4);
+    expect(wifeEnd.turn!).toBeLessThan(gapToBetween - NODE_SIZE / 2 - 4);
+    // The drop starts at the row, on the level stretch: nothing hangs from the raised part.
+    const geometry = sibshipLineGeometry(hopping[0]!.data!, id => {
+      const n = nodes.find(x => x.id === id);
+      return n && { position: n.position, data: n.data };
+    })!;
+    expect(geometry.solid[0]!.slice(0, 2)).toEqual([wife.position.x + dx, wife.position.y]);
   });
 });
 

@@ -11,7 +11,7 @@
 import type { ChildlessStatus } from "@pedigree-editor/layout-engine";
 import type { CoupleEdgeData, RFNodeData, SibshipEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
-import { couplePathD, consanguineousPathsD } from "./couplePath";
+import { couplePathD, consanguineousPathsD, hopRisers } from "./couplePath";
 import { childlessMarkSegments, childlessReasonBaselineY } from "./childless";
 import { endedBreakX, endedMarkSegments } from "./ended";
 import { symbolTopInset } from "./lifeStatus";
@@ -40,31 +40,46 @@ export interface CoupleLineGeometry {
 
 /**
  * A couple line between the symbols centred on `left` and `right`. It runs
- * from the facing edge of one symbol box to the facing edge of the other; a
- * hopping line (`data.hopHeight`) turns up `data.hopInset` px out from each.
+ * from the facing side of one symbol to the facing side of the other; a
+ * hopping line (`data.hopHeight`) leaves each side at the height in
+ * `data.hopEnds`, turns up before the people it passes over and comes down
+ * the same distance after them, beside the further partner, where it runs
+ * level into their side.
+ * A childless mark hangs from that level stretch, as the line to the couple's
+ * children does (`sibshipLineGeometry`); the ended mark and a consanguinity
+ * label stay on the raised part.
  */
 export function coupleLineGeometry(data: CoupleEdgeData | undefined, double: boolean, left: LinePosition, right: LinePosition): CoupleLineGeometry {
   const half = NODE_SIZE / 2;
-  const sx = left.x + half, sy = left.y, tx = right.x - half, ty = right.y;
+  const sx = left.x + half, tx = right.x - half;
   const hop = data?.hopHeight ?? 0;
-  const course = couplePathD(sx, sy, tx, ty, hop, data?.hopInset);
-  const cx = (sx + tx) / 2, cy = (sy + ty) / 2;
+  const from = { x: left.x, y: left.y, ...data?.hopEnds?.source }, to = { x: right.x, y: right.y, ...data?.hopEnds?.target };
+  const course = couplePathD(from, to, hop);
+  const cx = (sx + tx) / 2, cy = (left.y + right.y) / 2;
   const out: CoupleLineGeometry = {
-    paths: double ? consanguineousPathsD(sx, sy, tx, ty, hop, CONSANGUINEOUS_GAP, data?.hopInset) : [course],
+    paths: double ? consanguineousPathsD(from, to, hop, CONSANGUINEOUS_GAP) : [course],
     course, cx, cy, hop,
   };
   if (data?.childless) {
+    // From the middle of the line, or the level end of a hopping one.
+    const level = hop <= 0 ? undefined
+      : from.drop !== undefined ? { x: from.x + from.drop, y: from.y }
+      : to.drop !== undefined ? { x: to.x - to.drop, y: to.y }
+      : undefined;
+    const markX = level?.x ?? cx;
     // From the lower line of a double line.
-    const topY = cy - hop + (double ? CONSANGUINEOUS_GAP / 2 : 0);
+    const topY = (level?.y ?? cy) + (double ? CONSANGUINEOUS_GAP / 2 : 0);
     out.childless = {
-      cx, topY, status: data.childless, segments: childlessMarkSegments(cx, topY, data.childless),
+      cx: markX, topY, status: data.childless, segments: childlessMarkSegments(markX, topY, data.childless),
       reason: data.childlessReason, reasonY: childlessReasonBaselineY(topY),
     };
   }
   if (data?.ended) {
-    // Across the horizontal run: between the two lines of a double line that hops.
-    const y = cy - hop + (double && hop > 0 ? CONSANGUINEOUS_GAP / 2 : 0);
-    out.ended = endedMarkSegments(endedBreakX(sx, tx, hop, data.hopInset, !!data.middleTaken), y);
+    // Across the horizontal run, between the two lines of a double line:
+    // the middle of the raised part of a hopping line, which nothing hangs from.
+    const [ax, bx] = hopRisers(from, to);
+    const x = hop > 0 ? (ax + bx) / 2 : endedBreakX(sx, tx, !!data.middleTaken);
+    out.ended = endedMarkSegments(x, cy - hop);
   }
   return out;
 }
@@ -93,9 +108,13 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
   const children = (data.childIds ?? []).map(nodeAt).filter((n): n is SibshipEnd => !!n);
   if (!leftParent || !rightParent || children.length === 0) return null;
 
-  // Couple midpoint: horizontal centre of the couple line.
-  const coupleX = (leftParent.position.x + rightParent.position.x) / 2;
-  const coupleY = (leftParent.position.y + rightParent.position.y) / 2;
+  // Where the drop hangs from the couple line: its middle, or, when the line
+  // hops over a partner, its level end beside the further partner. That is
+  // measured from the further partner, as the line's turn there is, so the two
+  // stay together while either parent slot is dragged.
+  const far = data.hopDrop && nodeAt(data.hopDrop.parentId);
+  const coupleX = far ? far.position.x + data.hopDrop!.dx : (leftParent.position.x + rightParent.position.x) / 2;
+  const coupleY = far ? far.position.y : (leftParent.position.y + rightParent.position.y) / 2;
   // Drops end at the top of each child symbol, or at a loss triangle's apex.
   const kids: SibshipChild[] = children.map(c => ({
     ...c.position,
@@ -113,7 +132,7 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;
   return {
-    ...sibshipPaths(coupleX, coupleY, data.hopHeight ?? 0, kids, barOffset, apart, data.converge),
+    ...sibshipPaths(coupleX, coupleY, kids, barOffset, apart, data.converge),
     marks: twinForkMarks(coupleY, kids, barOffset),
   };
 }

@@ -33,10 +33,8 @@ const markLines = (svg: string) => (svg.match(/<line class="mark"/g) ?? []).leng
 
 describe("ended relationship geometry (#98)", () => {
   it("sits in the middle when nothing hangs there, else halfway to the left end", () => {
-    expect(endedBreakX(100, 140, 0, 0, false)).toBe(120);
-    expect(endedBreakX(100, 140, 0, 0, true)).toBe(110);
-    // A hopping line's run starts `inset` in.
-    expect(endedBreakX(100, 300, 30, 10, true)).toBe((110 + 200) / 2);
+    expect(endedBreakX(100, 140, false)).toBe(120);
+    expect(endedBreakX(100, 140, true)).toBe(110);
   });
 
   it("two parallel strokes rising to the right, centred on the point", () => {

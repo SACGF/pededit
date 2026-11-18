@@ -134,7 +134,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
         const partnership = w.pids.length === 1 ? partnershipById.get(w.pids[0]!) : undefined;
         if (partnership?.ended) {
           const lo = Math.min(uA, uB) + HALF, hi = Math.max(uA, uB) - HALF;
-          out.push(...endedSegs(endedBreakX(lo, hi, 0, 0, middleTaken(partnership, pedigree)), track, g));
+          out.push(...endedSegs(endedBreakX(lo, hi, middleTaken(partnership, pedigree)), track, g));
         }
       }
       if (!w.kids.length) {

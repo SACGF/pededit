@@ -110,7 +110,6 @@ function MinimapEdges() {
       paths.push(segmentsPathD(sibshipSegments(
         (lp.position.x + rp.position.x) / 2,
         (lp.position.y + rp.position.y) / 2,
-        data.hopHeight ?? 0,
         kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).individual?.lifeStatus, NODE_SIZE) })),
         data.barOffset ?? 0,
         apart,

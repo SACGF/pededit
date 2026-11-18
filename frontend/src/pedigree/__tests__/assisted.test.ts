@@ -231,9 +231,9 @@ describe("assisted reproduction: drawing (#45)", () => {
     // A donor pair's only child (converge): a line from each parent straight to
     // the top of the child, no bar (NSGC Fig. 3); the mother above it, vertical.
     const parents = [{ x: 0, y: 0, sex: "male" as const }, { x: 80, y: 0, sex: "female" as const }];
-    expect(sibshipSegments(40, 0, 0, [{ x: 80, y: 120 }], 0, parents, true))
+    expect(sibshipSegments(40, 0, [{ x: 80, y: 120 }], 0, parents, true))
       .toEqual([[20, 20, 80, 100], [80, 20, 80, 100]]);
-    expect(sibshipSegments(40, 0, 0, [{ x: 80, y: 120 }, { x: 160, y: 120 }], 0, parents, true)).toHaveLength(5);
+    expect(sibshipSegments(40, 0, [{ x: 80, y: 120 }, { x: 160, y: 120 }], 0, parents, true)).toHaveLength(5);
   });
 
   it("the canvas: no couple line between donor and parent, a line from each, and the extra lines", () => {

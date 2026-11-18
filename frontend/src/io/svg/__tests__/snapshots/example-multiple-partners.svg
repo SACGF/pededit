@@ -1,18 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="633" height="577"
-     viewBox="0 0 633 577">
+<svg xmlns="http://www.w3.org/2000/svg" width="633" height="588"
+     viewBox="0 0 633 588">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
           refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="633" height="577" fill="white"/>
+<rect width="633" height="588" fill="white"/>
 <text class="chart-title" x="316.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Multiple partners</text>
-<g transform="translate(92 100)">
+<g transform="translate(92 111)">
 <g class="couple-lines">
 <path d="M 49.55 0 L 89.55 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 129.55 0 L 169.55 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 129.55 0 L 139.55 0 L 139.55 -28 L 239.55 -28 L 239.55 0 L 249.55 0" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 128.55 -8 L 159.55 -8 L 159.55 -28 L 219.55 -28 L 219.55 0 L 249.55 0" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 260 120 L 300 120" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 340 120 L 380 120" stroke="black" stroke-width="2" fill="none"/>
 <path d="M 420 120 L 460 120" stroke="black" stroke-width="2" fill="none"/>
@@ -25,7 +25,7 @@
 <line x1="80" y1="60" x2="160" y2="60" stroke="black" stroke-width="2"/>
 <line x1="80" y1="60" x2="80" y2="100" stroke="black" stroke-width="2"/>
 <line x1="160" y1="60" x2="160" y2="100" stroke="black" stroke-width="2"/>
-<line x1="229.55" y1="-28" x2="229.55" y2="60" stroke="black" stroke-width="2"/>
+<line x1="229.55" y1="0" x2="229.55" y2="60" stroke="black" stroke-width="2"/>
 <line x1="229.55" y1="60" x2="320" y2="60" stroke="black" stroke-width="2"/>
 <line x1="320" y1="60" x2="320" y2="100" stroke="black" stroke-width="2"/>
 <line x1="280" y1="120" x2="280" y2="180" stroke="black" stroke-width="2"/>
@@ -97,7 +97,7 @@
 <g class="consanguinity-labels">
 </g>
 </g>
-<g class="pedigree-key" transform="translate(0 457)">
+<g class="pedigree-key" transform="translate(0 468)">
 <rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
 <clipPath id="legend-plain-carrier-female"><circle cx="48" cy="30" r="8"/></clipPath><circle cx="48" cy="30" r="8" fill="white" stroke="none"/><clipPath id="legend-plain-carrier-female-fill"><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z"/></clipPath><path d="M 48 30 L 48 14 A 16 16 0 0 1 48 46 Z" fill="white" clip-path="url(#legend-plain-carrier-female)"/><g clip-path="url(#legend-plain-carrier-female)"><path d="M40.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 23.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 25.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 28.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 30.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M40.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M43.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M45.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M48.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M50.625 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M53.125 33.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M41.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M44.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M46.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M49.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M51.875 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M54.375 35.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0" fill="#000000" clip-path="url(#legend-plain-carrier-female-fill)"/></g><circle cx="48" cy="30" r="8" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Carrier</text>
 <circle cx="48" cy="50" r="8" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="39" x2="59" y2="61" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Deceased</text>

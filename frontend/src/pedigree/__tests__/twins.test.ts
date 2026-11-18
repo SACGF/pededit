@@ -42,7 +42,7 @@ describe("twin fork geometry (#11)", () => {
   ];
 
   it("twins' drops start from one shared point on the bar", () => {
-    const segs = sibshipSegments(80, 0, 0, kids);
+    const segs = sibshipSegments(80, 0, kids);
     const half = NODE_SIZE / 2;
     expect(segs[2]).toEqual([40, 60, 0, 120 - half]);
     expect(segs[3]).toEqual([40, 60, 80, 120 - half]);
@@ -58,9 +58,9 @@ describe("twin fork geometry (#11)", () => {
   });
 
   it("the bar ends at the fork of twins at the end of the sibship, not over them (#104)", () => {
-    expect(sibshipSegments(80, 0, 0, kids)[1]).toEqual([40, 60, 160, 60]);
+    expect(sibshipSegments(80, 0, kids)[1]).toEqual([40, 60, 160, 60]);
     // Twins as the only children: no bar beyond the shared point.
-    expect(sibshipSegments(40, 0, 0, kids.slice(0, 2))[1]).toEqual([40, 60, 40, 60]);
+    expect(sibshipSegments(40, 0, kids.slice(0, 2))[1]).toEqual([40, 60, 40, 60]);
     const twinsOnly: Pedigree = {
       individuals: [
         { id: "f", sex: "male", affected: false, sibOrder: 0 },
@@ -76,7 +76,7 @@ describe("twin fork geometry (#11)", () => {
   });
 
   it("a lone member is not a fork", () => {
-    const segs = sibshipSegments(80, 0, 0, [kids[0]!, kids[2]!]);
+    const segs = sibshipSegments(80, 0, [kids[0]!, kids[2]!]);
     expect(segs[2]).toEqual([0, 60, 0, 120 - NODE_SIZE / 2]);
   });
 });

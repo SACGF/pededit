@@ -57,14 +57,11 @@ describe("lintFlow", () => {
     expect(lintFlow(base, layoutToFlow(base), { title: "A family" })).toEqual([]);
   });
 
-  it("reports a chart title drawn through something over the top row (#188)", () => {
-    // A couple line hopping far above the symbols, which the title is not raised to clear.
+  it("has nothing to report when the title is raised over a couple line hopping high above the top row", () => {
+    // What it reports when the title is not raised is in renderLintTitle.test.ts.
     const flow = layoutToFlow(base);
     flow.coupleEdges = flow.coupleEdges.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
-    const found = lintFlow(base, flow, { title: "A family" }).filter(f => f.code === "title-collides");
-    expect(found.map(f => f.message)).toEqual(['the chart title "A family" is drawn through a couple line hopping over a symbol']);
-    // No title, no check.
-    expect(lintFlow(base, flow).filter(f => f.code === "title-collides")).toEqual([]);
+    expect(lintFlow(base, flow, { title: "A family" }).filter(f => f.code === "title-collides")).toEqual([]);
   });
 
   it("reports a child whose parent line is gone", () => {

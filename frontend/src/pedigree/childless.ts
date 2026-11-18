@@ -29,8 +29,9 @@ export const CHILDLESS_BAR_GAP = 4;
 export const CHILDLESS_REASON_FONT_SIZE = 9;
 
 /**
- * Line segments of the mark hanging from (cx, topY), the middle of the couple
- * line (raised when the line hops). The lower bar is always at CHILDLESS_DROP.
+ * Line segments of the mark hanging from (cx, topY): the middle of the couple
+ * line, or the level end of one that hops. The lower bar is always at
+ * CHILDLESS_DROP.
  */
 export function childlessMarkSegments(cx: number, topY: number, status: ChildlessStatus): Segment[] {
   const h = CHILDLESS_BAR / 2;

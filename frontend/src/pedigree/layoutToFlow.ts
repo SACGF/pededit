@@ -3,7 +3,7 @@ import { buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/lay
 import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
-import { duplicateArcPoints, hopGeometry } from "./couplePath";
+import { couplePortHeights, duplicateArcPoints, hopGeometry, hopTurn } from "./couplePath";
 import { chooseArcRoute } from "./duplicateArc";
 import type { ArcLine, ArcObstacle } from "./duplicateArc";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
@@ -90,6 +90,14 @@ export interface RFNodeData extends Record<string, unknown> {
 }
 
 /**
+ * One end of a hopping couple line: see `CoupleEdgeData.hopEnds`. `turn` is
+ * where the line turns between the row and its raised part (px from this
+ * partner's centre). The end at the further partner also says where a
+ * childless mark hangs from the level stretch there (`drop`): see `hopTurn`.
+ */
+export interface HopEnd { shape?: Sex; port: number; turn?: number; drop?: number }
+
+/**
  * Geometry is derived from the source/target node positions. hopHeight is 0
  * for an ordinary line; otherwise the partners are not adjacent (someone with
  * three or more partners) and the line rises by that many px to pass over the
@@ -97,8 +105,14 @@ export interface RFNodeData extends Record<string, unknown> {
  */
 export interface CoupleEdgeData extends Record<string, unknown> {
   hopHeight: number;
-  /** Distance (px) from each symbol edge at which a hopping line turns up. */
-  hopInset: number;
+  /**
+   * How a hopping line meets the left partner's symbol (`source`) and the
+   * right partner's: the shape drawn there, the height (px) above its
+   * centre at which the line leaves its side, clear of the line to a nearer
+   * partner on that side, and where it turns up or comes back down. Unset
+   * for a line that does not hop.
+   */
+  hopEnds?: { source: HopEnd; target: HopEnd };
   /** The partnership the line draws, for the couple line's right-click menu. */
   partnershipId?: string;
   /** Childless couple mark under the line, when the partnership has one and no children. */
@@ -133,8 +147,12 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   coupleX: number;
   /** y (canvas px) of the parent generation centre = (level-1) * ROW_HEIGHT. */
   coupleY: number;
-  /** Rise (px) of the parents' couple line when it hops over an intermediate partner; 0 otherwise. */
-  hopHeight: number;
+  /**
+   * Set when the parents' couple line hops over a partner in between: the
+   * line to the children hangs from the level end of that line, `dx` px from
+   * the centre of the further partner (`parentId`, one of the two above).
+   */
+  hopDrop?: { parentId: string; dx: number };
   /** y (canvas px) of the sibship bar: halfway between the couple and the highest child, plus `barOffset`. */
   sibBarY: number;
   /** How far (px) the bar is lowered so it does not overlap another couple's bar; usually 0. */
@@ -447,14 +465,10 @@ function buildAssistedEdges(
 }
 
 /**
- * Rise of the couple line for the spouse marker at (level, slot): 0 when the
- * adjacent slots are partners, otherwise enough to clear the slots between the
- * real partners.
+ * Rise of the couple line for the spouse marker at (level, slot): none when
+ * the adjacent slots are partners, otherwise enough to clear the slots
+ * between the real partners.
  */
-function hopHeightAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number): number {
-  return hopAt(result, partners, level, slot).hopHeight;
-}
-
 function hopAt(result: LayoutResult, partners: PartnerSet, level: number, slot: number) {
   const rc = resolveCouple(result, partners, level, slot);
   return hopGeometry(rc.hop ? rc.rightSlot - rc.leftSlot : 1);
@@ -686,6 +700,9 @@ function buildCoupleEdges(
   const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
   // Partners with no parents drawn have nothing landing on their symbol tops.
   const hasParents = new Set(Object.values(pedigree.parentOf).flat());
+  const shapeAt = (level: number, slot: number) => symbolSex(pedigree.individuals[result.nid[level][slot] - 1]!, pedigree);
+  /** Slots from one partner to the other, for each edge: 1 when they are side by side. */
+  const spans: number[] = [];
 
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level] - 1; slot++) {
@@ -711,16 +728,53 @@ function buildCoupleEdges(
         type:         double ? "consanguineousEdge" : "coupleEdge",
         data:         {
           ...hopAt(result, partners, level, slot),
+          ...(rc.hop ? { hopEnds: hopEndsAt(level, slot, rc) } : {}),
           partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
           ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
           ...endedData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
           ...(double ? labelData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot), `${level}-${rc.leftSlot}`, `${level}-${rc.rightSlot}`, hopAt(result, partners, level, slot).hopHeight ?? 0) : {}),
         },
       });
+      spans.push(rc.rightSlot - rc.leftSlot);
+    }
+  }
+
+  // The lines on one side of a symbol each leave it at their own height,
+  // nearest partner lowest, so a hop is never drawn over the line beside it.
+  for (const end of ["source", "target"] as const) {
+    const sides = new Map<string, number[]>();
+    edges.forEach((e, i) => sides.set(e[end], [...(sides.get(e[end]) ?? []), i]));
+    for (const side of sides.values()) {
+      side.sort((a, b) => spans[a]! - spans[b]!);
+      const heights = couplePortHeights(side.length, side.some(i => edges[i]!.type === "consanguineousEdge"));
+      side.forEach((i, n) => {
+        const hopEnds = edges[i]!.data!.hopEnds;
+        if (hopEnds) hopEnds[end].port = heights[n]!;
+      });
     }
   }
 
   return edges;
+
+  /**
+   * The ends of the hopping line for the marker at `slot`. Each turns clear
+   * of the person next to it, the first or last the line passes over. The
+   * further partner is the one beside the marker: there the line runs level
+   * after coming down, and a childless mark hangs from that stretch.
+   */
+  function hopEndsAt(level: number, slot: number, rc: { leftSlot: number; rightSlot: number }): { source: HopEnd; target: HopEnd } {
+    const span = rc.rightSlot - rc.leftSlot;
+    const farIsRight = rc.rightSlot === slot + 1;
+    const end = (at: number, beside: number, far: boolean): HopEnd => {
+      const a = slotPos.get(`${level}-${at}`), b = slotPos.get(`${level}-${beside}`);
+      const { turn, drop } = a && b ? hopTurn(Math.abs(a.x - b.x), far ? 2 : span) : { turn: undefined, drop: undefined };
+      return { shape: shapeAt(level, at), port: 0, turn, ...(far ? { drop } : {}) };
+    };
+    return {
+      source: end(rc.leftSlot, rc.leftSlot + 1, !farIsRight),
+      target: end(rc.rightSlot, rc.rightSlot - 1, farIsRight),
+    };
+  }
 
   function childlessData(a: string, b: string): Pick<CoupleEdgeData, "childless" | "childlessReason"> {
     const partnership = partnershipOf.get(pairKey(a, b));
@@ -810,8 +864,13 @@ function buildSibshipEdges(
       const childYs  = resolvedChildIds.map(id => slotPos.get(id)?.y ?? firstChildPos.y);
       const childY   = Math.min(...childYs);
       const sibBarY  = (coupleY + childY) / 2;
-      const hopHeight = hopHeightAt(result, partners, level - 1, leftParentSlot);
       const rc = resolveCouple(result, partners, level - 1, leftParentSlot);
+      // The real parents are not side by side: the further one is the one
+      // beside the marker, and the drop hangs from the level end of their line.
+      const [farPos, farSlot, besidePos] = rc.rightSlot === rightParentSlot ? [rightPos, rightParentSlot, leftPos] : [leftPos, leftParentSlot, rightPos];
+      const hopDrop = rc.hop
+        ? { parentId: `${level - 1}-${farSlot}`, dx: Math.sign(besidePos.x - farPos.x) * hopTurn(Math.abs(besidePos.x - farPos.x)).drop }
+        : undefined;
       const isApart = apart.has(pairKeyOf(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
       const converge = slots.length === 1 && isApart;
 
@@ -827,7 +886,8 @@ function buildSibshipEdges(
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,
           childIds:      resolvedChildIds,
-          coupleX, coupleY, hopHeight, sibBarY, barOffset: 0, childXs, childYs, childY,
+          coupleX, coupleY, sibBarY, barOffset: 0, childXs, childYs, childY,
+          ...(hopDrop ? { hopDrop } : {}),
           ...(isApart ? { apart: [
             { ...leftPos, sex: shapeAt(level - 1, leftParentSlot) },
             { ...rightPos, sex: shapeAt(level - 1, rightParentSlot) },

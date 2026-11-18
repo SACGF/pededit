@@ -20,17 +20,15 @@ export const ENDED_STROKE_DY = 6;
 export const ENDED_STROKE_GAP = 5;
 
 /**
- * Where the break sits on a couple line from x1 (the left partner's edge) to
- * x2 (the right partner's). In the middle when nothing hangs from there;
- * when the line of descent or a childless mark does (`middleTaken`), halfway
- * between the left end of the line's horizontal run and the middle, so the
- * strokes do not cross it. A hopping line's run starts `inset` px in.
+ * Where the break sits on a straight couple line from x1 (the left partner's
+ * edge) to x2 (the right partner's). In the middle when nothing hangs from
+ * there; when the line of descent or a childless mark does (`middleTaken`),
+ * halfway between the left end and the middle, so the strokes do not cross
+ * it.
  */
-export function endedBreakX(x1: number, x2: number, hop: number, inset: number, middleTaken: boolean): number {
+export function endedBreakX(x1: number, x2: number, middleTaken: boolean): number {
   const mid = (x1 + x2) / 2;
-  if (!middleTaken) return mid;
-  const lo = hop > 0 ? x1 + inset : x1;
-  return (lo + mid) / 2;
+  return middleTaken ? (x1 + mid) / 2 : mid;
 }
 
 /** The two strokes centred on (cx, cy), each rising to the right. */

@@ -19,7 +19,7 @@ export const CHART_TITLE_NODE_ID = "__chart-title";
  * The title node centred over the symbols, its baseline TITLE_GAP (plus room
  * for a deceased slash) above the highest one, as in the SVG export.
  * `aboveTop` is the highest point of anything drawn over the symbols
- * (`highestAboveSymbols`: the consanguinity labels and the dashed
+ * (`highestAboveSymbols`: the consanguinity labels, hopping couple lines and the dashed
  * arcs between two copies of someone); the title is raised to clear it.
  */
 export function chartTitleNode(

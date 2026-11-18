@@ -4,7 +4,7 @@ import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, SLOT_WIDTH } from "../constants";
-import { highestDuplicateArc } from "../couplePath";
+import { highestDuplicateArc, highestHop } from "../couplePath";
 import { highestAboveSymbols } from "../consanguinityLabel";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -172,6 +172,36 @@ describe("chart title (#20)", () => {
     const titleY = Number(TITLE_Y.exec(svg)![2]);
     const translateY = Number(TRANSLATE_Y.exec(svg)![1]);
     expect(titleY).toBeLessThan(arcTop + translateY - 10);
+    expect(lintExport(p, options)).toEqual([]);
+  });
+
+  it("is raised above a couple line hopping over several partners in the top row (#177)", () => {
+    const wives = [1, 2, 3, 4, 5, 6, 7];
+    const ind = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+    const p: Pedigree = {
+      individuals: [ind("m", "male"), ...wives.map(i => ind(`w${i}`, "female")), ...wives.map(i => ind(`k${i}`, "male"))],
+      partnerships: wives.map(i => ({ id: `p${i}`, individual1: "m", individual2: `w${i}` })),
+      parentOf: Object.fromEntries(wives.map(i => [`p${i}`, [`k${i}`]])),
+      siblingOrder: { mode: "insertion", affectedFirst: false },
+    };
+    const flow = layoutToFlow(p);
+    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const hopTop = highestHop(flow);
+    // The fixture does what it is for: a hop rises into where the title would be.
+    expect(hopTop).toBeLessThan(topRow - NODE_SIZE / 2 - 20);
+    expect(highestAboveSymbols(flow)).toBe(hopTop);
+
+    // Canvas: the bottom of the title box is above the highest hop, and the lint agrees.
+    const node = chartTitleNode("Seven partners", flow.nodes, highestAboveSymbols(flow))!;
+    expect(node.position.y + node.height! / 2).toBeLessThan(hopTop);
+    expect(lintFlow(p, flow, { title: "Seven partners" })).toEqual([]);
+
+    // Export: the title's baseline is above the hop, and the lint agrees.
+    const options = { title: "Seven partners" };
+    const svg = exportSvg(p, options);
+    const titleY = Number(TITLE_Y.exec(svg)![2]);
+    const translateY = Number(TRANSLATE_Y.exec(svg)![1]);
+    expect(titleY).toBeLessThan(hopTop + translateY);
     expect(lintExport(p, options)).toEqual([]);
   });
 

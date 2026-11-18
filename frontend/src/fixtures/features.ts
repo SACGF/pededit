@@ -204,6 +204,34 @@ couples.partnerships.find(p => p.id === "p0")!.twins = [
 ];
 couples.partnerships.find(p => p.id === "p7")!.twins = [{ members: ["z2", "z3"], zygosity: "unknown" }];
 
+// ── Three or more partners ───────────────────────────────────────────────────
+
+const partners = build(
+  [
+    // Five partners: two lines hop from one side of a circle.
+    F("a"), M("a1"), M("a2"), M("a3"), M("a4"), M("a5"),
+    M("ak1"), F("ak2"), M("ak3"), F("ak4"), M("ak5"),
+    // A diamond, one couple ended.
+    M("b", { genderIdentity: "nonbinary" }), F("b1"), F("b2"), F("b3"),
+    F("bk1"), M("bk2"), F("bk3"),
+    // Related to every partner: two double lines on one side of a symbol.
+    M("c"), F("c1"), F("c2"), F("c3"),
+    M("ck1"), F("ck2"),
+  ],
+  [
+    ...[1, 2, 3, 4, 5].map(i => couple(`pa${i}`, `a${i}`, "a")),
+    couple("pb1", "b", "b1"), couple("pb2", "b", "b2"), couple("pb3", "b", "b3", { ended: true }),
+    couple("pc1", "c", "c1", { consanguineous: true }),
+    couple("pc2", "c", "c2", { consanguineous: true }),
+    couple("pc3", "c", "c3", { consanguineous: true, ended: true, childless: "byChoice" }),
+  ],
+  {
+    pa1: ["ak1"], pa2: ["ak2"], pa3: ["ak3"], pa4: ["ak4"], pa5: ["ak5"],
+    pb1: ["bk1"], pb2: ["bk2"], pb3: ["bk3"],
+    pc1: ["ck1"], pc2: ["ck2"],
+  },
+);
+
 // ── Pregnancies, losses and assisted reproduction ────────────────────────────
 
 const reproduction = build(
@@ -363,6 +391,11 @@ const BASE: FeatureFixture[] = [
     slug: "couples", label: "Couples and lines",
     covers: "twins of each zygosity, ended and childless couples, a second partner, a swapped couple, double lines with text above, adoption in and out",
     data: couples,
+  },
+  {
+    slug: "partners", label: "Three or more partners",
+    covers: "couple lines hopping over a partner from the side of a square, a circle and a diamond, two hops from one side, double lines that hop, ended and childless marks on a hop",
+    data: partners,
   },
   {
     slug: "reproduction", label: "Pregnancies, losses and assisted reproduction",

@@ -255,6 +255,18 @@
       "exportLint": []
     },
     {
+      "file": "drawn/partners.json",
+      "group": "drawn",
+      "purpose": "Three or more partners: couple lines hopping over a partner from the side of a square, a circle and a diamond, two hops from one side, double lines that hop, ended and childless marks on a hop",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 24,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
       "file": "drawn/reproduction.json",
       "group": "drawn",
       "purpose": "Pregnancies, losses and assisted reproduction: every pregnancy and loss symbol, a placeholder partner, donors, a surrogate, carried-by and social parent lines, a same-sex couple",

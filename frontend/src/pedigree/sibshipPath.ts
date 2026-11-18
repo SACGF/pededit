@@ -53,7 +53,6 @@ function forkXs(children: SibshipChild[]): Map<string, number> {
 export function sibshipSegments(
   coupleX: number,
   coupleY: number,
-  hopHeight: number,
   children: SibshipChild[],
   barOffset = 0,
   apart?: LinePoint[],
@@ -72,10 +71,9 @@ export function sibshipSegments(
   // Twins: every member's drop starts at the set's shared point on the bar.
   const fromXs = children.map(c => c.twinSet !== undefined ? (forks.get(c.twinSet) ?? c.x) : c.x);
   const segs: Segment[] = [
-    // Drop from the couple line (raised when it hops) to the bar. Parents
-    // who are not a couple (gamete donation) each get a line to the
-    // bar instead (`apart`).
-    ...(apart ? donorDescentSegments(apart, coupleX, sibBarY) : [[coupleX, coupleY - hopHeight, coupleX, sibBarY] as Segment]),
+    // Drop from the couple line to the bar. Parents who are not a couple
+    // (gamete donation) each get a line to the bar instead (`apart`).
+    ...(apart ? donorDescentSegments(apart, coupleX, sibBarY) : [[coupleX, coupleY, coupleX, sibBarY] as Segment]),
     // The bar ends where the outermost drops start: at a twin fork, not over
     // the twin's own symbol (#104: twins at the end of a sibship left a stub).
     [Math.min(coupleX, ...fromXs), sibBarY, Math.max(coupleX, ...fromXs), sibBarY],
@@ -137,13 +135,12 @@ export function twinForkMarks(
 export function sibshipPaths(
   coupleX: number,
   coupleY: number,
-  hopHeight: number,
   children: SibshipChild[],
   barOffset = 0,
   apart?: LinePoint[],
   converge = false,
 ): { solid: Segment[]; dashed: Segment[] } {
-  const segs = sibshipSegments(coupleX, coupleY, hopHeight, children, barOffset, apart, converge);
+  const segs = sibshipSegments(coupleX, coupleY, children, barOffset, apart, converge);
   // A converged only child has no drop of its own to dash.
   const ownDrops = segs.length - children.length >= 2;
   if (segs.length === 0 || !ownDrops || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };

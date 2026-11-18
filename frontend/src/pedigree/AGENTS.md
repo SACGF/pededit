@@ -145,6 +145,27 @@ draws NSGC symbols.
   `svgExporter` with the laid out ones, so the two cannot disagree. A couple line runs between the facing edges of the
   two symbol boxes, never centre to centre. Add anything new on a line
   there, not in a renderer.
+- **A couple line always leaves the side of a symbol, never its top** (#177):
+  the top is where the line from the parents lands, and the maintainer
+  treats this as fixed pedigree grammar. NSGC has no figure for someone with
+  three or more partners, so a line that hops over a partner follows
+  Madeline and pedigreejs: it leaves the same side as the line to the
+  partner beside the person, a little higher (`couplePortHeights`, the
+  nearest partner lowest), trimmed to the outline of a circle or a diamond
+  (`symbolSideDx`), runs level until it is a quarter of a gap short of the
+  first person it passes, then rises and crosses. It comes back down the
+  same distance past the last of them (`hopTurn`), so the route round them
+  is symmetrical, and runs level into the centre of the far partner's side.
+  The route is square whatever shape it passes, like every other solid
+  line; curves are kept for the dashed lines joining two copies of a person. The line to the couple's children hangs from that level
+  stretch, in the middle of the gap, and so does a childless mark: a line of
+  descent only ever leaves a level couple line (the maintainer's rule, and
+  what Madeline draws). Nothing hangs from the raised part; the ended mark
+  and a consanguinity label sit on it. `layoutToFlow` puts the heights,
+  shapes and turns on the edge (`CoupleEdgeData.hopEnds`) and the drop on
+  the sibship (`SibshipEdgeData.hopDrop`), both measured from the far
+  partner, so the two stay joined while a node is dragged and the renderers
+  need nothing new.
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
   the sibship bar follows dragged nodes. The segments come from
   `sibshipPath.ts`: the bar sits
@@ -736,8 +757,9 @@ draws NSGC symbols.
   The couple's own `parentOf` entry stays empty. No surrogate is added for
   two men: the user adds one on the child if wanted.
 - `childless.ts` — childless couple marks (#15): segments hung from the
-  middle of the couple line (raised by the hop when the line hops; on a
-  consanguineous double line, from the lower line). `layoutToFlow` puts
+  middle of the couple line (from the level end of a line that hops, beside
+  the further partner; on a consanguineous double line, from the lower
+  line). `layoutToFlow` puts
   `childless` / `childlessReason` on the couple edge data only when the
   partnership has no children (`activeChildless`), so a stale flag on a
   couple with children is never drawn; `edges/ChildlessMark.tsx` draws it on
@@ -748,7 +770,9 @@ draws NSGC symbols.
   couple line (`endedMarkSegments`). They sit in the middle of the line
   unless the line of descent or a childless mark hangs there
   (`middleTaken`), then halfway between the left end of the line's run and
-  the middle (`endedBreakX`), so they never cross the drop. On a double line
+  the middle (`endedBreakX`), so they never cross the drop. On a line that
+  hops they sit in the middle of the raised part, which nothing hangs from.
+  On a double line
   they are tall enough to cross both lines. Drawn by `edges/EndedMark.tsx`,
   `svgExporter` (as `class="mark"` lines, which the export lint skips), the
   U-shape (`endedSegs`, along the track), and the legend and export key

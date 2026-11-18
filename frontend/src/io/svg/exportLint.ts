@@ -36,13 +36,13 @@
  * `exportSvg` writes (couple-lines, sibship-lines, symbols, labels) and the
  * `class="mark"` on childless and twin marks, which are not connecting lines.
  */
-import { placementParentOf, type Pedigree } from "@pedigree-editor/layout-engine";
+import { placementParentOf, type Pedigree, type Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { textWidth, titleWidth } from "../../pedigree/labels";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
-import { pathPoints } from "../../pedigree/couplePath";
+import { pathPoints, symbolSideDx } from "../../pedigree/couplePath";
 import { arcCollisions } from "../../pedigree/duplicateArc";
 import { exportSvg } from "./svgExporter";
 import { deidentify } from "./deidentify";
@@ -254,7 +254,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   const toCanvas = ([x, y]: Pt): Pt => [x - shift[0], y - shift[1]];
 
   // 1. Symbols, named by the canvas node at the same place.
-  const symbols: { pos: Pt; id: string }[] = [];
+  const symbols: { pos: Pt; id: string; shape?: Sex }[] = [];
   for (const s of parsed.symbols) {
     const [x, y] = toCanvas(s);
     const node = nodes.find(n => Math.abs(n.position.x - x) < 0.5 && Math.abs(n.position.y - y) < 0.5);
@@ -262,7 +262,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       out.push({ code: "symbol-not-on-canvas", message: `the export draws a symbol at ${at([x, y])}, where the canvas has none`, individuals: [] });
       continue;
     }
-    symbols.push({ pos: [x, y], id: node.data.individual.id });
+    symbols.push({ pos: [x, y], id: node.data.individual.id, shape: node.data.shape });
   }
   const drawn = new Set(symbols.map(s => s.id));
   for (const ind of pedigree.individuals) {
@@ -275,10 +275,15 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
    * The symbol a couple line ends at: the edge of its box facing the other
    * partner (`side` 1 for the line's left end, at the symbol's right edge, -1
    * for its right end), at the symbol's height or 2px off it for a double
-   * line. As the canvas draws it (`coupleLineGeometry`).
+   * line; or, for a line hopping to a further partner, the symbol's outline
+   * higher up that side. As the canvas draws it (`coupleLineGeometry`).
    */
   const endSymbol = ([px, py]: Pt, side: 1 | -1) =>
-    symbols.find(s => Math.abs(s.pos[0] + side * half - px) < 0.5 && Math.abs(s.pos[1] - py) <= COUPLE_TOUCH);
+    symbols.find(s => {
+      const dx = side * (px - s.pos[0]), dy = s.pos[1] - py;
+      if (Math.abs(dx - half) < 0.5 && Math.abs(dy) <= COUPLE_TOUCH) return true;
+      return dy > 0 && dy < half && Math.abs(dx - symbolSideDx(s.shape, dy)) < 0.5;
+    });
 
   // 2. Couple lines.
   const partnerPairs = new Set(pedigree.partnerships.map(p => pairKey(p.individual1, p.individual2)));
@@ -317,13 +322,11 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       out.push({ code: "partnership-not-drawn", message: `partnership ${label(p.individual1)} = ${label(p.individual2)} has no couple line in the export`, individuals: [p.individual1, p.individual2] });
     }
   }
-  const rise = (pts: Pt[]) => Math.max(...pts.map(p => p[1])) - Math.min(...pts.map(p => p[1]));
   const flats = couples.flatMap(c => c.segs.filter(s => Math.abs(s[1] - s[3]) < 0.01 && c.key).map(s => ({ s, c })));
   for (let i = 0; i < flats.length; i++) {
     for (let j = i + 1; j < flats.length; j++) {
       const A = flats[i]!, B = flats[j]!;
-      // A hop leaves its partner along the same stub as a flat line from them; the canvas lint allows that too.
-      if (A.c.key === B.c.key || Math.abs(A.s[1] - B.s[1]) >= 1 || Math.abs(rise(A.c.pts) - rise(B.c.pts)) >= 1) continue;
+      if (A.c.key === B.c.key || Math.abs(A.s[1] - B.s[1]) >= 1) continue;
       const overlap = Math.min(Math.max(A.s[0], A.s[2]), Math.max(B.s[0], B.s[2])) - Math.max(Math.min(A.s[0], A.s[2]), Math.min(B.s[0], B.s[2]));
       if (overlap > 1) {
         once(`ov-${[A.c.key, B.c.key].sort().join("/")}`, {

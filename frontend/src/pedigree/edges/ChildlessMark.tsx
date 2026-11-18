@@ -3,8 +3,8 @@ import { childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_
 import { segmentsPathD } from "../sibshipPath";
 
 /**
- * Childless couple mark under a couple line, hung from (cx, topY), the line's
- * midpoint (raised when the line hops). Shared by CoupleEdge and
+ * Childless couple mark under a couple line, hung from (cx, topY): the line's
+ * midpoint, or the level end of a line that hops. Shared by CoupleEdge and
  * ConsanguineousEdge; the SVG exporter draws the same geometry.
  */
 export function ChildlessMark({ cx, topY, status, reason }: {

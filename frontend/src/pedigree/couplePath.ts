@@ -1,36 +1,113 @@
-import { COUPLE_HOP, COUPLE_HOP_STEP, COUPLE_HOP_INSET, COUPLE_HOP_INSET_STEP, COUPLE_HOP_INSET_MIN } from "./constants";
+import type { Sex } from "@pedigree-editor/layout-engine";
+import {
+  COUPLE_HOP, COUPLE_HOP_STEP, COUPLE_HOP_CLEARANCE, COUPLE_HOP_NEST_STEP,
+  COUPLE_PORT_STEP, COUPLE_PORT_MAX, COUPLE_PORT_DOUBLE_EXTRA, NODE_SIZE,
+} from "./constants";
 
 /**
- * Rise and inset of a couple line whose partners are `span` slots apart
- * (1 = adjacent, no hop). Wider hops rise higher and turn up closer to the
- * symbols (see COUPLE_HOP_INSET_STEP), so nested hops never share a riser.
+ * Rise of a couple line whose partners are `span` slots apart (1 = adjacent,
+ * no hop). Wider hops rise higher, so nested hops never run along each other.
  */
-export function hopGeometry(span: number): { hopHeight: number; hopInset: number } {
-  if (span <= 1) return { hopHeight: 0, hopInset: COUPLE_HOP_INSET };
-  return {
-    hopHeight: COUPLE_HOP + (span - 2) * COUPLE_HOP_STEP,
-    hopInset:  Math.max(COUPLE_HOP_INSET_MIN, COUPLE_HOP_INSET - (span - 2) * COUPLE_HOP_INSET_STEP),
-  };
+export function hopGeometry(span: number): { hopHeight: number } {
+  return { hopHeight: span <= 1 ? 0 : COUPLE_HOP + (span - 2) * COUPLE_HOP_STEP };
 }
 
 /**
- * SVG path for a couple line from the right edge of the left partner (x1, y1)
- * to the left edge of the right partner (x2, y2).
- *
- * hopHeight = 0 draws a straight line. Otherwise the line runs a short way
- * out, rises by hopHeight, passes over whatever sits between the partners and
- * drops back down just before the right partner. Used when someone has three
- * or more partners and the line to the far partner must clear the near one.
+ * Heights (px above the symbol's centre) at which the couple lines on one
+ * side of a symbol leave it, nearest partner first. A relationship line
+ * leaves the side of a symbol, never its top, which is where the line from
+ * the parents lands. So the line to the partner beside the person leaves at
+ * the centre and each line hopping to a further partner leaves the same side
+ * higher up: parallel lines that share nothing, as Madeline and pedigreejs
+ * draw them. `double`: one of the lines is a double line, which needs more
+ * room.
  */
-export function couplePathD(
-  x1: number, y1: number, x2: number, y2: number,
-  hopHeight = 0,
-  inset = COUPLE_HOP_INSET,
-): string {
-  if (hopHeight <= 0) return `M ${x1} ${y1} L ${x2} ${y2}`;
-  const ax = x1 + inset;
-  const bx = x2 - inset;
-  return `M ${x1} ${y1} L ${ax} ${y1} L ${ax} ${y1 - hopHeight} L ${bx} ${y2 - hopHeight} L ${bx} ${y2} L ${x2} ${y2}`;
+export function couplePortHeights(count: number, double = false): number[] {
+  const extra = double ? COUPLE_PORT_DOUBLE_EXTRA : 0;
+  const step = Math.min(COUPLE_PORT_STEP + extra, (COUPLE_PORT_MAX + extra) / Math.max(1, count - 1));
+  return Array.from({ length: count }, (_, i) => i * step);
+}
+
+/**
+ * Distance (px) from a symbol's centre to its outline `dy` px above or below
+ * the centre, on the middle of the stroke (nodes/symbols.tsx: each outline
+ * sits 1px inside the NODE_SIZE box). Where a line leaving the side of a
+ * circle or a diamond off its centre has to start to touch it.
+ */
+export function symbolSideDx(shape: Sex | undefined, dy: number, size = NODE_SIZE): number {
+  const r = size / 2 - 1;
+  const a = Math.min(Math.abs(dy), r);
+  if (shape === "female")  return Math.sqrt(r * r - a * a);
+  if (shape === "unknown") return r - a;
+  return r;
+}
+
+/**
+ * Where a hopping line turns between the row and its raised part, beside one
+ * of its partners, whose centre is `distance` px from the centre of the
+ * person next to them (the first the line passes over from that end): `turn`
+ * px from the partner's centre, COUPLE_HOP_CLEARANCE of the gap short of that
+ * person. The same at both ends, so the line is symmetrical about the people
+ * it passes. A hop over more slots (`span`) turns a little further from them
+ * (COUPLE_HOP_NEST_STEP).
+ *
+ * `drop`: beside the further partner the line runs level from the turn into
+ * their side, and what hangs from the couple (the line to their children, a
+ * childless mark) hangs from that stretch `drop` px from their centre, in the
+ * middle of the gap.
+ */
+export function hopTurn(distance: number, span = 2): { turn: number; drop: number } {
+  const half = NODE_SIZE / 2;
+  const gap = Math.max(8, distance - NODE_SIZE);
+  const turn = half + gap * (1 - COUPLE_HOP_CLEARANCE) - Math.max(0, span - 2) * COUPLE_HOP_NEST_STEP;
+  return { turn: Math.max(half + 3, turn), drop: half + gap / 2 };
+}
+
+/**
+ * One end of a couple line: the partner's symbol centre, and for a hopping
+ * line the shape drawn there, the height above the centre at which the line
+ * leaves its side (`couplePortHeights`) and how far from the centre it turns
+ * between the row and its raised part (`hopTurn`).
+ */
+export interface CoupleEnd { x: number; y: number; shape?: Sex; port?: number; turn?: number }
+
+/** `CoupleEnd.turn` when none is given: 10px out from the symbol box. */
+const DEFAULT_TURN = NODE_SIZE / 2 + 10;
+
+/**
+ * x of the two risers of a hopping line: where it turns up beside the left
+ * partner and where it comes down beside the right one.
+ */
+export function hopRisers(left: CoupleEnd, right: CoupleEnd): [number, number] {
+  return [left.x + (left.turn ?? DEFAULT_TURN), right.x - (right.turn ?? DEFAULT_TURN)];
+}
+
+/**
+ * SVG path for a couple line between two partners, given their symbol
+ * centres. It always meets the side of each symbol facing the other partner.
+ *
+ * hopHeight = 0 draws a straight line between the edges of the two symbol
+ * boxes. Otherwise (someone with three or more partners, whose line to a far
+ * partner must clear the near one) the line leaves the side at each end's
+ * `port` height, runs level to that end's `turn`, rises to hopHeight above
+ * the row and passes over whatever sits between the partners. It comes back
+ * down as soon as it is past them and runs level into the further partner's
+ * side, so the line to the couple's children hangs from a level couple line
+ * like any other.
+ *
+ * `shift` moves the whole line outwards (up, and its risers apart) by that
+ * many px, for the two lines of a double line.
+ */
+export function couplePathD(left: CoupleEnd, right: CoupleEnd, hopHeight = 0, shift = 0): string {
+  const half = NODE_SIZE / 2;
+  if (hopHeight <= 0) return `M ${left.x + half} ${left.y - shift} L ${right.x - half} ${right.y - shift}`;
+  // At the centre a line starts at the edge of the box, as a straight one does.
+  const reach = (end: CoupleEnd) => (end.port ? symbolSideDx(end.shape, end.port + shift) : half);
+  const y1 = left.y - (left.port ?? 0) - shift, y2 = right.y - (right.port ?? 0) - shift;
+  const [a, b] = hopRisers(left, right);
+  const ax = a - shift, bx = b + shift;
+  const rise = hopHeight + shift;
+  return `M ${left.x + reach(left)} ${y1} L ${ax} ${y1} L ${ax} ${left.y - rise} L ${bx} ${right.y - rise} L ${bx} ${y2} L ${right.x - reach(right)} ${y2}`;
 }
 
 /** Corner radius (px) of a dashed arc routed between two rows. */
@@ -118,24 +195,32 @@ export function duplicateArcPoints(
 }
 
 /**
- * The two paths of a consanguineous (double) couple line, drawn GAP px apart.
- * For a hopping line the two paths are concentric so they stay parallel around
- * the corners.
+ * The two paths of a consanguineous (double) couple line, `gap` px apart:
+ * the outer (upper) one, then the inner. For a hopping line the two are
+ * concentric, so they stay parallel round the corners.
  */
-export function consanguineousPathsD(
-  x1: number, y1: number, x2: number, y2: number,
-  hopHeight = 0,
-  gap = 4,
-  inset = COUPLE_HOP_INSET,
-): [string, string] {
+export function consanguineousPathsD(left: CoupleEnd, right: CoupleEnd, hopHeight = 0, gap = 4): [string, string] {
   const h = gap / 2;
-  if (hopHeight <= 0) {
-    return [`M ${x1} ${y1 - h} L ${x2} ${y2 - h}`, `M ${x1} ${y1 + h} L ${x2} ${y2 + h}`];
+  return [couplePathD(left, right, hopHeight, h), couplePathD(left, right, hopHeight, -h)];
+}
+
+/**
+ * The highest point any hopping couple line reaches, or Infinity when none
+ * hops: the top of its raised part, with the upper line of a double line and
+ * the stroke. A hop over several people in the top row rises well above the
+ * symbols.
+ */
+export function highestHop(flow: {
+  nodes: { id: string; position: { x: number; y: number } }[];
+  coupleEdges: { source: string; target: string; data?: { hopHeight?: number } }[];
+}): number {
+  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  let top = Infinity;
+  for (const e of flow.coupleEdges) {
+    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
+    if (a && b && hop > 0) top = Math.min(top, Math.min(a.y, b.y) - hop - 3);
   }
-  return [
-    couplePathD(x1, y1 - h, x2, y2 - h, hopHeight, inset - h),
-    couplePathD(x1, y1 + h, x2, y2 + h, hopHeight - gap, inset + h),
-  ];
+  return top;
 }
 
 /**
