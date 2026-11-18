@@ -167,3 +167,33 @@ Deployment" half).
   is no `shellcheck` in the dev environment; `bash -n` at least. A real
   dump and restore need PostgreSQL: a throwaway cluster works without root
   (`/usr/lib/postgresql/*/bin/initdb` and `pg_ctl` under `/tmp`).
+
+## Releases, tags and rollback
+
+A release is a GitHub milestone (the changelog page is built from them,
+`frontend/scripts/changelog.mjs`). Each one has an annotated git tag on
+`main` named `<due date>-<milestone in kebab case>`, such as
+`2026-11-16-family-business`, so going back to a release is a checkout of its
+name. `git tag -n3` lists them with their milestone.
+
+- **Cutting a release:** when the maintainer deploys a milestone, tag the
+  commit that is deployed and push the tag (`git tag -a <name> <sha> -m
+  "Release: <milestone title> (milestone N)"`, then `git push origin <name>`).
+  Tag the commit the server runs, not whatever `main` is by the time you tag:
+  read it from the deploy output or `git rev-parse HEAD` in `/opt/pededit`.
+  Tagging and pushing a tag are GitHub writes, so only when asked.
+- **Tags before 2026-11-18 were added afterwards**, at the last commit on
+  `main` before work on the next milestone began, which matches each
+  milestone's due date. Their messages say so. When each was actually
+  deployed was not recorded, so the server may have run a commit near it.
+- **Rolling back** is by hand: `deploy.sh` always pulls `main`, and in a
+  detached checkout its `git pull` fails. In `/opt/pededit`, note
+  `git rev-parse HEAD`, `git fetch --tags`, `git checkout <tag>`, then run the
+  steps of `deploy.sh` after its pull (npm ci, the frontend build with the
+  same `VITE_*` variables, uv pip install, collectstatic, restart) but not
+  `migrate`. Check `git diff --stat <tag> HEAD -- 'backend/*/migrations'`
+  first: if the release being left added a migration, either migrate back to
+  the tag's last migration before the checkout or restore the dump
+  `backup.sh --predeploy` took. Settings in `/etc/pededit/pededit.json` are
+  not in git and are undone separately. `git checkout main` before the next
+  `deploy.sh`. A one-command rollback is #208.
