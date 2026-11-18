@@ -383,6 +383,16 @@ sudo bash /opt/pededit/deploy/deploy.sh
 
 It first runs `manage.py check --deploy --fail-level WARNING` and stops, with the running site untouched, if Django has anything to say about the production settings (step 8). It dumps the database just before the migrations (step 13). In between it pulls the latest code, rebuilds the frontend (with social login env vars), updates backend dependencies, runs migrations, collects static files, and restarts Gunicorn, then polls `/api/health/` on `127.0.0.1:8000` until it answers 200 with the commit that was just pulled. The script exits non-zero if that takes more than 30 seconds or a different commit is being served, and prints the last answer it got.
 
+Each restart is recorded in `/var/lib/pededit/deploys.log` (time, the commit that was running, the commit started).
+
+To go back to an earlier release, give its tag (`git -C /opt/pededit tag -n1` lists them) or a commit, or nothing for the commit the last deploy replaced:
+
+```bash
+sudo bash /opt/pededit/deploy/deploy.sh --back-to 2026-11-16-family-business
+```
+
+It does everything a deploy does except take a dump and migrate. If the database has migrations the release does not have, it stops before changing anything and prints the `manage.py migrate` command that undoes them (which drops what they added) or points at the pre-deploy dump (step 13). The next plain `deploy.sh` goes back to `main`; if the release is older than `--back-to` itself, run `sudo -u pededit git -C /opt/pededit checkout main` first, as the script reminds you.
+
 The script does not install the service file or the Nginx config. If `deploy/pededit.service` changed, copy it into place again as in step 6. If `deploy/pededit-nginx.conf` changed, make the same edit by hand in `/etc/nginx/sites-available/pededit`, then `sudo nginx -t && sudo systemctl reload nginx`. Do not copy the file over the installed one: that loses your `server_name` and the TLS lines Certbot added.
 
 ## 11. Uptime monitoring
@@ -538,7 +548,7 @@ sudo -u pededit .venv/bin/python manage.py usage_stats
 
 Open a pedigree you know. When you are satisfied: `sudo -u postgres dropdb pededit_before_restore`. Everything saved after the dump was taken is gone from the restored database; it is still in `pededit_before_restore` if that database is readable.
 
-To undo a bad migration, restore the `pededit-predeploy-...` dump the same way, after checking out the commit that was running before (`deploy.sh` would migrate again).
+To undo a bad migration, restore the `pededit-predeploy-...` dump the same way but leave out the `migrate` line (it would run the bad migration again), then `sudo bash /opt/pededit/deploy/deploy.sh --back-to` to run the code from before it. Restore first: until then the database has the migration and `--back-to` refuses.
 
 On a new server, after losing the old one: follow this guide from step 1 to step 5 but stop before "Run migrations", fetch the newest off-box copy, decrypt it with the private key, then run the `pg_restore` line above into the empty database from step 3, and carry on from the migrations. `/etc/pededit/pededit.json` and `backend/secret_key.txt` are not in the database dump: without the old secret key everyone signed in has to sign in again, and nothing else is lost.
 

@@ -4,7 +4,8 @@ Production runs on a single Ubuntu VPS at pededit.com: Gunicorn behind Nginx,
 managed by systemd. Full walkthrough is in `INSTALL.md` (the "Production
 Deployment" half).
 
-- `deploy.sh` — the update script. Pulls `main` into `/opt/pededit`, runs
+- `deploy.sh` — the update script (`--back-to` goes back to a release,
+  below). Pulls `main` into `/opt/pededit`, runs
   `npm ci`, builds the frontend with the OAuth client IDs pulled from
   `/etc/pededit/pededit.json`, installs Python deps with uv, migrates,
   collects static, restarts the `pededit` service. Run it as root on the box.
@@ -186,14 +187,43 @@ name. `git tag -n3` lists them with their milestone.
   `main` before work on the next milestone began, which matches each
   milestone's due date. Their messages say so. When each was actually
   deployed was not recorded, so the server may have run a commit near it.
-- **Rolling back** is by hand: `deploy.sh` always pulls `main`, and in a
-  detached checkout its `git pull` fails. In `/opt/pededit`, note
-  `git rev-parse HEAD`, `git fetch --tags`, `git checkout <tag>`, then run the
-  steps of `deploy.sh` after its pull (npm ci, the frontend build with the
-  same `VITE_*` variables, uv pip install, collectstatic, restart) but not
-  `migrate`. Check `git diff --stat <tag> HEAD -- 'backend/*/migrations'`
-  first: if the release being left added a migration, either migrate back to
-  the tag's last migration before the checkout or restore the dump
-  `backup.sh --predeploy` took. Settings in `/etc/pededit/pededit.json` are
-  not in git and are undone separately. `git checkout main` before the next
-  `deploy.sh`. A one-command rollback is #208.
+- **Rolling back** is `sudo bash /opt/pededit/deploy/deploy.sh --back-to
+  [tag|sha]` (#208). It checks out the release detached, then runs the
+  deploy's steps except the backup check, the pre-deploy dump and `migrate`.
+  With no ref it goes back to the commit the last restart replaced, so a
+  second `--back-to` returns. The next plain `deploy.sh` checks out `main`
+  again before it pulls. Named `--back-to` rather than `--rollback` because
+  it does not undo the database: settings in `/etc/pededit/pededit.json`
+  are not touched either.
+- `deploy.sh` appends a line to `/var/lib/pededit/deploys.log` at each
+  restart: UTC time, `deploy` or `back-to`, the commit that was running, the
+  commit started, its `git describe`. That is the record of which commit
+  each release ran; tag from it. A failure before the restart writes
+  nothing, since the old code is still being served. A deploy with nothing
+  new is logged too, and the `--back-to` default skips those lines. So is
+  the deploy that brought the log in, since the older script it restarted
+  from could not pass on the commit it replaced.
+- Before the checkout `--back-to` compares this project's applied
+  migrations (`showmigrations`, run with the current code) with the
+  migration files in the release, and refuses, changing nothing, if they
+  differ either way. Undoing a migration loses what it added, so the script
+  only prints the `manage.py migrate <app> <name>` to run (or points at the
+  pre-deploy dump); it never runs it. Third-party apps' migrations are not
+  compared: they come with `requirements.txt`, and a release that pins an
+  older Django or package with fewer migrations would need the same care by
+  hand.
+- Steps run by `--back-to` are this script's, but the files they call
+  (`backup.sh`, `changelog.mjs`, the build) are the release's. So anything a
+  release older than this one cannot do is done before the checkout:
+  `backup.sh --max-age-days` is asked first (no tag before #208 has it). A
+  release before #50 has no health check, so the script says to look at the
+  site by hand. The nightly backup runs the checked-out `backup.sh`, whose
+  retention may be older than the 7 day promise (#183); the script warns
+  when it differs.
+- A release older than #208 has a `deploy.sh` that cannot leave a detached
+  checkout (its `git pull` fails, harmlessly). To go forward from one:
+  `sudo -u pededit git -C /opt/pededit checkout main`, then `deploy.sh`.
+  `--back-to` prints that line at the end.
+- If `check --deploy` refuses the release, `--back-to` checks out what was
+  there before and reinstalls its requirements, so the site and checkout are
+  as they were.
