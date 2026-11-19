@@ -503,7 +503,25 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
     if (!here.problem) { at = here; break; }
   }
+  await page.keyboard.press("Escape");
   let after = await dragged(at.problem ? null : at, "a drag that starts on a person pans too", `the person is ${at.problem}`);
+  r.check(!at.problem && after.selected?.length === 0, "and selects nobody", at.problem ? `the person is ${at.problem}` : `selection is ${JSON.stringify(after.selected)}`);
+  // Nor does a pinch with a finger on a person.
+  at = { problem: "nobody is on the screen with room beside them" };
+  for (const p of after.people) {
+    const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
+    const side = here.problem ? 0 : here.x + 130 < after.vw ? 1 : here.x - 130 > 0 ? -1 : 0;
+    if (side) { at = { x: here.x + side * 60, y: here.y }; break; }
+  }
+  // A small pinch, so there is room to zoom out even near the smallest zoom, then back.
+  let pinched = null;
+  if (!at.problem) {
+    await pinch(page, cdp, at, 120, 100);
+    pinched = await measure(page);
+    await pinch(page, cdp, at, 100, 120);
+  }
+  r.check(pinched && pinched.selected?.length === 0 && pinched.transform.zoom < after.transform.zoom - 1e-6, "a pinch with a finger on a person zooms and selects nobody",
+    at.problem ? at.problem : `selection is ${JSON.stringify(pinched.selected)}, zoom ${after.transform.zoom.toFixed(2)} to ${pinched.transform.zoom.toFixed(2)}`);
   r.check(after.scroll.x === 0 && after.scroll.y === 0 && after.pageScale === 1, "and the page itself does not scroll or zoom",
     `scroll ${after.scroll.x},${after.scroll.y}, page zoom ${after.pageScale}`);
 

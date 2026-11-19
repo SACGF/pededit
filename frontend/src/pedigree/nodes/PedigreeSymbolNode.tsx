@@ -68,6 +68,8 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // browser makes up after a tap differ between browsers and cannot be
   // relied on to open it or to close it.
   const [isTouchPill, setIsTouchPill] = useState(false);
+  // Whether the press now on the symbol is a finger.
+  const touchDown = useRef(false);
   useEffect(() => { if (!isSelected) setIsTouchPill(false); }, [isSelected]);
   const nameCut = isLabelCut(nameLines, glyph.name);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
@@ -124,13 +126,17 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         // drag moves just them; pressing on a selected one keeps the group
         // for a group drag. Only for the symbol itself: the hover pill
         // and more menu are portals whose events bubble here too.
-        if (e.pointerType === "touch" && !isPicking && e.currentTarget.contains(e.target as Element)) setIsTouchPill(true);
-        if (isPicking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
+        // A finger selects on the click instead: a touch that starts on a
+        // person is as often the start of a pan or a pinch, and the browser
+        // sends a click only for a tap.
+        touchDown.current = e.pointerType === "touch";
+        if (touchDown.current || isPicking || selected || e.button !== 0 || e.shiftKey || e.ctrlKey || e.metaKey) return;
         if (e.currentTarget.contains(e.target as Element)) setSelectedId(individual.id);
       }}
       onClick={e => {
         if (pickIndividual(individual.id)) return;
         const onSymbol = e.currentTarget.contains(e.target as Element);
+        if (onSymbol && touchDown.current) setIsTouchPill(true);
         if (onSymbol && (e.shiftKey || e.ctrlKey || e.metaKey)) toggleSelected(individual.id);
         // A click in this person's hover pill keeps a selection they are in.
         else if (onSymbol || !selected) setSelectedId(individual.id);

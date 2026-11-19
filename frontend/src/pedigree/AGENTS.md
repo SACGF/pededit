@@ -75,9 +75,11 @@ draws NSGC symbols.
 - `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
   name/DOB labels and pin indicator.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
-  By touch (#169) there is no hover: a touch `pointerdown` on the symbol
-  opens the pill and it stays while the person is selected, closing when the
-  selection clears. Do not lean on the mouse events a browser makes up after
+  By touch (#169) there is no hover: a tap on the symbol opens the pill and
+  it stays while the person is selected, closing when the selection clears.
+  A finger selects and opens the pill on the click, not on `pointerdown` as
+  the mouse does: a touch that starts on a person is as often a pan or a
+  pinch, and the browser sends a click only for a tap. Do not lean on the mouse events a browser makes up after
   a tap: they differ between browsers (and chromium's emulation moves its
   mouse away again, which closed the pill at once). Its buttons are larger
   under `pointer-coarse:`. The pill is centred on the person and is wider
