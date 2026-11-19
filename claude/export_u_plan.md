@@ -204,4 +204,4 @@ children of the first couple.
 
 ## Not done
 
-Open items are tracked on GitHub issue #2.
+Open items are tracked on GitHub issue #213.
