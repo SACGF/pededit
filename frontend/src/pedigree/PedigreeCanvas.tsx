@@ -290,8 +290,10 @@ function KeepSelectedInView() {
     const halfW = (node.width ?? NODE_SIZE) * zoom / 2, halfH = (node.height ?? NODE_SIZE) * zoom / 2;
     const cx = node.position.x * zoom + x, cy = node.position.y * zoom + y;
     const side = Math.min(40, width / 4), above = Math.min(40, height / 4), below = Math.min(70, height / 3);
-    const dx = Math.max(side + halfW - cx, 0) || Math.min(width - side - halfW - cx, 0);
-    const dy = Math.max(above + halfH - cy, 0) || Math.min(height - below - halfH - cy, 0);
+    // Into [lo, hi], or the middle where the canvas is too small for the margins.
+    const into = (c: number, lo: number, hi: number, size: number) => (lo > hi ? size / 2 : Math.min(Math.max(c, lo), hi)) - c;
+    const dx = into(cx, side + halfW, width - side - halfW, width);
+    const dy = into(cy, above + halfH, height - below - halfH, height);
     if (dx || dy) void setViewport({ x: x + dx, y: y + dy, zoom }, { duration: 200 });
   }, [width, height, getNodes, getViewport, setViewport]);
   return null;
@@ -305,9 +307,13 @@ interface PedigreeCanvasProps {
   showMinimap?: boolean;
   /** Tighter row and slot spacing so larger pedigrees fit on screen. */
   compact?: boolean;
+  /** A click or tap on a person's symbol (not their hover pill, and not a drag). */
+  onPersonTap?: () => void;
+  /** A click or tap on the empty canvas. */
+  onPaneTap?: () => void;
 }
 
-export function PedigreeCanvas({ showMinimap = false, compact = false }: PedigreeCanvasProps) {
+export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonTap, onPaneTap }: PedigreeCanvasProps) {
   const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout, picking } = usePedigreeFields("pedigree", "selectedIds", "setSelectedId", "setSelection", "pinIndividuals", "resetLayout", "picking");
   const [contextMenu, setContextMenu] = useState<ContextMenuTarget | null>(null);
   const hasPinnedNodes = !!pedigree.pinnedPositions &&
@@ -401,7 +407,15 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
 
   const handlePaneClick = useCallback(() => {
     setSelectedId(null);
-  }, [setSelectedId]);
+    onPaneTap?.();
+  }, [setSelectedId, onPaneTap]);
+
+  // The hover pill is a portal, so its clicks reach here through React but
+  // are not inside the node's element.
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    if (picking || node.type !== "pedigreeSymbol" || event.shiftKey || event.ctrlKey || event.metaKey) return;
+    if ((event.currentTarget as Element).contains(event.target as Element)) onPersonTap?.();
+  }, [picking, onPersonTap]);
 
   // Right-click: the more menu at the cursor on a person, the couple
   // items on a couple line. The browser's own menu is kept everywhere else.
@@ -493,6 +507,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false }: Pedigre
         // a dozen families side by side, so fit view would clip it.
         minZoom={MIN_ZOOM}
         onPaneClick={handlePaneClick}
+        onNodeClick={handleNodeClick}
         onNodeDragStop={handleNodeDragStop}
         onNodeContextMenu={handleNodeContextMenu}
         onEdgeContextMenu={handleEdgeContextMenu}

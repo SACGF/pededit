@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useAppStore } from "../store/useAppStore";
 import { usePedigreeStore, usePedigreeFields } from "../store/usePedigreeStore";
 import { Button } from "@/components/ui/button";
 import { PedigreeCanvas } from "../pedigree/PedigreeCanvas";
 import { Toolbar } from "../components/Toolbar";
-import { EditPanel } from "../components/EditPanel";
+import { EditPanel, type PanelSize } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
@@ -42,9 +42,8 @@ const REPO_URL = "https://github.com/SACGF/pededit";
 
 /**
  * Shown on small screens until dismissed: viewing works by touch, editing is built for a mouse and keyboard.
- * Selecting someone leaves the side panel shut, so it says where their details are.
  */
-const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom. Tap a person, then Person below to edit them or \u22ef for more. Editing is easier on a computer.";
+const SMALL_SCREEN_NOTICE = "Drag to move, pinch to zoom. Editing is easier on a computer.";
 const SMALL_SCREEN_NOTICE_KEY = "smallScreenNoticeDismissed";
 
 /**
@@ -78,12 +77,16 @@ export default function CanvasPage() {
   const [editingName, setEditingName] = useState("");
   const [notFound, setNotFound] = useState(false);
   // Small screens: the sidebar opens over the canvas from the
-  // toolbar's menu button, and the side panel is a sheet under the canvas
-  // that stays shut until one of its tabs is tapped. Neither state does
-  // anything from `lg` up, where both are always shown.
+  // toolbar's menu button, and the side panel is a sheet under the canvas,
+  // opened at half the screen by tapping a person or one of its tabs and
+  // shut by tapping the empty canvas. The tall sheet leaves the chart a
+  // strip showing who is selected. Neither state does anything from `lg`
+  // up, where both are always shown.
   const small = useSmallScreen();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelSize, setPanelSize] = useState<PanelSize>("closed");
+  const openPanel = useCallback(() => setPanelSize(size => size === "closed" ? "half" : size), []);
+  const closePanel = useCallback(() => setPanelSize("closed"), []);
   const [smallNoticeDismissed, setSmallNoticeDismissed] = useState(() => {
     try { return localStorage.getItem(SMALL_SCREEN_NOTICE_KEY) === "true"; } catch { return false; }
   });
@@ -414,9 +417,10 @@ export default function CanvasPage() {
         )}
 
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-          <div className="flex-1 min-h-0 min-w-0 relative">
+          <div className={`min-h-0 min-w-0 relative ${panelSize === "full" ? "max-lg:h-[min(7rem,20dvh)] max-lg:flex-none lg:flex-1" : "flex-1"}`}>
             {/* The minimap would cover a third of a phone's canvas. */}
-            <PedigreeCanvas showMinimap={showMinimap && !small} compact={compact} />
+            <PedigreeCanvas showMinimap={showMinimap && !small} compact={compact}
+              onPersonTap={openPanel} onPaneTap={closePanel} />
             {notice && (
               <div
                 role={notice.kind === "error" ? "alert" : "status"}
@@ -434,8 +438,8 @@ export default function CanvasPage() {
             )}
           </div>
 
-          <div className={`lg:w-60 lg:border-l max-lg:border-t bg-white shrink-0 overflow-hidden ${panelOpen ? "max-lg:h-[50dvh]" : ""}`}>
-            <EditPanel onManageTags={() => setTagsOpen(true)} open={panelOpen} onOpenChange={setPanelOpen} />
+          <div className={`lg:w-60 lg:border-l max-lg:border-t bg-white shrink-0 overflow-hidden ${panelSize === "half" ? "max-lg:h-[50dvh]" : panelSize === "full" ? "max-lg:flex-1 max-lg:min-h-0" : ""}`}>
+            <EditPanel onManageTags={() => setTagsOpen(true)} size={panelSize} onSizeChange={setPanelSize} />
           </div>
         </div>
       </div>

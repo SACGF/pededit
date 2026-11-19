@@ -174,19 +174,25 @@ reporting is off, and the dev server never reports.
   tap to select), editing is a nice to have. Below Tailwind's `lg` (1024px,
   so a phone on its side counts) `CanvasPage` hides the left sidebar behind
   the toolbar's menu button (it opens over the canvas), turns the side panel
-  into a sheet under the canvas that is shut to its row of tabs until a tab
-  is tapped (`EditPanel`'s `open` / `onOpenChange`; selecting someone does
-  not open it, so the chart stays in view; when it opens,
+  into a sheet under the canvas with its tabs as a 48px bar along the bottom
+  of the screen (`EditPanel`'s `size` / `onSizeChange`: "closed" is the bar
+  alone, "half" is 50dvh, "full" leaves the chart a strip of 112px, or a fifth of a short screen). A tab or a
+  tap on a person opens it at half (`PedigreeCanvas`'s `onPersonTap`; a
+  drag, a tap on the hover pill and a tap while picking do not), the tab of
+  the open sheet, the handle's close button and a tap on the empty canvas
+  shut it, a swipe or tap on the handle (`SheetHandle`) changes its height
+  when the finger lifts, and focusing a text field makes it tall because the
+  keyboard covers the lower half. Person can be tapped with nobody selected
+  and says to tap someone. When the canvas shrinks,
   `KeepSelectedInView` in `PedigreeCanvas.tsx` pans the selected person back
   onto the smaller canvas), folds the toolbar's exports into one "Export"
   menu and drops its dividers so it fits 360px (it scrolls sideways once
   "Reset layout" or the problems list is added), words the sidebar's "Using
   the canvas" for touch under `pointer-coarse:` (multi-select has no touch
-  gesture and the help says so),
+  gesture and the help says so; long press opens the more menu only where
+  the browser fires `contextmenu` on it, Android Chrome but not iOS Safari),
   leaves out the minimap and shows a dismissible line saying how to move
-  around, that a selected person is edited from the Person tab or the pill's
-  "⋯" (long press opens the more menu only where the browser fires
-  `contextmenu` on it, Android Chrome but not iOS Safari), and that editing
+  around and that editing
   is easier on a computer (localStorage
   `smallScreenNoticeDismissed`). It is all `lg:` / `max-lg:` classes plus
   `hooks/useSmallScreen.ts` for what CSS cannot do, and nothing changes from
