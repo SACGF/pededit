@@ -79,7 +79,10 @@ draws NSGC symbols.
   it stays while the person is selected, closing when the selection clears.
   A finger selects and opens the pill on the click, not on `pointerdown` as
   the mouse does: a touch that starts on a person is as often a pan or a
-  pinch, and the browser sends a click only for a tap. Do not lean on the mouse events a browser makes up after
+  pinch, and the browser sends a click only for a tap. Below `lg` a tap
+  shows no pill (#214): it opens the Person tab's sheet, which starts with
+  the same buttons (`components/PersonActions.tsx`), so a button added to
+  the pill is added there too. A large touch screen keeps the pill. Do not lean on the mouse events a browser makes up after
   a tap: they differ between browsers (and chromium's emulation moves its
   mouse away again, which closed the pill at once). Its buttons are larger
   under `pointer-coarse:`. The pill is centred on the person and is wider

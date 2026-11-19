@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Pedigree, Sex, Tag } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN, usePedigreeFields } from "../../store/usePedigreeStore";
@@ -30,6 +30,9 @@ interface MoreMenuProps {
    * pill uses this to hide itself.
    */
   onClose?: () => void;
+  /** The trigger's classes and content, in place of the pill's "···". */
+  triggerClassName?: string;
+  children?: ReactNode;
 }
 
 /**
@@ -40,7 +43,7 @@ interface MoreMenuProps {
 export const MENU_CONTENT_CLASS = "w-44 p-1 overflow-y-auto max-h-(--radix-popover-content-available-height)";
 
 /** The "···" button in the hover pill and the menu it opens. */
-export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
+export function MoreMenu({ individualId, onClose, triggerClassName, children }: MoreMenuProps) {
   const [open, setOpen] = useState(false);
 
   function close() {
@@ -54,9 +57,10 @@ export function MoreMenu({ individualId, onClose }: MoreMenuProps) {
         <button
           title="More options"
           onClick={(e) => e.stopPropagation()}
-          className="px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors pointer-coarse:px-2.5 pointer-coarse:py-2 pointer-coarse:text-xs"
+          aria-label="More options"
+          className={triggerClassName ?? "px-1.5 py-0.5 rounded-full text-[10px] leading-none hover:bg-gray-100 transition-colors pointer-coarse:px-2.5 pointer-coarse:py-2 pointer-coarse:text-xs"}
         >
-          ···
+          {children ?? "···"}
         </button>
       </PopoverTrigger>
       <PopoverContent

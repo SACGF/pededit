@@ -183,7 +183,9 @@ reporting is off, and the dev server never reports.
   shut it, a swipe or tap on the handle (`SheetHandle`) changes its height
   when the finger lifts, and focusing a text field makes it tall because the
   keyboard covers the lower half. Person can be tapped with nobody selected
-  and says to tap someone. When the canvas shrinks,
+  and says to tap someone. For one person the sheet starts with the hover
+  pill's buttons (`components/PersonActions.tsx`, #214), and a tap shows no
+  pill there: it sat over the name of the person tapped. When the canvas shrinks,
   `KeepSelectedInView` in `PedigreeCanvas.tsx` pans the selected person back
   onto the smaller canvas), folds the toolbar's exports into one "Export"
   menu and drops its dividers so it fits 360px (it scrolls sideways once

@@ -328,8 +328,8 @@ export default function CanvasPage() {
           <p className="text-gray-700 mb-1">Using the canvas</p>
           {/* By touch, in place of the list below. */}
           <ul className="space-y-0.5 hidden pointer-coarse:block">
-            <li>Tap a person to select them, then the Person tab to edit them</li>
-            <li>Tap <b className="font-medium text-gray-700">···</b> under a selected person for more</li>
+            <li>Tap a person to see and edit them</li>
+            <li>Add relatives and find more options from the buttons shown for a selected person</li>
             <li>Drag to pan, pinch to zoom</li>
             <li>Selecting several people needs a mouse or keyboard</li>
           </ul>

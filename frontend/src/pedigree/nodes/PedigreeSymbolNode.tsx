@@ -5,6 +5,7 @@ import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
+import { isSmallScreen } from "../../hooks/useSmallScreen";
 import { CAPTION_ROW_HEIGHT } from "../lifeStatus";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
@@ -66,7 +67,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // Touch: there is no hover, so a tap on the symbol opens the pill
   // and it stays for as long as the person is selected. The mouse events a
   // browser makes up after a tap differ between browsers and cannot be
-  // relied on to open it or to close it.
+  // relied on to open it or to close it. On a small screen a tap opens
+  // the Person tab's sheet, which has the pill's buttons
+  // (`components/PersonActions.tsx`), so no pill is shown by touch there.
   const [isTouchPill, setIsTouchPill] = useState(false);
   // Whether the press now on the symbol is a finger.
   const touchDown = useRef(false);
@@ -95,6 +98,8 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
     // Over a cut name label only the full name shows: the pill would
     // open under the cursor, where a click meant for the name hits a button.
     if (e && (e.target as Element).closest?.("[data-name-label]")) return;
+    // The mouse events a browser makes up after a tap.
+    if (touchDown.current && isSmallScreen()) return;
     cancelHide();
     setIsPillVisible(true);
     setHoveredId(individual.id);
@@ -136,7 +141,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
       onClick={e => {
         if (pickIndividual(individual.id)) return;
         const onSymbol = e.currentTarget.contains(e.target as Element);
-        if (onSymbol && touchDown.current) setIsTouchPill(true);
+        if (onSymbol && touchDown.current && !isSmallScreen()) setIsTouchPill(true);
         if (onSymbol && (e.shiftKey || e.ctrlKey || e.metaKey)) toggleSelected(individual.id);
         // A click in this person's hover pill keeps a selection they are in.
         else if (onSymbol || !selected) setSelectedId(individual.id);

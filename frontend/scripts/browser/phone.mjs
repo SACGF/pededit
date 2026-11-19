@@ -3,7 +3,7 @@
 // viewport, phone pixel ratio and user agent) and check what a phone must be
 // able to do with a pedigree link (#169): no sideways page scroll, the chart
 // fitted and not covered, one-finger pan, pinch zoom, tap to select, the
-// Person tab, More options from a tap.
+// Person tab and its buttons, More options from the sheet.
 //
 // This is chromium pretending: it has no Safari, no real fingers, no on-screen
 // keyboard and no browser bars. A clean report means "nothing is broken that
@@ -367,58 +367,66 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     await page.waitForTimeout(400);
   }
 
-  // More options from a tap: the pill a tap leaves open carries the "···" button.
-  at = selected ? await tappable(page, 'button[title="More options"]') : { problem: "nobody was selected" };
-  let menuOpen = false;
+  // The sheet starts with the hover pill's buttons, and the pill itself is
+  // not shown: it would sit over the name of the person tapped. The person
+  // was tapped again above and the sheet shut, so open it from its tab.
+  const pillShown = await onScreen(page, '[data-testid="hover-pill"]');
+  r.check(selected && !pillShown, "a tap does not show the hover pill", selected ? "the pill is on the screen" : "nobody was selected");
+  at = selected ? await tappable(page, '[data-testid="panel-tab-person"]') : { problem: "nobody was selected" };
+  let actions = null, added = null, menuOpen = false;
   if (!at.problem) {
-    r.note(`the "More options" button is ${at.size.w}x${at.size.h} px`);
     await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(500);
-    menuOpen = await onScreen(page, "[data-radix-popper-content-wrapper]", 60);
-    if (menuOpen) await page.screenshot({ path: `${shotBase}.menu.png` });
+    await page.waitForTimeout(400);
+    actions = await page.locator('[data-testid="person-actions"] button').evaluateAll(all => all.map(b => {
+      const q = b.getBoundingClientRect();
+      return { title: b.title, w: Math.round(q.width), h: Math.round(q.height), on: q.left >= 0 && q.right <= window.innerWidth + 0.5 && q.top >= 0 && q.bottom <= window.innerHeight, clipped: b.scrollWidth > b.clientWidth + 1 };
+    }));
+    await page.screenshot({ path: `${shotBase}.actions.png` });
+    // Add son adds one person, and undo takes him away again.
+    const count = () => page.evaluate(() => window.__pededit.pedigree().individuals.length);
+    const son = await tappable(page, '[data-testid="person-actions"] button[title="Add son"]');
+    if (!son.problem) {
+      const before = await count();
+      await page.touchscreen.tap(son.x, son.y);
+      await page.waitForTimeout(600);
+      added = (await count()) - before;
+      await page.keyboard.press("Control+z");
+      await page.waitForTimeout(600);
+    }
+    const more = await tappable(page, '[data-testid="person-actions"] button[title="More options"]');
+    if (!more.problem) {
+      await page.touchscreen.tap(more.x, more.y);
+      await page.waitForTimeout(500);
+      menuOpen = await onScreen(page, "[data-radix-popper-content-wrapper]", 60);
+      if (menuOpen) await page.screenshot({ path: `${shotBase}.menu.png` });
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(300);
+    }
   }
-  r.check(menuOpen, "More options opens from a tap", at.problem ? `its button is ${at.problem}` : "tapped the button and no menu showed");
-  // Escape closes the menu, then clears the selection.
-  await page.keyboard.press("Escape");
-  await page.keyboard.press("Escape");
+  const wantActions = ["Add parents", "Add son", "Add daughter", "Add child (unknown sex)", "Add sibling", "More options"];
+  const badActions = actions ? [...wantActions.filter(w => !actions.some(b => b.title === w)).map(w => `${w}: missing`), ...actions.filter(b => !b.on || b.h < 44 || b.w < 40 || b.clipped).map(b => `${b.title}: ${b.w}x${b.h}${b.on ? "" : ", off the screen"}${b.clipped ? ", label cut" : ""}`)] : ["the sheet did not open"];
+  r.check(badActions.length === 0, "the Person tab starts with the pill's buttons, each big enough for a finger", at.problem ? `the Person tab is ${at.problem}` : badActions.join("; "));
+  r.check(added === 1, "\"Add son\" in the sheet adds a person", added === null ? "the button could not be tapped" : `the number of people changed by ${added}`);
+  r.check(menuOpen, "More options opens from the sheet", at.problem ? `the Person tab is ${at.problem}` : "tapped the button and no menu showed");
+  // Shut the sheet, then clear the selection.
+  {
+    const toggle = await tappable(page, '[data-testid="panel-toggle"]');
+    if (!toggle.problem) await page.touchscreen.tap(toggle.x, toggle.y);
+    await page.waitForTimeout(400);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(GESTURE_GAP);
+  }
 
-  // The pill of someone at the edge of the chart stays on the screen: it is
-  // wider than a phone and centred on the person.
-  const centreX = p => p.x + p.w / 2;
-  for (const [side, edgePerson] of [["left", inside.reduce((a, b) => (a && centreX(a) <= centreX(b) ? a : b), null)], ["right", inside.reduce((a, b) => (a && centreX(a) >= centreX(b) ? a : b), null)]]) {
-    // Opening the sheet pans the chart to keep the person tapped in view,
-    // so fit it again to have the edge person on the screen.
+  // A tap opens the Person tab, a sheet over half the screen: the person
+  // tapped must still be in view above it.
+  // Fitted again first: keeping people in view above the sheet has panned the chart.
+  {
     const fit = await tappable(page, ".react-flow__controls-fitview");
     if (!fit.problem) {
       await page.touchscreen.tap(fit.x, fit.y);
       await page.waitForTimeout(GESTURE_GAP);
     }
-    at = edgePerson ? await tappable(page, `[data-individual-id="${CSS_ESCAPE(edgePerson.id)}"]`) : { problem: "nobody is drawn" };
-    let off = null;
-    if (!at.problem) {
-      await page.touchscreen.tap(at.x, at.y);
-      await page.waitForTimeout(400);
-      off = await page.evaluate(() => {
-        const pill = document.querySelector('[data-testid="hover-pill"]');
-        const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
-        if (!pill || !flow) return ["the pill is not shown"];
-        return [...pill.querySelectorAll("button")].filter(b => {
-          const r = b.getBoundingClientRect();
-          return r.left < flow.left - 0.5 || r.right > flow.right + 0.5;
-        }).map(b => b.title);
-      });
-      if (side === "left") await page.screenshot({ path: `${shotBase}.pill.png` });
-      const toggle = await tappable(page, '[data-testid="panel-toggle"]');
-      if (!toggle.problem && await onScreen(page, '[data-testid="panel-person"]')) await page.touchscreen.tap(toggle.x, toggle.y);
-      await page.waitForTimeout(400);
-      await page.keyboard.press("Escape");
-      await page.waitForTimeout(GESTURE_GAP);
-    }
-    r.check(off && off.length === 0, `every button of the pill of the person nearest the ${side} edge is on the screen`, at.problem ?? `off the canvas: ${off.join(", ")}`);
   }
-
-  // A tap opens the Person tab, a sheet over half the screen: the person
-  // tapped must still be in view above it.
   const lowest = inside.reduce((a, b) => (a && a.y >= b.y ? a : b), null);
   at = lowest ? await tappable(page, `[data-individual-id="${CSS_ESCAPE(lowest.id)}"]`) : { problem: "nobody is drawn" };
   let kept = null;
@@ -510,7 +518,9 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   at = { problem: "nobody is on the screen with room beside them" };
   for (const p of after.people) {
     const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
-    const side = here.problem ? 0 : here.x + 130 < after.vw ? 1 : here.x - 130 > 0 ? -1 : 0;
+    // The other finger on the bare canvas (see the pinch below for why).
+    const bare = dx => page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.classList.contains("react-flow__pane"), { x: here.x + dx, y: here.y });
+    const side = here.problem ? 0 : await bare(120) ? 1 : await bare(-120) ? -1 : 0;
     if (side) { at = { x: here.x + side * 60, y: here.y }; break; }
   }
   // A small pinch, so there is room to zoom out even near the smallest zoom, then back.

@@ -9,8 +9,13 @@ import { useEffect, useState } from "react";
  */
 const SMALL_SCREEN = "(max-width: 1023px)";
 
+/** The answer now, for an event handler that does not need to redraw when it changes. */
+export function isSmallScreen(): boolean {
+  return typeof window !== "undefined" && !!window.matchMedia?.(SMALL_SCREEN).matches;
+}
+
 export function useSmallScreen(): boolean {
-  const [small, setSmall] = useState(() => typeof window !== "undefined" && !!window.matchMedia?.(SMALL_SCREEN).matches);
+  const [small, setSmall] = useState(isSmallScreen);
   useEffect(() => {
     const query = window.matchMedia?.(SMALL_SCREEN);
     if (!query) return;

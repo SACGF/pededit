@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Legend, SectionHeader } from "./Legend";
 import { ConditionsAndTags } from "./ConditionsAndTags";
 import { SelectionPanel } from "./SelectionPanel";
+import { PersonActions } from "./PersonActions";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { coupleChildren } from "../pedigree/sameSex";
@@ -117,7 +118,10 @@ export function EditPanel({ onManageTags, size = "half", onSizeChange }: EditPan
           ) : multiple ? (
             <SelectionPanel />
           ) : individual ? (
-            <IndividualForm individual={individual} onManageTags={onManageTags} />
+            <>
+              {small && <PersonActions individual={individual} />}
+              <IndividualForm individual={individual} onManageTags={onManageTags} />
+            </>
           ) : (
             <p className="text-sm text-gray-500" data-testid="panel-nobody">Tap a person on the chart to see and edit their details.</p>
           )}
