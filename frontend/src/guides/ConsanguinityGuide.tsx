@@ -111,7 +111,7 @@ export function ConsanguinityGuide() {
         descent, is twice their kinship when neither is inbred.
       </P>
       <div className="overflow-x-auto mb-3">
-        <table className="text-xs border-collapse w-full max-w-xl">
+        <table className="text-sm border-collapse w-full max-w-xl">
           <thead>
             <tr className="border-b text-left">
               <th className="py-1 pr-4 font-medium">Relationship</th>
@@ -165,7 +165,7 @@ export function ConsanguinityGuide() {
       </P>
 
       <References />
-      <ul className="list-disc pl-5 mt-1 space-y-1 text-xs text-gray-600">
+      <ul className="list-disc pl-5 mt-1 space-y-1 text-sm text-gray-600">
         <li>Bennett RL, Motulsky AG, Bittles A, et al. (2002). Genetic counseling and screening of consanguineous couples and their offspring: recommendations of the National Society of Genetic Counselors. J Genet Couns 11:97-119.</li>
       </ul>
     </>

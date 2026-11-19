@@ -79,12 +79,12 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <header className="border-b px-8 py-4 flex items-center justify-between">
-        <h1 className="text-base font-medium tracking-tight">PedEdit</h1>
+        <h1 className="text-lg font-medium tracking-tight">PedEdit</h1>
         <div className="flex items-center gap-1 sm:gap-3">
           {isAuthenticated ? (
             <>
               {/* Left out on a phone, where it squeezes against the name of the app. */}
-              <span className="hidden sm:inline text-xs text-gray-500">
+              <span className="hidden sm:inline text-sm text-gray-500">
                 {user?.first_name
                   ? `${user.first_name} ${user.last_name}`.trim()
                   : user?.email || user?.username}
@@ -92,7 +92,7 @@ export default function LandingPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs px-3"
+                className="h-7 text-sm px-3"
                 onClick={logout}
               >
                 Sign out
@@ -100,7 +100,7 @@ export default function LandingPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs px-3 text-gray-400 hover:text-red-600"
+                className="h-7 text-sm px-3 text-gray-400 hover:text-red-600"
                 onClick={() => setDeleteAccountOpen(true)}
               >
                 Delete account
@@ -111,7 +111,7 @@ export default function LandingPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs px-3"
+                className="h-7 text-sm px-3"
                 onClick={() => navigate("/login")}
               >
                 Sign in
@@ -124,11 +124,11 @@ export default function LandingPage() {
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-8 py-16">
         <div className="w-full max-w-4xl">
-          <p className="text-sm text-gray-500 mb-3 max-w-xl">
+          <p className="text-base text-gray-500 mb-3 max-w-xl">
             Automatic layout from <a href="https://cran.r-project.org/package=kinship2" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">kinship2</a>, handling consanguinity and complex families. Drag-and-drop repositioning. <a href="https://github.com/SACGF/pededit" target="_blank" rel="noopener noreferrer" className="text-black underline underline-offset-2">Open source</a>.
           </p>
           {!isAuthenticated && (
-            <p className="text-sm text-gray-500 mb-8 max-w-xl">
+            <p className="text-base text-gray-500 mb-8 max-w-xl">
               <span className="text-black font-medium">No account required.</span>{" "}
               Click a button below to start drawing. Each pedigree is saved at its own link, which is not listed anywhere: bookmark it to come back, or send it to a colleague. Anyone who has the link can open the pedigree.{" "}
               <span
@@ -142,7 +142,7 @@ export default function LandingPage() {
           {/* Primary actions */}
           <div className="flex flex-wrap gap-2 mb-10">
             <Button
-              className="h-8 text-xs px-4"
+              className="h-8 text-sm px-4"
               onClick={handleCreateBlank}
               disabled={loading !== null}
             >
@@ -150,7 +150,7 @@ export default function LandingPage() {
             </Button>
             <Button
               variant="outline"
-              className="h-8 text-xs px-4"
+              className="h-8 text-sm px-4"
               onClick={() => setImportOpen(true)}
               disabled={loading !== null}
             >
@@ -158,10 +158,10 @@ export default function LandingPage() {
             </Button>
           </div>
           {createError && (
-            <p role="alert" data-testid="create-error" className="-mt-8 mb-10 text-xs text-red-600 max-w-xl">{createError}</p>
+            <p role="alert" data-testid="create-error" className="-mt-8 mb-10 text-sm text-red-600 max-w-xl">{createError}</p>
           )}
           {/* Pointer to /your-data */}
-          <p className="-mt-7 mb-10 text-[10px] text-gray-400">
+          <p className="-mt-7 mb-10 text-xs text-gray-400">
             Pedigrees are saved on this server.{" "}
             <Link to={YOUR_DATA_PATH} className="underline underline-offset-2 hover:text-gray-600">
               What is stored and who can read it
@@ -182,13 +182,13 @@ export default function LandingPage() {
 
           {/* Examples */}
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+            <p className="text-sm text-gray-400 uppercase tracking-wider mb-3">
               Start from an example
             </p>
             {EXAMPLE_GROUPS.map(group => (
               <div key={group} className="mb-4">
                 {group && (
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">{group}</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">{group}</p>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {EXAMPLES.map(ex => (ex.group ?? "") === group && (
@@ -198,10 +198,10 @@ export default function LandingPage() {
                       to={`/example/${ex.slug}`}
                       className="block text-left border rounded p-3 hover:bg-gray-50 transition-colors"
                     >
-                      <span className="block text-xs font-medium mb-0.5">{ex.label}</span>
-                      <span className="block text-[10px] text-gray-400">{ex.description}</span>
+                      <span className="block text-sm font-medium mb-0.5">{ex.label}</span>
+                      <span className="block text-xs text-gray-400">{ex.description}</span>
                       {ex.citation && (
-                        <span className="block text-[10px] text-gray-400 mt-0.5">{ex.citation}</span>
+                        <span className="block text-xs text-gray-400 mt-0.5">{ex.citation}</span>
                       )}
                     </Link>
                   ))}
@@ -212,13 +212,13 @@ export default function LandingPage() {
 
           {/* Guides (#202) */}
           <div className="mt-6" data-testid="guides">
-            <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+            <p className="text-sm text-gray-400 uppercase tracking-wider mb-3">
               Guides
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
               {GUIDES.map(g => (
                 <li key={g.slug}>
-                  <Link to={guidePath(g.slug)} className="text-xs text-black underline underline-offset-2">{g.title}</Link>
+                  <Link to={guidePath(g.slug)} className="text-sm text-black underline underline-offset-2">{g.title}</Link>
                 </li>
               ))}
             </ul>
@@ -227,7 +227,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t px-8 py-4 text-center text-xs text-gray-400">
+      <footer className="border-t px-8 py-4 text-center text-sm text-gray-400">
         <a
           href="https://github.com/SACGF/pededit"
           target="_blank"
@@ -272,10 +272,10 @@ function RecentOnThisDevice({ disabled, hiddenIds }: { disabled: boolean; hidden
 
   return (
     <div className="mb-10" data-testid="recent-on-this-device">
-      <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+      <p className="text-sm text-gray-400 uppercase tracking-wider mb-1">
         Recent on this device
       </p>
-      <p className="text-[10px] text-gray-400 mb-3">
+      <p className="text-xs text-gray-400 mb-3">
         Pedigrees opened in this browser. The list is stored here only, so it does not follow you to another device or browser.
       </p>
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
@@ -287,13 +287,13 @@ function RecentOnThisDevice({ disabled, hiddenIds }: { disabled: boolean; hidden
               disabled={disabled}
               title={`/p/${p.id}`}
             >
-              <span className="block text-xs font-medium truncate">{p.title || "Untitled pedigree"}</span>
-              <span className="block text-[10px] text-gray-400">
+              <span className="block text-sm font-medium truncate">{p.title || "Untitled pedigree"}</span>
+              <span className="block text-xs text-gray-400">
                 Opened {new Date(p.openedAt).toLocaleDateString()}
               </span>
             </button>
             <button
-              className="px-2 text-xs text-gray-400 hover:text-black rounded border hover:bg-gray-50 transition-colors"
+              className="px-2 text-sm text-gray-400 hover:text-black rounded border hover:bg-gray-50 transition-colors"
               onClick={() => forget(p.id)}
               aria-label={`Remove ${p.title || "Untitled pedigree"} from recent`}
               title="Remove from this list (the pedigree itself is not deleted)"
@@ -314,7 +314,7 @@ function MyPedigrees({ pedigrees }: { pedigrees: PedigreeMeta[] }) {
 
   return (
     <div className="mb-10" data-testid="your-pedigrees">
-      <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+      <p className="text-sm text-gray-400 uppercase tracking-wider mb-3">
         Your pedigrees
       </p>
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
@@ -324,8 +324,8 @@ function MyPedigrees({ pedigrees }: { pedigrees: PedigreeMeta[] }) {
               className="w-full text-left px-3 py-2 rounded border hover:bg-gray-50 transition-colors"
               onClick={() => navigate(`/p/${p.id}`)}
             >
-              <span className="block text-xs font-medium">{p.title}</span>
-              <span className="block text-[10px] text-gray-400">
+              <span className="block text-sm font-medium">{p.title}</span>
+              <span className="block text-xs text-gray-400">
                 {new Date(p.updated).toLocaleDateString()}
               </span>
             </button>

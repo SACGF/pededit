@@ -161,7 +161,7 @@ export function SymbolsGuide() {
         current edition. Where the 2022 revision changed a drawing, the 2008 form is shown beside it:
         PedEdit draws either (Settings, Notation).
       </P>
-      <nav className="mb-6 text-xs">
+      <nav className="mb-6 text-sm">
         <ul className="flex flex-wrap gap-x-4 gap-y-1">
           {SECTIONS.map(s => <li key={s.id}><a href={`#${s.id}`} className="underline underline-offset-2">{s.title}</a></li>)}
         </ul>
@@ -179,7 +179,7 @@ export function SymbolsGuide() {
                     <GuideFigure pedigree={e.figure} alt={`${e.name}: ${e.note}`} caption={e.figure2008 ? "NSGC 2022" : undefined} scale={e.scale ?? 1} />
                     {e.figure2008 && <GuideFigure pedigree={e.figure2008} alt={`${e.name}, NSGC 2008 form`} caption="NSGC 2008" scale={e.scale ?? 1} />}
                   </div>
-                  <p className="text-xs text-gray-600">{e.note}</p>
+                  <p className="text-sm text-gray-600">{e.note}</p>
                 </dd>
               </div>
             ))}

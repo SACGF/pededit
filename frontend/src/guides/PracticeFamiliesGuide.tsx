@@ -21,7 +21,7 @@ export function PracticeFamiliesGuide() {
         return (
           <section key={f.slug} id={f.slug}>
             <H2>{n + 1}. {f.label}</H2>
-            <p className="mb-3 text-xs text-gray-500">Practises: {f.teaches}</p>
+            <p className="mb-3 text-sm text-gray-500">Practises: {f.teaches}</p>
             {f.history.map((para, i) => <P key={i}>{para}</P>)}
             <details className="mt-4 border rounded px-4 py-3">
               <summary className="cursor-pointer text-black font-medium">The answer</summary>
@@ -30,7 +30,7 @@ export function PracticeFamiliesGuide() {
               <ul className="list-disc pl-5 space-y-1 mb-3">
                 {f.checks.map((c, i) => <li key={i}>{c}</li>)}
               </ul>
-              <p className="text-xs">
+              <p className="text-sm">
                 <AppLink to={`/example/${f.slug}`}>Open this answer in the editor</AppLink>. Nothing is saved until you
                 change it.
               </p>

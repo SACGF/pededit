@@ -35,7 +35,7 @@ export function GuidesIndexPage() {
         {GUIDES.map(g => (
           <li key={g.slug}>
             <Link to={guidePath(g.slug)} className="font-medium text-black underline underline-offset-2">{g.title}</Link>
-            <p className="text-xs text-gray-600 mt-0.5">{g.description}</p>
+            <p className="text-sm text-gray-600 mt-0.5">{g.description}</p>
           </li>
         ))}
       </ul>

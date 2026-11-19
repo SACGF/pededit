@@ -32,7 +32,7 @@ export function GuideFigure({ pedigree, alt, caption, scale = 1 }: {
         height={Math.round(img.height * scale)}
         className="max-w-full h-auto"
       />
-      {caption && <figcaption className="mt-1 text-xs text-gray-500">{caption}</figcaption>}
+      {caption && <figcaption className="mt-1 text-sm text-gray-500">{caption}</figcaption>}
     </figure>
   );
 }

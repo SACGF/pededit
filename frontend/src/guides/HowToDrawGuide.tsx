@@ -56,7 +56,7 @@ export const HOW_TO_FIGURES: Pedigree[] = ([1, 2, 3, 4, 5] as const).map(stage);
 
 /** What to do in PedEdit at a step. */
 function InPedEdit({ children }: { children: ReactNode }) {
-  return <p className="mb-3 text-xs text-gray-600 border-l-2 border-gray-200 pl-3"><span className="font-medium text-gray-800">In PedEdit:</span> {children}</p>;
+  return <p className="mb-3 text-sm text-gray-600 border-l-2 border-gray-200 pl-3"><span className="font-medium text-gray-800">In PedEdit:</span> {children}</p>;
 }
 
 export function HowToDrawGuide() {

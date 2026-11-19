@@ -45,12 +45,12 @@ export default function YourDataPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <header className="border-b px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
-        <Link to="/" className="text-base font-medium tracking-tight">PedEdit</Link>
+        <Link to="/" className="text-lg font-medium tracking-tight">PedEdit</Link>
       </header>
       <main className="flex-1 px-4 sm:px-8 py-10">
         <div className="w-full max-w-3xl mx-auto">
           <YourData />
-          <p className="mt-10 text-xs">
+          <p className="mt-10 text-sm">
             <Link to="/" className="font-medium text-black underline underline-offset-2">Open PedEdit</Link>
           </p>
         </div>
@@ -186,8 +186,8 @@ function YourData() {
 
   return (
     <section data-testid="your-data">
-      <h1 className="text-xl font-medium tracking-tight text-black mb-6">{YOUR_DATA_TITLE}</h1>
-      <dl className="max-w-2xl grid grid-cols-1 sm:grid-cols-[9rem_1fr] gap-x-6 gap-y-1 sm:gap-y-3 text-xs leading-relaxed">
+      <h1 className="text-2xl font-medium tracking-tight text-black mb-6">{YOUR_DATA_TITLE}</h1>
+      <dl className="max-w-2xl grid grid-cols-1 sm:grid-cols-[9rem_1fr] gap-x-6 gap-y-1 sm:gap-y-3 text-sm leading-relaxed">
         {rows.map(({ term, text }) => (
           <div key={term} className="contents">
             <dt className="font-medium text-black mt-3 sm:mt-0">{term}</dt>
