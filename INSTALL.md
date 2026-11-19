@@ -338,7 +338,7 @@ If the first answers 301, set `"https": false`, restart, and look at what reache
 HSTS tells a browser to refuse plain HTTP for the site for `max-age` seconds, and there is no taking it back for a browser that has seen it. It starts at one hour. Once the site has run clean for a few days, raise it to a day and then a year, in both places:
 
 - `"hsts_seconds": 86400` (later `31536000`) in `/etc/pededit/pededit.json`, for `/api/` and `/admin/`.
-- `max-age=` in the three `add_header Strict-Transport-Security` lines of `/etc/nginx/sites-available/pededit`, for the frontend and `/djstatic/`.
+- `max-age=` in the five `add_header Strict-Transport-Security` lines of `/etc/nginx/sites-available/pededit`, for the frontend and `/djstatic/`.
 
 The header includes subdomains. If a subdomain of yours is still served over plain HTTP, set `"hsts_include_subdomains": false` and drop `; includeSubDomains` from the Nginx lines. Preload is not set and should stay a decision you make by hand: it takes months to undo.
 
