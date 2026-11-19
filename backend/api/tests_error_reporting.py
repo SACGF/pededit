@@ -362,3 +362,16 @@ class ErrorReportingOffTests(APITestCase):
             [sys.executable, "-c", code], cwd=Path(settings.BASE_DIR), capture_output=True, text=True
         )
         self.assertEqual(result.returncode, 0, result.stderr)
+
+
+class TokenShapeTests(APITestCase):
+    def test_accepts_32_and_96_character_tokens_and_nothing_else(self):
+        import rollbar
+
+        self.addCleanup(lambda: rollbar.events.remove_payload_handler(scrub_payload))
+        self.assertTrue(init_error_reporting(FAKE_TOKEN, handler="blocking"))
+        self.assertTrue(init_error_reporting(FAKE_TOKEN * 3, handler="blocking"))
+        with self.assertLogs("peded.error_reporting", "WARNING"):
+            self.assertFalse(init_error_reporting(FAKE_TOKEN[1:], handler="blocking"))
+        with self.assertLogs("peded.error_reporting", "WARNING"):
+            self.assertFalse(init_error_reporting(FAKE_TOKEN.upper(), handler="blocking"))

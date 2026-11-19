@@ -23,9 +23,12 @@ export interface ReporterConfig {
   environment: string;
 }
 
-/** Rollbar access tokens are 32 hex characters. Anything else is a config mistake and sends nothing. */
+/**
+ * Rollbar access tokens are lowercase hex: 32 characters in older projects, 96 in projects made
+ * in 2026. Anything else is a config mistake and sends nothing.
+ */
 export function isAccessToken(token: string): boolean {
-  return /^[0-9a-f]{32}$/.test(token);
+  return /^[0-9a-f]{32,}$/.test(token);
 }
 
 export function itemBody(accessToken: string, report: Report): string {

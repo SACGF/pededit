@@ -209,6 +209,8 @@ describe("reporter", () => {
 
   it("accepts only something shaped like a Rollbar token", () => {
     expect(isAccessToken(TOKEN_OK)).toBe(true);
+    expect(isAccessToken(TOKEN_OK.repeat(3))).toBe(true);
+    expect(isAccessToken(TOKEN_OK.slice(1))).toBe(false);
     expect(isAccessToken("")).toBe(false);
     expect(isAccessToken("https://publickey@o1.ingest.errors.invalid/42")).toBe(false);
     expect(isAccessToken(TOKEN_OK.toUpperCase())).toBe(false);

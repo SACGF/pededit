@@ -48,7 +48,8 @@ _DATE = re.compile(r"\b\d{1,4}[-/.]\d{1,2}([-/.]\d{1,4})?\b")
 _LONG_NUMBER = re.compile(r"\d{4,}")
 _QUOTES = "\"'`‘’“”"
 _IDENTIFIER = re.compile(r"^[A-Za-z_][\w.]{0,99}$")
-_TOKEN_SHAPE = re.compile(r"^[0-9a-f]{32}$")
+# 32 hex characters in older Rollbar projects, 96 in projects made in 2026.
+_TOKEN_SHAPE = re.compile(r"^[0-9a-f]{32,}$")
 
 
 def scrub_text(text) -> str:
@@ -260,7 +261,7 @@ def init_error_reporting(access_token, environment="production", code_version=No
     if not _TOKEN_SHAPE.match(access_token):
         # A typo in the site config must not stop the site from starting.
         logging.getLogger(__name__).warning(
-            "rollbar_access_token is not a Rollbar access token (32 hex characters), error reporting is off"
+            "rollbar_access_token is not a Rollbar access token (32 or more hex characters), error reporting is off"
         )
         return False
 
