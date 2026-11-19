@@ -11,19 +11,33 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "../utils/recentPedigrees";
 import { requestErrorMessage } from "../api/errors";
 import { YOUR_DATA_PATH } from "./YourDataPage";
+import type { PedigreeMeta } from "../api/client";
 
 export default function LandingPage() {
-  const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout } = useAppStore();
+  const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout, pedigrees, loadPedigrees } = useAppStore();
   const navigate = useNavigate();
   const [importOpen, setImportOpen] = useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  // Signed in, the account's pedigrees are listed first and left out of
+  // Recent on this device, so both lists wait for them: a failed fetch shows
+  // Recent in full and no account list.
+  const [ownedLoaded, setOwnedLoaded] = useState(false);
+  const [ownedFailed, setOwnedFailed] = useState(false);
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    loadPedigrees()
+      .catch(() => setOwnedFailed(true))
+      .finally(() => setOwnedLoaded(true));
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  const listsReady = !isAuthenticated || ownedLoaded;
+  const owned = isAuthenticated && !ownedFailed ? pedigrees : [];
   // Why the last create or import failed: the rate limit's wait, or a plain failure.
   const [createError, setCreateError] = useState<string | null>(null);
 
   // Populate user state after a page reload. fetchMe will trigger the token
   // refresh interceptor if the access token is expired, so this also warms up
-  // the auth state before MyPedigrees fires loadPedigrees.
+  // the auth state before loadPedigrees runs.
   useEffect(() => {
     if (isAuthenticated && !user) {
       fetchMe().catch(() => { /* interceptor handles auth failures */ });
@@ -154,9 +168,17 @@ export default function LandingPage() {
             </Link>
           </p>
 
+          {listsReady && <MyPedigrees pedigrees={owned} />}
+
           {/* Recent on this device: per browser, no account needed */}
           {/* Keyed on sign-in so Delete account's forgotten pedigrees leave the list. */}
-          <RecentOnThisDevice key={String(isAuthenticated)} disabled={loading !== null} />
+          {listsReady && (
+            <RecentOnThisDevice
+              key={String(isAuthenticated)}
+              disabled={loading !== null}
+              hiddenIds={new Set(owned.map(p => p.id))}
+            />
+          )}
 
           {/* Examples */}
           <div>
@@ -201,9 +223,6 @@ export default function LandingPage() {
               ))}
             </ul>
           </div>
-
-          {/* My pedigrees (authenticated) */}
-          {isAuthenticated && <MyPedigrees />}
         </div>
       </main>
 
@@ -238,9 +257,11 @@ export default function LandingPage() {
   );
 }
 
-function RecentOnThisDevice({ disabled }: { disabled: boolean }) {
+/** hiddenIds: pedigrees listed under Your pedigrees, left out here. */
+function RecentOnThisDevice({ disabled, hiddenIds }: { disabled: boolean; hiddenIds: Set<string> }) {
   const navigate = useNavigate();
-  const [recent, setRecent] = useState<RecentPedigree[]>(() => listRecentPedigrees());
+  const [stored, setRecent] = useState<RecentPedigree[]>(() => listRecentPedigrees());
+  const recent = stored.filter(p => !hiddenIds.has(p.id));
 
   if (!recent.length) return null;
 
@@ -286,19 +307,13 @@ function RecentOnThisDevice({ disabled }: { disabled: boolean }) {
   );
 }
 
-function MyPedigrees() {
-  const { pedigrees, loadPedigrees } = useAppStore();
+function MyPedigrees({ pedigrees }: { pedigrees: PedigreeMeta[] }) {
   const navigate = useNavigate();
-  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    loadPedigrees().then(() => setLoaded(true));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!loaded || !pedigrees.length) return null;
+  if (!pedigrees.length) return null;
 
   return (
-    <div className="mt-10">
+    <div className="mb-10" data-testid="your-pedigrees">
       <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">
         Your pedigrees
       </p>

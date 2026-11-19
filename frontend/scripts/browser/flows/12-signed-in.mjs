@@ -25,12 +25,13 @@ export default {
 
     await t.newTab();
     await t.open("/");
-    // It is also under "Recent on this device", whose buttons carry the link as their title.
+    // "Recent on this device" buttons carry the link as their title; signed in it leaves out the account's own (#210).
     const mine = `button:has-text("${name}"):not([title^="/p/"])`;
     await t.waitFor(mine);
     t.match(await t.text("body"), /Your pedigrees/i, "the home page has a Your pedigrees list");
     t.equal(await t.count(mine), 1, "with the pedigree under its new name");
-    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${id}"]`), 1, "and it is under Recent on this device too");
+    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${id}"]`), 0, "and not under Recent on this device, which leaves out the account's own");
+    t.ok(await t.eval(id => JSON.parse(localStorage.getItem("recentPedigrees") ?? "[]").some(p => p.id === id), id), "though this browser still keeps it in its recent list");
     await t.click(mine);
     await t.waitFor('button[title="Add male"]');
     t.equal(new URL(t.page.url()).pathname, `/p/${id}`, "which opens it");
@@ -56,8 +57,9 @@ export default {
     const mineNow = (await (await api("/api/pedigrees/")).json()).filter(p => p.id === copy).map(p => p.title);
     t.equal(mineNow, ["Simple family"], "an edited example is saved as a copy that belongs to the signed-in user");
 
-    // Signing out takes the account's pedigrees off Recent on this device
-    // (their links no longer open) and leaves the others (#187).
+    // Signed in, Recent on this device lists only what the account does not
+    // own, under Your pedigrees (#210). Signing out takes the account's
+    // pedigrees off it (their links no longer open) and leaves the others (#187).
     const other = "00000000-0000-4000-8000-000000000187";
     await t.eval(other => {
       const list = JSON.parse(localStorage.getItem("recentPedigrees") ?? "[]");
@@ -65,14 +67,21 @@ export default {
     }, other);
     await t.open("/");
     const recent = pid => t.count(`[data-testid="recent-on-this-device"] button[title="/p/${pid}"]`);
-    await t.waitFor(`[data-testid="recent-on-this-device"] button[title="/p/${copy}"]`);
-    t.equal([await recent(copy), await recent(other)], [1, 1], "the owned copy and another pedigree are under Recent on this device");
+    const stored = pid => t.eval(pid => JSON.parse(localStorage.getItem("recentPedigrees") ?? "[]").some(p => p.id === pid), pid);
+    await t.waitFor(`[data-testid="recent-on-this-device"] button[title="/p/${other}"]`);
+    t.equal([await recent(copy), await recent(other)], [0, 1], "signed in, Recent on this device lists the other pedigree and not the owned copy");
+    t.ok(await t.eval(() => {
+      const mineList = document.querySelector('[data-testid="your-pedigrees"]');
+      const recentList = document.querySelector('[data-testid="recent-on-this-device"]');
+      return !!mineList && !!recentList && !!(mineList.compareDocumentPosition(recentList) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }), "Your pedigrees is above Recent on this device");
     await t.click('button:text-is("Sign out")');
     await t.sleep(800);
     t.ok(!(await t.eval(() => localStorage.getItem("access_token"))), "Sign out signs out");
     await t.open("/");
     await t.sleep(300);
-    t.equal([await recent(copy), await recent(other)], [0, 1], "signing out takes the account's pedigree off Recent and keeps the other");
+    t.equal([await recent(copy), await recent(other)], [0, 1], "signed out, Recent on this device still lists the other and not the account's pedigree");
+    t.equal([await stored(copy), await stored(other)], [false, true], "signing out takes the account's pedigree off this browser's recent list and keeps the other");
     await api(`/api/pedigrees/${copy}/`, { method: "DELETE" });
   },
 };

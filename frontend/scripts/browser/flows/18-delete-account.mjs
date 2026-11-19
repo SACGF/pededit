@@ -27,11 +27,13 @@ export default {
     const pedigreesLine = `${nPedigrees} pedigree${nPedigrees === 1 ? "" : "s"} you created while signed in`;
     const libraryLine = `${nLibrary} ${nLibrary === 1 ? "entry" : "entries"} in My library`;
 
-    // Opened once, so it is under Recent on this device.
+    // Opened once, so this browser keeps it in its recent list (shown under
+    // Your pedigrees while signed in, #210).
     await t.open(`/p/${owned.id}`);
     await t.waitFor('button[title="Add male"]');
     await t.open("/");
-    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${owned.id}"]`), 1, "the owned pedigree is under Recent");
+    const stored = () => t.eval(id => JSON.parse(localStorage.getItem("recentPedigrees") ?? "[]").some(p => p.id === id), owned.id);
+    t.ok(await stored(), "the owned pedigree is in this browser's recent list");
 
     await t.click('button:text-is("Delete account")');
     await t.waitFor(`[data-testid="delete-account-dialog"] >> text=${pedigreesLine}`);
@@ -47,7 +49,8 @@ export default {
     await t.click('button:text-is("Delete account permanently")');
     await t.waitFor('button:text-is("Sign in") >> nth=0');
     t.equal(await t.eval(() => [localStorage.getItem("access_token"), localStorage.getItem("refresh_token")]), [null, null], "the page is signed out");
-    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${owned.id}"]`), 0, "the deleted pedigree leaves Recent on this device");
+    t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${owned.id}"]`), 0, "the deleted pedigree is not under Recent on this device");
+    t.ok(!(await stored()), "and leaves this browser's recent list");
 
     t.equal((await fetch(new URL("/api/auth/me/", t.base), { headers: auth })).status, 401, "the old token no longer works");
     const refreshed = await fetch(new URL("/api/auth/token/refresh/", t.base), {
