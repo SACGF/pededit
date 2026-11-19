@@ -40,8 +40,11 @@ const ISSUES_URL = "https://github.com/SACGF/pededit/issues";
  */
 const REPO_URL = "https://github.com/SACGF/pededit";
 
-/** Shown on small screens until dismissed: viewing works by touch, editing is built for a mouse and keyboard. */
-const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom, tap a person to select them. Editing is easier on a computer.";
+/**
+ * Shown on small screens until dismissed: viewing works by touch, editing is built for a mouse and keyboard.
+ * Selecting someone leaves the side panel shut, so it says where their details are.
+ */
+const SMALL_SCREEN_NOTICE = "Drag to move around, pinch to zoom. Tap a person, then Person below to edit them or \u22ef for more. Editing is easier on a computer.";
 const SMALL_SCREEN_NOTICE_KEY = "smallScreenNoticeDismissed";
 
 /**

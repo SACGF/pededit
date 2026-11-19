@@ -184,7 +184,10 @@ reporting is off, and the dev server never reports.
   the canvas" for touch under `pointer-coarse:` (multi-select has no touch
   gesture and the help says so),
   leaves out the minimap and shows a dismissible line saying how to move
-  around and that editing is easier on a computer (localStorage
+  around, that a selected person is edited from the Person tab or the pill's
+  "⋯" (long press opens the more menu only where the browser fires
+  `contextmenu` on it, Android Chrome but not iOS Safari), and that editing
+  is easier on a computer (localStorage
   `smallScreenNoticeDismissed`). It is all `lg:` / `max-lg:` classes plus
   `hooks/useSmallScreen.ts` for what CSS cannot do, and nothing changes from
   `lg` up: check desktop screenshots are identical after touching it. The
