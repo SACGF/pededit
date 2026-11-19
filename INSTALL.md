@@ -410,7 +410,9 @@ Off by default. With no Rollbar token in the site config nothing is loaded and n
 
 To turn it on:
 
-1. Create a Rollbar project (one project takes both the Django and the browser reports). Under Project Settings > Project Access Tokens it has a `post_server_item` token and a `post_client_item` token.
+1. Create a Rollbar project (one project takes both the Django and the browser reports). When it asks you to select SDKs, pick Django (or skip) and ignore the install instructions that follow: PedEdit has its own reporting code, and Rollbar's browser snippet (`rollbar.js`) must not be added, since by default it collects page URLs, console output and page text. Then under Project Settings > Project Access Tokens create two tokens, each with one scope and no `read` or `write`:
+   - `post_server_item`, for Django;
+   - `post_client_item`, for the browser. It ends up in the public JavaScript, so anyone can copy it: give it a rate limit (a few hundred items an hour) so it cannot use up the project's quota.
 2. Add them to `/etc/pededit/pededit.json`:
 
    ```json
