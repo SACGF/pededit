@@ -492,17 +492,64 @@ Each run writes `/var/backups/pededit/pededit-db-<UTC time>.dump` (`pg_dump` cus
 
 Until you do this, every run ends with a `LOCAL ONLY` warning, and it means it: a backup on the same disk as the database is lost with the server.
 
-```bash
-sudo cp /opt/pededit/deploy/backup.env.example /etc/pededit/backup.env
-sudo chown root:pededit /etc/pededit/backup.env
-sudo chmod 640 /etc/pededit/backup.env
-sudo nano /etc/pededit/backup.env
-```
-
-Set one or both of:
+The settings go in `/etc/pededit/backup.env`, owned `root:pededit` with mode 640 (the script refuses a file others can read, since it is sourced as shell). `deploy/backup.env.example` lists every option with its default; write only the lines you use rather than copying the example and uncommenting, which is how its `backup.example.org` placeholder ends up in a real run. Set one or both of:
 
 - `BACKUP_RCLONE_DEST` for object storage (S3, Backblaze B2 and others): `sudo apt install rclone`, create a bucket and a key that can only write to it, run `sudo RCLONE_CONFIG=/etc/pededit/rclone.conf rclone config`, then `sudo chown root:pededit /etc/pededit/rclone.conf && sudo chmod 640 /etc/pededit/rclone.conf` and set `RCLONE_CONFIG` in `backup.env` as the example shows.
-- `BACKUP_RSYNC_DEST` for a second host over ssh. Make a key for it (`sudo ssh-keygen -t ed25519 -N '' -f /etc/pededit/backup_ssh_key`, then `sudo chown pededit /etc/pededit/backup_ssh_key`), add the `.pub` to the backup account on the other host, and record that host's key: `sudo -u pededit mkdir -p -m 700 ~pededit/.ssh && ssh-keyscan backup.example.org | sudo -u pededit tee -a ~pededit/.ssh/known_hosts`.
+- `BACKUP_RSYNC_DEST` and `BACKUP_RSYNC_SSH_KEY` for a second host over ssh, set up as below. Without `BACKUP_RSYNC_SSH_KEY` ssh looks for `~pededit/.ssh/id_*`, finds nothing, and the run fails with `Permission denied (publickey)` even though the key works when tried by hand with `-i`.
+
+#### A second host over ssh, with a write-only account
+
+The account on the other host can only run rsync, only into one directory, and only to write: it cannot read the backups back, get a shell or forward ports, so a stolen server key gives nothing beyond what the server already has. `rrsync` (shipped with rsync) enforces this. In the commands below `BACKUP_HOST_IP` is the other host's address and `PEDEDIT_IP` is this server's public address (`curl -4 -s ifconfig.me` on it). Use addresses, not DNS names, for any host behind Cloudflare (pededit.com is): Cloudflare forwards only web traffic, so ssh to the name goes nowhere and `ssh-keyscan` prints nothing.
+
+On this server, make the key:
+
+```bash
+sudo apt install rsync
+sudo ssh-keygen -t ed25519 -N '' -C 'pededit backup' -f /etc/pededit/backup_ssh_key
+sudo chown pededit /etc/pededit/backup_ssh_key
+sudo cat /etc/pededit/backup_ssh_key.pub       # the whole line goes in authorized_keys below
+```
+
+On the backup host (the directory here is an example; put it where you like):
+
+```bash
+sudo apt install rsync
+which rrsync      # Ubuntu 22.04+: /usr/bin/rrsync
+sudo adduser --system --group --disabled-password --shell /bin/sh --home /home/pededit-backup pededit-backup
+sudo install -d -o pededit-backup -g pededit-backup -m 700 /data/backup/pededit
+namei -l /data/backup/pededit          # every parent needs x for others, or the account cannot reach it
+sudo install -d -o root -g root -m 755 /home/pededit-backup/.ssh
+sudo nano /home/pededit-backup/.ssh/authorized_keys
+sudo chown root:root /home/pededit-backup/.ssh/authorized_keys
+sudo chmod 644 /home/pededit-backup/.ssh/authorized_keys
+```
+
+`authorized_keys` is one line, with the real key from `backup_ssh_key.pub` in place of the `ssh-ed25519 ...` part:
+
+```
+from="PEDEDIT_IP",restrict,command="/usr/bin/rrsync -wo /data/backup/pededit" ssh-ed25519 AAAAC3Nza... pededit backup
+```
+
+Root owns `.ssh` so the account cannot loosen its own restrictions. The shell must be a real one, because sshd runs the forced command through it; the account has no password (`!` in `/etc/shadow`), which Ubuntu's sshd accepts for key logins. `sudo ssh-keygen -lf /home/pededit-backup/.ssh/authorized_keys` must print the same fingerprint as `ssh-keygen -lf /etc/pededit/backup_ssh_key.pub` here. Optionally add `/etc/ssh/sshd_config.d/pededit-backup.conf` with `Match User pededit-backup` and `PasswordAuthentication no`, `KbdInteractiveAuthentication no`, `AllowTcpForwarding no`, `X11Forwarding no`, `PermitTTY no`, then `sudo sshd -t && sudo systemctl reload ssh`.
+
+Back on this server, record the host's key (the service sees the home directory as read-only, so this has to be done beforehand) and compare its fingerprint with `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` on the backup host:
+
+```bash
+sudo -u pededit mkdir -p -m 700 ~pededit/.ssh
+ssh-keyscan -t ed25519 BACKUP_HOST_IP | sudo -u pededit tee -a ~pededit/.ssh/known_hosts
+ssh-keygen -lf ~pededit/.ssh/known_hosts
+```
+
+If ssh there is not on port 22, add a `Host BACKUP_HOST_IP` / `Port N` entry to `~pededit/.ssh/config`; the script has no port setting. Then in `backup.env`:
+
+```
+BACKUP_RSYNC_DEST=pededit-backup@BACKUP_HOST_IP:.
+BACKUP_RSYNC_SSH_KEY=/etc/pededit/backup_ssh_key
+```
+
+The `.` is the directory named in `authorized_keys`: rrsync reads every path as relative to it. To check the lock, both of these should be refused: `sudo -u pededit ssh -i /etc/pededit/backup_ssh_key pededit-backup@BACKUP_HOST_IP` (no shell) and `sudo -u pededit rsync -e "ssh -i /etc/pededit/backup_ssh_key" pededit-backup@BACKUP_HOST_IP:. /tmp/x` (no reading). If the backup host is itself snapshotted or backed up, leave this directory out or keep nothing there longer than `BACKUP_MAX_AGE_DAYS`.
+
+#### Mirroring, encryption and checking it worked
 
 Both mirror the kept dumps, so the copies follow the same retention as the server. Only files named `pededit-*.dump*` are touched at the destination, and a mirror that would delete more than 10 of them there stops instead (a sign the local set has gone missing). For protection against a compromised server deleting its own backups, turn on versioning or object lock on the bucket; then the bucket's own expiry rule decides how long a deleted pedigree stays in it, and it must be no longer than `BACKUP_MAX_AGE_DAYS`, since the site tells users that number.
 
@@ -517,7 +564,7 @@ gpg --armor --export "PedEdit backups" > backup-public-key.asc
 
 Set `BACKUP_GPG_PUBLIC_KEY=/etc/pededit/backup-public-key.asc`. From then on only `.dump.gpg` files leave the server. The dumps on the server itself stay unencrypted: the live database sits beside them, and the restore test reads them. Without the private key the copies cannot be read by anyone, you included, so keep it (and its passphrase) somewhere that survives losing both the server and your laptop.
 
-Then run it and look: `sudo systemctl start pededit-backup; sudo journalctl -u pededit-backup -n 20` should end with an `off-box: mirrored to ...` line and no `LOCAL ONLY` warning. Check the files really are at the destination.
+Then run it and look: `sudo systemctl start pededit-backup; sudo journalctl -u pededit-backup -n 20 -o cat` should end with `off-box: mirrored to ... (encrypted with /etc/pededit/backup-public-key.asc)` and `backup finished`, with no `LOCAL ONLY` warning. If it says `unencrypted`, `BACKUP_GPG_PUBLIC_KEY` is not set: stop before more copies leave the server. Check the files really are at the destination, as `pededit-*.dump.gpg` only.
 
 **Being told when backups stop.** Nobody reads `systemctl status` on a server that is working. Set `BACKUP_PING_URL` to a dead man's switch (healthchecks.io or similar) with a period of one day: the script fetches it after each successful nightly run, and the service emails you when the ping is late, whether the backup failed or the timer never fired.
 
@@ -538,7 +585,7 @@ A backup nobody has restored is a hope. This restores the newest dump into a scr
 sudo bash /opt/pededit/deploy/restore-test.sh
 ```
 
-It ends with `RESTORE TEST PASSED` or `RESTORE TEST FAILED` and the reason, including when the newest dump is more than two days old. Run it when you set backups up and every few months after. To test an off-box copy, which is the one that matters when the server is gone, fetch it, decrypt it on the machine that holds the private key (`gpg --output x.dump --decrypt pededit-db-....dump.gpg`), and give the script the file: `sudo bash deploy/restore-test.sh /path/to/x.dump`.
+It ends with `RESTORE TEST PASSED` or `RESTORE TEST FAILED` and the reason, including when the newest dump is more than two days old. Run it when you set backups up and every few months after. To test an off-box copy, which is the one that matters when the server is gone, fetch it with your own login on the backup host (the write-only account cannot read it back, and its files are mode 600, so `sudo cp` it somewhere and `chown` it to yourself first), decrypt it on the machine that holds the private key (`gpg --output x.dump --decrypt pededit-db-....dump.gpg`; the result is binary and starts with `PGDMP`), copy it to the server and give the script the file: `sudo bash /opt/pededit/deploy/restore-test.sh /tmp/x.dump`. Delete the decrypted copies afterwards.
 
 ### Restore for real
 
@@ -567,7 +614,13 @@ On a new server, after losing the old one: follow this guide from step 1 to step
 
 ## Troubleshooting
 
-**`pededit-backup` failed.** `sudo journalctl -u pededit-backup -n 30` has a `BACKUP FAILED` line with the reason. A `pg_dump` "permission denied for table" means a table in the database belongs to another role (made by hand as `postgres`, say): give it to the app's role with `ALTER TABLE ... OWNER TO pededit`, or drop it. A failed off-box copy leaves the local dump in place and fails the run. `status=226/NAMESPACE` means `/var/backups/pededit` does not exist.
+**`pededit-backup` failed.** `sudo journalctl -u pededit-backup -n 30` has a `BACKUP FAILED` line with the reason. A `pg_dump` "permission denied for table" means a table in the database belongs to another role (made by hand as `postgres`, say): give it to the app's role with `ALTER TABLE ... OWNER TO pededit`, or drop it. A failed off-box copy leaves the local dump in place and fails the run. `status=226/NAMESPACE` means `/var/backups/pededit` does not exist. `journalctl -u pededit-backup -o cat` leaves out systemd's `░░` lines.
+
+- `backup.env has mode 644`: `sudo chown root:pededit /etc/pededit/backup.env && sudo chmod 640 /etc/pededit/backup.env`.
+- `cannot read BACKUP_GPG_PUBLIC_KEY`: the file is missing or not `root:pededit` 640.
+- `Could not resolve hostname backup.example.org`: `backup.env` still has the example's placeholder.
+- `Permission denied (publickey)` from rsync: first check `BACKUP_RSYNC_SSH_KEY` is set (`grep -v -E '^\s*(#|$)' /etc/pededit/backup.env`). Then try by hand: `sudo -u pededit ssh -v -i /etc/pededit/backup_ssh_key pededit-backup@BACKUP_HOST_IP 2>&1 | grep -E "Offering|accepts"`. `Server accepts key` means the key is fine and the backup is not using it. No `accepts` means the backup host refuses it: compare the fingerprints, check `authorized_keys` is one line holding the real key (`sudo cat -A`, not a placeholder), and that the home directory and `.ssh` are not group or world writable. sshd logs the reason only at a higher level: add `LogLevel DEBUG1` under the `Match User` block, reload, try again, read `sudo journalctl -u ssh`, and take it out again.
+- `ssh-keyscan` prints nothing: the host is not reachable on port 22 under that name (`nc -zv -w5 HOST 22`). Behind Cloudflare, use its IP.
 
 **`deploy.sh` says the health check did not return 200.** With no "last answer" line, Gunicorn failed to start. With one, the answer names the failing check: `"database": "unavailable"` or `"disk": "low"` (free some space, `df -h`). `sudo journalctl -u pededit -e` has the detail; `curl -s http://127.0.0.1:8000/api/health/` repeats the check.
 
