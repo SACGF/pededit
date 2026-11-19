@@ -103,7 +103,8 @@ All config files referenced below live in the `deploy/` directory:
 deploy/
 ├── pededit.json.example   # App config → /etc/pededit/pededit.json
 ├── pededit.service         # systemd unit → /etc/systemd/system/pededit.service
-└── pededit-nginx.conf      # Nginx vhost → /etc/nginx/sites-available/pededit
+├── pededit-nginx.conf      # Nginx vhost → /etc/nginx/sites-available/pededit
+└── pededit-nginx-catchall.conf  # drops other Host names → /etc/nginx/sites-available/catchall
 ```
 
 Database backups (step 13) add `backup.sh`, `restore-test.sh`, `pededit-backup.service`, `pededit-backup.timer` and `backup.env.example` from the same directory.
@@ -303,6 +304,16 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 ```
+
+Once `server_name` is your domain, add the catch-all, which closes the connection for any other Host (scanners trying the server's IP address), so they never reach Django and never show up in error reporting as `DisallowedHost`:
+
+```bash
+sudo cp /opt/pededit/deploy/pededit-nginx-catchall.conf /etc/nginx/sites-available/catchall
+sudo ln -sf /etc/nginx/sites-available/catchall /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Every name the site answers to (`pededit.com` and `www.pededit.com`, say) must then be in the pededit vhost's `server_name`: any other is dropped. Skip this step while `server_name` is an IP address. It needs Nginx 1.19.4 or later (`ssl_reject_handshake`).
 
 At this point you should be able to visit `http://your-domain.example.com` and see the app.
 

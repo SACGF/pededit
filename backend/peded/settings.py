@@ -112,6 +112,10 @@ LOGGING = {
     "loggers": {
         "django": {"level": "INFO"},
         "django.server": {"handlers": ["django.server"], "level": "INFO", "propagate": False},
+        # A request whose Host is not in ALLOWED_HOSTS is a scanner trying the
+        # server's address or a made-up name, not a bug: Django answers 400 and
+        # logs it at ERROR. Kept on the console, out of error reporting.
+        "django.security.DisallowedHost": {"handlers": ["console"], "propagate": False},
     },
 }
 

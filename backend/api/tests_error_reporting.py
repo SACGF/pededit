@@ -234,6 +234,12 @@ class ErrorReportScrubbingTests(APITestCase):
         logging.getLogger("rollbar").error("Exception while posting item %r", NAME)
         self.assertEqual(self.posted, [])
 
+    def test_a_disallowed_host_is_not_reported(self):
+        # Not assertLogs: it stops the logger propagating, which is what is tested.
+        with mock.patch.dict(self.client.defaults, {"HTTP_HOST": "203.0.113.50"}):
+            self.assertEqual(self._request("GET", "/api/health/"), 400)
+        self.assertEqual(self.posted, [])
+
     def test_a_chained_exception(self):
         def failing(self_, instance, validated_data):
             try:

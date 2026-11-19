@@ -54,6 +54,12 @@ Deployment" half).
   prerendered guides (`/guides/<slug>` from `dist/guides/<slug>.html`);
   without it they still work, as the app, but crawlers get the landing page
   HTML. Merge that by hand too.
+- `pededit-nginx-catchall.conf` is the `default_server` for 80 and 443 and
+  closes the connection (444, a refused TLS handshake) for any Host that is
+  not in the pededit vhost's `server_name`, so scanners using the IP address
+  never reach Django. A name served but missing from `server_name` is
+  dropped by it. Django keeps `DisallowedHost` out of error reporting too
+  (`LOGGING` in `settings.py`), for a box without the catch-all.
 - `pededit.json.example` — template for the config file.
 - `/your-data` tells users what the server keeps (#178, #203,
   `frontend/src/pages/YourDataPage.tsx`): request logs with the time, the
