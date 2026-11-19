@@ -10,6 +10,8 @@ import type { DeidentifyKeep } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { chartTitle } from "../pedigree/labels";
 import { clinicalDetailLines } from "../pedigree/clinicalDetails";
+import { usePedigreeStore } from "../store/usePedigreeStore";
+import { selectionLabel, selectionPedigree, selectionSubset } from "../pedigree/selectionSubset";
 
 interface ExportDialogProps {
   open: boolean;
@@ -30,7 +32,7 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompact = false }: ExportDialogProps) {
+export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defaultCompact = false }: ExportDialogProps) {
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
@@ -45,12 +47,30 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
 
   const [uPartners, setUPartners]   = useState(true);
   const [compact, setCompact]       = useState(defaultCompact);
+  const [onlySelected, setOnlySelected] = useState(false);
 
   // Follow the canvas setting each time the dialog opens.
   useEffect(() => {
     if (open) setCompact(defaultCompact);
     if (open) setError(null);
+    // An ordinary export draws everyone, whatever was ticked last time.
+    if (open) setOnlySelected(false);
   }, [open, defaultCompact]);
+
+  // The people selected on the canvas: with two or more, the figure can be of them alone.
+  const selectedIds = usePedigreeStore(s => s.selectedIds);
+  // A figure of the selected people alone, with whoever joins them into one chart.
+  const subset = useMemo(
+    () => (open && selectedIds.length >= 2 ? selectionSubset(whole, selectedIds) : null),
+    [open, whole, selectedIds],
+  );
+  const subsetOffered = !!subset && subset.selected.length >= 2;
+  const useSubset = onlySelected && subsetOffered && subset.joined;
+  // What the figure is drawn from. The title still comes from the whole pedigree's name.
+  const pedigree = useMemo(
+    () => (useSubset && subset ? selectionPedigree(whole, subset) : whole),
+    [useSubset, subset, whole],
+  );
 
   // The U shape is a descendant chart of one founder couple. With nobody to
   // descend from there is nothing to bend, so the option is switched off.
@@ -209,6 +229,27 @@ export function ExportDialog({ open, onOpenChange, pedigree, title, defaultCompa
               <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
             )}
           </div>
+
+          {/* Part of the chart: the people selected on the canvas */}
+          {subsetOffered && subset && (
+            <div className="space-y-1.5">
+              <label className={`flex items-center gap-2 text-xs ${subset.joined ? "cursor-pointer" : "text-muted-foreground"}`}>
+                <input
+                  type="checkbox"
+                  data-testid="export-only-selected"
+                  checked={useSubset}
+                  disabled={!subset.joined}
+                  onChange={e => setOnlySelected(e.target.checked)}
+                />
+                <span className="font-medium">{selectionLabel(subset)}</span>
+              </label>
+              {!subset.joined && (
+                <p className="text-xs text-muted-foreground ml-5">
+                  The selected people are in separate families with nobody to join them into one chart.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Compact spacing (standard layout only; the U shape has its own geometry) */}
           {!useU && (

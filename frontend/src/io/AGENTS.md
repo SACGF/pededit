@@ -236,6 +236,12 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   JSON export everyone. View filters (#4, "affected only") ride on the same
   path, so figure exports draw whatever the canvas shows with no export
   option of their own.
+- Only the selected people (#215): the export dialog's tickbox passes the
+  exporters `selectionPedigree()` (`pedigree/selectionSubset.ts`) in place of
+  the pedigree. It is already a drawn pedigree (`drawnSubset` registers it
+  like `asDrawn` does), so `exportSvg`, `exportUShapeSvg` and `deidentify`
+  take it unchanged and need no option. The exporters never see the
+  selection.
 - `types.ts` — `SvgExportOptions`.
 - Snapshots (#69): `__tests__/svgSnapshots.test.ts` exports every example
   and every feature fixture (#140) as the standard SVG (normal and compact,

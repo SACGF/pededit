@@ -1,5 +1,6 @@
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 import { kinshipOf } from "./relatedness";
+import { wholePedigree } from "./collapse";
 
 /**
  * Whether the couple line between two partners is drawn double.
@@ -10,6 +11,9 @@ import { kinshipOf } from "./relatedness";
  * family they hang from. A partnership's stored `consanguineous` flag is an
  * override on top, for a couple known to be related whose common ancestors
  * are not drawn. The editor only writes it from the edit panel's checkbox.
+ * `pedigree` may be the drawn one: a couple whose common ancestors a view
+ * filter or a figure of part of the chart leaves out are still related, so
+ * kinship is that of the whole pedigree.
  *
  * kinship2's own spouse code (2 = consanguineous) is not used: it is worked
  * out for the two slots a marker sits between, which are not the couple when
@@ -25,7 +29,7 @@ export function consanguinityTest(pedigree: Pedigree): (id1: string, id2: string
   // couples never needs the matrix.
   let coefficients: KinshipCoefficients | undefined;
   return (id1, id2) =>
-    flagged.has(key(id1, id2)) || (coefficients ??= kinshipOf(pedigree)).kinship(id1, id2) > 0;
+    flagged.has(key(id1, id2)) || (coefficients ??= kinshipOf(wholePedigree(pedigree))).kinship(id1, id2) > 0;
 }
 
 /**

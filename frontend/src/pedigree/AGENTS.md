@@ -515,9 +515,10 @@ draws NSGC symbols.
   and never drawn for 0, so a couple marked consanguineous by hand gets no
   number. Both read `wholePedigree(pedigree)` (`collapse.ts`): the drawn
   pedigree can lack a couple's common ancestors under a view filter, and a
-  number on the chart must not change with the view. The double line itself
-  still follows the drawn pedigree, so under such a filter a child can have
-  an F while the parents' line is single and carries no φ. Since the label
+  number on the chart must not change with the view. The double line reads
+  it too (`consanguinityTest`), so a related couple keeps their double line
+  and φ when a view filter or a figure of the selected people (#215) leaves
+  their common ancestors out. Since the label
   functions are shared, the canvas, both SVG exporters, the lints and the
   key (rows `inbreeding` and `kinship`, only when someone drawn has one)
   follow with no code of their own. `consanguinityWording` is the label
@@ -894,3 +895,22 @@ The kinship2 oracle tests compare slots with R, so a bug in the duplicate
 handling here passes them and is only caught by this lint. Its vitest keeps a
 `KNOWN_BROKEN` list of examples; remove an entry when a fix makes it draw
 cleanly. Also run by `__pededit.check()` and `scripts/browser/lint.mjs`.
+
+## Export only the selected people (#215)
+
+- `selectionSubset.ts` works out who the figure draws and `drawnSubset()`
+  (`collapse.ts`) makes the pedigree: a copy of the drawn pedigree with
+  everyone else removed, registered as drawn so group symbols, coefficients
+  and `wholePedigree()` carry over. It is built from what is drawn now, so a
+  selection under a view filter or beside a collapsed branch gives what the
+  canvas shows, minus the people not selected.
+- The joining rule is a cheapest path counted in people added, repeated until
+  the selection is one piece: stepping onto a couple costs every partner not
+  yet in the figure, because a child cannot hang from one parent. A tie goes
+  to the way through shared ancestors over the way through a marriage.
+- A kept couple's children who are not selected are left out with no group
+  symbol, unlike a view filter: the figure is what was selected, and the
+  "+N to connect them" in the tickbox is the only thing added. A group symbol
+  that is itself selected is kept, and not counted as a person.
+- The layout is run again on the subset, so a person the full chart draws
+  twice is drawn once when the loop is cut, with no dashed line.

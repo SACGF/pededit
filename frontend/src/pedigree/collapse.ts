@@ -301,6 +301,40 @@ export function asDrawn(derived: Pedigree, source: Pedigree): Pedigree {
   return derived;
 }
 
+/**
+ * The drawn pedigree with only the people in `keep` (ids of drawn people,
+ * group symbols included): what a figure of part of the chart draws
+ * (`selectionSubset.ts`). It is a drawn pedigree in its own right, so the
+ * exporters take it as it is, the group symbols kept stay group symbols, and
+ * kinship is still worked out on the whole family. A kept couple whose
+ * children are all left out gets no group symbol for them.
+ */
+export function drawnSubset(pedigree: Pedigree, keep: Set<string>): Pedigree {
+  const source = collapseInfo(pedigree);
+  const gone = new Set(source.drawn.individuals.filter(i => !keep.has(i.id)).map(i => i.id));
+  if (gone.size === 0) return source.drawn;
+  const subset: Pedigree = {
+    ...source.drawn,
+    individuals: source.drawn.individuals.map(i => ({ ...i })),
+    partnerships: source.drawn.partnerships.map(p => ({ ...p })),
+    parentOf: { ...source.drawn.parentOf },
+    ...(source.drawn.pinnedPositions ? { pinnedPositions: { ...source.drawn.pinnedPositions } } : {}),
+    ...(source.drawn.unlockedIndividuals ? { unlockedIndividuals: [...source.drawn.unlockedIndividuals] } : {}),
+  };
+  removeIndividuals(subset, gone);
+  for (const p of subset.partnerships) {
+    // Children left out, not absent: the couple is not childless.
+    if ((source.drawn.parentOf[p.id]?.length ?? 0) > 0 && (subset.parentOf[p.id]?.length ?? 0) === 0) {
+      delete p.childless;
+      delete p.childlessReason;
+    }
+  }
+  const placeholders = new Map([...source.placeholders].filter(([id]) => keep.has(id)));
+  cache.set(subset, { drawn: subset, hidden: new Set(), branches: source.branches, placeholders, filtered: source.filtered });
+  wholeOf.set(subset, wholePedigree(pedigree));
+  return subset;
+}
+
 /** The pedigree with hidden people left out: what the canvas and exports draw. */
 export function drawnPedigree(pedigree: Pedigree): Pedigree {
   return collapseInfo(pedigree).drawn;
