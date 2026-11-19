@@ -14,20 +14,20 @@
 <path d="M 100 120 L 140 120" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
-<line x1="360" y1="0" x2="360" y2="60" stroke="black" stroke-width="2"/>
-<line x1="160" y1="60" x2="560" y2="60" stroke="black" stroke-width="2"/>
-<line x1="160" y1="60" x2="160" y2="100" stroke="black" stroke-width="2"/>
-<line x1="240" y1="60" x2="240" y2="100" stroke="black" stroke-width="2"/>
-<line x1="320" y1="60" x2="320" y2="100" stroke="black" stroke-width="2"/>
-<line x1="400" y1="60" x2="400" y2="100" stroke="black" stroke-width="2"/>
-<line x1="480" y1="60" x2="480" y2="100" stroke="black" stroke-width="2"/>
-<line x1="560" y1="60" x2="560" y2="100" stroke="black" stroke-width="2"/>
-<line x1="120" y1="120" x2="120" y2="180" stroke="black" stroke-width="2"/>
-<line x1="0" y1="180" x2="240" y2="180" stroke="black" stroke-width="2"/>
-<line x1="0" y1="180" x2="0" y2="220" stroke="black" stroke-width="2"/>
-<line x1="80" y1="180" x2="80" y2="220" stroke="black" stroke-width="2"/>
-<line x1="160" y1="180" x2="160" y2="220" stroke="black" stroke-width="2"/>
-<line x1="240" y1="180" x2="240" y2="220" stroke="black" stroke-width="2" stroke-dasharray="5 3"/>
+<line x1="360" y1="0" x2="360" y2="76" stroke="black" stroke-width="2"/>
+<line x1="160" y1="76" x2="560" y2="76" stroke="black" stroke-width="2"/>
+<line x1="160" y1="76" x2="160" y2="100" stroke="black" stroke-width="2"/>
+<line x1="240" y1="76" x2="240" y2="100" stroke="black" stroke-width="2"/>
+<line x1="320" y1="76" x2="320" y2="100" stroke="black" stroke-width="2"/>
+<line x1="400" y1="76" x2="400" y2="100" stroke="black" stroke-width="2"/>
+<line x1="480" y1="76" x2="480" y2="100" stroke="black" stroke-width="2"/>
+<line x1="560" y1="76" x2="560" y2="100" stroke="black" stroke-width="2"/>
+<line x1="120" y1="120" x2="120" y2="209" stroke="black" stroke-width="2"/>
+<line x1="0" y1="209" x2="240" y2="209" stroke="black" stroke-width="2"/>
+<line x1="0" y1="209" x2="0" y2="220" stroke="black" stroke-width="2"/>
+<line x1="80" y1="209" x2="80" y2="220" stroke="black" stroke-width="2"/>
+<line x1="160" y1="209" x2="160" y2="220" stroke="black" stroke-width="2"/>
+<line x1="240" y1="209" x2="240" y2="220" stroke="black" stroke-width="2" stroke-dasharray="5 3"/>
 </g>
 <g class="assisted-lines">
 </g>

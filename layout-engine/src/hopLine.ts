@@ -82,6 +82,19 @@ export function hopTurn(
 }
 
 /**
+ * x at which the line of descent leaves a couple line whose middle is at
+ * `coupleX`. An only child the layout puts within a quarter of a symbol of
+ * that middle (both partners of the child pull on where it sits) is reached
+ * by one straight line from just beside the middle; drawn from the middle it
+ * would be a bar a few pixels long, which reads as a kink.
+ */
+export function descentX(coupleX: number, childXs: readonly number[], nodeSize: number): number {
+  if (childXs.length !== 1) return coupleX;
+  const x = childXs[0]!;
+  return Math.abs(x - coupleX) <= nodeSize / 4 ? x : coupleX;
+}
+
+/**
  * Distance (px) from a symbol's centre to its outline `dy` px above or below
  * the centre: where a line leaving the side of a circle (female) or a diamond
  * (unknown) off its centre starts. `inset`: how far inside the nodeSize box

@@ -1,5 +1,5 @@
 import type { Node, Edge } from "@xyflow/react";
-import { buildPartnerSetFromPedigree, resolveCouple } from "@pedigree-editor/layout-engine";
+import { buildPartnerSetFromPedigree, descentX, resolveCouple } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
@@ -18,7 +18,7 @@ import { copyNumberBlock, textBlockUnder } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
-import { sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
+import { barsUnderLabels, sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
 import { labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
@@ -143,7 +143,7 @@ export interface SibshipEdgeData extends Record<string, unknown> {
   /** React Flow node IDs of the children, in slot order. */
   childIds: string[];
   // Pre-computed geometry (the layout's, not the live node positions):
-  /** x (canvas px) of the midpoint of the couple line above this family. */
+  /** x (canvas px) where the line of descent leaves the couple line: its midpoint, or an only child's x when that is all but under it (`descentX`). */
   coupleX: number;
   /** y (canvas px) of the parent generation centre = (level-1) * ROW_HEIGHT. */
   coupleY: number;
@@ -341,6 +341,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
 
   const partners = buildPartnerSetFromPedigree(pedigree);
   const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos, spacing.rowHeight);
+  clearLabelsOfBars(pedigree, nodes, sibshipEdges, spacing);
 
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
@@ -363,6 +364,37 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
     assistedEdges,
     labelMax: labelMaxWidth(spacing.slotWidth),
   };
+}
+
+/**
+ * A bar never runs through the text under someone above it: it is lowered
+ * to pass under the text, or, where it cannot be, the text gets a white
+ * backing (`barsUnderLabels`). Changes the edges and nodes in place.
+ */
+function clearLabelsOfBars(pedigree: Pedigree, nodes: Node<RFNodeData>[], sibshipEdges: Edge<SibshipEdgeData>[], spacing: LayoutSpacing): void {
+  const labelMax = labelMaxWidth(spacing.slotWidth);
+  const numbers = labelNumbers(pedigree);
+  const labelled = nodes.flatMap(node => {
+    const box = textBlockUnder(node.data.individual, pedigree, node.position.x, node.position.y, labelMax, numbers);
+    return box ? [{ node, box }] : [];
+  });
+  const drawn = sibshipEdges.filter(e => e.data && e.data.childXs.length > 0 && !e.data.converge);
+  const { lower, through } = barsUnderLabels(
+    drawn.map(e => {
+      const d = e.data!, xs = [d.coupleX, ...d.childXs];
+      return { x1: Math.min(...xs), x2: Math.max(...xs), y: d.sibBarY, childY: d.childY };
+    }),
+    labelled.map(l => l.box),
+  );
+  drawn.forEach((e, i) => {
+    e.data!.barOffset += lower[i]!;
+    e.data!.sibBarY += lower[i]!;
+  });
+  for (const k of through) {
+    const { node } = labelled[k]!;
+    node.data.labelsBacked = true;
+    node.data.glyph.labelsBacked = true;
+  }
 }
 
 /**
@@ -861,7 +893,7 @@ function buildSibshipEdges(
       const rightPos = slotPos.get(`${level - 1}-${rightParentSlot}`)!;
       if (!leftPos || !rightPos) continue; // parent node was suppressed (shouldn't happen)
 
-      const coupleX  = (leftPos.x + rightPos.x) / 2;
+      const middleX  = (leftPos.x + rightPos.x) / 2;
       const coupleY  = (leftPos.y + rightPos.y) / 2;
 
       const firstChildPos = slotPos.get(resolvedChildIds[0]!);
@@ -879,6 +911,8 @@ function buildSibshipEdges(
         : undefined;
       const isApart = apart.has(pairKeyOf(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
       const converge = slots.length === 1 && isApart;
+      // Straight down to an only child who is all but under the middle.
+      const coupleX = hopDrop || isApart ? middleX : descentX(middleX, childXs, NODE_SIZE);
 
       // Source = left parent node; target = leftmost resolved child node.
       edges.push({

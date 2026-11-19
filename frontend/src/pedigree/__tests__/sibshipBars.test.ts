@@ -3,7 +3,12 @@ import { importPed } from "../../io/ped/index.js";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { layoutToFlow } from "../layoutToFlow";
 import { lintFlow } from "../renderLint";
-import { SIB_BAR_STEP, sibshipBarOffsets, sibshipSegments } from "../sibshipPath";
+import { SIB_BAR_STEP, barsUnderLabels, sibshipBarOffsets, sibshipSegments } from "../sibshipPath";
+import { EXAMPLES } from "../../data/examples";
+import { selectionPedigree, selectionSubset } from "../selectionSubset";
+import { textBlockUnder } from "../labelBlock";
+import { labelMaxWidth } from "../labels";
+import { SLOT_WIDTH } from "../constants";
 import type { SibshipBar } from "../sibshipPath";
 
 /**
@@ -175,5 +180,81 @@ describe("overlapping sibship bars on the canvas and in the export (#80)", () =>
       return run.length === 3 && gaps(run).every((g, k) => Math.abs(g - want[k]!) < 1e-6);
     });
     expect(found).toBe(true);
+  });
+});
+
+describe("barsUnderLabels: a bar never runs through the text above it", () => {
+  const bar = { x1: 0, x2: 80, y: 60, childY: 120 };
+  const label = (bottom: number, x = 40) => ({ x, halfWidth: 20, top: 20, bottom });
+
+  it("leaves a bar alone when the text ends above it", () => {
+    expect(barsUnderLabels([bar], [label(61)])).toEqual({ lower: [0], through: new Set() });
+  });
+
+  it("lowers the bar to just under text that hangs past it", () => {
+    const { lower, through } = barsUnderLabels([bar], [label(68)]);
+    expect(lower).toEqual([10]);
+    expect(through.size).toBe(0);
+  });
+
+  it("ignores text beside the bar", () => {
+    expect(barsUnderLabels([bar], [label(68, 140)]).lower).toEqual([0]);
+  });
+
+  it("leaves the bar and asks for a backing when the text hangs lower than the bar can go", () => {
+    // The bar may come no nearer the child symbols (tops at 100) than 8px.
+    const { lower, through } = barsUnderLabels([bar], [label(95)]);
+    expect(lower).toEqual([0]);
+    expect([...through]).toEqual([0]);
+  });
+
+  it("asks for no backing where the text reaches the symbols below", () => {
+    const { lower, through } = barsUnderLabels([bar], [label(104)]);
+    expect(lower).toEqual([0]);
+    expect(through.size).toBe(0);
+  });
+
+  it("does not lower a bar onto another couple's bar", () => {
+    const other = { x1: 60, x2: 200, y: 72, childY: 120 };
+    const { lower, through } = barsUnderLabels([bar, other], [label(68)]);
+    expect(lower).toEqual([0, 0]);
+    expect([...through]).toEqual([0]);
+  });
+});
+
+describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
+  const whole = EXAMPLES.find(e => e.slug === "targaryen")!.data;
+  const part = selectionPedigree(whole, selectionSubset(whole, ["Jaehaerys_I", "Alysanne", "Baelon", "Alyssa", "Rodrik_Arryn", "Daella_JA", "Aemon_JA", "Aemon_Dragonknight", "Jocelyn_Baratheon", "Daemon", "Aegon_Uncrowned", "Aegon_JA", "Aegon_Baelon", "Alicent_Hightower", "Viserys_I", "Aemma_Arryn", "Corlys_Velaryon", "Rhaenys_QWNW", "Aegon_II", "Helaena", "Aemond", "Daeron_VA", "Rhaenyra", "Laenor_Velaryon", "Laena_Velaryon", "Jaehaerys_AH", "Jaehaera", "Maelor", "Aegon_III", "Daenaera_Velaryon", "Viserys_II", "Larra_Rogare", "Jacaerys", "Lucerys", "Joffrey", "Baela", "Rhaena_Aenys", "Rhaena_Daemon", "Rhaena_AD"]));
+  const flow = layoutToFlow(part);
+
+  it("passes every sibship bar under the names of the people above it", () => {
+    const labelMax = labelMaxWidth(SLOT_WIDTH);
+    let lowered = 0;
+    for (const e of flow.sibshipEdges) {
+      const d = e.data!, xs = [d.coupleX, ...d.childXs];
+      if (d.barOffset > 0) lowered++;
+      for (const n of flow.nodes) {
+        const box = textBlockUnder(n.data.individual, part, n.position.x, n.position.y, labelMax);
+        if (!box || box.top >= d.sibBarY || box.x + box.halfWidth <= Math.min(...xs) || box.x - box.halfWidth >= Math.max(...xs)) continue;
+        expect(box.bottom, `${n.data.individual.name} over ${e.id}`).toBeLessThanOrEqual(d.sibBarY + 1);
+      }
+    }
+    // Laena Velaryon: a tag row and a two-line name.
+    expect(lowered).toBeGreaterThan(0);
+  });
+
+  it("names every copy of Daemon in the export", () => {
+    expect(flow.nodes.filter(n => n.data.individual.id === "Daemon")).toHaveLength(3);
+    expect(exportSvg(part).match(/>Daemon</g)).toHaveLength(3);
+  });
+
+  it("draws one straight line to an only child who is all but under the parents", () => {
+    const aemma = flow.nodes.find(n => n.data.individual.id === "Aemma_Arryn")!;
+    const edge = flow.sibshipEdges.find(e => e.data!.childIds.includes(aemma.id))!;
+    expect(edge.data!.childIds).toHaveLength(1);
+    expect(edge.data!.coupleX).toBe(aemma.position.x);
+    const parents = [edge.data!.leftParentId, edge.data!.rightParentId].map(id => flow.nodes.find(n => n.id === id)!.position.x);
+    expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeLessThanOrEqual(10);
+    expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeGreaterThan(0);
   });
 });

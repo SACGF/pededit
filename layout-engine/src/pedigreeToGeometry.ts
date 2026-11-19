@@ -12,7 +12,7 @@
 import { alignPedigree } from "./alignPedigree.js";
 import { buildPartnerSetFromPedigree, resolveCouple } from "./couples.js";
 import { isAffected } from "./affected.js";
-import { couplePortHeights, hopHeight, hopTurn, symbolSideDx } from "./hopLine.js";
+import { couplePortHeights, descentX, hopHeight, hopTurn, symbolSideDx } from "./hopLine.js";
 import type { HopLineConstants } from "./hopLine.js";
 import type { Pedigree, Individual, LayoutResult } from "./types.js";
 
@@ -178,7 +178,8 @@ export interface CoupleHop {
 export interface SibshipGeometry {
   /**
    * x of the vertical drop: the middle of the two slots the couple marker
-   * sits between. When the parents' line hops over someone that is the
+   * sits between, or the x of an only child within a quarter of a symbol of
+   * it (`descentX`). When the parents' line hops over someone that is the
    * middle of the level stretch beside the further partner, never the
    * raised part.
    */
@@ -372,7 +373,7 @@ export function pedigreeToGeometry(
       const leftParentSlot  = f - 1; // 0-based
       const rightParentSlot = f;     // 0-based
 
-      const coupleX = (xAt(lev - 1, leftParentSlot) + xAt(lev - 1, rightParentSlot)) / 2;
+      const middleX = (xAt(lev - 1, leftParentSlot) + xAt(lev - 1, rightParentSlot)) / 2;
       const coupleY = (lev - 1) * c.rowHeight;
       const sibBarY = (lev - c.sibBarFactor) * c.rowHeight;
       const childY  = lev * c.rowHeight;
@@ -384,6 +385,9 @@ export function pedigreeToGeometry(
       const rc = resolveCouple(result, partners, lev - 1, leftParentSlot);
       const line = rc.hop ? coupleAt.get(`${lev - 1}-${rc.leftSlot}-${rc.rightSlot}`) : undefined;
       if (line?.geo.hop) dropY = coupleY - (line.far === "right" ? line.geo.hop.rightPort : line.geo.hop.leftPort);
+
+      // Straight down to an only child who is all but under the middle.
+      const coupleX = rc.hop ? middleX : descentX(middleX, childXs, c.nodeSize);
 
       sibships.push({ coupleX, coupleY, dropY, sibBarY, childXs, childY });
     }

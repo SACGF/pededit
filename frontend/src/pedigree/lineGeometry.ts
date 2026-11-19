@@ -8,7 +8,7 @@
  * line cannot be drawn one way on the canvas and another in a file.
  * Framework-free.
  */
-import type { ChildlessStatus } from "@pedigree-editor/layout-engine";
+import { descentX, type ChildlessStatus } from "@pedigree-editor/layout-engine";
 import type { CoupleEdgeData, RFNodeData, SibshipEdgeData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { couplePathD, consanguineousPathsD, hopRisers } from "./couplePath";
@@ -113,7 +113,10 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
   // measured from the further partner, as the line's turn there is, so the two
   // stay together while either parent slot is dragged.
   const far = data.hopDrop && nodeAt(data.hopDrop.parentId);
-  const coupleX = far ? far.position.x + data.hopDrop!.dx : (leftParent.position.x + rightParent.position.x) / 2;
+  // An only child all but under the middle is reached by one straight line.
+  const middleX = (leftParent.position.x + rightParent.position.x) / 2;
+  const coupleX = far ? far.position.x + data.hopDrop!.dx
+    : data.apart ? middleX : descentX(middleX, children.map(c => c.position.x), NODE_SIZE);
   const coupleY = far ? far.position.y : (leftParent.position.y + rightParent.position.y) / 2;
   // Drops end at the top of each child symbol, or at a loss triangle's apex.
   const kids: SibshipChild[] = children.map(c => ({

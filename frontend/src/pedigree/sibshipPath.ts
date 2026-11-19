@@ -182,6 +182,8 @@ const SIB_BAR_MIN_STEP = 7;
 const SIB_BAR_CLEARANCE = 8;
 /** Bars whose ends come this close (px) read as one line, so they count as overlapping. */
 const SIB_BAR_TOUCH = NODE_SIZE / 4;
+/** Space (px) between the bottom of a label and a bar lowered to pass under it. */
+const SIB_BAR_UNDER_LABEL = 2;
 
 /**
  * How far (px) to lower each sibship's bar below the halfway line so that no
@@ -281,6 +283,52 @@ export function sibshipBarOffsets(sibs: SibshipBar[]): number[] {
     for (const b of group) offsets[b.i] = (b.level - lo) * step;
   }
   return offsets;
+}
+
+/** A bar as drawn, for `barsUnderLabels`. */
+export interface DrawnBar {
+  x1: number;
+  x2: number;
+  /** y of the bar, bar offset included. */
+  y: number;
+  /** y of the highest child's centre. */
+  childY: number;
+}
+
+/** The text under one symbol: `top` and `bottom` of the block, `bottom` a descender below the last baseline. */
+export interface LabelBox { x: number; halfWidth: number; top: number; bottom: number }
+
+/**
+ * Bars that would run through the text under someone above them: a tag row
+ * and a two-line name, or a long detail block, hang below the halfway line
+ * where a bar normally sits. For each bar, how much further (px) to lower it
+ * so it passes under that text, and the labels (by index) it still runs
+ * through, which then need a white backing: when the text hangs lower than
+ * a bar can go above its children, or lowering it would put it on another
+ * couple's bar, the bar stays where it was.
+ */
+export function barsUnderLabels(bars: DrawnBar[], labels: LabelBox[]): { lower: number[]; through: Set<number> } {
+  const lower = bars.map(() => 0);
+  const through = new Set<number>();
+  const ys = bars.map(b => b.y);
+  bars.forEach((b, i) => {
+    // Text that starts above the bar, over its length, and ends on or below it.
+    const over = labels
+      .map((l, k) => ({ l, k }))
+      .filter(({ l }) => l.top < b.y && l.bottom > b.y + 1 && l.x + l.halfWidth > b.x1 && l.x - l.halfWidth < b.x2);
+    if (over.length === 0) return;
+    const lowest = b.childY - NODE_SIZE / 2 - SIB_BAR_CLEARANCE;
+    const wanted = Math.max(...over.map(({ l }) => l.bottom)) + SIB_BAR_UNDER_LABEL;
+    const onAnother = bars.some((o, j) => j !== i && Math.abs(ys[j]! - wanted) < SIB_BAR_MIN_STEP
+      && b.x1 <= o.x2 + SIB_BAR_TOUCH && o.x1 <= b.x2 + SIB_BAR_TOUCH);
+    // A bar lowered part of the way would still run through the text, and
+    // take room from what is drawn above the children, so it stays put.
+    if (wanted <= lowest && !onAnother) { lower[i] = wanted - b.y; ys[i] = wanted; }
+    // Text that hangs down to the symbols below gets no backing: it would
+    // cover part of them.
+    else for (const { l, k } of over) if (l.bottom <= b.childY - NODE_SIZE / 2) through.add(k);
+  });
+  return { lower, through };
 }
 
 function lessThan(a: number[], b: number[]): boolean {

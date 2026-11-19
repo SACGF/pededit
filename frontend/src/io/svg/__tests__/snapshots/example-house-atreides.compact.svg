@@ -24,25 +24,25 @@
 <path d="M 278.95 336 L 422 336" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
-<line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>
-<line x1="0" y1="42" x2="34" y2="42" stroke="black" stroke-width="2"/>
-<line x1="0" y1="42" x2="0" y2="64" stroke="black" stroke-width="2"/>
-<line x1="102" y1="0" x2="102" y2="42" stroke="black" stroke-width="2"/>
-<line x1="102" y1="42" x2="136" y2="42" stroke="black" stroke-width="2"/>
-<line x1="136" y1="42" x2="136" y2="64" stroke="black" stroke-width="2"/>
-<line x1="34" y1="84" x2="34" y2="126" stroke="black" stroke-width="2"/>
-<line x1="1.58" y1="126" x2="34" y2="126" stroke="black" stroke-width="2"/>
-<line x1="1.58" y1="126" x2="1.58" y2="148" stroke="black" stroke-width="2"/>
-<line x1="170" y1="84" x2="170" y2="126" stroke="black" stroke-width="2"/>
-<line x1="137.58" y1="126" x2="205.58" y2="126" stroke="black" stroke-width="2"/>
-<line x1="137.58" y1="126" x2="137.58" y2="148" stroke="black" stroke-width="2"/>
-<line x1="205.58" y1="126" x2="205.58" y2="148" stroke="black" stroke-width="2"/>
-<line x1="306" y1="84" x2="306" y2="126" stroke="black" stroke-width="2"/>
-<line x1="273.58" y1="126" x2="306" y2="126" stroke="black" stroke-width="2"/>
-<line x1="273.58" y1="126" x2="273.58" y2="148" stroke="black" stroke-width="2"/>
-<line x1="442" y1="84" x2="442" y2="126" stroke="black" stroke-width="2"/>
-<line x1="341.58" y1="126" x2="442" y2="126" stroke="black" stroke-width="2"/>
-<line x1="341.58" y1="126" x2="341.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="34" y1="0" x2="34" y2="50" stroke="black" stroke-width="2"/>
+<line x1="0" y1="50" x2="34" y2="50" stroke="black" stroke-width="2"/>
+<line x1="0" y1="50" x2="0" y2="64" stroke="black" stroke-width="2"/>
+<line x1="102" y1="0" x2="102" y2="50" stroke="black" stroke-width="2"/>
+<line x1="102" y1="50" x2="136" y2="50" stroke="black" stroke-width="2"/>
+<line x1="136" y1="50" x2="136" y2="64" stroke="black" stroke-width="2"/>
+<line x1="34" y1="84" x2="34" y2="134" stroke="black" stroke-width="2"/>
+<line x1="1.58" y1="134" x2="34" y2="134" stroke="black" stroke-width="2"/>
+<line x1="1.58" y1="134" x2="1.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="170" y1="84" x2="170" y2="134" stroke="black" stroke-width="2"/>
+<line x1="137.58" y1="134" x2="205.58" y2="134" stroke="black" stroke-width="2"/>
+<line x1="137.58" y1="134" x2="137.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="205.58" y1="134" x2="205.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="306" y1="84" x2="306" y2="134" stroke="black" stroke-width="2"/>
+<line x1="273.58" y1="134" x2="306" y2="134" stroke="black" stroke-width="2"/>
+<line x1="273.58" y1="134" x2="273.58" y2="148" stroke="black" stroke-width="2"/>
+<line x1="442" y1="84" x2="442" y2="134" stroke="black" stroke-width="2"/>
+<line x1="341.58" y1="134" x2="442" y2="134" stroke="black" stroke-width="2"/>
+<line x1="341.58" y1="134" x2="341.58" y2="148" stroke="black" stroke-width="2"/>
 <line x1="35.58" y1="168" x2="35.58" y2="210" stroke="black" stroke-width="2"/>
 <line x1="-14.63" y1="210" x2="85.79" y2="210" stroke="black" stroke-width="2"/>
 <line x1="-14.63" y1="210" x2="-14.63" y2="232" stroke="black" stroke-width="2"/>
@@ -202,19 +202,26 @@
 <text x="408" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Kynes</text>
 <text x="476" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Liet&apos;s mother</title>Liet&apos;s</text>
 <text x="476" y="149" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
+<rect x="-20.72" y="210" width="44.6" height="13" fill="white"/>
 <text x="1.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jessica</text>
 <text x="69.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duke Leto</text>
 <text x="137.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rabban</text>
+<rect x="174.58" y="190" width="62" height="26" fill="white"/>
 <text x="205.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Feyd-Rautha</title>Feyd-Rauth</text>
 <text x="205.58" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">a</text>
+<text x="273.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duke Leto</text>
+<rect x="310.58" y="210" width="62" height="13" fill="white"/>
 <text x="341.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Liet-Kynes</text>
 <text x="409.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Chani&apos;s mother</title>Chani&apos;s</text>
 <text x="409.58" y="233" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">mother</text>
 <text x="477.58" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaddam IV</text>
 <text x="545.58" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anirul</text>
 <text x="-14.63" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alia</text>
+<rect x="72.19" y="294" width="27.2" height="13" fill="white"/>
 <text x="85.79" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Paul</text>
+<rect x="187.5" y="294" width="33" height="13" fill="white"/>
 <text x="204" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Chani</text>
+<rect x="252.6" y="294" width="38.8" height="13" fill="white"/>
 <text x="272" y="304" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Irulan</text>
 <text x="340" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Chalice</text>
 <text x="408" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Farad&apos;n&apos;s father</title>Farad&apos;n&apos;s</text>

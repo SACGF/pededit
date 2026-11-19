@@ -27,11 +27,11 @@
 <line x1="170" y1="84" x2="170" y2="126" stroke="black" stroke-width="2"/>
 <line x1="170" y1="126" x2="170" y2="126" stroke="black" stroke-width="2"/>
 <line x1="170" y1="126" x2="170" y2="148" stroke="black" stroke-width="2"/>
-<line x1="102" y1="168" x2="102" y2="210" stroke="black" stroke-width="2"/>
-<line x1="34" y1="210" x2="170" y2="210" stroke="black" stroke-width="2"/>
-<line x1="34" y1="210" x2="34" y2="232" stroke="black" stroke-width="2"/>
-<line x1="102" y1="210" x2="102" y2="232" stroke="black" stroke-width="2"/>
-<line x1="170" y1="210" x2="170" y2="232" stroke="black" stroke-width="2"/>
+<line x1="102" y1="168" x2="102" y2="218" stroke="black" stroke-width="2"/>
+<line x1="34" y1="218" x2="170" y2="218" stroke="black" stroke-width="2"/>
+<line x1="34" y1="218" x2="34" y2="232" stroke="black" stroke-width="2"/>
+<line x1="102" y1="218" x2="102" y2="232" stroke="black" stroke-width="2"/>
+<line x1="170" y1="218" x2="170" y2="232" stroke="black" stroke-width="2"/>
 </g>
 <g class="assisted-lines">
 </g>

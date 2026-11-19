@@ -184,6 +184,14 @@ draws NSGC symbols.
   than the row of their parents, so each sibship sits to one side of its
   parents. Offsets only lower a bar (labels hang above the halfway line),
   and the order is chosen so drops cross other bars as little as possible.
+  A bar is also lowered to pass under text that hangs past the halfway line
+  (a tag row and a two-line name, a long detail block; `barsUnderLabels`,
+  measured on the export's text, which runs lower than the canvas's). Where
+  that cannot clear it (compact rows, or it would land on another bar) the
+  bar stays and the text gets the white backing (`labelsBacked`), unless the
+  text reaches the symbols below, which a backing would cover. An only child
+  within a quarter of a symbol of the middle of its parents gets one
+  straight line and no bar (`descentX`, layout engine).
   `layoutToFlow` puts the offset on the edge data (`barOffset`), so during a
   drag the heights are as of the last layout; `svgExporter` reads the same
   edge data. The U-shape export has its own geometry and does not use it. `CoupleEdge` and

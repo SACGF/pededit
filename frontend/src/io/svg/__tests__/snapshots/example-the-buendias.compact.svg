@@ -26,15 +26,15 @@
 <path d="M 382.67 590 L 410.67 590" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
-<line x1="170" y1="0" x2="170" y2="42" stroke="black" stroke-width="2"/>
-<line x1="34" y1="42" x2="306" y2="42" stroke="black" stroke-width="2"/>
-<line x1="34" y1="42" x2="34" y2="64" stroke="black" stroke-width="2"/>
-<line x1="170" y1="42" x2="170" y2="64" stroke="black" stroke-width="2"/>
-<line x1="306" y1="42" x2="306" y2="64" stroke="black" stroke-width="2"/>
-<line x1="408" y1="0" x2="408" y2="42" stroke="black" stroke-width="2"/>
-<line x1="374" y1="42" x2="442" y2="42" stroke="black" stroke-width="2"/>
-<line x1="374" y1="42" x2="374" y2="64" stroke="black" stroke-width="2"/>
-<line x1="442" y1="42" x2="442" y2="64" stroke="black" stroke-width="2"/>
+<line x1="170" y1="0" x2="170" y2="50" stroke="black" stroke-width="2"/>
+<line x1="34" y1="50" x2="306" y2="50" stroke="black" stroke-width="2"/>
+<line x1="34" y1="50" x2="34" y2="64" stroke="black" stroke-width="2"/>
+<line x1="170" y1="50" x2="170" y2="64" stroke="black" stroke-width="2"/>
+<line x1="306" y1="50" x2="306" y2="64" stroke="black" stroke-width="2"/>
+<line x1="408" y1="0" x2="408" y2="50" stroke="black" stroke-width="2"/>
+<line x1="374" y1="50" x2="442" y2="50" stroke="black" stroke-width="2"/>
+<line x1="374" y1="50" x2="374" y2="64" stroke="black" stroke-width="2"/>
+<line x1="442" y1="50" x2="442" y2="64" stroke="black" stroke-width="2"/>
 <line x1="68" y1="84" x2="68" y2="126" stroke="black" stroke-width="2"/>
 <line x1="68" y1="126" x2="68" y2="126" stroke="black" stroke-width="2"/>
 <line x1="68" y1="126" x2="68" y2="148" stroke="black" stroke-width="2"/>
@@ -44,22 +44,22 @@
 <line x1="340" y1="84" x2="340" y2="126" stroke="black" stroke-width="2"/>
 <line x1="340" y1="126" x2="340" y2="126" stroke="black" stroke-width="2"/>
 <line x1="340" y1="126" x2="340" y2="148" stroke="black" stroke-width="2"/>
-<line x1="136" y1="168" x2="136" y2="210" stroke="black" stroke-width="2"/>
-<line x1="68" y1="210" x2="204" y2="210" stroke="black" stroke-width="2"/>
-<line x1="68" y1="210" x2="68" y2="232" stroke="black" stroke-width="2"/>
-<line x1="136" y1="210" x2="136" y2="232" stroke="black" stroke-width="2"/>
-<line x1="204" y1="210" x2="204" y2="232" stroke="black" stroke-width="2"/>
+<line x1="136" y1="168" x2="136" y2="218" stroke="black" stroke-width="2"/>
+<line x1="68" y1="218" x2="204" y2="218" stroke="black" stroke-width="2"/>
+<line x1="68" y1="218" x2="68" y2="232" stroke="black" stroke-width="2"/>
+<line x1="136" y1="218" x2="136" y2="232" stroke="black" stroke-width="2"/>
+<line x1="204" y1="218" x2="204" y2="232" stroke="black" stroke-width="2"/>
 <line x1="34" y1="252" x2="34" y2="294" stroke="black" stroke-width="2"/>
 <line x1="34" y1="294" x2="34" y2="294" stroke="black" stroke-width="2"/>
 <line x1="34" y1="294" x2="34" y2="316" stroke="black" stroke-width="2"/>
 <line x1="238" y1="252" x2="238" y2="294" stroke="black" stroke-width="2"/>
 <line x1="238" y1="294" x2="238" y2="294" stroke="black" stroke-width="2"/>
 <line x1="238" y1="294" x2="238" y2="316" stroke="black" stroke-width="2"/>
-<line x1="272" y1="336" x2="272" y2="378" stroke="black" stroke-width="2"/>
-<line x1="204" y1="378" x2="340" y2="378" stroke="black" stroke-width="2"/>
-<line x1="204" y1="378" x2="204" y2="400" stroke="black" stroke-width="2"/>
-<line x1="272" y1="378" x2="272" y2="400" stroke="black" stroke-width="2"/>
-<line x1="340" y1="378" x2="340" y2="400" stroke="black" stroke-width="2"/>
+<line x1="272" y1="336" x2="272" y2="386" stroke="black" stroke-width="2"/>
+<line x1="204" y1="386" x2="340" y2="386" stroke="black" stroke-width="2"/>
+<line x1="204" y1="386" x2="204" y2="400" stroke="black" stroke-width="2"/>
+<line x1="272" y1="386" x2="272" y2="400" stroke="black" stroke-width="2"/>
+<line x1="340" y1="386" x2="340" y2="400" stroke="black" stroke-width="2"/>
 <line x1="374" y1="420" x2="374" y2="462" stroke="black" stroke-width="2"/>
 <line x1="260.67" y1="462" x2="464.67" y2="462" stroke="black" stroke-width="2"/>
 <line x1="260.67" y1="462" x2="260.67" y2="484" stroke="black" stroke-width="2"/>
@@ -233,6 +233,7 @@
 <text x="238" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text>
 <text x="306" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aunt</text>
 <text x="374" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Uncle</text>
+<text x="442" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text>
 <text x="68" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Úrsula</text>
 <text x="204" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio B.</title>José</text>
 <text x="204" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio B.</text>
@@ -243,6 +244,7 @@
 <text x="136" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Amaranta</text>
 <text x="204" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text>
 <text x="204" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text>
+<text x="272" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Pilar</text>
 <text x="34" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano José</title>Aureliano</text>
 <text x="34" y="381" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">José</text>
 <text x="238" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text>
@@ -251,6 +253,7 @@
 <text x="204" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Remedios</text>
 <text x="272" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>J. A. Segundo</title>J. A.</text>
 <text x="272" y="485" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Segundo</text>
+<rect x="309" y="462" width="62" height="13" fill="white"/>
 <text x="340" y="472" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">A. Segundo</text>
 <text x="408" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fernanda</text>
 <text x="260.67" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text>
@@ -261,6 +264,8 @@
 <text x="464.67" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ú.</text>
 <text x="362.67" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano B.</title>Aureliano</text>
 <text x="362.67" y="653" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">B.</text>
+<text x="430.67" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amaranta Ú.</title>Amaranta</text>
+<text x="430.67" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ú.</text>
 <text x="396.67" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aureliano</text>
 </g>
 <g class="consanguinity-labels">

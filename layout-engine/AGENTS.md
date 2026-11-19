@@ -127,7 +127,9 @@ indexing convention inherited from R, and the three rendering rules.
   frontend's `couplePath.ts` calls with its own constants, so the package
   and the editor draw it the same way;
   `frontend/src/pedigree/__tests__/engineGeometry.test.ts` checks the two
-  agree. Keep `DEFAULT_CONSTANTS` equal to `frontend/src/pedigree/constants.ts`.
+  agree. `descentX` (same file) is shared the same way: an only child the
+  layout leaves a few pixels off the middle of its parents is reached by one
+  straight line, not a bar a few pixels long. Keep `DEFAULT_CONSTANTS` equal to `frontend/src/pedigree/constants.ts`.
 - `utils.ts` — `buildLayoutInput` (graph to 1-based flat arrays) and
   `buildPedigreeFromFlat`.
 - `quadprog.d.ts` — hand-written typings for the untyped quadprog package.

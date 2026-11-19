@@ -10,7 +10,7 @@ export { buildPartnerSet, buildPartnerSetFromPedigree, isPartnerPair, resolveCou
 export type { PartnerSet, ResolvedCouple } from "./couples.js";
 export { pedigreeToGeometry } from "./pedigreeToGeometry.js";
 export type { PedigreeGeometry, NodeGeometry, CoupleGeometry, CoupleHop, SibshipGeometry, RenderingConstants } from "./pedigreeToGeometry.js";
-export { couplePortHeights, hopHeight, hopTurn, symbolSideDx } from "./hopLine.js";
+export { couplePortHeights, descentX, hopHeight, hopTurn, symbolSideDx } from "./hopLine.js";
 export type { HopLineConstants } from "./hopLine.js";
 export { buildPedigreeFromFlat } from "./utils.js";
 export type { FlatPedRow } from "./utils.js";

@@ -53,11 +53,11 @@
 <path d="M 567.44 1176 L 595.44 1176" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g class="sibship-lines">
-<line x1="386.54" y1="0" x2="386.54" y2="42" stroke="black" stroke-width="2"/>
-<line x1="318.54" y1="42" x2="454.54" y2="42" stroke="black" stroke-width="2"/>
-<line x1="318.54" y1="42" x2="318.54" y2="64" stroke="black" stroke-width="2"/>
-<line x1="386.54" y1="42" x2="386.54" y2="64" stroke="black" stroke-width="2"/>
-<line x1="454.54" y1="42" x2="454.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="386.54" y1="0" x2="386.54" y2="50" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="50" x2="454.54" y2="50" stroke="black" stroke-width="2"/>
+<line x1="318.54" y1="50" x2="318.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="386.54" y1="50" x2="386.54" y2="64" stroke="black" stroke-width="2"/>
+<line x1="454.54" y1="50" x2="454.54" y2="64" stroke="black" stroke-width="2"/>
 <line x1="352.54" y1="84" x2="352.54" y2="126" stroke="black" stroke-width="2"/>
 <line x1="318.54" y1="126" x2="352.54" y2="126" stroke="black" stroke-width="2"/>
 <line x1="318.54" y1="126" x2="318.54" y2="148" stroke="black" stroke-width="2"/>
@@ -99,22 +99,22 @@
 <line x1="442" y1="336" x2="442" y2="378" stroke="black" stroke-width="2"/>
 <line x1="442" y1="378" x2="442" y2="378" stroke="black" stroke-width="2"/>
 <line x1="442" y1="378" x2="442" y2="400" stroke="black" stroke-width="2"/>
-<line x1="578" y1="336" x2="578" y2="378" stroke="black" stroke-width="2"/>
-<line x1="578" y1="378" x2="605.7" y2="378" stroke="black" stroke-width="2"/>
-<line x1="605.7" y1="378" x2="605.7" y2="400" stroke="black" stroke-width="2"/>
-<line x1="339.03" y1="420" x2="339.03" y2="462" stroke="black" stroke-width="2"/>
-<line x1="105.23" y1="462" x2="339.03" y2="462" stroke="black" stroke-width="2"/>
-<line x1="105.23" y1="462" x2="105.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="173.23" y1="462" x2="173.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="241.23" y1="462" x2="241.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="309.23" y1="462" x2="309.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="407.52" y1="420" x2="407.52" y2="462" stroke="black" stroke-width="2"/>
-<line x1="407.52" y1="462" x2="445.23" y2="462" stroke="black" stroke-width="2"/>
-<line x1="445.23" y1="462" x2="445.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="571.7" y1="420" x2="571.7" y2="462" stroke="black" stroke-width="2"/>
-<line x1="513.23" y1="462" x2="708.5" y2="462" stroke="black" stroke-width="2"/>
-<line x1="513.23" y1="462" x2="513.23" y2="484" stroke="black" stroke-width="2"/>
-<line x1="708.5" y1="462" x2="708.5" y2="484" stroke="black" stroke-width="2"/>
+<line x1="578" y1="336" x2="578" y2="386" stroke="black" stroke-width="2"/>
+<line x1="578" y1="386" x2="605.7" y2="386" stroke="black" stroke-width="2"/>
+<line x1="605.7" y1="386" x2="605.7" y2="400" stroke="black" stroke-width="2"/>
+<line x1="339.03" y1="420" x2="339.03" y2="470" stroke="black" stroke-width="2"/>
+<line x1="105.23" y1="470" x2="339.03" y2="470" stroke="black" stroke-width="2"/>
+<line x1="105.23" y1="470" x2="105.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="173.23" y1="470" x2="173.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="241.23" y1="470" x2="241.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="309.23" y1="470" x2="309.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="407.52" y1="420" x2="407.52" y2="470" stroke="black" stroke-width="2"/>
+<line x1="407.52" y1="470" x2="445.23" y2="470" stroke="black" stroke-width="2"/>
+<line x1="445.23" y1="470" x2="445.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="571.7" y1="420" x2="571.7" y2="470" stroke="black" stroke-width="2"/>
+<line x1="513.23" y1="470" x2="708.5" y2="470" stroke="black" stroke-width="2"/>
+<line x1="513.23" y1="470" x2="513.23" y2="484" stroke="black" stroke-width="2"/>
+<line x1="708.5" y1="470" x2="708.5" y2="484" stroke="black" stroke-width="2"/>
 <line x1="139.23" y1="504" x2="139.23" y2="546" stroke="black" stroke-width="2"/>
 <line x1="28.91" y1="546" x2="164.91" y2="546" stroke="black" stroke-width="2"/>
 <line x1="28.91" y1="546" x2="28.91" y2="568" stroke="black" stroke-width="2"/>
@@ -124,11 +124,11 @@
 <line x1="232.91" y1="546" x2="411.23" y2="546" stroke="black" stroke-width="2"/>
 <line x1="232.91" y1="546" x2="232.91" y2="568" stroke="black" stroke-width="2"/>
 <line x1="368.91" y1="546" x2="368.91" y2="568" stroke="black" stroke-width="2"/>
-<line x1="479.23" y1="504" x2="479.23" y2="546" stroke="black" stroke-width="2"/>
-<line x1="479.23" y1="546" x2="640.91" y2="546" stroke="black" stroke-width="2"/>
-<line x1="504.91" y1="546" x2="504.91" y2="568" stroke="black" stroke-width="2"/>
-<line x1="572.91" y1="546" x2="572.91" y2="568" stroke="black" stroke-width="2"/>
-<line x1="640.91" y1="546" x2="640.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="479.23" y1="504" x2="479.23" y2="554" stroke="black" stroke-width="2"/>
+<line x1="479.23" y1="554" x2="640.91" y2="554" stroke="black" stroke-width="2"/>
+<line x1="504.91" y1="554" x2="504.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="572.91" y1="554" x2="572.91" y2="568" stroke="black" stroke-width="2"/>
+<line x1="640.91" y1="554" x2="640.91" y2="568" stroke="black" stroke-width="2"/>
 <line x1="674.5" y1="504" x2="674.5" y2="546" stroke="black" stroke-width="2"/>
 <line x1="674.5" y1="546" x2="776.91" y2="546" stroke="black" stroke-width="2"/>
 <line x1="708.91" y1="546" x2="708.91" y2="568" stroke="black" stroke-width="2"/>
@@ -182,10 +182,10 @@
 <line x1="547.44" y1="1134" x2="547.44" y2="1156" stroke="black" stroke-width="2"/>
 <line x1="683.44" y1="1134" x2="683.44" y2="1156" stroke="black" stroke-width="2"/>
 <line x1="751.44" y1="1134" x2="751.44" y2="1156" stroke="black" stroke-width="2"/>
-<line x1="513.44" y1="1176" x2="513.44" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="459.52" y1="1218" x2="527.52" y2="1218" stroke="black" stroke-width="2"/>
-<line x1="459.52" y1="1218" x2="459.52" y2="1240" stroke="black" stroke-width="2"/>
-<line x1="527.52" y1="1218" x2="527.52" y2="1240" stroke="black" stroke-width="2"/>
+<line x1="513.44" y1="1176" x2="513.44" y2="1226" stroke="black" stroke-width="2"/>
+<line x1="459.52" y1="1226" x2="527.52" y2="1226" stroke="black" stroke-width="2"/>
+<line x1="459.52" y1="1226" x2="459.52" y2="1240" stroke="black" stroke-width="2"/>
+<line x1="527.52" y1="1226" x2="527.52" y2="1240" stroke="black" stroke-width="2"/>
 <line x1="581.44" y1="1176" x2="581.44" y2="1218" stroke="black" stroke-width="2"/>
 <line x1="581.44" y1="1218" x2="595.52" y2="1218" stroke="black" stroke-width="2"/>
 <line x1="595.52" y1="1218" x2="595.52" y2="1240" stroke="black" stroke-width="2"/>
@@ -597,10 +597,14 @@
 <text x="420.54" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
 <text x="318.54" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
 <text x="386.54" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon I</text>
+<rect x="432.24" y="126" width="44.6" height="13" fill="white"/>
 <text x="454.54" y="136" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Visenya</text>
+<rect x="296.24" y="210" width="44.6" height="13" fill="white"/>
 <text x="318.54" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aenys I</text>
+<rect x="361.34" y="190" width="50.4" height="26" fill="white"/>
 <text x="386.54" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alyssa Velaryon</title>Alyssa</text>
 <text x="386.54" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<rect x="429.34" y="210" width="50.4" height="13" fill="white"/>
 <text x="454.54" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegor I</text>
 <text x="51.41" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
 <text x="119.41" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
@@ -613,6 +617,7 @@
 <text x="68" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text>
 <text x="136" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text>
 <text x="204" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
+<rect x="252.6" y="378" width="38.8" height="13" fill="white"/>
 <text x="272" y="388" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelon</text>
 <text x="340" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alyssa</text>
 <text x="408" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Rodrik Arryn</title>Rodrik</text>
@@ -638,24 +643,33 @@
 <text x="537.7" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Corlys Velaryon</title>Corlys</text>
 <text x="537.7" y="465" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
 <text x="605.7" y="452" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text>
+<rect x="80.03" y="546" width="50.4" height="13" fill="white"/>
 <text x="105.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon II</text>
 <text x="173.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helaena</text>
+<rect x="221.83" y="546" width="38.8" height="13" fill="white"/>
 <text x="241.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemond</text>
 <text x="309.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
+<text x="377.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
 <text x="445.23" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenyra</text>
 <text x="513.23" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laenor Velaryon</title>Laenor</text>
 <text x="513.23" y="549" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="640.5" y="536" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
 <text x="708.5" y="556" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laena Velaryon</title>Laena</text>
 <text x="708.5" y="569" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
 <text x="28.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys</text>
 <text x="96.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaera</text>
 <text x="164.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maelor</text>
+<rect x="204.81" y="630" width="56.2" height="13" fill="white"/>
 <text x="232.91" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon III</text>
+<rect x="275.71" y="610" width="50.4" height="26" fill="white"/>
 <text x="300.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daenaera Velaryon</title>Daenaera</text>
 <text x="300.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<rect x="337.91" y="630" width="62" height="13" fill="white"/>
 <text x="368.91" y="640" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys II</text>
+<rect x="417.51" y="610" width="38.8" height="26" fill="white"/>
 <text x="436.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Larra Rogare</title>Larra</text>
 <text x="436.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rogare</text>
+<rect x="479.71" y="610" width="50.4" height="26" fill="white"/>
 <text x="504.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jacaerys Velaryon</title>Jacaerys</text>
 <text x="504.91" y="633" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
 <text x="572.91" y="620" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lucerys Velaryon</title>Lucerys</text>
@@ -669,26 +683,35 @@
 <text x="190.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text>
 <text x="258.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elaena</text>
 <text x="326.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daena</text>
+<rect x="369.07" y="714" width="50.4" height="13" fill="white"/>
 <text x="394.27" y="724" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon IV</text>
 <text x="462.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Naerys</text>
 <text x="530.27" y="704" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
+<rect x="304" y="778" width="56.2" height="26" fill="white"/>
 <text x="332.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daemon Blackfyre</title>Daemon</text>
 <text x="332.1" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackfyre</text>
+<rect x="372" y="798" width="56.2" height="13" fill="white"/>
 <text x="400.1" y="808" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron II</text>
+<rect x="445.8" y="778" width="44.6" height="26" fill="white"/>
 <text x="468.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Myriah Martell</title>Myriah</text>
 <text x="468.1" y="801" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text>
 <text x="536.1" y="788" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text>
 <text x="332.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor</text>
+<rect x="377.8" y="882" width="44.6" height="13" fill="white"/>
 <text x="400.1" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys I</text>
 <text x="468.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegel</text>
+<rect x="510.9" y="882" width="50.4" height="13" fill="white"/>
 <text x="536.1" y="892" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maekar I</text>
+<rect x="584.7" y="862" width="38.8" height="26" fill="white"/>
 <text x="604.1" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Dyanna Dayne</title>Dyanna</text>
 <text x="604.1" y="885" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Dayne</text>
 <text x="388.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
 <text x="456.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text>
 <text x="524.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text>
 <text x="592.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text>
+<rect x="638.47" y="966" width="44.6" height="13" fill="white"/>
 <text x="660.77" y="976" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon V</text>
+<rect x="700.67" y="946" width="56.2" height="26" fill="white"/>
 <text x="728.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Betha Blackwood</title>Betha</text>
 <text x="728.77" y="969" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackwood</text>
 <text x="796.77" y="956" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhae</text>
@@ -698,6 +721,7 @@
 <text x="694.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaera</text>
 <text x="762.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
 <text x="830.77" y="1040" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaelle</text>
+<rect x="601.57" y="1134" width="50.4" height="13" fill="white"/>
 <text x="626.77" y="1144" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys II</text>
 <text x="694.77" y="1124" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text>
 <text x="479.44" y="1208" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Elia Martell</title>Elia</text>

@@ -256,14 +256,12 @@ function escapeXml(s: string): string {
 
 function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
-  const seen = new Set<string>();
 
-  // Text goes under the first drawn copy of each person only.
+  // Text goes under every copy of someone drawn more than once, as on the
+  // canvas: a copy with no name can only be told by following its dashed arc.
   for (const node of flow.nodes) {
     const pos = slotPos.get(node.id);
-    const ind = node.data.individual;
-    if (!pos || seen.has(ind.id)) continue;
-    seen.add(ind.id);
+    if (!pos) continue;
     const glyph = node.data.glyph;
 
     const { x: cx, y: cy } = pos;

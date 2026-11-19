@@ -227,6 +227,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   drawing is centred under it, in both exporters. It is a
   `<text class="chart-title">` outside the `labels` group, so the export
   lint ignores it.
+- Someone drawn more than once has their text under every copy, as on the
+  canvas. The copy number alone does not say who a copy is.
 - Hidden descendants (#94): `deidentify` works on the drawn pedigree, so the
   generation numbers count only people who are drawn, and returns its copy
   through `asDrawn` so the collapsed-branch group symbols (#1) stay group

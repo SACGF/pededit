@@ -129,10 +129,10 @@
 <line x1="594.01" y1="780" x2="594.01" y2="820" stroke="black" stroke-width="2"/>
 <line x1="674.01" y1="780" x2="674.01" y2="820" stroke="black" stroke-width="2"/>
 <line x1="754.01" y1="780" x2="754.01" y2="820" stroke="black" stroke-width="2"/>
-<line x1="793.53" y1="720" x2="793.53" y2="780" stroke="black" stroke-width="2"/>
-<line x1="793.53" y1="780" x2="914.01" y2="780" stroke="black" stroke-width="2"/>
-<line x1="834.01" y1="780" x2="834.01" y2="820" stroke="black" stroke-width="2"/>
-<line x1="914.01" y1="780" x2="914.01" y2="820" stroke="black" stroke-width="2"/>
+<line x1="793.53" y1="720" x2="793.53" y2="790" stroke="black" stroke-width="2"/>
+<line x1="793.53" y1="790" x2="914.01" y2="790" stroke="black" stroke-width="2"/>
+<line x1="834.01" y1="790" x2="834.01" y2="820" stroke="black" stroke-width="2"/>
+<line x1="914.01" y1="790" x2="914.01" y2="820" stroke="black" stroke-width="2"/>
 <line x1="314.01" y1="840" x2="314.01" y2="900" stroke="black" stroke-width="2"/>
 <line x1="63.85" y1="900" x2="383.85" y2="900" stroke="black" stroke-width="2"/>
 <line x1="63.85" y1="900" x2="63.85" y2="940" stroke="black" stroke-width="2"/>
@@ -639,9 +639,11 @@
 <text x="203.8" y="752" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helaena</text>
 <text x="283.8" y="772" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemond</text>
 <text x="363.8" y="752" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text>
+<text x="443.8" y="752" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
 <text x="523.8" y="772" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenyra</text>
 <text x="603.8" y="752" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laenor Velaryon</title>Laenor</text>
 <text x="603.8" y="765" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
+<text x="753.53" y="752" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text>
 <text x="833.53" y="772" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laena Velaryon</title>Laena</text>
 <text x="833.53" y="785" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text>
 <text x="34.01" y="872" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys</text>

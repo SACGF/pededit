@@ -396,7 +396,9 @@ Stable, and covered by semantic versioning from 1.0:
   `FAMILY_GAP`.
 - `pedigreeToGeometry(pedigree, constants?)`: pixel geometry, built on
   `alignPedigree`, and the hop line helpers `hopHeight`, `hopTurn`,
-  `couplePortHeights`, `symbolSideDx`.
+  `couplePortHeights`, `symbolSideDx`. `descentX` is where the line to the
+  children leaves the couple line: the middle, or straight above an only
+  child who sits within a quarter of a symbol of it.
 - `resolveCouple`, `buildPartnerSetFromPedigree`: which slots a `spouse`
   mark joins.
 - `kinshipCoefficients(pedigree, options?)`.

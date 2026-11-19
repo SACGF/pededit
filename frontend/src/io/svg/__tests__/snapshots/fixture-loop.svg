@@ -96,6 +96,9 @@
 <text x="80" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text>
 <text x="160" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text>
 <text x="240" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Nettle</text>
+<text x="320" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maple</text>
+<text x="400" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text>
+<text x="480" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text>
 <text x="40" y="152" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Privet</text>
 <text x="200" y="152" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Quince</text>
 <text x="280" y="152" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sorrel</text>
