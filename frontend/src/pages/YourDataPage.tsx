@@ -17,6 +17,7 @@ export const YOUR_DATA_DESCRIPTION = "What PedEdit stores, where the server is, 
  * - where the server is and who runs it, the request logs' 14 days (the
  *   server's logrotate) and Cloudflare in front of it: the maintainer (#203);
  * - access rules: `backend/api/views.py` (`PedigreeViewSet.get_queryset`),
+ *   the id is a uuid4 (`backend/api/models.py`), 122 random bits,
  *   pinned by `PedigreeAccessTests` in `backend/api/tests.py`;
  * - deleting: `SettingsPanel` ("Delete this pedigree"), a hard delete;
  *   backups: `backupStatement` from `deploy/backup.sh`'s age limit;
@@ -60,9 +61,8 @@ export default function YourDataPage() {
 }
 
 /** Follows `errorReporting/scrub.ts` and `backend/peded/error_reporting.py`: change them together. */
-const ERROR_REPORTS = "When the app or the server hits an error, a report goes to Rollbar, an error tracking service: "
-  + "the kind of error, where in the code it happened and the kind of page (a pedigree page, not which one). A "
-  + "report never carries what is in a pedigree, a pedigree's link, or who you are.";
+const ERROR_REPORTS = "Errors are reported to Rollbar with the kind of error, where in the code and the kind of page, "
+  + "never a pedigree's contents, its link, or who you are.";
 
 const external = "underline underline-offset-2 hover:text-black";
 
@@ -75,9 +75,8 @@ function YourData() {
       term: "What is stored",
       text: (
         <>
-          Each pedigree is saved on the server at {host}: the chart, its title and everything typed into it,
-          including names, dates and notes. Changes are saved as you make them. Importing a file saves a new
-          pedigree there too, and so does the first change to an example.
+          Each pedigree is saved on the server at {host} as you edit it, with everything typed into it: names,
+          dates and notes. Imported files and edited examples are saved too.
         </>
       ),
     },
@@ -85,11 +84,11 @@ function YourData() {
       term: "Where it is",
       text: (
         <>
-          The server is on the{" "}
+          On the{" "}
           <a href="https://nectar.org.au" target="_blank" rel="noopener noreferrer" className={external}>
             Nectar Research Cloud
-          </a>
-          , at its Adelaide node in Australia. It is run by SA Pathology and the Centre for Cancer Biology.
+          </a>{" "}
+          in Adelaide, Australia, run by SA Pathology and the Centre for Cancer Biology.
         </>
       ),
     },
@@ -97,11 +96,10 @@ function YourData() {
       term: "Who can read it",
       text: (
         <>
-          A pedigree created while signed out is open to anyone who has its link: they can read it, change it
-          and delete it. The server does not list it anywhere and search engines are asked not to index it, so
-          the link is the key. Share it as carefully as the chart itself. It stays that way if you sign in
-          later. A pedigree created while signed in opens only in your account, and its link does not work for
-          anyone else. Whoever runs the server can read everything stored on it.
+          Made while signed out: anyone with the link can read, change and delete it, even after you sign in.
+          The link ends in a random 32-character code with far too many possibilities to guess, and is not listed
+          anywhere or indexed by search engines, so share it as carefully as the chart. Made while signed in:
+          only your account can open it. Whoever runs the server can read everything on it.
         </>
       ),
     },
@@ -109,9 +107,9 @@ function YourData() {
       term: "How to delete it",
       text: (
         <>
-          Open the pedigree, then <span className={name}>Pedigree settings</span> (the cog in the toolbar) and{" "}
-          <span className={name}>Delete this pedigree</span>. No account is needed. This removes it from the
-          server&apos;s database at once and cannot be undone. {backupStatement()}
+          <span className={name}>Pedigree settings</span> (the cog in the toolbar), then{" "}
+          <span className={name}>Delete this pedigree</span>. No account is needed, and it cannot be undone.{" "}
+          {backupStatement()}
         </>
       ),
     },
@@ -119,10 +117,9 @@ function YourData() {
       term: "Names are optional",
       text: (
         <>
-          Names, dates and notes are optional: a chart can be drawn with none. The SVG, PNG and PDF exports have
-          a <span className={name}>De-identify</span> option, which replaces names with pedigree numbers (I-1,
-          II-2) and leaves out dates, notes, the chart title and the clinical details. The CSV, PED and JSON
-          exports have no such option.
+          A chart can be drawn without names, dates or notes. SVG, PNG and PDF exports can{" "}
+          <span className={name}>De-identify</span>: pedigree numbers (I-1, II-2) replace names, and dates,
+          notes, the chart title and clinical details are left out. CSV, PED and JSON exports cannot.
         </>
       ),
     },
@@ -130,10 +127,9 @@ function YourData() {
       term: "In this browser",
       text: (
         <>
-          This browser keeps the <span className={name}>Recent on this device</span> list (the links and titles
-          of the last 20 pedigrees opened here), two display settings and, while you are signed in, your sign-in
-          tokens. Signing out takes your account&apos;s pedigrees off that list. On a shared computer, anyone
-          using this browser can see the rest of it and follow its links.
+          <span className={name}>Recent on this device</span> (links and titles of the last 20 pedigrees opened
+          here), two display settings and, while signed in, your sign-in tokens. Anyone using this browser can
+          see that list; signing out removes your account&apos;s pedigrees from it.
         </>
       ),
     },
@@ -141,11 +137,9 @@ function YourData() {
       term: "Signing in",
       text: (
         <>
-          Optional. Signing in with Google or GitHub stores the name and email address of that account on the
-          server, along with any conditions and tags you save to <span className={name}>My library</span>.{" "}
-          <span className={name}>Delete account</span>, at the top of the home page while signed in, deletes the
-          account, the pedigrees created while signed in and My library at once. Pedigrees created while signed
-          out are not part of the account and stay.
+          Optional. The server stores your Google or GitHub name and email, and anything you save to{" "}
+          <span className={name}>My library</span>. <span className={name}>Delete account</span>, on the home
+          page, deletes the account, its pedigrees and My library. Pedigrees made while signed out stay.
         </>
       ),
     },
@@ -153,16 +147,14 @@ function YourData() {
       term: "What is not done",
       text: (
         <>
-          No analytics, advertising or tracking scripts. The app sends a pedigree only to {host}, and exports
-          are made in your browser. The site is served through Cloudflare, which protects it from attacks:
-          requests pass through Cloudflare on the way to the server, and it does not store pedigrees.{" "}
+          No analytics, advertising or tracking. Pedigrees go only to {host}; exports are made in your browser.
+          Requests pass through Cloudflare for protection from attacks, which stores no pedigrees.{" "}
           {GOOGLE_CLIENT_ID
-            ? "One script comes from another site, on the Sign in page only: Google's sign-in script. No pedigree is sent to it."
-            : "No scripts, fonts or other files are loaded from other sites."}{" "}
+            ? "The only script from another site is Google's sign-in, on the Sign in page, and no pedigree is sent to it."
+            : "Nothing is loaded from other sites."}{" "}
           {ROLLBAR_ACCESS_TOKEN && ERROR_REPORTS}{" "}
-          The server&apos;s request logs record the time, the address requested (which includes a
-          pedigree&apos;s id, not its contents), the browser and the IP address, and are kept for 14 days. The
-          server&apos;s usage figures count pedigrees and accounts, not what is in them.
+          Request logs (time, address requested including a pedigree&apos;s id, browser, IP address) are kept for
+          14 days. Usage figures count pedigrees and accounts, not their contents.
         </>
       ),
     },
@@ -170,7 +162,7 @@ function YourData() {
       term: "Running your own",
       text: (
         <>
-          PedEdit is open source. A team that has to keep pedigrees on its own systems can{" "}
+          PedEdit is open source, so a team can{" "}
           <a
             href="https://github.com/SACGF/pededit/blob/main/INSTALL.md"
             target="_blank"
