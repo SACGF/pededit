@@ -1,0 +1,61 @@
+# House Lannister, George R. R. Martin, A Song of Ice and Fire: A Game of Thrones (1996)
+# to A Dance with Dragons (2011), their appendices, and The World of Ice & Fire (2014),
+# "Appendix: Lannister Lineage" and "House Lannister under the Dragons".
+# Gerold the Golden to Joffrey, Myrcella and Tommen, with the Freys of Genna's marriage
+# and Robert Baratheon. Tywin and his wife Joanna are first cousins (her father Jason is
+# Tytos's brother). Cersei and Jaime are twins, and Jaime is the father of her three
+# children (A Game of Thrones ch. 45), so they are F = 9/32 in kinship2; Robert is their
+# father in law only, a social parent in the app, so this file gives Jaime.
+# Twins: Tywald and Tion, Cersei and Jaime, Willem and Martyn (twin sets in the app;
+# PED has no column for them). Robert and Cersei's childless marriage is in the app only.
+# Left out: Jason's son by his first wife and his bastard daughter, Marla Prester's four
+# unnamed children, Cleos Frey's sons, Stafford's wife and children (with them between
+# Cersei and Gendry's family, Robert is drawn twice), and the childless marriages of
+# Tyrion (Tysha, Sansa Stark), Lancel, Joffrey and Tommen.
+# PHENO 2 = dwarfism (Tyrion).
+LANN	Gerold	0	0	1	1
+LANN	Rohanne_Webber	0	0	2	1
+# Gerold's four sons
+LANN	Tywald	Gerold	Rohanne_Webber	1	1
+LANN	Tion	Gerold	Rohanne_Webber	1	1
+LANN	Tytos	Gerold	Rohanne_Webber	1	1
+LANN	Jeyne_Marbrand	0	0	2	1
+LANN	Jason	Gerold	Rohanne_Webber	1	1
+LANN	Marla_Prester	0	0	2	1
+# Tytos's children, in birth order, and their partners
+LANN	Tywin	Tytos	Jeyne_Marbrand	1	1
+LANN	Kevan	Tytos	Jeyne_Marbrand	1	1
+LANN	Dorna_Swyft	0	0	2	1
+LANN	Genna	Tytos	Jeyne_Marbrand	2	1
+LANN	Emmon_Frey	0	0	1	1
+LANN	Tygett	Tytos	Jeyne_Marbrand	1	1
+LANN	Darlessa_Marbrand	0	0	2	1
+LANN	Gerion	Tytos	Jeyne_Marbrand	1	1
+LANN	Briony	0	0	2	1
+# Jason's children by Marla
+LANN	Joanna	Jason	Marla_Prester	2	1
+LANN	Stafford	Jason	Marla_Prester	1	1
+# The twins and Tyrion
+LANN	Cersei	Tywin	Joanna	2	1
+LANN	Jaime	Tywin	Joanna	1	1
+LANN	Tyrion	Tywin	Joanna	1	2
+LANN	Robert	0	0	1	1
+LANN	Gendry_mother	0	0	2	1
+# Kevan's children
+LANN	Lancel	Kevan	Dorna_Swyft	1	1
+LANN	Willem	Kevan	Dorna_Swyft	1	1
+LANN	Martyn	Kevan	Dorna_Swyft	1	1
+LANN	Janei	Kevan	Dorna_Swyft	2	1
+# Genna's sons by Emmon Frey
+LANN	Cleos_Frey	Emmon_Frey	Genna	1	1
+LANN	Lyonel_Frey	Emmon_Frey	Genna	1	1
+LANN	Tion_Frey	Emmon_Frey	Genna	1	1
+LANN	Walder_Frey	Emmon_Frey	Genna	1	1
+# Tygett's and Gerion's children
+LANN	Tyrek	Tygett	Darlessa_Marbrand	1	1
+LANN	Joy_Hill	Gerion	Briony	2	1
+# Cersei's children by Jaime, and Robert's bastard
+LANN	Joffrey	Jaime	Cersei	1	1
+LANN	Myrcella	Jaime	Cersei	2	1
+LANN	Tommen	Jaime	Cersei	1	1
+LANN	Gendry	Robert	Gendry_mother	1	1

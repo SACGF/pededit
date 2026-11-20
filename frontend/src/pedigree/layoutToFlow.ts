@@ -349,7 +349,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
     if (n) { n.data.labelsBacked = true; n.data.glyph.labelsBacked = true; }
   }
 
-  const text = textBlocks(pedigree, nodes, spacing), bars = sibshipBlocks(sibshipEdges);
+  const text = textBlocks(pedigree, nodes, spacing), bars = sibshipBlocks(sibshipEdges, nodes);
   let coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...bars]);
   // The arcs keep off the couple lines, and the couple labels off the arcs.
   const duplicateEdges = buildDuplicateEdges(pedigree, nodes, spacing, sibshipEdges, coupleEdges);
@@ -705,16 +705,38 @@ function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<strin
   });
 }
 
-/** Sibship bars and the drops from them, as thin boxes, so a raised couple label stays under them. */
-function sibshipBlocks(edges: Edge<SibshipEdgeData>[]): TextBlock[] {
+/**
+ * Sibship bars and the drops from them, as thin boxes, so a raised couple
+ * label stays under them. A twin's drop runs slantwise from the set's fork
+ * on the bar, over the gap between twins who are partners, so it is a run of
+ * short boxes along the slant.
+ */
+function sibshipBlocks(edges: Edge<SibshipEdgeData>[], nodes: Node<RFNodeData>[]): TextBlock[] {
+  const twinSetOf = new Map(nodes.map(n => [n.id, n.data.twinSet]));
   return edges.flatMap(e => {
     const d = e.data;
     if (!d) return [];
     const xs = [d.coupleX, ...d.childXs];
     const lo = Math.min(...xs), hi = Math.max(...xs);
+    const forkX = new Map<string, number[]>();
+    d.childIds.forEach((id, i) => {
+      const set = twinSetOf.get(id);
+      if (set !== undefined) forkX.set(set, [...(forkX.get(set) ?? []), d.childXs[i]!]);
+    });
     return [
       { x: (lo + hi) / 2, halfWidth: (hi - lo) / 2 + 1, top: d.sibBarY - 2, bottom: d.sibBarY + 2 },
-      ...d.childXs.map((x, i) => ({ x, halfWidth: 1, top: d.sibBarY, bottom: (d.childYs[i] ?? d.childY) - NODE_SIZE / 2 })),
+      ...d.childXs.flatMap((x, i) => {
+        const bottom = (d.childYs[i] ?? d.childY) - NODE_SIZE / 2;
+        const members = forkX.get(twinSetOf.get(d.childIds[i]!) ?? "");
+        if (!members || members.length < 2) return [{ x, halfWidth: 1, top: d.sibBarY, bottom }];
+        const from = members.reduce((a, b) => a + b, 0) / members.length;
+        const steps = 8;
+        return Array.from({ length: steps }, (_, k) => {
+          const x0 = from + (x - from) * k / steps, x1 = from + (x - from) * (k + 1) / steps;
+          const y0 = d.sibBarY + (bottom - d.sibBarY) * k / steps, y1 = d.sibBarY + (bottom - d.sibBarY) * (k + 1) / steps;
+          return { x: (x0 + x1) / 2, halfWidth: Math.abs(x1 - x0) / 2 + 1, top: y0, bottom: y1 };
+        });
+      }),
     ];
   });
 }

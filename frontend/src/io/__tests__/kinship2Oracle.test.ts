@@ -38,6 +38,7 @@ const FIXTURES: Record<string, string> = {
   targaryen_example_order: "fiction/targaryen_example_order.ped",
   buendia: "fiction/buendia.ped",
   atreides: "fiction/atreides.ped",
+  lannister: "fiction/lannister.ped",
   three_quarter_siblings: "classic/three_quarter_siblings.ped",
   five_eighths_siblings: "classic/five_eighths_siblings.ped",
   full_sib_mating: "classic/full_sib_mating.ped",
@@ -267,6 +268,7 @@ const EXAMPLE_FIXTURES: Record<string, string> = {
   "House Targaryen": "targaryen_example_order",
   "The Buendías": "buendia",
   "House Atreides": "atreides",
+  "House Lannister": "lannister",
   "3/4 siblings": "three_quarter_siblings",
   "5/8 siblings": "five_eighths_siblings",
   "Full-sib mating": "full_sib_mating",
@@ -296,9 +298,16 @@ describe("in-app historic and classic examples", () => {
       const ids = ex.data.individuals.map(i => i.id);
       expect(ids).toEqual(fixture.individuals.map(i => i.id));
 
-      // R is given the family alone: where an example chooses how its couples
-      // are drawn (leftPartner, drawnBeside), that is the editor's, not kinship2's.
-      const asR: typeof ex.data = { ...ex.data, partnerships: ex.data.partnerships.map(({ leftPartner: _l, drawnBeside: _b, ...c }) => c) };
+      // R is given the family alone: how an example's couples are drawn
+      // (leftPartner, drawnBeside), its twins, social parents and childless
+      // couples are not in PED, so they are the editor's, not kinship2's.
+      const asR: typeof ex.data = {
+        ...ex.data,
+        individuals: ex.data.individuals.map(({ socialParents: _s, ...i }) => i),
+        partnerships: ex.data.partnerships
+          .filter(c => ex.data.parentOf[c.id]?.length)
+          .map(({ leftPartner: _l, drawnBeside: _b, twins: _t, ...c }) => c),
+      };
       const ours = alignPedigree(asR);
       assertInvariants(ours, ex.data, ex.label);
       expect(ids).toEqual(R.ids);

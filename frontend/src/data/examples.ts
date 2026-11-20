@@ -1,4 +1,4 @@
-import type { Pedigree, Individual, Partnership, Sex, Tag } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Individual, Partnership, Sex, Tag, TwinSet } from "@pedigree-editor/layout-engine";
 import { withCurrentNotation } from "../pedigree/notation";
 import { PRACTICE_FAMILIES } from "./practiceFamilies";
 
@@ -644,6 +644,33 @@ function withCouples(ped: Pedigree, drawn: Record<string, Pick<Partnership, "lef
   return { ...ped, partnerships: ped.partnerships.map(p => (drawn[p.id] ? { ...p, ...drawn[p.id] } : p)) };
 }
 
+/**
+ * Add twin sets, each on the partnership whose children its members are, and
+ * parents who are not genetic (`Individual.socialParents`), by child id.
+ * Throws on an unknown id, or twins with different parents, so a typo fails
+ * the example tests.
+ */
+function withTwinsAndSocialParents(
+  ped: Pedigree,
+  twins: TwinSet[],
+  socialParents: Record<string, string[]> = {},
+): Pedigree {
+  const ids = new Set(ped.individuals.map(i => i.id));
+  const partnerships = ped.partnerships.map(p => ({ ...p }));
+  for (const set of twins) {
+    const p = partnerships.find(q => set.members.every(m => ped.parentOf[q.id]?.includes(m)));
+    if (!p) throw new Error(`withTwinsAndSocialParents: ${set.members.join(", ")} are not children of one couple`);
+    p.twins = [...(p.twins ?? []), set];
+  }
+  for (const [child, parents] of Object.entries(socialParents)) {
+    for (const id of [child, ...parents]) {
+      if (!ids.has(id)) throw new Error(`withTwinsAndSocialParents: no individual ${id}`);
+    }
+  }
+  const individuals = ped.individuals.map(i => (socialParents[i.id] ? { ...i, socialParents: socialParents[i.id] } : i));
+  return { ...ped, individuals, partnerships };
+}
+
 function historicAndClassicExamples(): ExamplePedigree[] {
   const M: Sex = "male";
   const F: Sex = "female";
@@ -950,6 +977,91 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     // The line continues
     ["Atreides_line",    U, "Farad_n", "Ghanima", { name: "Their descendants", notes: "The Atreides line of Ghanima and Farad'n, through Moneo to Siona (God Emperor of Dune), not shown individually" }],
   ];
+
+  // Fiction: test-data/ped/fiction/lannister.ped, where the sources are listed.
+  // Affected = dwarfism. Deceased as at the end of A Dance with Dragons.
+  const dead = { deceased: true };
+  const lannister: Row[] = [
+    ["Gerold",           M, null, null, { name: "Gerold", ...dead, notes: "The Golden. Lord of Casterly Rock" }],
+    ["Rohanne_Webber",   F, null, null, { name: "Rohanne Webber", notes: "Lady of Coldmoat in The Sworn Sword" }],
+    // Gerold's four sons
+    ["Tywald",           M, "Gerold", "Rohanne_Webber", { name: "Tywald", ...dead, notes: "Elder twin of Tion; killed at Starpike" }],
+    ["Tion",             M, "Gerold", "Rohanne_Webber", { name: "Tion", ...dead, notes: "Twin of Tywald" }],
+    ["Tytos",            M, "Gerold", "Rohanne_Webber", { name: "Tytos", ...dead, notes: "Lord of Casterly Rock. Called the Laughing Lion until Jeyne died" }],
+    ["Jeyne_Marbrand",   F, null, null, { name: "Jeyne Marbrand", ...dead, notes: "Died within a month of Gerion's birth" }],
+    ["Jason",            M, "Gerold", "Rohanne_Webber", { name: "Jason", ...dead, notes: "Killed at the Battle of the Bloodstone. Also had a son by his first wife, Alys Stackspear, and a bastard daughter, not shown" }],
+    ["Marla_Prester",    F, null, null, { name: "Marla Prester", notes: "Jason's second wife. Three sons and three daughters; four of them are never named and are not shown" }],
+    // Tytos's children, in birth order, and their partners
+    ["Tywin",            M, "Tytos", "Jeyne_Marbrand", { name: "Tywin", ...dead, notes: "Lord of Casterly Rock and Hand of the King. Killed by Tyrion" }],
+    ["Kevan",            M, "Tytos", "Jeyne_Marbrand", { name: "Kevan", ...dead, notes: "Refused to be Cersei's Hand; Lord Regent for Tommen. Killed by Varys" }],
+    ["Dorna_Swyft",      F, null, null, { name: "Dorna Swyft" }],
+    ["Genna",            F, "Tytos", "Jeyne_Marbrand", { name: "Genna" }],
+    ["Emmon_Frey",       M, null, null, { name: "Emmon Frey", notes: "Son of Lord Walder Frey" }],
+    ["Tygett",           M, "Tytos", "Jeyne_Marbrand", { name: "Tygett", ...dead, notes: "Died of a pox" }],
+    ["Darlessa_Marbrand", F, null, null, { name: "Darlessa Marbrand", notes: "Of his mother's house; the books do not say how she is related to Jeyne" }],
+    ["Gerion",           M, "Tytos", "Jeyne_Marbrand", { name: "Gerion", ...dead, notes: "Lost at sea searching for Brightroar, the lost Lannister sword" }],
+    ["Briony",           F, null, null, { name: "Briony", notes: "A common woman" }],
+    // Jason's children by Marla
+    ["Joanna",           F, "Jason", "Marla_Prester", { name: "Joanna", ...dead, notes: "Tywin's first cousin and wife. Died giving birth to Tyrion" }],
+    ["Stafford",         M, "Jason", "Marla_Prester", { name: "Stafford", ...dead, notes: "Tywin's cousin and brother-in-law, \"so twice related\". Killed at Oxcross. His wife Myranda Lefford and their three children are not shown" }],
+    // The twins and Tyrion
+    ["Cersei",           F, "Tywin", "Joanna", { name: "Cersei", notes: "Elder twin: Jaime \"came into this world holding my foot\". Queen to Robert; her three children are Jaime's" }],
+    ["Jaime",            M, "Tywin", "Joanna", { name: "Jaime", notes: "Twin of Cersei and father of her children. Lord Commander of the Kingsguard; never married" }],
+    ["Tyrion",           M, "Tywin", "Joanna", { name: "Tyrion", proband: true, notes: "The Imp, a dwarf, with one green eye and one black. Tywin blamed him for Joanna's death. Married Tysha (annulled) and Sansa Stark (never consummated)" }],
+    ["Robert",           M, null, null, { name: "Robert Baratheon", ...dead, notes: "King. Cersei's husband and legal father of her children, who are not his. Killed by a boar" }],
+    ["Gendry_mother",    F, null, null, { name: "Gendry's mother", ...dead, notes: "Unnamed; an alehouse worker with blonde hair, who died when he was small" }],
+    // Kevan's children
+    ["Lancel",           M, "Kevan", "Dorna_Swyft", { name: "Lancel", notes: "Cersei's first cousin and, while Jaime was a captive, her lover; no children" }],
+    ["Willem",           M, "Kevan", "Dorna_Swyft", { name: "Willem", ...dead, notes: "Twin of Martyn; which was born first is not known. Killed by Rickard Karstark as a captive" }],
+    ["Martyn",           M, "Kevan", "Dorna_Swyft", { name: "Martyn", notes: "Twin of Willem" }],
+    ["Janei",            F, "Kevan", "Dorna_Swyft", { name: "Janei" }],
+    // Genna's sons by Emmon Frey
+    ["Cleos_Frey",       M, "Emmon_Frey", "Genna", { name: "Cleos Frey", ...dead, notes: "Killed by outlaws escorting Jaime" }],
+    ["Lyonel_Frey",      M, "Emmon_Frey", "Genna", { name: "Lyonel Frey" }],
+    ["Tion_Frey",        M, "Emmon_Frey", "Genna", { name: "Tion Frey", ...dead, notes: "Killed with Willem by Rickard Karstark" }],
+    ["Walder_Frey",      M, "Emmon_Frey", "Genna", { name: "Red Walder", notes: "Walder Frey, called Red Walder" }],
+    // Tygett's and Gerion's children
+    ["Tyrek",            M, "Tygett", "Darlessa_Marbrand", { name: "Tyrek", notes: "Missing since the riot in King's Landing, feared dead" }],
+    ["Joy_Hill",         F, "Gerion", "Briony", { name: "Joy Hill", notes: "Gerion's bastard by Briony, a common woman" }],
+    // Cersei's children by Jaime, and Robert's bastard
+    ["Joffrey",          M, "Jaime", "Cersei", { name: "Joffrey", ...dead, notes: "King. Recorded as Robert's son; fathered by Jaime. F = 9/32. Poisoned at his wedding" }],
+    ["Myrcella",         F, "Jaime", "Cersei", { name: "Myrcella", notes: "Recorded as Robert's daughter; fathered by Jaime. F = 9/32" }],
+    ["Tommen",           M, "Jaime", "Cersei", { name: "Tommen", notes: "King after Joffrey. Recorded as Robert's son; fathered by Jaime. F = 9/32" }],
+    ["Gendry",           M, "Robert", "Gendry_mother", { name: "Gendry", notes: "Robert's bastard, black-haired like all of them, though his mother was fair" }],
+  ];
+  const lannisterTags = [
+    { id: "dwarfism", label: "Dwarfism", color: "#000000", style: "quadrant" as const,
+      members: ["Tyrion"] },
+    { id: "golden", label: "Golden hair", color: "#e0b000", style: "quadrant" as const, kind: "trait" as const,
+      members: ["Cersei", "Jaime", "Joffrey", "Myrcella", "Tommen"] },
+    { id: "black_hair", label: "Black hair", color: "#1f3a93", style: "quadrant" as const, kind: "trait" as const,
+      members: ["Robert", "Gendry"] },
+    { id: "hand", label: "Hand of the King", color: "#000000", style: "text" as const, abbrev: "Hand",
+      members: ["Tywin", "Tyrion"] },
+    { id: "kingsguard", label: "Kingsguard", color: "#000000", style: "text" as const, abbrev: "KG",
+      members: ["Jaime"] },
+    { id: "throne", label: "Sat the Iron Throne", color: "#000000", style: "text" as const, abbrev: "Throne",
+      members: ["Robert", "Joffrey", "Tommen"] },
+  ];
+  const lannisterNotes: Record<string, string> = {
+    Robert: "Eddard read in the book of lineages that every earlier Lannister and Baratheon match had black-haired children, so the golden-haired three could not be Robert's",
+    Tyrion: "Acting Hand for Joffrey",
+  };
+  const lannisterData = (): Pedigree => {
+    const ped = withTwinsAndSocialParents(
+      withTags(fromRows(lannister), lannisterTags, lannisterNotes),
+      [
+        { members: ["Tywald", "Tion"], zygosity: "unknown" },
+        { members: ["Cersei", "Jaime"], zygosity: "dizygotic" },
+        { members: ["Willem", "Martyn"], zygosity: "unknown" },
+      ],
+      { Joffrey: ["Robert"], Myrcella: ["Robert"], Tommen: ["Robert"] },
+    );
+    // Robert and Cersei's marriage had no children (she ended her one
+    // pregnancy by him), so fromRows, which makes couples from children, has
+    // no line for it.
+    return { ...ped, partnerships: [...ped.partnerships, { id: "Robert+Cersei", individual1: "Robert", individual2: "Cersei" }] };
+  };
   const atreidesTags = [
     { id: "preborn", label: "Pre-born (ancestral memory before birth)", color: "#9467bd", style: "quadrant" as const, kind: "trait" as const,
       members: ["Alia", "Leto_II", "Ghanima"] },
@@ -1131,6 +1243,14 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       group: "Fiction",
       citation: "F. Herbert, Dune (1965), Dune Messiah (1969), Children of Dune (1976)",
       data: withTags(fromRows(atreides), atreidesTags),
+    },
+    {
+      slug: "lannister",
+      label: "House Lannister",
+      description: "5 generations · 38 individuals · twins who are partners, with first cousin parents. Joffrey F = 9/32",
+      group: "Fiction",
+      citation: "G. R. R. Martin, A Song of Ice and Fire (1996 to 2011) and The World of Ice & Fire (2014)",
+      data: lannisterData(),
     },
   ];
 }

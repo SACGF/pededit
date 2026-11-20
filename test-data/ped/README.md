@@ -108,6 +108,23 @@ House Atreides, Frank Herbert, Dune (1965), Dune Messiah (1969), Children of Dun
 - Ghanima and Farad'n's descendants are one unknown-sex node. Without it the Corrinos
   would be a separate component (component ordering is #39) joined only by Paul and
   Irulan's childless marriage, which PED cannot express.
+
+### `fiction/lannister.ped`
+House Lannister from George R. R. Martin's A Song of Ice and Fire: the five novels and
+their appendices, and The World of Ice & Fire (2014), "Appendix: Lannister Lineage" and
+"House Lannister under the Dragons". Checked against the chapter citations on A Wiki of
+Ice and Fire; facts from TV only (Cersei's black-haired son by Robert) or from the
+unabridged Westerlands text cut from the book are left out.
+- 38 individuals, 5 generation rows, Gerold the Golden to Joffrey, Myrcella and Tommen.
+- Tywin and Joanna are first cousins, so Cersei and Jaime have F = 1/16 and their three
+  children F = 9/32 in kinship2. The file gives Jaime as their father (A Game of Thrones
+  ch. 45); the app adds Robert as social parent, his childless marriage to Cersei and the
+  three twin sets (Tywald and Tion, Cersei and Jaime, Willem and Martyn).
+- Stafford's wife and children are left out: placed between Cersei and Gendry's family
+  they made kinship2 draw Robert twice.
+- PHENO 2 = dwarfism (Tyrion).
+- Exercises: twins who are partners (the couple label must keep off the twin fork), a
+  sibling mating whose parents are themselves cousins, a childless couple.
 - PHENO 2 = Kwisatz Haderach (Paul, Leto II). The in-app example tags the four Bene
   Gesserit (Mohiam, Jessica, Anirul, Irulan) with a "BG" text tag.
 
