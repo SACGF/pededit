@@ -41,7 +41,7 @@ describe("example slugs (#150)", () => {
       "targaryen": "House Targaryen",
       "buendia": "The Buendías",
       "atreides": "House Atreides",
-      "lannister": "House Lannister",
+      "lannister": "House Lannister (TV show)",
       "practice-breast-ovarian-cancer": "Breast and ovarian cancer",
       "practice-cystic-fibrosis": "Cystic fibrosis, first cousin parents",
       "practice-duchenne": "Duchenne muscular dystrophy",

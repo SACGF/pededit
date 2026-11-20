@@ -268,7 +268,7 @@ const EXAMPLE_FIXTURES: Record<string, string> = {
   "House Targaryen": "targaryen_example_order",
   "The Buendías": "buendia",
   "House Atreides": "atreides",
-  "House Lannister": "lannister",
+  "House Lannister (TV show)": "lannister",
   "3/4 siblings": "three_quarter_siblings",
   "5/8 siblings": "five_eighths_siblings",
   "Full-sib mating": "full_sib_mating",

@@ -1248,7 +1248,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     },
     {
       slug: "lannister",
-      label: "House Lannister",
+      label: "House Lannister (TV show)",
       description: "5 generations · 38 individuals · twins who are partners, with first cousin parents. Joffrey F = 9/32",
       group: "Fiction",
       citation: "G. R. R. Martin, A Song of Ice and Fire (1996 to 2011) and The World of Ice & Fire (2014); who has died follows HBO's Game of Thrones (2011 to 2019)",

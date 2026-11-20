@@ -6,7 +6,7 @@
   </marker>
 </defs>
 <rect width="1228" height="1113" fill="white"/>
-<text class="chart-title" x="614" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Lannister</text>
+<text class="chart-title" x="614" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">House Lannister (TV show)</text>
 <g transform="translate(572.9 360.2)">
 <path d="M 188.8 -10.4 L 188.8 -90.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="188.8" y1="-50.4" x2="248.8" y2="-50.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
