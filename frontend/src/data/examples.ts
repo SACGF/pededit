@@ -985,14 +985,14 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   const dead = { deceased: true };
   const lannister: Row[] = [
     ["Gerold",           M, null, null, { name: "Gerold", ...dead, notes: "The Golden. Lord of Casterly Rock" }],
-    ["Rohanne_Webber",   F, null, null, { name: "Rohanne Webber", notes: "Lady of Coldmoat in The Sworn Sword" }],
+    ["Rohanne_Webber",   F, null, null, { name: "Rohanne Webber", ...dead, notes: "Lady of Coldmoat in The Sworn Sword. Her death is not recorded; born about 185, she is presumed dead" }],
     // Gerold's four sons
     ["Tywald",           M, "Gerold", "Rohanne_Webber", { name: "Tywald", ...dead, notes: "Elder twin of Tion; killed at Starpike" }],
     ["Tion",             M, "Gerold", "Rohanne_Webber", { name: "Tion", ...dead, notes: "Twin of Tywald" }],
     ["Tytos",            M, "Gerold", "Rohanne_Webber", { name: "Tytos", ...dead, notes: "Lord of Casterly Rock. Called the Laughing Lion until Jeyne died" }],
     ["Jeyne_Marbrand",   F, null, null, { name: "Jeyne Marbrand", ...dead, notes: "Died within a month of Gerion's birth" }],
     ["Jason",            M, "Gerold", "Rohanne_Webber", { name: "Jason", ...dead, notes: "Killed at the Battle of the Bloodstone. Also had a son by his first wife, Alys Stackspear, and a bastard daughter, not shown" }],
-    ["Marla_Prester",    F, null, null, { name: "Marla Prester", notes: "Jason's second wife. Three sons and three daughters; four of them are never named and are not shown" }],
+    ["Marla_Prester",    F, null, null, { name: "Marla Prester", ...dead, notes: "Jason's second wife. Three sons and three daughters; four of them are never named and are not shown. Her death is not recorded; presumed dead by age" }],
     // Tytos's children, in birth order, and their partners
     ["Tywin",            M, "Tytos", "Jeyne_Marbrand", { name: "Tywin", ...dead, notes: "Lord of Casterly Rock and Hand of the King. Killed by Tyrion" }],
     ["Kevan",            M, "Tytos", "Jeyne_Marbrand", { name: "Kevan", ...dead, notes: "Refused to be Cersei's Hand; Lord Regent for Tommen. Killed in the wildfire at the Sept of Baelor in the TV series (season 6); by Varys in the books" }],
