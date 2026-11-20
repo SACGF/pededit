@@ -123,6 +123,9 @@ unabridged Westerlands text cut from the book are left out.
 - Stafford's wife and children are left out: placed between Cersei and Gendry's family
   they made kinship2 draw Robert twice.
 - PHENO 2 = dwarfism (Tyrion).
+- PED has no column for it, but in the app who has died follows the TV series (Game of
+  Thrones, 2011 to 2019), where of Tywin's family only Tyrion survives; people the show
+  leaves out keep their status at the end of A Dance with Dragons.
 - Exercises: twins who are partners (the couple label must keep off the twin fork), a
   sibling mating whose parents are themselves cousins, a childless couple.
 - PHENO 2 = Kwisatz Haderach (Paul, Leto II). The in-app example tags the four Bene

@@ -979,7 +979,9 @@ function historicAndClassicExamples(): ExamplePedigree[] {
   ];
 
   // Fiction: test-data/ped/fiction/lannister.ped, where the sources are listed.
-  // Affected = dwarfism. Deceased as at the end of A Dance with Dragons.
+  // Affected = dwarfism. Deceased as at the end of the TV series (Game of
+  // Thrones, 2011 to 2019); people it leaves out as at the end of A Dance with
+  // Dragons. Where the two differ, the notes say so.
   const dead = { deceased: true };
   const lannister: Row[] = [
     ["Gerold",           M, null, null, { name: "Gerold", ...dead, notes: "The Golden. Lord of Casterly Rock" }],
@@ -993,7 +995,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Marla_Prester",    F, null, null, { name: "Marla Prester", notes: "Jason's second wife. Three sons and three daughters; four of them are never named and are not shown" }],
     // Tytos's children, in birth order, and their partners
     ["Tywin",            M, "Tytos", "Jeyne_Marbrand", { name: "Tywin", ...dead, notes: "Lord of Casterly Rock and Hand of the King. Killed by Tyrion" }],
-    ["Kevan",            M, "Tytos", "Jeyne_Marbrand", { name: "Kevan", ...dead, notes: "Refused to be Cersei's Hand; Lord Regent for Tommen. Killed by Varys" }],
+    ["Kevan",            M, "Tytos", "Jeyne_Marbrand", { name: "Kevan", ...dead, notes: "Refused to be Cersei's Hand; Lord Regent for Tommen. Killed in the wildfire at the Sept of Baelor in the TV series (season 6); by Varys in the books" }],
     ["Dorna_Swyft",      F, null, null, { name: "Dorna Swyft" }],
     ["Genna",            F, "Tytos", "Jeyne_Marbrand", { name: "Genna" }],
     ["Emmon_Frey",       M, null, null, { name: "Emmon Frey", notes: "Son of Lord Walder Frey" }],
@@ -1005,15 +1007,15 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Joanna",           F, "Jason", "Marla_Prester", { name: "Joanna", ...dead, notes: "Tywin's first cousin and wife. Died giving birth to Tyrion" }],
     ["Stafford",         M, "Jason", "Marla_Prester", { name: "Stafford", ...dead, notes: "Tywin's cousin and brother-in-law, \"so twice related\". Killed at Oxcross. His wife Myranda Lefford and their three children are not shown" }],
     // The twins and Tyrion
-    ["Cersei",           F, "Tywin", "Joanna", { name: "Cersei", notes: "Elder twin: Jaime \"came into this world holding my foot\". Queen to Robert; her three children are Jaime's" }],
-    ["Jaime",            M, "Tywin", "Joanna", { name: "Jaime", notes: "Twin of Cersei and father of her children. Lord Commander of the Kingsguard; never married" }],
+    ["Cersei",           F, "Tywin", "Joanna", { name: "Cersei", ...dead, notes: "Elder twin: Jaime \"came into this world holding my foot\". Queen to Robert; her three children are Jaime's. Dies with Jaime under the Red Keep in the TV series (season 8); alive at the end of the books so far" }],
+    ["Jaime",            M, "Tywin", "Joanna", { name: "Jaime", ...dead, notes: "Twin of Cersei and father of her children. Lord Commander of the Kingsguard; never married. Dies with Cersei under the Red Keep in the TV series (season 8); alive at the end of the books so far" }],
     ["Tyrion",           M, "Tywin", "Joanna", { name: "Tyrion", proband: true, notes: "The Imp, a dwarf, with one green eye and one black. Tywin blamed him for Joanna's death. Married Tysha (annulled) and Sansa Stark (never consummated)" }],
     ["Robert",           M, null, null, { name: "Robert Baratheon", ...dead, notes: "King. Cersei's husband and legal father of her children, who are not his. Killed by a boar" }],
     ["Gendry_mother",    F, null, null, { name: "Gendry's mother", ...dead, notes: "Unnamed; an alehouse worker with blonde hair, who died when he was small" }],
     // Kevan's children
-    ["Lancel",           M, "Kevan", "Dorna_Swyft", { name: "Lancel", notes: "Cersei's first cousin and, while Jaime was a captive, her lover; no children" }],
-    ["Willem",           M, "Kevan", "Dorna_Swyft", { name: "Willem", ...dead, notes: "Twin of Martyn; which was born first is not known. Killed by Rickard Karstark as a captive" }],
-    ["Martyn",           M, "Kevan", "Dorna_Swyft", { name: "Martyn", notes: "Twin of Willem" }],
+    ["Lancel",           M, "Kevan", "Dorna_Swyft", { name: "Lancel", ...dead, notes: "Cersei's first cousin and, while Jaime was a captive, her lover; no children. Killed in the wildfire at the Sept of Baelor in the TV series (season 6); alive at the end of the books so far" }],
+    ["Willem",           M, "Kevan", "Dorna_Swyft", { name: "Willem", ...dead, notes: "Twin of Martyn; which was born first is not known. Killed by Rickard Karstark as a captive (season 3 of the TV series)" }],
+    ["Martyn",           M, "Kevan", "Dorna_Swyft", { name: "Martyn", ...dead, notes: "Twin of Willem. Killed with him by Rickard Karstark in the TV series (season 3); in the books their cousin Tion Frey dies in his place" }],
     ["Janei",            F, "Kevan", "Dorna_Swyft", { name: "Janei" }],
     // Genna's sons by Emmon Frey
     ["Cleos_Frey",       M, "Emmon_Frey", "Genna", { name: "Cleos Frey", ...dead, notes: "Killed by outlaws escorting Jaime" }],
@@ -1025,8 +1027,8 @@ function historicAndClassicExamples(): ExamplePedigree[] {
     ["Joy_Hill",         F, "Gerion", "Briony", { name: "Joy Hill", notes: "Gerion's bastard by Briony, a common woman" }],
     // Cersei's children by Jaime, and Robert's bastard
     ["Joffrey",          M, "Jaime", "Cersei", { name: "Joffrey", ...dead, notes: "King. Recorded as Robert's son; fathered by Jaime. F = 9/32. Poisoned at his wedding" }],
-    ["Myrcella",         F, "Jaime", "Cersei", { name: "Myrcella", notes: "Recorded as Robert's daughter; fathered by Jaime. F = 9/32" }],
-    ["Tommen",           M, "Jaime", "Cersei", { name: "Tommen", notes: "King after Joffrey. Recorded as Robert's son; fathered by Jaime. F = 9/32" }],
+    ["Myrcella",         F, "Jaime", "Cersei", { name: "Myrcella", ...dead, notes: "Recorded as Robert's daughter; fathered by Jaime. F = 9/32. Poisoned leaving Dorne in the TV series (season 5); alive at the end of the books so far" }],
+    ["Tommen",           M, "Jaime", "Cersei", { name: "Tommen", ...dead, notes: "King after Joffrey. Recorded as Robert's son; fathered by Jaime. F = 9/32. Takes his own life in the TV series (season 6); alive at the end of the books so far" }],
     ["Gendry",           M, "Robert", "Gendry_mother", { name: "Gendry", notes: "Robert's bastard, black-haired like all of them, though his mother was fair" }],
   ];
   const lannisterTags = [
@@ -1249,7 +1251,7 @@ function historicAndClassicExamples(): ExamplePedigree[] {
       label: "House Lannister",
       description: "5 generations · 38 individuals · twins who are partners, with first cousin parents. Joffrey F = 9/32",
       group: "Fiction",
-      citation: "G. R. R. Martin, A Song of Ice and Fire (1996 to 2011) and The World of Ice & Fire (2014)",
+      citation: "G. R. R. Martin, A Song of Ice and Fire (1996 to 2011) and The World of Ice & Fire (2014); who has died follows HBO's Game of Thrones (2011 to 2019)",
       data: lannisterData(),
     },
   ];
