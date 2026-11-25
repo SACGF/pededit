@@ -25,6 +25,14 @@ describe("tolerateForeignDomEdits", () => {
     expect(removeChild).not.toHaveBeenCalled();
   });
 
+  it("takes a child that was moved out of where it now is", () => {
+    const { proto, removeChild } = fakeProto();
+    const elsewhere = {} as Node;
+    const child = { parentNode: elsewhere } as unknown as Node;
+    expect(proto.removeChild(child)).toBe(child);
+    expect(removeChild.mock.contexts).toEqual([elsewhere]);
+  });
+
   it("inserts before a node that is still there, or at the end when asked to", () => {
     const { proto, insertBefore } = fakeProto();
     const node = {} as Node;
