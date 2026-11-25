@@ -319,6 +319,7 @@ the flow. They run in CI.
 | `api-created` | the `curl` example of `docs/pedigree-json-format.md` posted with no account: its link draws, an edit saves, a broken reference is refused with its path (#201) |
 | `draw-couple-beside` | "Draw this couple beside" on a couple line in a family with a loop: who is drawn twice changes, the notice, undo, saved and reloaded; not offered for a couple with a partner who married in (#205). The same choice on a partner's own menu, and the couple's items on the menu of both partners selected (#207) |
 | `export-selected` | two siblings selected: the export dialog's "Only the 2 selected people (+2 to connect them)", off by default; the SVG and U-shape have them and their parents only, the key only their condition; pedigree, canvas and CSV unchanged (#215) |
+| `translated-page` | every text node replaced the way browser page translation does it (not Chrome's translator): opening and closing Clinical details and marking a person affected do not reach the error boundary (`src/domGuard.ts`) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

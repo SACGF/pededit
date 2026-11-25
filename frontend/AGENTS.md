@@ -72,6 +72,13 @@ reporting is off, and the dev server never reports.
   commit, for the reason in `utils/buildInfo.ts`.
 - `components/ErrorBoundary.tsx` wraps the app in `main.tsx`: a render error
   shows a plain page with Reload instead of a blank one, and is reported.
+- `domGuard.ts`, called in `main.tsx` before the first render, patches
+  `Node.prototype.removeChild` and `insertBefore`. Browser page translation
+  and some extensions replace text nodes React still holds, and React's next
+  removal of one, or insert before one, throws `NotFoundError` ("not a child
+  of this node") into the error boundary. A report with that message from a
+  browser the guard does not cover means something else edits the page; it is
+  not a bug in a component. The `translated-page` flow imitates translation.
 - `vite.config.ts` sets `build.sourcemap: true` so Rollbar can download the
   maps from the site; each report sets `client.javascript.source_map_enabled`
   and the code version (INSTALL.md step 12). The code is public; the maps are not a
