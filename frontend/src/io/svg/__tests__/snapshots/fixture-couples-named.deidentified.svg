@@ -1,22 +1,556 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1161" height="846"
-     viewBox="0 0 1161 846">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="1161" height="846" fill="white"/>
-<g transform="translate(60 60)">
-<g class="couple-lines"><path d="M 490 0 L 530 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 120 L 60 120" stroke="black" stroke-width="2" fill="none"></path><path d="M 180 120 L 220 120" stroke="black" stroke-width="2" fill="none"></path><path d="M 340 120 L 380 120" stroke="black" stroke-width="2" fill="none"></path><g data-childless="byChoice"><path d="M 360 120 L 360 138 M 353 138 L 367 138" stroke="black" stroke-width="2" fill="none"></path></g><path data-ended="true" d="M 344.5 126 L 350.5 114 M 349.5 126 L 355.5 114" stroke="black" stroke-width="2" fill="none"></path><path d="M 580 120 L 620 120" stroke="black" stroke-width="2" fill="none"></path><g data-childless="infertility"><path d="M 600 120 L 600 138 M 593 138 L 607 138 M 593 134 L 607 134" stroke="black" stroke-width="2" fill="none"></path></g><path d="M 900 120 L 940 120" stroke="black" stroke-width="2" fill="none"></path><path data-ended="true" d="M 904.5 126 L 910.5 114 M 909.5 126 L 915.5 114" stroke="black" stroke-width="2" fill="none"></path><path d="M 980 118 L 1020 118" stroke="black" stroke-width="2" fill="none"></path><path d="M 980 122 L 1020 122" stroke="black" stroke-width="2" fill="none"></path><path d="M 60 238 L 180 238" stroke="black" stroke-width="2" fill="none"></path><path d="M 60 242 L 180 242" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 510 0 L 510 60 M 0 60 L 880 60 M 0 60 L 0 100 M 160 60 L 160 100 M 400 60 L 320 100 M 400 60 L 480 100 M 680 60 L 640 100 M 680 60 L 720 100 M 880 60 L 800 100 M 880 60 L 960 100" stroke="black" stroke-width="2" fill="none"></path><line data-twin-mark="true" x1="360" y1="80" x2="440" y2="80" stroke="black" stroke-width="2"></line><text data-twin-mark="true" x="880" y="83.85" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black" pointer-events="none" style="user-select:none">?</text><path d="M 40 120 L 40 180 M 40 180 L 40 180 M 40 180 L 40 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 200 120 L 200 180 M 200 180 L 200 180 M 200 180 L 200 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 920 120 L 920 180 M 920 180 L 920 180 M 920 180 L 920 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 1000 120 L 1000 180 M 1000 180 L 1000 180 M 1000 180 L 1000 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 120 240 L 120 300 M 40 300 L 160 300 M 40 300 L 40 340 M 160 300 L 200 340" stroke="black" stroke-width="2" fill="none"></path><path d="M 160 300 L 120 340" stroke="black" stroke-width="2" fill="none" stroke-dasharray="5 3"></path><text data-twin-mark="true" x="160" y="323.85" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black" pointer-events="none" style="user-select:none">?</text></g><g class="assisted-lines"></g><g class="duplicate-arcs"></g><g class="symbols"><g transform="translate(470 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(550 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(80 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(160 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(240 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(320 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(400 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(480 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(560 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(640 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(720 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(800 120)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g></g></g></g><g transform="translate(880 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(960 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="black"></circle></g></g></g></g><g transform="translate(1040 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(40 240)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(200 240)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(920 240)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(1000 240)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(40 360)"><g transform="translate(-20 -20)"><g><g data-adopted="out"><line x1="-4" y1="-2" x2="-4" y2="42" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="42" x2="1" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="44" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="39" y2="-2" stroke="black" stroke-width="2"></line><line x1="44" y1="42" x2="39" y2="42" stroke="black" stroke-width="2"></line></g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(120 360)"><g transform="translate(-20 -20)"><g><g data-adopted="in"><line x1="-4" y1="-2" x2="-4" y2="42" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="42" x2="1" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="44" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="39" y2="-2" stroke="black" stroke-width="2"></line><line x1="44" y1="42" x2="39" y2="42" stroke="black" stroke-width="2"></line></g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(200 360)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g></g><g class="labels"><g transform="translate(450 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">I-1</text></g></g></g><g transform="translate(530 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">I-2</text></g></g></g><g transform="translate(-20 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-1</text></g></g></g><g transform="translate(60 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-2</text></g></g></g><g transform="translate(140 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-3</text></g></g></g><g transform="translate(220 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-4</text></g></g></g><g transform="translate(300 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-5</text></g></g></g><g transform="translate(380 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-6</text></g></g></g><g transform="translate(460 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-7</text></g></g></g><g transform="translate(540 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-8</text></g></g></g><g transform="translate(620 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-9</text></g></g></g><g transform="translate(700 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-10</text></g></g></g><g transform="translate(780 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-11</text></g></g></g><g transform="translate(860 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-12</text></g></g></g><g transform="translate(940 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-13</text></g></g></g><g transform="translate(1020 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">II-14</text></g></g></g><g transform="translate(20 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III-1</text></g></g></g><g transform="translate(180 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III-2</text></g></g></g><g transform="translate(900 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III-3</text></g></g></g><g transform="translate(980 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III-4</text></g></g></g><g transform="translate(20 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">IV-1</text></g><g data-detail-label="true" pointer-events="none"><rect x="-25.2" y="35" width="50.4" height="13" fill="white"></rect><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text></g></g></g><g transform="translate(100 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">IV-2</text></g></g></g><g transform="translate(180 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">IV-3</text></g><g data-detail-label="true" pointer-events="none"><rect x="-25.2" y="35" width="50.4" height="13" fill="white"></rect><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text></g></g></g></g><g class="consanguinity-labels"><text data-consanguinity-label="true" x="1000" y="82" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" pointer-events="none" style="user-select:none">distant</text><text data-consanguinity-label="true" x="1000" y="93" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" pointer-events="none" style="user-select:none">cousins</text><text data-consanguinity-label="true" x="120" y="213" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" pointer-events="none" style="user-select:none">first cousins (φ = 1/16)</text></g>
-</g>
-<g class="pedigree-key" transform="translate(0 518)">
-<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="black"></circle></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<g transform="translate(56 36) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><text x="14" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" fill="black">F</text></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Inbreeding coefficient</text>
-<g transform="translate(56 60) scale(0.667) translate(-18 -14)"><svg width="36" height="28" viewBox="-8 -4 36 28"><g><g data-adopted="in"><line x1="-4" y1="-2" x2="-4" y2="26" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="26" x2="1" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="28" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="23" y2="-2" stroke="black" stroke-width="2"></line><line x1="28" y1="26" x2="23" y2="26" stroke="black" stroke-width="2"></line></g><g><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect></g></g></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
-<g transform="translate(56 84) scale(0.667) translate(-18 -14)"><svg width="36" height="28" viewBox="-8 -4 36 28"><g><g data-adopted="out"><line x1="-4" y1="-2" x2="-4" y2="26" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="26" x2="1" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="28" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="23" y2="-2" stroke="black" stroke-width="2"></line><line x1="28" y1="26" x2="23" y2="26" stroke="black" stroke-width="2"></line></g><g><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle></g></g></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
-<g transform="translate(56 108) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="7" x2="48" y2="7" stroke="black" stroke-width="2"></line><line x1="0" y1="13" x2="48" y2="13" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="112" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<g transform="translate(56 132) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><text x="14" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" fill="black">φ</text></svg></g><text x="80" y="136" font-family="sans-serif" font-size="10" fill="black">Kinship coefficient of the couple</text>
-<g transform="translate(56 156) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="10" x2="48" y2="10" stroke="black" stroke-width="2"></line><path d="M 18.5 16 L 24.5 4 M 23.5 16 L 29.5 4" stroke="black" stroke-width="2" fill="none"></path></svg></g><text x="80" y="160" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
-<g transform="translate(56 180) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="0" y1="4" x2="48" y2="4" stroke="black" stroke-width="2"></line><line x1="24" y1="4" x2="24" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="22" x2="31" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="18" x2="31" y2="18" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="184" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
-<g transform="translate(56 204) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="0" y1="4" x2="48" y2="4" stroke="black" stroke-width="2"></line><line x1="24" y1="4" x2="24" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="22" x2="31" y2="22" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="208" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
-<g transform="translate(56 228) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line><line x1="18" y1="15" x2="30" y2="15" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="232" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
-<g transform="translate(56 252) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="256" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
-<g transform="translate(56 276) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line><text x="24" y="19" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold">?</text></svg></g><text x="80" y="280" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
-</g>
+<svg height="846" viewBox="0 0 1161 846" width="1161" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="846" width="1161"/>
+  <g transform="translate(60 60)">
+    <g class="couple-lines">
+      <path d="M 490 0 L 530 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 20 120 L 60 120" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 180 120 L 220 120" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 340 120 L 380 120" fill="none" stroke="black" stroke-width="2"/>
+      <g data-childless="byChoice">
+        <path d="M 360 120 L 360 138 M 353 138 L 367 138" fill="none" stroke="black" stroke-width="2"/>
+      </g>
+      <path d="M 344.5 126 L 350.5 114 M 349.5 126 L 355.5 114" data-ended="true" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 580 120 L 620 120" fill="none" stroke="black" stroke-width="2"/>
+      <g data-childless="infertility">
+        <path d="M 600 120 L 600 138 M 593 138 L 607 138 M 593 134 L 607 134" fill="none" stroke="black" stroke-width="2"/>
+      </g>
+      <path d="M 900 120 L 940 120" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 904.5 126 L 910.5 114 M 909.5 126 L 915.5 114" data-ended="true" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 980 118 L 1020 118" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 980 122 L 1020 122" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 60 238 L 180 238" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 60 242 L 180 242" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="sibship-lines">
+      <path d="M 510 0 L 510 60 M 0 60 L 880 60 M 0 60 L 0 100 M 160 60 L 160 100 M 400 60 L 320 100 M 400 60 L 480 100 M 680 60 L 640 100 M 680 60 L 720 100 M 880 60 L 800 100 M 880 60 L 960 100" fill="none" stroke="black" stroke-width="2"/>
+      <line data-twin-mark="true" stroke="black" stroke-width="2" x1="360" x2="440" y1="80" y2="80"/>
+      <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="880" y="83.85">?</text>
+      <path d="M 40 120 L 40 180 M 40 180 L 40 180 M 40 180 L 40 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 200 120 L 200 180 M 200 180 L 200 180 M 200 180 L 200 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 920 120 L 920 180 M 920 180 L 920 180 M 920 180 L 920 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1000 120 L 1000 180 M 1000 180 L 1000 180 M 1000 180 L 1000 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 120 240 L 120 300 M 40 300 L 160 300 M 40 300 L 40 340 M 160 300 L 200 340" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 160 300 L 120 340" fill="none" stroke="black" stroke-dasharray="5 3" stroke-width="2"/>
+      <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="160" y="323.85">?</text>
+    </g>
+    <g class="symbols">
+      <g transform="translate(470 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(550 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(0 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(80 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(160 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(240 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(400 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(480 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(560 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(640 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(720 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(800 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(880 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(960 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="black" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1040 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(40 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(200 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(920 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1000 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(40 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g data-adopted="out">
+              <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
+            </g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(120 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g data-adopted="in">
+              <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
+              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
+            </g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(200 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="labels">
+      <g transform="translate(450 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">I-1</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(530 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">I-2</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(-20 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-1</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(60 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-2</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(140 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-3</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(220 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-4</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(300 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-5</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(380 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-6</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(460 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-7</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(540 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-8</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(620 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-9</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(700 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-10</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(780 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-11</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(860 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-12</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(940 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-13</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1020 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">II-14</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(20 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">III-1</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(180 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">III-2</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(900 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">III-3</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(980 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">III-4</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(20 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">IV-1</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="50.4" x="-25.2" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">F = 1/16</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(100 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">IV-2</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(180 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">IV-3</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="50.4" x="-25.2" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">F = 1/16</text>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="consanguinity-labels">
+      <text data-consanguinity-label="true" fill="black" font-family="sans-serif" font-size="9" pointer-events="none" style="user-select:none" text-anchor="middle" x="1000" y="82">distant</text>
+      <text data-consanguinity-label="true" fill="black" font-family="sans-serif" font-size="9" pointer-events="none" style="user-select:none" text-anchor="middle" x="1000" y="93">cousins</text>
+      <text data-consanguinity-label="true" fill="black" font-family="sans-serif" font-size="9" pointer-events="none" style="user-select:none" text-anchor="middle" x="120" y="213">first cousins (φ = 1/16)</text>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 518)">
+    <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <circle cx="12" cy="12" fill="black" r="11" stroke="black" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="16">Affected</text>
+    <g transform="translate(56 36) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <text fill="black" font-family="sans-serif" font-size="12" text-anchor="middle" x="14" y="18">F</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="40">Inbreeding coefficient</text>
+    <g transform="translate(56 60) scale(0.667) translate(-18 -14)">
+      <svg height="28" viewBox="-8 -4 36 28" width="36">
+        <g>
+          <g data-adopted="in">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="26" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="28" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="26" y2="26"/>
+          </g>
+          <g>
+            <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="64">Adopted in (dashed line to adoptive parents)</text>
+    <g transform="translate(56 84) scale(0.667) translate(-18 -14)">
+      <svg height="28" viewBox="-8 -4 36 28" width="36">
+        <g>
+          <g data-adopted="out">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="26" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="28" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="26" y2="26"/>
+          </g>
+          <g>
+            <circle cx="12" cy="12" fill="white" r="11" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="88">Adopted out</text>
+    <g transform="translate(56 108) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="7" y2="7"/>
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="13" y2="13"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="112">Consanguineous couple</text>
+    <g transform="translate(56 132) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <text fill="black" font-family="sans-serif" font-size="12" text-anchor="middle" x="14" y="18">φ</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="136">Kinship coefficient of the couple</text>
+    <g transform="translate(56 156) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="10" y2="10"/>
+        <path d="M 18.5 16 L 24.5 4 M 23.5 16 L 29.5 4" fill="none" stroke="black" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="160">Relationship ended</text>
+    <g transform="translate(56 180) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="4" y2="4"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="24" y1="4" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="22" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="18" y2="18"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="184">Infertility</text>
+    <g transform="translate(56 204) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="4" y2="4"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="24" y1="4" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="22" y2="22"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="208">No children by choice</text>
+    <g transform="translate(56 228) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="18" x2="30" y1="15" y2="15"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="232">Monozygotic twins</text>
+    <g transform="translate(56 252) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="256">Dizygotic twins</text>
+    <g transform="translate(56 276) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+        <text font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle" x="24" y="19">?</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="280">Twins, zygosity unknown</text>
+  </g>
 </svg>

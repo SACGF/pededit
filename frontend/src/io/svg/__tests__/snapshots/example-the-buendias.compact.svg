@@ -1,19 +1,845 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="617" height="1154"
-     viewBox="0 0 617 1154">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="617" height="1154" fill="white"/>
-<g class="chart-title"><text x="308.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">The Buendías</text></g>
-<g transform="translate(92 100)">
-<g class="couple-lines"><path d="M 156 0 L 184 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 394 0 L 422 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 54 84 L 82 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 190 84 L 218 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 326 84 L 354 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 88 166 L 184 166" stroke="black" stroke-width="2" fill="none"></path><path d="M 88 170 L 184 170" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 252 L 48 252" stroke="black" stroke-width="2" fill="none"></path><path d="M 224 252 L 252 252" stroke="black" stroke-width="2" fill="none"></path><path d="M 258 336 L 286 336" stroke="black" stroke-width="2" fill="none"></path><path d="M 360 420 L 388 420" stroke="black" stroke-width="2" fill="none"></path><path d="M 348.67 504 L 376.67 504" stroke="black" stroke-width="2" fill="none"></path><path d="M 382.67 586 L 410.67 586" stroke="black" stroke-width="2" fill="none"></path><path d="M 382.67 590 L 410.67 590" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 170 0 L 170 50 M 34 50 L 306 50 M 34 50 L 34 64 M 170 50 L 170 64 M 306 50 L 306 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 408 0 L 408 50 M 374 50 L 442 50 M 374 50 L 374 64 M 442 50 L 442 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 68 84 L 68 126 M 68 126 L 68 126 M 68 126 L 68 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 204 84 L 204 126 M 204 126 L 204 126 M 204 126 L 204 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 340 84 L 340 126 M 340 126 L 340 126 M 340 126 L 340 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 136 168 L 136 218 M 68 218 L 204 218 M 68 218 L 68 232 M 136 218 L 136 232 M 204 218 L 204 232" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 252 L 34 294 M 34 294 L 34 294 M 34 294 L 34 316" stroke="black" stroke-width="2" fill="none"></path><path d="M 238 252 L 238 294 M 238 294 L 238 294 M 238 294 L 238 316" stroke="black" stroke-width="2" fill="none"></path><path d="M 272 336 L 272 386 M 204 386 L 340 386 M 204 386 L 204 400 M 272 386 L 272 400 M 340 386 L 340 400" stroke="black" stroke-width="2" fill="none"></path><path d="M 374 420 L 374 462 M 260.67 462 L 464.67 462 M 260.67 462 L 260.67 484 M 396.67 462 L 396.67 484 M 464.67 462 L 464.67 484" stroke="black" stroke-width="2" fill="none"></path><path d="M 362.67 504 L 362.67 546 M 362.67 546 L 362.67 546 M 362.67 546 L 362.67 568" stroke="black" stroke-width="2" fill="none"></path><path d="M 396.67 588 L 396.67 630 M 396.67 630 L 396.67 630 M 396.67 630 L 396.67 652" stroke="black" stroke-width="2" fill="none"></path></g><g class="assisted-lines"></g><g class="duplicate-arcs"><path d="M 238 64 Q 340 33.2 442 64" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path><path d="M 0 232 Q 136 201.2 272 232" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path><path d="M 444.67 504 Q 424.67 504 430.67 568" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path></g><g class="symbols"><g transform="translate(136 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(204 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(374 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(442 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(34 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(102 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(170 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(238 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(306 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(374 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(442 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(68 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(204 168)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(340 168)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-2"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#e377c2"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(0 252)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(68 252)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-3-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(136 252)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(204 252)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-3-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(272 252)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(34 336)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(238 336)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-4-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-4-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(306 336)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(204 420)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(272 420)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-5-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-5-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><circle cx="20" cy="47" r="3.5" fill="#2ca02c"></circle></g></g></g><g transform="translate(340 420)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-5-2"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-5-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><circle cx="20" cy="47" r="3.5" fill="#2ca02c"></circle></g></g></g><g transform="translate(408 420)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(260.67 504)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(328.67 504)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(396.67 504)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(464.67 504)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(362.67 588)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-7-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><circle cx="20" cy="47" r="3.5" fill="#2ca02c"></circle></g></g></g><g transform="translate(430.67 588)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(396.67 672)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-8-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-8-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#e377c2"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g></g><g class="labels"><g transform="translate(116 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Iguarán</text></g></g></g><g transform="translate(184 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Grandmother</title>Grandmothe</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">r</text></g></g></g><g transform="translate(354 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Buendía</text></g></g></g><g transform="translate(422 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Grandmother</title>Grandmothe</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">r</text></g></g></g><g transform="translate(14 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text></g></g></g><g transform="translate(82 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mother</text></g></g></g><g transform="translate(150 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mother</text></g></g></g><g transform="translate(218 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text></g></g></g><g transform="translate(286 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aunt</text></g></g></g><g transform="translate(354 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Uncle</text></g></g></g><g transform="translate(422 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Father</text></g></g></g><g transform="translate(48 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Úrsula</text></g></g></g><g transform="translate(184 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio B.</title>José</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio B.</text></g></g></g><g transform="translate(320 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Cousin</text></g></g></g><g transform="translate(-20 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Pilar</text></g></g></g><g transform="translate(48 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Col. Aureliano</title>Col.</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aureliano</text></g></g></g><g transform="translate(116 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Amaranta</text></g></g></g><g transform="translate(184 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text></g></g></g><g transform="translate(252 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Pilar</text></g></g></g><g transform="translate(14 316)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano José</title>Aureliano</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">José</text></g></g></g><g transform="translate(218 316)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text></g></g></g><g transform="translate(286 316)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Santa Sofía</title>Santa</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sofía</text></g></g></g><g transform="translate(184 400)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Remedios</text></g></g></g><g transform="translate(252 400)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>J. A. Segundo</title>J. A.</text><text x="0" y="65" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Segundo</text></g></g></g><g transform="translate(320 400)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><rect x="-31" y="42" width="62" height="13" fill="white"></rect><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">A. Segundo</text></g></g></g><g transform="translate(388 400)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fernanda</text></g></g></g><g transform="translate(240.67 484)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>José Arcadio</title>José</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Arcadio</text></g></g></g><g transform="translate(308.67 484)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mauricio</text></g></g></g><g transform="translate(376.67 484)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Meme</text></g></g></g><g transform="translate(444.67 484)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amaranta Ú.</title>Amaranta</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ú.</text></g></g></g><g transform="translate(342.67 568)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Aureliano B.</title>Aureliano</text><text x="0" y="65" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">B.</text></g></g></g><g transform="translate(410.67 568)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amaranta Ú.</title>Amaranta</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ú.</text></g></g></g><g transform="translate(376.67 652)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aureliano</text></g></g></g></g><g class="consanguinity-labels"></g>
-</g>
-<g class="pedigree-key" transform="translate(0 922)">
-<g transform="translate(56 12) scale(0.667) translate(-18 -18)"><svg width="36" height="36" viewBox="-6 -6 36 36"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><line x1="-4" y1="-4" x2="28" y2="28" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
-<g transform="translate(56 36) scale(0.667) translate(-23 -23)"><svg width="46" height="46" viewBox="-30 -2 56 56"><defs><marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="black"></polygon></marker></defs><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><g data-arrow="proband"><line x1="-18" y1="42" x2="0" y2="24" stroke="black" stroke-width="2" marker-end="url(#legend-arrowhead)"></line><rect x="-30" y="42" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="51" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
-<g transform="translate(56 60) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="7" x2="48" y2="7" stroke="black" stroke-width="2"></line><line x1="0" y1="13" x2="48" y2="13" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<g transform="translate(56 84) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><path d="M 4 17 Q 24 -5 44 17" stroke="black" stroke-width="2" stroke-dasharray="6 4" fill="none"></path></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
-<g transform="translate(56 108) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-pig_tail"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-pig_tail)"><g data-tag-fill="solid"><path d="M 14 14 L -2 14 A 16 16 0 0 1 14 -2 Z" fill="#e377c2"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="112" font-family="sans-serif" font-size="10" fill="black">Pig&#x27;s tail</text>
-<g transform="translate(56 132) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-aureliano"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-aureliano)"><g data-tag-fill="solid"><path d="M 14 14 L 14 -2 A 16 16 0 0 1 30 14 Z" fill="#1f77b4"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="136" font-family="sans-serif" font-size="10" fill="black">Aureliano temperament: withdrawn, lucid</text>
-<g transform="translate(56 156) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-jose_arcadio"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-jose_arcadio)"><g data-tag-fill="solid"><path d="M 14 14 L 30 14 A 16 16 0 0 1 14 30 Z" fill="#ff7f0e"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="160" font-family="sans-serif" font-size="10" fill="black">José Arcadio temperament: impulsive, enterprising</text>
-<g transform="translate(56 180) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="3.5" fill="#2ca02c"></circle></svg></g><text x="80" y="184" font-family="sans-serif" font-size="10" fill="black">Studied Melquíades&#x27;s parchments</text>
-</g>
+<svg height="1154" viewBox="0 0 617 1154" width="617" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="1154" width="617"/>
+  <g class="chart-title">
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="308.5" y="56">The Buendías</text>
+  </g>
+  <g transform="translate(92 100)">
+    <g class="couple-lines">
+      <path d="M 156 0 L 184 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 394 0 L 422 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 54 84 L 82 84" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 190 84 L 218 84" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 326 84 L 354 84" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 88 166 L 184 166" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 88 170 L 184 170" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 20 252 L 48 252" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 224 252 L 252 252" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 258 336 L 286 336" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 360 420 L 388 420" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 348.67 504 L 376.67 504" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 382.67 586 L 410.67 586" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 382.67 590 L 410.67 590" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="sibship-lines">
+      <path d="M 170 0 L 170 50 M 34 50 L 306 50 M 34 50 L 34 64 M 170 50 L 170 64 M 306 50 L 306 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 408 0 L 408 50 M 374 50 L 442 50 M 374 50 L 374 64 M 442 50 L 442 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 68 84 L 68 126 M 68 126 L 68 126 M 68 126 L 68 148" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 204 84 L 204 126 M 204 126 L 204 126 M 204 126 L 204 148" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 340 84 L 340 126 M 340 126 L 340 126 M 340 126 L 340 148" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 136 168 L 136 218 M 68 218 L 204 218 M 68 218 L 68 232 M 136 218 L 136 232 M 204 218 L 204 232" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 34 252 L 34 294 M 34 294 L 34 294 M 34 294 L 34 316" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 238 252 L 238 294 M 238 294 L 238 294 M 238 294 L 238 316" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 272 336 L 272 386 M 204 386 L 340 386 M 204 386 L 204 400 M 272 386 L 272 400 M 340 386 L 340 400" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 374 420 L 374 462 M 260.67 462 L 464.67 462 M 260.67 462 L 260.67 484 M 396.67 462 L 396.67 484 M 464.67 462 L 464.67 484" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 362.67 504 L 362.67 546 M 362.67 546 L 362.67 546 M 362.67 546 L 362.67 568" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 396.67 588 L 396.67 630 M 396.67 630 L 396.67 630 M 396.67 630 L 396.67 652" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="duplicate-arcs">
+      <path d="M 238 64 Q 340 33.2 442 64" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <path d="M 0 232 Q 136 201.2 272 232" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <path d="M 444.67 504 Q 424.67 504 430.67 568" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="1.5"/>
+    </g>
+    <g class="symbols">
+      <g transform="translate(136 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(204 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(374 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(442 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(34 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(102 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(170 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(238 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="1" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">1</text>
+        </g>
+      </g>
+      <g transform="translate(306 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(374 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(442 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="2" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">2</text>
+        </g>
+      </g>
+      <g transform="translate(68 168)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(204 168)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-2-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-2-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(340 168)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-2-2">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-2-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#e377c2"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(0 252)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="1" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">1</text>
+        </g>
+      </g>
+      <g transform="translate(68 252)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-3-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(136 252)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(204 252)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-3">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-3-3)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(272 252)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="2" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">2</text>
+        </g>
+      </g>
+      <g transform="translate(34 336)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(238 336)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-4-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-4-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(306 336)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(204 420)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(272 420)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-5-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-5-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <circle cx="20" cy="47" fill="#2ca02c" r="3.5"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(340 420)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-5-2">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-5-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <circle cx="20" cy="47" fill="#2ca02c" r="3.5"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(408 420)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(260.67 504)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#ff7f0e"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(328.67 504)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(396.67 504)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(464.67 504)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="1" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">1</text>
+        </g>
+      </g>
+      <g transform="translate(362.67 588)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-7-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#1f77b4"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <circle cx="20" cy="47" fill="#2ca02c" r="3.5"/>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(430.67 588)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="2" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">2</text>
+        </g>
+      </g>
+      <g transform="translate(396.67 672)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-8-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-8-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#e377c2"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g data-arrow="proband">
+            <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
+            <rect fill="white" height="10" width="8.5" x="-30" y="58"/>
+            <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="67">P</text>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="labels">
+      <g transform="translate(116 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Iguarán</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(184 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Grandmother</title>Grandmothe</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">r</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(354 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Buendía</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(422 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Grandmother</title>Grandmothe</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">r</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(14 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Father</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(82 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Mother</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(150 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Mother</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(218 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Father</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(286 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aunt</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(354 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Uncle</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(422 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Father</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(48 148)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Úrsula</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(184 148)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>José Arcadio B.</title>José</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Arcadio B.</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 148)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Cousin</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(-20 232)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Pilar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(48 232)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Col. Aureliano</title>Col.</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Aureliano</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(116 232)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Amaranta</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(184 232)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>José Arcadio</title>José</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Arcadio</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(252 232)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Pilar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(14 316)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Aureliano José</title>Aureliano</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">José</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(218 316)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Arcadio</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(286 316)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Santa Sofía</title>Santa</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Sofía</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(184 400)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Remedios</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(252 400)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>J. A. Segundo</title>J. A.</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">Segundo</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(320 400)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="62" x="-31" y="42"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">A. Segundo</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(388 400)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Fernanda</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(240.67 484)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>José Arcadio</title>José</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Arcadio</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(308.67 484)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Mauricio</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(376.67 484)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Meme</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(444.67 484)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Amaranta Ú.</title>Amaranta</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Ú.</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(342.67 568)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>Aureliano B.</title>Aureliano</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">B.</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(410.67 568)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Amaranta Ú.</title>Amaranta</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Ú.</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(376.67 652)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aureliano</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 922)">
+    <g transform="translate(56 12) scale(0.667) translate(-18 -18)">
+      <svg height="36" viewBox="-6 -6 36 36" width="36">
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <line stroke="black" stroke-width="2" x1="-4" x2="28" y1="-4" y2="28"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="16">Deceased</text>
+    <g transform="translate(56 36) scale(0.667) translate(-23 -23)">
+      <svg height="46" viewBox="-30 -2 56 56" width="46">
+        <defs>
+          <marker id="legend-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+            <polygon fill="black" points="0 0, 6 3, 0 6"/>
+          </marker>
+        </defs>
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <g data-arrow="proband">
+          <line marker-end="url(#legend-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="42" y2="24"/>
+          <rect fill="white" height="10" width="8.5" x="-30" y="42"/>
+          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="51">P</text>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="40">Proband (index case)</text>
+    <g transform="translate(56 60) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="7" y2="7"/>
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="13" y2="13"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="64">Consanguineous couple</text>
+    <g transform="translate(56 84) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <path d="M 4 17 Q 24 -5 44 17" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="88">Same person drawn more than once</text>
+    <g transform="translate(56 108) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-pig_tail">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-pig_tail)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L -2 14 A 16 16 0 0 1 14 -2 Z" fill="#e377c2"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="112">Pig&#x27;s tail</text>
+    <g transform="translate(56 132) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-aureliano">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-aureliano)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L 14 -2 A 16 16 0 0 1 30 14 Z" fill="#1f77b4"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="136">Aureliano temperament: withdrawn, lucid</text>
+    <g transform="translate(56 156) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-jose_arcadio">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-jose_arcadio)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L 30 14 A 16 16 0 0 1 14 30 Z" fill="#ff7f0e"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="160">José Arcadio temperament: impulsive, enterprising</text>
+    <g transform="translate(56 180) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <circle cx="14" cy="14" fill="#2ca02c" r="3.5"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="184">Studied Melquíades&#x27;s parchments</text>
+  </g>
 </svg>

@@ -1,22 +1,2352 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1433" height="2354"
-     viewBox="0 0 1433 2354">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="1433" height="2354" fill="white"/>
-<g class="chart-title"><text x="716.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">House Targaryen</text></g>
-<g transform="translate(92 100)">
-<g class="couple-lines"><path d="M 434.75 0 L 474.75 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 394.75 118 L 434.75 118" stroke="black" stroke-width="2" fill="none"></path><path d="M 394.75 122 L 434.75 122" stroke="black" stroke-width="2" fill="none"></path><path d="M 474.75 118 L 514.75 118" stroke="black" stroke-width="2" fill="none"></path><path d="M 474.75 122 L 514.75 122" stroke="black" stroke-width="2" fill="none"></path><path d="M 394.75 240 L 434.75 240" stroke="black" stroke-width="2" fill="none"></path><path d="M 80.48 358 L 120.48 358" stroke="black" stroke-width="2" fill="none"></path><path d="M 80.48 362 L 120.48 362" stroke="black" stroke-width="2" fill="none"></path><path d="M 564.26 358 L 604.26 358" stroke="black" stroke-width="2" fill="none"></path><path d="M 564.26 362 L 604.26 362" stroke="black" stroke-width="2" fill="none"></path><path d="M 340 478 L 380 478" stroke="black" stroke-width="2" fill="none"></path><path d="M 340 482 L 380 482" stroke="black" stroke-width="2" fill="none"></path><path d="M 500 480 L 540 480" stroke="black" stroke-width="2" fill="none"></path><path d="M 660 480 L 700 480" stroke="black" stroke-width="2" fill="none"></path><path d="M 378.86 600 L 418.86 600" stroke="black" stroke-width="2" fill="none"></path><path d="M 458.86 598 L 500 598" stroke="black" stroke-width="2" fill="none"></path><path d="M 458.86 602 L 500 602" stroke="black" stroke-width="2" fill="none"></path><path d="M 652.59 600 L 692.59 600" stroke="black" stroke-width="2" fill="none"></path><path d="M 143.8 718 L 183.8 718" stroke="black" stroke-width="2" fill="none"></path><path d="M 143.8 722 L 183.8 722" stroke="black" stroke-width="2" fill="none"></path><path d="M 463.8 718 L 503.8 718" stroke="black" stroke-width="2" fill="none"></path><path d="M 463.8 722 L 503.8 722" stroke="black" stroke-width="2" fill="none"></path><path d="M 543.8 718 L 583.8 718" stroke="black" stroke-width="2" fill="none"></path><path d="M 543.8 722 L 583.8 722" stroke="black" stroke-width="2" fill="none"></path><path d="M 773.53 718 L 813.53 718" stroke="black" stroke-width="2" fill="none"></path><path d="M 773.53 722 L 813.53 722" stroke="black" stroke-width="2" fill="none"></path><path d="M 294.01 840 L 334.01 840" stroke="black" stroke-width="2" fill="none"></path><path d="M 454.01 840 L 494.01 840" stroke="black" stroke-width="2" fill="none"></path><path d="M 403.85 958 L 443.85 958" stroke="black" stroke-width="2" fill="none"></path><path d="M 403.85 962 L 443.85 962" stroke="black" stroke-width="2" fill="none"></path><path d="M 483.85 958 L 523.85 958" stroke="black" stroke-width="2" fill="none"></path><path d="M 483.85 962 L 523.85 962" stroke="black" stroke-width="2" fill="none"></path><path d="M 490.71 1080 L 530.71 1080" stroke="black" stroke-width="2" fill="none"></path><path d="M 650.71 1200 L 690.71 1200" stroke="black" stroke-width="2" fill="none"></path><path d="M 797.38 1320 L 837.38 1320" stroke="black" stroke-width="2" fill="none"></path><path d="M 757.38 1438 L 797.38 1438" stroke="black" stroke-width="2" fill="none"></path><path d="M 757.38 1442 L 797.38 1442" stroke="black" stroke-width="2" fill="none"></path><path d="M 757.38 1558 L 797.38 1558" stroke="black" stroke-width="2" fill="none"></path><path d="M 757.38 1562 L 797.38 1562" stroke="black" stroke-width="2" fill="none"></path><path d="M 584.04 1680 L 624.04 1680" stroke="black" stroke-width="2" fill="none"></path><path d="M 664.04 1680 L 704.04 1680" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 454.75 0 L 454.75 60 M 374.75 60 L 534.75 60 M 374.75 60 L 374.75 100 M 454.75 60 L 454.75 100 M 534.75 60 L 534.75 100" stroke="black" stroke-width="2" fill="none"></path><path d="M 414.75 120 L 414.75 180 M 374.75 180 L 414.75 180 M 374.75 180 L 374.75 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 494.75 120 L 494.75 180 M 494.75 180 L 534.75 180 M 534.75 180 L 534.75 220" stroke="black" stroke-width="2" fill="none"></path><path d="M 414.75 240 L 414.75 300 M 60.48 300 L 704.26 300 M 60.48 300 L 60.48 340 M 140.48 300 L 140.48 340 M 414.75 300 L 414.75 340 M 544.26 300 L 544.26 340 M 624.26 300 L 624.26 340 M 704.26 300 L 704.26 340" stroke="black" stroke-width="2" fill="none"></path><path d="M 100.48 360 L 100.48 420 M 0 420 L 100.48 420 M 0 420 L 0 460 M 80 420 L 80 460" stroke="black" stroke-width="2" fill="none"></path><path d="M 584.26 360 L 584.26 420 M 160 420 L 1280 420 M 160 420 L 160 460 M 240 420 L 240 460 M 320 420 L 320 460 M 400 420 L 400 460 M 560 420 L 560 460 M 640 420 L 640 460 M 800 420 L 800 460 M 880 420 L 880 460 M 960 420 L 960 460 M 1040 420 L 1040 460 M 1120 420 L 1120 460 M 1200 420 L 1200 460 M 1280 420 L 1280 460" stroke="black" stroke-width="2" fill="none"></path><path d="M 360 480 L 360 540 M 198.86 540 L 438.86 540 M 198.86 540 L 198.86 580 M 278.86 540 L 278.86 580 M 438.86 540 L 438.86 580" stroke="black" stroke-width="2" fill="none"></path><path d="M 520 480 L 520 540 M 520 540 L 520 540 M 520 540 L 520 580" stroke="black" stroke-width="2" fill="none"></path><path d="M 680 480 L 680 540 M 680 540 L 712.59 540 M 712.59 540 L 712.59 580" stroke="black" stroke-width="2" fill="none"></path><path d="M 398.86 600 L 398.86 660 M 123.8 660 L 398.86 660 M 123.8 660 L 123.8 700 M 203.8 660 L 203.8 700 M 283.8 660 L 283.8 700 M 363.8 660 L 363.8 700" stroke="black" stroke-width="2" fill="none"></path><path d="M 479.43 600 L 479.43 660 M 479.43 660 L 523.8 660 M 523.8 660 L 523.8 700" stroke="black" stroke-width="2" fill="none"></path><path d="M 672.59 600 L 672.59 660 M 603.8 660 L 833.53 660 M 603.8 660 L 603.8 700 M 833.53 660 L 833.53 700" stroke="black" stroke-width="2" fill="none"></path><path d="M 163.8 720 L 163.8 780 M 34.01 780 L 194.01 780 M 34.01 780 L 34.01 820 M 114.01 780 L 114.01 820 M 194.01 780 L 194.01 820" stroke="black" stroke-width="2" fill="none"></path><path d="M 483.8 720 L 483.8 780 M 274.01 780 L 483.8 780 M 274.01 780 L 274.01 820 M 434.01 780 L 434.01 820" stroke="black" stroke-width="2" fill="none"></path><path d="M 563.8 720 L 563.8 780 M 563.8 780 L 754.01 780 M 594.01 780 L 594.01 820 M 674.01 780 L 674.01 820 M 754.01 780 L 754.01 820" stroke="black" stroke-width="2" fill="none"></path><path d="M 793.53 720 L 793.53 790 M 793.53 790 L 914.01 790 M 834.01 790 L 834.01 820 M 914.01 790 L 914.01 820" stroke="black" stroke-width="2" fill="none"></path><path d="M 314.01 840 L 314.01 900 M 63.85 900 L 383.85 900 M 63.85 900 L 63.85 940 M 143.85 900 L 143.85 940 M 223.85 900 L 223.85 940 M 303.85 900 L 303.85 940 M 383.85 900 L 383.85 940" stroke="black" stroke-width="2" fill="none"></path><path d="M 474.01 840 L 474.01 900 M 463.85 900 L 623.85 900 M 463.85 900 L 463.85 940 M 543.85 900 L 543.85 940 M 623.85 900 L 623.85 940" stroke="black" stroke-width="2" fill="none"></path><path d="M 423.85 960 L 423.85 1020 M 390.71 1020 L 423.85 1020 M 390.71 1020 L 390.71 1060" stroke="black" stroke-width="2" fill="none"></path><path d="M 503.85 960 L 503.85 1020 M 470.71 1020 L 630.71 1020 M 470.71 1020 L 470.71 1060 M 630.71 1020 L 630.71 1060" stroke="black" stroke-width="2" fill="none"></path><path d="M 510.71 1080 L 510.71 1140 M 390.71 1140 L 630.71 1140 M 390.71 1140 L 390.71 1180 M 470.71 1140 L 470.71 1180 M 550.71 1140 L 550.71 1180 M 630.71 1140 L 630.71 1180" stroke="black" stroke-width="2" fill="none"></path><path d="M 670.71 1200 L 670.71 1260 M 457.38 1260 L 937.38 1260 M 457.38 1260 L 457.38 1300 M 537.38 1260 L 537.38 1300 M 617.38 1260 L 617.38 1300 M 697.38 1260 L 697.38 1300 M 777.38 1260 L 777.38 1300 M 937.38 1260 L 937.38 1300" stroke="black" stroke-width="2" fill="none"></path><path d="M 817.38 1320 L 817.38 1380 M 657.38 1380 L 977.38 1380 M 657.38 1380 L 657.38 1420 M 737.38 1380 L 737.38 1420 M 817.38 1380 L 817.38 1420 M 897.38 1380 L 897.38 1420 M 977.38 1380 L 977.38 1420" stroke="black" stroke-width="2" fill="none"></path><path d="M 777.38 1440 L 777.38 1500 M 737.38 1500 L 817.38 1500 M 737.38 1500 L 737.38 1540 M 817.38 1500 L 817.38 1540" stroke="black" stroke-width="2" fill="none"></path><path d="M 777.38 1560 L 777.38 1620 M 644.04 1620 L 884.04 1620 M 644.04 1620 L 644.04 1660 M 804.04 1620 L 804.04 1660 M 884.04 1620 L 884.04 1660" stroke="black" stroke-width="2" fill="none"></path><path d="M 604.04 1680 L 604.04 1740 M 540.61 1740 L 620.61 1740 M 540.61 1740 L 540.61 1780 M 620.61 1740 L 620.61 1780" stroke="black" stroke-width="2" fill="none"></path><path d="M 684.04 1680 L 684.04 1740 M 684.04 1740 L 700.61 1740 M 700.61 1740 L 700.61 1780" stroke="black" stroke-width="2" fill="none"></path></g><g class="assisted-lines"></g><g class="duplicate-arcs"><path d="M 218.86 600 L 228.86 600 Q 238.86 600 238.86 610 L 238.86 662 Q 238.86 672 248.86 672 L 407.8 672 Q 434.8 672 443.8 700" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path><path d="M 443.8 700 Q 598.67 644 753.53 700" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path></g><g class="symbols"><g transform="translate(414.75 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(494.75 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(374.75 120)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-0"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(454.75 120)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-1-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(534.75 120)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-2"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text></g></g></g><g transform="translate(374.75 240)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(454.75 240)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(534.75 240)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-2"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(60.48 360)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-3-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(140.48 360)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-1"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-3-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(414.75 360)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(544.26 360)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-3-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(624.26 360)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-3-4"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-3-4)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(704.26 360)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(0 480)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-4-0"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-4-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(80 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(160 480)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(240 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(320 480)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-4-4"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-4-4)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text></g></g></g><g transform="translate(400 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(480 480)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(560 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(640 480)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-4-8"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-4-8)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(720 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(800 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(880 480)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(960 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(1040 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(1120 480)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(1200 480)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(1280 480)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(198.86 600)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-5-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-5-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(278.86 600)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(358.86 600)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(438.86 600)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-5-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-5-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(520 600)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(632.59 600)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(712.59 600)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-5-6"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-5-6)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(123.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(203.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-1"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-6-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(283.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-2"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text></g></g></g><g transform="translate(363.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(443.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-4"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-4)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(523.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-5"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-6-5)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(603.8 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-6"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-6)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(753.53 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-7"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-6-7)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><text data-copy-number="3" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">3</text></g></g><g transform="translate(833.53 720)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-6-8"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-6-8)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text></g></g></g><g transform="translate(34.01 840)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(114.01 840)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(194.01 840)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(274.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-7-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(354.01 840)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(434.01 840)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(514.01 840)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(594.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-7"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-7-7)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(674.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-8"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-7-8)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(754.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-9"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-7-9)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(834.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-10"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-7-10)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(914.01 840)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-7-11"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-7-11)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(63.85 960)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(143.85 960)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(223.85 960)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(303.85 960)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(383.85 960)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(463.85 960)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(543.85 960)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(623.85 960)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(390.71 1080)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(470.71 1080)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(550.71 1080)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(630.71 1080)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(390.71 1200)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(470.71 1200)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(550.71 1200)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(630.71 1200)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(710.71 1200)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(457.38 1320)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-11-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-11-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(537.38 1320)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-11-1"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-11-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(617.38 1320)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(697.38 1320)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(777.38 1320)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(857.38 1320)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(937.38 1320)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(657.38 1440)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(737.38 1440)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(817.38 1440)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(897.38 1440)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(977.38 1440)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(737.38 1560)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-13-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-13-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g><text x="20" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></g></g></g><g transform="translate(817.38 1560)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(564.04 1680)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(644.04 1680)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(724.04 1680)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(804.04 1680)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(884.04 1680)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-14-4"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-14-4)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g><g><g data-tag-fill="solid"><path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><g><text x="15.4" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#ff7f0e">Fireproof</text><text x="45.4" y="50.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">?</text></g></g></g><g transform="translate(540.61 1800)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(620.61 1800)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(700.61 1800)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-15-2"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-15-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><g data-arrow="consultand"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line></g></g></g></g><g class="labels"><g transform="translate(394.75 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text></g></g></g><g transform="translate(474.75 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Valaena Velaryon</title>Valaena</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(354.75 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text></g></g></g><g transform="translate(434.75 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon I</text></g></g></g><g transform="translate(514.75 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Visenya</text></g></g></g><g transform="translate(354.75 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aenys I</text></g></g></g><g transform="translate(434.75 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alyssa Velaryon</title>Alyssa</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(514.75 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegor I</text></g></g></g><g transform="translate(40.48 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text></g></g></g><g transform="translate(120.48 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text></g></g></g><g transform="translate(394.75 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text></g></g></g><g transform="translate(524.26 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys I</text></g></g></g><g transform="translate(604.26 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alysanne</text></g></g></g><g transform="translate(684.26 340)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Vaella</text></g></g></g><g transform="translate(-20 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerea</text></g></g></g><g transform="translate(60 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text></g></g></g><g transform="translate(140 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text></g></g></g><g transform="translate(220 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text></g></g></g><g transform="translate(300 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelon</text></g></g></g><g transform="translate(380 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Alyssa</text></g></g></g><g transform="translate(460 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rodrik Arryn</text></g></g></g><g transform="translate(540 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text></g></g></g><g transform="translate(620 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text></g></g></g><g transform="translate(700 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jocelyn Baratheon</title>Jocelyn</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baratheon</text></g></g></g><g transform="translate(780 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maegelle</text></g></g></g><g transform="translate(860 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Vaegon</text></g></g></g><g transform="translate(940 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Saera</text></g></g></g><g transform="translate(1020 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserra</text></g></g></g><g transform="translate(1100 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Gaemon</text></g></g></g><g transform="translate(1180 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Valerion</text></g></g></g><g transform="translate(1260 460)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Gael</text></g></g></g><g transform="translate(178.86 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text></g></g></g><g transform="translate(258.86 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text></g></g></g><g transform="translate(338.86 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Alicent Hightower</title>Alicent</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Hightower</text></g></g></g><g transform="translate(418.86 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys I</text></g></g></g><g transform="translate(500 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemma Arryn</text></g></g></g><g transform="translate(612.59 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Corlys Velaryon</title>Corlys</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(692.59 580)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text></g></g></g><g transform="translate(103.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon II</text></g></g></g><g transform="translate(183.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Helaena</text></g></g></g><g transform="translate(263.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemond</text></g></g></g><g transform="translate(343.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text></g></g></g><g transform="translate(423.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text></g></g></g><g transform="translate(503.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenyra</text></g></g></g><g transform="translate(583.8 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laenor Velaryon</title>Laenor</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(733.53 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daemon</text></g></g></g><g transform="translate(813.53 700)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Laena Velaryon</title>Laena</text><text x="0" y="65" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(14.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys</text></g></g></g><g transform="translate(94.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaera</text></g></g></g><g transform="translate(174.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maelor</text></g></g></g><g transform="translate(254.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon III</text></g></g></g><g transform="translate(334.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daenaera Velaryon</title>Daenaera</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(414.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys II</text></g></g></g><g transform="translate(494.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larra Rogare</text></g></g></g><g transform="translate(574.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Jacaerys Velaryon</title>Jacaerys</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(654.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Lucerys Velaryon</title>Lucerys</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(734.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Joffrey Velaryon</title>Joffrey</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Velaryon</text></g></g></g><g transform="translate(814.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baela</text></g></g></g><g transform="translate(894.01 820)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text></g></g></g><g transform="translate(43.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron I</text></g></g></g><g transform="translate(123.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor I</text></g></g></g><g transform="translate(203.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaena</text></g></g></g><g transform="translate(283.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elaena</text></g></g></g><g transform="translate(363.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daena</text></g></g></g><g transform="translate(443.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon IV</text></g></g></g><g transform="translate(523.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Naerys</text></g></g></g><g transform="translate(603.85 940)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text></g></g></g><g transform="translate(370.71 1060)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Daemon Blackfyre</title>Daemon</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackfyre</text></g></g></g><g transform="translate(450.71 1060)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron II</text></g></g></g><g transform="translate(530.71 1060)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Myriah Martell</title>Myriah</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Martell</text></g></g></g><g transform="translate(610.71 1060)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text></g></g></g><g transform="translate(370.71 1180)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Baelor</text></g></g></g><g transform="translate(450.71 1180)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys I</text></g></g></g><g transform="translate(530.71 1180)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegel</text></g></g></g><g transform="translate(610.71 1180)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maekar I</text></g></g></g><g transform="translate(690.71 1180)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Dyanna Dayne</text></g></g></g><g transform="translate(437.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text></g></g></g><g transform="translate(517.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerion</text></g></g></g><g transform="translate(597.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aemon</text></g></g></g><g transform="translate(677.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daella</text></g></g></g><g transform="translate(757.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon V</text></g></g></g><g transform="translate(837.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Betha Blackwood</title>Betha</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Blackwood</text></g></g></g><g transform="translate(917.38 1300)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhae</text></g></g></g><g transform="translate(637.38 1420)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Duncan</text></g></g></g><g transform="translate(717.38 1420)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jaehaerys II</text></g></g></g><g transform="translate(797.38 1420)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Shaera</text></g></g></g><g transform="translate(877.38 1420)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daeron</text></g></g></g><g transform="translate(957.38 1420)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaelle</text></g></g></g><g transform="translate(717.38 1540)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aerys II</text></g></g></g><g transform="translate(797.38 1540)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaella</text></g></g></g><g transform="translate(544.04 1660)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elia Martell</text></g></g></g><g transform="translate(624.04 1660)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaegar</text></g></g></g><g transform="translate(704.04 1660)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Lyanna Stark</text></g></g></g><g transform="translate(784.04 1660)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Viserys</text></g></g></g><g transform="translate(864.04 1660)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="52" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Daenerys</text></g></g></g><g transform="translate(520.61 1780)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rhaenys</text></g></g></g><g transform="translate(600.61 1780)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aegon</text></g></g></g><g transform="translate(680.61 1780)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jon Snow</text></g></g></g></g><g class="consanguinity-labels"></g>
-</g>
-<g class="pedigree-key" transform="translate(0 2050)">
-<g transform="translate(67 12) scale(0.667) translate(-18 -18)"><svg width="36" height="36" viewBox="-6 -6 36 36"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><line x1="-4" y1="-4" x2="28" y2="28" stroke="black" stroke-width="2"></line></svg></g><text x="102" y="16" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
-<g transform="translate(67 36) scale(0.667) translate(-23 -23)"><svg width="46" height="46" viewBox="-30 -2 56 56"><defs><marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="black"></polygon></marker></defs><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><g data-arrow="consultand"><line x1="-18" y1="42" x2="0" y2="24" stroke="black" stroke-width="2" marker-end="url(#legend-arrowhead)"></line></g></svg></g><text x="102" y="40" font-family="sans-serif" font-size="10" fill="black">Consultand (seeking counselling)</text>
-<g transform="translate(67 60) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="7" x2="48" y2="7" stroke="black" stroke-width="2"></line><line x1="0" y1="13" x2="48" y2="13" stroke="black" stroke-width="2"></line></svg></g><text x="102" y="64" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<g transform="translate(67 84) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><path d="M 4 17 Q 24 -5 44 17" stroke="black" stroke-width="2" stroke-dasharray="6 4" fill="none"></path></svg></g><text x="102" y="88" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
-<g transform="translate(67 108) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-madness"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-madness)"><g data-tag-fill="solid"><path d="M 14 14 L -2 14 A 16 16 0 0 1 14 -2 Z" fill="#000000"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="102" y="112" font-family="sans-serif" font-size="10" fill="black">Madness</text>
-<g transform="translate(67 132) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-dragonrider"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-dragonrider)"><g data-tag-fill="solid"><path d="M 14 14 L 14 -2 A 16 16 0 0 1 30 14 Z" fill="#d62728"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="102" y="136" font-family="sans-serif" font-size="10" fill="black">Dragonrider</text>
-<g transform="translate(67 156) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-dreams"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-dreams)"><g data-tag-fill="solid"><path d="M 14 14 L 30 14 A 16 16 0 0 1 14 30 Z" fill="#9467bd"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="102" y="160" font-family="sans-serif" font-size="10" fill="black">Prophetic dreams</text>
-<g transform="translate(67 180) scale(1) translate(-20 -14)"><svg width="40" height="28" viewBox="0 0 40 28"><text x="20" y="17.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">Throne</text></svg></g><text x="102" y="184" font-family="sans-serif" font-size="10" fill="black">Sat the Iron Throne</text>
-<g transform="translate(67 204) scale(1) translate(-20 -14)"><svg width="40" height="28" viewBox="0 0 40 28"><text x="20" y="17.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#7f7f7f">Vhagar</text></svg></g><text x="102" y="208" font-family="sans-serif" font-size="10" fill="black">Rode Vhagar</text>
-<g transform="translate(67 228) scale(1) translate(-20 -14)"><svg width="40" height="28" viewBox="0 0 40 28"><text x="20" y="17.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#ff7f0e">Fireproof</text></svg></g><text x="102" y="232" font-family="sans-serif" font-size="10" fill="black">Fireproof</text>
-<g transform="translate(67 252) scale(1) translate(-20 -14)"><svg width="40" height="28" viewBox="0 0 40 28"><text x="20" y="17.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">?</text></svg></g><text x="102" y="256" font-family="sans-serif" font-size="10" fill="black">Madness disputed</text>
-</g>
+<svg height="2354" viewBox="0 0 1433 2354" width="1433" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="2354" width="1433"/>
+  <g class="chart-title">
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="716.5" y="56">House Targaryen</text>
+  </g>
+  <g transform="translate(92 100)">
+    <g class="couple-lines">
+      <path d="M 434.75 0 L 474.75 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 394.75 118 L 434.75 118" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 394.75 122 L 434.75 122" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 474.75 118 L 514.75 118" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 474.75 122 L 514.75 122" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 394.75 240 L 434.75 240" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 80.48 358 L 120.48 358" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 80.48 362 L 120.48 362" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 564.26 358 L 604.26 358" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 564.26 362 L 604.26 362" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 340 478 L 380 478" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 340 482 L 380 482" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 500 480 L 540 480" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 660 480 L 700 480" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 378.86 600 L 418.86 600" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 458.86 598 L 500 598" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 458.86 602 L 500 602" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 652.59 600 L 692.59 600" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 143.8 718 L 183.8 718" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 143.8 722 L 183.8 722" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 463.8 718 L 503.8 718" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 463.8 722 L 503.8 722" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 543.8 718 L 583.8 718" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 543.8 722 L 583.8 722" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 773.53 718 L 813.53 718" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 773.53 722 L 813.53 722" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 294.01 840 L 334.01 840" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 454.01 840 L 494.01 840" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 403.85 958 L 443.85 958" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 403.85 962 L 443.85 962" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 483.85 958 L 523.85 958" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 483.85 962 L 523.85 962" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 490.71 1080 L 530.71 1080" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 650.71 1200 L 690.71 1200" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 797.38 1320 L 837.38 1320" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 757.38 1438 L 797.38 1438" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 757.38 1442 L 797.38 1442" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 757.38 1558 L 797.38 1558" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 757.38 1562 L 797.38 1562" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 584.04 1680 L 624.04 1680" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 664.04 1680 L 704.04 1680" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="sibship-lines">
+      <path d="M 454.75 0 L 454.75 60 M 374.75 60 L 534.75 60 M 374.75 60 L 374.75 100 M 454.75 60 L 454.75 100 M 534.75 60 L 534.75 100" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 414.75 120 L 414.75 180 M 374.75 180 L 414.75 180 M 374.75 180 L 374.75 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 494.75 120 L 494.75 180 M 494.75 180 L 534.75 180 M 534.75 180 L 534.75 220" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 414.75 240 L 414.75 300 M 60.48 300 L 704.26 300 M 60.48 300 L 60.48 340 M 140.48 300 L 140.48 340 M 414.75 300 L 414.75 340 M 544.26 300 L 544.26 340 M 624.26 300 L 624.26 340 M 704.26 300 L 704.26 340" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 100.48 360 L 100.48 420 M 0 420 L 100.48 420 M 0 420 L 0 460 M 80 420 L 80 460" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 584.26 360 L 584.26 420 M 160 420 L 1280 420 M 160 420 L 160 460 M 240 420 L 240 460 M 320 420 L 320 460 M 400 420 L 400 460 M 560 420 L 560 460 M 640 420 L 640 460 M 800 420 L 800 460 M 880 420 L 880 460 M 960 420 L 960 460 M 1040 420 L 1040 460 M 1120 420 L 1120 460 M 1200 420 L 1200 460 M 1280 420 L 1280 460" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 360 480 L 360 540 M 198.86 540 L 438.86 540 M 198.86 540 L 198.86 580 M 278.86 540 L 278.86 580 M 438.86 540 L 438.86 580" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 520 480 L 520 540 M 520 540 L 520 540 M 520 540 L 520 580" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 680 480 L 680 540 M 680 540 L 712.59 540 M 712.59 540 L 712.59 580" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 398.86 600 L 398.86 660 M 123.8 660 L 398.86 660 M 123.8 660 L 123.8 700 M 203.8 660 L 203.8 700 M 283.8 660 L 283.8 700 M 363.8 660 L 363.8 700" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 479.43 600 L 479.43 660 M 479.43 660 L 523.8 660 M 523.8 660 L 523.8 700" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 672.59 600 L 672.59 660 M 603.8 660 L 833.53 660 M 603.8 660 L 603.8 700 M 833.53 660 L 833.53 700" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 163.8 720 L 163.8 780 M 34.01 780 L 194.01 780 M 34.01 780 L 34.01 820 M 114.01 780 L 114.01 820 M 194.01 780 L 194.01 820" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 483.8 720 L 483.8 780 M 274.01 780 L 483.8 780 M 274.01 780 L 274.01 820 M 434.01 780 L 434.01 820" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 563.8 720 L 563.8 780 M 563.8 780 L 754.01 780 M 594.01 780 L 594.01 820 M 674.01 780 L 674.01 820 M 754.01 780 L 754.01 820" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 793.53 720 L 793.53 790 M 793.53 790 L 914.01 790 M 834.01 790 L 834.01 820 M 914.01 790 L 914.01 820" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 314.01 840 L 314.01 900 M 63.85 900 L 383.85 900 M 63.85 900 L 63.85 940 M 143.85 900 L 143.85 940 M 223.85 900 L 223.85 940 M 303.85 900 L 303.85 940 M 383.85 900 L 383.85 940" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 474.01 840 L 474.01 900 M 463.85 900 L 623.85 900 M 463.85 900 L 463.85 940 M 543.85 900 L 543.85 940 M 623.85 900 L 623.85 940" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 423.85 960 L 423.85 1020 M 390.71 1020 L 423.85 1020 M 390.71 1020 L 390.71 1060" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 503.85 960 L 503.85 1020 M 470.71 1020 L 630.71 1020 M 470.71 1020 L 470.71 1060 M 630.71 1020 L 630.71 1060" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 510.71 1080 L 510.71 1140 M 390.71 1140 L 630.71 1140 M 390.71 1140 L 390.71 1180 M 470.71 1140 L 470.71 1180 M 550.71 1140 L 550.71 1180 M 630.71 1140 L 630.71 1180" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 670.71 1200 L 670.71 1260 M 457.38 1260 L 937.38 1260 M 457.38 1260 L 457.38 1300 M 537.38 1260 L 537.38 1300 M 617.38 1260 L 617.38 1300 M 697.38 1260 L 697.38 1300 M 777.38 1260 L 777.38 1300 M 937.38 1260 L 937.38 1300" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 817.38 1320 L 817.38 1380 M 657.38 1380 L 977.38 1380 M 657.38 1380 L 657.38 1420 M 737.38 1380 L 737.38 1420 M 817.38 1380 L 817.38 1420 M 897.38 1380 L 897.38 1420 M 977.38 1380 L 977.38 1420" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 777.38 1440 L 777.38 1500 M 737.38 1500 L 817.38 1500 M 737.38 1500 L 737.38 1540 M 817.38 1500 L 817.38 1540" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 777.38 1560 L 777.38 1620 M 644.04 1620 L 884.04 1620 M 644.04 1620 L 644.04 1660 M 804.04 1620 L 804.04 1660 M 884.04 1620 L 884.04 1660" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 604.04 1680 L 604.04 1740 M 540.61 1740 L 620.61 1740 M 540.61 1740 L 540.61 1780 M 620.61 1740 L 620.61 1780" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 684.04 1680 L 684.04 1740 M 684.04 1740 L 700.61 1740 M 700.61 1740 L 700.61 1780" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="duplicate-arcs">
+      <path d="M 218.86 600 L 228.86 600 Q 238.86 600 238.86 610 L 238.86 662 Q 238.86 672 248.86 672 L 407.8 672 Q 434.8 672 443.8 700" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="1.5"/>
+      <path d="M 443.8 700 Q 598.67 644 753.53 700" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="1.5"/>
+    </g>
+    <g class="symbols">
+      <g transform="translate(414.75 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(494.75 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(374.75 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-0">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-1-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(454.75 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-1-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(534.75 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-2">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-1-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(374.75 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-2-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-2-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(454.75 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(534.75 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-2-2">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-2-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(60.48 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-3-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(140.48 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-1">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-3-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(414.75 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(544.26 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-3">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-3-3)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(624.26 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-3-4">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-3-4)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(704.26 360)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(0 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-4-0">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-4-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(80 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(160 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(240 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(320 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-4-4">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-4-4)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(400 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(480 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(560 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(640 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-4-8">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-4-8)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(720 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(800 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(880 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(960 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(1040 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(1120 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(1200 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(1280 480)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(198.86 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-5-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-5-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="1" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">1</text>
+        </g>
+      </g>
+      <g transform="translate(278.86 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(358.86 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(438.86 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-5-3">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-5-3)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(520 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(632.59 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(712.59 600)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-5-6">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-5-6)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(123.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(203.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-1">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-6-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(283.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-2">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(363.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-3">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-3)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(443.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-4">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-4)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="2" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">2</text>
+        </g>
+      </g>
+      <g transform="translate(523.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-5">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-6-5)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(603.8 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-6">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-6)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(753.53 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-7">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-6-7)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <text data-copy-number="3" fill="black" font-family="sans-serif" font-size="10" style="pointer-events:none;user-select:none" x="42" y="2">3</text>
+        </g>
+      </g>
+      <g transform="translate(833.53 720)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-6-8">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-6-8)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(34.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(114.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(194.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(274.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-3">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-7-3)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(354.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(434.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(514.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(594.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-7">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-7-7)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(674.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-8">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-7-8)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(754.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-9">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-7-9)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(834.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-10">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-7-10)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(914.01 840)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-7-11">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-7-11)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(63.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(143.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(223.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(303.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(383.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(463.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(543.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(623.85 960)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(390.71 1080)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(470.71 1080)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(550.71 1080)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(630.71 1080)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(390.71 1200)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(470.71 1200)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(550.71 1200)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(630.71 1200)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(710.71 1200)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(457.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-11-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-11-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(537.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-11-1">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-11-1)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(617.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(697.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(777.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(857.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(937.38 1320)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(657.38 1440)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(737.38 1440)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(817.38 1440)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(897.38 1440)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(977.38 1440)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(737.38 1560)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-13-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-13-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          <g>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(817.38 1560)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(564.04 1680)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(644.04 1680)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(724.04 1680)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(804.04 1680)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(884.04 1680)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-14-4">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-14-4)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#9467bd"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <g>
+            <text fill="#ff7f0e" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="15.4" y="50.5">Fireproof</text>
+            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="45.4" y="50.5">?</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(540.61 1800)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(620.61 1800)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(700.61 1800)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-15-2">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-15-2)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <g data-arrow="consultand">
+            <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="labels">
+      <g transform="translate(394.75 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerion</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(474.75 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Valaena Velaryon</title>Valaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(354.75 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(434.75 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(514.75 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Visenya</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(354.75 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aenys I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(434.75 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alyssa Velaryon</title>Alyssa</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(514.75 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Maegor I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(40.48 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(120.48 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(394.75 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(524.26 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Jaehaerys I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(604.26 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alysanne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(684.26 340)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Vaella</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(-20 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerea</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(60 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaella</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(140 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(220 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daenerys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(300 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Baelon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(380 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alyssa</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(460 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rodrik Arryn</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(540 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daella</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(620 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(700 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Jocelyn Baratheon</title>Jocelyn</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Baratheon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(780 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Maegelle</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(860 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Vaegon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(940 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Saera</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1020 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserra</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1100 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Gaemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1180 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Valerion</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1260 460)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Gael</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(178.86 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(258.86 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(338.86 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alicent Hightower</title>Alicent</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hightower</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(418.86 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Viserys I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(500 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemma Arryn</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(612.59 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Corlys Velaryon</title>Corlys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(692.59 580)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(103.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon II</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(183.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Helaena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(263.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aemond</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(343.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(423.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(503.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Rhaenyra</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(583.8 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Laenor Velaryon</title>Laenor</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(733.53 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(813.53 700)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>Laena Velaryon</title>Laena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(14.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jaehaerys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(94.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jaehaera</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(174.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Maelor</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(254.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon III</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(334.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Daenaera Velaryon</title>Daenaera</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(414.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Viserys II</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(494.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Larra Rogare</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(574.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Jacaerys Velaryon</title>Jacaerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(654.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Lucerys Velaryon</title>Lucerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(734.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Joffrey Velaryon</title>Joffrey</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(814.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baela</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(894.01 820)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(43.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daeron I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(123.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Baelor I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(203.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(283.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Elaena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(363.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daena</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(443.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon IV</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(523.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Naerys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(603.85 940)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(370.71 1060)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Daemon Blackfyre</title>Daemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Blackfyre</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(450.71 1060)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daeron II</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(530.71 1060)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Myriah Martell</title>Myriah</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Martell</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(610.71 1060)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daenerys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(370.71 1180)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baelor</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(450.71 1180)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aerys I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(530.71 1180)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaegel</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(610.71 1180)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Maekar I</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(690.71 1180)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Dyanna Dayne</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(437.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(517.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerion</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(597.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(677.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daella</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(757.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon V</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(837.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Betha Blackwood</title>Betha</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Blackwood</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(917.38 1300)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhae</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(637.38 1420)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Duncan</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(717.38 1420)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Jaehaerys II</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(797.38 1420)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Shaera</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(877.38 1420)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(957.38 1420)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaelle</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(717.38 1540)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aerys II</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(797.38 1540)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaella</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(544.04 1660)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Elia Martell</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(624.04 1660)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaegar</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(704.04 1660)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Lyanna Stark</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(784.04 1660)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(864.04 1660)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daenerys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(520.61 1780)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(600.61 1780)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(680.61 1780)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jon Snow</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 2050)">
+    <g transform="translate(67 12) scale(0.667) translate(-18 -18)">
+      <svg height="36" viewBox="-6 -6 36 36" width="36">
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <line stroke="black" stroke-width="2" x1="-4" x2="28" y1="-4" y2="28"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="16">Deceased</text>
+    <g transform="translate(67 36) scale(0.667) translate(-23 -23)">
+      <svg height="46" viewBox="-30 -2 56 56" width="46">
+        <defs>
+          <marker id="legend-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+            <polygon fill="black" points="0 0, 6 3, 0 6"/>
+          </marker>
+        </defs>
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <g data-arrow="consultand">
+          <line marker-end="url(#legend-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="42" y2="24"/>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="40">Consultand (seeking counselling)</text>
+    <g transform="translate(67 60) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="7" y2="7"/>
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="13" y2="13"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="64">Consanguineous couple</text>
+    <g transform="translate(67 84) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <path d="M 4 17 Q 24 -5 44 17" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="88">Same person drawn more than once</text>
+    <g transform="translate(67 108) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-madness">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-madness)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L -2 14 A 16 16 0 0 1 14 -2 Z" fill="#000000"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="112">Madness</text>
+    <g transform="translate(67 132) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-dragonrider">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-dragonrider)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L 14 -2 A 16 16 0 0 1 30 14 Z" fill="#d62728"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="136">Dragonrider</text>
+    <g transform="translate(67 156) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-dreams">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-dreams)">
+          <g data-tag-fill="solid">
+            <path d="M 14 14 L 30 14 A 16 16 0 0 1 14 30 Z" fill="#9467bd"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="160">Prophetic dreams</text>
+    <g transform="translate(67 180) scale(1) translate(-20 -14)">
+      <svg height="28" viewBox="0 0 40 28" width="40">
+        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Throne</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="184">Sat the Iron Throne</text>
+    <g transform="translate(67 204) scale(1) translate(-20 -14)">
+      <svg height="28" viewBox="0 0 40 28" width="40">
+        <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Vhagar</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="208">Rode Vhagar</text>
+    <g transform="translate(67 228) scale(1) translate(-20 -14)">
+      <svg height="28" viewBox="0 0 40 28" width="40">
+        <text fill="#ff7f0e" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Fireproof</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="232">Fireproof</text>
+    <g transform="translate(67 252) scale(1) translate(-20 -14)">
+      <svg height="28" viewBox="0 0 40 28" width="40">
+        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">?</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="256">Madness disputed</text>
+  </g>
 </svg>

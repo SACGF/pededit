@@ -1,21 +1,569 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2296" height="647"
-     viewBox="0 0 2296 647">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="2296" height="647" fill="white"/>
-<g class="chart-title"><text x="1148" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Pregnancies, losses and assisted reproduction</text></g>
-<g transform="translate(60 100)">
-<g class="couple-lines"><path d="M 190 0 L 218 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 598 0 L 626 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 904 0 L 932 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 1142 0 L 1170 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 1482 0 L 1510 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 1822 0 L 1850 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 2128 0 L 2156 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 1448 84 L 1476 84" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 204 0 L 204 42 M 0 42 L 408 42 M 0 42 L 0 64 M 68 42 L 68 64 M 136 42 L 136 72 M 204 42 L 204 72 M 272 42 L 272 64 M 340 42 L 340 72 M 408 42 L 408 72" stroke="black" stroke-width="2" fill="none"></path><path d="M 612 0 L 612 42 M 612 42 L 612 42 M 612 42 L 612 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 836 20 L 884 64 M 884 20 L 884 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 1156 0 L 1156 42 M 1156 42 L 1156 42 M 1156 42 L 1156 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 1496 0 L 1496 42 M 1496 42 L 1496 42 M 1496 42 L 1496 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 1734 20 L 1734 64 M 1782 20 L 1734 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 2060 20 L 2108 64 M 2108 20 L 2108 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 1462 84 L 1462 126 M 1462 126 L 1564 126 M 1564 126 L 1564 148" stroke="black" stroke-width="2" fill="none"></path></g><g class="assisted-lines"><line x1="1244.56" y1="13.44" x2="1156" y2="64" stroke="black" stroke-width="2"></line><line x1="1564" y1="104" x2="1564" y2="148" stroke="black" stroke-width="2"></line></g><g class="duplicate-arcs"></g><g class="symbols"><g transform="translate(170 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(238 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(578 0)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g></g></g></g><g transform="translate(646 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(816 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g><g><text data-role-letter="D" x="20" y="26.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">D</text></g></g></g></g><g transform="translate(884 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(952 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(1122 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(1190 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(1258 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g><g><text data-role-letter="D" x="20" y="26.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">D</text></g></g></g></g><g transform="translate(1462 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(1530 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(1734 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g><g><text data-role-letter="D" x="20" y="26.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">D</text></g></g></g></g><g transform="translate(1802 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(1870 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(2040 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g><g><text data-role-letter="D" x="20" y="26.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">D</text></g></g></g></g><g transform="translate(2108 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(2176 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 84)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g><g><text x="20" y="27" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">P</text></g></g></g></g><g transform="translate(68 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="black"></circle></g><g><text x="20" y="27" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="white" style="pointer-events:none;user-select:none">P</text></g></g></g></g><g transform="translate(136 84)"><g transform="translate(-20 -20)"><g><g><polygon points="20,8 32,32 8,32" stroke="black" stroke-width="2" fill="white"></polygon></g></g></g></g><g transform="translate(204 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-3"><polygon points="20,8 32,32 8,32"></polygon></clipPath><polygon points="20,8 32,32 8,32" stroke="black" stroke-width="2" fill="black"></polygon><g><line x1="5" y1="5" x2="35" y2="35" stroke="black" stroke-width="2"></line><line x1="5" y1="5" x2="35" y2="35" stroke="white" stroke-width="2" clip-path="url(#symbol-clip-1-3)"></line></g></g></g></g></g><g transform="translate(272 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g><g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g><text x="20" y="52" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" style="pointer-events:none;user-select:none">SB</text></g></g></g><g transform="translate(340 84)"><g transform="translate(-20 -20)"><g><g><polygon points="20,8 32,32 8,32" stroke="black" stroke-width="2" fill="white"></polygon></g><text x="20" y="52" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" style="pointer-events:none;user-select:none">ECT</text></g></g></g><g transform="translate(408 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-6"><polygon points="20,8 32,32 8,32"></polygon></clipPath><polygon points="20,8 32,32 8,32" stroke="black" stroke-width="2" fill="white"></polygon><g clip-path="url(#symbol-clip-1-6)"><g data-carrier-sector="__plain-carrier"><g data-tag-fill="dots"><clipPath id="symbol-clip-1-6-s0"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z"></path></clipPath><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="white"></path><path d="M1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000" clip-path="url(#symbol-clip-1-6-s0)"></path></g></g></g><polygon points="20,8 32,32 8,32" stroke="black" stroke-width="2" fill="none"></polygon></g></g></g></g><g transform="translate(612 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(884 84)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g><g><text x="20" y="27" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">P</text></g></g></g></g><g transform="translate(1156 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g><g transform="translate(1428 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(1496 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(1564 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g><g><text data-role-letter="S" x="20" y="26.48" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">S</text></g></g></g></g><g transform="translate(1734 84)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g><g><text x="20" y="27" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">P</text></g></g></g></g><g transform="translate(2108 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(1564 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g></g><g class="labels"><g transform="translate(150 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(218 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(558 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(626 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(796 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(864 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(932 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text></g></g></g><g transform="translate(1102 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text></g></g></g><g transform="translate(1170 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1238 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1442 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1510 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1714 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1782 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1850 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(2020 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(2088 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(2156 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Partner</text></g></g></g><g transform="translate(-20 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">20 wk</text></g></g></g><g transform="translate(48 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(116 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">8 wk</text></g></g></g><g transform="translate(184 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(252 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="46" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">32 wk</text></g></g></g><g transform="translate(320 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(388 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(592 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(864 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1136 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1408 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1476 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1544 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1714 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(2088 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(1544 148)"><g transform="translate(20 20)" style="user-select:none"></g></g></g><g class="consanguinity-labels"></g>
-</g>
-<g class="pedigree-key" transform="translate(0 367)">
-<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="black"></circle></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<g transform="translate(56 36) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><g><g><clipPath id="legend-plain-carrier-male"><rect x="1" y="1" width="22" height="22"></rect></clipPath><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#legend-plain-carrier-male)"><g data-carrier-sector="__plain-carrier"><g data-tag-fill="dots"><clipPath id="legend-plain-carrier-male-s0"><path d="M 12 12 L 12 -12 A 24 24 0 0 1 12 36 Z"></path></clipPath><path d="M 12 12 L 12 -12 A 24 24 0 0 1 12 36 Z" fill="white"></path><path d="M0.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0" fill="#000000" clip-path="url(#legend-plain-carrier-male-s0)"></path></g></g></g><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="none"></rect></g></g></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Carrier</text>
-<g transform="translate(56 60) scale(0.667) translate(-18 -20)"><svg width="36" height="40" viewBox="-6 -6 36 40"><g><g><polygon points="12,1 23,12 12,23 1,12" stroke="black" stroke-width="2" fill="white"></polygon></g><g><text x="12" y="16.2" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">P</text></g></g></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Pregnancy</text>
-<g transform="translate(56 84) scale(0.667) translate(-18 -20)"><svg width="36" height="40" viewBox="-6 -6 36 40"><g><g><polygon points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2" fill="white"></polygon></g></g></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Miscarriage</text>
-<g transform="translate(56 108) scale(0.667) translate(-18 -20)"><svg width="36" height="40" viewBox="-6 -6 36 40"><g><g><polygon points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2" fill="white"></polygon><g><line x1="1.8" y1="1.8" x2="22.2" y2="22.2" stroke="black" stroke-width="2"></line></g></g></g></svg></g><text x="80" y="112" font-family="sans-serif" font-size="10" fill="black">Termination</text>
-<g transform="translate(56 132) scale(0.667) translate(-18 -21)"><svg width="36" height="42" viewBox="-6 -6 36 42"><g><g><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle></g><g><line x1="-4" y1="-4" x2="28" y2="28" stroke="black" stroke-width="2"></line></g><text x="12" y="36" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" style="pointer-events:none;user-select:none">SB</text></g></svg></g><text x="80" y="136" font-family="sans-serif" font-size="10" fill="black">Stillbirth (SB)</text>
-<g transform="translate(56 156) scale(0.667) translate(-18 -21)"><svg width="36" height="42" viewBox="-6 -6 36 42"><g><g><polygon points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2" fill="white"></polygon></g><text x="12" y="36" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black" style="pointer-events:none;user-select:none">ECT</text></g></svg></g><text x="80" y="160" font-family="sans-serif" font-size="10" fill="black">Ectopic pregnancy (ECT)</text>
-<g transform="translate(56 180) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><g><g><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect></g><g><text data-role-letter="D" x="12" y="15.96" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">D</text></g></g></svg></g><text x="80" y="184" font-family="sans-serif" font-size="10" fill="black">Sperm or egg donor (D)</text>
-<g transform="translate(56 204) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><g><g><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle></g><g><text data-role-letter="S" x="12" y="15.96" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black" style="pointer-events:none;user-select:none">S</text></g></g></svg></g><text x="80" y="208" font-family="sans-serif" font-size="10" fill="black">Surrogate (S)</text>
-<g transform="translate(56 228) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="14" y1="2" x2="34" y2="18" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="232" font-family="sans-serif" font-size="10" fill="black">Carried the pregnancy, not the genetic mother</text>
-</g>
+<svg height="647" viewBox="0 0 2296 647" width="2296" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="647" width="2296"/>
+  <g class="chart-title">
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="1148" y="56">Pregnancies, losses and assisted reproduction</text>
+  </g>
+  <g transform="translate(60 100)">
+    <g class="couple-lines">
+      <path d="M 190 0 L 218 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 598 0 L 626 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 904 0 L 932 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1142 0 L 1170 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1482 0 L 1510 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1822 0 L 1850 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 2128 0 L 2156 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1448 84 L 1476 84" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="sibship-lines">
+      <path d="M 204 0 L 204 42 M 0 42 L 408 42 M 0 42 L 0 64 M 68 42 L 68 64 M 136 42 L 136 72 M 204 42 L 204 72 M 272 42 L 272 64 M 340 42 L 340 72 M 408 42 L 408 72" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 612 0 L 612 42 M 612 42 L 612 42 M 612 42 L 612 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 836 20 L 884 64 M 884 20 L 884 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1156 0 L 1156 42 M 1156 42 L 1156 42 M 1156 42 L 1156 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1496 0 L 1496 42 M 1496 42 L 1496 42 M 1496 42 L 1496 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1734 20 L 1734 64 M 1782 20 L 1734 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 2060 20 L 2108 64 M 2108 20 L 2108 64" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 1462 84 L 1462 126 M 1462 126 L 1564 126 M 1564 126 L 1564 148" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="assisted-lines">
+      <line stroke="black" stroke-width="2" x1="1244.56" x2="1156" y1="13.44" y2="64"/>
+      <line stroke="black" stroke-width="2" x1="1564" x2="1564" y1="104" y2="148"/>
+    </g>
+    <g class="symbols">
+      <g transform="translate(170 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(238 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(578 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(646 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(816 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+            <g>
+              <text data-role-letter="D" fill="black" font-family="sans-serif" font-size="18" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="26.48">D</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(884 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(952 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1122 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1190 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1258 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text data-role-letter="D" fill="black" font-family="sans-serif" font-size="18" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="26.48">D</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1462 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1530 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1734 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text data-role-letter="D" fill="black" font-family="sans-serif" font-size="18" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="26.48">D</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1802 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1870 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(2040 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+            <g>
+              <text data-role-letter="D" fill="black" font-family="sans-serif" font-size="18" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="26.48">D</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(2108 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(2176 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(0 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text fill="black" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(68 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="black" r="19" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text fill="white" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(136 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,8 32,32 8,32" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(204 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-3">
+                <polygon points="20,8 32,32 8,32"/>
+              </clipPath>
+              <polygon fill="black" points="20,8 32,32 8,32" stroke="black" stroke-width="2"/>
+              <g>
+                <line stroke="black" stroke-width="2" x1="5" x2="35" y1="5" y2="35"/>
+                <line clip-path="url(#symbol-clip-1-3)" stroke="white" stroke-width="2" x1="5" x2="35" y1="5" y2="35"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(272 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+            </g>
+            <text fill="black" font-family="sans-serif" font-size="9" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="52">SB</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(340 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,8 32,32 8,32" stroke="black" stroke-width="2"/>
+            </g>
+            <text fill="black" font-family="sans-serif" font-size="9" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="52">ECT</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(408 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-6">
+                <polygon points="20,8 32,32 8,32"/>
+              </clipPath>
+              <polygon fill="white" points="20,8 32,32 8,32" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-1-6)">
+                <g data-carrier-sector="__plain-carrier">
+                  <g data-tag-fill="dots">
+                    <clipPath id="symbol-clip-1-6-s0">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z"/>
+                    </clipPath>
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="white"/>
+                    <path clip-path="url(#symbol-clip-1-6-s0)" d="M1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000"/>
+                  </g>
+                </g>
+              </g>
+              <polygon fill="none" points="20,8 32,32 8,32" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(612 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(884 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text fill="black" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1156 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1428 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1496 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1564 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text data-role-letter="S" fill="black" font-family="sans-serif" font-size="18" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="26.48">S</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1734 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+            <g>
+              <text fill="black" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(2108 84)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1564 168)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="labels">
+      <g transform="translate(932 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Partner</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(1102 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Partner</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(2156 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Partner</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(-20 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">20 wk</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(116 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">8 wk</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(252 64)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="46">32 wk</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 367)">
+    <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <circle cx="12" cy="12" fill="black" r="11" stroke="black" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="16">Affected</text>
+    <g transform="translate(56 36) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <g>
+          <g>
+            <clipPath id="legend-plain-carrier-male">
+              <rect height="22" width="22" x="1" y="1"/>
+            </clipPath>
+            <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+            <g clip-path="url(#legend-plain-carrier-male)">
+              <g data-carrier-sector="__plain-carrier">
+                <g data-tag-fill="dots">
+                  <clipPath id="legend-plain-carrier-male-s0">
+                    <path d="M 12 12 L 12 -12 A 24 24 0 0 1 12 36 Z"/>
+                  </clipPath>
+                  <path d="M 12 12 L 12 -12 A 24 24 0 0 1 12 36 Z" fill="white"/>
+                  <path clip-path="url(#legend-plain-carrier-male-s0)" d="M0.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 1.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 3.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 6.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 8.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 11.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 13.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 16.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 18.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M0.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M3.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M5.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M8.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M10.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M13.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M15.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M18.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M20.625 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M23.125 21.25a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M1.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M4.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M6.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M9.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M11.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M14.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M16.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M19.375 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0M21.875 23.75a0.625 0.625 0 1 0 1.25 0a0.625 0.625 0 1 0 -1.25 0" fill="#000000"/>
+                </g>
+              </g>
+            </g>
+            <rect fill="none" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="40">Carrier</text>
+    <g transform="translate(56 60) scale(0.667) translate(-18 -20)">
+      <svg height="40" viewBox="-6 -6 36 40" width="36">
+        <g>
+          <g>
+            <polygon fill="white" points="12,1 23,12 12,23 1,12" stroke="black" stroke-width="2"/>
+          </g>
+          <g>
+            <text fill="black" font-family="sans-serif" font-size="12" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="16.2">P</text>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="64">Pregnancy</text>
+    <g transform="translate(56 84) scale(0.667) translate(-18 -20)">
+      <svg height="40" viewBox="-6 -6 36 40" width="36">
+        <g>
+          <g>
+            <polygon fill="white" points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="88">Miscarriage</text>
+    <g transform="translate(56 108) scale(0.667) translate(-18 -20)">
+      <svg height="40" viewBox="-6 -6 36 40" width="36">
+        <g>
+          <g>
+            <polygon fill="white" points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2"/>
+            <g>
+              <line stroke="black" stroke-width="2" x1="1.8" x2="22.2" y1="1.8" y2="22.2"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="112">Termination</text>
+    <g transform="translate(56 132) scale(0.667) translate(-18 -21)">
+      <svg height="42" viewBox="-6 -6 36 42" width="36">
+        <g>
+          <g>
+            <circle cx="12" cy="12" fill="white" r="11" stroke="black" stroke-width="2"/>
+          </g>
+          <g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="28" y1="-4" y2="28"/>
+          </g>
+          <text fill="black" font-family="sans-serif" font-size="9" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="36">SB</text>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="136">Stillbirth (SB)</text>
+    <g transform="translate(56 156) scale(0.667) translate(-18 -21)">
+      <svg height="42" viewBox="-6 -6 36 42" width="36">
+        <g>
+          <g>
+            <polygon fill="white" points="12,4.8 19.2,19.2 4.8,19.2" stroke="black" stroke-width="2"/>
+          </g>
+          <text fill="black" font-family="sans-serif" font-size="9" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="36">ECT</text>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="160">Ectopic pregnancy (ECT)</text>
+    <g transform="translate(56 180) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <g>
+          <g>
+            <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+          </g>
+          <g>
+            <text data-role-letter="D" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="15.96">D</text>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="184">Sperm or egg donor (D)</text>
+    <g transform="translate(56 204) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <g>
+          <g>
+            <circle cx="12" cy="12" fill="white" r="11" stroke="black" stroke-width="2"/>
+          </g>
+          <g>
+            <text data-role-letter="S" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="15.96">S</text>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="208">Surrogate (S)</text>
+    <g transform="translate(56 228) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="14" x2="34" y1="2" y2="18"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="232">Carried the pregnancy, not the genetic mother</text>
+  </g>
 </svg>

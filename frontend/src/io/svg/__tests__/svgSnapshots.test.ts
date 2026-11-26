@@ -7,13 +7,17 @@ import { FEATURE_FIXTURES } from "../../../fixtures/features";
 import { DATASET_TODAY } from "../../../fixtures/dataset";
 import { exportSvg } from "../svgExporter";
 import { exportUShapeSvg } from "../uShapeExporter";
+import { canonicalSvg } from "./canonicalSvg";
 
 /*
  * SVG snapshots (#69). The render and export lints check structure (who is
  * joined to whom); these catch a change in how anything looks: symbol detail,
  * label placement, duplicate arcs, hop risers, the key. Every example and
  * every feature fixture (#140) is exported and compared with a committed
- * file in ./snapshots, as text.
+ * file in ./snapshots, as text in canonical form (`canonicalSvg.ts`: sorted
+ * attributes, no empty groups, one element per line), so a change of markup
+ * that draws the same pixels leaves the files alone and a real change shows
+ * as the lines it touched.
  *
  * When one fails:
  *  - not meant to change anything (a refactoring): the diff is the bug;
@@ -45,7 +49,7 @@ const CASES: Case[] = [
 ];
 
 async function check(file: string, svg: string) {
-  await expect(normalise(svg)).toMatchFileSnapshot(join(SNAPSHOTS, file));
+  await expect(canonicalSvg(normalise(svg))).toMatchFileSnapshot(join(SNAPSHOTS, file));
 }
 
 describe("SVG export snapshots", () => {

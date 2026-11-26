@@ -311,7 +311,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   and every feature fixture (#140) as the standard SVG (normal and compact,
   fixtures also de-identified) and the U-shape, and compares each with a
   committed file in `__tests__/snapshots/` (numbers with four or more
-  decimals rounded to two). The lints check structure; this is what notices
+  decimals rounded to two, then put in canonical form by
+  `__tests__/canonicalSvg.ts`: attributes sorted, empty groups dropped, one
+  element per line, so reordering attributes or wrapping nothing in a group
+  changes no file). The lints check structure; this is what notices
   a change in how something looks. A refactoring must leave them alone. A
   change that is meant to move something: rerun with
   `npm -w frontend run test -- -u svgSnapshots`, look at old and new

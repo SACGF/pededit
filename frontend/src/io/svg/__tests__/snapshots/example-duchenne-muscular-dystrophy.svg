@@ -1,15 +1,280 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="393" height="606"
-     viewBox="0 0 393 606">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="393" height="606" fill="white"/>
-<g class="chart-title"><text x="196.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Duchenne muscular dystrophy</text></g>
-<g transform="translate(92 100)">
-<g class="couple-lines"><path d="M 113.33 0 L 153.33 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 100 120 L 140 120" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 133.33 0 L 133.33 60 M 0 60 L 240 60 M 0 60 L 0 100 M 160 60 L 160 100 M 240 60 L 240 100" stroke="black" stroke-width="2" fill="none"></path><path d="M 120 120 L 120 180 M 40 180 L 200 180 M 40 180 L 40 220 M 120 180 L 120 220 M 200 180 L 200 220" stroke="black" stroke-width="2" fill="none"></path></g><g class="assisted-lines"></g><g class="duplicate-arcs"></g><g class="symbols"><g transform="translate(93.33 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(173.33 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 120)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-1-0)"><g><g data-tag-fill="solid"><path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(80 120)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(160 120)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-2"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-2)"><g data-carrier-sector="dmd"><g data-tag-fill="diagonal"><clipPath id="symbol-clip-1-2-s0"><path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z"></path></clipPath><path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="white"></path><path d="M-37.172 40L2.828 0M-31.515 40L8.485 0M-25.858 40L14.142 0M-20.201 40L19.799 0M-14.544 40L25.456 0M-8.887 40L31.113 0M-3.23 40L36.77 0M2.426 40L42.426 0M8.083 40L48.083 0M13.74 40L53.74 0M19.397 40L59.397 0M25.054 40L65.054 0M30.711 40L70.711 0M36.368 40L76.368 0" fill="none" stroke="#d62728" stroke-width="1" clip-path="url(#symbol-clip-1-2-s0)"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g></g></g><g transform="translate(240 120)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(40 240)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-0)"><g><g data-tag-fill="solid"><path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g><g transform="translate(120 240)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(200 240)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g></g><g class="labels"><g transform="translate(73.33 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">60y</text></g></g></g><g transform="translate(153.33 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">58y</text></g></g></g><g transform="translate(-20 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Michael</text></g><g data-detail-label="true" pointer-events="none"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 19y</text></g></g></g><g transform="translate(60 100)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">33y</text></g></g></g><g transform="translate(140 100)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Emma</text></g><g data-detail-label="true" pointer-events="none"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">31y</text></g></g></g><g transform="translate(220 100)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">28y</text></g></g></g><g transform="translate(20 220)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Jack</text></g><g data-detail-label="true" pointer-events="none"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">6y</text></g></g></g><g transform="translate(100 220)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">4y</text></g></g></g><g transform="translate(180 220)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">2y</text></g></g></g></g><g class="consanguinity-labels"></g>
-</g>
-<g class="pedigree-key" transform="translate(0 470)">
-<g transform="translate(56 12) scale(0.667) translate(-18 -18)"><svg width="36" height="36" viewBox="-6 -6 36 36"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><line x1="-4" y1="-4" x2="28" y2="28" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
-<g transform="translate(56 36) scale(0.667) translate(-23 -23)"><svg width="46" height="46" viewBox="-30 -2 56 56"><defs><marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="black"></polygon></marker></defs><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><g data-arrow="proband"><line x1="-18" y1="42" x2="0" y2="24" stroke="black" stroke-width="2" marker-end="url(#legend-arrowhead)"></line><rect x="-30" y="42" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="51" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
-<g transform="translate(56 60) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-dmd"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-dmd)"><g data-tag-fill="solid"><path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z" fill="#d62728"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Duchenne muscular dystrophy</text>
-<g transform="translate(56 84) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-dmd-carrier"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-dmd-carrier)"><g data-tag-fill="diagonal"><clipPath id="legend-clip-dmd-carrier-fill"><path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z"></path></clipPath><path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z" fill="white"></path><path d="M-8.232 22L7.768 6M-4.697 22L11.303 6M-1.161 22L14.839 6M2.374 22L18.374 6M5.91 22L21.91 6M9.445 22L25.445 6M12.981 22L28.981 6M16.517 22L32.517 6M20.052 22L36.052 6" fill="none" stroke="#d62728" stroke-width="0.6" clip-path="url(#legend-clip-dmd-carrier-fill)"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Duchenne muscular dystrophy carrier</text>
-</g>
+<svg height="606" viewBox="0 0 393 606" width="393" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="606" width="393"/>
+  <g class="chart-title">
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="196.5" y="56">Duchenne muscular dystrophy</text>
+  </g>
+  <g transform="translate(92 100)">
+    <g class="couple-lines">
+      <path d="M 113.33 0 L 153.33 0" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 100 120 L 140 120" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="sibship-lines">
+      <path d="M 133.33 0 L 133.33 60 M 0 60 L 240 60 M 0 60 L 0 100 M 160 60 L 160 100 M 240 60 L 240 100" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 120 120 L 120 180 M 40 180 L 200 180 M 40 180 L 40 220 M 120 180 L 120 220 M 200 180 L 200 220" fill="none" stroke="black" stroke-width="2"/>
+    </g>
+    <g class="symbols">
+      <g transform="translate(93.33 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(173.33 0)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(0 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-1-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+        </g>
+      </g>
+      <g transform="translate(80 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(160 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-1-2">
+                <circle cx="20" cy="20" r="19"/>
+              </clipPath>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              <g clip-path="url(#symbol-clip-1-2)">
+                <g data-carrier-sector="dmd">
+                  <g data-tag-fill="diagonal">
+                    <clipPath id="symbol-clip-1-2-s0">
+                      <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z"/>
+                    </clipPath>
+                    <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="white"/>
+                    <path clip-path="url(#symbol-clip-1-2-s0)" d="M-37.172 40L2.828 0M-31.515 40L8.485 0M-25.858 40L14.142 0M-20.201 40L19.799 0M-14.544 40L25.456 0M-8.887 40L31.113 0M-3.23 40L36.77 0M2.426 40L42.426 0M8.083 40L48.083 0M13.74 40L53.74 0M19.397 40L59.397 0M25.054 40L65.054 0M30.711 40L70.711 0M36.368 40L76.368 0" fill="none" stroke="#d62728" stroke-width="1"/>
+                  </g>
+                </g>
+              </g>
+              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(240 120)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(40 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <clipPath id="symbol-clip-2-0">
+                <rect height="38" width="38" x="1" y="1"/>
+              </clipPath>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g clip-path="url(#symbol-clip-2-0)">
+                <g>
+                  <g data-tag-fill="solid">
+                    <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#d62728"/>
+                  </g>
+                </g>
+              </g>
+              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+          <g data-arrow="proband">
+            <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
+            <rect fill="white" height="10" width="8.5" x="-30" y="58"/>
+            <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="67">P</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(120 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(200 240)">
+        <g transform="translate(-20 -20)">
+          <g>
+            <g>
+              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="labels">
+      <g transform="translate(73.33 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">60y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(153.33 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">58y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(-20 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Michael</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">d. 19y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(60 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">33y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(140 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Emma</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">31y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(220 100)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">28y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(20 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jack</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">6y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(100 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">4y</text>
+          </g>
+        </g>
+      </g>
+      <g transform="translate(180 220)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">2y</text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 470)">
+    <g transform="translate(56 12) scale(0.667) translate(-18 -18)">
+      <svg height="36" viewBox="-6 -6 36 36" width="36">
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <line stroke="black" stroke-width="2" x1="-4" x2="28" y1="-4" y2="28"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="16">Deceased</text>
+    <g transform="translate(56 36) scale(0.667) translate(-23 -23)">
+      <svg height="46" viewBox="-30 -2 56 56" width="46">
+        <defs>
+          <marker id="legend-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+            <polygon fill="black" points="0 0, 6 3, 0 6"/>
+          </marker>
+        </defs>
+        <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+        <g data-arrow="proband">
+          <line marker-end="url(#legend-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="42" y2="24"/>
+          <rect fill="white" height="10" width="8.5" x="-30" y="42"/>
+          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="51">P</text>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="40">Proband (index case)</text>
+    <g transform="translate(56 60) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-dmd">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-dmd)">
+          <g data-tag-fill="solid">
+            <path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z" fill="#d62728"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="64">Duchenne muscular dystrophy</text>
+    <g transform="translate(56 84) scale(1) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <clipPath id="legend-clip-dmd-carrier">
+          <rect height="16" width="16" x="6" y="6"/>
+        </clipPath>
+        <rect fill="white" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+        <g clip-path="url(#legend-clip-dmd-carrier)">
+          <g data-tag-fill="diagonal">
+            <clipPath id="legend-clip-dmd-carrier-fill">
+              <path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z"/>
+            </clipPath>
+            <path d="M -2 14 A 16 16 0 1 1 30 14 A 16 16 0 1 1 -2 14 Z" fill="white"/>
+            <path clip-path="url(#legend-clip-dmd-carrier-fill)" d="M-8.232 22L7.768 6M-4.697 22L11.303 6M-1.161 22L14.839 6M2.374 22L18.374 6M5.91 22L21.91 6M9.445 22L25.445 6M12.981 22L28.981 6M16.517 22L32.517 6M20.052 22L36.052 6" fill="none" stroke="#d62728" stroke-width="0.6"/>
+          </g>
+        </g>
+        <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="88">Duchenne muscular dystrophy carrier</text>
+  </g>
 </svg>

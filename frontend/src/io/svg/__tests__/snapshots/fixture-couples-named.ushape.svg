@@ -1,97 +1,437 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="971" height="878"
-     viewBox="0 0 971 878">
-<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="971" height="878" fill="white"/>
-<g class="chart-title"><text x="485.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Couples and lines, relationships named</text></g>
-<g transform="translate(525 262.1)">
-<path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="0" y1="120" x2="0" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -227 -126.1 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 205.2 82.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-227" y1="-126.1" x2="-239" y2="-126.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-197.8" y1="94.3" x2="-207.7" y2="101.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -113.1 158.3 L -127.5 154.5 L -141.6 149.3 L -155.4 142.8 L -168.6 135.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -113.1 158.3 L -99.6 165.3 L -85.2 171.1 L -70.2 175.7 L -56.3 179" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 102.5 161.5 L 91.7 170.1 L 79.8 177.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 102.5 161.5 L 115.9 162.8 L 129.7 163" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 205.2 82.5 L 200.9 97.6 L 195.1 112.6 L 187.7 127.3 L 178.7 141.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 205.2 82.5 L 214.7 70.5 L 223.2 57.5 L 230.5 43.5 L 236.7 28.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-141.6" y1="149.3" x2="-85.2" y2="171.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="209.1" y="88.9" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<path d="M 228.3 106.1 A 199 199 0 0 0 256.4 31.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="248.4" y1="80.9" x2="239.5" y2="70.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="250.3" y1="76.3" x2="241.4" y2="66.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="246.1" y1="70.4" x2="290.1" y2="87" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 290.1 87 A 246 246 0 0 0 301.8 45.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="301.8" y1="45.1" x2="313.6" y2="47.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 254.5 31.5 A 197 197 0 0 0 257 0 L 257 -126.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 258.4 32.1 A 201 201 0 0 0 261 0 L 261 -126.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="259" y1="-53.5" x2="306" y2="-53.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 306 -7.2 L 306 -53.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="306" y1="-7.2" x2="318" y2="-7.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 2.1 199 L 60 199 A 199 199 0 0 0 82 197.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="37.7" y1="199" x2="37.7" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="30.7" y1="217" x2="44.7" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="30.7" y1="213" x2="44.7" y2="213" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="37.7" y="228" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
-<path d="M -184.7 155.1 A 199 199 0 0 0 -114.1 191.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-161.9" y1="178" x2="-150.9" y2="170.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-157.5" y1="180.3" x2="-146.5" y2="172.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-151.2" y1="176.9" x2="-159.5" y2="192.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-165.7" y1="189.7" x2="-153.2" y2="196.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -255.1 39.2 A 199 199 0 0 0 -224.2 112.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-243.4" y1="77.4" x2="-286.7" y2="95.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-286.7" y1="95.6" x2="-297.7" y2="100.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -259 -126.1 L -259 -46.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-259" y1="-86.1" x2="-306" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-306" y1="-86.1" x2="-318" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -336 -86.1 L -336 0 A 276 276 0 0 0 -314.3 107.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -340 -86.1 L -340 0 A 280 280 0 0 0 -318 108.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-338" y1="-19.1" x2="-385" y2="-19.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -103.1 L -385 -19.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-385" y1="-103.1" x2="-397" y2="-103.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -20.1 L -389 -28.3 L -393 -36.5 L -397 -44.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>
-<path d="M -385 -20.1 L -389 -11.8 L -393 -3.6 L -396.8 12.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="-391" y="-16.2" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<g transform="translate(-40 120) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(40 120) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(228.3 106.1) rotate(-57.8)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g transform="rotate(-32.2 20 20)"><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g></g>
-<g transform="translate(256.4 31.8) rotate(-80.8)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="black"></circle></g></g></g></g>
-<g transform="translate(259 -126.3) rotate(-90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(338 -7.2) rotate(-90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(333.3 50.9) rotate(-79.4)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(187.9 152.5) rotate(-40)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g transform="rotate(40 20 20)"><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g></g></g></g></g>
-<g transform="translate(138.3 183) rotate(-23.2)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g transform="rotate(23.2 20 20)"><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g></g>
-<g transform="translate(2.1 199) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(82 197.8) rotate(-6.4)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-56.3 199) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(-184.7 155.1) rotate(38.8)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g transform="rotate(-38.8 20 20)"><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g></g>
-<g transform="translate(-114.1 191.5) rotate(15.8)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-255.1 39.2) rotate(78.6)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g transform="rotate(11.4 20 20)"><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g></g>
-<g transform="translate(-224.2 112.4) rotate(55.6)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-316.1 108.1) rotate(67.1)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text></g></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-259 -126.1) rotate(90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(-259 -46.1) rotate(90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-338 -86.1) rotate(90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text></g></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(-416.7 13.7) rotate(87.8)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><rect x="-25.2" y="22" width="50.4" height="13" fill="white"></rect><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text></g></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g transform="translate(-417 -44.7) rotate(90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g data-adopted="in"><line x1="-4" y1="-2" x2="-4" y2="42" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="42" x2="1" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="44" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="39" y2="-2" stroke="black" stroke-width="2"></line><line x1="44" y1="42" x2="39" y2="42" stroke="black" stroke-width="2"></line></g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
-<g transform="translate(-417 -103.1) rotate(90)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><rect x="-25.2" y="22" width="50.4" height="13" fill="white"></rect><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text></g></g><g><g data-adopted="out"><line x1="-4" y1="-2" x2="-4" y2="42" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="42" x2="1" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="44" y2="42" stroke="black" stroke-width="2"></line><line x1="44" y1="-2" x2="39" y2="-2" stroke="black" stroke-width="2"></line><line x1="44" y1="42" x2="39" y2="42" stroke="black" stroke-width="2"></line></g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
-<g class="consanguinity-labels">
-<g transform="translate(259 -47.2) rotate(-90)"><text x="0" y="-6" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant cousins</text></g>
-<g transform="translate(-337.7 12.4) rotate(87.4)"><text x="0" y="-13.8" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins (φ = 1/16)</text></g>
-</g>
-</g>
-<g class="pedigree-key" transform="translate(0 550)">
-<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="black"></circle></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<g transform="translate(56 36) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><text x="14" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" fill="black">F</text></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Inbreeding coefficient</text>
-<g transform="translate(56 60) scale(0.667) translate(-18 -14)"><svg width="36" height="28" viewBox="-8 -4 36 28"><g><g data-adopted="in"><line x1="-4" y1="-2" x2="-4" y2="26" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="26" x2="1" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="28" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="23" y2="-2" stroke="black" stroke-width="2"></line><line x1="28" y1="26" x2="23" y2="26" stroke="black" stroke-width="2"></line></g><g><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect></g></g></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>
-<g transform="translate(56 84) scale(0.667) translate(-18 -14)"><svg width="36" height="28" viewBox="-8 -4 36 28"><g><g data-adopted="out"><line x1="-4" y1="-2" x2="-4" y2="26" stroke="black" stroke-width="2"></line><line x1="-4" y1="-2" x2="1" y2="-2" stroke="black" stroke-width="2"></line><line x1="-4" y1="26" x2="1" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="28" y2="26" stroke="black" stroke-width="2"></line><line x1="28" y1="-2" x2="23" y2="-2" stroke="black" stroke-width="2"></line><line x1="28" y1="26" x2="23" y2="26" stroke="black" stroke-width="2"></line></g><g><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle></g></g></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Adopted out</text>
-<g transform="translate(56 108) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="7" x2="48" y2="7" stroke="black" stroke-width="2"></line><line x1="0" y1="13" x2="48" y2="13" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="112" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<g transform="translate(56 132) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><text x="14" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" fill="black">φ</text></svg></g><text x="80" y="136" font-family="sans-serif" font-size="10" fill="black">Kinship coefficient of the couple</text>
-<g transform="translate(56 156) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="10" x2="48" y2="10" stroke="black" stroke-width="2"></line><path d="M 18.5 16 L 24.5 4 M 23.5 16 L 29.5 4" stroke="black" stroke-width="2" fill="none"></path></svg></g><text x="80" y="160" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
-<g transform="translate(56 180) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="0" y1="4" x2="48" y2="4" stroke="black" stroke-width="2"></line><line x1="24" y1="4" x2="24" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="22" x2="31" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="18" x2="31" y2="18" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="184" font-family="sans-serif" font-size="10" fill="black">Infertility</text>
-<g transform="translate(56 204) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="0" y1="4" x2="48" y2="4" stroke="black" stroke-width="2"></line><line x1="24" y1="4" x2="24" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="22" x2="31" y2="22" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="208" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
-<g transform="translate(56 228) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line><line x1="18" y1="15" x2="30" y2="15" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="232" font-family="sans-serif" font-size="10" fill="black">Monozygotic twins</text>
-<g transform="translate(56 252) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="256" font-family="sans-serif" font-size="10" fill="black">Dizygotic twins</text>
-<g transform="translate(56 276) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="8" y1="3" x2="40" y2="3" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="12" y2="27" stroke="black" stroke-width="2"></line><line x1="24" y1="3" x2="36" y2="27" stroke="black" stroke-width="2"></line><text x="24" y="19" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold">?</text></svg></g><text x="80" y="280" font-family="sans-serif" font-size="10" fill="black">Twins, zygosity unknown</text>
-</g>
+<svg height="878" viewBox="0 0 971 878" width="971" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
+    </marker>
+  </defs>
+  <rect fill="white" height="878" width="971"/>
+  <g class="chart-title">
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="485.5" y="34">Couples and lines, relationships named</text>
+  </g>
+  <g transform="translate(525 262.1)">
+    <path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="0" x2="0" y1="120" y2="167"/>
+    <path d="M -227 -126.1 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 205.2 82.5" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-227" x2="-239" y1="-126.1" y2="-126.1"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-197.8" x2="-207.7" y1="94.3" y2="101.1"/>
+    <path d="M -113.1 158.3 L -127.5 154.5 L -141.6 149.3 L -155.4 142.8 L -168.6 135.1" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M -113.1 158.3 L -99.6 165.3 L -85.2 171.1 L -70.2 175.7 L -56.3 179" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M 102.5 161.5 L 91.7 170.1 L 79.8 177.9" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M 102.5 161.5 L 115.9 162.8 L 129.7 163" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M 205.2 82.5 L 200.9 97.6 L 195.1 112.6 L 187.7 127.3 L 178.7 141.6" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M 205.2 82.5 L 214.7 70.5 L 223.2 57.5 L 230.5 43.5 L 236.7 28.6" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-141.6" x2="-85.2" y1="149.3" y2="171.1"/>
+    <text fill="black" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle" x="209.1" y="88.9">?</text>
+    <path d="M 228.3 106.1 A 199 199 0 0 0 256.4 31.8" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="248.4" x2="239.5" y1="80.9" y2="70.9"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="250.3" x2="241.4" y1="76.3" y2="66.3"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="246.1" x2="290.1" y1="70.4" y2="87"/>
+    <path d="M 290.1 87 A 246 246 0 0 0 301.8 45.1" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="301.8" x2="313.6" y1="45.1" y2="47.3"/>
+    <path d="M 254.5 31.5 A 197 197 0 0 0 257 0 L 257 -126.3" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M 258.4 32.1 A 201 201 0 0 0 261 0 L 261 -126.3" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="259" x2="306" y1="-53.5" y2="-53.5"/>
+    <path d="M 306 -7.2 L 306 -53.5" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="306" x2="318" y1="-7.2" y2="-7.2"/>
+    <path d="M 2.1 199 L 60 199 A 199 199 0 0 0 82 197.8" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="37.7" x2="37.7" y1="199" y2="217"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="30.7" x2="44.7" y1="217" y2="217"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="30.7" x2="44.7" y1="213" y2="213"/>
+    <text fill="black" font-family="sans-serif" font-size="9" text-anchor="middle" x="37.7" y="228">azoospermia</text>
+    <path d="M -184.7 155.1 A 199 199 0 0 0 -114.1 191.5" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-161.9" x2="-150.9" y1="178" y2="170.2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-157.5" x2="-146.5" y1="180.3" y2="172.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-151.2" x2="-159.5" y1="176.9" y2="192.9"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-165.7" x2="-153.2" y1="189.7" y2="196.1"/>
+    <path d="M -255.1 39.2 A 199 199 0 0 0 -224.2 112.4" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-243.4" x2="-286.7" y1="77.4" y2="95.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-286.7" x2="-297.7" y1="95.6" y2="100.3"/>
+    <path d="M -259 -126.1 L -259 -46.1" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-259" x2="-306" y1="-86.1" y2="-86.1"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-306" x2="-318" y1="-86.1" y2="-86.1"/>
+    <path d="M -336 -86.1 L -336 0 A 276 276 0 0 0 -314.3 107.3" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M -340 -86.1 L -340 0 A 280 280 0 0 0 -318 108.8" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-338" x2="-385" y1="-19.1" y2="-19.1"/>
+    <path d="M -385 -103.1 L -385 -19.1" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-385" x2="-397" y1="-103.1" y2="-103.1"/>
+    <path d="M -385 -20.1 L -389 -28.3 L -393 -36.5 L -397 -44.7" fill="none" stroke="black" stroke-dasharray="5 3" stroke-linecap="round" stroke-width="2"/>
+    <path d="M -385 -20.1 L -389 -11.8 L -393 -3.6 L -396.8 12.9" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <text fill="black" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle" x="-391" y="-16.2">?</text>
+    <g transform="translate(-40 120) rotate(0)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(40 120) rotate(0)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(228.3 106.1) rotate(-57.8)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g transform="rotate(-32.2 20 20)">
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(256.4 31.8) rotate(-80.8)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="black" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(259 -126.3) rotate(-90)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(338 -7.2) rotate(-90)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(333.3 50.9) rotate(-79.4)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(187.9 152.5) rotate(-40)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g transform="rotate(40 20 20)">
+            <g>
+              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(138.3 183) rotate(-23.2)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g transform="rotate(23.2 20 20)">
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(2.1 199) rotate(0)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(82 197.8) rotate(-6.4)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-56.3 199) rotate(0)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-184.7 155.1) rotate(38.8)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g transform="rotate(-38.8 20 20)">
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-114.1 191.5) rotate(15.8)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-255.1 39.2) rotate(78.6)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g transform="rotate(11.4 20 20)">
+            <g>
+              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-224.2 112.4) rotate(55.6)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-316.1 108.1) rotate(67.1)">
+      <g transform="translate(-20 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Bryony</text>
+          </g>
+        </g>
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-259 -126.1) rotate(90)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-259 -46.1) rotate(90)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-338 -86.1) rotate(90)">
+      <g transform="translate(-20 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-name-label="true" pointer-events="none">
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aspen</text>
+          </g>
+        </g>
+        <g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-416.7 13.7) rotate(87.8)">
+      <g transform="translate(-20 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="50.4" x="-25.2" y="22"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">F = 1/16</text>
+          </g>
+        </g>
+        <g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-417 -44.7) rotate(90)">
+      <g transform="translate(-20 -20)">
+        <g>
+          <g data-adopted="in">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
+          </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g transform="translate(-417 -103.1) rotate(90)">
+      <g transform="translate(-20 -20)">
+        <g style="user-select:none" transform="translate(20 20)">
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="50.4" x="-25.2" y="22"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">F = 1/16</text>
+          </g>
+        </g>
+        <g>
+          <g data-adopted="out">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
+          </g>
+          <g>
+            <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </g>
+    </g>
+    <g class="consanguinity-labels">
+      <g transform="translate(259 -47.2) rotate(-90)">
+        <text fill="black" font-family="sans-serif" font-size="9" text-anchor="middle" x="0" y="-6">distant cousins</text>
+      </g>
+      <g transform="translate(-337.7 12.4) rotate(87.4)">
+        <text fill="black" font-family="sans-serif" font-size="9" text-anchor="middle" x="0" y="-13.8">first cousins (φ = 1/16)</text>
+      </g>
+    </g>
+  </g>
+  <g class="pedigree-key" transform="translate(0 550)">
+    <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="-2 -2 28 28" width="28">
+        <circle cx="12" cy="12" fill="black" r="11" stroke="black" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="16">Affected</text>
+    <g transform="translate(56 36) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <text fill="black" font-family="sans-serif" font-size="12" text-anchor="middle" x="14" y="18">F</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="40">Inbreeding coefficient</text>
+    <g transform="translate(56 60) scale(0.667) translate(-18 -14)">
+      <svg height="28" viewBox="-8 -4 36 28" width="36">
+        <g>
+          <g data-adopted="in">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="26" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="28" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="26" y2="26"/>
+          </g>
+          <g>
+            <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="64">Adopted in (dashed line to adoptive parents)</text>
+    <g transform="translate(56 84) scale(0.667) translate(-18 -14)">
+      <svg height="28" viewBox="-8 -4 36 28" width="36">
+        <g>
+          <g data-adopted="out">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="26" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="28" y1="-2" y2="26"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="28" x2="23" y1="26" y2="26"/>
+          </g>
+          <g>
+            <circle cx="12" cy="12" fill="white" r="11" stroke="black" stroke-width="2"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="88">Adopted out</text>
+    <g transform="translate(56 108) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="7" y2="7"/>
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="13" y2="13"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="112">Consanguineous couple</text>
+    <g transform="translate(56 132) scale(0.667) translate(-14 -14)">
+      <svg height="28" viewBox="0 0 28 28" width="28">
+        <text fill="black" font-family="sans-serif" font-size="12" text-anchor="middle" x="14" y="18">φ</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="136">Kinship coefficient of the couple</text>
+    <g transform="translate(56 156) scale(0.667) translate(-24 -10)">
+      <svg height="20" viewBox="0 0 48 20" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="10" y2="10"/>
+        <path d="M 18.5 16 L 24.5 4 M 23.5 16 L 29.5 4" fill="none" stroke="black" stroke-width="2"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="160">Relationship ended</text>
+    <g transform="translate(56 180) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="4" y2="4"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="24" y1="4" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="22" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="18" y2="18"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="184">Infertility</text>
+    <g transform="translate(56 204) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="0" x2="48" y1="4" y2="4"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="24" y1="4" y2="22"/>
+        <line stroke="black" stroke-width="2" x1="17" x2="31" y1="22" y2="22"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="208">No children by choice</text>
+    <g transform="translate(56 228) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="18" x2="30" y1="15" y2="15"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="232">Monozygotic twins</text>
+    <g transform="translate(56 252) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="256">Dizygotic twins</text>
+    <g transform="translate(56 276) scale(0.667) translate(-24 -14)">
+      <svg height="28" viewBox="0 0 48 28" width="48">
+        <line stroke="black" stroke-width="2" x1="8" x2="40" y1="3" y2="3"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="12" y1="3" y2="27"/>
+        <line stroke="black" stroke-width="2" x1="24" x2="36" y1="3" y2="27"/>
+        <text font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle" x="24" y="19">?</text>
+      </svg>
+    </g>
+    <text fill="black" font-family="sans-serif" font-size="10" x="80" y="280">Twins, zygosity unknown</text>
+  </g>
 </svg>
