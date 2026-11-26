@@ -69,13 +69,13 @@
 </g>
 <g class="symbols">
 <g transform="translate(399.5 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(467.5 0)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(0 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(68 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
@@ -84,40 +84,40 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(204 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(272 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(340 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(408 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(476 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(544 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(612 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(680 84)">
 <polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(748 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(816 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
 </g>
 <g transform="translate(884 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(34 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(170 168)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
@@ -126,13 +126,13 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(850 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(34 252)">
 <g data-adopted="out"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(102 252)">
-<g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(170 252)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>

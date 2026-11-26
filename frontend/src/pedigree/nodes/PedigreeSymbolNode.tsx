@@ -3,7 +3,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, DuplicateSuperscript, AnnotationRow } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, CopyNumber, AnnotationRow } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { isSmallScreen } from "../../hooks/useSmallScreen";
 import { CAPTION_ROW_HEIGHT } from "../lifeStatus";
@@ -161,6 +161,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         {glyph.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
         {glyph.documented && <DocumentedMark size={NODE_SIZE} adopted={!!glyph.adopted} />}
         <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
+        {glyph.copy !== undefined && <CopyNumber size={NODE_SIZE} index={glyph.copy} />}
       </svg>
 
       {/* Name label below symbol, fitted to the slot width. A cut label
@@ -264,11 +265,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         >
           <ProblemIcon severity={problemSeverity} size={10} />
         </div>
-      )}
-
-      {/* Duplicate superscript */}
-      {glyph.copy !== undefined && (
-        <DuplicateSuperscript index={glyph.copy} />
       )}
 
       {/* React Flow edge handles — invisible */}

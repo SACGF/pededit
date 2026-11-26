@@ -412,6 +412,14 @@ export function branchTooltip(branch: CollapsedBranch): string {
 /** SVG text of the count centred on (cx, cy), the centre of a group symbol of `symbolSize`. */
 export function renderBranchCountSvg(count: number, symbolSize: number, cx = 0, cy = 0): string {
   const fs = branchCountFontSize(count, symbolSize);
-  // A baseline offset rather than dominant-baseline, which some rasterisers ignore.
-  return `<text class="branch-count" x="${cx}" y="${cy + Math.round(fs * 0.36 * 10) / 10}" text-anchor="middle" font-family="sans-serif" font-size="${fs}" fill="black">${count}</text>`;
+  return `<text class="branch-count" x="${cx}" y="${cy + branchCountBaseline(count, symbolSize)}" text-anchor="middle" font-family="sans-serif" font-size="${fs}" fill="black">${count}</text>`;
+}
+
+/**
+ * Baseline of the number inside a group symbol, below the symbol's centre,
+ * so the digits sit in the middle. A baseline offset rather than
+ * dominant-baseline, which some rasterisers ignore.
+ */
+export function branchCountBaseline(count: number, symbolSize: number): number {
+  return Math.round(branchCountFontSize(count, symbolSize) * 0.36 * 10) / 10;
 }

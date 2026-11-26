@@ -79,31 +79,31 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(68 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(136 0)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(0 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(68 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-7.2" cy="27" r="3.5" fill="#1f77b4"/><text x="5.5" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text>
 </g>
 <g transform="translate(136 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(204 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(272 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(340 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(408 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(476 84)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
@@ -112,27 +112,27 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-24.8" cy="27" r="3.5" fill="#1f77b4"/><text x="-12.1" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text><text x="12.7" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(69.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(137.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(205.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(273.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(341.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(409.58 168)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(477.58 168)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(545.58 168)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><circle cx="-7.2" cy="27" r="3.5" fill="#1f77b4"/><text x="5.5" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#000000">BG</text>
@@ -141,7 +141,7 @@
 <clipPath id="symbol-clip-3-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-3-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(85.79 252)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><circle cx="-14.5" cy="27" r="3.5" fill="#1f77b4"/><text x="8.6" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/><circle cx="-14.5" cy="27" r="3.5" fill="#1f77b4"/><text x="8.6" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 <line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
 </g>
 <g transform="translate(204 252)">
@@ -154,7 +154,7 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(408 252)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(476 252)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
@@ -166,16 +166,16 @@
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(53.87 336)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(121.87 336)">
-<clipPath id="symbol-clip-4-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-4-1)"/><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="white" stroke-width="5.455"/></g><g transform="scale(0.55)"><rect x="-20" y="-20" width="40" height="40" fill="black" stroke="none"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
+<clipPath id="symbol-clip-4-1"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-4-1)"/><g transform="scale(0.55)"><rect x="-19" y="-19" width="38" height="38" fill="black" stroke="white" stroke-width="5.455"/></g><g transform="scale(0.55)"><rect x="-19" y="-19" width="38" height="38" fill="black" stroke="none"/></g><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(258.95 336)">
 <clipPath id="symbol-clip-4-2"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M -40 0 A 40 40 0 1 1 40 0 A 40 40 0 1 1 -40 0 Z" fill="#9467bd" clip-path="url(#symbol-clip-4-2)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/><text x="0" y="30.5" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="bold" fill="#8c564b">Fremen</text>
 </g>
 <g transform="translate(442 336)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(350.47 420)">
 <polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>

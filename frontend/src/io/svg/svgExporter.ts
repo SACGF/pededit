@@ -11,7 +11,7 @@ import type { PersonGlyph } from "../../pedigree/personGlyph";
 import {
   CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestAboveSymbols,
 } from "../../pedigree/consanguinityLabel";
-import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT } from "../../pedigree/labelBlock";
+import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT, COPY_NUMBER_FONT_SIZE, copyNumberAt } from "../../pedigree/labelBlock";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -211,10 +211,10 @@ function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
 
 // ── Symbols ───────────────────────────────────────────────────────────────────
 
-/** Copy number of someone drawn more than once, top right, as DuplicateSuperscript on the canvas. */
+/** Copy number of someone drawn more than once, top right, as `CopyNumber` on the canvas. */
 function renderDuplicateMark(index: number): string {
-  const half = NODE_SIZE / 2;
-  return `<text x="${half + 2}" y="${-half + 2}" font-family="sans-serif" font-size="10" fill="black">${index}</text>`;
+  const at = copyNumberAt();
+  return `<text x="${at.x}" y="${at.y}" font-family="sans-serif" font-size="${COPY_NUMBER_FONT_SIZE}" fill="black">${index}</text>`;
 }
 
 function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {

@@ -39,19 +39,19 @@
 </g>
 <g class="symbols">
 <g transform="translate(247.75 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(327.75 0)">
 <clipPath id="symbol-clip-0-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-0-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g transform="translate(132.92 120)">
-<clipPath id="symbol-clip-1-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#d62728" clip-path="url(#symbol-clip-1-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-1-0"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#d62728" clip-path="url(#symbol-clip-1-0)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g transform="translate(212.92 120)">
 <clipPath id="symbol-clip-1-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-1-1-s0"><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z"/></clipPath><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="white" clip-path="url(#symbol-clip-1-1)"/><g clip-path="url(#symbol-clip-1-1)"><path d="M-57.172 20L-17.172 -20M-51.515 20L-11.515 -20M-45.858 20L-5.858 -20M-40.201 20L-0.201 -20M-34.544 20L5.456 -20M-28.887 20L11.113 -20M-23.23 20L16.77 -20M-17.574 20L22.426 -20M-11.917 20L28.083 -20M-6.26 20L33.74 -20M-0.603 20L39.397 -20M5.054 20L45.054 -20M10.711 20L50.711 -20M16.368 20L56.368 -20" fill="none" stroke="#d62728" stroke-width="1" clip-path="url(#symbol-clip-1-1-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g transform="translate(362.58 120)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(442.58 120)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
@@ -61,22 +61,22 @@
 <line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
 </g>
 <g transform="translate(80 240)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(160 240)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(240 240)">
-<clipPath id="symbol-clip-2-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-2-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-2-3"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-2-3)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 </g>
 <g transform="translate(320 240)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(400 240)">
 <circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
 </g>
 <g transform="translate(480 240)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/>
 </g>
 <g transform="translate(360 360)">
 <polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>

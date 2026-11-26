@@ -75,7 +75,9 @@ export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId
   if (triangle) {
     geom = triangle;
   } else if (glyph.shape === "male") {
-    geom = `<rect x="${-half}" y="${-half}" width="${NODE_SIZE}" height="${NODE_SIZE}"`;
+    // Inset by half the stroke, as the circle and diamond are, so the
+    // square's outer edge is the 40px box and it stands as tall as a circle.
+    geom = `<rect x="${-half + 1}" y="${-half + 1}" width="${NODE_SIZE - 2}" height="${NODE_SIZE - 2}"`;
   } else if (glyph.shape === "female") {
     geom = `<circle cx="0" cy="0" r="${half - 1}"`;
   } else {

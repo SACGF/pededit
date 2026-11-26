@@ -13,10 +13,10 @@
 <path d="M -37 154 L 37 154" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-37" y1="154" x2="-37" y2="166" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="37" y1="154" x2="37" y2="166" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<g data-id="p1" transform="translate(-40 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="p1" transform="translate(-40 120) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="p2" transform="translate(40 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="c2" transform="translate(37 186) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="c1" transform="translate(-37 186) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
+<g data-id="c1" transform="translate(-37 186) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
 <g class="consanguinity-labels">
 </g>
 </g>

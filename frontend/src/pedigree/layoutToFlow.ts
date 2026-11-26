@@ -39,12 +39,12 @@ export interface RFNodeData extends Record<string, unknown> {
   /**
    * True when the same individual is drawn in more than one slot (kinship2
    * could not place them both with their siblings and beside every partner).
-   * Every copy renders with a superscript, joined by a dashed duplicateEdge.
+   * Every copy is drawn with its copy number, joined by a dashed duplicateEdge.
    */
   isDuplicate: boolean;
   /**
    * 1 = first drawn copy of a duplicate, 2 = second, and so on, in reading
-   * order. Shown as a superscript. Undefined when isDuplicate = false.
+   * order. Written beside the symbol. Undefined when isDuplicate = false.
    */
   duplicateIndex?: number;
   /** True if individual has a parent partnership in the pedigree. */

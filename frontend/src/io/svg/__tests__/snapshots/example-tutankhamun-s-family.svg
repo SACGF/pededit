@@ -38,7 +38,7 @@
 </g>
 <g class="symbols">
 <g transform="translate(40 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(120 0)">
@@ -46,7 +46,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(0 120)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(80 120)">
@@ -54,7 +54,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(0 240)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(80 240)">
@@ -62,7 +62,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(40 360)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
 </g>

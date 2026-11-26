@@ -38,11 +38,21 @@ export function textBlockUnder(ind: Individual, pedigree: Pedigree, x: number, y
   };
 }
 
+/** Font size (px) of the copy number beside someone drawn more than once. */
+export const COPY_NUMBER_FONT_SIZE = 10;
+
 /**
- * The copy number written beside the top right corner of a symbol drawn
- * twice: from 20px right of the centre (the canvas) to past the end of the
- * export's text at 22px, from 28px above the centre (the canvas) to just
- * below the export's baseline at 18px above.
+ * Where the copy number of someone drawn more than once starts, from the
+ * symbol's centre: the left end of its baseline, just right of the symbol's
+ * top right corner. The canvas and the exports both write it here.
+ */
+export function copyNumberAt(size = NODE_SIZE): { x: number; y: number } {
+  return { x: size / 2 + 2, y: -size / 2 + 2 };
+}
+
+/**
+ * The box the copy number beside the top right corner of a symbol drawn
+ * twice takes (`copyNumberAt`), with a few px to spare above and below.
  */
 export function copyNumberBlock(x: number, y: number, index: number): TextBlock {
   const left = x + NODE_SIZE / 2, right = x + NODE_SIZE / 2 + 2 + textWidth(String(index));

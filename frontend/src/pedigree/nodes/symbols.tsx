@@ -20,6 +20,8 @@ import {
   DOCUMENTED_FONT_SIZE, DOCUMENTED_MARK,
 } from "../evaluation";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
+import { COPY_NUMBER_FONT_SIZE, copyNumberAt } from "../labelBlock";
+import { branchCountBaseline, branchCountFontSize } from "../collapse";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
 
@@ -131,6 +133,8 @@ function AffectedCore({ size, show, outline }: { size: number; show: boolean; ou
 // ── Male (square) ──────────────────────────────────────────────────────────────
 
 function MaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
+  // Inset by half the stroke, as the circle and diamond are, so the outer
+  // edge is the box and a square stands as tall as a circle.
   const padding = 1;
   const outline = { x: padding, y: padding, width: size - 2 * padding, height: size - 2 * padding };
   return (
@@ -470,22 +474,30 @@ export function DocumentedMark({ size, adopted }: { size: number; adopted: boole
   );
 }
 
-export function DuplicateSuperscript({ index }: { index: number }) {
+/** Copy number of someone drawn more than once, beside the top right corner. Placement in `labelBlock.ts`. */
+export function CopyNumber({ size, index }: { size: number; index: number }) {
+  const at = copyNumberAt(size);
   return (
-    <span
-      style={{
-        position: "absolute",
-        top: -8,
-        right: -6,
-        fontSize: 10,
-        fontFamily: "sans-serif",
-        lineHeight: 1,
-        color: "black",
-        pointerEvents: "none",
-        userSelect: "none",
-      }}
+    <text
+      data-copy-number={index}
+      x={size / 2 + at.x} y={size / 2 + at.y}
+      fontFamily="sans-serif" fontSize={COPY_NUMBER_FONT_SIZE} fill="black"
+      style={{ pointerEvents: "none", userSelect: "none" }}
     >
       {index}
-    </span>
+    </text>
+  );
+}
+
+/** The number inside a collapsed-branch group symbol. Placement in `collapse.ts`. */
+export function BranchCount({ size, count }: { size: number; count: number }) {
+  return (
+    <text
+      x={size / 2} y={size / 2 + branchCountBaseline(count, size)}
+      textAnchor="middle" fontFamily="sans-serif" fontSize={branchCountFontSize(count, size)} fill="black"
+      style={{ userSelect: "none" }}
+    >
+      {count}
+    </text>
   );
 }

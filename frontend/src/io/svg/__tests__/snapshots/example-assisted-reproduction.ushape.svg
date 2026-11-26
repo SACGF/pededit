@@ -14,9 +14,9 @@
 <path d="M -80 186 L 0 186" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-40" y1="186" x2="-40" y2="220" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-40" y1="220" x2="-40" y2="232" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<g data-id="ar_gf" transform="translate(-40 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="ar_gf" transform="translate(-40 120) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="ar_gm" transform="translate(40 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="ar_h3" transform="translate(-80 186) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="ar_h3" transform="translate(-80 186) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="ar_w3" transform="translate(0 186) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="ar_c3" transform="translate(-40 252) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g class="consanguinity-labels">

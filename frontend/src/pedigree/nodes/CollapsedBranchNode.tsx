@@ -2,10 +2,10 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape } from "./symbols";
+import { SymbolShape, BranchCount } from "./symbols";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT } from "../labels";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { branchCountFontSize, branchTooltip } from "../collapse";
+import { branchTooltip } from "../collapse";
 
 export type CollapsedBranchNodeType = Node<RFNodeData, "collapsedBranch">;
 
@@ -24,7 +24,6 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
   if (!branch) return null;
   // The number drawn is the glyph's, the same one the exports write.
   const n = data.glyph.groupCount ?? branch.children.length;
-  const fs = branchCountFontSize(n, NODE_SIZE);
 
   return (
     <div
@@ -40,17 +39,7 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
     >
       <svg width={NODE_SIZE} height={NODE_SIZE} viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`} overflow="visible">
         <SymbolShape individual={individual} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
-        <text
-          x={NODE_SIZE / 2}
-          y={NODE_SIZE / 2 + Math.round(fs * 0.36 * 10) / 10}
-          textAnchor="middle"
-          fontFamily="sans-serif"
-          fontSize={fs}
-          fill="black"
-          style={{ userSelect: "none" }}
-        >
-          {n}
-        </text>
+        <BranchCount size={NODE_SIZE} count={n} />
       </svg>
 
       {data.detailLines.length > 0 && (

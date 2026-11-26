@@ -81,7 +81,7 @@
 </g>
 <g class="symbols">
 <g transform="translate(136 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(204 0)">
@@ -89,7 +89,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(374 0)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(442 0)">
@@ -97,7 +97,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(34 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(102 84)">
@@ -109,7 +109,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(238 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
@@ -118,11 +118,11 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(374 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(442 84)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
@@ -131,11 +131,11 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(204 168)">
-<clipPath id="symbol-clip-2-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-2-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-2-1"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-2-1)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(340 168)">
-<clipPath id="symbol-clip-2-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-2-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-2-2"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-2-2)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(0 252)">
@@ -144,7 +144,7 @@
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(68 252)">
-<clipPath id="symbol-clip-3-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-3-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-3-1"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-3-1)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(136 252)">
@@ -152,7 +152,7 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(204 252)">
-<clipPath id="symbol-clip-3-3"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-3-3)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-3-3"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-3-3)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(272 252)">
@@ -161,11 +161,11 @@
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(34 336)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(238 336)">
-<clipPath id="symbol-clip-4-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-4-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-4-1"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-4-1)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(306 336)">
@@ -177,11 +177,11 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(272 420)">
-<clipPath id="symbol-clip-5-1"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-5-1)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<clipPath id="symbol-clip-5-1"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-5-1)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(340 420)">
-<clipPath id="symbol-clip-5-2"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-5-2)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<clipPath id="symbol-clip-5-2"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-5-2)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(408 420)">
@@ -189,11 +189,11 @@
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(260.67 504)">
-<clipPath id="symbol-clip-6-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-6-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-6-0"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 40 0 A 40 40 0 0 1 0 40 Z" fill="#ff7f0e" clip-path="url(#symbol-clip-6-0)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(328.67 504)">
-<rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/>
+<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(396.67 504)">
@@ -206,7 +206,7 @@
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
 </g>
 <g transform="translate(362.67 588)">
-<clipPath id="symbol-clip-7-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-7-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
+<clipPath id="symbol-clip-7-0"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 40 0 Z" fill="#1f77b4" clip-path="url(#symbol-clip-7-0)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/><circle cx="0" cy="27" r="3.5" fill="#2ca02c"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 </g>
 <g transform="translate(430.67 588)">
@@ -215,7 +215,7 @@
 <text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
 </g>
 <g transform="translate(396.67 672)">
-<clipPath id="symbol-clip-8-0"><rect x="-20" y="-20" width="40" height="40"/></clipPath><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-8-0)"/><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="none"/>
+<clipPath id="symbol-clip-8-0"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L -40 0 A 40 40 0 0 1 0 -40 Z" fill="#e377c2" clip-path="url(#symbol-clip-8-0)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
 <line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
 <line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
 </g>

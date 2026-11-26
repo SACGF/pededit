@@ -22,14 +22,14 @@
 <line x1="-77" y1="266" x2="-77" y2="300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-77" y1="300" x2="-77" y2="312" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <g data-id="B" transform="translate(-80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="A" transform="translate(0 200) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="A" transform="translate(0 200) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="D" transform="translate(80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="F2" transform="translate(40 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="F2" transform="translate(40 266) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="M2" transform="translate(120 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="Y" transform="translate(80 332) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
-<g data-id="F1" transform="translate(-117 266) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="F1" transform="translate(-117 266) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
 <g data-id="M1" transform="translate(-37 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="X" transform="translate(-77 332) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="X" transform="translate(-77 332) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/></g>
 <g class="consanguinity-labels">
 </g>
 </g>
