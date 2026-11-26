@@ -128,9 +128,9 @@ describe("evaluation notation, NSGC 2008 setting (#101)", () => {
   it("puts the evaluation lines after age and onset, before the pedigree number", () => {
     const ind = { ...family().individuals[0]!, age: "45y" };
     const numbers = new Map([["f", "I-1"]]);
-    expect(detailLines(ind, WIDTH, family2008(), numbers)).toEqual(["45y", "E+ (BRCA1", "c.5266dupC)", "I-1"]);
-    expect(detailLines(ind, WIDTH, family(), numbers)).toEqual(["45y", "BRCA1", "c.5266dupC +", "I-1"]);
-    expect(detailSections(ind, WIDTH, family()).evaluation).toHaveLength(2);
+    expect(detailLines(detailSections(ind, WIDTH, family2008(), numbers))).toEqual(["45y", "E+ (BRCA1", "c.5266dupC)", "I-1"]);
+    expect(detailLines(detailSections(ind, WIDTH, family(), numbers))).toEqual(["45y", "BRCA1", "c.5266dupC +", "I-1"]);
+    expect(detailSections(ind, WIDTH, family()).find(s => s.key === "evaluation")!.lines).toHaveLength(2);
   });
 
   it("draws the * at the lower right on the canvas, outside adoption brackets", () => {

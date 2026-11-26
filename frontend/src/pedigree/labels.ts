@@ -127,47 +127,40 @@ export function linesWidth(lines: string[]): number {
  *      which callers pass only when the pedigree shows numbers.
  *
  * A collapsed-branch group symbol has none. Shared by the canvas, both
- * SVG exporters and the lints through `detailLines`.
+ * SVG exporters and the lints through the glyph's `detailLines`.
  */
-export interface DetailSections {
-  age: string[];
-  onset: string[];
-  gender: string[];
-  evaluation: string[];
-  inbreeding: string[];
-  number: string[];
+export interface DetailSection {
+  key: "age" | "onset" | "gender" | "evaluation" | "inbreeding" | "number";
+  lines: string[];
 }
 
-export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSections {
-  const number = wrapLabel(numbers?.get(ind.id), maxWidth, 1);
-  const branch = branchOf(pedigree, ind.id);
-  if (branch) return { age: [], onset: [], gender: [], evaluation: [], inbreeding: [], number };
-  return {
-    age: ageLines(ind).flatMap(l => wrapLabel(l, maxWidth, 1)),
-    onset: onsetLines(ind, pedigree, maxWidth),
-    gender: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1),
-    evaluation: evaluationLines(ind, maxWidth, notationOf(pedigree)),
-    inbreeding: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1),
+export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSection[] {
+  const number: DetailSection = { key: "number", lines: wrapLabel(numbers?.get(ind.id), maxWidth, 1) };
+  if (branchOf(pedigree, ind.id)) return [number];
+  return [
+    { key: "age", lines: ageLines(ind).flatMap(l => wrapLabel(l, maxWidth, 1)) },
+    { key: "onset", lines: onsetLines(ind, pedigree, maxWidth) },
+    { key: "gender", lines: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1) },
+    { key: "evaluation", lines: evaluationLines(ind, maxWidth, notationOf(pedigree)) },
+    { key: "inbreeding", lines: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1) },
     number,
-  };
+  ];
 }
 
-/** Every line under the name, top to bottom (see `detailSections`). */
-export function detailLines(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): string[] {
-  const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return [...s.age, ...s.onset, ...s.gender, ...s.evaluation, ...s.inbreeding, ...s.number];
+/** Every line under the name, top to bottom. */
+export function detailLines(sections: DetailSection[]): string[] {
+  return sections.flatMap(s => s.lines);
 }
 
 /**
  * True when the detail block runs past one age line (a birth and a death
  * line count as two). A two-line name plus one age line clears the sibship bar of the person's children; anything
- * more can reach it, so the block then gets a white backing (canvas div
- * background, a `<rect>` in the exports) and the bar shows a gap under the
- * text instead of running through it.
+ * more can reach it, so the block then gets a white backing (a `<rect>`
+ * behind the text) and the bar shows a gap under the text instead of
+ * running through it.
  */
-export function detailsBacked(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): boolean {
-  const s = detailSections(ind, maxWidth, pedigree, numbers);
-  return s.age.length > 1 || s.onset.length + s.gender.length + s.evaluation.length + s.inbreeding.length + s.number.length > 0;
+export function detailsBacked(sections: DetailSection[]): boolean {
+  return sections.some(s => s.lines.length > (s.key === "age" ? 1 : 0));
 }
 
 /**

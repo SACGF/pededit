@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { chartTitle, detailLines, labelMaxWidth, titleWidth, DEFAULT_PEDIGREE_NAME, ELLIPSIS } from "../labels";
+import { chartTitle, detailLines, labelMaxWidth, titleWidth, DEFAULT_PEDIGREE_NAME, ELLIPSIS, detailSections } from "../labels";
 import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
@@ -17,7 +17,7 @@ import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 const max = labelMaxWidth(SLOT_WIDTH);
 /** The lines under someone with these fields, in a pedigree with no settings. */
 const under = (fields: Partial<Individual>) =>
-  detailLines({ id: "x", sex: "unknown", affected: false, sibOrder: 0, ...fields }, max, family());
+  detailLines(detailSections({ id: "x", sex: "unknown", affected: false, sibOrder: 0, ...fields }, max, family()));
 
 function family(): Pedigree {
   return {

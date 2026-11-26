@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ageLines, ageAtDeath, parsePartialDate, detailLines, detailsBacked, labelMaxWidth } from "../labels";
+import { ageLines, ageAtDeath, parsePartialDate, detailLines, detailsBacked, labelMaxWidth, detailSections } from "../labels";
 import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
 import { SLOT_WIDTH } from "../constants";
@@ -65,11 +65,11 @@ describe("date of death under the symbol (#103)", () => {
   it("two age lines get the white backing; one does not", () => {
     const ped = family();
     const [f, m, c1] = ped.individuals;
-    expect(detailLines(m!, max, ped)).toEqual(["b. 1938", "d. 2010"]);
-    expect(detailsBacked(m!, max, ped)).toBe(true);
-    expect(detailLines(f!, max, ped)).toEqual(["d. 71y"]);
-    expect(detailsBacked(f!, max, ped)).toBe(false);
-    expect(detailsBacked(c1!, max, ped)).toBe(false);
+    expect(detailLines(detailSections(m!, max, ped))).toEqual(["b. 1938", "d. 2010"]);
+    expect(detailsBacked(detailSections(m!, max, ped))).toBe(true);
+    expect(detailLines(detailSections(f!, max, ped))).toEqual(["d. 71y"]);
+    expect(detailsBacked(detailSections(f!, max, ped))).toBe(false);
+    expect(detailsBacked(detailSections(c1!, max, ped))).toBe(false);
   });
 
   it("canvas, SVG and U-shape draw it, and the lints stay clean", () => {

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { toRoman } from "../numbering";
 import { buildScene, pedigreeNumbers } from "../scene";
-import { nameLabelText, detailLines, detailsBacked } from "../labels";
+import { nameLabelText, detailLines, detailsBacked, detailSections } from "../labels";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -118,12 +118,12 @@ describe("labels with numbers", () => {
     const p = family();
     const jo: Individual = { ...person("x", "male", 0, "Jo"), age: "30y", affected: true, onset: "20s" };
     expect(nameLabelText(jo)).toBe("Jo");
-    expect(detailLines(jo, 74, p, numbers)).toEqual(["30y", "onset 20s", "II-3"]);
-    expect(detailLines(jo, 74, p)).toEqual(["30y", "onset 20s"]);
-    expect(detailLines(person("x", "male", 0), 74, p, numbers)).toEqual(["II-3"]);
+    expect(detailLines(detailSections(jo, 74, p, numbers))).toEqual(["30y", "onset 20s", "II-3"]);
+    expect(detailLines(detailSections(jo, 74, p))).toEqual(["30y", "onset 20s"]);
+    expect(detailLines(detailSections(person("x", "male", 0), 74, p, numbers))).toEqual(["II-3"]);
     // Past the age line the block gets a white backing.
-    expect(detailsBacked({ ...person("x", "male", 0), age: "30y" }, 74, p)).toBe(false);
-    expect(detailsBacked({ ...person("x", "male", 0), age: "30y" }, 74, p, numbers)).toBe(true);
+    expect(detailsBacked(detailSections({ ...person("x", "male", 0), age: "30y" }, 74, p))).toBe(false);
+    expect(detailsBacked(detailSections({ ...person("x", "male", 0), age: "30y" }, 74, p, numbers))).toBe(true);
   });
 
   it("draws the number on the canvas only when the setting is on", () => {

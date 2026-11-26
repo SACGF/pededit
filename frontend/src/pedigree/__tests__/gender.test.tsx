@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } from "../gender";
-import { detailLines } from "../labels";
+import { detailLines, detailSections } from "../labels";
 import { buildScene } from "../scene";
 import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { exportKeyMarkup } from "../exportKey";
@@ -71,8 +71,8 @@ describe("gender identity on the symbol (#26)", () => {
   it("puts the code under the name, after onset and before the number", () => {
     const g = family();
     const t = { ...ind(g, "t"), age: "34y", onset: "20s" };
-    expect(detailLines(t, 74, g, new Map([["t", "II-1"]]))).toEqual(["34y", "onset 20s", "AFAB", "II-1"]);
-    expect(detailLines(ind(family("sex"), "t"), 74, family("sex"))).toEqual([]);
+    expect(detailLines(detailSections(t, 74, g, new Map([["t", "II-1"]])))).toEqual(["34y", "onset 20s", "AFAB", "II-1"]);
+    expect(detailLines(detailSections(ind(family("sex"), "t"), 74, family("sex")))).toEqual([]);
   });
 
   it("gives the canvas node its drawn shape, and the canvas draws it", () => {

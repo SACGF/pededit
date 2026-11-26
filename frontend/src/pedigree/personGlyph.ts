@@ -19,7 +19,7 @@ import { arrowKind, type ArrowKind } from "./proband";
 import { hasDocumentedEvaluation } from "./evaluation";
 import { lifeStatusCaption } from "./lifeStatus";
 import { symbolLetter } from "./assisted";
-import { wrapLabel, nameLabelText, detailLines, detailsBacked, MAX_LABEL_LINES } from "./labels";
+import { wrapLabel, nameLabelText, detailSections, detailLines, detailsBacked, MAX_LABEL_LINES } from "./labels";
 import { branchOf } from "./collapse";
 
 export interface PersonGlyph {
@@ -85,6 +85,7 @@ export function personGlyph(individual: Individual, pedigree: Pedigree, options:
   const arrow = arrowKind(individual);
   const caption = lifeStatusCaption(individual.lifeStatus);
   const letter = symbolLetter(individual);
+  const details = detailSections(individual, labelMax, pedigree, numbers);
   return {
     shape: symbolSex(individual, pedigree),
     ...(individual.lifeStatus ? { lifeStatus: individual.lifeStatus } : {}),
@@ -101,8 +102,8 @@ export function personGlyph(individual: Individual, pedigree: Pedigree, options:
     ...(name ? { name } : {}),
     nameLines: wrapLabel(name, labelMax, options.nameLineLimit ?? MAX_LABEL_LINES),
     figureNameLines: wrapLabel(name, labelMax),
-    detailLines: detailLines(individual, labelMax, pedigree, numbers),
-    detailsBacked: detailsBacked(individual, labelMax, pedigree, numbers),
+    detailLines: detailLines(details),
+    detailsBacked: detailsBacked(details),
     ...(options.copy !== undefined ? { copy: options.copy } : {}),
     ...(branch ? { groupCount: branch.children.length } : {}),
   };

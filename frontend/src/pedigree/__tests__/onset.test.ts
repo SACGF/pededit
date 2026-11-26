@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { onsetsOf, onsetSubject } from "../onset";
-import { onsetLines, detailLines } from "../labels";
+import { onsetLines, detailLines, detailSections } from "../labels";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportCsv } from "../../io/csv/exporter";
@@ -54,7 +54,7 @@ describe("onset under the symbol (#93)", () => {
   it("follows the age or DOB line", () => {
     const ped = pedigree();
     Object.assign(ped.individuals[0]!, { dob: "1950-01-01", tagOnset: { bc: "45y" } });
-    expect(detailLines(ped.individuals[0]!, 74, ped)).toEqual(["b. 1950", "BC 45y"]);
+    expect(detailLines(detailSections(ped.individuals[0]!, 74, ped))).toEqual(["b. 1950", "BC 45y"]);
   });
 
   it("cuts the tag text, not the age, when the line is too wide", () => {

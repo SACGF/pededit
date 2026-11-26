@@ -10,7 +10,7 @@ import { consanguinityLabelText, wrapConsanguinityLabel } from "../consanguinity
 import { ROW_HEIGHT, SLOT_WIDTH } from "../constants";
 import { drawnPedigree } from "../collapse";
 import { keyRows } from "../keyRows";
-import { detailLines, labelMaxWidth } from "../labels";
+import { detailLines, labelMaxWidth, detailSections } from "../labels";
 import { buildScene, pedigreeNumbers } from "../scene";
 import { inbreedingLabel, kinshipLabel } from "../relatedness";
 import { lintScene } from "../renderLint";
@@ -63,7 +63,7 @@ describe("coefficients on the figure (#86)", () => {
     const p = cousins({ ...ON, showNumbers: true });
     p.individuals.find(i => i.id === "z")!.dob = "1990-05-06";
     const z = p.individuals.find(i => i.id === "z")!;
-    expect(detailLines(z, max, p, pedigreeNumbers(p))).toEqual(["b. 1990", "F = 1/16", "IV-1"]);
+    expect(detailLines(detailSections(z, max, p, pedigreeNumbers(p)))).toEqual(["b. 1990", "F = 1/16", "IV-1"]);
   });
 
   it("φ above the double line, alone or after the words", () => {

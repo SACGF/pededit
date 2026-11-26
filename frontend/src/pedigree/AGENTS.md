@@ -879,7 +879,7 @@ Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
 (one or two lines), then the detail lines in NSGC order (2008 Fig. 1: age,
 then evaluation, then pedigree number; `claude/nsgc_nomenclature.md`).
 `detailSections` in `labels.ts` is the one place that orders them; add new
-text under the symbol there as its own section, not by appending to a
+text under the symbol there as its own entry of the list, not by appending to a
 renderer:
 
 1. age (`ageText`): the free-text `Individual.age` when set, otherwise the
