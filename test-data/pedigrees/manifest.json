@@ -479,6 +479,18 @@
       "exportLint": []
     },
     {
+      "file": "drawn/text-notes.json",
+      "group": "drawn",
+      "purpose": "Text under the symbol, notes shown: Show notes on the chart: a short note, one cut at two lines, one of two lines of its own, above the pedigree number",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 13,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
       "file": "drawn/couples-named.json",
       "group": "drawn",
       "purpose": "Couples and lines, relationships named: Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width",

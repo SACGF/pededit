@@ -128,6 +128,14 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               checked={pedigree.canvasSettings?.showCoefficients === true}
               onChange={on => updateCanvasSettings({ showCoefficients: on })}
             />
+            <SettingToggle
+              className="mt-2"
+              name="showNotes"
+              label="Show notes on the chart"
+              description="Write each person's notes under their symbol, above the pedigree number, up to two lines, on the canvas and in exports. Notes often hold private detail, so check them before sharing a figure. De-identified exports never include them."
+              checked={pedigree.canvasSettings?.showNotes === true}
+              onChange={on => updateCanvasSettings({ showNotes: on })}
+            />
             <SettingSelect<SymbolsShowMode>
               name="symbolsShow"
               label="Symbols show"

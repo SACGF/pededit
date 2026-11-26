@@ -125,14 +125,19 @@ export function linesWidth(lines: string[]): number {
  *      whose parents are related, when the pedigree draws coefficients
  *      (#86). NSGC has no place for it; it goes with what was worked
  *      out about the person, above the number that only locates them;
- *   6. `number`: the pedigree number ("II-3") when `numbers` has one,
+ *   6. `notes`: the person's notes, when the pedigree draws them
+ *      (`canvasSettings.showNotes`, off by default as notes are free text
+ *      and often private). NSGC's list has no comment line, so they go
+ *      after everything recorded or worked out about the person and above
+ *      the number, up to `NOTE_LINES` lines (`noteLines`);
+ *   7. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
  * A collapsed-branch group symbol has none. Shared by the canvas, both
  * SVG exporters and the lints through the glyph's `detailLines`.
  */
 export interface DetailSection {
-  key: "age" | "onset" | "gender" | "evaluation" | "inbreeding" | "number";
+  key: "age" | "onset" | "gender" | "evaluation" | "inbreeding" | "notes" | "number";
   lines: string[];
 }
 
@@ -145,6 +150,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
     { key: "gender", lines: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1) },
     { key: "evaluation", lines: evaluationLines(ind, maxWidth, notationOf(pedigree)) },
     { key: "inbreeding", lines: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1) },
+    { key: "notes", lines: showsNotes(pedigree) ? noteLines(ind.notes, maxWidth) : [] },
     number,
   ];
 }
@@ -248,6 +254,32 @@ export function evaluationLines(ind: Individual, maxWidth: number, notation: Not
     }
     return [...cut.slice(0, -1), `${last} ${mark}`];
   });
+}
+
+/** True when the pedigree draws people's notes under their symbols (`canvasSettings.showNotes`). */
+export function showsNotes(pedigree: Pick<Pedigree, "canvasSettings">): boolean {
+  return pedigree.canvasSettings?.showNotes === true;
+}
+
+/** Lines a person's notes may take under the symbol. */
+export const NOTE_LINES = 2;
+
+/**
+ * A person's notes as lines under the symbol: each line of the notes
+ * wrapped to `maxWidth`, at most `maxLines` in all, the last cut with an
+ * ellipsis when anything is left out. Blank lines are skipped.
+ */
+export function noteLines(notes: string | null | undefined, maxWidth: number, maxLines = NOTE_LINES): string[] {
+  const paragraphs = (notes ?? "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const lines: string[] = [];
+  for (let i = 0; i < paragraphs.length; i++) {
+    lines.push(...wrapLabel(paragraphs[i], maxWidth, maxLines - lines.length));
+    if (lines.length >= maxLines && i < paragraphs.length - 1) {
+      const last = lines[lines.length - 1]!;
+      return last.endsWith(ELLIPSIS) ? lines : truncate(lines, Math.max(1, Math.floor(maxWidth / LABEL_CHAR_WIDTH)), "");
+    }
+  }
+  return lines;
 }
 
 /** Lines one evaluation may take under the symbol. */

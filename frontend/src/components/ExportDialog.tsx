@@ -8,7 +8,7 @@ import {
 } from "../io/svg/index";
 import type { DeidentifyKeep } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { chartTitle } from "../pedigree/labels";
+import { chartTitle, showsNotes } from "../pedigree/labels";
 import { clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { uShapeExportLayout } from "../pedigree/uShapeView";
@@ -90,6 +90,9 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
       compact,
     });
   }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact]);
+
+  // Notes are drawn only with the pedigree setting, so say so when there are some.
+  const hasNotes = useMemo(() => open && pedigree.individuals.some(i => !!i.notes?.trim()), [open, pedigree]);
 
   // Which free-text choices this pedigree has anything for.
   const freeText = useMemo(() => (open && deident ? deidentifiableText(pedigree) : null), [open, deident, pedigree]);
@@ -188,6 +191,12 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
             </div>
           )}
 
+          {hasNotes && !showsNotes(pedigree) && !deident && (
+            <p className="text-xs text-muted-foreground" data-testid="export-notes-hint">
+              Notes are not drawn; turn on Show notes on the chart in Settings.
+            </p>
+          )}
+
           {/* De-identification */}
           <div className="space-y-1.5">
             <label className="flex items-center gap-2 text-xs cursor-pointer">
@@ -219,6 +228,9 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
             {freeText?.consanguinityLabels && keepBox("consanguinityLabels", "Include the relationship text above double lines")}
             {freeText?.textTags && keepBox("textTags", "Include text tags (genotypes …)")}
             {freeText?.childlessReason && keepBox("childlessReason", "Include the reason under no-children marks")}
+            {deident && hasNotes && showsNotes(pedigree) && (
+              <p className="text-[10px] text-gray-500 ml-5">Notes are left out.</p>
+            )}
             {deident && clinicalDetailLines(pedigree).length > 0 && (
               <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
             )}

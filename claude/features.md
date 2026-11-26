@@ -34,6 +34,7 @@ checked by `npm run check` (`scripts/check-doc-paths.mjs`).
 | Consanguinity text above the double line, ended relationships | #97, #98, #109 | `frontend/src/pedigree/consanguinityLabel.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Chart title, approximate age, long names | #20, #68 | `frontend/src/pedigree/labels.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Age of onset | #93 | `frontend/src/pedigree/onset.ts` | `frontend/src/pedigree/AGENTS.md` |
+| Notes on the chart | #219 | `frontend/src/pedigree/labels.ts` (`noteLines`) | `frontend/src/pedigree/AGENTS.md` |
 | Pedigree numbers (I-1, II-3) | #8 | `frontend/src/pedigree/numbering.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Clinical details | #102, #135 | `frontend/src/pedigree/clinicalDetails.ts` | `frontend/AGENTS.md` |
 | Assisted reproduction: donor, surrogate, social parents | #45 | `frontend/src/pedigree/assisted.ts` | `frontend/src/pedigree/AGENTS.md` |

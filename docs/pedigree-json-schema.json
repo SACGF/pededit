@@ -233,6 +233,10 @@
           "type": "boolean",
           "description": "Draw the inbreeding coefficient under anyone whose parents are related (\"F = 1/16\") and the kinship coefficient above a related couple's double line (\"\u03c6 = 1/16\"), on the canvas and in figure exports. The coefficients are computed from the pedigree, not stored. Absent means false."
         },
+        "showNotes": {
+          "type": "boolean",
+          "description": "Draw each person's notes under their symbol, after the other text and before the pedigree number, up to two lines cut to the slot width, on the canvas and in figure exports. De-identified exports never draw them. Absent means false."
+        },
         "symbolsShow": {
           "enum": ["gender", "sex"],
           "description": "What symbol shapes show: \"gender\" draws someone with a recorded genderIdentity with that gender's symbol and their sex assigned at birth (AMAB, AFAB, UAAB) below it (NSGC 2022); \"sex\" draws biological sex for everyone. Absent means \"gender\"."

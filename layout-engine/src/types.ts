@@ -332,6 +332,13 @@ export interface CanvasSettings {
    */
   showCoefficients?: boolean;
   /**
+   * Draw each person's notes under their symbol, after the other text and
+   * before the pedigree number, on the canvas and in figure exports. Notes
+   * are free text and often private, so absent means false; a de-identified
+   * export never draws them.
+   */
+  showNotes?: boolean;
+  /**
    * What the symbol shapes show: "gender" draws a person with a
    * recorded gender identity with that gender's symbol and writes AMAB /
    * AFAB / UAAB under it (NSGC 2022); "sex" draws biological sex for

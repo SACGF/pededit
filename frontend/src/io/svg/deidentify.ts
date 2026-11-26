@@ -167,9 +167,11 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     chartTitle: "",
     // The names are the numbers now: drawing them again would repeat them.
     // Without consanguinity text the relationship is not named either.
+    // Notes are dropped above; the setting goes too, so nothing can draw them.
     ...(pedigree.canvasSettings ? { canvasSettings: {
       ...pedigree.canvasSettings,
       showNumbers: false,
+      showNotes: false,
       ...(keep.consanguinityLabels ? {} : { relationshipLabels: false }),
     } } : {}),
     partnerships: pedigree.partnerships.map(p => ({

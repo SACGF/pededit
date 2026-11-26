@@ -53,7 +53,7 @@ FULL_PEDIGREE = {
     "pinnedPositions": {"c1": {"x": 12.5, "y": -40.0}},
     "canvasSettings": {"nodesMoveable": True, "snapToGrid": True, "snapGridSize": 20,
                        "nameLabels": "truncate", "layoutWidth": "relaxed",
-                       "relationshipLabels": True, "showCoefficients": True, "symbolsShow": "sex", "notation": "nsgc2008",
+                       "relationshipLabels": True, "showCoefficients": True, "showNotes": True, "symbolsShow": "sex", "notation": "nsgc2008",
                        "tagFills": "monochrome"},
     "unlockedIndividuals": ["f"],
     "tags": [

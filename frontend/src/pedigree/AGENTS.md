@@ -189,6 +189,15 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `canvasSettings.nameLabels` "truncate" (Settings, "Truncate long names")
   gives one line on the canvas only; exports always wrap, because a file
   cannot be hovered.
+- Notes on the chart: `Individual.notes` is drawn only with
+  `canvasSettings.showNotes` ("Show notes on the chart", off by default,
+  since notes are free text and often private). `noteLines` keeps the
+  note's own line breaks, wraps each to the slot width and stops at
+  `NOTE_LINES` (2) with an ellipsis (a two-line name, an age, three note
+  lines and a number reach the symbol of anyone drawn directly below,
+  which no lint catches); they are the `notes` detail section,
+  just above the pedigree number, so the canvas and every figure export
+  draw them. De-identification drops the notes and turns the setting off.
 - Reading a cut name: the full name is repeated under the hover pill, which
   sits on top of the name label. A cut label (`data-name-cut`) also takes
   the mouse itself: hovering it shows the name alone, without the pill

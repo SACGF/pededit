@@ -37,6 +37,10 @@ export const build = (
 const withSettings = (p: Pedigree, patch: Partial<CanvasSettings>): Pedigree =>
   ({ ...p, canvasSettings: { ...SETTINGS_2022, ...p.canvasSettings, ...patch } });
 
+/** `p` with these people's notes replaced. */
+const withNotes = (p: Pedigree, notes: Record<string, string>): Pedigree =>
+  ({ ...p, individuals: p.individuals.map(i => (notes[i.id] === undefined ? i : { ...i, notes: notes[i.id] })) });
+
 // ── Status and conditions ────────────────────────────────────────────────────
 
 const statusTags: Tag[] = [
@@ -422,6 +426,11 @@ const VARIANTS: FeatureFixture[] = [
   { slug: "fills-2008", label: "Pattern fills, NSGC 2008", covers: "2008 quarters with pattern fills", data: withSettings(fills, { notation: "nsgc2008", tagFills: "color" }) },
   { slug: "text-2008", label: "Text under the symbol, NSGC 2008", covers: "2008 evaluations (E1+, E2-)", data: withSettings(text, { notation: "nsgc2008" }) },
   { slug: "text-sex", label: "Text under the symbol, symbols by sex", covers: "Symbols show: biological sex, names cut to one line", data: withSettings(text, { symbolsShow: "sex", nameLabels: "truncate" }) },
+  { slug: "text-notes", label: "Text under the symbol, notes shown", covers: "Show notes on the chart: a short note, one cut at two lines, one of two lines of its own, above the pedigree number", data: withSettings(withNotes(text, {
+    gf: "Records held at the regional hospital; cause of death not confirmed by post mortem",
+    gm: "Lives abroad",
+    k2: "Deaf\nsince age 5",
+  }), { showNotes: true }) },
   { slug: "couples-named", label: "Couples and lines, relationships named", covers: "Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width", data: withSettings(couples, { relationshipLabels: true, showCoefficients: true, layoutWidth: "relaxed" }) },
   {
     slug: "couples-pinned", label: "Couples and lines, pinned and snapped",
