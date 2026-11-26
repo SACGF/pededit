@@ -50,6 +50,7 @@ import { deidentify } from "./deidentify";
 import { drawnPedigree } from "../../pedigree/collapse";
 import { assistedLinks } from "../../pedigree/assisted";
 import type { SvgExportOptions } from "./types";
+import { pairKey } from "../../pedigree/graph";
 
 export type ExportLintCode =
   | "missing-individual"
@@ -265,7 +266,6 @@ export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): Ex
     const ind = pedigree.individuals.find(i => i.id === id);
     return ind?.name ? `${ind.name} (${id})` : id;
   };
-  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const at = ([x, y]: Pt) => `(${Math.round(x)}, ${Math.round(y)})`;
 
   // exportSvg draws in canvas coordinates inside one translated group.

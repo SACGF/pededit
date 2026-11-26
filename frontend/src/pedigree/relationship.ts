@@ -1,5 +1,6 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { briefCoefficient } from "./relatedness";
+import { childrenOf, parentCoupleOf } from "./graph";
 
 /**
  * The name of the relationship between two people: "first cousin once
@@ -40,23 +41,15 @@ export interface RelationshipName {
 
 const EPS = 1e-9;
 
-/** Each person's parents, from the partnerships that list them as a child. */
-function parentsMap(pedigree: Pedigree): Map<string, [string, string]> {
-  const parents = new Map<string, [string, string]>();
-  for (const p of pedigree.partnerships) {
-    for (const child of pedigree.parentOf[p.id] ?? []) parents.set(child, [p.individual1, p.individual2]);
-  }
-  return parents;
-}
-
 /** Every ancestor of `id`, and `id` itself at 0, with the fewest generations up to each. */
-function ancestorDistances(id: string, parents: Map<string, [string, string]>): Map<string, number> {
+function ancestorDistances(pedigree: Pedigree, id: string): Map<string, number> {
   const dist = new Map<string, number>([[id, 0]]);
   let frontier = [id];
   for (let d = 1; frontier.length > 0; d++) {
     const next: string[] = [];
     for (const x of frontier) {
-      for (const parent of parents.get(x) ?? []) {
+      const couple = parentCoupleOf(pedigree, x);
+      for (const parent of couple ? [couple.individual1, couple.individual2] : []) {
         if (dist.has(parent)) continue;
         dist.set(parent, d);
         next.push(parent);
@@ -120,11 +113,10 @@ function term(up: number, down: number, half: boolean, sex: Sex | undefined, twi
  */
 export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinship: number): RelationshipName | null {
   if (a === b || !(kinship > EPS)) return null;
-  const parents = parentsMap(pedigree);
   const sexOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.sex;
 
-  const fromA = ancestorDistances(a, parents);
-  const fromB = ancestorDistances(b, parents);
+  const fromA = ancestorDistances(pedigree, a);
+  const fromB = ancestorDistances(pedigree, b);
 
   // The closest common ancestors: fewest generations in total.
   let best = Infinity;
@@ -143,7 +135,7 @@ export function nameRelationship(pedigree: Pedigree, a: string, b: string, kinsh
   const children = (x: string, y: string) => {
     const couple = pedigree.partnerships.find(p =>
       (p.individual1 === x && p.individual2 === y) || (p.individual1 === y && p.individual2 === x));
-    return couple ? { couple, children: pedigree.parentOf[couple.id] ?? [] } : null;
+    return couple ? { couple, children: childrenOf(pedigree, couple.id) } : null;
   };
   const onLine = (x: string, y: string) => {
     const c = children(x, y);

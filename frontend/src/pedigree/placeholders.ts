@@ -1,5 +1,6 @@
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { removeIndividuals } from "./removal";
+import { childrenOf, couplesOf, hasParents } from "./graph";
 
 /**
  * Placeholder partners. kinship2 needs a child to have 0 or 2
@@ -63,11 +64,11 @@ export function leftoverPlaceholders(pedigree: Pedigree, candidateIds: Iterable<
   for (const id of new Set(candidateIds)) {
     const ind = pedigree.individuals.find(i => i.id === id);
     if (!ind || !isUntouchedPlaceholder(ind) || referenced.has(id)) continue;
-    if (Object.values(pedigree.parentOf).some(kids => kids.includes(id))) continue;
-    const own = pedigree.partnerships.filter(q => q.individual1 === id || q.individual2 === id);
+    if (hasParents(pedigree, id)) continue;
+    const own = couplesOf(pedigree, id, { donorPairs: true });
     if (own.length > 1) continue;
     const p = own[0];
-    if (p && ((pedigree.parentOf[p.id] ?? []).length > 0 || PARTNERSHIP_FIELDS.some(f => !isEmptyValue(p[f])))) continue;
+    if (p && (childrenOf(pedigree, p.id).length > 0 || PARTNERSHIP_FIELDS.some(f => !isEmptyValue(p[f])))) continue;
     out.add(id);
   }
   return out;

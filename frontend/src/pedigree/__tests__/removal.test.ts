@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { descendantsOf, ancestorsOf, removeWithDescendantsSet, removeWithAncestorsSet } from "../removal";
+import { ancestorsOf, descendantsOf } from "../graph";
+import { removeWithDescendantsSet, removeWithAncestorsSet } from "../removal";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { lintScene } from "../renderLint";
 import { buildScene } from "../scene";

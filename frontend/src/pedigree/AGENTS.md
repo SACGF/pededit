@@ -448,7 +448,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   as "onset 40s" or "BC 45y" (tag abbrev, cut before the age is).
 
 - `validation.ts` — editor warnings (#116): the rules only. It imports the
-  data model, `conditions.ts` and the date helpers and nothing of the
+  data model, `graph.ts`, `conditions.ts` and the date helpers and nothing of the
   editor (no store, layout or React; a test holds it to that, #126), so the
   checks can run anywhere. `findProblems(pedigree)` runs `RULES` and gives
   `{ id, rule, severity, individualId | partnershipId, field, message,
@@ -643,8 +643,23 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   panel under the "Consanguineous with" checkbox (with a "Write <name>"
   button when the pedigree names the relationship) and "Text above line..."
   in the couple line's right-click menu.
-- `removal.ts` — branch removal sets (#34): descendants, ancestors,
-  "remove with descendants" (which also takes partners who married in and
+- `graph.ts`: where questions about the family graph are answered. Ask
+  it rather than walking `partnerships` and `parentOf`: `parentCoupleOf`
+  (the couple someone is a child of; a child listed under two keeps the
+  first), `couplesOf(pedigree, id, { donorPairs })` (say whether a
+  `donorConception` pair counts; menus and forms about relationships leave
+  them out, anything about who descends from whom keeps them), `partnerIn`,
+  `childrenOf` (genetic children, as `parentOf` lists them) and
+  `raisedChildrenOf` (adds a same-sex couple's donor-conceived children),
+  `hasParents`, `descendantsOf`, `ancestorsOf`, `parentRoles` (father and
+  mother of a couple, the man and the woman whichever way round they were
+  recorded) and `pairKey`. A frozen pedigree (everything immer produces) is
+  indexed once in a `WeakMap`; any other (a draft, one being built, a
+  drawn copy) is read directly each call, so changes made in place are
+  seen. The layout engine has its own copies, since it is published on its
+  own. Who is drawn under whom (`placementParentOf`) is a different
+  question and stays with the layout engine.
+- `removal.ts` — branch removal sets (#34): "remove with descendants" (which also takes partners who married in and
   have no partnership with anyone staying) and `removeIndividuals`, the one
   routine that strips a set of people out of a draft (partnerships, parentOf,
   twin sets, pins, unlocks). The store's `removeWithDescendants` /

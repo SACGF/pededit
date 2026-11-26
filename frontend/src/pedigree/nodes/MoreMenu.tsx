@@ -6,7 +6,7 @@ import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
 import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
 import { addDonorProblem, addSurrogateProblem } from "../assisted";
-import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../twins";
+import { ZYGOSITY_OPTIONS, twinSetOf, twinSetProblem } from "../twins";
 import { adjacentSibling } from "../../components/EditPanel";
 import { batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
@@ -14,8 +14,9 @@ import { namedCoupleRelationship } from "../consanguinityLabel";
 import { hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
 import { CONDITIONS_AND_TAGS, CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
-import { coupleChildren, donorPairFor, sameSexCouple } from "../sameSex";
+import { donorPairFor, sameSexCouple } from "../sameSex";
 import { coupleOfPair, couplePartnerLabel, drawBesideOptions } from "../partners";
+import { couplesOf, hasParents, parentCoupleOf, partnerIn, raisedChildrenOf } from "../graph";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -147,17 +148,17 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   }
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
-  const hasParentsAlready = Object.values(pedigree.parentOf).some(kids => kids.includes(individualId));
+  const hasParentsAlready = hasParents(pedigree, individualId);
   const ownPartnerships = partnerChoices(pedigree, individualId);
   // Gamete donation pairs have no couple line, so no line to mark.
   const couples = ownPartnerships.filter(c => !pedigree.partnerships.find(p => p.id === c.partnershipId)?.donorConception);
   // Twins: the current set, or the sibling drawn next to this person to pair with.
   const twin = twinSetOf(pedigree, individualId);
-  const twinPartnership = parentPartnershipOf(pedigree, individualId);
+  const twinPartnership = parentCoupleOf(pedigree, individualId);
   const twinMembers = twin?.set.members ?? [individualId, adjacentSibling(pedigree, individualId) ?? ""].filter(Boolean);
   // Partnerships of this person with no children: the childless mark applies to these.
   const childlessCouples = partnerChoices(pedigree, individualId)
-    .filter(c => coupleChildren(pedigree, c.partnershipId).length === 0)
+    .filter(c => raisedChildrenOf(pedigree, c.partnershipId).length === 0)
     .map(c => ({ ...c, status: pedigree.partnerships.find(p => p.id === c.partnershipId)?.childless }));
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
   const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
@@ -667,7 +668,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
-  const childless = coupleChildren(pedigree, partnershipId).length === 0;
+  const childless = raisedChildrenOf(pedigree, partnershipId).length === 0;
   const sameSex = !!sameSexCouple(pedigree, partnershipId);
   function action(fn: () => void) {
     fn();
@@ -846,10 +847,9 @@ const REMOVE_PARTNERSHIP_TITLE ="Remove the couple line, keeping both people (fo
 
 /** Partners of individualId, one per partnership, in partnership order. */
 function partnerChoices(pedigree: ReturnType<typeof usePedigreeStore.getState>["pedigree"], individualId: string) {
-  return pedigree.partnerships
-    .filter(p => p.individual1 === individualId || p.individual2 === individualId)
+  return couplesOf(pedigree, individualId, { donorPairs: true })
     .map((p, i) => {
-      const otherId = p.individual1 === individualId ? p.individual2 : p.individual1;
+      const otherId = partnerIn(p, individualId);
       const other = pedigree.individuals.find(ind => ind.id === otherId);
       const name = other?.name?.trim();
       const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";

@@ -1,6 +1,6 @@
 import type { ChildlessStatus, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import type { Segment } from "./sibshipPath";
-import { coupleChildren } from "./sameSex";
+import { raisedChildrenOf } from "./graph";
 
 /**
  * Childless couple marks (NSGC 2008, Bennett et al.): a short vertical line
@@ -52,7 +52,7 @@ export function childlessReasonBaselineY(topY: number): number {
 /** The partnership's mark, or undefined when it has children (the mark would contradict them). */
 export function activeChildless(partnership: Partnership, pedigree: Pedigree): ChildlessStatus | undefined {
   if (!partnership.childless) return undefined;
-  if (coupleChildren(pedigree, partnership.id).length > 0) return undefined;
+  if (raisedChildrenOf(pedigree, partnership.id).length > 0) return undefined;
   return partnership.childless;
 }
 

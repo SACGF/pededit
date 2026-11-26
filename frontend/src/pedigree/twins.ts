@@ -1,4 +1,5 @@
 import type { Pedigree, Partnership, TwinSet, Zygosity } from "@pedigree-editor/layout-engine";
+import { childrenOf, parentCoupleOf } from "./graph";
 
 /**
  * Twins (NSGC 2008): a twin set's members share one fork from the
@@ -19,17 +20,9 @@ export function twinLegendLabel(z: Zygosity): string {
   return z === "monozygotic" ? "Monozygotic twins" : z === "dizygotic" ? "Dizygotic twins" : "Twins, zygosity unknown";
 }
 
-/** The partnership whose child this individual is, or undefined. */
-export function parentPartnershipOf(pedigree: Pedigree, individualId: string): Partnership | undefined {
-  for (const p of pedigree.partnerships) {
-    if ((pedigree.parentOf[p.id] ?? []).includes(individualId)) return p;
-  }
-  return undefined;
-}
-
 /** The twin set this individual belongs to, with its partnership, or undefined. */
 export function twinSetOf(pedigree: Pedigree, individualId: string): { partnership: Partnership; set: TwinSet } | undefined {
-  const partnership = parentPartnershipOf(pedigree, individualId);
+  const partnership = parentCoupleOf(pedigree, individualId);
   const set = partnership?.twins?.find(t => t.members.includes(individualId));
   return partnership && set ? { partnership, set } : undefined;
 }
@@ -45,7 +38,7 @@ export function twinSetProblem(pedigree: Pedigree, partnershipId: string, member
   if (unique.length < 2) return "A twin set needs at least two siblings.";
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return "Unknown partnership.";
-  const children = new Set(pedigree.parentOf[partnershipId] ?? []);
+  const children = new Set(childrenOf(pedigree, partnershipId));
   if (unique.some(id => !children.has(id))) return "Twins must all be children of the same couple.";
   if (zygosity === "monozygotic") {
     const sexes = new Set(unique.map(id => pedigree.individuals.find(i => i.id === id)?.sex));
@@ -58,7 +51,7 @@ export function twinSetProblem(pedigree: Pedigree, partnershipId: string, member
 export function zygositiesInUse(pedigree: Pedigree): Set<Zygosity> {
   const out = new Set<Zygosity>();
   for (const p of pedigree.partnerships) {
-    const children = new Set(pedigree.parentOf[p.id] ?? []);
+    const children = new Set(childrenOf(pedigree, p.id));
     for (const t of p.twins ?? []) {
       if (t.members.filter(m => children.has(m)).length >= 2) out.add(t.zygosity);
     }
@@ -76,7 +69,7 @@ export const TWIN_QUESTION_FONT_SIZE = 11;
 export function twinMembership(pedigree: Pedigree): Map<string, { twinSet: string; zygosity: Zygosity }> {
   const out = new Map<string, { twinSet: string; zygosity: Zygosity }>();
   for (const p of pedigree.partnerships) {
-    const children = new Set(pedigree.parentOf[p.id] ?? []);
+    const children = new Set(childrenOf(pedigree, p.id));
     (p.twins ?? []).forEach((t, k) => {
       const members = t.members.filter(m => children.has(m) && !out.has(m));
       if (members.length < 2) return;

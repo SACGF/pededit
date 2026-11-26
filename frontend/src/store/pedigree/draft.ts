@@ -1,5 +1,6 @@
 import type { Pedigree, Individual, Sex, Partnership } from "@pedigree-editor/layout-engine";
 import { dropLeftoverPlaceholders } from "../../pedigree/placeholders";
+import { childrenOf, couplesOf } from "../../pedigree/graph";
 
 /**
  * Edits to a pedigree in place, for the store's Immer recipes: making
@@ -12,39 +13,18 @@ export function newId(): string {
   return crypto.randomUUID();
 }
 
-/** Find the partnership ID where individualId is a child. Returns null if none. */
-export function findParentPartnershipId(
-  pedigree: Pedigree,
-  individualId: string
-): string | null {
-  for (const [partnerId, children] of Object.entries(pedigree.parentOf)) {
-    if (children.includes(individualId)) return partnerId;
-  }
-  return null;
-}
-
-/** Find all partnership IDs where individualId is individual1 or individual2. */
-export function findOwnPartnerships(
-  pedigree: Pedigree,
-  individualId: string
-): string[] {
-  return pedigree.partnerships
-    .filter(p => p.individual1 === individualId || p.individual2 === individualId)
-    .map(p => p.id);
-}
-
 /**
  * True when the individual has a partner or children. Children only exist
  * through a partnership, so one check covers both. A pregnancy or pregnancy
  * loss can have neither, see setLifeStatus.
  */
 export function hasPartnerOrChild(pedigree: Pedigree, individualId: string): boolean {
-  return findOwnPartnerships(pedigree, individualId).length > 0;
+  return couplesOf(pedigree, individualId, { donorPairs: true }).length > 0;
 }
 
 /** Next sibOrder value within a sibling group (children of partnershipId). */
 export function nextSibOrderInFamily(pedigree: Pedigree, partnershipId: string): number {
-  const siblings = pedigree.parentOf[partnershipId] ?? [];
+  const siblings = childrenOf(pedigree, partnershipId);
   if (siblings.length === 0) return 0;
   const max = Math.max(
     ...siblings.map(id => {
@@ -122,7 +102,7 @@ export function addPlaceholderFor(draft: Pedigree, individualId: string): Indivi
  * placeholder partner, the person first.
  */
 export function ensureChildPartnershipId(draft: Pedigree, individualId: string, preferred?: string): string {
-  const ownPs = findOwnPartnerships(draft, individualId);
+  const ownPs = couplesOf(draft, individualId, { donorPairs: true }).map(p => p.id);
   if (preferred && ownPs.includes(preferred)) return preferred;
   return ownPs[0] ?? addCouple(draft, individualId, addPlaceholderFor(draft, individualId).id).id;
 }
@@ -145,7 +125,7 @@ export function removeFromTwinSets(draft: Pedigree, individualId: string): void 
  * the same couple or donor.
  */
 export function leaveParents(draft: Pedigree, before: Partnership, childId: string): void {
-  draft.parentOf[before.id] = (draft.parentOf[before.id] ?? []).filter(c => c !== childId);
+  draft.parentOf[before.id] = childrenOf(draft, before.id).filter(c => c !== childId);
   removeFromTwinSets(draft, childId);
 }
 
@@ -155,7 +135,7 @@ export function leaveParents(draft: Pedigree, before: Partnership, childId: stri
  * partner left with nothing (`dropLeftoverPlaceholders`).
  */
 export function tidyCoupleLeft(draft: Pedigree, before: Partnership): void {
-  if (before.donorConception && (draft.parentOf[before.id] ?? []).length === 0) {
+  if (before.donorConception && childrenOf(draft, before.id).length === 0) {
     draft.partnerships = draft.partnerships.filter(p => p.id !== before.id);
     delete draft.parentOf[before.id];
   }

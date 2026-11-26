@@ -7,6 +7,7 @@ import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";
 import { carrierConditions, isAffected, isCarrier } from "../../pedigree/conditions";
 import { kinshipOf } from "../../pedigree/relatedness";
+import { childrenOf } from "../../pedigree/graph";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
   const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids,dod,carrier_of,inbreeding_coefficient";
@@ -15,7 +16,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
   // Build parent lookup: childId → { f: fatherId, m: motherId }
   const parents = new Map<string, { f: string; m: string }>();
   for (const p of pedigree.partnerships) {
-    const children = pedigree.parentOf[p.id] ?? [];
+    const children = childrenOf(pedigree, p.id);
     const ind1 = pedigree.individuals.find(i => i.id === p.individual1)!;
     const ind2 = pedigree.individuals.find(i => i.id === p.individual2)!;
     const [father, mother] = ind1.sex === "male" ? [ind1, ind2] : [ind2, ind1];

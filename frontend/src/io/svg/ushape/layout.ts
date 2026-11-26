@@ -10,6 +10,7 @@ import { labelMaxWidth, LABEL_CHAR_WIDTH } from "../../../pedigree/labels";
 import { labelNumbers } from "../../../pedigree/scene";
 import { NODE_SIZE, HALF, LABEL_LINE_HEIGHT, CONSANG_GAP, MIN_SLOT, MAX_SLOT, FAMILY_GAP, BAR_CLEARANCE, TARGET_ASPECT, MIN_ASPECT, MAX_PLACE_ATTEMPTS, FAN_MAX_WIDTH, MAX_FLAT, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH } from "./constants";
 import { coupleGap, labelRadius, kidsOf, walk, buildTree, type UShapeOptions, type Union, type TNode } from "./tree";
+import { hasParents } from "../../../pedigree/graph";
 
 // ── Geometry ──────────────────────────────────────────────────────────────────
 
@@ -668,16 +669,16 @@ export function layoutUShape(pedigree: Pedigree, opts: UShapeOptions = {}): USha
  * figure draw, with names wrapped at its widest slot and nobody numbered as
  * a copy (its copies are joined by dashed links, not numbers).
  */
-export const glyphCache = new WeakMap<Pedigree, { childIds: Set<string>; numbers: Map<string, string> | undefined; glyphs: Map<string, PersonGlyph> }>();
+export const glyphCache = new WeakMap<Pedigree, { numbers: Map<string, string> | undefined; glyphs: Map<string, PersonGlyph> }>();
 export function glyphOf(ind: Individual, pedigree: Pedigree): PersonGlyph {
   let cache = glyphCache.get(pedigree);
   if (!cache) {
-    cache = { childIds: new Set(Object.values(pedigree.parentOf).flat()), numbers: labelNumbers(pedigree), glyphs: new Map() };
+    cache = { numbers: labelNumbers(pedigree), glyphs: new Map() };
     glyphCache.set(pedigree, cache);
   }
   let glyph = cache.glyphs.get(ind.id);
   if (!glyph) {
-    glyph = personGlyph(ind, pedigree, { labelMax: labelMaxWidth(MAX_SLOT), numbers: cache.numbers, hasParents: cache.childIds.has(ind.id) });
+    glyph = personGlyph(ind, pedigree, { labelMax: labelMaxWidth(MAX_SLOT), numbers: cache.numbers, hasParents: hasParents(pedigree, ind.id) });
     cache.glyphs.set(ind.id, glyph);
   }
   return glyph;

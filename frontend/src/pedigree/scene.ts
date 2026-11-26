@@ -24,6 +24,7 @@ import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
 import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint } from "./assisted";
+import { hasParents, pairKey } from "./graph";
 
 /**
  * The drawing as plain data (#146): who is drawn where, every line and the
@@ -584,7 +585,6 @@ function buildNodes(
   // Determine which individuals are draggable.
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
-  const childIds = new Set(Object.values(pedigree.parentOf).flat());
   const twins = twinMembership(pedigree);
   const labelLines = canvasLabelLines(nameLabelMode(pedigree));
   const numbers = showsNumbers(pedigree) ? numberFromLayout(pedigree, result, hidden) : undefined;
@@ -604,7 +604,7 @@ function buildNodes(
       const branch = branchOf(pedigree, individual.id);
       const glyph = personGlyph(individual, pedigree, {
         labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines,
-        hasParents: childIds.has(individual.id), copy: isDuplicate ? copies.indexOf(id) + 1 : undefined,
+        hasParents: hasParents(pedigree, individual.id), copy: isDuplicate ? copies.indexOf(id) + 1 : undefined,
       });
 
       nodes.push({
@@ -762,10 +762,8 @@ function buildCoupleEdges(
   const edges: SceneCoupleLine[] = [];
   const related = consanguinityTest(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
-  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const partnershipOf = new Map(pedigree.partnerships.map(p => [pairKey(p.individual1, p.individual2), p]));
   // Partners with no parents drawn have nothing landing on their symbol tops.
-  const hasParents = new Set(Object.values(pedigree.parentOf).flat());
   const shapeAt = (level: number, slot: number) => symbolSex(pedigree.individuals[result.nid[level][slot] - 1]!, pedigree);
   /** Slots from one partner to the other, for each edge: 1 when they are side by side. */
   const spans: number[] = [];
@@ -853,7 +851,7 @@ function buildCoupleEdges(
     const l = slotPos.get(left), r = slotPos.get(right);
     if (!text || !l || !r) return {};
     const top = (id: string) => ({
-      hasParents: hasParents.has(id),
+      hasParents: hasParents(pedigree, id),
       familyHistoryUnknown: !!pedigree.individuals.find(i => i.id === id)?.familyHistoryUnknown,
     });
     const [lx, rx] = l.x <= r.x ? [l.x, r.x] : [r.x, l.x];
@@ -878,11 +876,9 @@ function buildCoupleEdges(
 
 // ── Sibship edges ─────────────────────────────────────────────────────────────
 
-const pairKeyOf = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
-
 /** Partner pairs who are genetic parents through gamete donation, not a couple. */
 function donorPairs(pedigree: Pedigree): Set<string> {
-  return new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKeyOf(p.individual1, p.individual2)));
+  return new Set(pedigree.partnerships.filter(p => p.donorConception).map(p => pairKey(p.individual1, p.individual2)));
 }
 
 function buildSibshipEdges(
@@ -937,7 +933,7 @@ function buildSibshipEdges(
       const hopDrop = rc.hop
         ? { parentId: `${level - 1}-${farSlot}`, dx: Math.sign(besidePos.x - farPos.x) * hopTurn(Math.abs(besidePos.x - farPos.x)).drop }
         : undefined;
-      const isApart = apart.has(pairKeyOf(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
+      const isApart = apart.has(pairKey(idAt(level - 1, rc.leftSlot), idAt(level - 1, rc.rightSlot)));
       const converge = slots.length === 1 && isApart;
       // Straight down to an only child who is all but under the middle.
       const coupleX = hopDrop || isApart ? middleX : descentX(middleX, childXs, NODE_SIZE);

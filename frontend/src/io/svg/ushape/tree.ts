@@ -10,6 +10,7 @@ import { twinMembership } from "../../../pedigree/twins";
 import { consanguinityLabelText, consanguinityLabelWidth } from "../../../pedigree/consanguinityLabel";
 import { NODE_SIZE, HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS } from "./constants";
 import { groupBy } from "./connectors";
+import { couplesOf, partnerIn } from "../../../pedigree/graph";
 
 /** How far a label may be lifted off a curve before it reaches the dashed links just inside the symbols. */
 export function maxLabelSag(w: Union): number {
@@ -176,25 +177,19 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
 
   const byId = new Map<string, Individual>(pedigree.individuals.map(i => [i.id, i]));
   const sexOf = (id: string) => byId.get(id)?.sex;
-  const partnershipsOf = new Map<string, Partnership[]>();
-  const hasParents = new Set<string>();
-  // Where each child is drawn: under the couple carrying it, for an egg donor's child.
+  const couplesWith = (id: string) => couplesOf(pedigree, id, { donorPairs: true });
+  // Where each child is drawn: under the couple carrying it, for an egg
+  // donor's child. "Has parents" here means drawn under a couple.
   const placed = placementParentOf(pedigree);
-  for (const p of pedigree.partnerships) {
-    for (const id of [p.individual1, p.individual2]) {
-      if (!partnershipsOf.has(id)) partnershipsOf.set(id, []);
-      partnershipsOf.get(id)!.push(p);
-    }
-    for (const c of placed[p.id] ?? []) hasParents.add(c);
-  }
+  const hasParents = new Set<string>();
+  for (const p of pedigree.partnerships) for (const c of placed[p.id] ?? []) hasParents.add(c);
   const kidIds = (p: Partnership): string[] => placed[p.id] ?? [];
-  const otherOf = (p: Partnership, id: string) => (p.individual1 === id ? p.individual2 : p.individual1);
 
   const descendants = (ids: string[]): Set<string> => {
     const seen = new Set<string>();
     const stack = [...ids];
     while (stack.length) {
-      for (const p of partnershipsOf.get(stack.pop()!) ?? []) {
+      for (const p of couplesWith(stack.pop()!)) {
         for (const c of kidIds(p)) if (!seen.has(c)) { seen.add(c); stack.push(c); }
       }
     }
@@ -213,7 +208,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const line = descendants([p.individual1, p.individual2]);
     line.add(p.individual1).add(p.individual2);
     const showsProband = probands.some(q =>
-      line.has(q) || (partners && (partnershipsOf.get(q) ?? []).some(pp => line.has(otherOf(pp, q)))));
+      line.has(q) || (partners && couplesWith(q).some(pp => line.has(partnerIn(pp, q)))));
     const score = (founders ? 1e7 : 0) + (showsProband ? 1e6 : 0) + line.size;
     if (score > best) { best = score; rootP = p; }
   }
@@ -275,13 +270,13 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
   // beside somebody else, is a duplicate.
   const drawn = new Set<string>();
   const consumed = new Set<string>([rootP.id]);
-  const isRelated = (p: Partnership, of: string) => bloodLine.has(otherOf(p, of));
+  const isRelated = (p: Partnership, of: string) => bloodLine.has(partnerIn(p, of));
 
   let root: TNode;
   if (!extraP) {
     // Male on the left, as in a standard pedigree.
     const first = sexOf(rootP.individual1) === "female" ? rootP.individual2 : rootP.individual1;
-    const second = otherOf(rootP, first);
+    const second = partnerIn(rootP, first);
     root = mkNode(first, 0, null, null);
     const w = { ...mkUnion("spouse", [rootP.id], second, isDouble(rootP)), a: 0, b: 1 };
     root.members = [{ id: first, dx: -coupleGap(w) / 2, dup: false }, { id: second, dx: coupleGap(w) / 2, dup: false }];
@@ -292,15 +287,15 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     const [pl, pr] = pedigree.partnerships.indexOf(extraP) < pedigree.partnerships.indexOf(rootP) ? [extraP, rootP] : [rootP, extraP];
     const hub = pl.individual1 === pr.individual1 || pl.individual1 === pr.individual2 ? pl.individual1 : pl.individual2;
     root = mkNode(hub, 0, null, null);
-    const isDup = (p: Partnership) => p === extraP && bloodLine.has(otherOf(p, hub));
+    const isDup = (p: Partnership) => p === extraP && bloodLine.has(partnerIn(p, hub));
     root.unions = [pl, pr].map((p, i) => ({
-      ...mkUnion(isDup(p) ? "dup" : "spouse", [p.id], otherOf(p, hub), isDouble(p)),
+      ...mkUnion(isDup(p) ? "dup" : "spouse", [p.id], partnerIn(p, hub), isDouble(p)),
       a: 1, b: i === 0 ? 0 : 2,
     }));
     root.members = [
-      { id: otherOf(pl, hub), dx: -coupleGap(root.unions[0]), dup: isDup(pl) },
+      { id: partnerIn(pl, hub), dx: -coupleGap(root.unions[0]), dup: isDup(pl) },
       { id: hub, dx: 0, dup: false },
-      { id: otherOf(pr, hub), dx: coupleGap(root.unions[1]), dup: isDup(pr) },
+      { id: partnerIn(pr, hub), dx: coupleGap(root.unions[1]), dup: isDup(pr) },
     ];
   }
   for (const m of root.members) if (!m.dup) drawn.add(m.id);
@@ -341,7 +336,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
     if (node !== root) {
       // Partnerships with children first. At most two partners fit beside one
       // symbol. Further partnerships are omitted along with their children.
-      const ps = (partnershipsOf.get(node.blood) ?? []).filter(p => !consumed.has(p.id));
+      const ps = couplesWith(node.blood).filter(p => !consumed.has(p.id));
       // With partners off, children by partners who are not drawn hang from
       // the symbol itself, which leaves room for one couple line only.
       const solo = partners ? [] : ps.filter(p => !isRelated(p, node.blood) && kidIds(p).length);
@@ -352,7 +347,7 @@ export function buildTree(pedigree: Pedigree, partners: boolean): TNode | null {
       couples.sort((x, y) => ps.indexOf(x) - ps.indexOf(y));
       for (const p of couples) {
         consumed.add(p.id);
-        const other = otherOf(p, node.blood);
+        const other = partnerIn(p, node.blood);
         const related = bloodLine.has(other);
         const dup = related || drawn.has(other);
         if (!dup) drawn.add(other);

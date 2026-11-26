@@ -39,6 +39,7 @@ import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinity
 import { duplicateArcPoints } from "./couplePath";
 import { textBlockUnder } from "./labelBlock";
 import { arcCollisions } from "./duplicateArc";
+import { pairKey } from "./graph";
 
 export type LintCode =
   | "missing-individual"
@@ -85,7 +86,6 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
     const ind = pedigree.individuals.find(i => i.id === id);
     return ind?.name ? `${ind.name} (${id})` : id;
   };
-  const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   // A node id is a layout slot ("level-slot"). When one is not drawn, name the
   // person kinship2 put in that slot, from the same layout buildScene uses.
   let layout: LayoutResult | undefined;

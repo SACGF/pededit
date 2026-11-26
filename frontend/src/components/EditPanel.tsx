@@ -7,10 +7,9 @@ import { SelectionPanel } from "./SelectionPanel";
 import { PersonActions } from "./PersonActions";
 import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
-import { coupleChildren } from "../pedigree/sameSex";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { GENDER_IDENTITY_OPTIONS, assignedAtBirthText, drawsGender } from "../pedigree/gender";
-import { ZYGOSITY_OPTIONS, parentPartnershipOf, twinSetOf, twinSetProblem } from "../pedigree/twins";
+import { ZYGOSITY_OPTIONS, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { referenceRelatedness } from "../pedigree/referenceRelatedness";
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
@@ -34,6 +33,7 @@ import {
 import { batchSexProblem, carrierStatusOf } from "../pedigree/batch";
 import { notationOf } from "../pedigree/notation";
 import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
+import { childrenOf, couplesOf, parentCoupleOf, partnerIn, raisedChildrenOf } from "../pedigree/graph";
 
 /** Small screens: how much of the screen the side panel's sheet takes. */
 export type PanelSize = "closed" | "half" | "full";
@@ -479,7 +479,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
 function hasDetails(pedigree: Pedigree, individual: Individual): boolean {
   return !!(individual.lifeStatus || individual.adopted || individual.genderIdentity || individual.reproductiveRole
     || individual.carriedBy || individual.socialParents?.length || twinSetOf(pedigree, individual.id)
-    || pedigree.partnerships.some(p => p.donorConception && (pedigree.parentOf[p.id] ?? []).includes(individual.id)));
+    || pedigree.partnerships.some(p => p.donorConception && childrenOf(pedigree, p.id).includes(individual.id)));
 }
 
 /** A dropdown in an inline `Field`: it fills the control column. */
@@ -668,13 +668,15 @@ function siblingLabel(pedigree: Pedigree, id: string): string {
   const name = ind?.name?.trim();
   if (name) return name;
   const sex = ind?.sex === "male" ? "Brother" : ind?.sex === "female" ? "Sister" : "Sibling";
-  const sibs = pedigree.parentOf[parentPartnershipOf(pedigree, id)?.id ?? ""] ?? [];
+  const couple = parentCoupleOf(pedigree, id);
+  const sibs = couple ? childrenOf(pedigree, couple.id) : [];
   return `${sex} ${sibs.indexOf(id) + 1}`;
 }
 
 /** The sibling drawn next to this person: the next one in the sibship, or the previous one for the last. */
 export function adjacentSibling(pedigree: Pedigree, individualId: string): string | undefined {
-  const sibs = pedigree.parentOf[parentPartnershipOf(pedigree, individualId)?.id ?? ""] ?? [];
+  const couple = parentCoupleOf(pedigree, individualId);
+  const sibs = couple ? childrenOf(pedigree, couple.id) : [];
   const i = sibs.indexOf(individualId);
   if (i < 0 || sibs.length < 2) return undefined;
   return sibs[i + 1] ?? sibs[i - 1];
@@ -688,8 +690,8 @@ export function adjacentSibling(pedigree: Pedigree, individualId: string): strin
 function TwinsForm({ individual }: { individual: Individual }) {
   const { pedigree, setTwins, removeTwin } = usePedigreeFields("pedigree", "setTwins", "removeTwin");
   const [problem, setProblem] = useState<string | null>(null);
-  const partnership = parentPartnershipOf(pedigree, individual.id);
-  const siblings = partnership ? (pedigree.parentOf[partnership.id] ?? []).filter(id => id !== individual.id) : [];
+  const partnership = parentCoupleOf(pedigree, individual.id);
+  const siblings = partnership ? childrenOf(pedigree, partnership.id).filter(id => id !== individual.id) : [];
   if (!partnership || siblings.length === 0) return null;
 
   const twin = twinSetOf(pedigree, individual.id);
@@ -752,11 +754,11 @@ function TwinsForm({ individual }: { individual: Individual }) {
 
 /** Label for the other member of a partnership, as the more menu names them. */
 export function partnerLabel(pedigree: Pedigree, individualId: string, partnershipId: string): string {
-  const own = pedigree.partnerships.filter(p => p.individual1 === individualId || p.individual2 === individualId);
+  const own = couplesOf(pedigree, individualId, { donorPairs: true });
   const i = own.findIndex(p => p.id === partnershipId);
   const p = own[i];
   if (!p) return "partner";
-  const otherId = p.individual1 === individualId ? p.individual2 : p.individual1;
+  const otherId = partnerIn(p, individualId);
   const other = pedigree.individuals.find(ind => ind.id === otherId);
   const name = other?.name?.trim();
   const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
@@ -911,14 +913,14 @@ function capitalise(text: string): string {
  */
 function PartnersForm({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason");
-  const own = pedigree.partnerships.filter(p => (p.individual1 === individual.id || p.individual2 === individual.id) && !p.donorConception);
+  const own = couplesOf(pedigree, individual.id, { donorPairs: false });
   if (own.length === 0) return null;
   return (
     <div className="border-t pt-3 space-y-2" data-testid="partners-form">
       <SectionHeader>Partners</SectionHeader>
       {own.map(p => {
         const partner = partnerLabel(pedigree, individual.id, p.id);
-        const childless = coupleChildren(pedigree, p.id).length === 0;
+        const childless = raisedChildrenOf(pedigree, p.id).length === 0;
         return (
           <div key={p.id} className="space-y-1 text-xs text-gray-600" data-partner-row={p.id}>
             <div className="text-gray-800 break-words">{partner}</div>
@@ -977,7 +979,7 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
     return (ind?.name?.trim() || (letter ? `${letter === "D" ? "Donor" : "Surrogate"} (${ind!.sex})` : `Unnamed ${ind?.sex ?? ""}`)).trim();
   };
   const hasParents = geneticParents(pedigree, individual.id).length > 0;
-  const donorConceived = !!pedigree.partnerships.find(p => (pedigree.parentOf[p.id] ?? []).includes(individual.id))?.donorConception;
+  const donorConceived = !!parentCoupleOf(pedigree, individual.id)?.donorConception;
   const linked = !!individual.carriedBy || !!individual.socialParents?.length || donorConceived;
   const [expanded, setExpanded] = useState(false);
   const social = individual.socialParents ?? [];

@@ -3,6 +3,7 @@ import { drawnBesideChoices, drawnBesideConflict, drawnLeftPartner } from "@pedi
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { buildScene, type Scene } from "./scene";
+import { couplesOf, partnerIn } from "./graph";
 
 /**
  * Linking two existing individuals as partners: the rules,
@@ -65,18 +66,16 @@ export function swapSidesPlan(pedigree: Pedigree, partnershipId: string): { side
   const before = cachedLayout(base);
   const left = drawnLeftPartner(base, before, partnershipId);
   if (!left) return { problem: "These partners are not drawn side by side, so there is no side to swap." };
-  const other = (q: { individual1: string; individual2: string }, id: string) => id === q.individual1 ? q.individual2 : q.individual1;
-  const sides: Record<string, string> = { [partnershipId]: other(p, left) };
+  const sides: Record<string, string> = { [partnershipId]: partnerIn(p, left) };
 
-  const couples = (id: string) => base.partnerships.filter(q => !q.donorConception && (q.individual1 === id || q.individual2 === id));
   for (const hub of [p.individual1, p.individual2]) {
-    const mine = couples(hub);
+    const mine = couplesOf(base, hub, { donorPairs: false });
     if (mine.length !== 2) continue;
     const q = mine.find(x => x.id !== partnershipId)!;
     const qLeft = drawnLeftPartner(base, before, q.id);
     if (!qLeft) continue;
     // This couple's partner and q's partner on opposite sides of the hub: trade places.
-    if ((left === hub) !== (qLeft === hub)) sides[q.id] = other(q, qLeft);
+    if ((left === hub) !== (qLeft === hub)) sides[q.id] = partnerIn(q, qLeft);
   }
 
   // Trading places first; failing that, this couple alone.
@@ -140,7 +139,7 @@ export function couplePartnerLabel(pedigree: Pedigree, partnershipId: string, id
   const person = pedigree.individuals.find(i => i.id === id);
   const name = person?.name?.trim();
   if (name || !p || !person) return name || "this person";
-  const other = pedigree.individuals.find(i => i.id === (id === p.individual1 ? p.individual2 : p.individual1));
+  const other = pedigree.individuals.find(i => i.id === partnerIn(p, id));
   if (person.sex !== other?.sex && person.sex !== "unknown") return person.sex === "male" ? "the man" : "the woman";
   const base = laidOutWith(pedigree, partnershipId);
   const left = drawnLeftPartner(base, cachedLayout(base), partnershipId);
@@ -226,7 +225,7 @@ export function drawBesidePlan(pedigree: Pedigree, partnershipId: string, beside
 
   const base = laidOutWith(pedigree, partnershipId);
   const drawnLeft = drawnLeftPartner(base, cachedLayout(base), partnershipId) ?? p.individual1;
-  const sides = p.leftPartner ? [p.leftPartner] : [drawnLeft, drawnLeft === p.individual1 ? p.individual2 : p.individual1];
+  const sides = p.leftPartner ? [p.leftPartner] : [drawnLeft, partnerIn(p, drawnLeft)];
   let pick: { left: string; scene: Scene } | null = null;
   for (const left of sides) {
     const chosen = withChoice(besideId, left);

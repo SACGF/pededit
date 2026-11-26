@@ -3,6 +3,7 @@ import { twinSetProblem, twinSetOf } from "../../pedigree/twins";
 import { swapSidesPlan, drawBesidePlan, couplePartnerLabel } from "../../pedigree/partners";
 import { removeFromTwinSets, setOptional } from "./draft";
 import type { EditTools } from "./tools";
+import { childrenOf } from "../../pedigree/graph";
 
 /** Edits to what is recorded about a couple, twins among their children included. */
 
@@ -64,7 +65,7 @@ export function coupleSlice(tools: EditTools): CoupleSlice {
       mutate(draft => {
         const p = draft.partnerships.find(x => x.id === partnershipId);
         if (!p) return;
-        const order = draft.parentOf[partnershipId] ?? [];
+        const order = childrenOf(draft, partnershipId);
         const sorted = [...unique].sort((a, b) => order.indexOf(a) - order.indexOf(b));
         const rest = (p.twins ?? [])
           .map(t => ({ ...t, members: t.members.filter(m => !unique.includes(m)) }))
@@ -80,7 +81,7 @@ export function coupleSlice(tools: EditTools): CoupleSlice {
     },
 
     setPartnershipChildless: (partnershipId, status) => {
-      if (status !== undefined && (get().pedigree.parentOf[partnershipId] ?? []).length > 0) {
+      if (status !== undefined && childrenOf(get().pedigree, partnershipId).length > 0) {
         console.warn("Cannot mark a couple with children as childless");
         return;
       }

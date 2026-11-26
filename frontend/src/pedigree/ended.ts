@@ -1,6 +1,7 @@
 import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import type { Segment } from "./sibshipPath";
 import { activeChildless } from "./childless";
+import { childrenOf } from "./graph";
 
 /**
  * Ended relationship (NSGC 2008 Fig. 2.2a): two short parallel
@@ -39,7 +40,7 @@ export function endedMarkSegments(cx: number, cy: number, scale = 1): Segment[] 
 
 /** Whether something hangs from the middle of the couple's line: their children's line of descent or a childless mark. */
 export function middleTaken(partnership: Partnership, pedigree: Pedigree): boolean {
-  return (pedigree.parentOf[partnership.id] ?? []).length > 0 || activeChildless(partnership, pedigree) !== undefined;
+  return childrenOf(pedigree, partnership.id).length > 0 || activeChildless(partnership, pedigree) !== undefined;
 }
 
 /** Whether any drawn partnership is marked ended, for the legend and export key. */

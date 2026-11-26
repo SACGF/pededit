@@ -1,48 +1,11 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { ancestorsOf, couplesOf, descendantsOf, parentCoupleOf, partnerIn } from "./graph";
 
 /**
  * Branch removal: which individuals go when someone is removed together
  * with their descendants or their ancestors. Pure set computations; the
  * store applies them. Framework-free so the rules are unit testable.
  */
-
-function partnershipsOf(pedigree: Pedigree, id: string) {
-  return pedigree.partnerships.filter(p => p.individual1 === id || p.individual2 === id);
-}
-
-function parentPartnershipOf(pedigree: Pedigree, id: string) {
-  return pedigree.partnerships.find(p => (pedigree.parentOf[p.id] ?? []).includes(id));
-}
-
-/** Everyone below any of `ids` through their partnerships, not including `ids` themselves. */
-export function descendantsOf(pedigree: Pedigree, ids: string[]): Set<string> {
-  const out = new Set<string>();
-  const queue = [...ids];
-  while (queue.length) {
-    const id = queue.shift()!;
-    for (const p of partnershipsOf(pedigree, id)) {
-      for (const child of pedigree.parentOf[p.id] ?? []) {
-        if (!out.has(child) && !ids.includes(child)) { out.add(child); queue.push(child); }
-      }
-    }
-  }
-  return out;
-}
-
-/** Everyone above any of `ids` (parents, their parents, ...), not including `ids` themselves. */
-export function ancestorsOf(pedigree: Pedigree, ids: string[]): Set<string> {
-  const out = new Set<string>();
-  const queue = [...ids];
-  while (queue.length) {
-    const id = queue.shift()!;
-    const p = parentPartnershipOf(pedigree, id);
-    if (!p) continue;
-    for (const parent of [p.individual1, p.individual2]) {
-      if (!out.has(parent) && !ids.includes(parent)) { out.add(parent); queue.push(parent); }
-    }
-  }
-  return out;
-}
 
 /**
  * `people` plus the partners of those people who married in (no parents in
@@ -57,12 +20,11 @@ export function withMarriedInPartners(pedigree: Pedigree, people: Iterable<strin
   while (changed) {
     changed = false;
     for (const id of [...out]) {
-      for (const p of partnershipsOf(pedigree, id)) {
-        const other = p.individual1 === id ? p.individual2 : p.individual1;
+      for (const p of couplesOf(pedigree, id, { donorPairs: true })) {
+        const other = partnerIn(p, id);
         if (out.has(other)) continue;
-        const marriedIn = !parentPartnershipOf(pedigree, other);
-        const onlyWithOut = partnershipsOf(pedigree, other).every(q =>
-          out.has(q.individual1 === other ? q.individual2 : q.individual1));
+        const marriedIn = !parentCoupleOf(pedigree, other);
+        const onlyWithOut = couplesOf(pedigree, other, { donorPairs: true }).every(q => out.has(partnerIn(q, other)));
         if (marriedIn && onlyWithOut) { out.add(other); changed = true; }
       }
     }

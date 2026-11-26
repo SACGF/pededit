@@ -1,13 +1,14 @@
 import type { Pedigree, Individual, Sex, Partnership } from "@pedigree-editor/layout-engine";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../../pedigree/removal";
-import { setParentsProblem, currentParentsOf } from "../../pedigree/parents";
+import { setParentsProblem } from "../../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../../pedigree/placeholders";
 import { linkPartnerProblem } from "../../pedigree/partners";
 import { kinshipOf } from "../../pedigree/relatedness";
 import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../../pedigree/assisted";
-import { applySameSexChildren, coupleChildren, isSameSexCouple, sameSexChildProblem } from "../../pedigree/sameSex";
-import { newId, findParentPartnershipId, findOwnPartnerships, fatherFirst, nextSibOrderInFamily, nextRootSibOrder, makeIndividual, makePlaceholder, oppositeSex, addCouple, addPlaceholderFor, ensureChildPartnershipId, leaveParents, tidyCoupleLeft, clearChildless } from "./draft";
+import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../../pedigree/sameSex";
+import { newId, fatherFirst, nextSibOrderInFamily, nextRootSibOrder, makeIndividual, makePlaceholder, oppositeSex, addCouple, addPlaceholderFor, ensureChildPartnershipId, leaveParents, tidyCoupleLeft, clearChildless } from "./draft";
 import type { EditTools } from "./tools";
+import { childrenOf, couplesOf, parentCoupleOf, partnerIn, raisedChildrenOf } from "../../pedigree/graph";
 
 /**
  * Edits to who is in the pedigree and how they are joined: adding and
@@ -96,7 +97,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
   function noticeDonorChildren(geneticParentId: string, pairId: string, n: number) {
     const ped = get().pedigree;
     const pair = ped.partnerships.find(p => p.id === pairId);
-    const donor = ped.individuals.find(i => i.id === (pair?.individual1 === geneticParentId ? pair?.individual2 : pair?.individual1));
+    const donor = ped.individuals.find(i => i.id === (pair && partnerIn(pair, geneticParentId)));
     const name = nameOr(geneticParentId, "this person");
     const kind = donor?.sex === "male" ? "sperm donor" : "egg donor";
     get().setNotice({
@@ -109,9 +110,9 @@ export function structureSlice(tools: EditTools): StructureSlice {
   /** Swap a person with the sibling `direction` places along (-1 left, 1 right) in their sibship. */
   function moveSib(individualId: string, direction: -1 | 1) {
     mutate(draft => {
-      const parentPId = findParentPartnershipId(draft, individualId);
+      const parentPId = parentCoupleOf(draft, individualId)?.id;
       if (!parentPId) return;
-      const siblings = (draft.parentOf[parentPId] ?? [])
+      const siblings = childrenOf(draft, parentPId)
         .map(id => draft.individuals.find(i => i.id === id))
         .filter((i): i is Individual => !!i)
         .sort((a, b) => a.sibOrder - b.sibOrder);
@@ -142,7 +143,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
     // Couples losing a child here may leave a placeholder partner with none.
     // and partners of removed people may be left alone.
     const candidates = partnersIn(pedigree, pedigree.partnerships
-      .filter(p => gone.has(p.individual1) || gone.has(p.individual2) || (pedigree.parentOf[p.id] ?? []).some(c => gone.has(c)))
+      .filter(p => gone.has(p.individual1) || gone.has(p.individual2) || childrenOf(pedigree, p.id).some(c => gone.has(c)))
       .map(p => p.id)).filter(id => !gone.has(id));
     let removed = gone.size;
     mutate(draft => {
@@ -179,7 +180,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
      */
     addParent: (individualId, sex) => {
       mutate(draft => {
-        const parentPId = findParentPartnershipId(draft, individualId);
+        const parentPId = parentCoupleOf(draft, individualId)?.id;
 
         if (parentPId) {
           // Partnership exists — find the correct slot
@@ -248,7 +249,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
         for (let k = 0; k < n; k++) {
           const child = makeIndividual(sex, sibOrder++);
           draft.individuals.push(child);
-          draft.parentOf[pid] = [...(draft.parentOf[pid] ?? []), child.id];
+          draft.parentOf[pid] = [...childrenOf(draft, pid), child.id];
         }
         clearChildless(draft, pid);
       });
@@ -263,7 +264,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
      */
     addSibling: (individualId) => {
       mutate(draft => {
-        const parentPId = findParentPartnershipId(draft, individualId);
+        const parentPId = parentCoupleOf(draft, individualId)?.id;
         if (!parentPId) return; // no parents — can't add sibling
 
         const sibling = makeIndividual("unknown", nextSibOrderInFamily(draft, parentPId));
@@ -325,7 +326,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
       const ped0 = get().pedigree;
       const candidates = partnersIn(ped0, [
         ...Object.keys(ped0.parentOf).filter(pid => ped0.parentOf[pid]!.includes(individualId)),
-        ...findOwnPartnerships(ped0, individualId),
+        ...couplesOf(ped0, individualId, { donorPairs: true }).map(p => p.id),
       ]);
       mutate(draft => {
         removeIndividuals(draft, new Set([individualId]));
@@ -344,7 +345,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
       const unique = [...new Set(parentIds)];
       const problem = setParentsProblem(get().pedigree, childId, unique);
       if (problem) { console.warn(`Cannot set parents: ${problem}`); return problem; }
-      const before = currentParentsOf(get().pedigree, childId);
+      const before = parentCoupleOf(get().pedigree, childId);
       mutate(draft => {
         if (before) leaveParents(draft, before, childId);
         // The partnership to attach to: existing, or new (with a placeholder for a single parent).
@@ -354,11 +355,11 @@ export function structureSlice(tools: EditTools): StructureSlice {
           || addCouple(draft, ...fatherFirst(draft, a, b ?? addPlaceholderFor(draft, a).id));
         const child = draft.individuals.find(i => i.id === childId)!;
         child.sibOrder = nextSibOrderInFamily(draft, partnership.id);
-        draft.parentOf[partnership.id] = [...(draft.parentOf[partnership.id] ?? []), childId];
+        draft.parentOf[partnership.id] = [...childrenOf(draft, partnership.id), childId];
         clearChildless(draft, partnership.id);
         if (before) tidyCoupleLeft(draft, before);
       });
-      const after = currentParentsOf(get().pedigree, childId)!;
+      const after = parentCoupleOf(get().pedigree, childId)!;
       const name = (id: string) => nameOr(id, "an individual");
       get().setNotice({
         kind: "info",
@@ -371,12 +372,12 @@ export function structureSlice(tools: EditTools): StructureSlice {
     setSameSexChild: (childId, partnershipId, geneticParentId) => {
       const ped = get().pedigree;
       const couple = ped.partnerships.find(p => p.id === partnershipId);
-      const partner = couple && (couple.individual1 === geneticParentId ? couple.individual2 : couple.individual1);
+      const partner = couple && partnerIn(couple, geneticParentId);
       const problem = sameSexChildProblem(ped, partnershipId, geneticParentId)
         ?? setParentsProblem(ped, childId, [geneticParentId])
         ?? setParentsProblem(ped, childId, [partner!]);
       if (problem) { console.warn(`Cannot set parents: ${problem}`); return problem; }
-      const before = currentParentsOf(ped, childId);
+      const before = parentCoupleOf(ped, childId);
       mutate(draft => {
         if (before) leaveParents(draft, before, childId);
         applySameSexChildren(draft, partnershipId, geneticParentId, [childId], { donor: newId(), pair: newId() });
@@ -392,7 +393,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
     },
 
     detachFromParents: (childId) => {
-      const before = currentParentsOf(get().pedigree, childId);
+      const before = parentCoupleOf(get().pedigree, childId);
       if (!before) return;
       mutate(draft => {
         leaveParents(draft, before, childId);
@@ -407,7 +408,7 @@ export function structureSlice(tools: EditTools): StructureSlice {
       const { pedigree } = get();
       const p = pedigree.partnerships.find(x => x.id === partnershipId);
       if (!p) return "Unknown partnership.";
-      const kids = coupleChildren(pedigree, partnershipId);
+      const kids = raisedChildrenOf(pedigree, partnershipId);
       if (kids.length > 0) {
         return `Not removed: this couple has ${kids.length === 1 ? "a child" : `${kids.length} children`}. Use Replace parents or Detach from parents on ${kids.length === 1 ? "the child" : "each child"} first.`;
       }

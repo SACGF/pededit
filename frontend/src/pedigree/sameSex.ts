@@ -1,4 +1,5 @@
 import type { Partnership, Pedigree, Sex } from "@pedigree-editor/layout-engine";
+import { childrenOf, couplesOf, partnerIn } from "./graph";
 
 /**
  * Same-sex couples (NSGC 2022 Fig. 5, which draws them as ordinary
@@ -33,36 +34,10 @@ export function sameSexCouple(pedigree: Pedigree, partnershipId: string | undefi
  */
 export function donorPairFor(pedigree: Pedigree, geneticParentId: string, partnerId: string): Partnership | undefined {
   const isDonor = (id: string) => pedigree.individuals.find(i => i.id === id)?.reproductiveRole === "donor";
-  const raisedBy = (pid: string) => (pedigree.parentOf[pid] ?? []).some(c =>
+  const raisedBy = (pid: string) => childrenOf(pedigree, pid).some(c =>
     pedigree.individuals.find(i => i.id === c)?.socialParents?.includes(partnerId));
-  return [...pedigree.partnerships].reverse().find(p => {
-    if (!p.donorConception) return false;
-    const other = p.individual1 === geneticParentId ? p.individual2 : p.individual2 === geneticParentId ? p.individual1 : undefined;
-    return !!other && isDonor(other) && raisedBy(p.id);
-  });
-}
-
-/**
- * The couple's children: those in `parentOf` and, for a couple whose
- * children are donor-conceived (a same-sex couple), the children of
- * one partner's `donorConception` pair who have the other partner as a
- * social parent. The childless mark, its menu and Remove partnership go by
- * this, so a same-sex couple with children is not offered them.
- */
-export function coupleChildren(pedigree: Pedigree, partnershipId: string): string[] {
-  const own = pedigree.parentOf[partnershipId] ?? [];
-  const couple = pedigree.partnerships.find(p => p.id === partnershipId);
-  if (!couple || couple.donorConception) return own;
-  const raised = new Set(own);
-  for (const [genetic, social] of [[couple.individual1, couple.individual2], [couple.individual2, couple.individual1]]) {
-    for (const p of pedigree.partnerships) {
-      if (!p.donorConception || (p.individual1 !== genetic && p.individual2 !== genetic)) continue;
-      for (const c of pedigree.parentOf[p.id] ?? []) {
-        if (pedigree.individuals.find(i => i.id === c)?.socialParents?.includes(social)) raised.add(c);
-      }
-    }
-  }
-  return [...raised];
+  return [...couplesOf(pedigree, geneticParentId, { donorPairs: true })].reverse()
+    .find(p => p.donorConception && isDonor(partnerIn(p, geneticParentId)) && raisedBy(p.id));
 }
 
 /** Why `geneticParentId` cannot have a child through this same-sex couple, or null. */
@@ -90,7 +65,7 @@ export function applySameSexChildren(
 ): string | null {
   if (sameSexChildProblem(draft, partnershipId, geneticParentId)) return null;
   const couple = draft.partnerships.find(x => x.id === partnershipId)!;
-  const partner = couple.individual1 === geneticParentId ? couple.individual2 : couple.individual1;
+  const partner = partnerIn(couple, geneticParentId);
   let pair = donorPairFor(draft, geneticParentId, partner);
   if (!pair) {
     const gp = draft.individuals.find(i => i.id === geneticParentId)!;
@@ -132,7 +107,7 @@ export function applySameSexChildren(
 export function geneticParentsSexProblem(pedigree: Pedigree, targets: Set<string>, sexOf: (id: string) => Sex | undefined): string | null {
   for (const p of pedigree.partnerships) {
     if (!targets.has(p.individual1) && !targets.has(p.individual2)) continue;
-    if ((pedigree.parentOf[p.id] ?? []).length === 0) continue;
+    if (childrenOf(pedigree, p.id).length === 0) continue;
     const a = sexOf(p.individual1), b = sexOf(p.individual2);
     if (!a || a === "unknown" || a !== b) continue;
     const n1 = pedigree.individuals.find(i => i.id === p.individual1)?.name?.trim();

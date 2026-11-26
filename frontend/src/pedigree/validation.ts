@@ -26,6 +26,7 @@ import type {
 import { parsePartialDate, type PartialDate } from "./labels";
 import { affectedConditions, affectedControlOn, carrierLabel, conditionMode, conditionTags, isAffected, plainAffected, plainCarrier, resolvePlainAffected, type ConditionState } from "./conditions";
 import { addYears, ageRange, certainlyBefore, minDaysApart, partialDateOf } from "./dateRanges";
+import { childrenOf, couplesOf, parentCoupleOf } from "./graph";
 
 export type Severity = "warning" | "error";
 
@@ -124,8 +125,6 @@ export interface RuleContext {
   /** Today, for dates in the future and ages. */
   today: PartialDate;
   byId: Map<string, Individual>;
-  /** Each child's partnership in `parentOf`: their genetic parents. */
-  parentsOf: Map<string, Partnership>;
   /** Everyone linked to someone else: a partner, a parent or child, or a carrier or social parent line. */
   connected: Set<string>;
   /** Siblings drawn out of birth order (`siblings-out-of-order`): the person to report, with the younger sibling drawn left of them. */
@@ -183,7 +182,7 @@ function parentWords(parent: Individual): string {
  */
 function geneticParentsOf(ind: Individual, ctx: RuleContext): Individual[] {
   if (ind.adopted === "in") return [];
-  const p = ctx.parentsOf.get(ind.id);
+  const p = parentCoupleOf(ctx.pedigree, ind.id);
   if (!p) return [];
   return [p.individual1, p.individual2].map(id => ctx.byId.get(id)).filter((x): x is Individual => !!x);
 }
@@ -223,7 +222,7 @@ function siblingsOutOfOrder(pedigree: Pedigree, byId: Map<string, Individual>): 
   if (mode !== "insertion") return out;
   const group = (i: Individual) => affectedFirst && isAffected(i, pedigree) ? 0 : affectedFirst ? 1 : 0;
   for (const p of pedigree.partnerships) {
-    const kids = (pedigree.parentOf[p.id] ?? []).map(id => byId.get(id)).filter((x): x is Individual => !!x);
+    const kids = childrenOf(pedigree, p.id).map(id => byId.get(id)).filter((x): x is Individual => !!x);
     if (kids.length < 2) continue;
     const ranked = [...kids].sort((a, b) => group(a) - group(b) || a.sibOrder - b.sibOrder);
     const place = new Map(ranked.map((k, i) => [k.id, i + 1]));
@@ -519,7 +518,7 @@ export const RULES: Rule[] = [
     id: "twins-born-apart",
     individual: (ind, ctx) => {
       const birth = parsed(ind.dob);
-      const set = birth && ctx.parentsOf.get(ind.id)?.twins?.find(t => t.members.includes(ind.id));
+      const set = birth && parentCoupleOf(ctx.pedigree, ind.id)?.twins?.find(t => t.members.includes(ind.id));
       if (!birth || !set || set.members[0] === ind.id) return null;
       const first = ctx.byId.get(set.members[0]!);
       const firstBirth = parsed(first?.dob);
@@ -548,7 +547,7 @@ export const RULES: Rule[] = [
     id: "pregnancy-with-family",
     individual: (ind, ctx) => {
       if (!ind.lifeStatus) return null;
-      const partner = ctx.pedigree.partnerships.some(p => p.individual1 === ind.id || p.individual2 === ind.id);
+      const partner = couplesOf(ctx.pedigree, ind.id, { donorPairs: true }).length > 0;
       return partner && {
         severity: "error",
         field: "lifeStatus",
@@ -676,8 +675,7 @@ export const RULES: Rule[] = [
     individual: (ind, ctx) => {
       const role = ind.reproductiveRole;
       if (!role) return null;
-      const parent = ctx.pedigree.partnerships.some(p =>
-        (p.individual1 === ind.id || p.individual2 === ind.id) && (ctx.pedigree.parentOf[p.id] ?? []).length > 0);
+      const parent = couplesOf(ctx.pedigree, ind.id, { donorPairs: true }).some(p => childrenOf(ctx.pedigree, p.id).length > 0);
       const carried = ctx.pedigree.individuals.some(i => i.carriedBy === ind.id);
       if (role === "donor" ? parent : parent || carried) return null;
       const what = role === "donor" ? "A donor (D)" : "A surrogate (S)";
@@ -709,8 +707,8 @@ export const RULES: Rule[] = [
       };
     },
     partnership: (p, ctx) => {
-      const missing = [p.individual1, p.individual2, ...(ctx.pedigree.parentOf[p.id] ?? [])].filter(id => !ctx.byId.has(id));
-      const kids = new Set(ctx.pedigree.parentOf[p.id] ?? []);
+      const missing = [p.individual1, p.individual2, ...childrenOf(ctx.pedigree, p.id)].filter(id => !ctx.byId.has(id));
+      const kids = new Set(childrenOf(ctx.pedigree, p.id));
       const twin = (p.twins ?? []).some(t => t.members.some(m => !kids.has(m)));
       return (missing.length > 0 || twin) && {
         severity: "error",
@@ -728,14 +726,11 @@ function asList(d: Drafts): ProblemDraft[] {
 /** Every problem the rules find, people in pedigree order then couples. Not memoised: see `problemsOf`. */
 export function findProblems(pedigree: Pedigree, rules: Rule[] = RULES, today: Date = new Date()): Problem[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
-  const parentsOf = new Map<string, Partnership>();
-  for (const p of pedigree.partnerships) for (const c of pedigree.parentOf[p.id] ?? []) if (!parentsOf.has(c)) parentsOf.set(c, p);
   const ctx: RuleContext = {
     pedigree,
     conditions: conditionTags(pedigree),
     today: partialDateOf(today),
     byId,
-    parentsOf,
     connected: connectedIds(pedigree),
     outOfOrder: siblingsOutOfOrder(pedigree, byId),
   };

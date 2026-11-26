@@ -1,6 +1,7 @@
 import { isAffected, type Pedigree } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { kinshipOf } from "../../pedigree/relatedness";
+import { childrenOf, parentCoupleOf } from "../../pedigree/graph";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
@@ -32,25 +33,20 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
   const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
   const pedId = exportIds(pedigree, rDialect);
 
-  // Build child→(father,mother) lookup from partnerships + parentOf.
   // Partnership members are unordered, so put the male partner in PAT: a
   // female in PAT makes every other PED reader warn or reject the file.
   // When neither partner is male the original order is kept.
-  const parentLookup = new Map<string, { father: string; mother: string }>();
-  for (const partnership of pedigree.partnerships) {
-    const { individual1, individual2 } = partnership;
+  const parentsOf = (id: string) => {
+    const couple = parentCoupleOf(pedigree, id);
+    if (!couple) return undefined;
+    const { individual1, individual2 } = couple;
     const swap = sexOf.get(individual1) !== "male" && sexOf.get(individual2) === "male";
-    const father = swap ? individual2 : individual1;
-    const mother = swap ? individual1 : individual2;
-    const children = pedigree.parentOf[partnership.id] ?? [];
-    for (const childId of children) {
-      parentLookup.set(childId, { father, mother });
-    }
-  }
+    return swap ? { father: individual2, mother: individual1 } : { father: individual1, mother: individual2 };
+  };
 
   const lines: string[] = [];
   for (const ind of pedigree.individuals) {
-    const parents = parentLookup.get(ind.id);
+    const parents = parentsOf(ind.id);
     const pat = parents ? pedId.get(parents.father)! : "0";
     const mat = parents ? pedId.get(parents.mother)! : "0";
     const sex = ind.sex === "male" ? "1" : ind.sex === "female" ? "2" : "0";
@@ -132,7 +128,7 @@ export function pedLostAssisted(pedigree: Pedigree): Pedigree["individuals"] {
 export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
   const out: { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] = [];
   for (const p of pedigree.partnerships) {
-    const children = new Set(pedigree.parentOf[p.id] ?? []);
+    const children = new Set(childrenOf(pedigree, p.id));
     for (const t of p.twins ?? []) {
       const members = t.members.filter(m => children.has(m));
       if (members.length >= 2) out.push({ partnership: p, members, zygosity: t.zygosity });
@@ -148,7 +144,7 @@ export function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
 
 /** Partnerships whose childless mark PED cannot carry. */
 export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
-  return pedigree.partnerships.filter(p => !!p.childless && (pedigree.parentOf[p.id] ?? []).length === 0);
+  return pedigree.partnerships.filter(p => !!p.childless && childrenOf(pedigree, p.id).length === 0);
 }
 
 /**

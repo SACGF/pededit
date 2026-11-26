@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { Lock, MoreHorizontal, Unlock } from "lucide-react";
 import type { Individual } from "@pedigree-editor/layout-engine";
 import { usePedigreeFields } from "../store/usePedigreeStore";
-import { parentPartnershipOf } from "../pedigree/twins";
 import { MoreMenu } from "../pedigree/nodes/MoreMenu";
+import { parentCoupleOf } from "../pedigree/graph";
 
 const ACTION_CLASS = "flex min-w-0 flex-1 h-12 flex-col items-center justify-center gap-1 border-r last:border-r-0 text-[10px] leading-none text-gray-700 active:bg-gray-100 disabled:text-gray-300";
 
@@ -18,7 +18,7 @@ const ACTION_CLASS = "flex min-w-0 flex-1 h-12 flex-col items-center justify-cen
 export function PersonActions({ individual }: { individual: Individual }) {
   const { pedigree, addParent, addChild, addSibling, lockIndividual, unlockIndividual, uShapeView } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling", "lockIndividual", "unlockIndividual", "uShapeView");
   const id = individual.id;
-  const hasParents = !!parentPartnershipOf(pedigree, id);
+  const hasParents = !!parentCoupleOf(pedigree, id);
   // A pregnancy or pregnancy loss cannot have children.
   const noChildren = !!individual.lifeStatus;
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;

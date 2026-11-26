@@ -1,5 +1,6 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { drawnPedigree, drawnSubset, isBranchPlaceholderId } from "./collapse";
+import { childrenOf, couplesOf, parentCoupleOf, partnerIn } from "./graph";
 
 /**
  * "Only the selected people" in the export dialog (#215): a figure of part of
@@ -56,7 +57,7 @@ function pieces(pedigree: Pedigree, keep: Set<string>): Map<string, string> {
     if (!keep.has(p.individual1) || !keep.has(p.individual2)) continue;
     const r = find(p.individual1);
     root.set(find(p.individual2), r);
-    for (const c of pedigree.parentOf[p.id] ?? []) if (keep.has(c)) root.set(find(c), r);
+    for (const c of childrenOf(pedigree, p.id)) if (keep.has(c)) root.set(find(c), r);
   }
   return new Map([...keep].map(id => [id, find(id)]));
 }
@@ -68,13 +69,7 @@ function pieces(pedigree: Pedigree, keep: Set<string>): Map<string, string> {
  * they are kept.
  */
 function cheapestJoin(pedigree: Pedigree, keep: Set<string>, piece: Map<string, string>, start: string): string[] | null {
-  const partnershipsOf = new Map<string, Pedigree["partnerships"]>();
-  const parentsOf = new Map<string, Pedigree["partnerships"][number]>();
   const byId = new Map(pedigree.partnerships.map(p => [p.id, p]));
-  for (const p of pedigree.partnerships) {
-    for (const id of [p.individual1, p.individual2]) partnershipsOf.set(id, [...(partnershipsOf.get(id) ?? []), p]);
-    for (const c of pedigree.parentOf[p.id] ?? []) parentsOf.set(c, p);
-  }
   const home = piece.get(start);
   const best = new Map<string, Step>();
   const done = new Set<string>();
@@ -106,11 +101,8 @@ function cheapestJoin(pedigree: Pedigree, keep: Set<string>, piece: Map<string, 
         }
         return [...add].filter(a => !keep.has(a));
       }
-      for (const p of partnershipsOf.get(id) ?? []) {
-        const other = p.individual1 === id ? p.individual2 : p.individual1;
-        offer(couple(p.id), cost + owed(other), at);
-      }
-      const parents = parentsOf.get(id);
+      for (const p of couplesOf(pedigree, id, { donorPairs: true })) offer(couple(p.id), cost + owed(partnerIn(p, id)), at);
+      const parents = parentCoupleOf(pedigree, id);
       if (parents) offer(couple(parents.id), cost + owed(parents.individual1) + owed(parents.individual2), at);
     } else {
       const p = byId.get(id)!;
@@ -122,7 +114,7 @@ function cheapestJoin(pedigree: Pedigree, keep: Set<string>, piece: Map<string, 
         const across = cameFrom !== null && cameFrom !== person(partner) && (cameFrom === person(p.individual1) || cameFrom === person(p.individual2));
         offer(person(partner), cost + (across ? MARRIAGE_STEP : 0), at);
       }
-      for (const c of pedigree.parentOf[p.id] ?? []) offer(person(c), cost + owed(c), at);
+      for (const c of childrenOf(pedigree, p.id)) offer(person(c), cost + owed(c), at);
     }
   }
 }

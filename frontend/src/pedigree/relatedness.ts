@@ -1,6 +1,7 @@
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 import { wholePedigree } from "./collapse";
+import { couplesOf, partnerIn } from "./graph";
 
 /**
  * Relatedness shown in the edit panel: how to write a coefficient, the
@@ -143,10 +144,9 @@ export function relatednessOf(
   return {
     inbreeding: coefficients.inbreeding(individualId),
     inbreedingX: xCoefficients.inbreeding(individualId),
-    couples: pedigree.partnerships
-      .filter(p => p.individual1 === individualId || p.individual2 === individualId)
+    couples: couplesOf(pedigree, individualId, { donorPairs: true })
       .map(p => {
-        const partnerId = p.individual1 === individualId ? p.individual2 : p.individual1;
+        const partnerId = partnerIn(p, individualId);
         return {
           partnershipId: p.id,
           partnerId,

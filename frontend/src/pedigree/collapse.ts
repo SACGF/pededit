@@ -1,6 +1,7 @@
 import { isAffected, type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
 import { isCarrier } from "./conditions";
-import { ancestorsOf, descendantsOf, removeIndividuals, withMarriedInPartners } from "./removal";
+import { ancestorsOf, childrenOf, couplesOf, descendantsOf, partnerIn } from "./graph";
+import { removeIndividuals, withMarriedInPartners } from "./removal";
 import { filterHidden, withoutFilters } from "./viewFilters";
 
 /**
@@ -135,14 +136,6 @@ export function wholePedigree(pedigree: Pedigree): Pedigree {
   return wholeOf.get(pedigree) ?? pedigree;
 }
 
-function partnersOf(pedigree: Pedigree, id: string): string[] {
-  const out: string[] = [];
-  for (const p of pedigree.partnerships) {
-    if (p.individual1 === id) out.push(p.individual2);
-    else if (p.individual2 === id) out.push(p.individual1);
-  }
-  return out;
-}
 
 /** Who is drawn and who is hidden (see the module comment). Cached per pedigree object. */
 export function collapseInfo(pedigree: Pedigree): CollapseInfo {
@@ -228,7 +221,7 @@ function hiddenUnder(pedigree: Pedigree, people: Iterable<string>, hidden: Set<s
   const out = new Set<string>();
   for (const id of people) {
     if (hidden.has(id)) out.add(id);
-    for (const other of partnersOf(pedigree, id)) if (hidden.has(other)) out.add(other);
+    for (const p of couplesOf(pedigree, id, { donorPairs: true })) if (hidden.has(partnerIn(p, id))) out.add(partnerIn(p, id));
   }
   return out;
 }
@@ -253,8 +246,8 @@ function addPlaceholders(
   const orderKey = (i: Individual) => mode === "birthDate" && i.dob ? new Date(i.dob).getTime() : i.sibOrder;
   for (const p of couples) {
     if (!drawn.partnerships.some(q => q.id === p.id)) continue;
-    const children = full.parentOf[p.id] ?? [];
-    const kept = new Set(drawn.parentOf[p.id] ?? []);
+    const children = childrenOf(full, p.id);
+    const kept = new Set(childrenOf(drawn, p.id));
     const grouped = children.filter(c => !kept.has(c)).map(c => byId.get(c)!).filter(Boolean);
     if (grouped.length === 0) continue;
     const roots = [p.individual1, p.individual2].filter(r => drawnRoots.has(r));

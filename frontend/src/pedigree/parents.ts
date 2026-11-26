@@ -1,5 +1,5 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { descendantsOf } from "./removal";
+import { descendantsOf } from "./graph";
 
 /**
  * Linking a child to existing parents: the rules, framework-free so
@@ -45,9 +45,4 @@ export function setParentsProblem(pedigree: Pedigree, childId: string, parentIds
     }
   }
   return null;
-}
-
-/** The partnership whose child this is, or undefined. */
-export function currentParentsOf(pedigree: Pedigree, childId: string) {
-  return pedigree.partnerships.find(p => (pedigree.parentOf[p.id] ?? []).includes(childId));
 }

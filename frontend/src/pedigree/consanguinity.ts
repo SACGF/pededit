@@ -1,6 +1,7 @@
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 import { kinshipOf } from "./relatedness";
 import { wholePedigree } from "./collapse";
+import { pairKey } from "./graph";
 
 /**
  * Whether the couple line between two partners is drawn double.
@@ -21,15 +22,14 @@ import { wholePedigree } from "./collapse";
  * or the flag. Shared by the canvas, the legend and the SVG exporters.
  */
 export function consanguinityTest(pedigree: Pedigree): (id1: string, id2: string) => boolean {
-  const key = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   const flagged = new Set(
-    pedigree.partnerships.filter(p => p.consanguineous).map(p => key(p.individual1, p.individual2)),
+    pedigree.partnerships.filter(p => p.consanguineous).map(p => pairKey(p.individual1, p.individual2)),
   );
   // Most callers ask about a handful of couples, and a pedigree with no
   // couples never needs the matrix.
   let coefficients: KinshipCoefficients | undefined;
   return (id1, id2) =>
-    flagged.has(key(id1, id2)) || (coefficients ??= kinshipOf(wholePedigree(pedigree))).kinship(id1, id2) > 0;
+    flagged.has(pairKey(id1, id2)) || (coefficients ??= kinshipOf(wholePedigree(pedigree))).kinship(id1, id2) > 0;
 }
 
 /**

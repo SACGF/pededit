@@ -1,5 +1,5 @@
 import { isConditionTag, type Individual, type Pedigree, type Tag, type ViewFilters } from "@pedigree-editor/layout-engine";
-import { ancestorsOf, descendantsOf } from "./removal";
+import { ancestorsOf, childrenOf, couplesOf, descendantsOf, hasParents, parentCoupleOf, partnerIn } from "./graph";
 
 /**
  * View filters: global switches, saved with the pedigree in
@@ -65,21 +65,17 @@ export function affectedOnlyKept(pedigree: Pedigree): Set<string> {
   const seeds = affectedOnlySeeds(pedigree);
   if (seeds.size === 0) return seeds;
   const kept = new Set([...seeds, ...ancestorsOf(pedigree, [...seeds])]);
-  const hasParents = new Set(Object.values(pedigree.parentOf).flat());
   const parentsOfKept = new Set<string>();
   for (const p of pedigree.partnerships) {
-    if ((pedigree.parentOf[p.id] ?? []).some(c => kept.has(c))) {
+    if (childrenOf(pedigree, p.id).some(c => kept.has(c))) {
       parentsOfKept.add(p.individual1);
       parentsOfKept.add(p.individual2);
     }
   }
   const partners: string[] = [];
   for (const id of seeds) {
-    if (hasParents.has(id) || parentsOfKept.has(id)) continue;
-    for (const p of pedigree.partnerships) {
-      if (p.individual1 === id) partners.push(p.individual2);
-      else if (p.individual2 === id) partners.push(p.individual1);
-    }
+    if (hasParents(pedigree, id) || parentsOfKept.has(id)) continue;
+    for (const p of couplesOf(pedigree, id, { donorPairs: true })) partners.push(partnerIn(p, id));
   }
   for (const id of partners) kept.add(id);
   for (const id of ancestorsOf(pedigree, partners)) kept.add(id);
@@ -114,7 +110,7 @@ export function bloodRelativesKept(pedigree: Pedigree, roots: string[]): Set<str
 
 /** The genetic parent of `id` of the given sex, if their parents are in the pedigree. */
 function parentOfSex(pedigree: Pedigree, id: string, sex: "male" | "female"): string | undefined {
-  const couple = pedigree.partnerships.find(p => (pedigree.parentOf[p.id] ?? []).includes(id));
+  const couple = parentCoupleOf(pedigree, id);
   if (!couple) return undefined;
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const [a, b] = [byId.get(couple.individual1), byId.get(couple.individual2)];

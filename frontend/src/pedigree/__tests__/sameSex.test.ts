@@ -3,7 +3,7 @@ import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Individual, Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { assistedLinks } from "../assisted";
-import { isSameSexCouple, donorPairFor, coupleChildren } from "../sameSex";
+import { isSameSexCouple, donorPairFor } from "../sameSex";
 import { activeChildless } from "../childless";
 import { setParentsProblem } from "../parents";
 import { batchSexProblem } from "../batch";
@@ -13,6 +13,7 @@ import { lintExport } from "../../io/svg/exportLint";
 import { exportPed } from "../../io/ped/exporter";
 import { importJson, exportJson } from "../../io/json";
 import { EXAMPLES } from "../../data/examples";
+import { raisedChildrenOf } from "../graph";
 
 /**
  * Same-sex couples (#105). Partners may share a sex; a child's genetic
@@ -135,7 +136,7 @@ describe("same-sex couples: children (#105)", () => {
     const [sib] = newKids(before);
     expect(parentsOf(ped(), sib.id)).toEqual(parentsOf(ped(), child));
     expect(sib.socialParents).toEqual(["bea"]);
-    expect(coupleChildren(ped(), ab).sort()).toEqual([child, sib.id].sort());
+    expect(raisedChildrenOf(ped(), ab).sort()).toEqual([child, sib.id].sort());
     // Childless mark and Remove partnership go by those children.
     usePedigreeStore.setState(s => ({ pedigree: { ...s.pedigree, partnerships: s.pedigree.partnerships.map(p => p.id === ab ? { ...p, childless: "byChoice" as const } : p) } }));
     expect(activeChildless(ped().partnerships.find(p => p.id === ab)!, ped())).toBeUndefined();

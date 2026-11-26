@@ -3,7 +3,7 @@ import type { PersonGlyph } from "./personGlyph";
 import { NODE_SIZE } from "./constants";
 import type { Segment } from "./sibshipPath";
 import { symbolTopInset } from "./lifeStatus";
-import { descendantsOf } from "./removal";
+import { childrenOf, couplesOf, descendantsOf, parentCoupleOf, partnerIn } from "./graph";
 
 /**
  * Assisted reproduction (NSGC 2008 Fig. 3). Framework-free, shared by the
@@ -80,7 +80,7 @@ export interface AssistedLink {
 
 /** The genetic parents of a child (the two members of its partnership), or none. */
 export function geneticParents(pedigree: Pedigree, childId: string): string[] {
-  const p = pedigree.partnerships.find(x => (pedigree.parentOf[x.id] ?? []).includes(childId));
+  const p = parentCoupleOf(pedigree, childId);
   return p ? [p.individual1, p.individual2] : [];
 }
 
@@ -261,7 +261,7 @@ function replacedParent(pedigree: Pedigree, p: Partnership, gamete: Gamete): str
  * the donor.
  */
 export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gamete, donorId?: string): string | null {
-  const p = pedigree.partnerships.find(x => (pedigree.parentOf[x.id] ?? []).includes(childId));
+  const p = parentCoupleOf(pedigree, childId);
   if (!p) return "Add the parents first: the donor replaces one of them as the genetic parent.";
   const x = replacedParent(pedigree, p, gamete);
   if (!x) return `Neither parent could have given the ${gamete}.`;
@@ -292,9 +292,9 @@ export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gam
 export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, donorId: string, partnershipId: string): string | null {
   const existing = draft.individuals.find(i => i.id === donorId);
   if (addDonorProblem(draft, childId, gamete, existing ? donorId : undefined)) return null;
-  const p = draft.partnerships.find(x => (draft.parentOf[x.id] ?? []).includes(childId))!;
+  const p = parentCoupleOf(draft, childId)!;
   const replaced = replacedParent(draft, p, gamete)!;
-  const other = p.individual1 === replaced ? p.individual2 : p.individual1;
+  const other = partnerIn(p, replaced);
   const child = draft.individuals.find(i => i.id === childId)!;
 
   if (existing) {
@@ -311,8 +311,8 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
   const shared = existing && draft.partnerships.find(x => x.donorConception
     && ((x.individual1 === donorId && x.individual2 === other) || (x.individual1 === other && x.individual2 === donorId)));
   if (shared) {
-    child.sibOrder = Math.max(-1, ...(draft.parentOf[shared.id] ?? []).map(id => draft.individuals.find(i => i.id === id)?.sibOrder ?? 0)) + 1;
-    draft.parentOf[shared.id] = [...(draft.parentOf[shared.id] ?? []), childId];
+    child.sibOrder = Math.max(-1, ...childrenOf(draft, shared.id).map(id => draft.individuals.find(i => i.id === id)?.sibOrder ?? 0)) + 1;
+    draft.parentOf[shared.id] = [...childrenOf(draft, shared.id), childId];
   } else {
     const [i1, i2] = gamete === "sperm" ? [donorId, other] : [other, donorId];
     draft.partnerships.push({ id: partnershipId, individual1: i1, individual2: i2, donorConception: true });
@@ -321,7 +321,7 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
   }
 
   // Leave the old parents, and their twin sets.
-  draft.parentOf[p.id] = (draft.parentOf[p.id] ?? []).filter(c => c !== childId);
+  draft.parentOf[p.id] = childrenOf(draft, p.id).filter(c => c !== childId);
   if (p.twins) {
     p.twins = p.twins.map(t => ({ ...t, members: t.members.filter(m => m !== childId) })).filter(t => t.members.length >= 2);
     if (p.twins.length === 0) delete p.twins;
@@ -402,9 +402,7 @@ export function applyAddSurrogate(draft: Pedigree, childId: string, surrogateId:
  */
 export function assistedCandidates(pedigree: Pedigree, childId: string): Individual[] {
   const genetic = new Set(geneticParents(pedigree, childId));
-  const own = new Set(pedigree.partnerships
-    .filter(p => p.individual1 === childId || p.individual2 === childId)
-    .flatMap(p => pedigree.parentOf[p.id] ?? []));
+  const own = new Set(couplesOf(pedigree, childId, { donorPairs: true }).flatMap(p => childrenOf(pedigree, p.id)));
   return pedigree.individuals.filter(i => i.id !== childId && !genetic.has(i.id) && !own.has(i.id) && !i.lifeStatus);
 }
 

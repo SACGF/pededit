@@ -1,6 +1,6 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { descendantsOf } from "./removal";
 import { hasDescendants } from "./collapse";
+import { descendantsOf } from "./graph";
 
 /**
  * Batch lock and unlock for a multiple selection, shared by the more
