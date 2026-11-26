@@ -18,13 +18,15 @@ So they need nothing in `/etc` and no right to create a PostgreSQL database.
 
 Use `uv` for environment work (`uv venv`, `uv pip install -r requirements.txt`),
 never pip directly. Config is read from `/etc/pededit/pededit.json` by
-`site_config.py` (database_url, cors_allowed_origins, allowed_hosts, debug,
-google_client_id, github_client_id, github_client_secret, and the production
-keys https, hsts_seconds, hsts_include_subdomains, throttle_rates,
-num_proxies). The file must exist
-or Django will not start. A SQLite `database_url` is fine for local dev. The
-secret key is generated into `backend/secret_key.txt` on first run if not
-supplied.
+`site_config.py` (database_url, secret_key, cors_allowed_origins,
+allowed_hosts, debug, google_client_id, github_client_id,
+github_client_secret, and the production keys https, hsts_seconds,
+hsts_include_subdomains, throttle_rates, num_proxies, health_disk_paths,
+health_disk_min_free_mb, rollbar_access_token, rollbar_environment;
+`deploy.sh` reads rollbar_client_access_token for the frontend build). The
+file must exist or Django will not start. A SQLite `database_url` is fine for
+local dev. With no `DJANGO_SECRET_KEY` and no secret_key the secret key is
+generated into `backend/secret_key.txt` on first run.
 
 ## Production settings and rate limits (#47)
 
@@ -32,8 +34,8 @@ supplied.
   redirect, secure cookies and HSTS (`peded/security.py`, a function of the
   config values so tests can call it both ways). Off, it sets nothing and
   development is untouched. `deploy.sh` runs `check --deploy --fail-level
-  WARNING`; a warning accepted on purpose is silenced by name in that file
-  with the reason (`security.W021`: no HSTS preload).
+  WARNING`; a warning accepted on purpose is silenced by name, with the
+  reason, in `peded/security.py` (`security.W021`: no HSTS preload).
 - `api/health/` is in `SECURE_REDIRECT_EXEMPT`. `deploy.sh` asks Gunicorn for
   it over plain HTTP on loopback, and a redirect there fails every deploy.
 - Rate limits are DRF throttles in `api/throttling.py`, set per view, never
@@ -61,9 +63,8 @@ supplied.
   that mirrors `layout-engine/src/types.ts` exactly. `PedigreeDataSerializer`
   only validates the known fields; `PedigreeDataField` then stores the
   submitted JSON untouched, so unknown fields survive and absent optional
-  fields stay absent (the JSON format promises this). Never switch back to
-  storing `validated_data`: DRF drops undeclared keys and fills defaults,
-  which lost `lifeStatus` on every save. Still add new `types.ts` fields to
+  fields stay absent (the JSON format promises this). Do not store
+  `validated_data`: DRF drops undeclared keys and fills defaults. Still add new `types.ts` fields to
   the serializer so they get validated.
 - `TagPreset` — a signed-in user's saved condition or tag ("My library"
   in the Conditions and tags dialog). Pedigrees always
@@ -102,7 +103,7 @@ pedigree refused.
   not a way to share it. An anonymous pedigree stays anonymous when a
   signed-in user opens or edits it: nothing ever sets `owner` after create.
 - These rules are pinned by `PedigreeAccessTests` and stated to users on the
-  `/your-data` page (#178, `frontend/src/pages/YourDataPage.tsx`).
+  `/your-data` page (#203, `frontend/src/pages/YourDataPage.tsx`).
   Change that text with any change to them.
 - There is no `api/admin.py`, so Django admin shows users only, not
   pedigrees. `Pedigree.data` is plain JSON in the database, readable by
@@ -123,8 +124,7 @@ pedigree refused.
 - `api/social_auth.py` — Google (ID token verified server-side) and GitHub
   (code exchange) both find-or-create a Django user by email and return a
   token pair.
-- There is no username and password sign-in and no registration (#51,
-  removed: direct OAuth works, so the planned move to Clerk was dropped).
+- There is no username and password sign-in and no registration (#51).
   Tokens are issued only by the two social views and by the `agent_token`
   management command for the page checks; `auth/token/refresh/` renews
   them. Django admin still uses a password (`createsuperuser`), which gives
@@ -133,7 +133,7 @@ pedigree refused.
 
 ## URLs
 
-`peded/urls.py` mounts admin, simplejwt's token refresh view, and `api/urls.py`
+`peded/urls.py` mounts admin, our token refresh view (`RefreshView`), and `api/urls.py`
 (health, pedigrees, tag-presets, auth/me, auth/google, auth/github).
 
 `GET /api/health/` (`api/health.py`, #50) has `authentication_classes = []`

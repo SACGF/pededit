@@ -1,220 +1,66 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for agents working in this repository. This file is loaded into
+every session, so it holds only what every task needs; everything else is
+in the files under "Read before".
 
-## Project Status
+## What this is
 
-Pending work is tracked in GitHub issues (https://github.com/SACGF/pededit/issues), not in plan files. Check there before starting anything.
+PedEdit is an open-source web editor for pedigrees (genetic family trees),
+for genetic counsellors, clinical genetics teams and researchers. It is
+live at https://pededit.com and the code is public at
+https://github.com/SACGF/pededit. Its layout is a TypeScript port of the
+kinship2 R package (`layout-engine/`), with a Django 5 + DRF + PostgreSQL
+backend (`backend/`) and a React 18 + TypeScript + Vite + React Flow +
+Zustand editor (`frontend/`). The `Pedigree` interface in
+`layout-engine/src/types.ts` is the canonical data model: the backend's
+JSON field and the frontend store mirror it.
 
-**Pull before starting new work.** Run `git pull --rebase` on `main` before each new task, not only at the start of a session: other agents and the maintainer push to `main` while you work, and a stale checkout means reviewing or building on old code and a rejected push at the end. If the tree has uncommitted changes, stop and ask rather than stash or discard them. Fetch again before pushing.
+## Product facts
 
-### Issue and release workflow
+- **NSGC nomenclature is the spec.** Every symbol, line, fill and piece of text on the chart follows the NSGC pedigree nomenclature (Bennett et al. 2008 and the 2022 focused revision), summarised in `claude/nsgc_nomenclature.md`. When a drawing choice is open, do what NSGC does; when NSGC is silent, follow common practice in published pedigrees. Deliberate differences are listed in that file, and new ones need the maintainer's agreement.
+- **Default to the latest edition, keep the older style as an option.** Where the 2022 revision changed the drawing, 2022 is the default for new pedigrees and the 2008 form stays available through Settings > Notation (`frontend/src/pedigree/notation.ts`). A pedigree saved with no notation setting is drawn as 2008, so existing work keeps its look.
+- **No account is required.** A pedigree made while signed out is stored with no owner, and the UUID in its URL (`/p/<uuid>`) is the only key. Google or GitHub sign-in only adds the "Your pedigrees" list and "My library". Never describe PedEdit as requiring login.
+- **`sex` is biological sex** and drives all genetics (layout, kinship, X-linkage, PED). Gender identity is optional and only changes the drawing (`frontend/src/pedigree/gender.ts`). Never make a calculation read gender identity.
+- **The look is black and white and minimal**, like a clinical or published pedigree: a white canvas, black symbols and lines, colour only where it means something (conditions), and chrome that gets out of the way.
 
-- **Why issues exist.** They are for humans: so a bug reported twice can be found as already captured, and so changes that need manual testing get tested. Decide whether work needs one on that basis:
-  - **Major work** (a feature, a behaviour change, anything needing manual testing) gets an issue. Raise one if none exists.
-  - **A super quick fix that needs no manual testing** (a small bug found along the way, fully covered by unit tests or the browser page checks) can go in without an issue. Do not raise an issue just to have a number to cite.
-- **No other GitHub writes without being asked.** Beyond raising issues for major work, labelling `Human work required` and closing tested issues as described below, do not edit, comment on, label or reopen issues, PRs or milestones, and do not push, unless the user asked for that in this conversation.
-- When a commit works on an issue, name it as `(#N)` in the subject. The release process finds fixes by searching commit messages, so a fix without a number is invisible.
-- **Issue comments do not report git state.** Cite the commit by its sha ("fixed in b651929") and stop there: do not write "on local `main`", "committed", "not pushed yet" or "pushed". The comment outlives that state, so it goes stale as soon as the push happens, and GitHub links the sha once it is on `main` anyway.
-- **Never use a closing keyword** (`closes`, `fixes`, `resolves` and their variants) in a commit message or PR description. GitHub would close the issue on merge with no testing decision made. Write `(#N)` and nothing more.
-- **Label an issue that needs a human `Human work required`.** As soon as its code is committed, if any part of it has to be done by the maintainer (tested by hand, judged by eye, or set up on the server or in an outside account), add the label yourself without waiting to be asked, say in a comment what is needed, and leave the issue open.
-- **Issues stay open by default.** Finishing the code is not the end of an issue. An agent may close one only as a deliberate decision, once it is sure the change works and the whole issue is covered: by unit tests, by agent testing with the browser page checks (`frontend/scripts/browser/`), or both. Coverage means every behaviour the issue asks for, including a save and reload where the data model changed. Close with a comment saying what was run. Interaction (drag, dialogs, menus, export files, signed-in pages) counts as covered only when an end-to-end flow (`frontend/scripts/browser/flows.mjs`, #167) drives it and checks the result, and the flow was seen to fail with the feature broken: extend a flow or add one for the new behaviour, as its README says. What no flow covers, and anything that has to be judged by eye (does it look right, is the wording clear), stays open with the `Human work required` label for the maintainer to test by hand. When in doubt, label rather than close.
-- **Unfinished work must not be left buried in a comment.** If you decide not to do part of an issue (a "Remaining", "Not done", "Deferred", "Still open" or "Future work" list, a P2/P3 testing finding you did not fix, a gap you noticed), either do it now if it is small, or raise a new issue for it and leave only a one-line pointer in the original ("Remaining work raised in #N"). Point at an existing issue instead when one already tracks it. An issue may be closed or labelled `Human work required` with leftover agent work only once every leftover has its own issue; otherwise it is closed and the work is lost. What only the maintainer can do stays in the issue, named in the comment that adds the label.
-- An issue is **fixed** when code that solves it is on `main`. Its GitHub state says nothing about that, since fixed issues normally stay open until tested. When asked which issues are fixed, read the commits, not the open/closed flag.
-- Every fixed issue goes on the current release milestone (`gh api repos/SACGF/pededit/milestones`) as soon as its code lands, tested or not. Reopening an issue keeps its milestone. When sweeping for fixed issues, searching commits for `#N` is not enough: also read issue comments for "fixed in <sha>". A fix can land under another issue's number, most often when the issue is a duplicate report raised after the fixing commit (#65 was fixed by e938281, which cites only #5).
-- **Each deployed release has a git tag** named after its milestone (`2026-11-16-family-business`). How to tag one and how to roll back to it: `deploy/AGENTS.md`, "Releases, tags and rollback".
-- **"Extract", "pull out", "split off" and "move" mean move, not copy.** When asked to take future work or any other content out of an issue into its own issue, raise the new issue, then edit the original (body or comment) so only a one-line pointer remains, such as "Future work raised in #72". The original must not still contain the list. Check first whether an existing issue already tracks part of it and point at that instead of duplicating.
+## Every task
 
-What exists:
-- `layout-engine/`: TypeScript port of the kinship2 layout algorithm (`kindepth`, `alignped1-4`, `autohint` with the duplicate fixup and twin handling). Packaged for npm with a README, a `dist/` build and a release checklist (#22, `layout-engine/AGENTS.md` "Publishing"); not published yet, and the frontend reads it from source through an alias.
-- Django 5 + DRF backend: `Pedigree` model with JSON data, CRUD API, social login via Google and GitHub. Legacy password endpoints are still present (#51). "Delete account" on the landing page (#183, `DELETE /api/auth/me/`) deletes the account, its pedigrees and My library; anonymous pedigrees stay.
-- React editor: NSGC symbols, couple/sibship/consanguinity edges, pan/zoom canvas, toolbar, hover pill, more menu (also on right-click of a node or couple line, #95), proband arrow with "P" and consultand arrow (#99, `pedigree/proband.ts`), "?" above the symbol for family history not known (#100), evaluation results under the symbol ("BRCA1 +", NSGC 2022; the 2008 "E+ (BRCA1)" with the Notation setting, #114), documented "*" and the presymptomatic carrier line (#101, `pedigree/evaluation.ts`, `pedigree/notation.ts`), Person tab (name/DOB/notes, and sex, affected, proband and consultand as the menu sets them, #120), settings panel (sibling order, snap to grid, minimise width #82), undo/redo, keyboard shortcuts, auto-save, manual repositioning with pin/unpin and reset layout.
-- Swap sides (#106): "Swap sides" on a couple line's right-click menu and in the person menu sets `Partnership.leftPartner`, fed to kinship2 as a spouse hint (`layout-engine/src/partnerSides.ts`), so partner order is a free choice (NSGC 2022) without pinning; partners who both have parents swap families. Swaps kinship2 can only draw with a duplicate are refused with a notice.
-- Draw this couple beside (#205): in a family with a loop someone is drawn twice, and "Draw this couple beside" (a partner, or "Automatic") on a couple line's right-click menu, on either partner's menu and on the menu of both partners selected together chooses who, by setting `Partnership.drawnBeside`, kinship2's spouse hint anchor. Offered only where both partners have a place of their own on the chart. Unlike a swap it may draw someone twice; a notice says how many are. The "Quadruple half first cousins" example is set with it. `frontend/src/pedigree/partners.ts`, `layout-engine/AGENTS.md`.
-- Multi-select (#21): Shift/Ctrl/Cmd+click, Shift+drag rubber band and "Select with descendants" in the more menu; dragging any selected node moves and pins the group as one undo step; batch lock/unlock in the more menu and on the Person tab. With several selected, the more menu acts on all of them as one undo step each ("Mark 3 affected", carrier status, tags, sex, delete; A and D toggle affected and deceased, #35, `frontend/src/pedigree/batch.ts`). The store keeps `selectedIds` plus the primary `selectedId`.
-- Carriers per condition (#115, `frontend/src/pedigree/conditions.ts`): a condition is affected (`Individual.tags`) or carrier (`Individual.carrierTags`) per person, the carrier drawn as the condition's section hatched and keyed "<condition> carrier"; in NSGC 2022 the sections follow the number of conditions in use on the drawn chart (one: the whole symbol, solid black in black and white; two: halves; three or four: quarters), 2008 keeps a quarter per defined condition; a carrier with no condition is half the symbol dotted in NSGC 2022 and the dot in 2008. The Person tab records conditions only in its "Conditions and tags" section (#136), and with two or more conditions the batch menu asks per condition and affected or carrier with no condition recorded gets a warning with one-click fixes. `Individual.affected` is only affected with something not recorded: recording a condition does not set it, and "affected" overall is `isAffected` (#118); marking someone with a condition affected draws black under their sections (NSGC 2022) with that warning. A section can be a trait instead of a condition (`Tag.kind`, #118, opt-in, listed as a deliberate difference in `claude/nsgc_nomenclature.md`): a coloured section that never means affected. A pedigree with no `canvasSettings.notation` is drawn as NSGC 2008; new pedigrees, PED imports and examples are written as 2022.
-- Conditions, tags and colouring (#3): `Pedigree.tags` definitions with section (`"quadrant"`), dot and text display styles, `Individual.tags` references, `frontend/src/pedigree/tags.ts` geometry shared by canvas and exporters, the Conditions and tags dialog (`TagsDialog`), auto legend in the app and key in SVG/PNG/PDF export, "My library" for signed-in users (`/api/tag-presets/`). Pattern fills (#67): each condition or trait can be solid, hatched, lined, cross-hatched, dotted or lightly shaded (`Tag.fill`), and the "Conditions and tags drawn in: Black and white patterns" setting (`canvasSettings.tagFills`) draws them all in black with patterns, canvas and exports (`frontend/src/pedigree/tagFills.ts`). See `claude/phase_7_2_plan.md`.
-- Relatedness (#32): kinship and inbreeding coefficients from the drawn structure (`layout-engine/src/kinship.ts`, checked against kinship2's `kinship()`), shown read-only on the Person tab for an inbred person and for a couple who are related, autosomal with the X-linked value beside it (#87), and for any two selected people with a named relationship where the tree gives one certain name (#90, `frontend/src/pedigree/relationship.ts`), and for one selected person their relationship to the proband and consultand (#134, `frontend/src/pedigree/referenceRelatedness.ts`). With the "Show kinship and inbreeding coefficients" setting (#86, `canvasSettings.showCoefficients`, off by default) the canvas and figure exports write "F = 1/16" under anyone whose parents are related and "φ = 1/16" above a related couple's double line; the CSV always has an `inbreeding_coefficient` column. The double couple line is drawn from kinship above 0, with `Partnership.consanguineous` as a manual override set on the Person tab or the more menu (#85, #92). Text above the double line (#97, `Partnership.consanguinityLabel`, or the named relationship with `canvasSettings.relationshipLabels`), kept clear of nearby text and lines (#109, left out in compact rows where there is no room) and written along the line in the U-shape export. Ended relationships draw two strokes across the couple line (#98, `Partnership.ended`).
-- Chart title and approximate age (#20): `Pedigree.chartTitle` (falls back to the pedigree's name) drawn above the canvas and in SVG/PNG/PDF exports, `Individual.age` free text shown under the symbol in place of the year of birth ("b. 1978"; the full DOB is never drawn, NSGC privacy). Long names wrap or truncate to the slot width (#68).
-- Age of onset (#93): `Individual.onset` (affected status) and `Individual.tagOnset` (per condition), free text, edited on the Person tab, drawn under the symbol ("BC 45y") on the canvas and in exports, and in the CSV `onset` column. `frontend/src/pedigree/onset.ts`.
-- Hide descendants (#94): `Individual.descendantsHidden`, set from the more menu, collapses everything below a person without deleting it; the canvas, legend and SVG/PNG/PDF/U-shape exports draw `drawnPedigree()` (`frontend/src/pedigree/collapse.ts`), and each collapsed couple's unaffected children are drawn as one NSGC group symbol with their number inside (diamond, or square/circle when they share a sex), with affected and carrier children drawn as themselves beside it (#1), on the canvas and in exports; the group symbol expands the branch on click. Several selected people can be collapsed at once from the "N selected" menu section.
-- View filters (#4): `Pedigree.filters`, toggled from the toolbar's Filter menu, with a chip over the canvas while one is on (`frontend/src/pedigree/viewFilters.ts`). "Affected only" draws affected people, carriers, people with a condition, the proband and the consultand with their ancestors, and each drawn couple's other children as the #1 group symbol; with two or more conditions it can be narrowed to one. "Blood relatives only" leaves out the families of people who married in, and "Mother's side only" / "Father's side only" draw one side of the proband's family. Several on at once draw only who all of them keep. It goes through the same `drawnPedigree()` as hidden descendants, so exports, legend and numbers follow; CSV, PED and JSON keep everyone.
-- U-shape view (#220): the toolbar's "U-shape" button (in the Filter menu on a phone) draws the U-shape export's figure live in place of the chart (`frontend/src/pedigree/UShapeView.tsx`, `uShapeView.ts`): pan, zoom, click to select, edit on the Person tab (which then shows the hover pill's buttons), and the U redraws. A banner counts who is drawn ("37 of 100 people drawn"). Drag, right-click menus, the rubber band, the toolbar's add buttons and Reset layout are refused with a notice saying why; picking turns the view off. A way of looking, in the store (`uShapeView`), never saved.
-- Export only the selected people (#215): with two or more people selected, the export dialog offers "Only the 23 selected people (+4 to connect them)", off each time it opens. The SVG/PNG/PDF and U-shape figure then draws the selection plus the fewest people that join it into one chart (`frontend/src/pedigree/selectionSubset.ts`), through `drawnSubset()` in `collapse.ts`, so the key, pedigree numbers and coefficients follow. Nothing is saved, and CSV, PED and JSON keep everyone.
-- Clinical details (#102): `Pedigree.clinicalDetails` (reason for referral, maternal and paternal ancestry, historian, recorded by, date), edited in a folded "Clinical details" section under the chart title on the side panel's Pedigree tab (#135, beside the Person tab), listed in the in-app legend and the export key when filled, dropped by de-identified export (`frontend/src/pedigree/clinicalDetails.ts`).
-- Same-sex couples (#105, NSGC 2022 Fig. 5): "Add existing partner" and the Sex menus allow partners of one sex; their children are one partner's and a donor's (#45 donor pair) with the other partner a social parent, added from that partner or from "Add child..." in the couple line's menu, which asks for the genetic parent (`frontend/src/pedigree/sameSex.ts`). A child's two genetic parents still cannot share a sex.
-- Editor warnings (#116): `frontend/src/pedigree/validation.ts` turns a pedigree into problems, one entry in `RULES` per check (the code is the list; do not repeat it here), shown as a field outline with the message on the Person tab, a "N problems" list in the toolbar (people named by pedigree number, hovering outlines them on the canvas, the one-click fixes with "Fix all like this" as one undo step, F8 / Shift+F8 for next / previous), and a small "!" marker on the canvas node only (never the minimap or exports). Warnings never block saving or editing. Partial dates are compared by `pedigree/dateRanges.ts`.
-- Assisted reproduction (#45, NSGC 2008 Fig. 3): "D" donor and "S" surrogate letters, a donor as the child's genetic parent in a `donorConception` partnership drawn without a couple line, `carriedBy` (solid line) and `socialParents` (dashed line) on the child. Kinship and PED follow the genetic parents; the drawing follows Fig. 3 (the pregnancy below the woman carrying it, an egg donor's child hanging from the couple carrying it, `placementParentOf`). See `frontend/src/pedigree/assisted.ts`.
-- Import/export: PED (6-column PLINK layout only, see #31), SVG/PNG/PDF with de-identification (per-field choices for evaluation detail, onset, consanguinity text and text tags, #111), PNG at 96/150/300/600 dpi with a pHYs chunk (#18), U-shape SVG export, CSV. Pedigree numbers (I-1, II-3, #8): a "Show pedigree numbers" setting draws them on their own line under each symbol, last in the NSGC label order, on the canvas and in figure exports, and the CSV always has a `pedigree_number` column; computed from the layout, never stored. `hpoTerms` exists on the data model with no UI (#46).
-- Example links (#150, #151): `/example/<slug>`, such as `/example/targaryen`, opens a built-in example in the editor (`CanvasPage`, slugs in `frontend/src/data/examples.ts`); the landing page's examples are links to them. Nothing is saved until the first edit, which saves the visitor's own copy and replaces the URL with its `/p/<id>`.
-- Guides (#202): `/guides/pedigree-symbols` (a symbols cheat sheet, 2022 with the 2008 forms), `/guides/how-to-draw-a-pedigree`, `/guides/consanguinity` (kinship table computed by the layout engine) and `/guides/practice-families` (histories to draw, whose answers are the "Practice" examples), every figure drawn by the SVG exporter. Text in `frontend/src/guides/`.
-- Findability (#25, #200): the build prerenders the landing page, the guides and `/your-data` (what is stored, where the server is, who can read it, #203) into static HTML (`frontend/src/prerender.tsx`, `prerenderPlugin` in `frontend/vite.config.ts`), and publishes `frontend/public/llms.txt` and the JSON format reference and schema from `docs/` at `/docs/` (`publishedDocsPlugin`).
-- Small screens (#169): below 1024px wide the editor gives the canvas the screen: the left sidebar opens from a menu button, the side panel is a sheet under the canvas opened by its tabs, the toolbar scrolls sideways, and a dismissible line says how to move around by touch and that editing is easier on a computer. Viewing (display, pan, pinch zoom, tap to select) is the bar on a phone; editing there is a nice to have. See `frontend/AGENTS.md`.
-- Agent page checks: `frontend/scripts/browser/` runs a page in headless chromium and reports JS errors with `frontend/src/...:line`, screenshots and measures, evaluates against the dev-only `window.__pededit` stores, lints what the canvas and the SVG export draw (`lint.mjs`), and with `--fixture-via-api` checks what survives a save and reload. `flows.mjs` runs the end-to-end flows (#167: build, select, drag, conditions, exports, imports, filters, problems, signed in), `phone.mjs` checks the landing page and editor as an emulated phone (#169: touch pan, pinch, tap, the small-screen layout; emulation, not a phone) and `compare.mjs` compares the canvas and exports of two commits pixel for pixel (#142), and `perf.mjs` times the editor on pedigrees of 96 to 513 people, with CPU throttling and a breakdown of where the time goes (#180, run by hand). Every report starts with the commit Vite serves. See its `README.md`.
-- Test data: `frontend/src/fixtures/features.ts` holds feature fixtures that between them draw every symbol, line and label (#140), with SVG snapshots of them and of every example (#69). `test-data/pedigrees/` is the whole test data set (#167), generated from `frontend/src/fixtures/dataset.ts` with a manifest of what the code does with each file, read by the frontend sweeps, the backend tests and the page checks.
-- CI: `.github/workflows/ci.yml` runs the unit tests, type check, backend tests, the page checks over every example and test data file, the end-to-end flows and the emulated phone check on each PR and push to main (#72, #167). It also runs the dead code check (`npm run deadcode`, below) and reports what it finds as a warning without failing.
-- Error reporting (#49): Rollbar for Django and the browser (the maintainer's other projects use it, with its Slack integration), off until the site config has the tokens (`rollbar_access_token`, `rollbar_client_access_token`). Every report is built from an allowlist so no pedigree content, pedigree id or user identity leaves the server or the page: `backend/peded/error_reporting.py`, `frontend/src/errorReporting/scrub.ts`. An error boundary (`components/ErrorBoundary.tsx`) replaces a blank page after a render error.
-- Deploy: Gunicorn + Nginx + systemd on a VPS at pededit.com, `deploy/` scripts and `INSTALL.md`. Production settings and rate limits (#47), database backups (#48) and error reporting (#49) are in the repo and each needs setting up on the server (`INSTALL.md` steps 8, 12 and 13, `deploy/AGENTS.md`).
+- **Pull first.** Run `git pull --rebase` on `main` before each new task, not only at the start of a session: other agents and the maintainer push while you work. If the tree has uncommitted changes, stop and ask rather than stash or discard them. Fetch again before pushing.
+- **Pending work is in GitHub issues** (https://github.com/SACGF/pededit/issues), not in plan files. Check there before starting anything.
+- **Issues and commits**, in brief; read `claude/issue_workflow.md` before any GitHub write:
+  - Name the issue as `(#N)` in the commit subject. Never use a closing keyword (`closes`, `fixes`, `resolves`).
+  - No GitHub writes beyond raising issues for major work, labelling `Human work required`, putting fixed issues on the current milestone and closing tested issues, unless the user asked.
+  - Issues stay open by default. Close one only when tests or the end-to-end flows cover everything it asks; otherwise label it `Human work required` and say what the maintainer must do.
+  - Work you leave undone gets its own issue, never a list buried in a comment.
+  - Issue comments cite the commit sha and say nothing about git state ("pushed", "on local main").
+- **Run the checks.** `npm run check` (engine tests, type check, frontend tests, dead code, guide paths, backend tests: about 20 s). `npm run check:pages` runs CI's page checks (servers up first: several minutes).
+- **Run frontend changes in the browser.** A change under `frontend/src/` is not done until it has run on a page whose data reaches the changed code:
 
-The research phase is complete: `claude/search_report.md` contains a comprehensive survey of 60+ existing pedigree tools (open-source, commercial, and academic), including a feature gap analysis organized into three tiers.
+  ```bash
+  node frontend/scripts/browser/servers.mjs up --frontend-only      # once per session (plain `up` adds Django)
+  node frontend/scripts/browser/console.mjs --fixture example:2     # JS errors, mapped to source lines
+  node frontend/scripts/browser/shot.mjs --fixture example:2        # then read the PNG
+  ```
 
-## Product Facts Every Agent Must Know
+  Anything that must survive a save is checked against `/p/<id>` with Django running. Worktrees, signed-in pages and the flows: `frontend/scripts/browser/README.md`.
+- **Python:** use `uv` (`uv venv`, `uv pip install`, `uv run`), never `pip` or `python -m venv`.
+- **Writing:** no em-dashes. A code comment or an `AGENTS.md` says what the code does now and why, where that is not obvious; history belongs in the commit message and the issue. Data saved by an older version is a present fact and can be described ("pedigrees saved before #85 may carry the flag"). Cite an issue number only where the issue explains a decision the reader would otherwise question. Use the glossary's words (`claude/glossary.md`).
+- **Keep the guides current.** A non-obvious fact about a directory goes in its `AGENTS.md` in the same change. A new feature gets a row in `claude/features.md`: a pointer, never a description.
 
-- **NSGC nomenclature is the spec.** Every symbol, line, fill and piece of text on the chart follows the NSGC pedigree nomenclature (Bennett et al. 2008 and the 2022 focused revision), summarised in our own words in `claude/nsgc_nomenclature.md`. When a drawing choice is open, do what NSGC does; when NSGC is silent, follow common practice in published pedigrees. Deliberate differences (biological sex drives genetics, gender is a display choice) are listed in that file, and new ones need the maintainer's agreement.
-- **Default to the latest edition, keep the older style as an option.** Where the 2022 revision changed the drawing, 2022 is the default for new pedigrees and the 2008 form stays available through Settings > Notation (`canvasSettings.notation`, `frontend/src/pedigree/notation.ts`). A pedigree saved with no notation setting predates this and is drawn as 2008, so existing work keeps its look.
-- **No account is required.** Anonymous mode is the default: creating a pedigree while signed out stores it with `owner=None` and the UUID in the URL (`/p/<uuid>`) is the only key. Users bookmark or copy the link. Google/GitHub sign-in only adds the "Your pedigrees" list and "My library" of conditions and tags. Never describe PedEdit as requiring login.
-- The site is live at https://pededit.com and the code is public at https://github.com/SACGF/pededit.
-- `sex` is biological sex and drives all genetics; symbols can show a recorded gender identity instead, with AMAB/AFAB/UAAB below (see below, #26).
+## Read before
 
-## Glossary
+| Before | Read |
+|---|---|
+| building or changing a feature | `claude/features.md`, then the guide its row names |
+| writing UI text, docs, an issue or a comment | `claude/glossary.md` |
+| any GitHub write: an issue, label, milestone or release | `claude/issue_workflow.md` |
+| adding or changing a symbol, line or text on the chart | `claude/nsgc_nomenclature.md` |
+| the renderer or the layout algorithm | `claude/layout_engine_guide.md` |
+| working in a directory | its `AGENTS.md`: `layout-engine/`, `frontend/`, `frontend/src/pedigree/`, `frontend/src/io/`, `backend/`, `deploy/`, `claude/` |
+| page checks, flows, the phone check, CI | `frontend/scripts/browser/README.md` |
+| a dead code finding | `frontend/AGENTS.md`, "Dead code" |
+| deploying, tagging a release, rolling back | `deploy/AGENTS.md` |
+| comparing with other pedigree tools | `claude/search_report.md` |
 
-One word per concept (#137). The app's labels, the docs (`AGENTS.md` files, `claude/*.md`) and new issues and comments use the "users see" word; code keeps its own names. Old issues and commit messages stay as written.
-
-| Concept | Users see | Code | Avoid |
-|---|---|---|---|
-| Everything the Conditions and tags dialog defines | "Conditions and tags" (`CONDITIONS_AND_TAGS`): the dialog, the legend header, the Person tab section, the more menu section while the only condition is listed there | `Tag`, `Pedigree.tags`, `TagsDialog` | "Tags" for the whole list |
-| Condition: a section of the symbol meaning affected with it | "condition"; "Affected with X", "Carrier of X", "X carrier" | a `Tag` with `style: "quadrant"` that is not a trait (`isConditionTag`, `conditionTags`), affected in `Individual.tags`, carrier in `Individual.carrierTags` | "quadrant tag", "condition tag" (outside code), "disease" |
-| Trait: a coloured section that never means affected | "trait" | `Tag.kind: "trait"` | calling it a condition |
-| Tag: anything defined that is not a condition | "tag": a trait, a dot tag or a text tag; the more menu's "Tags" once conditions have their own section | `Tag` | "tag" for a condition |
-| Section: the part of the symbol a condition or trait fills | "section", named as drawn: "whole symbol", "left half", "upper left" | `style: "quadrant"`, `sectionInfo`, `Sector` | "quadrant" or "quarter" except for a quarter actually drawn |
-| Dot tag, text tag | "dot", "text"; text tags carry a short abbreviation | `style: "dot"`, `style: "text"`, `Tag.abbrev` | |
-| Affected or a carrier with no condition recorded | "Affected", "Carrier"; with two or more conditions "Affected (condition not recorded)", "Carrier (condition not recorded)" | the plain flags `Individual.affected`, `Individual.carrier` (`plainAffected`, `plainCarrier`) | "plain" in the UI |
-| Affected at all | "affected" | `isAffected` (the flag or any condition) | reading `Individual.affected` for it |
-| The chart's key in the app | "legend", on the Pedigree tab | `Legend.tsx`, rows from `keyRows(pedigree, "legend")` | "key" |
-| The chart's key in SVG/PNG/PDF exports | "key" (NSGC's word) | `<g class="pedigree-key">`, `pedigree/exportKey.ts`, rows from `keyRows(pedigree, "export")` | "legend" |
-| Drawing conditions and tags in colour or black and white | Settings "Conditions and tags drawn in": Colour / Black and white patterns | `canvasSettings.tagFills`, `"monochrome"` | "Tag fills" |
-| A signed-in user's saved conditions and tags | "My library", in the Conditions and tags dialog | `TagPreset`, `/api/tag-presets/` | "tag library" |
-| A person on the chart | "person", "people" | `Individual` | "individual" in UI text |
-| The side panel's tabs (#135) | "Person tab" (the selected person, their couples, or the batch panel for several), "Pedigree tab" (chart title, clinical details, legend) | `EditPanel.tsx`, `PanelTab` | "edit panel" |
-| The menu on a person or couple line (the ⋯ button or right-click) | "More options" | `MoreMenu.tsx`; "the more menu" in docs | |
-| Who the family was ascertained through; who seeks counselling | "proband" (arrow with P), "consultand" (arrow without P) | `Individual.proband`, `Individual.consultand`, `pedigree/proband.ts` | "patient" ("index case" only as the legend's gloss) |
-| A check the editor flags (#116) | "problem", "N problems" | `Problem`, `RULES` in `pedigree/validation.ts`, severity `"warning"` or `"error"` | "error" for all of them |
-
-## Directory Guides
-
-Each major directory has its own `AGENTS.md` with the non-obvious facts about that code. Read the one for any directory you work in:
-
-- `layout-engine/AGENTS.md` — kinship2 port, 1-based indexing, where tests live
-- `frontend/AGENTS.md` — app structure, stores, auth tokens, running and testing
-- `frontend/src/pedigree/AGENTS.md` — canvas renderer and symbol drawing
-- `frontend/src/io/AGENTS.md` — PED import, SVG/PNG/PDF/CSV export, U-shape
-- `backend/AGENTS.md` — Django config file, data model, anonymous access rules, auth
-- `deploy/AGENTS.md` — VPS deploy script and services
-- `claude/AGENTS.md` — index of plans and research
-- Strategy, user research and outreach notes are in the private repo `SACGF/pededit_private`, not here
-- `test-data/ped/README.md` — PED test corpus
-
-**Keep them current.** When you learn something about a directory that is not obvious from reading its code (a gotcha, a convention, why something is the way it is, a product fact), add it to that directory's `AGENTS.md` in the same change. Do not duplicate what the code or git history already says.
-
-## Key Reference Documents
-
-- `claude/layout_engine_guide.md` — **read this before working on the renderer or layout algorithm**: explains `LayoutResult` field semantics, a worked example, and the three rendering rules (nodes, couple lines, sibship connections)
-- `claude/nsgc_nomenclature.md`: the NSGC pedigree nomenclature (Bennett et al. 2008, 2022 revision) that the drawing follows, where we conform, where we differ on purpose (sex, not gender) and the open gaps. Read it before adding or changing any symbol, line or text under a symbol.
-- `claude/search_report.md` — domain research and feature gap analysis
-- `claude/export_u_plan.md`: how the U-shape export works (open items on #213). `claude/phase_7_2_plan.md`: how tags and colouring work (#3). Design notes for other open issues are linked from the issues themselves.
-
-## What This Project Is
-
-A new open-source pedigree editor — a web-based tool for drawing, editing, and managing genetic family trees used in clinical genetics, genetic counseling, and medical research.
-
-**Target users:** Genetic counselors, clinical genetics teams, research geneticists.
-
-**North star:** Every open-source pedigree tool trades correct layout for simplicity, and almost none have drag-and-drop repositioning (pedigreejs added SHIFT+drag in December 2024, without persistent pinning; see `user_research/github_issues.md` in the private repo `SACGF/pededit_private`). The layout problem is solved in the [kinship2](https://cran.r-project.org/package=kinship2) R package — we ported it to TypeScript, giving us publication-quality automatic layout as a native npm package for the first time. Everything else is built on top of that foundation.
-
-## Key Research Findings (from `claude/search_report.md`)
-
-### Best open-source reference implementations
-- **pedigreejs** (GPL-3.0, active): D3.js-based, standard NSGC nomenclature, undo/redo, JSON/BOADICEA/PED import, SVG/PNG export. Best candidate to build upon or study.
-- **Open Pedigree** (LGPL-2.1, abandoned 2019): Feature-rich but uses legacy Prototype.js. Most comprehensive feature set among open-source tools.
-- **DrawPed** (active, 2024 NAR paper): Lightweight, no JS framework dependencies, publication-ready SVG.
-- **family-chart** (MIT, 712 stars): TypeScript + D3.js, framework-agnostic, most popular JS family tree library. Not genetics-specific but highly adaptable.
-
-### Commercial tools defining the feature ceiling
-- **FamGenix**: Most feature-complete for pedigree drawing itself — manual node repositioning, toggle display filters, all cancer risk models simultaneously.
-- **Progeny**: Industry leader (800+ institutions), but users complain about inability to manually reposition nodes.
-- **TrakGene**: Pedigree is one module of a broader genomic health record platform.
-
-### Feature tiers
-
-**Tier 1 — Open source table stakes (must match):** Basic drawing, NSGC symbols, interactive editing, SVG/PNG export, undo/redo, consanguinity, twins, multiple spouses, PED/JSON import/export, web-based, offline support (24 features total — see report §9 Tier 1).
-
-**Tier 2 — Commercial only:** Patient intake questionnaires, integrated risk assessment, EHR integration, HIPAA compliance, manual node repositioning (FamGenix only), HPO phenotyping, VUS alerts, letter templates, role-based access (19 features — see report §9 Tier 2).
-
-**Tier 3 — Nobody does this (differentiation opportunity):**
-- Drag-and-drop node repositioning in open-source (FamGenix is the only tool with this, at $500+/year)
-- Non-linear layout (U-shape, horseshoe, radial) for large families
-- Arbitrary branch collapsing with expand/collapse interaction
-- Round-trip SVG editing (export → hand-edit → re-import as structured data)
-- Interactive editing at scale (hundreds of individuals)
-- Nested consanguinity loops without overlapping lines
-- Cross-generational matings with correct alignment
-- Multiple traits/conditions with distinct shading in one pedigree
-(22 features total — see report §9 Tier 3)
-
-### Biological sex notation
-`Individual.sex` is **biological sex** (sex assigned at birth) and is the only thing genetics uses: layout, kinship and X-linked kinship, twins, PED export and every other calculation, because sex determines inheritance patterns, X-linkage and sex-specific risk. Never make any of these read gender identity.
-
-Gender identity is optional (`Individual.genderIdentity`: man, woman, non-binary, #26) and only changes the drawing. The pedigree setting "Symbols show" (`canvasSettings.symbolsShow`) defaults to "gender identity where recorded": a person with a recorded gender identity is drawn with the NSGC 2022 symbol for that gender, and their sex assigned at birth is written under it as AMAB, AFAB or UAAB (unless gender and sex match). People with no gender identity recorded, pregnancies and losses draw by sex as before. "Biological sex" draws everyone by sex. So a trans man who is 46,XX keeps `sex: "female"` (and is treated as such by every calculation) and is drawn as a square with AFAB below by default, or as a circle in sex mode. All shape decisions go through `frontend/src/pedigree/gender.ts`.
-
-## Tooling Preferences
-
-**Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
-
-## Running the checks
-
-```bash
-npm run check         # engine tests, type check, frontend tests, dead code, backend tests: about 20 s
-npm run check:pages   # what CI's page checks job runs; servers up first (below): several minutes
-```
-
-CI (`.github/workflows/ci.yml`) runs these same root `package.json` scripts, so a change that passes both passes CI. Each part also runs alone: `npm run test:layout`, `test:frontend`, `test:backend`, `typecheck`, `deadcode`.
-
-## Checking frontend changes
-
-A change under `frontend/src/` is not done until it has been run in the browser on a page whose data reaches the changed code:
-
-```bash
-node frontend/scripts/browser/servers.mjs up --frontend-only      # once per session (plain `up` adds Django)
-node frontend/scripts/browser/console.mjs --fixture example:2 [--click SEL ...]   # JS errors, mapped to source lines
-node frontend/scripts/browser/shot.mjs --fixture example:2                        # then read the PNG
-```
-
-From a git worktree, start the servers with `servers.mjs up --here` and pass the `PEDEDIT_BASE` it prints: the servers on 5173 and 8000 serve the main checkout's code. It shares the main checkout's `node_modules`, virtualenv and secret key, so `--as-agent` works there (README, "Working in a git worktree").
-
-`--fixture` takes `example:N`, a `.ped` file or a Pedigree `.json` and needs no backend, so it cannot catch serializer bugs; check anything that must survive a save against `/p/<id>` with Django running. Use `--as-agent` for signed-in pages. These tools only drive localhost. Details in `frontend/scripts/browser/README.md`. Node 20+ is required.
-
-## Dead code
-
-`npm run deadcode` runs knip (`knip.json`) over the frontend, its scripts and the layout engine. It lists files nothing imports, exports nothing uses and dependencies nothing needs, and exits 1 when it finds any. Run it before finishing a change and leave it clean. If it says knip is not installed, run `npm install`: an install made before knip was added does not have it.
-
-- **Delete what it reports**, then run it again: removing one thing can leave another unused.
-- **It can be wrong** about code reached in a way it cannot follow: a file run by a shell script, the target of a Vite alias, a `/src/...` import inside a page check. That is why CI only warns. When the code is used, say how in `knip.json`: an `entry` for a file run or aliased from outside, `ignore` for vendored code (`src/components/ui/`).
-- **A test counts as a use.** `npx knip --production` leaves the tests out, so it also lists what only tests call. Read that list now and then: a wrapper only tests call is deleted and its tests pointed at what the app calls; deliberate test support stays (`resetProblemStep`, `readPngDpi`, `layoutCost.ts`, `uShapeLint.ts`, the fixtures).
-- **What it does not report:** an export used only in its own file, a field of an object that nothing reads, and anything that is not TypeScript or JavaScript.
-
-## Writing Style
-
-No em-dashes. Use commas, periods, or rewrite the sentence instead.
-
-A code comment says what the code does now and why, where that is not obvious from reading it. How it used to work, what a change replaced and why a refactor was done belong in the commit message and the issue, not in the code or the `AGENTS.md` files. Cite an issue number only where the issue explains a decision the reader would otherwise question. Data saved by an older version is a present fact and can be described ("pedigrees saved before #85 may carry the flag").
-
-## Visual Design Direction
-
-**Black and white minimalist.** The UI should look like a clinical pedigree chart — not a generic SaaS app. The pedigree symbols (squares, circles, filled/unfilled, slashes, connecting lines) are the visual language; the chrome around them should get out of the way.
-
-- Pedigree canvas: white background, black symbols and lines, no colour except where clinically meaningful (e.g. multi-trait shading, #3)
-- App UI: minimal, low-contrast chrome — the pedigree is the focus, not the toolbar
-- No gradients, drop shadows, rounded-corner cards, or decorative colour on pedigree elements
-- Typography: clean sans-serif, small, functional
-
-This is the established aesthetic for clinical and publication pedigrees. Maintain it across all phases.
-
----
-
-## Architectural Decisions (settled)
-
-**Stack:** Django 5 + DRF + PostgreSQL + simplejwt on the backend; React 18 + TypeScript + Vite + React Flow (`@xyflow/react`) + Zustand + Tailwind + shadcn/ui on the frontend. Layout engine is a local npm workspace package (`@pedigree-editor/layout-engine`) imported by the frontend.
-
-**Data model:** Graph-based — `Individual` nodes, `Partnership` edges, `parentOf` map. JSON serialization is the native format; PED/BOADICEA/GA4GH FHIR are import targets. The `Pedigree` interface in `layout-engine/src/types.ts` is canonical — the Django `JSONField` and the Zustand store both mirror it exactly.
-
-**Layout algorithm:** Ported from kinship2 (R). The hard parts are done: `kindepth` assigns generations, `alignped1–4` place individuals and optimise positions. `autohint` is a full port of the kinship2 duplicate fixup (sibling shift plus spouse hints). See `claude/layout_engine_guide.md` for how to consume `LayoutResult` in the renderer, including pass-through spouse markers for people with three or more partners.
+Strategy, user research and outreach notes are in the private repo `SACGF/pededit_private`, not here.

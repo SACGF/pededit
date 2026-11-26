@@ -3,7 +3,7 @@
 TypeScript port of the kinship2 R pedigree layout algorithm, the npm
 workspace package `@pedigree-editor/layout-engine`, set up to be published to
 npm (#22, see "Publishing" below). It has no React or DOM dependency and is
-consumed by the frontend and by the exporters.
+consumed by the frontend.
 
 Read `claude/layout_engine_guide.md` before touching anything here or in the
 renderer. It explains `LayoutResult` (n, nid, pos, fam, spouse), the 1-based
@@ -14,7 +14,8 @@ indexing convention inherited from R, and the three rendering rules.
 - `types.ts` — the canonical `Pedigree` data model (Individual, Partnership,
   parentOf, Tag, CanvasSettings, pinnedPositions). The Django `JSONField`
   serializer and the Zustand store mirror this exactly. Change it here first,
-  then `backend/api/serializers.py`, then the store.
+  then `backend/api/serializers.py`, then the store. `Individual.hpoTerms`
+  has no editor UI yet (#46): JSON and CSV carry it, PED drops it.
 - `kindepth.ts` — generation assignment. `alignPedigree` first calls it with
   `align=true` (tries to level spouses) and falls back to `align=false` when
   that fails.
@@ -33,8 +34,9 @@ indexing convention inherited from R, and the three rendering rules.
   The frontend's Vite needs `optimizeDeps.include: ["quadprog"]` for that
   package to load, because it reads the engine from source (a CommonJS
   dependency of linked source is not pre-bundled otherwise).
-- `families.ts` — `alignPedigreeByFamily`, which the canvas, SVG export and
-  de-identification call instead of `alignPedigree` (#64). R's `align.pedigree`
+- `families.ts`: `alignPedigreeByFamily`, used in place of `alignPedigree`
+  (#64). Its one caller is `frontend/src/pedigree/layoutCache.ts`, through
+  which the canvas, the exports and de-identification lay out. R's `align.pedigree`
   packs disconnected families into shared rows at ordinary spacing, so they
   read as one family; this lays out each family alone and joins them with
   `FAMILY_GAP`, with unconnected people last. With one family it returns
@@ -115,7 +117,7 @@ indexing convention inherited from R, and the three rendering rules.
   pedigree (male 1/2, wrong), so the oracle leaves those families out of
   `pairs_x`. Ground truth is
   `tests/oracle/kinship.json`, written by `scripts/kinship-oracle.R` (every
-  related pair of 26 PED files, autosomal `pairs` and X-linked `pairs_x`,
+  related pair of 27 PED files, autosomal `pairs` and X-linked `pairs_x`,
   plus twin cases built in the script because PED cannot name twins); the PED comparison runs in the frontend
   (`src/io/__tests__/kinshipOracle.test.ts`) since the importer lives there.
   R refuses families the editor accepts (a father recorded as female), and
@@ -304,7 +306,7 @@ demonstrably worse, while keeping the port as the tested baseline:
   `frontend/scripts/browser/worktree.mjs`, the imports under `frontend/src`
   (`grep -rl "@pedigree-editor/layout-engine" frontend/src | xargs sed -i
   "s#@pedigree-editor/layout-engine#NEW#g"`), `README.md`, `CHANGELOG.md`,
-  this file and the root `AGENTS.md`, and run `npm install` to rewrite
+  this file and `frontend/AGENTS.md`, and run `npm install` to rewrite
   `package-lock.json`.
 
 ### Releasing
@@ -322,8 +324,8 @@ Done by the maintainer, by hand. Nothing in CI publishes.
 3. Check: `npm -w layout-engine run test`, `npm -w frontend run typecheck`,
    `npm -w frontend run test`.
 4. Look at what would be published:
-   `npm -w layout-engine publish --dry-run`. Expect 38 files and about
-   66 kB, all under `dist/` apart from the README, changelog, licence and
+   `npm -w layout-engine publish --dry-run`. Expect 40 files and about
+   76 kB packed, all under `dist/` apart from the README, changelog, licence and
    `package.json`.
 5. Publish: `npm -w layout-engine publish`. `publishConfig.access` is
    already `public`, which a scoped package needs. npm asks for the one-time

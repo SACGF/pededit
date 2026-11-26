@@ -103,8 +103,9 @@ node frontend/scripts/browser/console.mjs --all-examples --fixture-via-api   # w
 ```
 
 ```
+served: c07d02f main, origin/main c07d02f
 page: http://localhost:5173/p/fixture (fixture example:0)  status 200, 2541 ms
-js: 1 uncaught error(s), 8 console error/warning(s), 0 failed request(s), 0 step failure(s) [1 known warning(s) ignored]
+js: 1 uncaught error, 8 console errors/warnings, 0 failed requests, 0 step failures, render lint clean [1 known warning ignored]
   uncaught  frontend/src/pedigree/nodes/PedigreeSymbolNode.tsx:56  probe click (x2)
   console.error  frontend/src/pedigree/nodes/PedigreeSymbolNode.tsx:40  probe render p1 (x8)
 ```
@@ -173,10 +174,7 @@ include it):
   canvas draws it, compact mode included (read from `localStorage`, the way
   the canvas reads it): `people` (each with `id`, `position` at the symbol's
   centre, `individual`, `glyph`, `isPinned`), `couples` (with `double`),
-  `sibships`, `duplicates`, `assisted`, `bounds`. Before #146 it gave React
-  Flow's `{ nodes, coupleEdges, ... }` with the person under `n.data`; a
-  script written for that reads `n.data.individual.id` where it now needs
-  `n.individual.id`.
+  `sibships`, `duplicates`, `assisted`, `bounds`.
 - `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`,
   for comparing with R. The canvas lays out each family separately
   (`alignPedigreeByFamily`, #64), so for a file with several families this
@@ -184,6 +182,9 @@ include it):
 - `kinship(pedigree?)`: kinship and inbreeding coefficients (#32), as
   `.kinship(idA, idB)` and `.inbreeding(id)`.
 - `check(pedigree?, options?)`: the render lint, `[]` when clean.
+- `checkExport(pedigree?, options?)`: the same for the SVG export.
+- `exportSvg(options?)`: the editor's pedigree as an SVG string (`{ uShape: true }`
+  for the U-shape), to save and render with `shot.mjs FILE.svg`.
 - `problems(pedigree?)`: the editor warnings (#116), with each fix as its
   label. The toolbar list is `[data-testid="problems-menu"]`, its items
   `[data-problem-id="rule:id"]`, panel fields `[data-problem-field]` and
@@ -221,8 +222,8 @@ checks run in vitest over every example
 to draw wrong: fixing one makes that test fail until it is removed from the
 list.
 
-The SVG export is a second renderer (strings, where the canvas is React
-components), so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
+The SVG export draws with the canvas's components but lays out its own
+figure (title, key, bounds), so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
 `export` lines in the report, `--no-export` to skip, `--deidentify` for the
 de-identified export). It parses what the SVG draws and matches symbols to
 people by position against the canvas layout, since the export carries no
@@ -232,8 +233,8 @@ symbol or overlapping, a missing couple line, a sibship line through a
 symbol, a child whose lines lead to no couple or the wrong one, overlapping
 labels. PNG and PDF are made from this SVG, so they are covered; the
 U-shape export is not. It relies on the group classes `exportSvg` writes
-(`couple-lines`, `sibship-lines`, `symbols`, `labels`) and `class="mark"`
-on childless and twin marks; keep them when changing the exporter. In vitest
+(`couple-lines`, `sibship-lines`, `symbols`, `labels`) and
+`data-childless`, `data-ended` and `data-twin-mark` on marks; keep them when changing the exporter. In vitest
 it is `src/io/svg/__tests__/exportLint.test.ts`; in a page,
 `__pededit.checkExport()`.
 
@@ -315,7 +316,7 @@ the flow. They run in CI.
 | `problems-list` | the problems list, a fix, "Fix all like this", F8 |
 | `person-tab-saves` | typing on the Person tab, auto-save, reload |
 | `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
-| `example-link` | `/example/<slug>` (#150): one new pedigree per visit, Back makes no extra copy, unknown slug, the landing page's links |
+| `example-link` | `/example/<slug>` (#150, #151): the landing page's links, nothing saved on open, the first edit saves one copy at `/p/<id>` with undo kept, a failed create keeps the edits, unknown slug |
 | `error-reporting-off` | with no Rollbar token, an uncaught error sends no request off the site and loads no reporter (#49) |
 | `rejected-token` | a sign-in token the server rejects: one refresh, then signed out on the same page, and a pedigree's link still opens (#191) |
 | `rate-limited` | spends a test address's anonymous-create allowance, then the landing page, an example link and GitHub sign-in say how long to wait (#184) |
@@ -378,16 +379,17 @@ Rules that keep them worth having:
 ### phone.mjs: does it work by touch on a small screen?
 
 ```bash
-node frontend/scripts/browser/phone.mjs                       # landing page and two pedigrees at three sizes, about 80 seconds
+node frontend/scripts/browser/phone.mjs                       # landing page and two pedigrees at three sizes, about 3.5 minutes
 node frontend/scripts/browser/phone.mjs --viewport 390x844 --fixture example:3 --no-landing --verbose
 ```
 
 ```
 phone: emulated in chromium (touch, mobile viewport, pixel ratio 3). Not a phone: iOS Safari, finger size, the keyboard and speed need a real one.
 ok    390x844  landing page  (4 of 4 checks, 2.6 s)
-FAIL  390x844  editor, example:House Targaryen  (16 of 17 checks, 12.1 s)
+FAIL  390x844  editor, example:House Targaryen  (42 of 43 checks, 34.7 s)
         FAIL  a one-finger drag pans the canvas: dragged 70,50 and the canvas moved 0,0
         note  fitted at zoom 0.27: a symbol is 11 px across
+screenshots: frontend/test-output/browser/phone
 phone: 1 of 9 page(s) failed
 ```
 
@@ -396,17 +398,18 @@ with `hasTouch`, `isMobile`, device pixel ratio 3 and a phone user agent: at
 390x844, 360x640 and 844x390 (a phone on its side) by default, on the landing
 page, a 4 person example and House Targaryen (96 people). Per editor page:
 the viewport meta tag, no sideways page scroll, the canvas keeps at least half
-the screen, everyone is in view on open, a tap selects a person, the Person
-tab opens and closes, More options opens from a tap on the pill's "···", the
-pill of the people nearest the left and right edges keeps every button on the
-canvas, the selected person stays in view when the Person tab opens, the
-toolbar fits without scrolling and its Export menu lists every export, the
-menu button opens the sidebar and its help is worded for touch (#182), a
-one-finger drag pans (from bare canvas and
-from a person), a two-finger pinch zooms out and back in, the page itself
-never scrolls or zooms (also when pinching on the toolbar), and no JavaScript
-errors or warnings. `--verbose` lists the passed checks and the notes (canvas
-size, the size of a symbol at fit, the size of the "···" button).
+the screen, everyone is in view on open; a tap selects a person and shows no
+hover pill; the Person and Pedigree tabs are a bar along the bottom that
+opens and shuts the sheet, whose handle swipes it taller, back to half and
+shut; the Person tab starts with the pill's buttons, big enough for a finger,
+and More options; the selected person stays in view; the toolbar fits and
+its Export menu lists every export; the menu button opens the sidebar and
+its help is worded for touch (#182); a one-finger drag pans and a pinch
+zooms, from bare canvas and from a person; the page never scrolls or zooms
+by itself, a pinch on the toolbar zooms the page and a notice says how to
+zoom back out; the U-shape view pans, zooms and selects by touch; and no
+JavaScript errors or warnings. `--verbose` lists the passed checks and the
+notes (canvas size, the size of a symbol at fit).
 Screenshots of each page as loaded, with the Person tab, the menu and the
 sidebar open, go to `frontend/test-output/browser/phone/`. It runs in CI.
 

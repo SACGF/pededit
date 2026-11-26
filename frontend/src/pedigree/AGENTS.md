@@ -23,8 +23,9 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
 - `chart/` (#147): the drawing as React components that take scene data
   and positions as props and return SVG: `symbols.tsx` (the symbol and
   its marks, the text under it), `PersonSymbol` (everything at one person,
-  from the glyph), `CoupleLine`, `SibshipLines`, `AssistedLine`,
-  `DuplicateArc`, `ChartTitle`, and `Chart`, a whole scene. Nothing under
+  from the glyph), `CoupleLine`, `ChildlessMark`, `SibshipLines`,
+  `AssistedLine`, `DuplicateArc`, `ConsanguinityLabel`, `ChartTitle`,
+  `keySwatches` (the key's swatches), and `Chart`, a whole scene. Nothing under
   `chart/` imports React Flow or a store (`sceneImports.test.ts`), uses a
   class name or page CSS (presentation attributes only, as the export
   needs), or makes up its own ids: clip path and marker ids are props.
@@ -38,8 +39,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   both sides of the tree) is drawn once per slot that carries a line, each
   copy numbered, joined by a dashed `duplicateEdge` arc (R's `arcconnect`).
   Copies with no line at all are left out. Never merge or move copies to
-  "tidy" them: an earlier version did, and drew 7 of the 13 historic and
-  classic examples wrong while the R oracle tests still passed. A pin is
+  "tidy" them: that draws many of the historic and classic examples wrong
+  while the R oracle tests still pass. A pin is
   stored per individual, so it moves only the copy laid out nearest to it.
   `svgExporter` takes its positions from `buildScene` so it matches.
 - `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40. The layout
@@ -76,20 +77,18 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   consanguineous), lines of descent and assisted lines, with no dashes,
   marks or text, from live node positions. React Flow's MiniMap has no slot
   for edges, so the first node's `nodeComponent` draws them before its own
-  shape, which keeps them under every symbol. An earlier custom minimap drew the real
-  symbols and lines scaled down; it was too small to read and on a wide
-  pedigree its 1px outlines covered sub-pixel symbols, so people looked
-  black. Its strokes are in flow units (4 on a 40px symbol) so they shrink
-  with the symbol. The chart title node is in its bounds but not drawn.
+  shape, which keeps them under every symbol. Its strokes are in flow units
+  (4 on a 40px symbol) so they shrink with the symbol: 1px outlines on a
+  wide pedigree would cover sub-pixel symbols and make people look black. The chart title node is in its bounds but not drawn.
 - `personGlyph.ts` (#144): everything drawn at one person, as plain data
   (`PersonGlyph`: shape, paint, brackets, letter, slash, arrow, "?", "*",
   caption, annotation row, name and detail lines, white backings, copy
-  number, group count). `buildScene` puts it on every node
-  (`RFNodeData.glyph`), which holds nothing that repeats it (#174);
+  number, group count). `buildScene` puts it on every person
+  (`ScenePerson.glyph`), which holds nothing that repeats it (#174);
   `PedigreeSymbolNode`, `svgExporter`, the lints and the minimap read it there,
   and the U-shape export, which has its own layout, calls `personGlyph` per
   person. None of the three imports `symbolPaint`, `annotationRow`,
-  `arrowKind`, `symbolSex` or the label functions any more (a test holds
+  `arrowKind`, `symbolSex` or the label functions (a test holds
   them to that), so a renderer cannot decide differently from the others.
   The symbol renderer (`SymbolShape`, `PersonMarks`) takes the
   glyph and never the person; a legend swatch, which has no pedigree, gets
@@ -97,14 +96,15 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   Add a new mark or line of text for a person as a field of the glyph first.
   The SVG snapshots (#69) are the record of what is drawn; glyphs are not
   recorded as well (#175). The
-  canvas node still reads the pedigree from the store, for the problem
-  marker only. `nameLines` is what the canvas draws (one line when names are
+  canvas node reads the pedigree from the store only for the problem
+  marker. `nameLines` is what the canvas draws (one line when names are
   truncated), `figureNameLines` what a file writes (always wrapped).
 - `chart/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, condition and trait sections and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps `PersonSymbol` with the hover
   pill, more menu, selection outline, pin indicator and problem marker.
-- `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
+- `nodes/HoverPill.tsx`: add parents / son / daughter / child of unknown
+  sex / sibling buttons, and lock / unlock.
   By touch (#169) there is no hover: a tap on the symbol opens the pill and
   it stays while the person is selected, closing when the selection clears.
   A finger selects and opens the pill on the click, not on `pointerdown` as
@@ -170,8 +170,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   the mouse itself: hovering it shows the name alone, without the pill
   buttons, since a pill opening under the cursor turns a click on the name
   into a click on a button. A `title` attribute on the label does nothing
-  while it has `pointer-events: none`, which is how the first version of
-  #68 shipped a tooltip that never appeared.
+  while it has `pointer-events: none`.
 - `lineGeometry.ts` (#143): what is drawn for a couple line
   (`coupleLineGeometry`: the path or the two paths of a double line, its hop,
   the childless and ended marks) and for a sibship (`sibshipLineGeometry`),
@@ -197,8 +196,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   descent only ever leaves a level couple line (the maintainer's rule, and
   what Madeline draws). Nothing hangs from the raised part; the ended mark
   and a consanguinity label sit on it. `buildScene` puts the heights,
-  shapes and turns on the edge (`CoupleEdgeData.hopEnds`) and the drop on
-  the sibship (`SibshipEdgeData.hopDrop`), both measured from the far
+  shapes and turns on the couple line (`CoupleLineData.hopEnds`) and the
+  drop on the sibship (`SibshipData.hopDrop`), both measured from the far
   partner, so the two stay joined while a node is dragged and the renderers
   need nothing new. The numbers (`hopHeight`, `couplePortHeights`, `hopTurn`,
   `symbolSideDx`) are the layout engine's (`layout-engine/src/hopLine.ts`),
@@ -364,9 +363,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `Individual.carrierTags` a carrier of it. The plain flags are what the
   conditions do not say: `affected` is affected with something not
   recorded, `carrier` a carrier with no condition recorded. Recording or
-  clearing a condition never sets or clears `affected` (#118: the old
-  coupling made the flag beside a condition ambiguous, so marking someone
-  with a condition affected drew nothing). "Is this person affected?"
+  clearing a condition never sets or clears `affected` (#118). "Is this person affected?"
   is `isAffected` (layout-engine, re-exported here: the flag or any
   affected condition), used by PED/CSV, filters, sibling order, collapse
   and warnings; never read `ind.affected` for that. The plain Affected
@@ -479,7 +476,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   exports never get it. Kept here, not as warnings: action
   refusals (picking, twins, swap sides notices), the PED export loss
   dialog, and display notes such as "carrier mark not drawn on an
-  affected fill" (for a plain carrier that is also affected it is now the
+  affected fill" (a plain carrier who is also affected gets the
   `affected-and-carrier` warning instead). Ages and dates are checked only
   where they parse.
   Dates are partial ("1950", "1950-03"), so date checks ask what is
@@ -637,7 +634,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   two or more lines of text hang down to the symbol tops of the row below:
   siblings side by side under such a parent have no room anywhere
   (House Targaryen's Aegon and Shaera, the Habsburg uncle and niece). The
-  result is `CoupleEdgeData.consanguinityLabelOffset`; the canvas, the
+  result is `CoupleLineData.consanguinityLabelOffset`; the canvas, the
   export and `highestConsanguinityLabel` all read it. The export lint's
   `consanguinity-label-collides` checks the label against symbols, lines,
   other text, copy numbers and dashed arcs (unless backed), compact rows
@@ -733,20 +730,19 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `FilterMenu` and the banner read that list; rows sharing a `group` are
   alternatives, drawn as one row of radio buttons.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
-  to a set key and zygosity; `buildScene` copies that onto the node data
-  so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:
-  in `sibshipPath.ts` every member's drop starts at the set's shared point
+  to a set key and zygosity; `buildScene` copies that onto each
+  `ScenePerson` (`twinSet`, `zygosity`) so `sibshipLineGeometry` can fork
+  for the canvas and `svgExporter` alike: in `sibshipPath.ts` every member's drop starts at the set's shared point
   on the bar (the mean of their x), and `twinForkMarks` gives the bar across
   monozygotic drops and the "?" for unknown zygosity, both at the points
   halfway down the drops as R's plot.pedigree does.
   `twinSetProblem` is the one rule list (two members, same couple, same sex
   for monozygotic); the store's `setTwins` returns its message when refused.
 - `adoption.ts` — adoption brackets (#12): the six bracket segments round
-  the symbol box, drawn by `AdoptionBrackets` in `symbols.tsx` (so the
-  legend gets them for free through `SymbolShape`), `renderAdoptionBrackets`
-  in `svgExporter` (shared with the U-shape) and the export key. An
-  adopted-in child's drop from the sibship bar is dashed: `sibshipPath.ts`
-  gained `sibshipPaths`, which splits `sibshipSegments` into solid and dashed
+  the symbol box, drawn by `AdoptionBrackets` in `chart/symbols.tsx`
+  wherever a symbol is drawn (canvas, legend, export key, both exports). An
+  adopted-in child's drop from the sibship bar is dashed: `sibshipPaths` in
+  `sibshipPath.ts` splits `sibshipSegments` into solid and dashed
   by the children's `dashed` flag, keeping the per-child order (couple drop,
   bar, then one drop per child).
 - `assisted.ts` — assisted reproduction (#45, NSGC 2008 Fig. 3). The model
@@ -777,8 +773,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   scenario 2), "carrier" (solid, the woman who carried it, when she is not
   a parent it hangs from) and "social" (dashed). A social parent whose
   partner has a biological line to the child gets none (the couple line is
-  the link, scenarios 1 and 4), and nobody is drawn twice. They are `assistedEdges` in the
-  flow (edge type `assistedEdge`), one per person and child, or one per
+  the link, scenarios 1 and 4), and nobody is drawn twice. They are the
+  scene's `assisted` lines (edge type `assistedEdge` on the canvas), one per person and child, or one per
   sibship when the person is linked the same way to every child of it (the
   line then ends where the sibship's descent meets the bar, so siblings do
   not each get a crossing line). `assistedEdgeSegment` is the one geometry,
@@ -809,8 +805,9 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   line). `buildScene` puts
   `childless` / `childlessReason` on the couple edge data only when the
   partnership has no children (`activeChildless`), so a stale flag on a
-  couple with children is never drawn; `edges/ChildlessMark.tsx` draws it on
-  the canvas, `svgExporter` and `uShapeExporter` draw the same segments. The
+  couple with children is never drawn; `chart/ChildlessMark.tsx` draws it
+  for the canvas and `svgExporter`, and the U-shape draws the same marks
+  along its track. The
   reason text shares the name-label row, so long reasons run into long names.
 - `ended.ts` — ended relationship (#98, NSGC "relationship no longer
   exists"): `Partnership.ended` draws two short diagonal strokes across the
@@ -820,9 +817,9 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   the middle (`endedBreakX`), so they never cross the drop. On a line that
   hops they sit in the middle of the raised part, which nothing hangs from.
   On a double line
-  they are tall enough to cross both lines. Drawn by `edges/EndedMark.tsx`,
-  `svgExporter` (as `class="mark"` lines, which the export lint skips), the
-  U-shape (`endedSegs`, along the track), and the legend and export key
+  they are tall enough to cross both lines. Drawn by `chart/CoupleLine.tsx`
+  for the canvas and `svgExporter` (a `<path data-ended>`, which the export
+  lint skips), the U-shape (`endedSegs`, along the track), and the legend and export key
   ("Relationship ended"). Set from the panel's "Relationship" section and
   the "Relationship" / couple-line items of the more and right-click menus
   (`setPartnershipEnded`). PED cannot carry it; Export PED warns.
@@ -839,7 +836,7 @@ renderer:
    date for privacy, so the full DOB is never drawn; it stays in the data,
    the Person tab and CSV. A DOB not starting with a year (the age range a
    de-identified export puts in `dob`) is drawn as it is. One line, on
-   purpose: a two-line name plus DOB plus age ran into the sibship bar
+   purpose: a two-line name plus DOB plus age would run into the sibship bar
    halfway to the next row, so the age replaces the year. The date of death
    (#103, `ageLines`): with full dates of birth and death the line is the
    age at death alone, "d. 72y" ("4 mo", "5 d" for infants); otherwise
@@ -868,9 +865,8 @@ in both) and `svgExporter` writes the same numbers; the lints and the
 placement of bars and couple labels read `textBlockUnder`. A cut name's
 group (`data-name-label`, `data-name-cut`) takes the mouse through a
 transparent box the size of its lines; the `text-under-symbols` flow checks
-the hover and the click. The U-shape keeps its own placement
-(`ushape/render.ts`, beside the symbol and turned with it, with the same
-font and line height), since its spacing along the tracks is built round it.
+the hover and the click. The U-shape draws the same `TextUnderSymbol`,
+turned with the symbol along its track: `io/AGENTS.md`.
 
 - Chart title (#20): `chartTitle(pedigree, name)` in `labels.ts` is the one
   rule. `Pedigree.chartTitle` wins when set, `""` meaning no title; absent
@@ -891,8 +887,7 @@ font and line height), since its spacing along the tracks is built round it.
   generation with nobody drawn is not counted, so there are no gaps. Never
   stored. With `canvasSettings.showNumbers` the number is the last detail
   line under the symbol (NSGC order, see above), on the canvas, in both SVG
-  exporters and in the lints. It was first put before the name on the same
-  line, which the standard does not do. The U-shape
+  exporters and in the lints. The U-shape
   uses the standard figure's numbers so the two exports agree. Tests:
   `__tests__/numbering.test.ts`.
 

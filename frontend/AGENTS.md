@@ -110,7 +110,7 @@ reporting is off, and the dev server never reports.
   tags.
 - `Individual.sex` is biological sex and drives every genetic calculation;
   an optional `genderIdentity` can change only the symbol drawn (#26,
-  `pedigree/gender.ts`, see root AGENTS.md "Biological sex notation").
+  `pedigree/gender.ts`, see `claude/nsgc_nomenclature.md`, "Where we differ on purpose").
 - Structures that competitors refuse but we handle: partnerships with no
   children (`addPartner`; the layout engine feeds them to kinship2 as
   `childlessCouples`, which R has no way to express; `Partnership.childless`
@@ -159,6 +159,8 @@ reporting is off, and the dev server never reports.
   together with the others (`drawnBesideConflict`); "Automatic" clears the
   choice and the side. It is meant to draw people twice, so unlike a swap it
   is never refused for that: the notice gives the count before and after.
+  The "Quadruple half first cousins" example is set with it (`withCouples`
+  in `data/examples.ts`).
   "Add existing partner..." (#84, `linkPartner`) joins two people already
   on the tree, relatives included, and of any sex; "Add partner" always
   makes a new person, of the opposite sex (unknown for an unknown-sex
@@ -188,6 +190,8 @@ reporting is off, and the dev server never reports.
   draws the shared fork, and `setSex` on a monozygotic twin changes the whole
   set.
 - Visual style is black and white, minimal chrome. No colour except tags.
+  No gradients, drop shadows, rounded-corner cards or decorative colour on
+  pedigree elements; type is a small, plain sans-serif.
 - Small screens (#169): viewing is the bar on a phone (display, pan, zoom,
   tap to select), editing is a nice to have. Below Tailwind's `lg` (1024px,
   so a phone on its side counts) `CanvasPage` hides the left sidebar behind
@@ -266,7 +270,7 @@ reporting is off, and the dev server never reports.
 - `pages/` — `LandingPage` (create blank, import PED, "Recent on this
   device", examples, "Your pedigrees" when signed in), `CanvasPage` (sidebar + toolbar + canvas +
   panels, also for `/example/<slug>`), `LoginPage`, `GitHubCallbackPage`,
-  `ChangelogPage` (#79).
+  `ChangelogPage` (#79), `GuidePage` (#202), `YourDataPage` (#203).
 - Example links (#150, #151): `/example/<slug>` renders `CanvasPage`, which
   draws the example from the bundle (`openExample`) with
   `useAppStore.example` set and no `activePedigreeId`: nothing is sent to
@@ -324,8 +328,8 @@ reporting is off, and the dev server never reports.
   (`utils/buildInfo.ts`, a Vite define), never the commit, for the reason in
   `backend/AGENTS.md` (health check).
   A release is dated by its milestone's due date, so every milestone needs
-  one; "Initial deployment" and "U-shape export" were made after the fact for
-  work that predates issues (#152 to #166 are retrospective). The GitHub API
+  one; "Initial deployment" and "U-shape export" hold work from before issues
+  were used, recorded in the retrospective issues #152 to #166. The GitHub API
   shifts a `due_on` back a day for this account's timezone: send noon UTC
   (`2026-04-14T12:00:00Z`) to store that date.
 - `store/useAppStore.ts` — auth tokens (localStorage `access_token` /
@@ -412,7 +416,7 @@ reporting is off, and the dev server never reports.
   72px column beside the control, as the panel is 240px wide).
   "Conditions and tags" (`CONDITIONS_AND_TAGS`) is the user-facing name for
   what the tags dialog defines; "tag" stays the code's word. Every other
-  user-facing word follows the glossary in the root `AGENTS.md` (#137).
+  user-facing word follows `claude/glossary.md` (#137).
   The status controls edit sex, affected, proband and consultand with the
   more menu's store actions and rules (#120: refused sexes disabled with
   `batchSexProblem`'s reason written out); keep the two in step when a rule
@@ -434,7 +438,7 @@ reporting is off, and the dev server never reports.
   panel says so when nothing is selected.
 - Editor warnings (#116): data that looks wrong is reported by
   `pedigree/validation.ts`, never refused; see `src/pedigree/AGENTS.md`.
-  The panel's date hints moved there. Use a rule for "this data is probably
+  Use a rule for "this data is probably
   a mistake" and a notice for "this edit did X / could not be done".
 - Notices: the pedigree store's `notice` / `setNotice` (not undoable) is how
   an edit reports what it did or why it was refused; `CanvasPage` shows it
@@ -478,11 +482,20 @@ reporting is off, and the dev server never reports.
   `test-data/pedigrees/README.md` says how. A new rule in `RULES` or a new
   importer issue code fails its coverage test until a file triggers it.
 
+## Dead code
+
+`npm run deadcode` (part of `npm run check`) runs knip (`knip.json`, at the repo root) over the frontend, its scripts and the layout engine. It lists files nothing imports, exports nothing uses and dependencies nothing needs, and exits 1 when it finds any. Run it before finishing a change and leave it clean. If it says knip is not installed, run `npm install`: an install made before knip was added does not have it.
+
+- **Delete what it reports**, then run it again: removing one thing can leave another unused.
+- **It can be wrong** about code reached in a way it cannot follow: a file run by a shell script, the target of a Vite alias, a `/src/...` import inside a page check. That is why CI only warns. When the code is used, say how in `knip.json`: an `entry` for a file run or aliased from outside, `ignore` for vendored code (`src/components/ui/`).
+- **A test counts as a use.** `npx knip --production` leaves the tests out, so it also lists what only tests call. Read that list now and then: a wrapper only tests call is deleted and its tests pointed at what the app calls; deliberate test support stays (`resetProblemStep`, `readPngDpi`, `layoutCost.ts`, `uShapeLint.ts`, the fixtures).
+- **What it does not report:** an export used only in its own file, a field of an object that nothing reads, and anything that is not TypeScript or JavaScript.
+
 ## Conventions
 
 - Tests sit in `__tests__/` next to the code they cover. Files prefixed `_` and
   suffixed `.dev.ts` are manual render helpers, not tests.
 - Use `@/` for `src/` imports in components; relative paths elsewhere are fine.
-- Keep geometry shared: anything drawn on the canvas must also be drawable by
-  the string-based SVG exporter, so put geometry in framework-free modules
-  (`pedigree/tags.ts` is the model).
+- Draw once: the canvas and the SVG exporters render the same components in
+  `pedigree/chart/`, so a drawing change goes there, and shared geometry goes
+  in framework-free modules (`pedigree/tags.ts` is the model).

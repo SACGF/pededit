@@ -1,7 +1,8 @@
 # frontend/src/io/ — agent notes
 
-Import and export. Everything here is framework-free TypeScript so it can be
-unit tested and reused headlessly.
+Import and export, unit tested and run headlessly. Only the SVG exporters
+(`svg/svgExporter.tsx`, `svg/ushape/render.tsx`) use React, to render the
+chart components to markup.
 
 ## ped/ — PED file format
 
@@ -77,7 +78,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 
 ## svg/ — figure export
 
-- `svgExporter.ts` draws everything from the scene (`buildScene`, #143,
+- `svgExporter.tsx` draws everything from the scene (`buildScene`, #143,
   #146): positions from its people, couple and sibship lines through
   `pedigree/lineGeometry.ts`, assisted lines and duplicate arcs from theirs,
   and the figure's size from `scene.bounds`. Nothing under `io/` imports
@@ -89,13 +90,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `personGlyph` through its `glyphOf`. Anything the export needs that
   the scene lacks is added to it in `buildScene`, not
   worked out again here.
-- `svgExporter.ts` — standard layout as an SVG string, including the key
+- `svgExporter.tsx`: standard layout as an SVG string, including the key
   (`exportKeyMarkup` in `pedigree/exportKey.tsx`, its rows from
   `keyRows(pedigree, "export")`, #148: Affected, Carrier, Deceased
   rows when present, then tags in use), in a `<g class="pedigree-key">`.
   The "Same person drawn more than once" row (#124) cannot be read off the
   pedigree: each exporter passes `{ duplicates }` from its own drawing
-  (`flow.duplicateEdges` here, `layout.duplicates` in the U-shape, which
+  (`scene.duplicates` here, `layout.duplicates` in the U-shape, which
   draws different copies), and the in-app legend uses `drawsDuplicates`.
   Tests find symbols by `<g transform="translate(..)">` followed by a shape,
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
@@ -115,8 +116,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 - `uShapeExporter.ts` — the public entry (`layoutUShape`,
   `exportUShapeSvg`): horseshoe layout for large families (partners,
   consanguinity, flat bottom, fan for small families). Plan in
-  `claude/export_u_plan.md`. The code is in `ushape/` (#149, split from one
-  1,600-line file): `tree.ts` builds the descendant tree of one founder
+  `claude/export_u_plan.md`. The code is in `ushape/` (#149): `tree.ts` builds the descendant tree of one founder
   couple (nodes, unions, joins; no positions), `layout.ts` is the bent
   coordinate system, the packing along the tracks and the public
   `UShapeLayout` (no SVG in it, so it could move beside the layout engine),
@@ -156,11 +156,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `alignPedigreeByFamily`, so SVG, PNG, PDF and de-identification get the
   same layout as the canvas with no code here. The U-shape has its own
   layout and ignores it.
-- To look at an export without the dialog: bundle a scratch entry that
-  imports `exportSvg` / `exportUShapeSvg` with
-  `node_modules/.bin/esbuild entry.ts --bundle --platform=node --format=esm`,
-  run it to write the SVG, then `node frontend/scripts/browser/shot.mjs
-  FILE.svg` renders it to PNG to read back.
+- To look at an export without the dialog: `__pededit.exportSvg()` in
+  `eval.mjs` (`{ uShape: true }` for the U-shape) returns the SVG, and
+  `node frontend/scripts/browser/shot.mjs FILE.svg` renders it to PNG. A
+  scratch entry bundled with plain esbuild does not build (#233).
 - `exportLint.ts` (#72) — render lint for the standard SVG export, run by
   `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
   example. It parses the SVG, so `svgExporter.tsx` must keep writing its
@@ -175,7 +174,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `arcCollisions`), with the lines of text under a symbol taken as one
   block. The chart title is outside the `labels` group
   on purpose (it is not a label), so it has a check of its own,
-  `title-collides` (#172): the `class="chart-title"` text against the
+  `title-collides` (#172): the text in `<g class="chart-title">` against the
   symbols, the dashed arcs and the consanguinity labels. The canvas title
   is a React Flow node added by the canvas, not part of the scene, so `lintScene` takes
   the title as an option and places it with the same `chartTitlePlace`
@@ -238,8 +237,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `chartTitle()` from `pedigree/labels.ts`. Its width is estimated
   (`titleWidth`); a title wider than the drawing widens the figure and the
   drawing is centred under it, in both exporters. It is a
-  `<text class="chart-title">` outside the `labels` group, so the export
-  lint ignores it.
+  `<g class="chart-title">` outside the `labels` group, checked by the
+  lints' `title-collides`.
 - Someone drawn more than once has their text under every copy, as on the
   canvas. The copy number alone does not say who a copy is.
 - Hidden descendants (#94): `deidentify` works on the drawn pedigree, so the
@@ -256,7 +255,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   the pedigree. It is already a drawn pedigree (`drawnSubset` registers it
   like `asDrawn` does), so `exportSvg`, `exportUShapeSvg` and `deidentify`
   take it unchanged and need no option. The exporters never see the
-  selection.
+  selection. The tickbox is off each time the dialog opens and is never
+  saved.
 - `types.ts` — `SvgExportOptions`.
 - Snapshots (#69): `__tests__/svgSnapshots.test.ts` exports every example
   and every feature fixture (#140) as the standard SVG (normal and compact,
@@ -273,15 +273,16 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `Math.random`.
 
 `__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render
-helpers, not tests.
+helpers, not tests; their runner, `frontend/render-u.sh`, does not currently
+run (#233).
 
 ## csv/ — tabular export
 
 `exporter.ts` writes one row per individual with relationships and tags.
-The last column, `onset` (#93), lists ages of onset as
+`onset` (#93) lists ages of onset as
 `Affected: 40s;Breast cancer: 45y` (tag labels, from `onsetsOf`). Tests
 should not anchor on the line end, so a new column can go last.
-`pedigree_number` (#8) follows: the "II-3" the figure shows (whether or not
+`pedigree_number` (#8) follows it: the "II-3" the figure shows (whether or not
 the figure shows numbers), blank for people hidden under a collapsed branch.
 It is how the numbers link back to the ids. PED stays six columns (#31).
 New columns go on the end so earlier positions never move: `consultand`

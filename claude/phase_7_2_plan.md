@@ -2,7 +2,7 @@
 
 *Define tags per pedigree, apply them to individuals, and choose how each tag is drawn: a coloured quarter of the symbol, a coloured dot, or short coloured text under the symbol. A legend is generated automatically. Signed-in users can keep a personal tag library to reuse across pedigrees.*
 
-Written before the wording settled: the app now calls this "Conditions and tags", a quadrant tag is a condition or trait filling a section, and the personal tag library is "My library". See the glossary in the root `AGENTS.md` (#137).
+Only the files table describes the code as it is now. The rest is the plan as first built: `Tag` has gained fields (see `types.ts`), sections follow the number of conditions in NSGC 2022 (#115), pattern fills exist (#67) and so does narrowing to one condition (#4). Current behaviour is in `frontend/src/pedigree/AGENTS.md`. The app calls this "Conditions and tags", a quadrant tag is a condition or trait filling a section, and the personal tag library is "My library" (`claude/glossary.md`).
 
 ---
 
@@ -58,16 +58,16 @@ Pedigree.tags?: Tag[]        // definitions in display order
 | File | Change |
 |------|--------|
 | `layout-engine/src/types.ts`, `index.ts` | `Tag`, `TagStyle`, `Individual.tags`, `Pedigree.tags` |
-| `frontend/src/pedigree/tags.ts` | New. Palette, lookups, sector geometry, annotation row layout, string-SVG renderers for sectors / row / legend rows |
-| `frontend/src/pedigree/nodes/symbols.tsx` | Sector fills clipped to the symbol outline; annotation row |
-| `frontend/src/pedigree/nodes/PedigreeSymbolNode.tsx` | Pass pedigree tags in; shift name label down when the row is present |
-| `frontend/src/store/usePedigreeStore.ts` | `addTag`, `updateTag`, `deleteTag`, `moveTag`, `setIndividualTag` (all undoable) |
-| `frontend/src/components/TagsDialog.tsx` | New. Manage pedigree tags: add, label, colour, style, abbrev, reorder, delete, library save/add |
-| `frontend/src/components/EditPanel.tsx` | Tag checkboxes for the selected individual, "Manage tags" link |
-| `frontend/src/pedigree/nodes/MoreMenu.tsx` | "Tags" section with toggles |
-| `frontend/src/components/Toolbar.tsx`, `pages/CanvasPage.tsx` | "Tags" button and dialog wiring |
-| `frontend/src/components/LegendDialog.tsx` | Tags section |
-| `frontend/src/io/svg/svgExporter.ts`, `uShapeExporter.ts` | Sectors, annotation row, legend block, bounds |
+| `frontend/src/pedigree/tags.ts` | Palette, lookups, section and sector geometry, annotation row layout (no drawing) |
+| `frontend/src/pedigree/chart/symbols.tsx` | Sector fills clipped to the symbol outline; annotation row. The canvas and every export draw with it |
+| `frontend/src/pedigree/chart/keySwatches.tsx`, `pedigree/exportKey.tsx` | Swatches shared by the legend and the export key; the export key |
+| `frontend/src/store/pedigree/chart.ts`, `person.ts` | `addTag`, `updateTag`, `deleteTag`, `moveTag`; `setIndividualTag` (all undoable) |
+| `frontend/src/components/TagsDialog.tsx` | Manage pedigree tags: add, label, colour, style, abbrev, reorder, delete, library save/add |
+| `frontend/src/components/ConditionsAndTags.tsx` | The Person tab's "Conditions and tags" section |
+| `frontend/src/pedigree/nodes/MoreMenu.tsx` | Conditions and tags sections with toggles |
+| `frontend/src/pages/CanvasPage.tsx` | Dialog wiring |
+| `frontend/src/components/Legend.tsx` | Tags section |
+| `frontend/src/io/svg/svgExporter.tsx`, `ushape/render.tsx` | Key block and bounds |
 | `frontend/src/io/csv/exporter.ts` | `tags` column (labels, `;`-joined) |
 | `frontend/src/api/client.ts` | `tagPresetApi` |
 | `backend/api/serializers.py` | `TagSerializer`, `tags` on individual and pedigree data, `TagPresetSerializer` |

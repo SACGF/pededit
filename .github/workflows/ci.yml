@@ -39,11 +39,13 @@ jobs:
         run: npm run typecheck
       - name: Frontend tests
         run: npm run test:frontend
+      - name: Paths named in the agent guides exist
+        run: npm run test:docs
       # Reported as a warning, never fails the build: knip can be wrong about
-      # code reached in a way it cannot follow. See "Dead code" in AGENTS.md.
+      # code reached in a way it cannot follow. See "Dead code" in frontend/AGENTS.md.
       - name: Dead code (knip)
         continue-on-error: true
-        run: npm run deadcode || { echo "::warning title=Dead code::knip found unused files, exports or dependencies. Run 'npm run deadcode' and see Dead code in AGENTS.md."; exit 1; }
+        run: npm run deadcode || { echo "::warning title=Dead code::knip found unused files, exports or dependencies. Run 'npm run deadcode' and see Dead code in frontend/AGENTS.md."; exit 1; }
 
   backend:
     name: Backend tests

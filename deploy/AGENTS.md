@@ -25,8 +25,7 @@ Deployment" half).
   fixes a server lacks.
 - `deploy.sh` restarts itself (`exec`, guarded by `PEDEDIT_DEPLOY_REEXEC`)
   when its own `git pull` changes it. Without that, bash finishes the old
-  copy and any newly added step is skipped on the deploy that brings it in
-  (the changelog step was, #79).
+  copy and any newly added step is skipped on the deploy that brings it in.
 - Before the build `deploy.sh` runs `frontend/scripts/changelog.mjs` (#79),
   which needs outbound HTTPS to api.github.com and writes the gitignored
   `frontend/public/changelog.json`. A failure keeps the previous file and

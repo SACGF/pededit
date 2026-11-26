@@ -3,8 +3,9 @@
 Planning and research documents. Nothing here is loaded automatically; read
 what you need.
 
-- Pending work is tracked in GitHub issues, not here. The status summary
-  lives in the root AGENTS.md.
+- Pending work is tracked in GitHub issues, not here. `features.md` indexes
+  what exists; `glossary.md` and `issue_workflow.md` hold the glossary and
+  the issue rules.
 - `layout_engine_guide.md` — required reading before touching the layout
   engine or renderer.
 - `nsgc_nomenclature.md`: the NSGC pedigree standard we follow, rule by rule,
@@ -13,7 +14,7 @@ what you need.
 - `search_report.md` — survey of 60+ existing pedigree tools with a feature
   gap analysis in three tiers (open source table stakes, commercial only,
   nobody does it).
-- `phase_6_*.md`, `phase_7_*.md`, `export_u_plan.md` — per-feature design
+- `phase_7_*.md`, `export_u_plan.md`: per-feature design
   notes, each tied to a GitHub issue. Write a new one for any feature that
   needs more than a paragraph of design, and link it from the issue.
 User research, outreach plans and paper drafts are **not** here. They live in

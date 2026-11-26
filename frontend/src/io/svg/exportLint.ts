@@ -34,7 +34,8 @@
  * the export carries no ids (they could be names after a PED import, which
  * de-identification must not leak). It relies on the group classes
  * `exportSvg` writes (couple-lines, sibship-lines, symbols, labels) and the
- * `class="mark"` on childless and twin marks, which are not connecting lines.
+ * `data-childless`, `data-ended` and `data-twin-mark` on marks, which are not
+ * connecting lines.
  */
 import { placementParentOf, type Pedigree, type Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";

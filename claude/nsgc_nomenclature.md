@@ -312,8 +312,8 @@ recommendations stand except as below. No new symbols.
 makes the symbol show gender identity, with sex assigned at birth written
 below it (AMAB, AFAB, UAAB). PedEdit stores biological sex on every person
 and uses it for layout, kinship, X-linked kinship, twins and PED export,
-because inheritance depends on it (root `AGENTS.md`, "Biological sex
-notation"). Gender identity is optional and only changes the drawing: with
+because inheritance depends on it (a product fact in the root `AGENTS.md`;
+every shape decision goes through `frontend/src/pedigree/gender.ts`). Gender identity is optional and only changes the drawing: with
 the pedigree setting "Symbols show: gender identity where recorded" (the
 default) such a person gets the 2022 symbol for their gender and the AMAB /
 AFAB / UAAB line under it, as the 2022 figure does; "biological sex" draws
