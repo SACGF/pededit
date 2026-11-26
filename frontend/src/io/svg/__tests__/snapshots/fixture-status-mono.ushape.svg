@@ -12,19 +12,19 @@
     <path d="M -40 128.8 L 40 128.8" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="0" x2="0" y1="128.8" y2="188.8"/>
     <path d="M -173 151.2 A 188.8 188.8 0 0 0 -60 188.8 L 60 188.8 A 188.8 188.8 0 0 0 215.3 107.3" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-173" x2="-177.2" y1="151.2" y2="156.9"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-173" x2="-180.2" y1="151.2" y2="160.8"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-45.9" x2="-45.9" y1="188.8" y2="200.8"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="45.9" x2="45.9" y1="188.8" y2="200.8"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="112.1" x2="115.4" y1="181.5" y2="193"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="170.1" x2="180.4" y1="153.4" y2="167.7"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="215.3" x2="221.6" y1="107.3" y2="111.7"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="170.1" x2="177.1" y1="153.4" y2="163.1"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="215.3" x2="225.2" y1="107.3" y2="114.2"/>
     <path d="M -192.2 176.9 A 220.8 220.8 0 0 0 -120.9 212.2" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-158.1" x2="-184.8" y1="197.8" y2="251.5"/>
     <path d="M -289.1 162.3 A 280.8 280.8 0 0 0 -60 280.8 L -55.4 280.8" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-289.1" x2="-298.9" y1="162.3" y2="169.2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-243.5" x2="-247.1" y1="212.6" y2="216.8"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-243.5" x2="-251.3" y1="212.6" y2="221.6"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-187.1" x2="-192.6" y1="250.4" y2="261.1"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123.3" x2="-125.9" y1="273.6" y2="284.7"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123.3" x2="-126" y1="273.6" y2="285.3"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-55.4" x2="-55.4" y1="280.8" y2="292.8"/>
     <g transform="translate(-40 128.8) rotate(0)">
       <g transform="translate(-20 -20)">
@@ -82,34 +82,32 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-34.7 20 20)">
-            <g>
-              <clipPath id="symbol-clip-2">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-2)">
-                <g data-carrier-sector="hcm">
-                  <g data-tag-fill="horizontal">
-                    <clipPath id="symbol-clip-2-s0">
-                      <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z"/>
-                    </clipPath>
-                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="white"/>
-                    <path clip-path="url(#symbol-clip-2-s0)" d="M0 2H40M0 6H40M0 10H40M0 14H40M0 18H40M0 22H40M0 26H40M0 30H40M0 34H40M0 38H40" fill="none" stroke="#8c8c8c" stroke-width="1"/>
-                  </g>
-                </g>
-                <g>
-                  <g data-tag-fill="diagonal">
-                    <clipPath id="symbol-clip-2-s1">
-                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z"/>
-                    </clipPath>
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="white"/>
-                    <path clip-path="url(#symbol-clip-2-s1)" d="M-37.172 40L2.828 0M-31.515 40L8.485 0M-25.858 40L14.142 0M-20.201 40L19.799 0M-14.544 40L25.456 0M-8.887 40L31.113 0M-3.23 40L36.77 0M2.426 40L42.426 0M8.083 40L48.083 0M13.74 40L53.74 0M19.397 40L59.397 0M25.054 40L65.054 0M30.711 40L70.711 0M36.368 40L76.368 0" fill="none" stroke="#000000" stroke-width="1"/>
-                  </g>
+          <g>
+            <clipPath id="symbol-clip-2">
+              <rect height="38" width="38" x="1" y="1"/>
+            </clipPath>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            <g clip-path="url(#symbol-clip-2)">
+              <g data-carrier-sector="hcm">
+                <g data-tag-fill="horizontal">
+                  <clipPath id="symbol-clip-2-s0">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z"/>
+                  </clipPath>
+                  <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="white"/>
+                  <path clip-path="url(#symbol-clip-2-s0)" d="M0 2H40M0 6H40M0 10H40M0 14H40M0 18H40M0 22H40M0 26H40M0 30H40M0 34H40M0 38H40" fill="none" stroke="#8c8c8c" stroke-width="1"/>
                 </g>
               </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              <g>
+                <g data-tag-fill="diagonal">
+                  <clipPath id="symbol-clip-2-s1">
+                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z"/>
+                  </clipPath>
+                  <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="white"/>
+                  <path clip-path="url(#symbol-clip-2-s1)" d="M-37.172 40L2.828 0M-31.515 40L8.485 0M-25.858 40L14.142 0M-20.201 40L19.799 0M-14.544 40L25.456 0M-8.887 40L31.113 0M-3.23 40L36.77 0M2.426 40L42.426 0M8.083 40L48.083 0M13.74 40L53.74 0M19.397 40L59.397 0M25.054 40L65.054 0M30.711 40L70.711 0M36.368 40L76.368 0" fill="none" stroke="#000000" stroke-width="1"/>
+                </g>
+              </g>
             </g>
+            <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
@@ -123,25 +121,23 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(35.7 20 20)">
-            <g>
-              <clipPath id="symbol-clip-3">
-                <polygon points="20,1 39,20 20,39 1,20"/>
-              </clipPath>
-              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
-              <g clip-path="url(#symbol-clip-3)">
-                <g>
-                  <g data-tag-fill="dots">
-                    <clipPath id="symbol-clip-3-s0">
-                      <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z"/>
-                    </clipPath>
-                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="white"/>
-                    <path clip-path="url(#symbol-clip-3-s0)" d="M1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000"/>
-                  </g>
+          <g>
+            <clipPath id="symbol-clip-3">
+              <polygon points="20,1 39,20 20,39 1,20"/>
+            </clipPath>
+            <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
+            <g clip-path="url(#symbol-clip-3)">
+              <g>
+                <g data-tag-fill="dots">
+                  <clipPath id="symbol-clip-3-s0">
+                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z"/>
+                  </clipPath>
+                  <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="white"/>
+                  <path clip-path="url(#symbol-clip-3-s0)" d="M1 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 2a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 6a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 10a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 14a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 18a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 22a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 26a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 30a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M1 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M5 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M9 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M13 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M17 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M21 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M25 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M29 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M33 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M37 34a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M3 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M7 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M11 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M15 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M19 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M23 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M27 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M31 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0M35 38a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" fill="#000000"/>
                 </g>
               </g>
-              <polygon fill="none" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
             </g>
+            <polygon fill="none" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
           </g>
         </g>
         <g>
@@ -254,25 +250,23 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-36.8 20 20)">
-            <g>
-              <clipPath id="symbol-clip-7">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-7)">
-                <g>
-                  <g data-tag-fill="horizontal">
-                    <clipPath id="symbol-clip-7-s0">
-                      <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z"/>
-                    </clipPath>
-                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="white"/>
-                    <path clip-path="url(#symbol-clip-7-s0)" d="M0 2H40M0 6H40M0 10H40M0 14H40M0 18H40M0 22H40M0 26H40M0 30H40M0 34H40M0 38H40" fill="none" stroke="#000000" stroke-width="1"/>
-                  </g>
+          <g>
+            <clipPath id="symbol-clip-7">
+              <rect height="38" width="38" x="1" y="1"/>
+            </clipPath>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            <g clip-path="url(#symbol-clip-7)">
+              <g>
+                <g data-tag-fill="horizontal">
+                  <clipPath id="symbol-clip-7-s0">
+                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z"/>
+                  </clipPath>
+                  <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="white"/>
+                  <path clip-path="url(#symbol-clip-7-s0)" d="M0 2H40M0 6H40M0 10H40M0 14H40M0 18H40M0 22H40M0 26H40M0 30H40M0 34H40M0 38H40" fill="none" stroke="#000000" stroke-width="1"/>
                 </g>
               </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
             </g>
+            <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
       </g>
@@ -352,10 +346,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-13 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g>
@@ -409,10 +401,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-40.8 20 20)">
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g data-arrow="consultand">

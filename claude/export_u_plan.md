@@ -11,6 +11,32 @@ layout or anything saved.
 Code: `frontend/src/io/svg/uShapeExporter.ts`. Tests:
 `frontend/src/io/svg/__tests__/uShapeExporter.test.ts`.
 
+## Reference
+
+The figure that prompted #2 is a FAME (familial adult myoclonic epilepsy)
+family bent into a U: Corbett MA et al. (2019) "Intronic ATTTC repeat
+expansions in STARD7 in familial adult myoclonic epilepsy linked to
+chromosome 2", Nature Communications 10:4920,
+https://doi.org/10.1038/s41467-019-12671-y, Supplementary Figure 2a
+(Family 1). The image attached to #2 is the same family in another colouring.
+The U-shape follows it:
+
+- The founder sits at the bottom centre on the innermost track and each
+  generation is one track further out. On the arms the family is an ordinary
+  pedigree turned 90 degrees: siblings stacked, a generation per column.
+- Everything about a person turns with the track: the outline (a square or
+  diamond on a 45 degree stretch is simply drawn tilted), fills, slashes, the
+  arrow, the individual numbers under the symbol and the counts inside
+  diamonds. Readers turn their heads; PedEdit keeps only letters upright,
+  which the figure does not have.
+- Text sits on the outward side of the symbol, along the line of descent.
+
+Where it differs: the figure draws no partners (PedEdit draws them by
+default; "Include married-in partners" off is the figure's form), puts its
+generation numerals I to VI as column heads across the top (I in the
+middle, VI at both edges), and has no flat bottom: the founder's track is a
+plain semicircle.
+
 ## Looking at the output
 
 This is a visual problem, so look at it. In the editor, the toolbar's

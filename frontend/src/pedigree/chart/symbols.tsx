@@ -78,13 +78,6 @@ interface ShapeProps {
    * letters. Slashes turn with the symbol.
    */
   upright?: number;
-  /**
-   * Degrees to turn the outline (with its fill, sections, adoption brackets
-   * and presymptomatic line) by about its centre, within a symbol drawn
-   * turned: the U-shape keeps a square a square and a diamond a diamond this
-   * way (`outlineRotation`). The slashes, letters and marks beside it stay.
-   */
-  outlineTurn?: number;
 }
 
 /** A turn of `deg` degrees about (x, y), or nothing for none. */
@@ -246,22 +239,14 @@ function LossTriangle({ size, fill, slash, sectors, core, clipId, clip }: {
  * A slash through a symbol. Black, and on an affected (black) fill the part
  * inside the symbol is drawn again in white so the slash stays visible.
  */
-function SlashOverFill({ x1, y1, x2, y2, fill, clipId, outlineTurn, size }: {
+function SlashOverFill({ x1, y1, x2, y2, fill, clipId }: {
   x1: number; y1: number; x2: number; y2: number; fill: FillDescriptor; clipId: string;
-  /** The outline's turn (`ShapeProps`): the clip follows the outline, the slash does not. */
-  outlineTurn?: number; size?: number;
 }) {
-  const c = (size ?? 0) / 2;
   return (
     <g>
       <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={LINE_WIDTH} />
-      {fill.type === "solid" && (outlineTurn
-        // A clip is read in the space of the element that uses it, so the
-        // white slash is turned back inside a group turned like the outline.
-        ? <g {...turn(outlineTurn, c, c)} clipPath={`url(#${clipId})`}>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={LINE_WIDTH} {...turn(-outlineTurn, c, c)} />
-          </g>
-        : <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={LINE_WIDTH} clipPath={`url(#${clipId})`} />
+      {fill.type === "solid" && (
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={LINE_WIDTH} clipPath={`url(#${clipId})`} />
       )}
     </g>
   );
@@ -346,7 +331,7 @@ export function AdoptionBrackets({ size, adopted }: { size: number; adopted: str
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright, outlineTurn }: ShapeProps) {
+export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright }: ShapeProps) {
   const { paint, shape } = glyph;
   const fill = symbolFill(paint);
   const { sectors, core } = paint;
@@ -355,26 +340,19 @@ export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright, 
   // sections, and a slash redrawn in white over a black fill.
   const clip = sectors.length > 0 || (fill.type === "solid" && (status === "termination" || status === "stillbirth"));
   const brackets = glyph.adopted ? <AdoptionBrackets size={size} adopted={glyph.adopted} /> : null;
-  const sexSymbol = <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />;
-  const line = paint.line ? <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} /> : null;
-  // What turns with a turned outline: the brackets round it, the outline with
-  // its fill and sections, and the presymptomatic line across it.
-  const outlined = (shapeEl: React.ReactElement, dot: React.ReactNode) => outlineTurn
-    ? <><g {...turn(outlineTurn, size / 2, size / 2)}>{brackets}{shapeEl}</g>{dot}{line && <g {...turn(outlineTurn, size / 2, size / 2)}>{line}</g>}</>
-    : <>{brackets}{shapeEl}{dot}{line}</>;
   if (status) {
     const caption = glyph.caption;
     return (
       <g>
-        {outlined(
-          usesLossTriangle(status)
-            ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} clip={clip} />
-            : sexSymbol,
-          fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />,
-        )}
+        {brackets}
+        {usesLossTriangle(status)
+          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} clip={clip} />
+          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />}
+        {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
+        {paint.line && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
         {status === "pregnancy"  && <g {...turn(upright, size / 2, size / 2)}><PregnancyMark size={size} fill={fill} /></g>}
         {status === "stillbirth" && (
-          <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} outlineTurn={outlineTurn} size={size} />
+          <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
         )}
         {caption && <LifeStatusCaption size={size} text={caption} />}
       </g>
@@ -382,7 +360,10 @@ export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright, 
   }
   return (
     <g>
-      {outlined(sexSymbol, fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />)}
+      {brackets}
+      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />
+      {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
+      {paint.line && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
       {glyph.letter && <g {...turn(upright, size / 2, size / 2)}><RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} /></g>}
     </g>
   );
@@ -591,11 +572,11 @@ export function CopyNumber({ size, index }: { size: number; index: number }) {
 }
 
 /** The number inside a collapsed-branch group symbol. Placement in `collapse.ts`. */
-export function BranchCount({ size, count, upright }: { size: number; count: number; upright?: number }) {
+export function BranchCount({ size, count }: { size: number; count: number }) {
   return (
     <text
       data-branch-count={count}
-      x={size / 2} y={size / 2 + branchCountBaseline(count, size)} {...turn(upright, size / 2, size / 2)}
+      x={size / 2} y={size / 2 + branchCountBaseline(count, size)}
       textAnchor="middle" fontFamily="sans-serif" fontSize={branchCountFontSize(count, size)} fill="black"
       style={{ userSelect: "none" }}
     >

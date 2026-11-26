@@ -175,16 +175,15 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   and the consanguinity labels and assembles the figure, `constants.ts` has
   the shared sizes. No symbol or text under one is drawn in `ushape/`. `glyphOf` in `layout.ts` caches each person's glyph per
   pedigree object, so, as with `kinshipOf`, a test that changes a pedigree
-  in place after laying it out must make a fresh object. Symbols, labels and slashes
-  rotate with the track (that is the design, labels included); only the
-  pregnancy "P" is counter-rotated to stay upright (#71), since a sideways P
-  reads as another letter. A square's or diamond's outline (the group
-  symbol's too), with its fill, sections, adoption brackets and
-  presymptomatic line, turns only by the nearest multiple of 90 degrees
-  (`outlineRotation`, `UShapeNode.symbolRotation`), since either turned 45
-  degrees reads as the other; circles turn with the track. Slashes, the
-  arrow, marks and text still turn with the track, and lines along the
-  normal stop at the outline's edge (`edgeReach` in `connectors.ts`). Twins (#11): `sortSibs` averages a set's order
+  in place after laying it out must make a fresh object. Everything about a
+  person turns with the track so "down" points outward, as in the FAME
+  figure the U-shape follows (`claude/export_u_plan.md`, "Reference"): the
+  outline whatever its shape (a square or diamond on a 45 degree stretch is
+  drawn tilted, #171), fills, slashes, the arrow, numbers (the group count
+  too) and the text under the symbol. Only letters inside or beside the
+  symbol (the pregnancy "P", #71, the role letters, the proband "P") and the
+  "?" and "*" marks are turned back upright (`upright`), since on their side
+  they read as other letters. Twins (#11): `sortSibs` averages a set's order
   keys so members stay side by side, the root sibship is never split between
   the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
   in track coordinates, since a straight chord between twins far apart along

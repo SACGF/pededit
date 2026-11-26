@@ -15,13 +15,13 @@
     <path d="M -80 199 L 0 199" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-40" x2="-40" y1="199" y2="246"/>
     <path d="M -192.8 227.8 A 246 246 0 0 0 -100 246 L 11.7 246" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-192.8" x2="-196.7" y1="227.8" y2="237.5"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-192.8" x2="-197.3" y1="227.8" y2="238.9"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="11.7" x2="11.7" y1="246" y2="258"/>
     <path d="M -204.1 255.6 A 276 276 0 0 0 -100 276 L 11.7 276" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <path d="M -205.6 259.3 A 280 280 0 0 0 -100 280 L 11.7 280" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-67.4" x2="-67.4" y1="278" y2="325"/>
     <path d="M -164.8 318.5 A 325 325 0 0 0 -100 325 L -67.4 325" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-164.8" x2="-167.1" y1="318.5" y2="329.8"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-164.8" x2="-167.2" y1="318.5" y2="330.2"/>
     <path d="M -171.2 349.8 A 357 357 0 0 0 -100 357 L -91.7 357" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123.5" x2="-126.6" y1="356.2" y2="403.1"/>
     <path d="M -178.2 396.4 A 404 404 0 0 0 -100 404 L -97.6 404" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
@@ -110,10 +110,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-22.2 20 20)">
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
@@ -127,10 +125,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-11.5 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>

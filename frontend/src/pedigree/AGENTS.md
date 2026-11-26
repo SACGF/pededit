@@ -758,7 +758,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `branchOf` say what it stands for (`children` is the number drawn inside,
   `hidden` everyone hidden under the couple for the tooltip, the collapsed
   partner or partners whose flag it clears). Each renderer adds only the
-  count inside (`BranchCount`, kept upright in the U-shape). On the canvas it is its own node type
+  count inside (`BranchCount`, turned with the symbol in the U-shape like the counts in the FAME figure, `claude/export_u_plan.md`). On the canvas it is its own node type
   (`collapsedBranch`), not selectable or draggable, so it needs
   `style.pointerEvents: "all"` or React Flow makes it click-through. Code
   that walks the drawn pedigree's people as people (legend sex rows,

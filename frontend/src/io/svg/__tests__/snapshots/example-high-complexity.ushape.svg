@@ -22,7 +22,7 @@
     <path d="M -169.4 188 L 37 188" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-66.2" x2="-66.2" y1="186" y2="220"/>
     <path d="M -248.1 215.3 A 220 220 0 0 0 -203 220 L -37 220" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-248.1" x2="-250.4" y1="215.3" y2="226.7"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-248.1" x2="-250.5" y1="215.3" y2="227.1"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-37" x2="-37" y1="220" y2="232"/>
     <path d="M -117 252 L -37 252" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-77" x2="-77" y1="252" y2="286"/>
@@ -216,10 +216,8 @@
     <g transform="translate(-254.6 246.7) rotate(11.8)">
       <g transform="translate(-20 -20)">
         <g>
-          <g transform="rotate(-11.8 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g data-arrow="proband">

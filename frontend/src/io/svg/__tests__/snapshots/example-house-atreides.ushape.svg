@@ -28,13 +28,13 @@
     <path d="M -183.3 384 A 384 384 0 0 0 -178.6 384 L -103.3 384" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-142.2" x2="-142.2" y1="384" y2="444"/>
     <path d="M -256.8 437.1 A 444 444 0 0 0 -178.6 444 L -72.3 444" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-256.8" x2="-258.9" y1="437.1" y2="448.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-256.8" x2="-258.9" y1="437.1" y2="448.9"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-72.3" x2="-72.3" y1="444" y2="456"/>
     <path d="M -262.4 468.6 A 476 476 0 0 0 -182.9 476" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-222.8" x2="-228.4" y1="473.9" y2="533.7"/>
     <path d="M -403.2 486.7 A 536 536 0 0 0 -178.6 536 L -123 536" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-403.2" x2="-407.4" y1="486.7" y2="495.7"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-304.8" x2="-307.5" y1="520.9" y2="532"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-403.2" x2="-408.2" y1="486.7" y2="497.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-304.8" x2="-307.6" y1="520.9" y2="532.6"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123" x2="-123" y1="536" y2="548"/>
     <path d="M -203 567.5 A 568 568 0 0 0 -178.6 568 L -123 568" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-155.1" x2="-155.1" y1="568" y2="628"/>
@@ -178,10 +178,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-0.7 20 20)">
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
       </g>
@@ -241,10 +239,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-10.1 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g data-arrow="proband">
@@ -283,10 +279,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-2.5 20 20)">
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
       </g>
@@ -341,25 +335,23 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-13.6 20 20)">
-            <g>
-              <clipPath id="symbol-clip-17">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-17)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#9467bd"/>
-                  </g>
+          <g>
+            <clipPath id="symbol-clip-17">
+              <rect height="38" width="38" x="1" y="1"/>
+            </clipPath>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+            <g clip-path="url(#symbol-clip-17)">
+              <g>
+                <g data-tag-fill="solid">
+                  <path d="M -20 20 A 40 40 0 1 1 60 20 A 40 40 0 1 1 -20 20 Z" fill="#9467bd"/>
                 </g>
               </g>
-              <g transform="translate(20 20) scale(0.55) translate(-20 -20)">
-                <rect fill="black" height="38" stroke="white" stroke-width="5.45" width="38" x="1" y="1"/>
-                <rect fill="black" height="38" stroke="none" width="38" x="1" y="1"/>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
             </g>
+            <g transform="translate(20 20) scale(0.55) translate(-20 -20)">
+              <rect fill="black" height="38" stroke="white" stroke-width="5.45" width="38" x="1" y="1"/>
+              <rect fill="black" height="38" stroke="none" width="38" x="1" y="1"/>
+            </g>
+            <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g>
@@ -375,10 +367,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-24.8 20 20)">
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <g>

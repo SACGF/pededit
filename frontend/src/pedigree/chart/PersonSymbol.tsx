@@ -43,26 +43,24 @@ export function PersonSymbol({ glyph, clipId, markerId, nameLines = glyph.nameLi
  * outline, fill, sections, slash, arrow, "?", "*", annotation row, copy
  * number or group count. In the box from (0, 0) to (size, size).
  */
-export function PersonMarks({ glyph, clipId, markerId = "proband-arrowhead", size = NODE_SIZE, upright, outlineTurn }: {
+export function PersonMarks({ glyph, clipId, markerId = "proband-arrowhead", size = NODE_SIZE, upright }: {
   glyph: PersonGlyph;
   clipId: string;
   markerId?: string;
   size?: number;
-  /** Degrees to turn letters and numbers back by when the symbol is drawn turned (the U-shape). */
+  /** Degrees to turn letters and marks back by when the symbol is drawn turned (the U-shape). */
   upright?: number;
-  /** Degrees to turn the outline alone by within a turned symbol (`SymbolShape`). */
-  outlineTurn?: number;
 }) {
   return (
     <>
-      <SymbolShape glyph={glyph} size={size} clipId={clipId} upright={upright} outlineTurn={outlineTurn} />
+      <SymbolShape glyph={glyph} size={size} clipId={clipId} upright={upright} />
       {glyph.deceased && <DeceasedSlash size={size} />}
       {glyph.arrow && <ProbandArrow size={size} kind={glyph.arrow} markerId={markerId} upright={upright} />}
       {glyph.familyHistoryUnknown && <FamilyHistoryMark size={size} hasParents={glyph.hasParents} upright={upright} />}
       {glyph.documented && <DocumentedMark size={size} adopted={!!glyph.adopted} upright={upright} />}
       <AnnotationRow items={glyph.annotations} size={size} offsetY={textUnder(glyph, []).annotationShift} />
       {glyph.copy !== undefined && <CopyNumber size={size} index={glyph.copy} />}
-      {glyph.groupCount !== undefined && <BranchCount size={size} count={glyph.groupCount} upright={upright} />}
+      {glyph.groupCount !== undefined && <BranchCount size={size} count={glyph.groupCount} />}
     </>
   );
 }

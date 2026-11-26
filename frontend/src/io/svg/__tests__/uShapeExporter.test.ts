@@ -588,46 +588,33 @@ describe("the U-shape draws no symbol of its own (#149)", () => {
   });
 });
 
-describe("U-shape squares and diamonds (#171)", () => {
-  // A square turned by 45 degrees is a diamond and a diamond so turned is a
-  // square, so their outlines turn by the nearest multiple of 90 instead;
-  // circles turn with the track.
+describe("U-shape symbols turn with the track (#171)", () => {
+  // As in the FAME figure the U-shape follows (claude/export_u_plan.md): a
+  // square or diamond on a 45 degree stretch is drawn tilted, not squared up,
+  // and the count in a group symbol turns with it.
   const rest = (deg: number) => ((((deg + 45) % 90) + 90) % 90) - 45;
-  // One wide sibship of every sex, so children run round the curve; one son
-  // has a collapsed branch of mixed sexes, drawn as a group diamond.
   const sexes = ["unknown", "male", "female"] as const;
   const kids = Array.from({ length: 24 }, (_, i) => person(`c${i}`, sexes[i % 3]!, i === 1 ? { descendantsHidden: true } : {}));
-  const pedigree = drawnPedigree(build(
+  const pedigree = build(
     [M("dad"), F("mum"), ...kids, F("w"), M("g1"), F("g2")],
     [couple("p", "dad", "mum"), couple("q", "c1", "w")],
     { p: kids.map(k => k.id), q: ["g1", "g2"] },
-  ));
-  const layout = layoutUShape(pedigree)!;
-  const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
-  const nodes = [...layout.nodes.values()];
+  );
+  const svg = exportUShapeSvg(pedigree, { personIds: true });
+  const groups = svg.split(/(?=<g data-id="|<g class=")/).slice(1);
+  const of = (id: string) => groups.find(g => g.startsWith(`<g data-id="${id}"`))!;
+  const rotation = (g: string) => Number(/rotate\((-?[\d.]+)\)/.exec(g)![1]);
 
-  for (const [shape, sex] of [["diamond", "unknown"], ["square", "male"]] as const) {
-    it(`draws a ${shape} on a 45 degree stretch of the track as a ${shape}`, () => {
-      const of = nodes.filter(n => sexOf.get(n.id) === sex);
-      const steep = of.filter(n => Math.abs(Math.abs(rest(n.rotation)) - 45) < 12);
-      expect(steep.length).toBeGreaterThan(0);
-      for (const n of of) {
-        expect(Math.abs(rest(n.symbolRotation))).toBeLessThan(1e-9);
-        // Still turned with the track, to the nearest quarter turn.
-        expect(Math.abs(n.symbolRotation - n.rotation)).toBeLessThanOrEqual(45 + 1e-9);
-      }
-    });
-  }
-
-  it("keeps the collapsed group symbol a diamond", () => {
-    const group = nodes.find(n => isBranchPlaceholderId(n.id))!;
-    expect(sexOf.get(group.id)).toBe("unknown");
-    expect(Math.abs(rest(group.symbolRotation))).toBeLessThan(1e-9);
+  it("draws squares and diamonds turned fully, with no outline turned back", () => {
+    const steep = kids.filter(k => k.sex !== "female" && Math.abs(Math.abs(rest(rotation(of(k.id)))) - 45) < 12);
+    expect(steep.length).toBeGreaterThan(0);
+    // Inside the person's own turned group, nothing is turned again.
+    for (const k of kids) expect(of(k.id).replace(/^<g [^>]*>/, ""), k.id).not.toMatch(/<(rect|polygon|path|g)[^>]*rotate\(/);
   });
 
-  it("turns circles with the track", () => {
-    const circles = nodes.filter(n => sexOf.get(n.id) === "female");
-    expect(circles.some(n => Math.abs(rest(n.rotation)) > 20)).toBe(true);
-    for (const n of circles) expect(n.symbolRotation).toBe(n.rotation);
+  it("turns the count in a group symbol with the track", () => {
+    const groupId = drawnPedigree(pedigree).individuals.find(i => isBranchPlaceholderId(i.id))!.id;
+    const count = /<text data-branch-count[^>]*>/.exec(of(groupId))![0];
+    expect(count).not.toMatch(/transform/);
   });
 });
