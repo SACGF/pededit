@@ -2,6 +2,13 @@ import { isAffected, type Pedigree } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { kinshipOf } from "../../pedigree/relatedness";
 import { childrenOf, parentCoupleOf, parentRoles } from "../../pedigree/graph";
+import { pedigreeNumbers } from "../../pedigree/scene";
+import { personSubject } from "../../pedigree/personLabel";
+import { lifeStatusLabel } from "../../pedigree/lifeStatus";
+import { childlessLabel } from "../../pedigree/childless";
+import { adoptionLabel } from "../../pedigree/adoption";
+import { assistedLossText } from "../../pedigree/assisted";
+import { twinLegendLabel } from "../../pedigree/twins";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
@@ -106,7 +113,7 @@ export function pedLostLifeStatus(pedigree: Pedigree): Pedigree["individuals"] {
 }
 
 /** Individuals whose adoption brackets PED cannot carry. */
-export function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
+function pedLostAdoption(pedigree: Pedigree): Pedigree["individuals"] {
   return pedigree.individuals.filter(i => !!i.adopted);
 }
 
@@ -120,7 +127,7 @@ export function pedLostAssisted(pedigree: Pedigree): Pedigree["individuals"] {
 }
 
 /** Twin sets PED cannot carry, as [partnership, members, zygosity]. */
-export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
+function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] {
   const out: { partnership: Pedigree["partnerships"][0]; members: string[]; zygosity: string }[] = [];
   for (const p of pedigree.partnerships) {
     const children = new Set(childrenOf(pedigree, p.id));
@@ -133,12 +140,12 @@ export function pedLostTwins(pedigree: Pedigree): { partnership: Pedigree["partn
 }
 
 /** Partnerships marked ended, which PED cannot carry. */
-export function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
+function pedLostEnded(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.ended);
 }
 
 /** Partnerships whose childless mark PED cannot carry. */
-export function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
+function pedLostChildless(pedigree: Pedigree): Pedigree["partnerships"] {
   return pedigree.partnerships.filter(p => !!p.childless && childrenOf(pedigree, p.id).length === 0);
 }
 
@@ -163,4 +170,31 @@ export function pedLostConsanguinity(pedigree: Pedigree): { partnership: Pedigre
     else if (shownLabel) out.push({ partnership: p, what: `"${label}" above the double line` });
   }
   return out;
+}
+
+/**
+ * Everything in the pedigree that PED cannot carry, one line each, naming
+ * the people by pedigree number as the problems list does. Empty when PED
+ * loses nothing; Export PED shows the lines before writing the file.
+ */
+export function pedExportLosses(pedigree: Pedigree): string[] {
+  const lost = pedLostLifeStatus(pedigree);
+  const lostCouples = pedLostChildless(pedigree);
+  const lostAdopted = pedLostAdoption(pedigree);
+  const lostTwins = pedLostTwins(pedigree);
+  const lostEnded = pedLostEnded(pedigree);
+  const lostAssisted = pedLostAssisted(pedigree);
+  const lostConsanguinity = pedLostConsanguinity(pedigree);
+  if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0 && lostAssisted.length === 0 && lostConsanguinity.length === 0) return [];
+  const numbers = pedigreeNumbers(pedigree);
+  const nameOf = (id: string) => personSubject(pedigree, id, numbers);
+  return [
+    ...lost.map(i => `${nameOf(i.id)}: ${lifeStatusLabel(i.lifeStatus!)}`),
+    ...lostAdopted.map(i => `${nameOf(i.id)}: ${adoptionLabel(i.adopted!)}`),
+    ...lostTwins.map(t => `${t.members.map(nameOf).join(", ")}: ${twinLegendLabel(t.zygosity as "monozygotic" | "dizygotic" | "unknown")}`),
+    ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
+    ...lostEnded.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: relationship ended`),
+    ...lostAssisted.map(i => `${nameOf(i.id)}: ${assistedLossText(i, nameOf)}`),
+    ...lostConsanguinity.map(c => `${nameOf(c.partnership.individual1)} and ${nameOf(c.partnership.individual2)}: ${c.what}`),
+  ];
 }

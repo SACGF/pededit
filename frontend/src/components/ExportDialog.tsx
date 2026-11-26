@@ -13,6 +13,7 @@ import { clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { uShapeExportLayout } from "../pedigree/uShapeView";
 import { selectionLabel, selectionPedigree, selectionSubset } from "../pedigree/selectionSubset";
+import { downloadBlob } from "../utils/download";
 
 interface ExportDialogProps {
   open: boolean;
@@ -22,15 +23,6 @@ interface ExportDialogProps {
   title: string;
   /** Initial state of the compact toggle, normally the canvas setting. */
   defaultCompact?: boolean;
-}
-
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a   = document.createElement("a");
-  a.href     = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defaultCompact = false }: ExportDialogProps) {

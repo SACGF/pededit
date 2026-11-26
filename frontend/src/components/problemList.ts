@@ -8,7 +8,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { findProblems, type Problem, type ProblemField } from "../pedigree/validation";
 import { pedigreeNumbers } from "../pedigree/scene";
-import { personLabel } from "../pedigree/personLabel";
+import { personSubject } from "../pedigree/personLabel";
 
 export interface ProblemIndex {
   all: Problem[];
@@ -63,16 +63,6 @@ export function problemSubject(pedigree: Pedigree, problem: Problem, numbers: Ma
   if (problem.individualId) return label(problem.individualId);
   const couple = pedigree.partnerships.find(p => p.id === problem.partnershipId);
   return couple ? `${label(couple.individual1)} and ${label(couple.individual2)}` : "Couple";
-}
-
-/**
- * One person in a list of several, as the problems list and the PED warning
- * name them: "II-2, Mary", "II-2, unnamed female", or without a number
- * (someone not drawn) "Unnamed female".
- */
-export function personSubject(pedigree: Pedigree, id: string, numbers: Map<string, string>): string {
-  const number = numbers.get(id);
-  return number ? `${number}, ${personLabel(pedigree, id, "unnamed")}` : personLabel(pedigree, id, "unnamed", { start: true });
 }
 
 /** The person to select for a problem: the person, or a couple's first partner (the panel shows their couples). */

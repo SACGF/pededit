@@ -5,14 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedLostLifeStatus, pedLostChildless, pedLostAdoption, pedLostTwins, pedLostEnded, pedLostAssisted, pedLostConsanguinity } from "../io/ped/exporter.js";
-import { lifeStatusLabel } from "../pedigree/lifeStatus";
-import { childlessLabel } from "../pedigree/childless";
-import { adoptionLabel } from "../pedigree/adoption";
-import { assistedLossText } from "../pedigree/assisted";
-import { twinLegendLabel } from "../pedigree/twins";
-import { pedigreeNumbers } from "../pedigree/scene";
-import { personSubject } from "./problemList";
+import { pedExportLosses } from "../io/ped/exporter.js";
+import { downloadText } from "../utils/download";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
 import { FilterMenu } from "./FilterMenu";
@@ -87,62 +81,22 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
 
   function handleExportPedClick(dialect: PedDialect) {
     setPedMenuOpen(false);
-    const lost = pedLostLifeStatus(pedigree);
-    const lostCouples = pedLostChildless(pedigree);
-    const lostAdopted = pedLostAdoption(pedigree);
-    const lostTwins = pedLostTwins(pedigree);
-    const lostEnded = pedLostEnded(pedigree);
-    const lostAssisted = pedLostAssisted(pedigree);
-    const lostConsanguinity = pedLostConsanguinity(pedigree);
-    if (lost.length === 0 && lostCouples.length === 0 && lostAdopted.length === 0 && lostTwins.length === 0 && lostEnded.length === 0 && lostAssisted.length === 0 && lostConsanguinity.length === 0) { handleExportPed(dialect); return; }
-    const numbers = pedigreeNumbers(pedigree);
-    const nameOf = (id: string) => personSubject(pedigree, id, numbers);
-    setPedWarning({
-      dialect,
-      lines: [
-        ...lost.map(i => `${nameOf(i.id)}: ${lifeStatusLabel(i.lifeStatus!)}`),
-        ...lostAdopted.map(i => `${nameOf(i.id)}: ${adoptionLabel(i.adopted!)}`),
-        ...lostTwins.map(t => `${t.members.map(nameOf).join(", ")}: ${twinLegendLabel(t.zygosity as "monozygotic" | "dizygotic" | "unknown")}`),
-        ...lostCouples.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: ${childlessLabel(p.childless!)}`),
-        ...lostEnded.map(p => `${nameOf(p.individual1)} and ${nameOf(p.individual2)}: relationship ended`),
-        ...lostAssisted.map(i => `${nameOf(i.id)}: ${assistedLossText(i, nameOf)}`),
-        ...lostConsanguinity.map(c => `${nameOf(c.partnership.individual1)} and ${nameOf(c.partnership.individual2)}: ${c.what}`),
-      ],
-    });
+    const lines = pedExportLosses(pedigree);
+    if (lines.length === 0) handleExportPed(dialect);
+    else setPedWarning({ dialect, lines });
   }
 
   function handleExportPed(dialect: PedDialect) {
     setPedWarning(null);
-    const text = exportPed(pedigree, { familyId: "1", dialect });
-    const blob = new Blob([text], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${activeTitle ?? "pedigree"}.ped`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadText(exportPed(pedigree, { familyId: "1", dialect }), "text/plain", `${activeTitle ?? "pedigree"}.ped`);
   }
 
   function handleExportCsv() {
-    const text = exportCsv(pedigree, "FAM001");
-    const blob = new Blob([text], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${activeTitle ?? "pedigree"}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadText(exportCsv(pedigree, "FAM001"), "text/csv", `${activeTitle ?? "pedigree"}.csv`);
   }
 
   function handleExportJson() {
-    const text = exportJson(pedigree, { title: activeTitle ?? "pedigree" });
-    const blob = new Blob([text], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${activeTitle ?? "pedigree"}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadText(exportJson(pedigree, { title: activeTitle ?? "pedigree" }), "application/json", `${activeTitle ?? "pedigree"}.json`);
   }
 
   return (

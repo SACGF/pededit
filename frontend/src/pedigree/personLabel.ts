@@ -30,3 +30,13 @@ export function personLabel(pedigree: Pedigree, id: string, style: PersonLabelSt
 function sexWords(sex: Sex | undefined): string {
   return sex === "male" || sex === "female" ? sex : "unknown sex";
 }
+
+/**
+ * One person in a list of several, as the problems list and the PED warning
+ * name them: "II-2, Mary", "II-2, unnamed female", or without a number
+ * (someone not drawn) "Unnamed female".
+ */
+export function personSubject(pedigree: Pedigree, id: string, numbers: Map<string, string>): string {
+  const number = numbers.get(id);
+  return number ? `${number}, ${personLabel(pedigree, id, "unnamed")}` : personLabel(pedigree, id, "unnamed", { start: true });
+}

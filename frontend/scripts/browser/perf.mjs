@@ -271,8 +271,8 @@ async function interact(page, around) {
     return { update: f.ms / f.updates, longest: f.longest };
   });
   await run("drop", () => timed(page, "pointerup", () => page.mouse.up()));
-  // "Auto arrange" is on the canvas only while someone is pinned (a production build has no store to ask).
-  if (await page.locator('.react-flow button:has-text("Auto arrange")').count() === 0) throw new Error("the drag did not pin the person");
+  // The toolbar shows "Reset layout" only while someone is pinned (a production build has no store to ask).
+  if (await page.locator('[data-testid="toolbar"] button:has-text("Reset layout")').count() === 0) throw new Error("the drag did not pin the person");
   return out;
 }
 

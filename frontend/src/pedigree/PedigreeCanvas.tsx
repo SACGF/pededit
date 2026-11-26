@@ -5,7 +5,6 @@ import {
   Controls,
   MiniMap,
   type MiniMapNodeProps,
-  Panel,
   applyNodeChanges,
   type NodeTypes,
   type EdgeTypes,
@@ -180,7 +179,7 @@ function PedigreeMinimap({ pedigree }: { pedigree: Pedigree }) {
 
 /**
  * Refits the view, once the new layout has rendered, when a pedigree is
- * loaded, compact mode is toggled or Auto arrange / Reset layout
+ * loaded, compact mode is toggled or Reset layout
  * clears the pins (#64: an auto layout of several families is often wider
  * than the hand-placed one).
  *
@@ -321,10 +320,8 @@ interface PedigreeCanvasProps {
 }
 
 export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonTap, onPaneTap }: PedigreeCanvasProps) {
-  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, resetLayout, picking } = usePedigreeFields("pedigree", "selectedIds", "setSelectedId", "setSelection", "pinIndividuals", "resetLayout", "picking");
+  const { pedigree, selectedIds, setSelectedId, setSelection, pinIndividuals, picking } = usePedigreeFields("pedigree", "selectedIds", "setSelectedId", "setSelection", "pinIndividuals", "picking");
   const [contextMenu, setContextMenu] = useState<ContextMenuTarget | null>(null);
-  const hasPinnedNodes = !!pedigree.pinnedPositions &&
-    Object.keys(pedigree.pinnedPositions).length > 0;
   // A drag let go over a disabled hover pill button must still end (#185).
   useEffect(() => endMouseGesturesOverDisabled(), []);
 
@@ -546,24 +543,6 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
               Use the toolbar above to add people
             </span>
           </div>
-        )}
-        {hasPinnedNodes && (
-          <Panel position="top-left">
-            <button
-              onClick={resetLayout}
-              style={{
-                padding: "4px 10px",
-                fontSize: 12,
-                background: "white",
-                border: "1px solid #d1d5db",
-                borderRadius: 4,
-                cursor: "pointer",
-                color: "#374151",
-              }}
-            >
-              Auto arrange
-            </button>
-          </Panel>
         )}
         <PickingBanner />
         <FilterBanner />

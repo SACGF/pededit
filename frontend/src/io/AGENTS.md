@@ -55,9 +55,10 @@ Rules that keep a bad file from importing as nonsense (#31):
 PED cannot carry pregnancy / loss status, twins, adoption, childless couple
 marks, ended relationships or assisted reproduction details (#45: the D/S
 letter, `carriedBy`, `socialParents`; a donor is written as the genetic
-parent, which is right). `pedLostLifeStatus`, `pedLostTwins`, `pedLostAdoption`,
-`pedLostChildless`, `pedLostEnded` and `pedLostAssisted` in `exporter.ts` list what a file would drop; the toolbar
-warns with them before writing.
+parent, which is right), or consanguinity it cannot work out from the
+parents. `pedExportLosses` in `exporter.ts` lists what a file would drop, one
+line per person or couple (from the `pedLost*` functions there); the toolbar
+shows the lines before writing.
 
 ## json/ — native lossless format
 

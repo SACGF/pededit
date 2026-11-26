@@ -553,7 +553,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   a person who may be unnamed: "this person" (the subject of a refusal),
   "unnamed" ("unnamed female", in a list or a pair) or `{ partner: n }`.
   The problems list and the PED warning add the pedigree number
-  (`personSubject` in `components/problemList.ts`). A
+  (`personSubject`, here too). A
   cross-generation link draws
   the older partner twice with the dashed arc, as kinship2 does; that is the
   layout, not a bug in the link.
