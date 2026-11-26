@@ -21,7 +21,7 @@ const ALLOWED = new Set([
   // On the server, written by the install steps.
   "/etc/pededit/pededit.json",
   // Build output and scratch directories, not checked in.
-  "dist/", ".worktrees/",
+  "dist/", ".worktrees/", ".claude/worktrees/",
   // URL routes, not files.
   "api/health/", "api/auth/token/refresh/", "auth/token/refresh/", "djstatic/",
   // Named as absent: "There is no `api/admin.py`".
