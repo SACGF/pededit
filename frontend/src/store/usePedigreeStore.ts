@@ -269,6 +269,15 @@ interface PedigreeState {
   notice: Notice | null;
   setNotice: (notice: Omit<Notice, "id"> | null) => void;
 
+  /**
+   * The canvas draws the pedigree bent round a U (#220), the U-shape
+   * export's figure, instead of the editable chart. A way of looking, so not
+   * saved with the pedigree and not undoable; opening a pedigree turns it
+   * off. Turning it on cancels any picking, which needs the chart.
+   */
+  uShapeView: boolean;
+  setUShapeView: (on: boolean) => void;
+
   /** Active on-canvas picking, or null. Not undoable. */
   picking: Picking | null;
   startPickingParents: (childId: string) => void;
@@ -657,7 +666,10 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
     layoutResetCount: 0,
     revealRequest: null,
     notice: null,
+    uShapeView: false,
     picking: null,
+
+    setUShapeView: (on) => set(on ? { uShapeView: true, picking: null } : { uShapeView: false }),
 
     setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
 
@@ -731,6 +743,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       ...selectOnly(null),
       isDirty: false,
       picking: null,
+      uShapeView: false,
     })),
 
     reset: () => set({
@@ -740,6 +753,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
       ...selectOnly(null),
       isDirty: false,
       picking: null,
+      uShapeView: false,
     }),
 
     getPedigree: () => get().pedigree,

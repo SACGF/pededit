@@ -17,6 +17,8 @@ import { FilterMenu } from "./FilterMenu";
 import { ProblemsMenu } from "./ProblemsMenu";
 import { exportJson } from "../io/json/index.js";
 import { useSmallScreen } from "../hooks/useSmallScreen";
+import { U_SHAPE_REFUSALS } from "../pedigree/uShapeView";
+import { useUShapeToggle } from "../hooks/useUShapeToggle";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -30,6 +32,14 @@ function FemaleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16">
       <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+/** The U-shape view's button: a horseshoe. */
+function UShapeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+      <path d="M2 1.5 V6 A4 4 0 0 0 10 6 V1.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -49,7 +59,7 @@ interface ToolbarProps {
 }
 
 export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: ToolbarProps) {
-  const { addIndividual, undo, redo, past, future, pedigree, resetLayout } = usePedigreeFields("addIndividual", "undo", "redo", "past", "future", "pedigree", "resetLayout");
+  const { addIndividual, undo, redo, past, future, pedigree, resetLayout, uShapeView, setNotice } = usePedigreeFields("addIndividual", "undo", "redo", "past", "future", "pedigree", "resetLayout", "uShapeView", "setNotice");
   // An example drawn before its first edit (#151) is in the editor too.
   const hasPedigree = useAppStore(s => s.activePedigreeId !== null || s.example !== null);
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
@@ -63,6 +73,15 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   // PED has no column for pregnancy / loss status, so warn before writing
   // those individuals as ordinary children. Holds the chosen dialect too.
   const [pedWarning, setPedWarning] = useState<{ lines: string[]; dialect: PedDialect } | null>(null);
+
+  const { toggle: toggleUShapeView } = useUShapeToggle();
+  // In the U-shape view the add buttons and Reset layout do nothing useful.
+  // They stay clickable, dimmed, and say why: a disabled button cannot
+  // show its hover text.
+  const notInU = (title: string, why: string, run: () => void) => uShapeView
+    ? { title: `${title}: not in the U-shape view. Click for why.`, "aria-disabled": true, onClick: () => setNotice({ kind: "info", text: why }) }
+    : { title, onClick: run };
+  const dim = uShapeView ? "opacity-40" : "";
 
   function handleExportPedClick(dialect: PedDialect) {
     setPedMenuOpen(false);
@@ -161,28 +180,25 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
       {/* Add individual — action buttons, not mode toggles */}
       <Button
         variant="ghost" size="sm"
-        title="Add male"
         disabled={!hasPedigree}
-        onClick={() => addIndividual("male")}
-        className="h-7 w-7 p-0"
+        {...notInU("Add male", U_SHAPE_REFUSALS.add, () => addIndividual("male"))}
+        className={`h-7 w-7 p-0 ${dim}`}
       >
         <MaleIcon />
       </Button>
       <Button
         variant="ghost" size="sm"
-        title="Add female"
         disabled={!hasPedigree}
-        onClick={() => addIndividual("female")}
-        className="h-7 w-7 p-0"
+        {...notInU("Add female", U_SHAPE_REFUSALS.add, () => addIndividual("female"))}
+        className={`h-7 w-7 p-0 ${dim}`}
       >
         <FemaleIcon />
       </Button>
       <Button
         variant="ghost" size="sm"
-        title="Add unknown sex"
         disabled={!hasPedigree}
-        onClick={() => addIndividual("unknown")}
-        className="h-7 w-7 p-0"
+        {...notInU("Add unknown sex", U_SHAPE_REFUSALS.add, () => addIndividual("unknown"))}
+        className={`h-7 w-7 p-0 ${dim}`}
       >
         <UnknownIcon />
       </Button>
@@ -215,9 +231,8 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
       {hasPins && (
         <Button
           variant="ghost" size="sm"
-          className="h-7 px-2 gap-1 text-xs text-gray-500"
-          title="Clear all manual node positions and restore auto-layout"
-          onClick={resetLayout}
+          {...notInU("Clear all manual node positions and restore auto-layout", U_SHAPE_REFUSALS.resetLayout, resetLayout)}
+          className={`h-7 px-2 gap-1 text-xs text-gray-500 ${dim}`}
         >
           Reset layout
         </Button>
@@ -228,6 +243,23 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
 
       {/* View filters */}
       <FilterMenu disabled={!hasPedigree} />
+
+      {/* U-shape view (#220): a way of looking, toggled, not saved. On a
+          phone it is in the Filter menu, so the toolbar still fits 360px. */}
+      {!small && <Button
+        variant="ghost" size="sm"
+        className={`h-7 px-2 gap-1 text-xs ${uShapeView ? "font-medium text-black bg-gray-100" : ""}`}
+        title={uShapeView
+          ? "Back to the standard chart"
+          : "Draw the family bent round a U, for wide families. Some people are not drawn; edit on the Person tab."}
+        aria-pressed={uShapeView}
+        data-testid="u-shape-toggle"
+        disabled={!hasPedigree}
+        onClick={toggleUShapeView}
+      >
+        <UShapeIcon />
+        U-shape
+      </Button>}
 
       {small ? (
         <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>

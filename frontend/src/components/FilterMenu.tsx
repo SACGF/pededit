@@ -5,6 +5,8 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { VIEW_FILTERS, activeFilters, filterLabel } from "../pedigree/viewFilters";
 import { conditionTags } from "../pedigree/conditions";
+import { useSmallScreen } from "../hooks/useSmallScreen";
+import { useUShapeToggle } from "../hooks/useUShapeToggle";
 
 /**
  * The view filters as a toolbar menu of switches, so they can be turned
@@ -22,6 +24,9 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
   const conditions = conditionTags(pedigree);
   const chosen = pedigree.filters?.affectedCondition;
   const sides = VIEW_FILTERS.filter(f => f.group === "side");
+  // A phone's toolbar has no room for the U-shape button (#220), so it is here.
+  const small = useSmallScreen();
+  const uShape = useUShapeToggle();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -39,6 +44,22 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-2 space-y-2" side="bottom" align="end">
+        {small && (
+          <label className="flex items-start gap-2 cursor-pointer border-b pb-2">
+            <input
+              type="checkbox"
+              name="uShapeView"
+              data-testid="u-shape-toggle"
+              className="mt-0.5"
+              checked={uShape.on}
+              onChange={() => { uShape.toggle(); setOpen(false); }}
+            />
+            <div>
+              <div className="text-sm">U-shape view</div>
+              <div className="text-xs text-gray-400">Draw the family bent round a U, for wide families. Some people are not drawn; edit on the Person tab.</div>
+            </div>
+          </label>
+        )}
         {VIEW_FILTERS.filter(f => !f.group).map(f => (
           <div key={f.id}>
             <label className="flex items-start gap-2 cursor-pointer">

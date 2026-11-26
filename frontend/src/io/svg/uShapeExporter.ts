@@ -34,6 +34,6 @@
 // packs it along the tracks (no SVG), connectors.ts draws the lines along
 // them, render.ts draws the symbols and text and assembles the figure.
 // This file is the public entry.
-export { exportUShapeSvg } from "./ushape/render";
+export { exportUShapeSvg, renderUShape } from "./ushape/render";
 export { layoutUShape } from "./ushape/layout";
 export type { UShapeLayout, UShapeNode } from "./ushape/layout";

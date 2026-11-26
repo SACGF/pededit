@@ -73,7 +73,7 @@ type PanelTab = "person" | "pedigree";
  * Person can be tapped with nobody selected and says to tap someone.
  */
 export function EditPanel({ onManageTags, size = "half", onSizeChange }: EditPanelProps) {
-  const { pedigree, selectedId, selectedIds } = usePedigreeFields("pedigree", "selectedId", "selectedIds");
+  const { pedigree, selectedId, selectedIds, uShapeView } = usePedigreeFields("pedigree", "selectedId", "selectedIds", "uShapeView");
   const small = useSmallScreen();
   const open = !small || size !== "closed";
   const anyone = selectedIds.length > 0;
@@ -119,7 +119,8 @@ export function EditPanel({ onManageTags, size = "half", onSizeChange }: EditPan
             <SelectionPanel />
           ) : individual ? (
             <>
-              {small && <PersonActions individual={individual} />}
+              {/* The hover pill's buttons: on a phone, and in the U-shape view, which has no pill (#220). */}
+              {(small || uShapeView) && <PersonActions individual={individual} />}
               <IndividualForm individual={individual} onManageTags={onManageTags} />
             </>
           ) : (

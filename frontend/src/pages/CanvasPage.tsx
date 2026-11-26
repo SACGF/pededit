@@ -4,6 +4,7 @@ import { useAppStore } from "../store/useAppStore";
 import { usePedigreeStore, usePedigreeFields } from "../store/usePedigreeStore";
 import { Button } from "@/components/ui/button";
 import { PedigreeCanvas } from "../pedigree/PedigreeCanvas";
+import { UShapeView } from "../pedigree/UShapeView";
 import { Toolbar } from "../components/Toolbar";
 import { EditPanel, type PanelSize } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
@@ -64,7 +65,7 @@ export default function CanvasPage() {
   const editorOpen = activePedigreeId !== null || openExampleInfo !== null;
   // Failed creates of an example's copy so far, which spaces out the retries.
   const [copyRetries, setCopyRetries] = useState(0);
-  const { isDirty, pedigree, notice, setNotice, undo } = usePedigreeFields("isDirty", "pedigree", "notice", "setNotice", "undo");
+  const { isDirty, pedigree, notice, setNotice, undo, uShapeView } = usePedigreeFields("isDirty", "pedigree", "notice", "setNotice", "undo", "uShapeView");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(() => localStorage.getItem("showMinimap") !== "false");
   const [compact, setCompact] = useState(() => {
@@ -325,7 +326,7 @@ export default function CanvasPage() {
 
         {/* How to select and move around: there is no select mode (#122), so it is said here, always in view. */}
         <div className="px-3 py-2 border-t text-[11px] text-gray-500 leading-snug" data-testid="canvas-help">
-          <p className="text-gray-700 mb-1">Using the canvas</p>
+          <p className="text-gray-700 mb-1">{uShapeView ? "Using the U-shape view" : "Using the canvas"}</p>
           {/* By touch, in place of the list below. */}
           <ul className="space-y-0.5 hidden pointer-coarse:block">
             <li>Tap a person to see and edit them</li>
@@ -333,6 +334,14 @@ export default function CanvasPage() {
             <li>Drag to pan, pinch to zoom</li>
             <li>Selecting several people needs a mouse or keyboard</li>
           </ul>
+          {uShapeView ? (
+          <ul className="space-y-0.5 pointer-coarse:hidden">
+            <li>Click a person to select them and edit them on the Person tab</li>
+            <li><b className="font-medium text-gray-700">Shift+click</b> to add or remove from the selection</li>
+            <li>Drag to pan, scroll to zoom</li>
+            <li>The U is laid out for you: nobody is dragged, and there are no menus on it</li>
+          </ul>
+          ) : (
           <ul className="space-y-0.5 pointer-coarse:hidden">
             <li>Click a person to select and edit them</li>
             <li><b className="font-medium text-gray-700">Shift+click</b> to add or remove from the selection</li>
@@ -340,6 +349,7 @@ export default function CanvasPage() {
             <li>Drag the background to pan, scroll to zoom</li>
             <li>Right-click a person or couple line for more</li>
           </ul>
+          )}
         </div>
 
         {/* Feedback and self-hosting */}
@@ -419,8 +429,10 @@ export default function CanvasPage() {
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
           <div className={`min-h-0 min-w-0 relative ${panelSize === "full" ? "max-lg:h-[min(7rem,20dvh)] max-lg:flex-none lg:flex-1" : "flex-1"}`}>
             {/* The minimap would cover a third of a phone's canvas. */}
-            <PedigreeCanvas showMinimap={showMinimap && !small} compact={compact}
-              onPersonTap={openPanel} onPaneTap={closePanel} />
+            {uShapeView
+              ? <UShapeView onPersonTap={openPanel} onPaneTap={closePanel} />
+              : <PedigreeCanvas showMinimap={showMinimap && !small} compact={compact}
+                  onPersonTap={openPanel} onPaneTap={closePanel} />}
             {notice && (
               <div
                 role={notice.kind === "error" ? "alert" : "status"}

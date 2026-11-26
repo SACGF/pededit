@@ -320,6 +320,7 @@ the flow. They run in CI.
 | `draw-couple-beside` | "Draw this couple beside" on a couple line in a family with a loop: who is drawn twice changes, the notice, undo, saved and reloaded; not offered for a couple with a partner who married in (#205). The same choice on a partner's own menu, and the couple's items on the menu of both partners selected (#207) |
 | `export-selected` | two siblings selected: the export dialog's "Only the 2 selected people (+2 to connect them)", off by default; the SVG and U-shape have them and their parents only, the key only their condition; pedigree, canvas and CSV unchanged (#215) |
 | `translated-page` | every text node replaced the way browser page translation does it (not Chrome's translator): opening and closing Clinical details and marking a person affected do not reach the error boundary (`src/domGuard.ts`) |
+| `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, not saved over a reload |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

@@ -108,12 +108,21 @@ export function renderDebugTracks(b: Built, layout: UShapeLayout): string[] {
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = {}): string {
+  return renderUShape(pedigree, options).svg;
+}
+
+/**
+ * The figure and the layout it was drawn from, from one layout pass: the
+ * editor's U-shape view (#220) needs both, to count who is drawn. `layout`
+ * is null, and the SVG an empty white box, when there is nobody to descend from.
+ */
+export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {}): { svg: string; layout: UShapeLayout | null } {
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
   const b = build(working, { partners: options.uShapePartners });
   if (!b) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
+    return { layout: null, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
   <rect width="200" height="100" fill="white"/>
-</svg>`;
+</svg>` };
   }
   const layout = toLayout(working, b);
 
@@ -131,7 +140,7 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
     minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
-  const legend = renderExportKeySvg(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
+  const legend = options.key === false ? { width: 0, height: 0, markup: [] } : renderExportKeySvg(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
   const titleW = options.title ? titleWidth(options.title) + 2 * padding : 0;
   const drawingW = Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding);
@@ -166,5 +175,5 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
     out.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);
   }
   out.push(`</svg>`);
-  return out.join("\n");
+  return { svg: out.join("\n"), layout };
 }

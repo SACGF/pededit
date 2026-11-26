@@ -11,10 +11,12 @@ const ACTION_CLASS = "flex min-w-0 flex-1 h-12 flex-col items-center justify-cen
  * Small screens: the hover pill's buttons (`pedigree/nodes/HoverPill.tsx`)
  * as a row at the top of the Person tab's sheet, where a finger can hit
  * them and they cover nothing on the chart. The pill is not shown after a
- * tap there. A new button on the pill belongs here too.
+ * tap there. A new button on the pill belongs here too. The U-shape view
+ * (#220), which has no pill, shows the row on any screen, without the lock:
+ * nobody is dragged there.
  */
 export function PersonActions({ individual }: { individual: Individual }) {
-  const { pedigree, addParent, addChild, addSibling, lockIndividual, unlockIndividual } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling", "lockIndividual", "unlockIndividual");
+  const { pedigree, addParent, addChild, addSibling, lockIndividual, unlockIndividual, uShapeView } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling", "lockIndividual", "unlockIndividual", "uShapeView");
   const id = individual.id;
   const hasParents = !!parentPartnershipOf(pedigree, id);
   // A pregnancy or pregnancy loss cannot have children.
@@ -22,13 +24,15 @@ export function PersonActions({ individual }: { individual: Individual }) {
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const unlocked = (pedigree.unlockedIndividuals ?? []).includes(id);
   return (
-    <div className="flex border" data-testid="person-actions">
+    // On a phone, one row across the sheet. In the 240px side panel (the
+    // U-shape view) the labels need two rows of three.
+    <div className="flex border lg:grid lg:grid-cols-3 lg:border-r-0 lg:border-b-0 lg:*:border-b lg:*:border-r lg:*:last:border-r" data-testid="person-actions">
       <Action glyph="↑" label="Parents" title="Add parents" disabled={hasParents} onClick={() => addParent(id, "male")} />
       <Action glyph="□↓" label="Son" title="Add son" disabled={noChildren} onClick={() => addChild(id, "male")} />
       <Action glyph="○↓" label="Daughter" title="Add daughter" disabled={noChildren} onClick={() => addChild(id, "female")} />
       <Action glyph="◇↓" label="Child" title="Add child (unknown sex)" disabled={noChildren} onClick={() => addChild(id, "unknown")} />
       <Action glyph="←│→" label="Sibling" title="Add sibling" disabled={!hasParents} onClick={() => addSibling(id)} />
-      {!nodesMoveable && (
+      {!nodesMoveable && !uShapeView && (
         <Action
           glyph={unlocked ? <Unlock size={14} strokeWidth={1.5} /> : <Lock size={14} strokeWidth={1.5} />}
           label={unlocked ? "Lock" : "Unlock"}

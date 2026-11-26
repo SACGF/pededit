@@ -865,6 +865,34 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
   `layout-engine/AGENTS.md`). `layoutToFlow`'s `improveLayout: false` gives
   the plain port to compare against.
 
+## U-shape view (#220)
+
+- `UShapeView.tsx` replaces `PedigreeCanvas` while the store's `uShapeView`
+  is on (`CanvasPage`). It draws `uShapeViewDrawing` (`uShapeView.ts`), which
+  is `renderUShape`, the U-shape export with `key: false`, so the view and
+  the export cannot differ. Not React Flow: the SVG string is set as HTML in
+  a div that is panned and zoomed with a CSS transform (pointer events for
+  drag and pinch, a non-passive wheel listener, since React's is passive).
+- Who is clicked is read from the exporter's `data-id` / `data-dup-of` on
+  each person's `<g>`. The selection outline (and the dashed outline of a
+  hovered problem) is a `<rect data-u-highlight>` appended to that `<g>`
+  after each draw, so it turns with the track.
+- It only looks. Every refusal is a notice from `U_SHAPE_REFUSALS`: a mouse
+  drag that starts on a person (it still pans, and a finger's drag never
+  warns), right-click on a person, Shift+drag, the toolbar's add buttons
+  and Reset layout (dimmed but clickable, `aria-disabled`, because a
+  disabled button shows no hover text). Picking needs the chart, so when the
+  More options menu on the Person tab starts it, the view turns itself off.
+- The Person tab shows `PersonActions` (the hover pill's buttons) in this
+  view on any screen, since there is no pill, without the lock button.
+- The figure is drawn from `useDeferredValue(pedigree)` so typing a name
+  stays quick; layout plus SVG is about 17 ms at 96 people, 100 ms at 347.
+  The view fits on opening, on a pedigree opened and on a filter change,
+  and keeps the pan and zoom through edits.
+- Not saved: `initialize` and `reset` turn it off, and nothing goes in the
+  `Pedigree`. Editing on the U itself waits for the U to draw everyone
+  (#213).
+
 ## Layout cache (#189)
 
 - **Every layout in the frontend goes through `cachedLayout`

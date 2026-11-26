@@ -19,7 +19,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, compact, onToggleCompact }: SettingsPanelProps) {
-  const { pedigree, updateSiblingOrderSettings, updateCanvasSettings } = usePedigreeFields("pedigree", "updateSiblingOrderSettings", "updateCanvasSettings");
+  const { pedigree, updateSiblingOrderSettings, updateCanvasSettings, uShapeView } = usePedigreeFields("pedigree", "updateSiblingOrderSettings", "updateCanvasSettings", "uShapeView");
   const { mode, affectedFirst } = pedigree.siblingOrder;
   const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: DEFAULT_SNAP_GRID_SIZE };
   const { activePedigreeId, pedigrees, deletePedigree } = useAppStore();
@@ -67,6 +67,12 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
         </DialogHeader>
 
         <div className="space-y-4">
+          {uShapeView && (
+            <p className="text-xs text-gray-600 border border-gray-300 px-2 py-1.5" data-testid="settings-u-shape-note">
+              The U-shape view is on. Show minimap, Compact layout, Truncate long names and the
+              positioning settings apply to the standard chart only; the rest change the U too.
+            </p>
+          )}
           <div>
             <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
               Display

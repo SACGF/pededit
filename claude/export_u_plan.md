@@ -3,8 +3,10 @@
 Very wide pedigrees do not fit a journal figure. This export bends the pedigree
 around a U so the widest generations run up both arms and around the curve.
 
-It is an export option only ("Render in U shape" in the export dialog). It never
-affects the editor layout.
+It is an export option ("Render in U shape" in the export dialog) and a view in
+the editor (the toolbar's "U-shape" button, #220), which draws this figure live
+in place of the chart, to look at and select on. It never changes the chart's
+layout or anything saved.
 
 Code: `frontend/src/io/svg/uShapeExporter.ts`. Tests:
 `frontend/src/io/svg/__tests__/uShapeExporter.test.ts`.

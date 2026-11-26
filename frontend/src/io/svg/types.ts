@@ -37,7 +37,8 @@ export interface SvgExportOptions {
 
   /**
    * Draw the key under the chart. Default: true. The guide pages' figures
-   * (`src/guides/`) leave it out, as their text says what each symbol is.
+   * (`src/guides/`) leave it out, as their text says what each symbol is,
+   * and so does the editor's U-shape view, whose legend is on the Pedigree tab.
    */
   key?: boolean;
 

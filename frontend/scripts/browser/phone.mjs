@@ -600,10 +600,68 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   r.check(zoomNotice && after.pageScale <= 1.01 && shown === 0, "a pinch on the notice zooms the page back out, and the notice goes",
     `page zoom ${after.pageScale.toFixed(2)}, notice ${shown ? "still shown" : "gone"}`);
 
+  await checkUShapeView(r, page, cdp, shotBase);
+
   await resolveFindings(run.findings);
   jsChecks(r, run.findings);
   await page.close();
   return r;
+}
+
+/**
+ * The U-shape view by touch (#220): it is switched on from the Filter menu
+ * (no room in the toolbar), a pinch zooms it, a swipe pans it, a tap selects
+ * and opens the Person tab, and the banner's button goes back to the chart.
+ */
+async function checkUShapeView(r, page, cdp, shotBase) {
+  const figureTransform = () => page.evaluate(() => {
+    const el = document.querySelector("[data-u-shape-figure]");
+    if (!el) return null;
+    const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+    return { x: m.e, y: m.f, zoom: m.a };
+  });
+  let at = await tappable(page, '[data-testid="filter-menu"]');
+  if (!at.problem) {
+    await page.touchscreen.tap(at.x, at.y);
+    await page.waitForTimeout(400);
+    at = await tappable(page, '[data-testid="u-shape-toggle"]');
+    if (!at.problem) { await page.touchscreen.tap(at.x, at.y); await page.waitForTimeout(600); }
+  }
+  const before = await figureTransform();
+  r.check(!at.problem && before, "the Filter menu turns on the U-shape view", at.problem ? `its switch is ${at.problem}` : "the U is not drawn");
+  if (!before) return;
+  await page.screenshot({ path: `${shotBase}.u-shape.png` });
+
+  const box = await page.locator('[data-testid="u-shape-view"]').boundingBox();
+  const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await pinch(page, cdp, centre, 60, 180);
+  const pinched = await figureTransform();
+  r.check(pinched && Math.abs(pinched.zoom / before.zoom - 3) < 0.3, "a pinch zooms the U",
+    `the zoom went from ${before.zoom.toFixed(2)} to ${pinched?.zoom.toFixed(2)}, expected ${(before.zoom * 3).toFixed(2)}`);
+  await swipe(page, cdp, centre, 40, -30);
+  const swiped = await figureTransform();
+  r.check(swiped && Math.abs(swiped.x - pinched.x - 40) <= 6 && Math.abs(swiped.y - pinched.y + 30) <= 6 && swiped.zoom === pinched.zoom, "a swipe pans the U",
+    `it moved by ${(swiped.x - pinched.x).toFixed(0)},${(swiped.y - pinched.y).toFixed(0)} for a swipe of 40,-30`);
+
+  const person = await page.evaluate(() => {
+    const view = document.querySelector('[data-testid="u-shape-view"]').getBoundingClientRect();
+    for (const g of document.querySelectorAll("[data-u-shape-figure] g[data-id]")) {
+      const b = g.getBoundingClientRect();
+      const x = b.x + b.width / 2, y = b.y + b.height / 2;
+      if (x > view.left + 20 && x < view.right - 20 && y > view.top + 60 && y < view.bottom - 20 && document.elementFromPoint(x, y)?.closest("[data-id]") === g) {
+        return { id: g.getAttribute("data-id"), x, y };
+      }
+    }
+    return null;
+  });
+  if (person) { await page.touchscreen.tap(person.x, person.y); await page.waitForTimeout(400); }
+  const selected = person && (await measure(page)).selected?.[0] === person.id;
+  r.check(selected, "tapping a person on the U selects them", person ? "they are not selected" : "nobody is on the screen to tap");
+  r.check(selected && await onScreen(page, '[data-testid="panel-person"]', 80), "and opens the Person tab", "the person's fields are not on the screen");
+
+  at = await tappable(page, '[data-testid="u-shape-back"]');
+  if (!at.problem) { await page.touchscreen.tap(at.x, at.y); await page.waitForTimeout(400); }
+  r.check(!at.problem && await page.locator(".react-flow").count() === 1, "the banner's button goes back to the chart", at.problem ? `the button is ${at.problem}` : "the chart is not back");
 }
 
 /** CSS.escape for the ids the fixtures use (node has no CSS global). */
