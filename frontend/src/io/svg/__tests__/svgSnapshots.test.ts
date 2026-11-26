@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { EXAMPLES } from "../../../data/examples";
 import { FEATURE_FIXTURES } from "../../../fixtures/features";
+import { DATASET_TODAY } from "../../../fixtures/dataset";
 import { exportSvg } from "../svgExporter";
 import { exportUShapeSvg } from "../uShapeExporter";
 
@@ -48,6 +49,11 @@ async function check(file: string, svg: string) {
 }
 
 describe("SVG export snapshots", () => {
+  // A de-identified export writes ages as decades counted from today, so
+  // today is fixed: the files must not change as the people in them age.
+  beforeAll(() => { vi.useFakeTimers({ now: new Date(`${DATASET_TODAY}T12:00:00Z`), toFake: ["Date"] }); });
+  afterAll(() => { vi.useRealTimers(); });
+
   for (const c of CASES) {
     it(`${c.name}: standard, compact${c.fixture ? ", de-identified" : ""} and U-shape`, async () => {
       // With the chart title, as the export dialog passes it.

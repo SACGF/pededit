@@ -514,8 +514,10 @@ files, and this repository's functions by source line
 ## CI
 
 `.github/workflows/ci.yml` runs on every PR and push to main: layout engine
-and frontend vitest, `tsc -b`, the backend tests, and the page checks on
-headless chromium: `lint.mjs --all-examples` (normal, then compact and
+and frontend vitest, the type check, the layout engine's package build, the
+dead code report, the backend tests, and the page checks on headless
+chromium, which are `npm run check:pages` (the list is in the root
+`package.json`): `lint.mjs --all-examples` (normal, then compact and
 de-identified) and `console.mjs --all-examples --fixture-via-api` against a
 SQLite Django, then the lints with `--all-fixtures` and the console sweep
 with `--all-test-data` (every valid file of the test data set in
@@ -523,7 +525,9 @@ with `--all-test-data` (every valid file of the test data set in
 must load without JS errors, draw and export cleanly, and survive a save and
 reload; then `flows.mjs`, the end-to-end flows, and `phone.mjs`, the emulated phone. On failure the job prints the tail
 of the Vite and Django logs. Reproduce a failing step locally with the same
-command after `servers.mjs up`.
+command after `servers.mjs up`. The flows compare pedigrees whatever order
+their keys are in, since PostgreSQL (jsonb) reorders the keys of what it
+stores and CI's SQLite does not.
 
 ## Fixtures
 

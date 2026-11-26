@@ -5,7 +5,6 @@ import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } from "../gender";
 import { detailLines } from "../labels";
 import { buildScene } from "../scene";
-import type { ScenePerson } from "../scene";
 import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -135,7 +134,7 @@ describe("gender identity on the symbol (#26)", () => {
   });
 
   it("round-trips through JSON, rejects unknown values, and has a CSV column", () => {
-    const back = importJson(exportJson(family("sex"))).pedigree;
+    const back = importJson(exportJson(family("sex"))).pedigree!;
     expect(back.individuals.find(i => i.id === "t")!.genderIdentity).toBe("man");
     expect(back.canvasSettings?.symbolsShow).toBe("sex");
     const bad = JSON.parse(exportJson(family()));

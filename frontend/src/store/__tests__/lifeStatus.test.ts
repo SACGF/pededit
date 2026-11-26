@@ -30,15 +30,14 @@ const store = () => usePedigreeStore.getState();
 const find = (id: string) => store().pedigree.individuals.find(i => i.id === id)!;
 
 describe("setLifeStatus", () => {
-  let warn: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     store().initialize(familyPedigree());
-    warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {}); // refusals log; keep the output clean
   });
 
   afterEach(() => {
-    warn.mockRestore();
+    vi.restoreAllMocks();
   });
 
   it("sets each status on a child with no partner or children", () => {
@@ -85,12 +84,12 @@ describe("setLifeStatus", () => {
     store().setLifeStatus("dad", "miscarriage");
     expect(find("dad").lifeStatus).toBeUndefined();
     expect(store().past.length).toBe(before);   // no undo entry, no-op
-    expect(warn).toHaveBeenCalledTimes(1);
   });
 
   it("allows clearing even when the individual has a partner (defensive)", () => {
+    const before = store().pedigree;
     store().setLifeStatus("dad", undefined);
-    expect(warn).not.toHaveBeenCalled();
+    expect(store().pedigree).toBe(before);
   });
 
   it("marks a solo individual who then cannot gain a partner or child", () => {
@@ -100,15 +99,14 @@ describe("setLifeStatus", () => {
 });
 
 describe("add child / add partner on a pregnancy or loss", () => {
-  let warn: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     store().initialize(familyPedigree());
-    warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {}); // refusals log; keep the output clean
   });
 
   afterEach(() => {
-    warn.mockRestore();
+    vi.restoreAllMocks();
   });
 
   it.each(["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"] as const)(
@@ -120,8 +118,7 @@ describe("add child / add partner on a pregnancy or loss", () => {
       expect(store().pedigree.individuals.length).toBe(n);
       expect(store().pedigree.partnerships).toHaveLength(1);
       expect(store().past.length).toBe(before);
-      expect(warn).toHaveBeenCalledTimes(1);
-    },
+      },
   );
 
   it("addPartner is refused for a miscarriage", () => {
@@ -130,7 +127,6 @@ describe("add child / add partner on a pregnancy or loss", () => {
     store().addPartner("kid");
     expect(store().pedigree.individuals.length).toBe(n);
     expect(store().pedigree.partnerships).toHaveLength(1);
-    expect(warn).toHaveBeenCalledTimes(1);
   });
 
   it("addParent and addSibling still work for a miscarriage", () => {
@@ -148,7 +144,6 @@ describe("add child / add partner on a pregnancy or loss", () => {
     const n = store().pedigree.individuals.length;
     store().addChild("dad", "female");
     expect(store().pedigree.individuals.length).toBe(n + 1);
-    expect(warn).not.toHaveBeenCalled();
   });
 });
 

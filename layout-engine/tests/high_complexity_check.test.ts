@@ -38,39 +38,6 @@ const highComplexity: Pedigree = {
 };
 
 describe("high complexity geometry", () => {
-  it("prints full geometry for inspection", () => {
-    const geo = pedigreeToGeometry(highComplexity);
-
-    console.log("\n=== Nodes by level ===");
-    const nodesByLevel = new Map<number, typeof geo.nodes>();
-    for (const n of geo.nodes) {
-      if (!nodesByLevel.has(n.level)) nodesByLevel.set(n.level, []);
-      nodesByLevel.get(n.level)!.push(n);
-    }
-    for (const [lev, nodes] of [...nodesByLevel.entries()].sort((a,b)=>a[0]-b[0])) {
-      console.log(`  Gen ${lev}: ${nodes.map(n => `${n.id}@x=${n.cx.toFixed(1)}`).join(", ")}`);
-    }
-
-    console.log("\n=== Couples ===");
-    for (const c of geo.couples) {
-      console.log(`  ${c.leftId}+${c.rightId} (${c.kind}): line x=[${c.x1.toFixed(1)}, ${c.x2.toFixed(1)}] y=${c.y.toFixed(1)}`);
-    }
-
-    console.log("\n=== Sibships ===");
-    for (const s of geo.sibships) {
-      const offset = s.childXs.map(x => (x - s.coupleX).toFixed(2));
-      console.log(`  coupleX=${s.coupleX.toFixed(1)} childXs=[${s.childXs.map(x=>x.toFixed(1)).join(",")}] offsets=[${offset.join(",")}]`);
-    }
-
-    console.log("\n=== Centring check (coupleX vs mean(childXs)) ===");
-    for (const s of geo.sibships) {
-      const childMid = s.childXs.reduce((a,b)=>a+b,0) / s.childXs.length;
-      const diff = Math.abs(childMid - s.coupleX);
-      const flag = diff > 1 ? "  <-- MISALIGNED" : "";
-      console.log(`  coupleX=${s.coupleX.toFixed(2)} childMid=${childMid.toFixed(2)} diff=${diff.toFixed(2)}${flag}`);
-    }
-  });
-
   /**
    * h3d (affected daughter, single child of h2b+h2c) is 15.67 px right of the
    * couple midpoint.  This is NOT a code bug — it is a hard spacing constraint:
@@ -83,20 +50,16 @@ describe("high complexity geometry", () => {
    * To fix this we would need to move h3b left, which would break h3b's own
    * centering under h2a+h2d.  The QP cannot satisfy both simultaneously.
    *
-   * This test DOCUMENTS the current measured offset and will alert us if the
-   * algorithm accidentally makes it worse.
+   * The offset measures 15.67 px. The test fails if the layout makes it
+   * worse; a layout that centres her better passes.
    */
-  it("h3d is off-centre by ~15-16 px due to spacing constraint (known limitation)", () => {
+  it("h3d is no more than 20 px off-centre (known limitation of the spacing constraint)", () => {
     const geo = pedigreeToGeometry(highComplexity);
     const h2b = geo.nodes.find(n => n.id === "h2b")!;
     const h2c = geo.nodes.find(n => n.id === "h2c")!;
     const h3d = geo.nodes.find(n => n.id === "h3d")!;
     const coupleMid = (h2b.cx + h2c.cx) / 2;
     const diff = Math.abs(h3d.cx - coupleMid);
-    console.log(`\nh2b.cx=${h2b.cx.toFixed(2)}, h2c.cx=${h2c.cx.toFixed(2)}, coupleMid=${coupleMid.toFixed(2)}, h3d.cx=${h3d.cx.toFixed(2)}, diff=${diff.toFixed(2)}`);
-    // Misalignment should be ~15-16 px (one measure of the spacing constraint tightness).
-    // If this number grows significantly, the QP has regressed.
-    expect(diff, "h3d spacing-forced offset").toBeGreaterThan(10);
     expect(diff, "h3d offset should not exceed 20 px").toBeLessThan(20);
   });
 

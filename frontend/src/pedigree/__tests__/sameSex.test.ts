@@ -100,7 +100,7 @@ describe("same-sex couples: children (#105)", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("Add child from a partner: hers and a new sperm donor's, her partner a social parent (Fig. 5, 1b)", () => {
-    store().setPartnershipChildless(ab, "by-choice");
+    store().setPartnershipChildless(ab, "byChoice");
     const before = ped();
     store().addChild("ann", "male");
     const [donor, child] = [newKids(before).find(i => i.reproductiveRole === "donor")!, newKids(before).find(i => !i.reproductiveRole)!];
@@ -137,7 +137,7 @@ describe("same-sex couples: children (#105)", () => {
     expect(sib.socialParents).toEqual(["bea"]);
     expect(coupleChildren(ped(), ab).sort()).toEqual([child, sib.id].sort());
     // Childless mark and Remove partnership go by those children.
-    usePedigreeStore.setState(s => ({ pedigree: { ...s.pedigree, partnerships: s.pedigree.partnerships.map(p => p.id === ab ? { ...p, childless: "by-choice" as const } : p) } }));
+    usePedigreeStore.setState(s => ({ pedigree: { ...s.pedigree, partnerships: s.pedigree.partnerships.map(p => p.id === ab ? { ...p, childless: "byChoice" as const } : p) } }));
     expect(activeChildless(ped().partnerships.find(p => p.id === ab)!, ped())).toBeUndefined();
     expect(store().removePartnership(ab)).toMatch(/has 2 children/);
     clean(ped());
@@ -212,7 +212,7 @@ describe("same-sex couples: children (#105)", () => {
 
   it("survives a JSON round trip", () => {
     store().addChild("ann", "female");
-    const back = importJson(exportJson(ped())).pedigree;
+    const back = importJson(exportJson(ped())).pedigree!;
     expect(back.partnerships).toEqual(ped().partnerships);
     expect(back.individuals.find(i => i.socialParents)?.socialParents).toEqual(["bea"]);
   });

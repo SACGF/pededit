@@ -8,8 +8,6 @@ import { SIB_BAR_STEP, barsUnderLabels, sibshipBarOffsets, sibshipSegments } fro
 import { EXAMPLES } from "../../data/examples";
 import { selectionPedigree, selectionSubset } from "../selectionSubset";
 import { textBlockUnder } from "../labelBlock";
-import { labelMaxWidth } from "../labels";
-import { SLOT_WIDTH } from "../constants";
 import type { SibshipBar } from "../sibshipPath";
 
 /**
@@ -229,7 +227,6 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
   const flow = buildScene(part);
 
   it("passes every sibship bar under the names of the people above it", () => {
-    const labelMax = labelMaxWidth(SLOT_WIDTH);
     let lowered = 0;
     for (const e of flow.sibships) {
       const d = e.data!, xs = [d.coupleX, ...d.childXs];

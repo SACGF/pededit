@@ -209,7 +209,7 @@ describe("JSON import of fills (#67)", () => {
 
   it("rejects an unknown fill or mode", () => {
     const bad = ped([{ ...q("a", "#d62728"), fill: "plaid" as TagFill }]);
-    expect(importJson(exportJson(bad)).issues.some(i => i.severity === "error" && i.path.includes("tags[0]"))).toBe(true);
+    expect(importJson(exportJson(bad)).issues.some(i => i.severity === "error" && i.path?.includes("tags[0]"))).toBe(true);
     const badMode = { ...ped([]), canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, tagFills: "sepia" } } as unknown as Pedigree;
     expect(importJson(exportJson(badMode)).issues.some(i => i.severity === "error")).toBe(true);
   });

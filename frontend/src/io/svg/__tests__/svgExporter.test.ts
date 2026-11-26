@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { EXAMPLES } from "../../../data/examples";
 import { exportSvg } from "../svgExporter";
-import { parseExportSvg } from "../exportLint";
+import { lintExport, parseExportSvg } from "../exportLint";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -18,68 +18,48 @@ function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
   };
 }
 
+/**
+ * The markup of the people alone: the page background is a <rect>, and the
+ * marker, labels and key have fills of their own, so a test of what a symbol
+ * draws has to look here and not at the whole file.
+ */
+const symbolsOf = (svg: string) => svg.match(/<g class="symbols">\n([^]*?)\n<\/g>\n<g class="labels">/)![1]!;
+const one = (ind: Partial<Pedigree["individuals"][number]>) =>
+  makePedigree({ individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, ...ind }] });
+
 // ── Structural / shape tests ──────────────────────────────────────────────────
 
 describe("exportSvg — symbol shapes", () => {
-  it("single male individual → SVG contains <rect>", () => {
-    const p = makePedigree({
-      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],
+  it.each([["male", "rect"], ["female", "circle"], ["unknown", "polygon"]] as const)(
+    "a %s person is drawn as a <%s> and nothing else", (sex, element) => {
+      const drawn = [...symbolsOf(exportSvg(one({ sex }))).matchAll(/<(rect|circle|polygon|path|line)\b/g)].map(m => m[1]);
+      expect(drawn).toEqual([element]);
     });
-    const svg = exportSvg(p);
-    expect(svg).toContain("<rect");
-  });
 
-  it("single female individual → SVG contains <circle>", () => {
-    const p = makePedigree({
-      individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0 }],
-    });
-    const svg = exportSvg(p);
-    expect(svg).toContain("<circle");
-  });
-
-  it("single unknown individual → SVG contains <polygon>", () => {
-    const p = makePedigree({
-      individuals: [{ id: "i1", sex: "unknown", affected: false, sibOrder: 0 }],
-    });
-    const svg = exportSvg(p);
-    expect(svg).toContain("<polygon");
-  });
-
-  it("empty pedigree → returns minimal SVG without symbol elements", () => {
+  it("empty pedigree → an SVG with no symbols", () => {
     const svg = exportSvg(makePedigree());
     expect(svg).toContain("<svg");
-    expect(svg).not.toContain("<rect x=");     // no symbol rect
-    expect(svg).not.toContain("<circle cx=");  // no symbol circle
-    expect(svg).not.toContain("<polygon");
+    expect(parseExportSvg(svg).symbols).toEqual([]);
   });
 });
 
 // ── Fill tests ────────────────────────────────────────────────────────────────
 
 describe("exportSvg — symbol fills", () => {
-  it("affected individual → shape contains fill=\"black\"", () => {
-    const p = makePedigree({
-      individuals: [{ id: "i1", sex: "male", affected: true, sibOrder: 0 }],
-    });
-    const svg = exportSvg(p);
-    expect(svg).toContain('fill="black"');
-  });
-
-  it("unaffected individual → shape contains fill=\"white\"", () => {
-    const p = makePedigree({
-      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],
-    });
-    const svg = exportSvg(p);
-    expect(svg).toContain('fill="white"');
+  it("the symbol is filled black for an affected person and white otherwise", () => {
+    const fills = (svg: string) => [...symbolsOf(svg).matchAll(/fill="([^"]+)"/g)].map(m => m[1]);
+    expect(fills(exportSvg(one({ affected: true })))).toEqual(["black"]);
+    expect(fills(exportSvg(one({ affected: false })))).toEqual(["white"]);
   });
 
   it("carrier individual → SVG contains carrier dot circle", () => {
     const p = makePedigree({
       individuals: [{ id: "i1", sex: "male", affected: false, carrier: true, sibOrder: 0 }],
     });
-    const svg = exportSvg(p);
-    // Carrier dot: centred in the symbol's box.
-    expect(svg).toMatch(/<circle cx="20" cy="20" r="\d/);
+    // Carrier dot (NSGC 2008): a circle at the centre of the square, well inside it.
+    const dot = symbolsOf(exportSvg(p)).match(/<circle cx="20" cy="20" r="([\d.]+)" fill="black"/);
+    expect(Number(dot?.[1])).toBeGreaterThan(0);
+    expect(Number(dot?.[1])).toBeLessThan(NODE_SIZE / 4);
   });
 });
 
@@ -241,27 +221,21 @@ describe("exportSvg, pregnancy and pregnancy loss", () => {
 // ── Relationship line tests ───────────────────────────────────────────────────
 
 describe("exportSvg — relationship lines", () => {
-  it("nuclear family → contains couple line element", () => {
+  it("nuclear family → a line for each couple and each sibship, joined to the people", () => {
     const svg = exportSvg(simpleFamily);
-    // A couple line is a horizontal <line> at some y
-    expect(svg).toContain("<line");
+    const parsed = parseExportSvg(svg);
+    expect(parsed.couples).toHaveLength(simpleFamily.partnerships.length);
+    const families = Object.values(simpleFamily.parentOf).filter(kids => kids.length > 0);
+    expect(svg.match(/<g class="sibship-lines">\n(.*)\n<\/g>/)![1]!.match(/<path /g)).toHaveLength(families.length);
+    expect(lintExport(simpleFamily)).toEqual([]);
   });
 
-  it("consanguineous family → contains two parallel couple lines", () => {
-    const svg = exportSvg(consanguineousFamily);
-    // consanguineousFamily: i3+i4 couple is at level 1 (raw y = ROW_HEIGHT = 120)
-    // Double couple lines at y ± CONSANG_GAP/2 = 120 ± 2 = 118 and 122
-    expect(svg).toMatch(/<path d="M [\d.]+ 118 L [\d.]+ 118"/);
-    expect(svg).toMatch(/<path d="M [\d.]+ 122 L [\d.]+ 122"/);
-  });
-
-  it("nuclear family → contains sibship bar and vertical drops", () => {
-    const svg = exportSvg(simpleFamily);
-    // sibship bar is a horizontal line; vertical drops are vertical lines
-    // We can check that there are multiple <line> elements
-    const lineMatches = svg.match(/<line /g);
-    expect(lineMatches).not.toBeNull();
-    expect(lineMatches!.length).toBeGreaterThan(3);
+  it("consanguineous family → the related couple's line is drawn twice, one above the other", () => {
+    const lines = parseExportSvg(exportSvg(consanguineousFamily)).couples;
+    const [x1, x2] = [(l: number[][]) => l[0]![0], (l: number[][]) => l[l.length - 1]![0]];
+    // Gaps between lines over the same stretch; other couples are a row or more away.
+    const gaps = lines.flatMap((a, i) => lines.slice(i + 1).filter(b => x1(a) === x1(b) && x2(a) === x2(b)).map(b => Math.abs(a[0]![1]! - b[0]![1]!)));
+    expect(gaps.filter(gap => gap > 0 && gap < NODE_SIZE / 4)).toHaveLength(1);
   });
 });
 
@@ -332,7 +306,6 @@ describe("exportSvg — labels", () => {
   });
 
   it("named individuals → each name appears exactly once in SVG", () => {
-    // Tests the renderLabels deduplication: seen.has(nid) skips second occurrence
     const p = makePedigree({
       individuals: [
         { id: "i1", sex: "male",   affected: false, sibOrder: 0, name: "Alice" },
@@ -510,7 +483,7 @@ describe("exportSvg — duplicate copies", () => {
 });
 
 describe("the export draws from the canvas's layout data (#143)", () => {
-  it("svgExporter.ts imports only types from the layout engine and never lays out itself", async () => {
+  it("svgExporter.tsx imports only types from the layout engine and never lays out itself", async () => {
     const { readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
     const source = readFileSync(join(__dirname, "../svgExporter.tsx"), "utf8");

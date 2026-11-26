@@ -14,7 +14,18 @@ npm -w frontend run typecheck   # tsc -b, the same check the production build ru
 
 `typecheck` must stay `tsc -b`: the root `tsconfig.json` only has project
 references, so a plain `tsc --noEmit` checks no files at all (it hid a build
-break until deploy).
+break until deploy). It checks the app (`tsconfig.app.json`) and the tests
+(`tsconfig.test.json`), both in `strict` mode: vitest strips types without
+checking them, so a test calling an action with a value its type does not
+allow would otherwise pass.
+
+Tests. A new test builds its pedigree with `person`, `M`, `F`, `U`, `couple`
+and `build` from `src/fixtures/features.ts` where it can, not a builder of its
+own. Assert what is drawn or stored, not how: look a person up by id, not by
+layout slot; compare `keyRows` or `parseExportSvg` output, not markup strings
+or path data; and when a number is checked, make it a relation (above, inside,
+centred) unless the number is the specification. A test that needs today's
+date fixes it (`vi.useFakeTimers`, as `svgSnapshots.test.ts` does).
 
 Check a change in the real page before calling it done: `node
 frontend/scripts/browser/console.mjs --fixture example:2` reports JS errors as

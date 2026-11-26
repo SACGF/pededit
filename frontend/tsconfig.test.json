@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "types": ["vite/client", "vitest/globals", "node"]
+  },
+  "include": ["src", "../layout-engine/src/quadprog.d.ts"],
+  "exclude": []
+}

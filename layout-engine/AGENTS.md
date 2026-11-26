@@ -342,9 +342,11 @@ such workflow yet, on purpose.
 ## Testing
 
 ```
-. ~/.nvm/nvm.sh && npm -w layout-engine run test
+npm -w layout-engine run test
+npm -w layout-engine run typecheck   # src and tests (tsconfig.test.json)
 ```
 
 Tests live in `tests/` (not `src/__tests__`). `tests/fixtures/samplePed.ts` is
 the kinship2 `sample.ped` reference family, the standard benchmark for layout
-correctness. `all_examples_inspection.test.ts` prints layouts for eyeballing.
+correctness. `all_examples_inspection.test.ts` holds invariants (no overlap,
+bar between the rows, couple lines meet their symbols) over a set of families.

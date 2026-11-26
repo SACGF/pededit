@@ -77,7 +77,7 @@ describe("proband and consultand arrows (#99)", () => {
   });
 
   it("round-trips through JSON and has a CSV column", () => {
-    const back = importJson(exportJson(family())).pedigree;
+    const back = importJson(exportJson(family())).pedigree!;
     expect(back.individuals.find(i => i.id === "c2")!.consultand).toBe(true);
     const [header, ...rows] = exportCsv(family()).split("\n");
     const col = header!.split(",").indexOf("consultand");

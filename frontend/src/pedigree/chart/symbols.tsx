@@ -132,7 +132,6 @@ export function RegionFill({ fill, color, d, box, clipId }: { fill: TagFill; col
  * Black centre for an affected person whose symbol carries quadrant tags, so
  * affected status stays visible when tags cover every quarter. `outline` is
  * the symbol's own outline element; it is drawn scaled about the centre.
- * Mirrors renderAffectedCoreSvg in tags.ts.
  */
 function AffectedCore({ size, show, outline }: { size: number; show: boolean; outline: React.ReactElement<React.SVGProps<SVGElement>> }) {
   if (!show) return null;

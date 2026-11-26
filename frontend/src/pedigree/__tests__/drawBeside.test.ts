@@ -143,10 +143,10 @@ describe("draw this couple beside (#205)", () => {
 
   it("survives a JSON round trip, and a value that is not one of the couple is reported", () => {
     const p = example();
-    const back = importJson(exportJson(p, "x")).pedigree!;
+    const back = importJson(exportJson(p)).pedigree!;
     expect(couple(back, "C+B").drawnBeside).toBe("C");
     expect(rows(back)).toEqual(rows(p));
-    const bad = JSON.parse(exportJson(p, "x"));
+    const bad = JSON.parse(exportJson(p));
     bad.pedigree.partnerships.find((q: { id: string }) => q.id === "C+B").drawnBeside = "X";
     expect(importJson(JSON.stringify(bad)).issues.some(i => i.message.includes("drawnBeside"))).toBe(true);
   });

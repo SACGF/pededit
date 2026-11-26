@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { isAffected, kinshipCoefficients, type Pedigree } from "@pedigree-editor/layout-engine";
 import { DATASET, DATASET_TODAY, datasetFileText, type DatasetCase } from "../dataset";
@@ -59,14 +59,6 @@ interface ManifestEntry {
 }
 
 const unique = (xs: string[]) => [...new Set(xs)].sort();
-
-/** The pedigree object a client would send to the server for this document, or null. */
-function serverPayload(c: DatasetCase): unknown {
-  if (c.text !== undefined) return null;
-  const doc = c.document as Record<string, unknown> | unknown[];
-  if (Array.isArray(doc) || typeof doc !== "object" || doc === null) return null;
-  return "format" in doc || "pedigree" in doc ? (doc as { pedigree?: unknown }).pedigree ?? null : doc;
-}
 
 /** Importer errors that are about the file or envelope, not the pedigree in it. */
 const ENVELOPE_ERRORS = new Set<string>([JsonIssueCode.INVALID_JSON, JsonIssueCode.NOT_AN_OBJECT, JsonIssueCode.UNKNOWN_FORMAT]);

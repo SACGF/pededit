@@ -1,7 +1,5 @@
 /**
- * Comprehensive geometry inspection across all UI examples and notable PED scenarios.
- *
- * Run with:  npx vitest run tests/all_examples_inspection.test.ts
+ * Geometry invariants across all UI examples and notable PED scenarios.
  *
  * STATUS NOTES
  * ─────────────
@@ -25,9 +23,6 @@
  *   geometry x1/x2 are computed from the actual slot positions; the test matches by cx.
  *
  * KNOWN LIMITATIONS (documented, not tested here)
- *   • Multiple-partnerships couple lines: when one individual has two partners, autohint
- *     (stub) does not insert a duplicate slot for that individual. The couple lines are
- *     therefore incorrectly associated — this is Phase 6 work. See it.todo below.
  *   • h3d in high-complexity is 15.67 px off-centre: the spacing constraint from the
  *     adjacent node (h3b at 240 px, minimum spacing 80 px) forces h3d ≥ 320 px while
  *     the ideal position is 304 px. Not fixable without moving h3b, which would violate
@@ -104,30 +99,6 @@ function assertAllPlaced(geo: PedigreeGeometry, expectedCount: number, label: st
 }
 
 /** Print a full geometry dump for one scenario. */
-function printGeometry(geo: PedigreeGeometry, label: string) {
-  console.log(`\n${"─".repeat(60)}`);
-  console.log(`SCENARIO: ${label}`);
-  const byLevel = new Map<number, NodeGeometry[]>();
-  for (const n of geo.nodes) {
-    if (!byLevel.has(n.level)) byLevel.set(n.level, []);
-    byLevel.get(n.level)!.push(n);
-  }
-  for (const [lev, nodes] of [...byLevel.entries()].sort((a, b) => a[0] - b[0])) {
-    console.log(`  Gen ${lev}: ${nodes.map(n => `${n.id}@${n.cx.toFixed(1)}`).join("  ")}`);
-  }
-  console.log("  Couples:");
-  for (const c of geo.couples) {
-    console.log(`    ${c.leftId}+${c.rightId} (${c.kind}) y=${c.y.toFixed(0)} x=[${c.x1.toFixed(1)},${c.x2.toFixed(1)}]`);
-  }
-  console.log("  Sibships:");
-  for (const s of geo.sibships) {
-    const childMid = s.childXs.reduce((a, b) => a + b, 0) / s.childXs.length;
-    const diff = Math.abs(childMid - s.coupleX);
-    const flag = diff > 1 ? " *** MISALIGNED ***" : "";
-    console.log(`    coupleX=${s.coupleX.toFixed(1)} childMid=${childMid.toFixed(1)} diff=${diff.toFixed(1)} children=[${s.childXs.map(x => x.toFixed(1)).join(",")}]${flag}`);
-  }
-}
-
 // ── UI Examples (inline Pedigree objects) ─────────────────────────────────────
 
 const SIMPLE_FAMILY: Pedigree = {
@@ -333,6 +304,15 @@ const KINSHIP2_FAM1 = buildPedigreeFromFlat([
   { id: 141, father: 137, mother: 138, sex: 2 },
 ]);
 
+// A father with a child by each of two partners: he is drawn between them.
+const TWO_PARTNERS = buildPedigreeFromFlat([
+  { id: 1, father: 0, mother: 0, sex: 1 },
+  { id: 2, father: 0, mother: 0, sex: 2 },
+  { id: 3, father: 0, mother: 0, sex: 2 },
+  { id: 4, father: 1, mother: 2, sex: 1 },
+  { id: 5, father: 1, mother: 3, sex: 2 },
+]);
+
 // ── Scenario registry ─────────────────────────────────────────────────────────
 
 /** centred=true → assertChildrenCentred is applicable for this scenario. */
@@ -354,21 +334,10 @@ const SCENARIOS: Array<{ label: string; ped: Pedigree; count: number; centred: b
   { label: "ped/first-cousin",        ped: FIRST_COUSIN,          count: 9,  centred: true  },
   { label: "ped/double-first-cousin", ped: DOUBLE_FIRST_COUSIN,   count: 11, centred: true  },
   { label: "ped/three-gen",           ped: THREE_GENERATION_PED,  count: 10, centred: true  },
+  { label: "ped/two-partners",        ped: TWO_PARTNERS,          count: 5,  centred: true  },
   // large multi-generation — some sibships spacing-constrained (see NOTE A)
   { label: "ped/kinship2-fam1",       ped: KINSHIP2_FAM1,         count: 41, centred: false },
 ];
-
-// ── Print everything (inspection only) ───────────────────────────────────────
-
-describe("all examples — geometry dump", () => {
-  it("prints geometry for all scenarios (inspect console output)", () => {
-    for (const { label, ped } of SCENARIOS) {
-      const geo = pedigreeToGeometry(ped);
-      printGeometry(geo, label);
-    }
-    expect(true).toBe(true);
-  });
-});
 
 // ── Invariant assertions ──────────────────────────────────────────────────────
 
@@ -414,13 +383,13 @@ describe("all examples — couple lines fit node edges (duplicate-robust)", () =
       assertCoupleLinesFit(geo, label);
     });
   }
+});
 
-  it.todo(
-    "half-siblings / multiple-partnerships — autohint stub does not duplicate the " +
-    "shared parent (e.g. father with two wives). The layout emits a couple line " +
-    "between the TWO MOTHERS instead of between father+mother2. This produces " +
-    "'couple 2+3' instead of 'couple 1+3'. Phase 6 work (autohint full implementation).",
-  );
+describe("a parent with two partners", () => {
+  it("has a couple line to each partner, not one between the partners", () => {
+    const pairs = pedigreeToGeometry(TWO_PARTNERS).couples.map(c => [c.leftId, c.rightId].sort().join("+")).sort();
+    expect(pairs).toEqual(["1+2", "1+3"]);
+  });
 });
 
 describe("all examples — all individuals placed", () => {

@@ -6,11 +6,12 @@ import type { Sector } from "../tags";
 
 const SIZE = 40;
 const tag = (id: string, color: string): Tag => ({ id, label: id, color, style: "quadrant" });
+const sector = (id: string, color: string, start: number, end: number): Sector => ({ tag: tag(id, color), start, end, color, fill: "solid" });
 const ALL_FOUR: Sector[] = [
-  { tag: tag("a", "#d62728"), start: 270, end: 360 },
-  { tag: tag("b", "#1f77b4"), start: 0, end: 90 },
-  { tag: tag("c", "#2ca02c"), start: 90, end: 180 },
-  { tag: tag("d", "#ff7f0e"), start: 180, end: 270 },
+  sector("a", "#d62728", 270, 360),
+  sector("b", "#1f77b4", 0, 90),
+  sector("c", "#2ca02c", 90, 180),
+  sector("d", "#ff7f0e", 180, 270),
 ];
 
 function render(ind: Partial<Individual>, sectors: Sector[]): string {

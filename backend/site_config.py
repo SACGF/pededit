@@ -6,7 +6,9 @@ from pathlib import Path
 THIS_DIR = Path(__file__).resolve().parent
 SECRET_FILE = THIS_DIR / Path("secret_key.txt")
 
-CONFIG_FILE = Path("/etc/pededit/pededit.json")
+# PEDEDIT_CONFIG names another file, as deploy/backup.sh also reads it:
+# the tests use backend/test_config.json, so they need nothing in /etc.
+CONFIG_FILE = Path(os.environ.get("PEDEDIT_CONFIG", "/etc/pededit/pededit.json"))
 
 
 def _load_or_create_secret(path):

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EXAMPLES } from "../../data/examples";
 import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
+import { highestAboveSymbols } from "../consanguinityLabel";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
@@ -57,11 +58,21 @@ describe("lintScene", () => {
     expect(lintScene(base, buildScene(base), { title: "A family" })).toEqual([]);
   });
 
-  it("has nothing to report when the title is raised over a couple line hopping high above the top row", () => {
-    // What it reports when the title is not raised is in renderLintTitle.test.ts.
-    const flow = buildScene(base);
-    flow.couples = flow.couples.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
-    expect(lintScene(base, flow, { title: "A family" }).filter(f => f.code === "title-collides")).toEqual([]);
+  it("checks the chart title against a couple line hopping high above the top row", () => {
+    const titleFindings = (scene: ReturnType<typeof buildScene>, title?: string) =>
+      lintScene(base, scene, { title }).filter(f => f.code === "title-collides");
+    // A hop added after the scene worked out how high the drawing reaches
+    // (`aboveTop`), so the title stays where it was and is drawn through it (#188).
+    const scene = buildScene(base);
+    scene.couples = scene.couples.map(e => ({ ...e, data: { ...e.data, hopHeight: 50 } }));
+    const found = titleFindings(scene, "A family");
+    expect(found).toHaveLength(1);
+    expect(found[0]!.message).toContain("couple line hopping");
+    // No title, no check.
+    expect(titleFindings(scene)).toEqual([]);
+    // With the hop counted, as buildScene counts it, the title is raised clear.
+    scene.aboveTop = highestAboveSymbols(scene);
+    expect(titleFindings(scene, "A family")).toEqual([]);
   });
 
   it("reports a child whose parent line is gone", () => {

@@ -195,8 +195,8 @@ describe("a figure of the selected people (#215)", () => {
       const s = selectionSubset(p, ids);
       if (!s.joined) continue;
       const drawn = selectionPedigree(p, s);
-      expect(lintScene(drawn, buildScene(drawn)), example.name).toEqual([]);
-      expect(lintExport(drawn, {}), example.name).toEqual([]);
+      expect(lintScene(drawn, buildScene(drawn)), example.label).toEqual([]);
+      expect(lintExport(drawn, {}), example.label).toEqual([]);
     }
   });
 });

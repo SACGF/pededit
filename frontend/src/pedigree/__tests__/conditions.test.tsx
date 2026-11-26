@@ -71,7 +71,7 @@ describe("notation default (#115)", () => {
   });
 
   it("new pedigrees, PED imports and every example are written in NSGC 2022", () => {
-    expect(withCurrentNotation({}).canvasSettings).toEqual({ nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" });
+    expect(withCurrentNotation<Pick<Pedigree, "canvasSettings">>({}).canvasSettings).toEqual({ nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" });
     expect(withCurrentNotation(family([], "nsgc2008")).canvasSettings!.notation).toBe("nsgc2008");
     const ped = importPed("F 1 0 0 1 1\nF 2 0 0 2 1\nF 3 1 2 1 2\n");
     expect(ped.pedigrees[0]!.pedigree.canvasSettings!.notation).toBe("nsgc2022");
@@ -663,7 +663,7 @@ describe("trait quadrants (#118)", () => {
     expect(importJson(exportJson(p)).pedigree!.tags!.find(t => t.id === "cohort")!.kind).toBe("trait");
     const bad = JSON.parse(exportJson(p));
     bad.pedigree.tags[1].kind = "maybe";
-    expect(importJson(JSON.stringify(bad)).issues.some(i => i.path.includes("kind"))).toBe(true);
+    expect(importJson(JSON.stringify(bad)).issues.some(i => i.path?.includes("kind"))).toBe(true);
   });
 });
 

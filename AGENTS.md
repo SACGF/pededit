@@ -160,6 +160,15 @@ Gender identity is optional (`Individual.genderIdentity`: man, woman, non-binary
 
 **Python:** Use `uv` for all Python environment and package operations (`uv venv`, `uv pip install`, `uv run`). Do not use `pip` or `python -m venv` directly.
 
+## Running the checks
+
+```bash
+npm run check         # engine tests, type check, frontend tests, dead code, backend tests: about 20 s
+npm run check:pages   # what CI's page checks job runs; servers up first (below): several minutes
+```
+
+CI (`.github/workflows/ci.yml`) runs these same root `package.json` scripts, so a change that passes both passes CI. Each part also runs alone: `npm run test:layout`, `test:frontend`, `test:backend`, `typecheck`, `deadcode`.
+
 ## Checking frontend changes
 
 A change under `frontend/src/` is not done until it has been run in the browser on a page whose data reaches the changed code:

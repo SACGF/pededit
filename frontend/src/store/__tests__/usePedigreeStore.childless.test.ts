@@ -58,7 +58,6 @@ describe("setPartnershipChildless (#15)", () => {
     store().setPartnershipChildless("p1", "infertility");
     expect(partnership("p1").childless).toBeUndefined();
     expect(store().past.length).toBe(before);
-    expect(console.warn).toHaveBeenCalled();
   });
 
   it("adding a child clears the mark and reason", () => {

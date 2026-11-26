@@ -526,10 +526,7 @@ describe("buildScene — man with three wives", () => {
     expect(wifeEnd.turn!).toBeGreaterThan(Math.abs(dx) + 4);
     expect(wifeEnd.turn!).toBeLessThan(gapToBetween - NODE_SIZE / 2 - 4);
     // The drop starts at the row, on the level stretch: nothing hangs from the raised part.
-    const geometry = sibshipLineGeometry(hopping[0]!.data!, id => {
-      const n = nodes.find(x => x.id === id);
-      return n && { position: n.position, data: n.data };
-    })!;
+    const geometry = sibshipLineGeometry(hopping[0]!.data!, id => nodes.find(x => x.id === id))!;
     expect(geometry.solid[0]!.slice(0, 2)).toEqual([wife.position.x + dx, wife.position.y]);
   });
 });

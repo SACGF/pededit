@@ -9,8 +9,12 @@ the single app is `api/`.
 cd backend
 .venv/bin/python manage.py migrate
 .venv/bin/python manage.py runserver 8000
-.venv/bin/python manage.py test api
+npm run test:backend     # from anywhere in the repo: manage.py test api, on SQLite in memory
 ```
+
+The tests read `backend/test_config.json` instead of the site config, through
+`PEDEDIT_CONFIG`, which `site_config.py` takes as the path of the config file.
+So they need nothing in `/etc` and no right to create a PostgreSQL database.
 
 Use `uv` for environment work (`uv venv`, `uv pip install -r requirements.txt`),
 never pip directly. Config is read from `/etc/pededit/pededit.json` by

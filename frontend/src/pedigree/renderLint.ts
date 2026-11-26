@@ -35,7 +35,7 @@ import { assistedLinks } from "./assisted";
 import type { Scene, ScenePerson } from "./scene";
 import { NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
-import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth, highestAboveSymbols } from "./consanguinityLabel";
+import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth } from "./consanguinityLabel";
 import { duplicateArcPoints } from "./couplePath";
 import { textBlockUnder } from "./labelBlock";
 import { arcCollisions } from "./duplicateArc";
@@ -341,13 +341,13 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
 const SLASH_REACH = 4;
 
 /**
- * The canvas title, placed as `chartTitleNode` places it, against
+ * The canvas title, placed as `ChartTitleNode` places it, against
  * everything drawn near the top of the chart. The title is raised to clear
- * `highestAboveSymbols`, so a finding means that missed something.
+ * the scene's `aboveTop`, so a finding means that missed something.
  */
 function lintTitle(title: string, scene: Scene): LintFinding[] {
   const half = NODE_SIZE / 2;
-  const place = chartTitlePlace(title, scene.people, half, highestAboveSymbols(scene));
+  const place = chartTitlePlace(title, scene.people, half, scene.aboveTop);
   if (!place) return [];
   const w = titleWidth(title);
   const box = [place.x - w / 2, place.y - place.height / 2, place.x + w / 2, place.y + place.height / 2] as const;

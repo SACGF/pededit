@@ -1,5 +1,7 @@
 # Unit tests, type check, a dead code report and the agent page checks (#72) on every PR and push to main.
 # The page checks are frontend/scripts/browser/: see its README.md.
+# Each job runs the root package.json scripts, so `npm run check` and, with
+# the servers up, `npm run check:pages` run the same things on a desk.
 name: CI
 
 on:
@@ -28,15 +30,15 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Layout engine tests
-        run: npm -w layout-engine run test
+        run: npm run test:layout
       # Builds dist/ and lists the npm tarball (#22). Nothing is published,
       # and nothing else in CI uses the build: the frontend reads the source.
       - name: Layout engine package build
         run: npm -w layout-engine pack --dry-run
-      - name: Frontend type check
-        run: npm -w frontend run typecheck
+      - name: Type check (layout engine and frontend, tests included)
+        run: npm run typecheck
       - name: Frontend tests
-        run: npm -w frontend run test
+        run: npm run test:frontend
       # Reported as a warning, never fails the build: knip can be wrong about
       # code reached in a way it cannot follow. See "Dead code" in AGENTS.md.
       - name: Dead code (knip)
@@ -50,18 +52,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3
-      - name: Site config (SQLite)
-        run: |
-          sudo mkdir -p /etc/pededit
-          echo '{"database_url": "sqlite:///${{ runner.temp }}/pededit.sqlite3", "debug": true}' | sudo tee /etc/pededit/pededit.json
       - name: Install
         working-directory: backend
         run: |
           uv venv --python 3.13 .venv
           uv pip install --python .venv -r requirements.txt
+      # Reads backend/test_config.json (SQLite in memory) through PEDEDIT_CONFIG.
       - name: Test
-        working-directory: backend
-        run: .venv/bin/python manage.py test api
+        run: npm run test:backend
 
   page-checks:
     name: Page checks (render lint, export lint, console, persistence, flows)
@@ -88,22 +86,11 @@ jobs:
           .venv/bin/python manage.py createcachetable
       - name: Start Vite and Django
         run: node frontend/scripts/browser/servers.mjs up
-      - name: Render and export lint, every example
-        run: node frontend/scripts/browser/lint.mjs --all-examples
-      - name: Render and export lint, every example, compact and de-identified
-        run: node frontend/scripts/browser/lint.mjs --all-examples --compact --deidentify
-      - name: Console sweep, every example saved and reloaded through the API
-        run: node frontend/scripts/browser/console.mjs --all-examples --fixture-via-api
-      - name: Render and export lint, every feature fixture
-        run: node frontend/scripts/browser/lint.mjs --all-fixtures
-      - name: Render and export lint, every feature fixture, compact and de-identified
-        run: node frontend/scripts/browser/lint.mjs --all-fixtures --compact --deidentify
-      - name: Console sweep, every valid test data file (feature fixtures included) saved and reloaded through the API
-        run: node frontend/scripts/browser/console.mjs --all-test-data --fixture-via-api
-      - name: End-to-end flows (build, select, drag, conditions, export, import, filters, problems, signed in)
-        run: node frontend/scripts/browser/flows.mjs
-      - name: Emulated phone (touch pan, pinch, tap, small-screen layout)
-        run: node frontend/scripts/browser/phone.mjs
+      # Render and export lint over every example and feature fixture (also
+      # compact and de-identified), the console sweep with each saved and
+      # reloaded through the API, the end-to-end flows and the emulated phone.
+      - name: Page checks
+        run: npm run check:pages
       - name: Server logs
         if: failure()
         run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true
