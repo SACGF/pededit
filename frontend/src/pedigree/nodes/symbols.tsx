@@ -5,6 +5,7 @@ import {
   ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
 } from "../tags";
 import type { Sector, AnnotationItem, SymbolPaint } from "../tags";
+import type { PersonGlyph } from "../personGlyph";
 import { fillLayers, type FillBox } from "../tagFills";
 import type { TagFill } from "@pedigree-editor/layout-engine";
 import {
@@ -36,35 +37,39 @@ function symbolFill(paint: SymbolPaint): FillDescriptor {
   return { type: "empty" };
 }
 
+/** What `SymbolShape` draws: the symbol's part of a person's glyph. */
+export type SymbolGlyph = Pick<PersonGlyph, "shape" | "lifeStatus" | "caption" | "adopted" | "letter" | "paint">;
+
 /**
- * The paint of a symbol drawn without its pedigree (legend swatches):
- * the 2008 rules on the person alone. Canvas symbols pass `symbolPaint`.
+ * The symbol of someone drawn without their pedigree (legend swatches):
+ * their sex, and the 2008 paint rules on the person alone. A person on the
+ * chart is drawn from their glyph (`personGlyph`).
  */
-export function standalonePaint(individual: Individual): SymbolPaint {
+export function standaloneGlyph(individual: Individual): SymbolGlyph {
+  const letter = symbolLetter(individual);
+  const caption = lifeStatusCaption(individual.lifeStatus);
   return {
-    sectors: [], base: individual.affected ? "black" : "white", core: false,
-    dot: !!individual.carrier && !individual.affected,
-    line: drawsPresymptomatic(individual, { tags: [] }),
+    shape: individual.sex,
+    ...(individual.lifeStatus ? { lifeStatus: individual.lifeStatus } : {}),
+    ...(caption ? { caption } : {}),
+    ...(individual.adopted ? { adopted: individual.adopted } : {}),
+    ...(letter ? { letter } : {}),
+    paint: {
+      sectors: [], base: individual.affected ? "black" : "white", core: false,
+      dot: !!individual.carrier && !individual.affected,
+      line: drawsPresymptomatic(individual, { tags: [] }),
+    },
   };
 }
 
 // ── Shape props ────────────────────────────────────────────────────────────────
 
 interface ShapeProps {
-  individual: Individual;
+  /** What to draw: a person's glyph, or `standaloneGlyph` for a swatch. */
+  glyph: SymbolGlyph;
   size: number;
-  /**
-   * What fills the symbol (`symbolPaint` in tags.ts: sectors, black fill,
-   * black centre, carrier dot). Defaults to `standalonePaint`.
-   */
-  paint?: SymbolPaint;
-  /** Unique id for this symbol's clipPath. Required when the paint has sectors. */
+  /** Unique id for this symbol's clipPath. Needed when the paint has sectors. */
   clipId?: string;
-  /**
-   * The shape to draw, when it is not `individual.sex`: a symbol drawn by
-   * gender identity (`symbolSex` in gender.ts).
-   */
-  shape?: Individual["sex"];
 }
 
 /**
@@ -316,14 +321,14 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ individual, size, paint = standalonePaint(individual), clipId, shape = individual.sex }: ShapeProps) {
+export function SymbolShape({ glyph, size, clipId: id = "symbol-clip" }: ShapeProps) {
+  const { paint, shape } = glyph;
   const fill = symbolFill(paint);
   const { sectors, core } = paint;
-  const id = clipId ?? `symbol-clip-${individual.id}`;
-  const status = individual.lifeStatus;
-  const brackets = individual.adopted ? <AdoptionBrackets size={size} /> : null;
+  const status = glyph.lifeStatus;
+  const brackets = glyph.adopted ? <AdoptionBrackets size={size} /> : null;
   if (status) {
-    const caption = lifeStatusCaption(status);
+    const caption = glyph.caption;
     return (
       <g>
         {brackets}
@@ -346,7 +351,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
       <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {paint.line && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
-      <RoleLetter individual={individual} size={size} halo={sectors.length > 0} base={paint.base} />
+      {glyph.letter && <RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} />}
     </g>
   );
 }
@@ -355,9 +360,7 @@ export function SymbolShape({ individual, size, paint = standalonePaint(individu
  * "D" (gamete donor) or "S" (surrogate) inside the symbol. White on a
  * filled symbol; with a white halo over tag colours so it stays legible.
  */
-export function RoleLetter({ individual, size, halo = false, base = "white" }: { individual: Individual; size: number; halo?: boolean; base?: "black" | "white" }) {
-  const letter = symbolLetter(individual);
-  if (!letter) return null;
+function RoleLetter({ letter, size, halo = false, base = "white" }: { letter: string; size: number; halo?: boolean; base?: "black" | "white" }) {
   return (
     <text
       data-role-letter={letter}

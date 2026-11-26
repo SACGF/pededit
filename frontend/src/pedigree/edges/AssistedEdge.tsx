@@ -16,7 +16,7 @@ export function AssistedEdge({ source, target, data }: EdgeProps<AssistedEdgeTyp
   const seg = assistedEdgeSegment({ source, target, data }, id => {
     const n = nodes.find(x => x.id === id);
     const d = n?.data as RFNodeData | undefined;
-    return n && { position: n.position, individual: d?.individual, shape: d?.shape };
+    return n && { position: n.position, glyph: d?.glyph };
   });
   if (!seg) return null;
   const [x1, y1, x2, y2] = seg;

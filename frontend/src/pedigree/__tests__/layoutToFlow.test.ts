@@ -108,7 +108,7 @@ describe("layoutToFlow — simpleFamily", () => {
     });
 
     it("isDuplicate=false → duplicateIndex is undefined", () => {
-      expect(nodes.every((n) => n.data.duplicateIndex === undefined)).toBe(true);
+      expect(nodes.every((n) => n.data.glyph.copy === undefined)).toBe(true);
     });
   });
 
@@ -332,7 +332,7 @@ describe("layoutToFlow: duplicated individuals", () => {
     const a1 = nodes.filter(n => n.data.individual.id === "a1");
     expect(a1).toHaveLength(2);
     expect(a1.map(n => n.data.isDuplicate)).toEqual([true, true]);
-    expect(a1.map(n => n.data.duplicateIndex)).toEqual([1, 2]);
+    expect(a1.map(n => n.data.glyph.copy)).toEqual([1, 2]);
   });
 
   it("joins the copies with one dashed duplicate edge", () => {

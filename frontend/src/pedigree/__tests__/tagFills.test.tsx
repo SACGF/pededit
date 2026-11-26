@@ -7,7 +7,7 @@ import {
 } from "../tagFills";
 import { symbolPaint, renderSectorListSvg, annotationRow, renderAnnotationItemsSvg, sectorPath } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { TagSwatchSvg } from "../../components/Legend";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -135,7 +135,7 @@ describe("renderers draw the pattern (#67)", () => {
   it("canvas symbol draws the same layers", () => {
     const p = ped(tags);
     const ind = p.individuals[0]!;
-    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} paint={symbolPaint(ind, p)} clipId="k" /></svg>);
+    const html = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="k" /></svg>);
     expect(html).toContain(`data-tag-fill="diagonal"`);
     expect(html).toContain(`data-tag-fill="dots"`);
     expect(html).toContain(`stroke="#d62728"`);
@@ -146,7 +146,7 @@ describe("renderers draw the pattern (#67)", () => {
   it("an affected patterned symbol keeps its black centre over a white pattern base", () => {
     const p = ped([q("a", "#000000", "horizontal")], false, ["a"], true);
     const ind = p.individuals[0]!;
-    const html = renderToStaticMarkup(<svg><SymbolShape individual={ind} size={40} paint={symbolPaint(ind, p)} clipId="k" /></svg>);
+    const html = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="k" /></svg>);
     const base = html.indexOf(`fill="white"></path>`);
     const core = html.indexOf(`scale(0.55)`);
     expect(base).toBeGreaterThan(0);

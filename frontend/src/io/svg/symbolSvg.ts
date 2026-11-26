@@ -6,10 +6,10 @@
  * and mirrors `SymbolShape` in `pedigree/nodes/symbols.tsx`, which
  * draws the same on the canvas. Framework-free: strings only.
  */
-import type { Individual } from "@pedigree-editor/layout-engine";
+import type { Adoption, Individual, LifeStatus } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { adoptionBracketSegments, ADOPTION_DASH } from "../../pedigree/adoption";
-import { symbolLetter, roleLetterFontSize, roleLetterBaselineY, roleLetterFill } from "../../pedigree/assisted";
+import { roleLetterFontSize, roleLetterBaselineY, roleLetterFill } from "../../pedigree/assisted";
 import type { PersonGlyph } from "../../pedigree/personGlyph";
 import { renderPresymptomaticLineSvg } from "../../pedigree/evaluation";
 import { renderArrowSvg, type ArrowKind } from "../../pedigree/proband";
@@ -34,16 +34,15 @@ export function seg(x1: number, y1: number, x2: number, y2: number, dashed = fal
   return `<line${mark ? ` class="mark"` : ""} x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="black" stroke-width="${STROKE}"${dash}/>`;
 }
 
-/** Brackets round an adopted individual's symbol, centred on the origin. Shared with the U-shape exporter. */
-export function renderAdoptionBrackets(ind: Individual): string {
-  if (!ind.adopted) return "";
+/** Brackets round an adopted individual's symbol, centred on the origin. */
+function renderAdoptionBrackets(adopted: Adoption | undefined): string {
+  if (!adopted) return "";
   const half = NODE_SIZE / 2;
-  return `<g data-adopted="${ind.adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
+  return `<g data-adopted="${adopted}">` + adoptionBracketSegments(NODE_SIZE, -half, -half).map(([x1, y1, x2, y2]) => seg(x1, y1, x2, y2)).join("") + `</g>`;
 }
 
-/** "D" or "S" inside the symbol, centred on the origin. Shared with the U-shape exporter. */
-export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black" | "white" = "white"): string {
-  const letter = symbolLetter(ind);
+/** "D" or "S" inside the symbol, centred on the origin. */
+function renderRoleLetterSvg(letter: string | undefined, halo: boolean, base: "black" | "white"): string {
   if (!letter) return "";
   const half = NODE_SIZE / 2;
   const h = halo ? ` stroke="white" stroke-width="3" paint-order="stroke"` : "";
@@ -62,7 +61,7 @@ export function renderRoleLetterSvg(ind: Individual, halo = false, base: "black"
  * with the symbol. `captionShift` is how far an "SB" / "ECT" caption pushes
  * the annotation row down in the caller's text geometry.
  */
-export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId: string, { rotation = 0, captionShift }: { rotation?: number; captionShift: number }): string {
+export function renderPersonShapeSvg(glyph: PersonGlyph, clipId: string, { rotation = 0, captionShift }: { rotation?: number; captionShift: number }): string {
   const half = NODE_SIZE / 2;
   // What fills the symbol, by the notation, as decided for the canvas.
   const paint = glyph.paint;
@@ -70,7 +69,7 @@ export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId
 
   // Geometry without paint, reused for the clipPath, the filled base and the
   // re-stroked outline that keeps the border crisp over tag sectors.
-  const triangle = lossTriangleGeom(ind);
+  const triangle = lossTriangleGeom(glyph.lifeStatus);
   let geom: string;
   if (triangle) {
     geom = triangle;
@@ -96,12 +95,11 @@ export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId
   }
 
   const upright = (markup: string) => (markup && rotation !== 0 ? `<g transform="rotate(${Math.round(-rotation * 10) / 10})">${markup}</g>` : markup);
-  const letter = upright(renderRoleLetterSvg(ind, sectors.length > 0, paint.base));
-  const marks = renderLifeStatusMarks(ind, geom, clipId, paint);
-  return renderAdoptionBrackets(ind) + shape + renderCarrierDot(ind, sectors.length > 0, paint.dot) + letter
+  const letter = upright(renderRoleLetterSvg(glyph.letter, sectors.length > 0, paint.base));
+  const marks = renderLifeStatusMarks(glyph.lifeStatus, geom, clipId, paint);
+  return renderAdoptionBrackets(glyph.adopted) + shape + renderCarrierDot(glyph.lifeStatus, sectors.length > 0, paint.dot) + letter
     + (paint.line ? renderPresymptomaticLineSvg(glyph.lifeStatus, NODE_SIZE, -half, -half, sectors.length > 0) : "")
-    // From `ind`, as the marks themselves are (`renderLifeStatusMarks`).
-    + (ind.lifeStatus === "pregnancy" ? upright(marks) : marks)
+    + (glyph.lifeStatus === "pregnancy" ? upright(marks) : marks)
     + renderAnnotationItemsSvg(glyph.annotations, NODE_SIZE, glyph.caption ? captionShift : 0);
 }
 
@@ -109,12 +107,12 @@ export function renderPersonShapeSvg(ind: Individual, glyph: PersonGlyph, clipId
  * Carrier dot (NSGC 2008), centred on the origin's symbol; `show` is
  * `symbolPaint(...).dot`, which leaves it off an affected fill and off a
  * carrier whose condition is recorded. With `rim` (tag colours behind
- * it) it gets a white rim, as on the canvas. Shared with the U-shape exporter.
+ * it) it gets a white rim, as on the canvas.
  */
-export function renderCarrierDot(ind: Individual, rim: boolean, show: boolean): string {
+function renderCarrierDot(lifeStatus: LifeStatus | undefined, rim: boolean, show: boolean): string {
   if (!show) return "";
   const half = NODE_SIZE / 2;
-  const d = carrierDot(ind.lifeStatus, NODE_SIZE, -half, -half);
+  const d = carrierDot(lifeStatus, NODE_SIZE, -half, -half);
   return rim
     ? `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r + CARRIER_RIM / 2}" fill="black" stroke="white" stroke-width="${CARRIER_RIM}"/>`
     : `<circle cx="${d.cx}" cy="${d.cy}" r="${d.r}" fill="black"/>`;
@@ -130,8 +128,8 @@ export function childDropEndOffset(ind: Individual | undefined): number {
 
 /*
  * Pregnancy / pregnancy-loss symbols (NSGC 2008), centred on the origin.
- * Mirror SymbolShape in symbols.tsx and are shared with the U-shape exporter.
- * The "SB" / "ECT" caption is a label line, see lifeStatusCaption.
+ * Mirror SymbolShape in symbols.tsx. The "SB" / "ECT" caption is a label
+ * line, see lifeStatusCaption.
  */
 
 /**
@@ -140,8 +138,8 @@ export function childDropEndOffset(ind: Individual | undefined): number {
  * can reuse it for the clipPath and the outline. Null when the individual is
  * drawn with their sex symbol.
  */
-export function lossTriangleGeom(ind: Individual): string | null {
-  if (!usesLossTriangle(ind.lifeStatus)) return null;
+function lossTriangleGeom(lifeStatus: LifeStatus | undefined): string | null {
+  if (!usesLossTriangle(lifeStatus)) return null;
   const half = NODE_SIZE / 2;
   return `<polygon points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
 }
@@ -152,8 +150,7 @@ export function lossTriangleGeom(ind: Individual): string | null {
  * on an affected symbol the part of a slash inside it is redrawn in white,
  * clipped to that outline, so the slash does not vanish into the fill.
  */
-export function renderLifeStatusMarks(ind: Individual, geom: string, clipId: string, paint: Pick<SymbolPaint, "base" | "dot">): string {
-  const status = ind.lifeStatus;
+function renderLifeStatusMarks(status: LifeStatus | undefined, geom: string, clipId: string, paint: Pick<SymbolPaint, "base" | "dot">): string {
   if (!status) return "";
   const filled = paint.base === "black";
   const half = NODE_SIZE / 2;

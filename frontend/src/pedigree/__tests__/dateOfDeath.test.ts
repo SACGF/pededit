@@ -75,9 +75,9 @@ describe("date of death under the symbol (#103)", () => {
   it("canvas, SVG and U-shape draw it, and the lints stay clean", () => {
     const flow = layoutToFlow(family());
     const data = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.data;
-    expect(data("f").detailLines).toEqual(["d. 71y"]);
-    expect(data("m").detailLines).toEqual(["b. 1938", "d. 2010"]);
-    expect(data("c1").detailLines).toEqual(["d. 1999"]);
+    expect(data("f").glyph.detailLines).toEqual(["d. 71y"]);
+    expect(data("m").glyph.detailLines).toEqual(["b. 1938", "d. 2010"]);
+    expect(data("c1").glyph.detailLines).toEqual(["d. 1999"]);
     expect(lintFlow(family(), flow)).toEqual([]);
     const svg = exportSvg(family());
     for (const t of ["d. 71y", "b. 1938", "d. 2010", "d. 1999"]) expect(svg).toContain(`>${t}</text>`);

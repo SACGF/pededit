@@ -241,9 +241,11 @@ describe("U-shape SVG", () => {
     const layout = layoutUShape(p)!;
     const rotated = [...layout.nodes.values()].find(n => Math.abs(n.rotation) === 90)!;
     expect(rotated).toBeDefined();
-    const ind = p.individuals.find(i => i.id === rotated.id)!;
+    // A fresh pedigree: glyphs are kept per pedigree object.
+    const q = structuredClone(p);
+    const ind = q.individuals.find(i => i.id === rotated.id)!;
     ind.lifeStatus = "pregnancy";
-    const svg = exportUShapeSvg(p);
+    const svg = exportUShapeSvg(q);
     const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g>`))!;
     expect(group).not.toBeNull();
     expect(group[2]).toContain(`<g transform="rotate(${-Number(group[1])})"><text`);

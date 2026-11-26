@@ -295,7 +295,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   // 5. Labels on one row running into each other. Names are wrapped to
   // the slot width, so this catches dragged nodes and long dates.
   const labelW = (n: FlowData["nodes"][0]) =>
-    Math.max(linesWidth(n.data.nameLines ?? []), linesWidth(n.data.detailLines ?? []));
+    Math.max(linesWidth(n.data.glyph.nameLines), linesWidth(n.data.glyph.detailLines));
   for (let i = 0; i < flow.nodes.length; i++) {
     for (let j = i + 1; j < flow.nodes.length; j++) {
       const A = flow.nodes[i]!, B = flow.nodes[j]!;

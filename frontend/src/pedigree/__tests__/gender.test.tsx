@@ -6,7 +6,7 @@ import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } fro
 import { detailLines } from "../labels";
 import { layoutToFlow } from "../layoutToFlow";
 import type { RFNodeData } from "../layoutToFlow";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -79,12 +79,12 @@ describe("gender identity on the symbol (#26)", () => {
   it("gives the canvas node its drawn shape, and the canvas draws it", () => {
     const nodes = layoutToFlow(family()).nodes;
     const data = (id: string) => nodes.find(n => (n.data as RFNodeData).individual.id === id)!.data as RFNodeData;
-    expect(data("t").shape).toBe("male");
-    expect(data("t").detailLines).toContain("AFAB");
-    expect(data("n").shape).toBe("unknown");
+    expect(data("t").glyph.shape).toBe("male");
+    expect(data("t").glyph.detailLines).toContain("AFAB");
+    expect(data("n").glyph.shape).toBe("unknown");
     const t = ind(family(), "t");
-    expect(renderToStaticMarkup(<svg><SymbolShape individual={t} shape="male" size={40} /></svg>)).toContain("<rect");
-    expect(renderToStaticMarkup(<svg><SymbolShape individual={t} size={40} /></svg>)).toContain("<circle");
+    expect(renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(t), shape: "male" }} size={40} /></svg>)).toContain("<rect");
+    expect(renderToStaticMarkup(<svg><SymbolShape glyph={standaloneGlyph(t)} size={40} /></svg>)).toContain("<circle");
   });
 
   it("does not move anyone: the layout follows sex, not the drawing", () => {

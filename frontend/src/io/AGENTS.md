@@ -99,7 +99,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.
 - `symbolSvg.ts` (#149): a person's symbol as SVG markup, for both figure
-  exports. `renderPersonShapeSvg(ind, glyph, clipId, { rotation,
+  exports. `renderPersonShapeSvg(glyph, clipId, { rotation,
   captionShift })` draws the outline, fill, sections, brackets, dot, letter,
   presymptomatic line, pregnancy and loss marks and the annotation row from
   the person's glyph; the standard export calls it upright, the U-shape

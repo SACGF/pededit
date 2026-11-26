@@ -59,8 +59,8 @@ describe("approximate age under the symbol (#20)", () => {
   it("layoutToFlow puts it on the node data and the canvas lint stays clean", () => {
     const flow = layoutToFlow(family());
     const data = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.data;
-    expect(data("f").detailLines).toEqual(["d. 72"]);
-    expect(data("c2").detailLines).toEqual(["b. 1962"]);
+    expect(data("f").glyph.detailLines).toEqual(["d. 72"]);
+    expect(data("c2").glyph.detailLines).toEqual(["b. 1962"]);
     expect(lintFlow(family(), flow)).toEqual([]);
   });
 

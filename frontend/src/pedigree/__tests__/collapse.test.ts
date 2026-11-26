@@ -279,8 +279,8 @@ describe("collapsed branch diamond (#1)", () => {
     expect(sib.data!.childIds).toEqual([diamond.id]);
     expect(lintFlow(p, flow)).toEqual([]);
     // No affected people hidden: no note under the diamond.
-    expect(diamond.data.detailLines).toEqual([]);
-    expect(node(branchPlaceholderId("sw")).data.nameLines).toEqual([]);
+    expect(diamond.data.glyph.detailLines).toEqual([]);
+    expect(node(branchPlaceholderId("sw")).data.glyph.nameLines).toEqual([]);
   });
 
   it("puts the count inside the diamond in the export", () => {
@@ -382,7 +382,7 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     expect(lintFlow(p, flow)).toEqual([]);
     const node = flow.nodes.find(n => n.data.individual.id === sym)!;
     expect(node.type).toBe("collapsedBranch");
-    expect(node.data.detailLines).toEqual([]);
+    expect(node.data.glyph.detailLines).toEqual([]);
   });
 
   it("numbers the drawn affected children and skips the group symbol (#8)", () => {

@@ -17,7 +17,7 @@ export type CollapsedBranchNodeType = Node<RFNodeData, "collapsedBranch">;
  * in the pedigree, so it has no hover pill, menu, selection or drag.
  */
 export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>) {
-  const { individual, branch } = data;
+  const { branch } = data;
   const nodeId = useNodeId()!;
   const setDescendantsHidden = usePedigreeStore(s => s.setDescendantsHidden);
   const picking = usePedigreeStore(s => s.picking);
@@ -38,11 +38,11 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
       }}
     >
       <svg width={NODE_SIZE} height={NODE_SIZE} viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`} overflow="visible">
-        <SymbolShape individual={individual} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
+        <SymbolShape glyph={data.glyph} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
         <BranchCount size={NODE_SIZE} count={n} />
       </svg>
 
-      {data.detailLines.length > 0 && (
+      {data.glyph.detailLines.length > 0 && (
         <div
           data-detail-label
           style={{
@@ -58,7 +58,7 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
             pointerEvents: "none",
           }}
         >
-          {data.detailLines.map((line, i) => <div key={i}>{line}</div>)}
+          {data.glyph.detailLines.map((line, i) => <div key={i}>{line}</div>)}
         </div>
       )}
 

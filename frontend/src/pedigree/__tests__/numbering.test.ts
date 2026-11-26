@@ -129,16 +129,16 @@ describe("labels with numbers", () => {
   it("draws the number on the canvas only when the setting is on", () => {
     const off = layoutToFlow(family());
     const gfOff = off.nodes.find(n => n.data.individual.id === "gf")!;
-    expect(gfOff.data.nameLines).toEqual(["Grandpa"]);
-    expect(gfOff.data.detailLines).toEqual([]);
+    expect(gfOff.data.glyph.nameLines).toEqual(["Grandpa"]);
+    expect(gfOff.data.glyph.detailLines).toEqual([]);
     const on = layoutToFlow(withNumbers(family()));
     const gf = on.nodes.find(n => n.data.individual.id === "gf")!;
-    expect(gf.data.nameLines).toEqual(["Grandpa"]);
-    expect(gf.data.detailLines).toEqual(["I-1"]);
-    expect(gf.data.detailsBacked).toBe(true);
+    expect(gf.data.glyph.nameLines).toEqual(["Grandpa"]);
+    expect(gf.data.glyph.detailLines).toEqual(["I-1"]);
+    expect(gf.data.glyph.detailsBacked).toBe(true);
     const a2 = on.nodes.find(n => n.data.individual.id === "a2")!;
-    expect(a2.data.nameLines).toEqual([]);
-    expect(a2.data.detailLines).toEqual([pedigreeNumbers(family()).get("a2")]);
+    expect(a2.data.glyph.nameLines).toEqual([]);
+    expect(a2.data.glyph.detailLines).toEqual([pedigreeNumbers(family()).get("a2")]);
   });
 
   it("draws the numbers in the SVG and U-shape exports, and they lint clean", () => {

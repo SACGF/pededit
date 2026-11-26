@@ -263,7 +263,7 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(at("ar_c4").x).toBeCloseTo(at("ar_d4").x, 3);
     expect(at("ar_c5").x).toBeCloseTo(at("ar_m5").x, 3); // NSGC 2022 Fig. 5 1b (#105)
     // A line runs straight down through the labels of those carrying women: white backing.
-    expect(flow.nodes.filter(n => n.data.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_m5", "ar_s3", "ar_w1"]);
+    expect(flow.nodes.filter(n => n.data.glyph.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_m5", "ar_s3", "ar_w1"]);
     // Kinship and PED still follow the genetic parents.
     const k = kinshipCoefficients(p);
     expect(k.kinship("ar_d2", "ar_c2")).toBe(1 / 4);

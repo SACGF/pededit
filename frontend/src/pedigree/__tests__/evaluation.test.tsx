@@ -5,7 +5,7 @@ import {
   evaluationText, evaluationsCsv, documentedMarkAt, presymptomaticLine, drawsPresymptomatic,
 } from "../evaluation";
 import { detailLines, detailSections, evaluationLines, labelMaxWidth, textWidth } from "../labels";
-import { SymbolShape, DocumentedMark } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph, DocumentedMark } from "../nodes/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -172,11 +172,11 @@ describe("evaluation notation, NSGC 2008 setting (#101)", () => {
 
 describe("presymptomatic carrier (#101)", () => {
   it("draws a vertical line through the symbol, not on an affected one", () => {
-    const html = renderToStaticMarkup(<svg><SymbolShape individual={family().individuals[0]!} size={40} /></svg>);
+    const html = renderToStaticMarkup(<svg><SymbolShape glyph={standaloneGlyph(family().individuals[0]!)} size={40} /></svg>);
     expect(html).toContain('data-presymptomatic="true"');
     expect(html).toMatch(/x1="20" y1="1" x2="20" y2="39"/);
     expect(drawsPresymptomatic({ presymptomatic: true, affected: true }, { tags: [] })).toBe(false);
-    const affected = renderToStaticMarkup(<svg><SymbolShape individual={{ ...family().individuals[0]!, affected: true }} size={40} /></svg>);
+    const affected = renderToStaticMarkup(<svg><SymbolShape glyph={standaloneGlyph({ ...family().individuals[0]!, affected: true })} size={40} /></svg>);
     expect(affected).not.toContain("data-presymptomatic");
   });
 

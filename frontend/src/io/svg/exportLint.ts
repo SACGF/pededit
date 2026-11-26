@@ -262,7 +262,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       out.push({ code: "symbol-not-on-canvas", message: `the export draws a symbol at ${at([x, y])}, where the canvas has none`, individuals: [] });
       continue;
     }
-    symbols.push({ pos: [x, y], id: node.data.individual.id, shape: node.data.shape });
+    symbols.push({ pos: [x, y], id: node.data.individual.id, shape: node.data.glyph.shape });
   }
   const drawn = new Set(symbols.map(s => s.id));
   for (const ind of pedigree.individuals) {

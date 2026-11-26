@@ -38,7 +38,7 @@ function cousins(settings: Partial<CanvasSettings> = {}, extra: Partial<Pedigree
 const ON = { showCoefficients: true };
 const max = labelMaxWidth(SLOT_WIDTH);
 const couple = (p: Pedigree, id = "p3") => p.partnerships.find(x => x.id === id)!;
-const under = (p: Pedigree, id: string) => layoutToFlow(p).nodes.find(n => n.data.individual.id === id)!.data.detailLines;
+const under = (p: Pedigree, id: string) => layoutToFlow(p).nodes.find(n => n.data.individual.id === id)!.data.glyph.detailLines;
 const texts = (svg: string) => [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]);
 
 describe("coefficients on the figure (#86)", () => {

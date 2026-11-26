@@ -55,7 +55,7 @@ function pair(name: string, dx = SLOT_WIDTH, other = "Bea"): Pedigree {
 describe("labels on the canvas, in exports and in the lint (#68)", () => {
   it("layoutToFlow puts the wrapped lines on the node data", () => {
     const flow = layoutToFlow(pair("Ferdinand of Aragon"));
-    expect(flow.nodes.find(n => n.data.individual.id === "a")!.data.nameLines).toEqual(["Ferdinand of", "Aragon"]);
+    expect(flow.nodes.find(n => n.data.individual.id === "a")!.data.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
     expect(linesWidth(["Ferdinand of", "Aragon"])).toBeLessThanOrEqual(max);
   });
 
@@ -102,12 +102,12 @@ describe("name label setting: wrap or truncate (#68)", () => {
 
   it("truncate gives one line on the canvas, cut with an ellipsis", () => {
     const p = truncated(pair("Ferdinand of Aragon"));
-    const lines = layoutToFlow(p).nodes[0]!.data.nameLines;
+    const lines = layoutToFlow(p).nodes[0]!.data.glyph.nameLines;
     expect(lines).toHaveLength(1);
     expect(lines[0]!.endsWith(ELLIPSIS)).toBe(true);
     expect(linesWidth(lines)).toBeLessThanOrEqual(max);
-    expect(layoutToFlow(truncated(pair("Mary"))).nodes[0]!.data.nameLines).toEqual(["Mary"]);
-    expect(layoutToFlow(pair("Ferdinand of Aragon")).nodes[0]!.data.nameLines).toEqual(["Ferdinand of", "Aragon"]);
+    expect(layoutToFlow(truncated(pair("Mary"))).nodes[0]!.data.glyph.nameLines).toEqual(["Mary"]);
+    expect(layoutToFlow(pair("Ferdinand of Aragon")).nodes[0]!.data.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
   });
 
   it("knows when a label leaves part of the name out", () => {

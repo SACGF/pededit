@@ -9,7 +9,7 @@ import { symbolPaint, renderSectorListSvg, keyTagRows, statusKeyRows, sectionLay
 import { renderExportKeySvg } from "../exportKey";
 import { carrierPaintFrom, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { Legend } from "../../components/Legend";
 import { ConditionsAndTags } from "../../components/ConditionsAndTags";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -373,7 +373,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
         const p = family([...tags], "nsgc2022", tagFills);
         const a = byId(p, "a");
         // The canvas symbol has its corner at 0 0; the exporters centre it on 0 0. Radius = size.
-        const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
+        const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
         expect(canvas).toContain(sectorPath(20, 20, 40, start, end));
         const centred = sectorPath(0, 0, 40, start, end);
         expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
@@ -439,7 +439,7 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
   it("every renderer and both keys draw it: canvas, app legend, export key, SVG, U-shape", () => {
     const p = single("monochrome");
     const a = byId(p, "a");
-    const canvas = renderToStaticMarkup(<svg><SymbolShape individual={a} size={40} paint={symbolPaint(a, p)} clipId="k" /></svg>);
+    const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
     expect(canvas).toContain(`<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`);
     const centred = `<path d="${sectorPath(0, 0, 40, 0, 360)}" fill="#000000"`;
     expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
@@ -461,7 +461,7 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
 
 describe("renderers (#115)", () => {
   const html = (p: Pedigree, id: string) =>
-    renderToStaticMarkup(<svg><SymbolShape individual={byId(p, id)} size={40} paint={symbolPaint(byId(p, id), p)} clipId="k" /></svg>);
+    renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(byId(p, id)), paint: symbolPaint(byId(p, id), p) }} size={40} clipId="k" /></svg>);
 
   it("canvas symbol: carrier sectors are marked, no dot in 2022, the dot in 2008", () => {
     const p22 = family(undefined, "nsgc2022"), p08 = family();

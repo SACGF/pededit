@@ -85,7 +85,7 @@ function MinimapEdges() {
     const n = byId.get(id);
     if (!n) return undefined;
     const d = n.data as Partial<RFNodeData>;
-    return { position: n.position, individual: d.individual, shape: d.shape };
+    return { position: n.position, glyph: d.glyph };
   };
   const half = NODE_SIZE / 2;
   const paths: string[] = [];
@@ -103,7 +103,7 @@ function MinimapEdges() {
       const lp = byId.get(data.leftParentId), rp = byId.get(data.rightParentId);
       const kids = data.childIds.map(id => byId.get(id)).filter((n): n is Node => !!n);
       if (!lp || !rp || kids.length === 0) continue;
-      const sexOf = (n: Node) => { const d = n.data as Partial<RFNodeData>; return d.shape ?? d.individual?.sex; };
+      const sexOf = (n: Node) => (n.data as Partial<RFNodeData>).glyph?.shape;
       const apart = data.apart
         ? [{ ...lp.position, sex: sexOf(lp) }, { ...rp.position, sex: sexOf(rp) }]
         : undefined;
@@ -156,8 +156,8 @@ function PedigreeMinimap({ pedigree }: { pedigree: Pedigree }) {
         pannable
         nodeComponent={MinimapNode}
         nodeClassName={n => {
-          const ind = individual(n);
-          return ind ? MINIMAP_SHAPE[(n.data as RFNodeData).shape ?? ind.sex] ?? "minimap-diamond" : "";
+          const glyph = (n.data as Partial<RFNodeData>).glyph;
+          return glyph ? MINIMAP_SHAPE[glyph.shape] ?? "minimap-diamond" : "";
         }}
         nodeColor={n => { const ind = individual(n); return ind && isAffected(ind, pedigree) ? "black" : "white"; }}
         nodeStrokeColor="black"

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { adoptionBracketSegments, ADOPTION_BRACKET_GAP, ADOPTION_DASH } from "../adoption";
 import { sibshipPaths, sibshipSegments } from "../sibshipPath";
 import { layoutToFlow } from "../layoutToFlow";
@@ -38,7 +38,7 @@ describe("adoption brackets (#12)", () => {
 
   it("SymbolShape draws the brackets for adopted in and out, not otherwise", () => {
     const html = (adopted?: "in" | "out") =>
-      renderToStaticMarkup(<SymbolShape individual={{ id: "x", sex: "male", affected: false, sibOrder: 0, adopted }} size={40} />);
+      renderToStaticMarkup(<SymbolShape glyph={standaloneGlyph({ id: "x", sex: "male", affected: false, sibOrder: 0, adopted })} size={40} />);
     expect(html("in")).toContain('data-adopted="true"');
     expect(html("out")).toContain('data-adopted="true"');
     expect(html()).not.toContain("data-adopted");

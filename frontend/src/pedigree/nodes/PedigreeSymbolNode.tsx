@@ -30,7 +30,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // component draws it and adds what only the editor shows (selection, the
   // pin dot, the problem marker, the dev id, the hover pill).
   const { individual, glyph, isPinned } = data;
-  const { nameLines, shape, paint, annotations, arrow } = glyph;
+  const { nameLines, annotations, arrow } = glyph;
   const details = glyph.detailLines;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
@@ -155,7 +155,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`}
         overflow="visible"
       >
-        <SymbolShape individual={individual} shape={shape} size={NODE_SIZE} paint={paint} clipId={`symbol-clip-${nodeId}`} />
+        <SymbolShape glyph={glyph} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
         {glyph.deceased && <DeceasedSlash size={NODE_SIZE} />}
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         {glyph.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}

@@ -87,7 +87,7 @@ export function coupleLineGeometry(data: CoupleEdgeData | undefined, double: boo
 /** A symbol at one end of a sibship's lines: where it is and what `layoutToFlow` put on its node. */
 export interface SibshipEnd {
   position: LinePosition;
-  data?: Pick<RFNodeData, "individual" | "shape" | "twinSet" | "zygosity">;
+  data?: Pick<RFNodeData, "glyph" | "twinSet" | "zygosity">;
 }
 
 export interface SibshipLineGeometry {
@@ -121,8 +121,8 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
   // Drops end at the top of each child symbol, or at a loss triangle's apex.
   const kids: SibshipChild[] = children.map(c => ({
     ...c.position,
-    topInset: symbolTopInset(c.data?.individual?.lifeStatus, NODE_SIZE),
-    dashed: c.data?.individual?.adopted === "in",
+    topInset: symbolTopInset(c.data?.glyph.lifeStatus, NODE_SIZE),
+    dashed: c.data?.glyph.adopted === "in",
     twinSet: c.data?.twinSet,
     zygosity: c.data?.zygosity,
   }));
@@ -130,7 +130,7 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
   // layout while a node is being dragged.
   const barOffset = data.barOffset ?? 0;
   // Parents who are not a couple (gamete donation): a line from each.
-  const sexOf = (n: SibshipEnd) => n.data?.shape ?? n.data?.individual?.sex;
+  const sexOf = (n: SibshipEnd) => n.data?.glyph.shape;
   const apart = data.apart
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;

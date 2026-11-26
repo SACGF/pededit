@@ -1,4 +1,5 @@
 import { placementParentOf, type Individual, type Partnership, type Pedigree, type ReproductiveRole } from "@pedigree-editor/layout-engine";
+import type { PersonGlyph } from "./personGlyph";
 import { NODE_SIZE } from "./constants";
 import type { Segment } from "./sibshipPath";
 import { symbolTopInset } from "./lifeStatus";
@@ -215,12 +216,12 @@ export interface AssistedEdgeLike {
  */
 export function assistedEdgeSegment(
   edge: AssistedEdgeLike,
-  nodeAt: (id: string) => { position: { x: number; y: number }; individual?: Individual; shape?: Individual["sex"] } | undefined,
+  nodeAt: (id: string) => { position: { x: number; y: number }; glyph?: Pick<PersonGlyph, "shape" | "lifeStatus"> } | undefined,
 ): Segment | null {
   const a = nodeAt(edge.source), b = nodeAt(edge.target);
   if (!a || !b) return null;
   // The shape drawn (gender identity), which the line leaves from.
-  const from: LinePoint = { ...a.position, sex: a.shape ?? a.individual?.sex };
+  const from: LinePoint = { ...a.position, sex: a.glyph?.shape };
   const bar = edge.data?.bar;
   if (bar) {
     const l = nodeAt(bar.leftParentId), r = nodeAt(bar.rightParentId);
@@ -230,7 +231,7 @@ export function assistedEdgeSegment(
     const [x1, y1] = symbolExitPoint(from, j.x);
     return [x1, y1, j.x, j.y];
   }
-  return assistedLinkSegment(from, b.position, symbolTopInset(b.individual?.lifeStatus, NODE_SIZE));
+  return assistedLinkSegment(from, b.position, symbolTopInset(b.glyph?.lifeStatus, NODE_SIZE));
 }
 
 // ── Editing: the store applies these to an immer draft ─────────────────

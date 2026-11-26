@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import type { Individual } from "@pedigree-editor/layout-engine";
 
 const SIZE = 40;
@@ -12,7 +12,7 @@ function person(overrides: Partial<Individual> = {}): Individual {
 }
 
 function render(ind: Individual): string {
-  return renderToStaticMarkup(createElement(SymbolShape, { individual: ind, size: SIZE }));
+  return renderToStaticMarkup(createElement(SymbolShape, { glyph: standaloneGlyph(ind), size: SIZE }));
 }
 
 /** True when a small inner circle (the carrier dot) is present. */

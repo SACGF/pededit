@@ -1,7 +1,7 @@
 import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE } from "../pedigree/tags";
 import { CONDITIONS_AND_TAGS } from "../pedigree/conditions";
-import { SymbolShape, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
+import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { type ArrowKind } from "../pedigree/proband";
 import { ADOPTION_DASH } from "../pedigree/adoption";
@@ -76,7 +76,7 @@ function DeceasedSvg({ sex }: { sex: Sex }) {
 function FamilyHistorySvg({ sex }: { sex: Sex }) {
   return (
     <svg width="36" height="36" viewBox="-6 -14 36 42">
-      <SymbolShape individual={{ id: "legend", sex, affected: false, sibOrder: 0 }} size={SZ} />
+      <SymbolShape glyph={standaloneGlyph({ id: "legend", sex, affected: false, sibOrder: 0 })} size={SZ} />
       <FamilyHistoryMark size={SZ} hasParents={false} />
     </svg>
   );
@@ -87,12 +87,7 @@ function PlainCarrierSvg({ sex }: { sex: Sex }) {
   const [start, end] = PLAIN_CARRIER_ANGLES;
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
-      <SymbolShape
-        individual={{ id: "legend", sex, affected: false, sibOrder: 0 }}
-        size={SZ}
-        paint={{ sectors: [{ tag: PLAIN_CARRIER_TAG, start, end, ...PLAIN_CARRIER_PAINT, carrier: true }], base: "white", core: false, dot: false }}
-        clipId={`legend-plain-carrier-${sex}`}
-      />
+      <SymbolShape glyph={{ ...standaloneGlyph({ id: "legend", sex, affected: false, sibOrder: 0 }), paint: { sectors: [{ tag: PLAIN_CARRIER_TAG, start, end, ...PLAIN_CARRIER_PAINT, carrier: true }], base: "white", core: false, dot: false } }} size={SZ} clipId={`legend-plain-carrier-${sex}`} />
     </svg>
   );
 }
@@ -101,7 +96,7 @@ function PlainCarrierSvg({ sex }: { sex: Sex }) {
 function PresymptomaticSvg({ sex }: { sex: Sex }) {
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
-      <SymbolShape individual={{ id: "legend", sex, affected: false, presymptomatic: true, sibOrder: 0 }} size={SZ} />
+      <SymbolShape glyph={standaloneGlyph({ id: "legend", sex, affected: false, presymptomatic: true, sibOrder: 0 })} size={SZ} />
     </svg>
   );
 }
@@ -120,7 +115,7 @@ function DocumentedSvg({ sex }: { sex: Sex }) {
   const s = 18;
   return (
     <svg width="28" height="28" viewBox="-2 -2 30 30">
-      <SymbolShape individual={{ id: "legend", sex, affected: false, sibOrder: 0 }} size={s} />
+      <SymbolShape glyph={standaloneGlyph({ id: "legend", sex, affected: false, sibOrder: 0 })} size={s} />
       <DocumentedMark size={s} adopted={false} />
     </svg>
   );
@@ -195,12 +190,7 @@ function AffectedCoreSvg({ sex }: { sex: Sex }) {
   const sample: Tag = { id: "legend-sample", label: "", color: "#bdbdbd", style: "quadrant" };
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
-      <SymbolShape
-        individual={{ id: "", sex, affected: true, sibOrder: 0 }}
-        size={SZ}
-        paint={{ sectors: [{ tag: sample, start: 0, end: 360, color: sample.color, fill: "solid" }], base: "white", core: true, dot: false }}
-        clipId="legend-affected-core"
-      />
+      <SymbolShape glyph={{ ...standaloneGlyph({ id: "", sex, affected: true, sibOrder: 0 }), paint: { sectors: [{ tag: sample, start: 0, end: 360, color: sample.color, fill: "solid" }], base: "white", core: true, dot: false } }} size={SZ} clipId="legend-affected-core" />
     </svg>
   );
 }
@@ -209,7 +199,7 @@ function AffectedCoreSvg({ sex }: { sex: Sex }) {
 function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
   return (
     <svg width="36" height="28" viewBox="-8 -4 36 28">
-      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, adopted }} size={SZ} clipId={`legend-adopted-${adopted}`} />
+      <SymbolShape glyph={standaloneGlyph({ id: "", sex, affected: false, sibOrder: 0, adopted })} size={SZ} clipId={`legend-adopted-${adopted}`} />
     </svg>
   );
 }
@@ -218,7 +208,7 @@ function AdoptedSvg({ sex, adopted }: { sex: Sex; adopted: Adoption }) {
 function RoleSvg({ sex, role }: { sex: Sex; role: ReproductiveRole }) {
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
-      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, reproductiveRole: role }} size={SZ} clipId={`legend-role-${role}`} />
+      <SymbolShape glyph={standaloneGlyph({ id: "", sex, affected: false, sibOrder: 0, reproductiveRole: role })} size={SZ} clipId={`legend-role-${role}`} />
     </svg>
   );
 }
@@ -248,7 +238,7 @@ function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }
   // Extra room below for the "SB" / "ECT" caption and the stillbirth slash overhang.
   return (
     <svg width="36" height="40" viewBox="-6 -6 36 40">
-      <SymbolShape individual={{ id: "", sex, affected: false, sibOrder: 0, lifeStatus }} size={SZ} clipId={`legend-life-${lifeStatus}`} />
+      <SymbolShape glyph={standaloneGlyph({ id: "", sex, affected: false, sibOrder: 0, lifeStatus })} size={SZ} clipId={`legend-life-${lifeStatus}`} />
     </svg>
   );
 }

@@ -31,9 +31,7 @@ export interface RFNodeData extends Record<string, unknown> {
   individual: Individual;
   /**
    * Everything drawn at this person, decided once (`personGlyph`): the
-   * canvas node and the SVG export draw from it. `shape`, `hasParents`,
-   * `duplicateIndex`, `nameLines`, `detailLines`, `detailsBacked` and
-   * `labelsBacked` below repeat its fields for the lints and the minimap.
+   * canvas node, the SVG export, the lints and the minimap draw from it.
    */
   glyph: PersonGlyph;
   /**
@@ -43,18 +41,6 @@ export interface RFNodeData extends Record<string, unknown> {
    */
   isDuplicate: boolean;
   /**
-   * 1 = first drawn copy of a duplicate, 2 = second, and so on, in reading
-   * order. Written beside the symbol. Undefined when isDuplicate = false.
-   */
-  duplicateIndex?: number;
-  /** True if individual has a parent partnership in the pedigree. */
-  hasParents: boolean;
-  /**
-   * The symbol shape drawn: the gender identity's when shown, else the
-   * sex (`symbolSex` in gender.ts). Never use it for genetics.
-   */
-  shape?: Sex;
-  /**
    * True if this node sits at the individual's pinned (dragged) position. For
    * someone drawn more than once only the copy nearest the pin is moved.
    */
@@ -62,25 +48,6 @@ export interface RFNodeData extends Record<string, unknown> {
   /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin. */
   twinSet?: string;
   zygosity?: Zygosity;
-  /**
-   * The name fitted to the slot width and cut with an ellipsis: at most
-   * two lines, or one when canvasSettings.nameLabels is "truncate". Empty when unnamed.
-   */
-  nameLines: string[];
-  /**
-   * The lines under the name, in NSGC order (`detailSections` in labels.ts):
-   * age or year of birth, ages of onset, then the pedigree number when shown.
-   */
-  detailLines: string[];
-  /** The detail block runs past the age line, so it gets a white backing (`detailsBacked`). */
-  detailsBacked?: boolean;
-  /**
-   * A line of descent leaves the bottom of this symbol straight down through
-   * its labels (the woman carrying a pregnancy by assisted reproduction
-   * has it below her, NSGC 2008 Fig. 3), so the labels get a white backing
-   * and the line passes behind them (`labelsOverLines`).
-   */
-  labelsBacked?: boolean;
   /**
    * Set on the diamond standing for a collapsed branch, whose
    * `individual` is a stand-in that is not in the stored pedigree. Such a
@@ -346,7 +313,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
     const n = nodes.find(x => x.id === id);
-    if (n) { n.data.labelsBacked = true; n.data.glyph.labelsBacked = true; }
+    if (n) n.data.glyph.labelsBacked = true;
   }
 
   const text = textBlocks(pedigree, nodes, spacing), bars = sibshipBlocks(sibshipEdges, nodes);
@@ -392,7 +359,6 @@ function clearLabelsOfBars(pedigree: Pedigree, nodes: Node<RFNodeData>[], sibshi
   });
   for (const k of through) {
     const { node } = labelled[k]!;
-    node.data.labelsBacked = true;
     node.data.glyph.labelsBacked = true;
   }
 }
@@ -422,7 +388,7 @@ export function labelsOverLines(
     below(d.rightParentId, d.childXs[0]!, d.childYs[0]!);
   }
   for (const e of assistedEdges) {
-    const seg = assistedEdgeSegment(e, id => byId.get(id) && { position: byId.get(id)!.position, individual: byId.get(id)!.data.individual, shape: byId.get(id)!.data.shape });
+    const seg = assistedEdgeSegment(e, id => byId.get(id) && { position: byId.get(id)!.position, glyph: byId.get(id)!.data.glyph });
     if (seg) below(e.source, seg[2], seg[3]);
   }
   return out;
@@ -594,14 +560,8 @@ function buildNodes(
           individual,
           glyph,
           isDuplicate,
-          duplicateIndex: glyph.copy,
-          hasParents: glyph.hasParents,
           isPinned,
-          shape: glyph.shape,
           ...(twins.get(individual.id) ?? {}),
-          nameLines: glyph.nameLines,
-          detailLines: glyph.detailLines,
-          detailsBacked: glyph.detailsBacked,
           ...(branch ? { branch } : {}),
         },
       });
@@ -688,7 +648,7 @@ function textBlocks(pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: Layo
   const numbers = labelNumbers(pedigree);
   return nodes.flatMap(n => [
     ...[textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, labelMax, numbers) ?? []].flat(),
-    ...(n.data.isDuplicate && n.data.duplicateIndex !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.data.duplicateIndex)] : []),
+    ...(n.data.glyph.copy !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.data.glyph.copy)] : []),
   ]);
 }
 

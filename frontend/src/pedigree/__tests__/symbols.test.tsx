@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { lossTrianglePoints } from "../lifeStatus";
 import type { Individual } from "@pedigree-editor/layout-engine";
 
@@ -8,7 +8,7 @@ const SIZE = 40;
 
 function render(overrides: Partial<Individual>): string {
   const individual: Individual = { id: "i1", sex: "male", affected: false, sibOrder: 0, ...overrides };
-  return renderToStaticMarkup(<svg><SymbolShape individual={individual} size={SIZE} /></svg>);
+  return renderToStaticMarkup(<svg><SymbolShape glyph={standaloneGlyph(individual)} size={SIZE} /></svg>);
 }
 
 const TRIANGLE = `points="${lossTrianglePoints(SIZE)}"`;
@@ -101,7 +101,7 @@ describe("SymbolShape, tags on pregnancy and pregnancy loss", () => {
 
   it("clips quadrant sectors to the loss triangle", () => {
     const html = renderToStaticMarkup(
-      <svg><SymbolShape individual={{ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "ectopic" }} size={SIZE} paint={{ sectors: [sector], base: "white", core: false, dot: false }} clipId="c1" /></svg>,
+      <svg><SymbolShape glyph={{ ...standaloneGlyph({ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "ectopic" }), paint: { sectors: [sector], base: "white", core: false, dot: false } }} size={SIZE} clipId="c1" /></svg>,
     );
     expect(html).toMatch(new RegExp(`<clipPath id="c1"><polygon ${TRIANGLE.replace(/[.*+?^$()|[\]\\]/g, "\\$&")}`));
     expect(html).toContain('fill="#d62728"');
@@ -110,7 +110,7 @@ describe("SymbolShape, tags on pregnancy and pregnancy loss", () => {
 
   it("keeps sectors on the sex symbol of a pregnancy", () => {
     const html = renderToStaticMarkup(
-      <svg><SymbolShape individual={{ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "pregnancy" }} size={SIZE} paint={{ sectors: [sector], base: "white", core: false, dot: false }} clipId="c2" /></svg>,
+      <svg><SymbolShape glyph={{ ...standaloneGlyph({ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "pregnancy" }), paint: { sectors: [sector], base: "white", core: false, dot: false } }} size={SIZE} clipId="c2" /></svg>,
     );
     expect(html).toMatch(/<clipPath id="c2"><rect/);
     expect(html).toContain('fill="#d62728"');
@@ -147,7 +147,7 @@ describe("SymbolShape, carrier dot and slashes over fill (#13, #14)", () => {
   it("affected termination and stillbirth: the slash is redrawn in white inside the fill", () => {
     for (const lifeStatus of ["termination", "stillbirth"] as const) {
       const html = render({ affected: true, lifeStatus });
-      expect(html).toMatch(/<line[^>]*stroke="white"[^>]*clip-path="url\(#symbol-clip-i1\)"/);
+      expect(html).toMatch(/<line[^>]*stroke="white"[^>]*clip-path="url\(#symbol-clip\)"/);
     }
     expect(render({ lifeStatus: "stillbirth" })).not.toContain('stroke="white"');
   });

@@ -82,7 +82,7 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
         renderLabel(glyph, solo && m.id === n.blood) +
         // The symbol is the standard figure's (io/svg/symbolSvg.ts), turned with the track.
-        renderPersonShapeSvg(ind, glyph, clipId, { rotation: pos.rotation, captionShift: glyph.caption ? LABEL_LINE_HEIGHT : 0 }) +
+        renderPersonShapeSvg(glyph, clipId, { rotation: pos.rotation, captionShift: glyph.caption ? LABEL_LINE_HEIGHT : 0 }) +
         (glyph.deceased ? renderDeceasedSlashSvg() : "") +
         (glyph.arrow ? renderProbandArrowSvg(glyph.arrow, pos.rotation) : "") +
         (glyph.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -HALF, -HALF, -pos.rotation) : "") +

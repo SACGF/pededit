@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Individual, Tag } from "@pedigree-editor/layout-engine";
-import { SymbolShape } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import type { Sector } from "../tags";
 
 const SIZE = 40;
@@ -17,7 +17,7 @@ function render(ind: Partial<Individual>, sectors: Sector[]): string {
   const individual: Individual = { id: "i1", sex: "male", affected: false, sibOrder: 0, ...ind };
   // The NSGC 2008 paint (`symbolPaint`): black fill, and the black centre over sectors.
   const paint = { sectors, base: individual.affected ? "black" as const : "white" as const, core: individual.affected && sectors.length > 0, dot: false };
-  return renderToStaticMarkup(<svg><SymbolShape individual={individual} size={SIZE} paint={paint} clipId="c" /></svg>);
+  return renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(individual), paint: paint }} size={SIZE} clipId="c" /></svg>);
 }
 
 describe("affected core on tagged symbols", () => {

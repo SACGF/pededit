@@ -203,7 +203,7 @@ function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
   return flow.assistedEdges.flatMap(e => {
     const s = assistedEdgeSegment(e, id => {
       const p = slotPos.get(id);
-      return p && { position: p, individual: nodeById.get(id)?.data.individual, shape: nodeById.get(id)?.data.shape };
+      return p && { position: p, glyph: nodeById.get(id)?.data.glyph };
     });
     return s ? [seg(s[0], s[1], s[2], s[3], e.data?.kind === "social")] : [];
   });
@@ -225,12 +225,11 @@ function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
   for (const node of flow.nodes) {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
-    const ind = node.data.individual;
     const glyph = node.data.glyph;
     const { x: cx, y: cy } = pos;
 
     elems.push(`<g transform="translate(${cx} ${cy})">`);
-    elems.push(renderPersonShapeSvg(ind, glyph, `symbol-clip-${node.id}`, { captionShift: CAPTION_SHIFT }));
+    elems.push(renderPersonShapeSvg(glyph, `symbol-clip-${node.id}`, { captionShift: CAPTION_SHIFT }));
     if (glyph.deceased) elems.push(renderDeceasedSlashSvg());
     if (glyph.arrow) elems.push(renderProbandArrowSvg(glyph.arrow));
     if (glyph.familyHistoryUnknown) elems.push(renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -NODE_SIZE / 2, -NODE_SIZE / 2));

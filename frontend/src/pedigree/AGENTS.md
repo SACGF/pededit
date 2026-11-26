@@ -45,7 +45,7 @@ draws NSGC symbols.
   whole pedigree with the viewport as a rectangle; dragging pans the main
   view and a click centres it (a press that moved is a drag, not a click).
   It is only for a sense of where you are, so `MinimapNode` draws each
-  person as a plain square, circle or diamond (`RFNodeData.shape`), black
+  person as a plain square, circle or diamond (`glyph.shape`), black
   when `isAffected`. `MinimapEdges` draws plain couple lines (doubled when
   consanguineous), lines of descent and assisted lines, with no dashes,
   marks or text, from live node positions. React Flow's MiniMap has no slot
@@ -59,11 +59,15 @@ draws NSGC symbols.
   (`PersonGlyph`: shape, paint, brackets, letter, slash, arrow, "?", "*",
   caption, annotation row, name and detail lines, white backings, copy
   number, group count). `layoutToFlow` puts it on every node
-  (`RFNodeData.glyph`); `PedigreeSymbolNode` and `svgExporter` read it there,
+  (`RFNodeData.glyph`), which holds nothing that repeats it (#174);
+  `PedigreeSymbolNode`, `svgExporter`, the lints and the minimap read it there,
   and the U-shape export, which has its own layout, calls `personGlyph` per
   person. None of the three imports `symbolPaint`, `annotationRow`,
   `arrowKind`, `symbolSex` or the label functions any more (a test holds
   them to that), so a renderer cannot decide differently from the others.
+  The symbol renderers (`SymbolShape`, `renderPersonShapeSvg`) take the
+  glyph and never the person; a legend swatch, which has no pedigree, gets
+  one from `standaloneGlyph`.
   Add a new mark or line of text for a person as a field of the glyph first.
   The SVG snapshots (#69) are the record of what is drawn; glyphs are not
   recorded as well (#175). The
@@ -126,7 +130,7 @@ draws NSGC symbols.
   Unnamed people have no label in production.
 - `labels.ts` — name labels wrap to the slot width (#68): `wrapLabel` gives
   at most two lines, cut with an ellipsis, from an estimated 5.8px per
-  character; `layoutToFlow` puts the lines on the node data (`nameLines`),
+  character; `layoutToFlow` puts the lines on the glyph (`nameLines`),
   `svgExporter` writes one text element per line with the full name in a
   `<title>`, and the U-shape wraps at its widest slot. The `labels-overlap`
   lint code uses the same estimate, so names fit by construction and it
@@ -302,7 +306,7 @@ draws NSGC symbols.
   `assignedAtBirthText` for the AMAB / AFAB / UAAB line (a `gender` section
   in `labels.ts` `detailSections`). Everything that draws a person's shape
   must call it rather than read `ind.sex`: `layoutToFlow` puts it on the
-  node data as `shape` (the canvas node passes it to `SymbolShape`, the minimap picks its shape by it),
+  glyph as `shape` (`SymbolShape` draws it, the minimap picks its shape by it),
   both exporters' `renderShape`, the legend and the export key swatches.
   Nothing genetic may call it: layout, kinship, twins, PED and the CSV
   father/mother columns read `sex`. A non-binary person always gets the

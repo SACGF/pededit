@@ -22,6 +22,14 @@ describe("personGlyph", () => {
     }
   });
 
+  it("is the only description of the person on a node (#174)", () => {
+    for (const fx of FEATURE_FIXTURES) {
+      for (const node of layoutToFlow(fx.data).nodes) {
+        expect(Object.keys(node.data).filter(k => k !== "glyph" && k in node.data.glyph), fx.slug).toEqual([]);
+      }
+    }
+  });
+
   it("says what marks a person carries", () => {
     expect(glyph(status, "p")).toMatchObject({ shape: "female", arrow: "proband", documented: true, deceased: false });
     expect(glyph(status, "c")).toMatchObject({ arrow: "consultand", documented: false });
