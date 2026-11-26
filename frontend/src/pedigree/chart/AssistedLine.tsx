@@ -1,5 +1,5 @@
 import { ADOPTION_DASH } from "../adoption";
-import { assistedEdgeSegment } from "../assisted";
+import { assistedEdgeSegment } from "../assistedLines";
 import type { AssistedLineData, SceneLine } from "../scene";
 import { LINE_WIDTH } from "../constants";
 

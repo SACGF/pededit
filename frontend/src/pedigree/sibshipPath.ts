@@ -1,8 +1,6 @@
 import { NODE_SIZE } from "./constants";
-import { donorDescentSegments, type LinePoint } from "./assisted";
-
-/** A straight line segment [x1, y1, x2, y2]. */
-export type Segment = [number, number, number, number];
+import type { Segment, LinePoint } from "./geometryTypes";
+import { donorDescentSegments } from "./assistedLines";
 
 /**
  * Lines joining a couple to their children, shared by `SibshipEdge` and

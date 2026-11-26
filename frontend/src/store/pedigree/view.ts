@@ -1,7 +1,7 @@
 import { removeWithDescendantsSet } from "../../pedigree/removal";
 import { setParentsProblem } from "../../pedigree/parents";
 import { collapseInfo } from "../../pedigree/collapse";
-import type { Gamete } from "../../pedigree/assisted";
+import type { Gamete } from "../../pedigree/assistedEdits";
 import { isSameSexCouple } from "../../pedigree/sameSex";
 import type { EditTools } from "./tools";
 

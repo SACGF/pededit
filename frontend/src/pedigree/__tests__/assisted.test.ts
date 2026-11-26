@@ -2,10 +2,9 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { produce } from "immer";
 import { kinshipCoefficients, placementParentOf } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import {
-  assistedLinks, applyAddDonor, addDonorProblem, applyAddSurrogate, addSurrogateProblem,
-  assistedLinkSegment, donorDescentSegments, symbolExitPoint, reproductiveRoleProblem,
-} from "../assisted";
+import { assistedLinks } from "../assisted";
+import { assistedLinkSegment, donorDescentSegments, symbolExitPoint } from "../assistedLines";
+import { applyAddDonor, addDonorProblem, applyAddSurrogate, addSurrogateProblem, reproductiveRoleProblem } from "../assistedEdits";
 import { buildScene } from "../scene";
 import { sibshipSegments } from "../sibshipPath";
 import { lintScene } from "../renderLint";

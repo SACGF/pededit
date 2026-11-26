@@ -798,7 +798,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `sibshipPath.ts` splits `sibshipSegments` into solid and dashed
   by the children's `dashed` flag, keeping the per-child order (couple drop,
   bar, then one drop per child).
-- `assisted.ts` — assisted reproduction (#45, NSGC 2008 Fig. 3). The model
+- `assisted.ts` — assisted reproduction (#45, NSGC 2008 Fig. 3), with its line
+  geometry in `assistedLines.ts` and its edits in `assistedEdits.ts`. The model
   keeps genetics in the ordinary structure so kinship, X-linked kinship,
   relationship names, the double line and PED need nothing special: the
   child's partnership is its GENETIC parents (donor included), flagged
@@ -830,14 +831,14 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   scene's `assisted` lines (edge type `assistedEdge` on the canvas), one per person and child, or one per
   sibship when the person is linked the same way to every child of it (the
   line then ends where the sibship's descent meets the bar, so siblings do
-  not each get a crossing line). `assistedEdgeSegment` is the one geometry,
+  not each get a crossing line). `assistedEdgeSegment` (`assistedLines.ts`) is the one geometry,
   for the canvas and `svgExporter` (group `assisted-lines`,
   read by the export lint); the U-shape draws its own along the tracks.
   Lines leave the symbol from a lower corner (`symbolExitPoint`) so they
   clear the name under it. A surrogate with no partner of her own would be
   an isolated founder: `families.ts` keeps her in the child's family and
   `alignPedigree` appends her to the row above the child, not the top row.
-  Editing: `applyAddDonor` / `applyAddSurrogate` (store `addDonor`,
+  Editing: `applyAddDonor` / `applyAddSurrogate` (`assistedEdits.ts`, store `addDonor`,
   `addSurrogate`, more menu "Assisted reproduction"); the Person tab's
   `AssistedForm` sets the letter, carrier and social parents.
 - `sameSex.ts`: same-sex couples (#105, NSGC 2022 Fig. 5). Partners may

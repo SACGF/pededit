@@ -4,7 +4,7 @@ import { usePedigreeFields } from "../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { setParentsProblem } from "./parents";
 import { linkPartnerProblem } from "./partners";
-import { addDonorProblem, addSurrogateProblem } from "./assisted";
+import { addDonorProblem, addSurrogateProblem } from "./assistedEdits";
 import { isSameSexCouple } from "./sameSex";
 import { personLabel } from "./personLabel";
 

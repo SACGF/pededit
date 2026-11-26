@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { Individual, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import { usePedigreeFields } from "@/store/usePedigreeStore";
-import { REPRODUCTIVE_ROLE_OPTIONS, assistedCandidates, geneticParents, reproductiveRoleProblem, symbolLetter } from "@/pedigree/assisted";
+import { REPRODUCTIVE_ROLE_OPTIONS, geneticParents, symbolLetter } from "@/pedigree/assisted";
+import { assistedCandidates, reproductiveRoleProblem } from "@/pedigree/assistedEdits";
 import { personLabel } from "@/pedigree/personLabel";
 import { parentCoupleOf } from "@/pedigree/graph";
 import { Field, Hint, OptionSelect, SELECT, type ProblemsOn } from "./fields";

@@ -15,7 +15,8 @@ import { couplePathD, consanguineousPathsD, hopRisers } from "./couplePath";
 import { childlessMarkSegments, childlessReasonBaselineY } from "./childless";
 import { endedBreakX, endedMarkSegments } from "./ended";
 import { symbolTopInset } from "./lifeStatus";
-import { sibshipPaths, twinForkMarks, type Segment, type SibshipChild } from "./sibshipPath";
+import { sibshipPaths, twinForkMarks, type SibshipChild } from "./sibshipPath";
+import type { Segment } from "./geometryTypes";
 
 export interface LinePosition { x: number; y: number }
 

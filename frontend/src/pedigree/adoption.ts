@@ -1,5 +1,5 @@
 import type { Adoption } from "@pedigree-editor/layout-engine";
-import type { Segment } from "./sibshipPath";
+import type { Segment } from "./geometryTypes";
 
 /**
  * Adoption (NSGC 2008, Bennett et al.): square brackets round the symbol.

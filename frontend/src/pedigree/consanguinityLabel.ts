@@ -1,4 +1,5 @@
 import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
+import type { TextBlock } from "./geometryTypes";
 import { CONSANGUINEOUS_GAP, DECEASED_OVERHANG, NODE_SIZE, ROW_HEIGHT } from "./constants";
 import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
 import { highestDuplicateArc, highestHop } from "./couplePath";
@@ -143,13 +144,6 @@ export function consanguinityLabelTop(cy: number, hop: number, lines: number, dy
  * the usual place.
  */
 export interface ConsanguinityLabelOffset { dx: number; dy: number; backed?: boolean }
-
-/**
- * Something drawn that a couple label must keep off, as a box (x centre,
- * top, bottom, half width): the text under a symbol, a copy number, a
- * stretch of sibship line or of the dashed arc between two copies.
- */
-export interface TextBlock { x: number; top: number; bottom: number; halfWidth: number; arc?: boolean }
 
 /** How far (px) a label may be raised, in steps of 3, to clear what is under its usual place. */
 const MAX_RAISE = 12;

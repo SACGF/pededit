@@ -6,7 +6,7 @@ import { LIFE_STATUS_LOCKED_TITLE, LIFE_STATUS_OPTIONS, NO_CHILDREN_TITLE, NO_PA
 import { probandTitle } from "../proband";
 import { DELETE_TITLE, REMOVE_WITH_ANCESTORS_TITLE, REMOVE_WITH_DESCENDANTS_TITLE } from "../removal";
 import { ADOPTION_OPTIONS } from "../adoption";
-import { addDonorProblem, addSurrogateProblem } from "../assisted";
+import { addDonorProblem, addSurrogateProblem } from "../assistedEdits";
 import { ZYGOSITY_OPTIONS, adjacentSibling, twinSetOf, twinSetProblem } from "../twins";
 import { hasDescendants } from "../collapse";
 import { batchSexProblem, carrierStatusOf } from "../batch";

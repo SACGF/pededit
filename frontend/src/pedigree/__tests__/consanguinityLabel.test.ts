@@ -3,10 +3,7 @@ import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { buildScene } from "../scene";
 import { nameCoupleRelationship } from "../relationship";
-import {
-  consanguinityLabelText, consanguinityLabelRoom, wrapConsanguinityLabel, consanguinityLabelBaseline, consanguinityLabelTop,
-  highestConsanguinityLabel, placeConsanguinityLabel, consanguinityLabelPlacements,
-} from "../consanguinityLabel";
+import { consanguinityLabelText, consanguinityLabelRoom, wrapConsanguinityLabel, consanguinityLabelBaseline, consanguinityLabelTop, highestConsanguinityLabel, placeConsanguinityLabel, consanguinityLabelPlacements } from "../consanguinityLabel";
 import { EXAMPLES } from "../../data/examples";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, ROW_HEIGHT } from "../constants";

@@ -1,6 +1,6 @@
 /**
- * U-shape export: the sizes and gaps every part of it shares, and two small
- * helpers for writing SVG.
+ * U-shape export: the sizes and gaps every part of it shares, and small
+ * helpers its parts share.
  */
 import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "../../../pedigree/proband";
 import { ENDED_STROKE_DY } from "../../../pedigree/ended";
@@ -40,4 +40,16 @@ export function escapeXml(s: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+}
+
+/** Group items by a key, dropping items whose key is undefined. */
+export function groupBy<T>(items: T[], keyOf: (t: T) => string | undefined): Map<string, T[]> {
+  const out = new Map<string, T[]>();
+  for (const it of items) {
+    const k = keyOf(it);
+    if (k === undefined) continue;
+    if (!out.has(k)) out.set(k, []);
+    out.get(k)!.push(it);
+  }
+  return out;
 }

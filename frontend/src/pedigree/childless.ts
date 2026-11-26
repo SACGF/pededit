@@ -1,5 +1,5 @@
 import type { ChildlessStatus, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
-import type { Segment } from "./sibshipPath";
+import type { Segment } from "./geometryTypes";
 import { raisedChildrenOf } from "./graph";
 
 /**

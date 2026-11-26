@@ -4,7 +4,7 @@ import { setParentsProblem } from "../../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../../pedigree/placeholders";
 import { linkPartnerProblem } from "../../pedigree/partners";
 import { kinshipOf } from "../../pedigree/relatedness";
-import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../../pedigree/assisted";
+import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../../pedigree/assistedEdits";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../../pedigree/sameSex";
 import { newId, fatherFirst, nextSibOrderInFamily, nextRootSibOrder, makeIndividual, makePlaceholder, oppositeSex, addCouple, addPlaceholderFor, ensureChildPartnershipId, leaveParents, tidyCoupleLeft, clearChildless } from "./draft";
 import type { EditTools } from "./tools";

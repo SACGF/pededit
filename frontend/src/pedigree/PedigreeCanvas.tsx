@@ -33,7 +33,7 @@ import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import { AssistedEdge }       from "./edges/AssistedEdge";
 import type { RFNodeData, CoupleEdgeData, SibshipEdgeData, AssistedEdgeData } from "./sceneToFlow";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
-import { assistedEdgeSegment } from "./assisted";
+import { assistedEdgeSegment } from "./assistedLines";
 import { symbolTopInset } from "./lifeStatus";
 import { NODE_SIZE } from "./constants";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";

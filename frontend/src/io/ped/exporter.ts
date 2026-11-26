@@ -7,7 +7,7 @@ import { personSubject } from "../../pedigree/personLabel";
 import { lifeStatusLabel } from "../../pedigree/lifeStatus";
 import { childlessLabel } from "../../pedigree/childless";
 import { adoptionLabel } from "../../pedigree/adoption";
-import { assistedLossText } from "../../pedigree/assisted";
+import { assistedLossText } from "../../pedigree/assistedEdits";
 import { twinLegendLabel } from "../../pedigree/twins";
 
 export interface ExportOptions {

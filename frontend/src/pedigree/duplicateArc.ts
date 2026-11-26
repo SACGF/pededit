@@ -4,7 +4,7 @@
  * of a route round it when the usual curve passes through a symbol or the
  * text under one.
  */
-import type { TextBlock } from "./consanguinityLabel";
+import type { TextBlock } from "./geometryTypes";
 import { duplicateArcPoints } from "./couplePath";
 
 /** Someone the arc does not belong to: their symbol's centre and the text under it. */

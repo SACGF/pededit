@@ -4,15 +4,14 @@
  * copies, drawn along the tracks. This geometry is the U-shape's own.
  */
 import { type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE } from "../../../pedigree/constants";
 import { symbolTopInset } from "../../../pedigree/lifeStatus";
 import { assistedLinks } from "../../../pedigree/assisted";
 import { ADOPTION_DASH } from "../../../pedigree/adoption";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../../pedigree/ended";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../../pedigree/twins";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../../pedigree/childless";
-import { CONSANGUINEOUS_GAP, LINE_WIDTH } from "../../../pedigree/constants";
-import { HALF, BAR_CLEARANCE, DUP_LINK_INSET, r, escapeXml } from "./constants";
+import { CONSANGUINEOUS_GAP, LINE_WIDTH, NODE_SIZE } from "../../../pedigree/constants";
+import { HALF, BAR_CLEARANCE, DUP_LINK_INSET, groupBy, r, escapeXml } from "./constants";
 import { walk, type TNode } from "./tree";
 import { trackPoint, memberU, descentU, glyphOf, outlineRotation, type Geom, type UShapeLayout, type Built } from "./layout";
 
@@ -57,18 +56,6 @@ export function trackPath(u1: number, u2: number, offset: number, g: Geom, attrs
     d += onCurve ? ` A ${rad} ${rad} 0 0 0 ${at(cuts[i])}` : ` L ${at(cuts[i])}`;
   }
   return `<path d="${d}" ${attrs}/>`;
-}
-
-/** Group items by a key, dropping items whose key is undefined. */
-export function groupBy<T>(items: T[], keyOf: (t: T) => string | undefined): Map<string, T[]> {
-  const out = new Map<string, T[]>();
-  for (const it of items) {
-    const k = keyOf(it);
-    if (k === undefined) continue;
-    if (!out.has(k)) out.set(k, []);
-    out.get(k)!.push(it);
-  }
-  return out;
 }
 
 /** A short segment along the track direction at (u, offset), centred there, 2 * halfLen long. */

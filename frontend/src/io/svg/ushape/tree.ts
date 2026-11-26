@@ -9,8 +9,7 @@ import { consanguinityTest } from "../../../pedigree/consanguinity";
 import { twinMembership } from "../../../pedigree/twins";
 import { consanguinityLabelText, consanguinityLabelWidth } from "../../../pedigree/consanguinityLabel";
 import { NODE_SIZE } from "../../../pedigree/constants";
-import { HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS } from "./constants";
-import { groupBy } from "./connectors";
+import { HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS, groupBy } from "./constants";
 import { couplesOf, partnerIn } from "../../../pedigree/graph";
 
 /** How far a label may be lifted off a curve before it reaches the dashed links just inside the symbols. */

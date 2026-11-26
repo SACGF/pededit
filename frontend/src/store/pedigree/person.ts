@@ -1,6 +1,6 @@
 import type { Individual, Sex, LifeStatus, Adoption, ReproductiveRole, Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetOf } from "../../pedigree/twins";
-import { reproductiveRoleProblem } from "../../pedigree/assisted";
+import { reproductiveRoleProblem } from "../../pedigree/assistedEdits";
 import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../../pedigree/batch";
 import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type ConditionState } from "../../pedigree/conditions";
 import { hasPartnerOrChild, dryRun, setOptional, removeTagOnset, setPlainTag } from "./draft";

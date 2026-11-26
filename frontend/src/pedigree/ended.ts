@@ -1,5 +1,5 @@
 import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
-import type { Segment } from "./sibshipPath";
+import type { Segment } from "./geometryTypes";
 import { activeChildless } from "./childless";
 import { childrenOf } from "./graph";
 

@@ -12,7 +12,8 @@ import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { middleTaken } from "./ended";
 import { consanguinityLabelLimits, consanguinityLabelRoom, consanguinityLabelText, placeConsanguinityLabel, wrapConsanguinityLabel } from "./consanguinityLabel";
-import { highestAboveSymbols, type ConsanguinityLabelOffset, type TextBlock } from "./consanguinityLabel";
+import { highestAboveSymbols, type ConsanguinityLabelOffset } from "./consanguinityLabel";
+import type { TextBlock, LinePoint } from "./geometryTypes";
 import { copyNumberBlock, textBlockUnder, TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
@@ -23,7 +24,8 @@ import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "./proband";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
-import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint } from "./assisted";
+import { assistedLinks, type AssistedLink } from "./assisted";
+import { assistedEdgeSegment } from "./assistedLines";
 import { hasParents, pairKey } from "./graph";
 
 /**

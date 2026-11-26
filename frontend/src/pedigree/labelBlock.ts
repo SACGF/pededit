@@ -2,7 +2,7 @@ import { NODE_SIZE } from "./constants";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth, textWidth } from "./labels";
 import { ANNOTATION_ROW_HEIGHT } from "./tags";
 import { CAPTION_ROW_HEIGHT, captionBaselineY } from "./lifeStatus";
-import type { TextBlock } from "./consanguinityLabel";
+import type { TextBlock } from "./geometryTypes";
 import type { PersonGlyph } from "./personGlyph";
 
 /**
