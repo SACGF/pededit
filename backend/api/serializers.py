@@ -149,6 +149,7 @@ class CanvasSettingsSerializer(serializers.Serializer):
     relationshipLabels = _opt(serializers.BooleanField)
     showCoefficients = _opt(serializers.BooleanField)
     showNotes = _opt(serializers.BooleanField)
+    notesLength = _opt(serializers.ChoiceField, choices=["twoLines", "full"])
     symbolsShow = _opt(serializers.ChoiceField, choices=["gender", "sex"])
     notation = _opt(serializers.ChoiceField, choices=["nsgc2022", "nsgc2008"])
     tagFills = _opt(serializers.ChoiceField, choices=["color", "monochrome"])

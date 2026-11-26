@@ -491,6 +491,18 @@
       "exportLint": []
     },
     {
+      "file": "drawn/text-notes-full.json",
+      "group": "drawn",
+      "purpose": "Text under the symbol, notes in full: Show notes on the chart, full text: notes of three and four lines above the next generation, which moves down to make room",
+      "import": [],
+      "valid": true,
+      "server": "accepted",
+      "people": 13,
+      "problems": [],
+      "lint": [],
+      "exportLint": []
+    },
+    {
       "file": "drawn/couples-named.json",
       "group": "drawn",
       "purpose": "Couples and lines, relationships named: Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width",

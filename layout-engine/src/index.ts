@@ -20,7 +20,7 @@ export { kinshipCoefficients } from "./kinship.js";
 export type { KinshipCoefficients, KinshipOptions } from "./kinship.js";
 
 // ---- Data model ----
-export type { LayoutResult, Pedigree, Individual, Partnership, Sex, GenderIdentity, SymbolsShowMode, NotationEdition, LifeStatus, Adoption, ReproductiveRole, ChildlessStatus, Zygosity, TwinSet, SiblingOrderMode, SiblingOrderSettings, CanvasSettings, NameLabelMode, LayoutWidthMode, Tag, TagStyle, TagFill, TagKind, TagFillMode, ClinicalDetails } from "./types.js";
+export type { LayoutResult, Pedigree, Individual, Partnership, Sex, GenderIdentity, SymbolsShowMode, NotesLength, NotationEdition, LifeStatus, Adoption, ReproductiveRole, ChildlessStatus, Zygosity, TwinSet, SiblingOrderMode, SiblingOrderSettings, CanvasSettings, NameLabelMode, LayoutWidthMode, Tag, TagStyle, TagFill, TagKind, TagFillMode, ClinicalDetails } from "./types.js";
 export type { Evaluation, EvaluationResult } from "./types.js";
 export type { ViewFilters } from "./types.js";
 export { isAffected, isConditionTag } from "./affected.js";

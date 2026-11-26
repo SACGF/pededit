@@ -430,7 +430,12 @@ const VARIANTS: FeatureFixture[] = [
     gf: "Records held at the regional hospital; cause of death not confirmed by post mortem",
     gm: "Lives abroad",
     k2: "Deaf\nsince age 5",
-  }), { showNotes: true }) },
+  }), { showNotes: true, notesLength: "twoLines" }) },
+  { slug: "text-notes-full", label: "Text under the symbol, notes in full", covers: "Show notes on the chart, full text: notes of three and four lines above the next generation, which moves down to make room", data: withSettings(withNotes(text, {
+    gf: "Records held at the regional hospital; cause of death not confirmed by post mortem. Served in the merchant navy 1950 to 1962",
+    m: "Diagnosed with relapsing remitting MS at 31\nOn natalizumab since 2015\nSees the neurologist yearly",
+    k2: "Deaf\nsince age 5",
+  }), { showNotes: true, notesLength: "full" }) },
   { slug: "couples-named", label: "Couples and lines, relationships named", covers: "Name consanguineous relationships, kinship and inbreeding coefficients, relaxed width", data: withSettings(couples, { relationshipLabels: true, showCoefficients: true, layoutWidth: "relaxed" }) },
   {
     slug: "couples-pinned", label: "Couples and lines, pinned and snapped",

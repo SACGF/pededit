@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DEFAULT_SNAP_GRID_SIZE, usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
-import type { NotationEdition, SiblingOrderMode, SymbolsShowMode, TagFillMode } from "@pedigree-editor/layout-engine";
+import type { NotationEdition, NotesLength, SiblingOrderMode, SymbolsShowMode, TagFillMode } from "@pedigree-editor/layout-engine";
 import { TAG_FILL_MODE_OPTIONS, tagFillMode } from "../pedigree/tagFills";
 import { nameLabelMode } from "../pedigree/labels";
 import { symbolsShowMode } from "../pedigree/gender";
 import { NOTATION_OPTIONS, notationOf } from "../pedigree/notation";
 import { SettingSelect, SettingToggle } from "./SettingControls";
+
+const NOTES_LENGTH_OPTIONS: { value: NotesLength; label: string }[] = [
+  { value: "twoLines", label: "Up to two lines" },
+  { value: "full", label: "Full text" },
+];
 
 const SYMBOLS_SHOW_OPTIONS: { value: SymbolsShowMode; label: string }[] = [
   { value: "gender", label: "Gender identity where recorded" },
@@ -132,10 +137,20 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               className="mt-2"
               name="showNotes"
               label="Show notes on the chart"
-              description="Write each person's notes under their symbol, above the pedigree number, up to two lines, on the canvas and in exports. Notes often hold private detail, so check them before sharing a figure. De-identified exports never include them."
+              description="Write each person's notes under their symbol, above the pedigree number, on the canvas and in exports. Notes often hold private detail, so check them before sharing a figure. De-identified exports never include them."
               checked={pedigree.canvasSettings?.showNotes === true}
               onChange={on => updateCanvasSettings({ showNotes: on })}
             />
+            {pedigree.canvasSettings?.showNotes === true && (
+              <SettingSelect<NotesLength>
+                name="notesLength"
+                label="Notes"
+                value={pedigree.canvasSettings.notesLength ?? "twoLines"}
+                options={NOTES_LENGTH_OPTIONS}
+                onChange={notesLength => updateCanvasSettings({ notesLength })}
+                description="Up to two lines cuts longer notes with an ellipsis. Full text writes every line and moves the generation below down to make room."
+              />
+            )}
             <SettingSelect<SymbolsShowMode>
               name="symbolsShow"
               label="Symbols show"

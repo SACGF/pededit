@@ -1,11 +1,12 @@
 // Notes under the symbol (#219): drawn only with "Show notes on the chart",
 // then in the canvas and the SVG export alike, never in a de-identified one,
-// and the setting is saved.
+// cut at two lines unless Notes is "Full text", when the next generation
+// moves down to make room; the settings are saved.
 import { readFileSync } from "node:fs";
 
 export default {
   name: "notes-on-chart",
-  about: "With Show notes on the chart off the export dialog says notes are not drawn; turned on, a person's notes are under their symbol on the canvas and in the SVG, not in a de-identified SVG, and the setting is there after a reload",
+  about: "With Show notes on the chart off the export dialog says notes are not drawn; turned on, a person's notes are under their symbol on the canvas and in the SVG, not in a de-identified SVG; a long note is cut at two lines until Notes is Full text, which draws all of it clear of the children's symbols; the settings are there after a reload",
   async run(t) {
     const id = await t.openFixture("fixture:text");
     const note = "Notes are never drawn.";
@@ -46,8 +47,38 @@ export default {
     await t.click('[role="dialog"] label:has-text("De-identify")');
     await t.click('[role="dialog"] button:has-text("Cancel")');
 
+    // A long note: two lines, then in full.
+    const long = "Records held at the regional hospital; cause of death not confirmed by post mortem";
+    await t.click('[data-individual-id="gf"]');
+    await t.fill('textarea[aria-label="Notes"]', long);
+    await t.press("Tab");
+    await t.press("Escape");
+    t.notMatch(await exportSvg(), /post mortem/, "a long note is cut at two lines in the SVG");
+    t.notMatch(await detail(), /post mortem/, "and on the canvas");
+    await t.click('button[title="Pedigree settings"]');
+    t.equal(await t.eval(() => document.querySelector('select[name="notesLength"]').value), "twoLines", "Notes says up to two lines");
+    await t.select('select[name="notesLength"]', "Full text");
+    await t.press("Escape");
+    t.equal((await t.pedigree()).canvasSettings.notesLength, "full", "Notes turns to full text");
+    t.match(await detail(), /confirmed[\s\S]*post mortem/, "the whole note is drawn on the canvas");
+    const clear = () => t.eval(() => {
+      const text = document.querySelector('[data-individual-id="gf"] [data-detail-label]').getBoundingClientRect();
+      const child = document.querySelector('[data-individual-id="m"] svg').getBoundingClientRect();
+      return text.bottom < child.top;
+    });
+    t.ok(await clear(), "and the row below has moved down clear of it");
+    const full = await exportSvg();
+    t.match(full, />post mortem<|>post<[\s\S]*>mortem</, "the SVG has the whole note");
+    const fullFindings = await t.eval(async text => {
+      const { lintExportSvg } = await import("/src/io/svg/exportLint.ts");
+      const p = window.__pededit.pedigree();
+      return lintExportSvg(p, window.__pededit.layout(p, { compact: false }), text).map(f => f.code);
+    }, full);
+    t.equal(fullFindings, [], "and passes the export lint");
+
     await t.reload();
     t.equal((await t.stored(id)).data.canvasSettings.showNotes, true, "the setting is saved");
-    t.match(await detail(), /Notes are never/, "and the note is drawn after a reload");
+    t.equal((await t.stored(id)).data.canvasSettings.notesLength, "full", "and so is Notes");
+    t.match(await detail(), /post mortem/, "the full note is drawn after a reload");
   },
 };

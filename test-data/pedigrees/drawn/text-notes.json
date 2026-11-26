@@ -203,7 +203,8 @@
       "showNumbers": true,
       "nameLabels": "wrap",
       "symbolsShow": "gender",
-      "showNotes": true
+      "showNotes": true,
+      "notesLength": "twoLines"
     },
     "tags": [
       {

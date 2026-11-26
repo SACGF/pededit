@@ -129,7 +129,8 @@ export function linesWidth(lines: string[]): number {
  *      (`canvasSettings.showNotes`, off by default as notes are free text
  *      and often private). NSGC's list has no comment line, so they go
  *      after everything recorded or worked out about the person and above
- *      the number, up to `NOTE_LINES` lines (`noteLines`);
+ *      the number, up to `NOTE_LINES` lines or in full
+ *      (`canvasSettings.notesLength`, `noteLines`);
  *   7. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
@@ -150,7 +151,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
     { key: "gender", lines: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1) },
     { key: "evaluation", lines: evaluationLines(ind, maxWidth, notationOf(pedigree)) },
     { key: "inbreeding", lines: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1) },
-    { key: "notes", lines: showsNotes(pedigree) ? noteLines(ind.notes, maxWidth) : [] },
+    { key: "notes", lines: showsNotes(pedigree) ? noteLines(ind.notes, maxWidth, noteLineLimit(pedigree)) : [] },
     number,
   ];
 }
@@ -261,8 +262,17 @@ export function showsNotes(pedigree: Pick<Pedigree, "canvasSettings">): boolean 
   return pedigree.canvasSettings?.showNotes === true;
 }
 
-/** Lines a person's notes may take under the symbol. */
+/** Lines a person's notes may take under the symbol, unless the pedigree draws them in full. */
 export const NOTE_LINES = 2;
+
+/**
+ * Lines a person's notes may take under the symbol in this pedigree:
+ * `NOTE_LINES`, or no limit with `canvasSettings.notesLength` "full" (the
+ * rows below then move down to make room, see `rowYs` in scene.ts).
+ */
+export function noteLineLimit(pedigree: Pick<Pedigree, "canvasSettings">): number {
+  return pedigree.canvasSettings?.notesLength === "full" ? Infinity : NOTE_LINES;
+}
 
 /**
  * A person's notes as lines under the symbol: each line of the notes

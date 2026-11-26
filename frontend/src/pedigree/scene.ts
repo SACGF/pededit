@@ -19,7 +19,7 @@ import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { barsUnderLabels, sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
-import { labelMaxWidth, nameLabelMode, canvasLabelLines, LABEL_LINE_HEIGHT } from "./labels";
+import { labelMaxWidth, nameLabelMode, canvasLabelLines, noteLineLimit, showsNotes, LABEL_LINE_HEIGHT } from "./labels";
 import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "./proband";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
@@ -380,7 +380,7 @@ export function buildScene(full: Pedigree, options: SceneOptions = {}): Scene {
     assisted: assistedEdges,
     labelMax: labelMaxWidth(spacing.slotWidth),
     aboveTop,
-    bounds: sceneBounds(nodes, aboveTop),
+    bounds: sceneBounds(nodes, aboveTop, fullNotes(pedigree)),
   };
 }
 
@@ -390,7 +390,7 @@ export function buildScene(full: Pedigree, options: SceneOptions = {}): Scene {
  * has, and whatever is drawn above the top row. The export's size and the
  * canvas's fit to view are both worked out from it.
  */
-function sceneBounds(people: ScenePerson[], aboveTop: number): SceneBounds {
+function sceneBounds(people: ScenePerson[], aboveTop: number, showsFullNotes: boolean): SceneBounds {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (const { position: { x, y } } of people) {
     minX = Math.min(minX, x); maxX = Math.max(maxX, x);
@@ -399,8 +399,11 @@ function sceneBounds(people: ScenePerson[], aboveTop: number): SceneBounds {
   const glyphs = people.map(p => p.glyph);
   const proband = glyphs.some(g => g.arrow) ? ARROW_TAIL + PROBAND_LETTER_SIZE + 4 : 0;
   // Names wrap to the slot width, the age or DOB takes a line, so does each
-  // age of onset and the pedigree number: allow for the most lines anyone takes.
-  const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
+  // age of onset and the pedigree number: allow for the most lines anyone
+  // takes, or with notes in full (where one person's notes can run to many
+  // lines) the most anyone in the lowest row takes.
+  const counted = showsFullNotes ? people.filter(p => p.position.y === maxY).map(p => p.glyph) : glyphs;
+  const textLines = Math.max(1, ...counted.map(g => g.figureNameLines.length + g.detailLines.length));
   const labelHeight = TEXT_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (glyphs.some(g => g.annotations.length > 0) ? ANNOTATION_SHIFT : 0) + (glyphs.some(g => g.caption) ? CAPTION_SHIFT : 0);
   const above = Math.max(0, Math.ceil(minY - NODE_SIZE / 2 - aboveTop));
@@ -571,10 +574,26 @@ function buildNodes(
     }
   }
 
-  const autoPos = (level: number, slot: number) => ({
-    x: result.pos[level][slot] * slotWidth,
-    y: level * rowHeight,
-  });
+  const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
+  const twins = twinMembership(pedigree);
+  const labelLines = canvasLabelLines(nameLabelMode(pedigree));
+  const numbers = showsNumbers(pedigree) ? numberFromLayout(pedigree, result, hidden) : undefined;
+  const glyphs = new Map<string, PersonGlyph>();
+  for (const [nid, ids] of slotsOf) {
+    const individual = pedigree.individuals[nid - 1]!;
+    for (const id of ids) {
+      glyphs.set(id, personGlyph(individual, pedigree, {
+        labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines,
+        hasParents: hasParents(pedigree, individual.id), copy: ids.length > 1 ? ids.indexOf(id) + 1 : undefined,
+      }));
+    }
+  }
+
+  const xAt = (level: number, slot: number) => result.pos[level][slot] * slotWidth;
+  const rowY = fullNotes(pedigree)
+    ? rowYs(result, glyphs, xAt, rowHeight)
+    : result.n.map((_, level) => level * rowHeight);
+  const autoPos = (level: number, slot: number) => ({ x: xAt(level, slot), y: rowY[level]! });
 
   // A pin is stored per individual. When someone is drawn more than once it
   // moves only the copy laid out nearest to it (normally the one that was
@@ -597,10 +616,6 @@ function buildNodes(
 
   // Determine which individuals are draggable.
   const nodesMoveable = pedigree.canvasSettings?.nodesMoveable ?? false;
-  const unlockedSet = new Set(pedigree.unlockedIndividuals ?? []);
-  const twins = twinMembership(pedigree);
-  const labelLines = canvasLabelLines(nameLabelMode(pedigree));
-  const numbers = showsNumbers(pedigree) ? numberFromLayout(pedigree, result, hidden) : undefined;
 
   const nodes: ScenePerson[] = [];
   for (let level = 0; level < result.n.length; level++) {
@@ -610,15 +625,10 @@ function buildNodes(
 
       const nid = result.nid[level][slot];
       const individual = pedigree.individuals[nid - 1]; // 1-based → 0-based
-      const copies = slotsOf.get(nid)!;
-      const isDuplicate = copies.length > 1;
       const isPinned = pinnedSlot.get(nid) === id;
       const pinnedPos = pedigree.pinnedPositions?.[individual.id];
       const branch = branchOf(pedigree, individual.id);
-      const glyph = personGlyph(individual, pedigree, {
-        labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines,
-        hasParents: hasParents(pedigree, individual.id), copy: isDuplicate ? copies.indexOf(id) + 1 : undefined,
-      });
+      const glyph = glyphs.get(id)!;
 
       nodes.push({
         id,
@@ -634,6 +644,48 @@ function buildNodes(
   }
 
   return nodes;
+}
+
+/** True when the pedigree draws people's notes in full (`canvasSettings.notesLength`). */
+function fullNotes(pedigree: Pedigree): boolean {
+  return showsNotes(pedigree) && noteLineLimit(pedigree) === Infinity;
+}
+
+/** Space (px) kept between the text under someone and the top of a symbol in the row below: room for a sibship bar to pass under the text (`barsUnderLabels`). */
+const ROW_TEXT_CLEARANCE = 12;
+
+/**
+ * y (canvas px) of each row's centre when notes are drawn in full
+ * (`canvasSettings.notesLength`): `rowHeight` apart, further where the text
+ * under someone would otherwise come within `ROW_TEXT_CLEARANCE` of a
+ * symbol below it in the next row. Without full notes the rows are always
+ * `rowHeight` apart: every other text is cut to its own line limit, and a
+ * pedigree should not move when someone's text gets a line longer. Pinned
+ * people are measured where they are laid out: a pin moves its node, not
+ * the row.
+ */
+function rowYs(
+  result: LayoutResult,
+  glyphs: Map<string, PersonGlyph>,
+  xAt: (level: number, slot: number) => number,
+  rowHeight: number,
+): number[] {
+  const ys = [0];
+  for (let level = 1; level < result.n.length; level++) {
+    let gap = rowHeight;
+    for (let slot = 0; slot < result.n[level - 1]; slot++) {
+      const glyph = glyphs.get(`${level - 1}-${slot}`);
+      const box = glyph && textBlockUnder(glyph, xAt(level - 1, slot), 0);
+      if (!box) continue;
+      for (let below = 0; below < result.n[level]; below++) {
+        if (!glyphs.has(`${level}-${below}`)) continue;
+        if (Math.abs(xAt(level, below) - box.x) >= box.halfWidth + NODE_SIZE / 2) continue;
+        gap = Math.max(gap, box.bottom + ROW_TEXT_CLEARANCE + NODE_SIZE / 2);
+      }
+    }
+    ys.push(ys[level - 1]! + gap);
+  }
+  return ys;
 }
 
 // ── Duplicate connectors ──────────────────────────────────────────────────────

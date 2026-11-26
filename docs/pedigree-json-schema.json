@@ -235,7 +235,11 @@
         },
         "showNotes": {
           "type": "boolean",
-          "description": "Draw each person's notes under their symbol, after the other text and before the pedigree number, up to two lines cut to the slot width, on the canvas and in figure exports. De-identified exports never draw them. Absent means false."
+          "description": "Draw each person's notes under their symbol, after the other text and before the pedigree number, wrapped to the slot width (two lines at most unless notesLength is \"full\"), on the canvas and in figure exports. De-identified exports never draw them. Absent means false."
+        },
+        "notesLength": {
+          "enum": ["twoLines", "full"],
+          "description": "How much of each person's notes showNotes draws: \"twoLines\" cuts them at two lines with an ellipsis; \"full\" draws every line, and a row moves down where the text above it would otherwise reach its symbols. Absent means \"twoLines\"."
         },
         "symbolsShow": {
           "enum": ["gender", "sex"],

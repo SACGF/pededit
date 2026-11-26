@@ -69,7 +69,7 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the Person tab and CSV. "Deceased" alone means date unknown. |
 | Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
 | Nothing about an inbreeding coefficient | Adds, off by default (#86): with "Show kinship and inbreeding coefficients" the line "F = 1/16" under anyone whose parents are related, after the evaluations and before the pedigree number, with a key row saying what F is. |
-| No line for free comments | Adds, off by default (#219): with "Show notes on the chart" the person's notes, up to two lines, after the inbreeding coefficient and before the pedigree number. Off by default because notes are free text that can identify people; de-identified export never draws them. |
+| No line for free comments | Adds, off by default (#219): with "Show notes on the chart" the person's notes, up to two lines or in full ("Notes: Full text", which moves the next generation down to make room), after the inbreeding coefficient and before the pedigree number. Off by default because notes are free text that can identify people; de-identified export never draws them. |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |
 
 ### Lines (Fig. 2)

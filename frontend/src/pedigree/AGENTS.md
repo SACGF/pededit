@@ -198,6 +198,15 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   which no lint catches); they are the `notes` detail section,
   just above the pedigree number, so the canvas and every figure export
   draw them. De-identification drops the notes and turns the setting off.
+  `canvasSettings.notesLength` "full" (Settings, "Notes: Full text", shown
+  only with the notes on) lifts the limit (`noteLineLimit`); then, and only
+  then, rows are not a fixed `rowHeight` apart: `rowYs` in `scene.ts`
+  moves each row down until the text of anyone above clears the symbols
+  under it by `ROW_TEXT_CLEARANCE` (room for the sibship bar to pass under
+  the text). The canvas and the standard export both draw the scene, so
+  they agree; the U-shape already spaces its tracks by the most lines
+  anyone has. Pins are absolute, so a pinned person stays put while the
+  rows move.
 - Reading a cut name: the full name is repeated under the hover pill, which
   sits on top of the name label. A cut label (`data-name-cut`) also takes
   the mouse itself: hovering it shows the name alone, without the pill

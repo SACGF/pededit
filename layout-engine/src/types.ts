@@ -339,6 +339,13 @@ export interface CanvasSettings {
    */
   showNotes?: boolean;
   /**
+   * How much of each person's notes `showNotes` draws: "twoLines" cuts them
+   * at two lines with an ellipsis, "full" draws every line and moves the
+   * rows below down where the text would reach them. Absent means
+   * "twoLines".
+   */
+  notesLength?: NotesLength;
+  /**
    * What the symbol shapes show: "gender" draws a person with a
    * recorded gender identity with that gender's symbol and writes AMAB /
    * AFAB / UAAB under it (NSGC 2022); "sex" draws biological sex for
@@ -364,6 +371,10 @@ export interface CanvasSettings {
 }
 
 export type SymbolsShowMode = "gender" | "sex";
+
+/** How much of each person's notes the chart draws (`CanvasSettings.notesLength`). */
+export type NotesLength = "twoLines" | "full";
+
 export type NotationEdition = "nsgc2022" | "nsgc2008";
 
 export type NameLabelMode = "wrap" | "truncate";
