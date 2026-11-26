@@ -71,8 +71,22 @@ The schema is hand-written, not generated. `json/__tests__/schemaDrift.test.ts`
 parses `types.ts` with the TypeScript compiler API and fails when a property,
 its optionality or a string-literal enum differs from the schema, and
 `backend/api/tests.py` checks the Django validating serializers against the same
-schema. So a new field fails both test suites until types.ts, the schema and
-the serializer agree.
+schema, field by field (type, enum, required, blank strings, minimums). So a
+new field fails both test suites until types.ts, the schema and the serializer
+agree. The importer has no field list of its own: `json/schemaCheck.ts`
+imports the schema (it is in the bundle, about 19 kB, 5 kB gzipped) and walks
+its `$defs` for `type`, `enum`, `required`, `minLength`, `minItems` and
+`minimum`; `importer.ts` adds only the checks between fields (ids, cycles,
+twins, `leftPartner` / `drawnBeside` naming a partner), which
+`structure_errors` in `backend/api/serializers.py` mirrors. A field added to
+the schema is checked by the importer with no code. `pattern` and `format`
+are not checked by either side.
+
+A pedigree opened by its link (`openPedigree` in `store/useAppStore.ts`)
+never passes the importer. `repairShape` reads it leniently instead: a value
+of the wrong type that the server's DRF coerced and stored as sent (in
+pedigrees saved before #229) is read as DRF read it, so a stored
+`"deceased": "false"` is false, not a truthy string.
 Test corpus: `test-data/ped/` (simple, edge_cases, malformed, consanguineous,
 large). `large/kinship2_sample.ped` is the kinship2 reference family. Tests are
 in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).

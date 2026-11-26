@@ -30,17 +30,40 @@ def _opt(field_cls, **kwargs):
     return field_cls(required=False, allow_null=True, **kwargs)
 
 
+# Strings are kept exactly as sent and may be blank, as the schema allows;
+# only the ids it gives minLength 1 (individual, partnership and tag ids) may
+# not be blank.
+def _text(**kwargs):
+    return serializers.CharField(allow_blank=True, trim_whitespace=False, **kwargs)
+
+
+def _opt_text():
+    return _text(required=False, allow_null=True)
+
+
+def _id():
+    return serializers.CharField(trim_whitespace=False)
+
+
+def _texts(**kwargs):
+    return serializers.ListField(child=_text(), **kwargs)
+
+
+def _opt_texts():
+    return _texts(required=False, allow_null=True)
+
+
 LIFE_STATUS_CHOICES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"]
 
 
 class EvaluationSerializer(serializers.Serializer):
     result = _opt(serializers.ChoiceField, choices=["positive", "negative", "uninformative"])
-    detail = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    detail = _opt_text()
     documented = _opt(serializers.BooleanField)
 
 
 class IndividualSerializer(serializers.Serializer):
-    id = serializers.CharField()
+    id = _id()
     sex = serializers.ChoiceField(choices=["male", "female", "unknown"])
     genderIdentity = _opt(serializers.ChoiceField, choices=["man", "woman", "nonbinary"])
     affected = serializers.BooleanField()
@@ -52,25 +75,22 @@ class IndividualSerializer(serializers.Serializer):
     consultand = _opt(serializers.BooleanField)
     familyHistoryUnknown = _opt(serializers.BooleanField)
     sibOrder = serializers.FloatField(required=False)
-    name = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    dob = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    dod = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    age = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    notes = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    hpoTerms = _opt(serializers.ListField, child=serializers.CharField())
+    name = _opt_text()
+    dob = _opt_text()
+    dod = _opt_text()
+    age = _opt_text()
+    notes = _opt_text()
+    hpoTerms = _opt_texts()
     lifeStatus = _opt(serializers.ChoiceField, choices=LIFE_STATUS_CHOICES)
     adopted = _opt(serializers.ChoiceField, choices=["in", "out"])
     reproductiveRole = _opt(serializers.ChoiceField, choices=["donor", "surrogate"])
-    carriedBy = _opt(serializers.CharField)
-    socialParents = _opt(serializers.ListField, child=serializers.CharField())
-    tags = _opt(serializers.ListField, child=serializers.CharField())
+    carriedBy = _opt_text()
+    socialParents = _opt_texts()
+    tags = _opt_texts()
     # Conditions (quadrant tags) carried (#115).
-    carrierTags = _opt(serializers.ListField, child=serializers.CharField())
-    onset = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    tagOnset = _opt(
-        serializers.DictField,
-        child=serializers.CharField(allow_blank=True, trim_whitespace=False),
-    )
+    carrierTags = _opt_texts()
+    onset = _opt_text()
+    tagOnset = _opt(serializers.DictField, child=_text())
     descendantsHidden = _opt(serializers.BooleanField)
     placeholder = _opt(serializers.BooleanField)
 
@@ -80,11 +100,11 @@ TAG_KIND_CHOICES = ["condition", "trait"]
 
 
 class TagSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    label = serializers.CharField(allow_blank=True, trim_whitespace=False)
-    color = serializers.CharField()
+    id = _id()
+    label = _text()
+    color = _text()
     style = serializers.ChoiceField(choices=["quadrant", "dot", "text"])
-    abbrev = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    abbrev = _opt_text()
     fill = _opt(serializers.ChoiceField, choices=TAG_FILL_CHOICES)
     kind = _opt(serializers.ChoiceField, choices=TAG_KIND_CHOICES)
 
@@ -94,23 +114,23 @@ ZYGOSITY_CHOICES = ["monozygotic", "dizygotic", "unknown"]
 
 
 class TwinSetSerializer(serializers.Serializer):
-    members = serializers.ListField(child=serializers.CharField(), min_length=2)
+    members = _texts(min_length=2)
     zygosity = serializers.ChoiceField(choices=ZYGOSITY_CHOICES)
 
 
 class PartnershipSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    individual1 = serializers.CharField()
-    individual2 = serializers.CharField()
+    id = _id()
+    individual1 = _text()
+    individual2 = _text()
     consanguineous = _opt(serializers.BooleanField)
-    consanguinityLabel = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    consanguinityLabel = _opt_text()
     childless = _opt(serializers.ChoiceField, choices=CHILDLESS_CHOICES)
-    childlessReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    childlessReason = _opt_text()
     twins = _opt(TwinSetSerializer, many=True)
     ended = _opt(serializers.BooleanField)
     donorConception = _opt(serializers.BooleanField)
-    leftPartner = _opt(serializers.CharField)
-    drawnBeside = _opt(serializers.CharField)
+    leftPartner = _opt_text()
+    drawnBeside = _opt_text()
 
 
 class SiblingOrderSettingsSerializer(serializers.Serializer):
@@ -133,17 +153,17 @@ class CanvasSettingsSerializer(serializers.Serializer):
 
 
 class ClinicalDetailsSerializer(serializers.Serializer):
-    referralReason = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    recordedBy = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    recordedOn = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    historian = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    maternalAncestry = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
-    paternalAncestry = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    referralReason = _opt_text()
+    recordedBy = _opt_text()
+    recordedOn = _opt_text()
+    historian = _opt_text()
+    maternalAncestry = _opt_text()
+    paternalAncestry = _opt_text()
 
 
 class ViewFiltersSerializer(serializers.Serializer):
     affectedOnly = _opt(serializers.BooleanField)
-    affectedCondition = _opt(serializers.CharField)
+    affectedCondition = _opt_text()
     bloodRelativesOnly = _opt(serializers.BooleanField)
     side = _opt(serializers.ChoiceField, choices=["maternal", "paternal"])
 
@@ -156,23 +176,74 @@ class PositionSerializer(serializers.Serializer):
 class PedigreeDataSerializer(serializers.Serializer):
     individuals = IndividualSerializer(many=True)
     partnerships = PartnershipSerializer(many=True)
-    parentOf = serializers.DictField(
-        child=serializers.ListField(child=serializers.CharField())
-    )
+    parentOf = serializers.DictField(child=_texts())
     siblingOrder = _opt(SiblingOrderSettingsSerializer)
     pinnedPositions = _opt(serializers.DictField, child=PositionSerializer())
     canvasSettings = _opt(CanvasSettingsSerializer)
-    unlockedIndividuals = _opt(serializers.ListField, child=serializers.CharField())
+    unlockedIndividuals = _opt_texts()
     tags = _opt(TagSerializer, many=True)
-    chartTitle = _opt(serializers.CharField, allow_blank=True, trim_whitespace=False)
+    chartTitle = _opt_text()
     clinicalDetails = _opt(ClinicalDetailsSerializer)
     filters = _opt(ViewFiltersSerializer)
 
 
+def _same(raw, valid):
+    """Whether DRF read `raw` as itself. A number is the same number whether
+    it came as 1 or 1.0; a bool is never a number, though Python says 1 == True."""
+    if isinstance(raw, bool) or isinstance(valid, bool):
+        return type(raw) is type(valid) and raw == valid
+    if isinstance(raw, (int, float)) and isinstance(valid, (int, float)):
+        return raw == valid
+    return type(raw) is type(valid) and raw == valid
+
+
+def coerced_values(data, validated):
+    """Where DRF accepted a value of the wrong type by converting it ("yes"
+    as true, "1" as 1, 5 as "5", "" as null), as (path, steps, value read):
+    the path written like structure_errors', the steps the keys and indexes
+    that lead there. Walks the serializer's fields, so unknown fields are
+    never visited."""
+    found = []
+
+    def walk(field, raw, valid, path, steps):
+        if valid is None or not isinstance(raw, (dict, list)):
+            if not _same(raw, valid):
+                found.append((path, steps, valid))
+        elif isinstance(field, serializers.Serializer):
+            for name, sub in field.fields.items():
+                if name in valid:
+                    walk(sub, raw.get(name), valid[name], f"{path}.{name}" if path else name, steps + (name,))
+        elif isinstance(field, (serializers.ListSerializer, serializers.ListField)):
+            for i, (r, v) in enumerate(zip(raw, valid)):
+                walk(field.child, r, v, f"{path}[{i}]", steps + (i,))
+        elif isinstance(field, serializers.DictField):
+            for key, v in valid.items():
+                walk(field.child, raw.get(key), v, f'{path}["{key}"]', steps + (key,))
+
+    walk(PedigreeDataSerializer(), data, validated, "", ())
+    return found
+
+
+def _type_name(value):
+    if value is None:
+        return "absent or null"
+    if isinstance(value, bool):
+        return "a boolean"
+    if isinstance(value, (int, float)):
+        return "a number"
+    return "a string"
+
+
+def _put(data, steps, value):
+    for step in steps[:-1]:
+        data = data[step]
+    data[steps[-1]] = value
+
+
 def structure_errors(data):
     """How the parts of a field-valid pedigree fail to fit together, as
-    messages that start with the path. The same checks, in the same order, as
-    the errors of the JSON importer (frontend/src/io/json/importer.ts): the
+    messages that start with the path. The same checks as the reference
+    checks of the JSON importer (frontend/src/io/json/importer.ts): the
     editor cannot lay out a pedigree that fails them. Keep the two in step.
     Ids are quoted with %r so error reporting scrubs them."""
     errors = []
@@ -195,6 +266,9 @@ def structure_errors(data):
                 errors.append(f"partnerships[{i}].{key}: partnership {pid!r} refers to unknown individual {member!r}")
         if a == b:
             errors.append(f"partnerships[{i}]: partnership {pid!r} pairs individual {a!r} with itself")
+        for key in ("leftPartner", "drawnBeside"):
+            if p.get(key) is not None and p[key] not in (a, b):
+                errors.append(f"partnerships[{i}].{key}: {p[key]!r} is not a partner of partnership {pid!r}")
         partners[pid] = (a, b)
 
     child_of = {}
@@ -258,12 +332,16 @@ def _ancestry_cycle(child_of, partners):
 
 class PedigreeDataField(serializers.Field):
     """Validates pedigree JSON with PedigreeDataSerializer, then stores the
-    submitted value untouched (lossless: unknown keys kept, nothing added).
+    submitted value (lossless: unknown keys kept, nothing added).
 
-    A pedigree whose parts do not fit together (structure_errors) is refused
-    on create, where the caller is a script or an import and can fix its JSON.
-    On update it is stored: the editor auto-saves the whole pedigree, and
-    refusing would turn one bad edit into every later edit being lost (#170).
+    DRF converts some values of the wrong type ("yes" to true, "1" to 1, 5 to
+    "5") where the JSON importer refuses them. A pedigree with such a value,
+    or whose parts do not fit together (structure_errors), is refused on
+    create, where the caller is a script or an import and can fix its JSON.
+    On update it is stored, with each converted value replaced by what DRF
+    read so the stored JSON says what was validated: the editor auto-saves
+    the whole pedigree, and refusing would turn one bad edit into every later
+    edit being lost (#170).
     """
 
     def to_internal_value(self, data):
@@ -272,15 +350,24 @@ class PedigreeDataField(serializers.Field):
         checker = PedigreeDataSerializer(data=data)
         if not checker.is_valid():
             raise serializers.ValidationError(checker.errors)
-        errors = structure_errors(data)
-        if errors:
-            if getattr(self.parent, "instance", None) is None:
-                raise serializers.ValidationError(errors)
-            # No ids or messages: they are pedigree content.
-            logger.warning("Pedigree updated with %d structure errors", len(errors))
         # Round-trip through JSON so the stored value is plain JSON types and
         # does not alias the request body.
-        return json.loads(json.dumps(data))
+        stored = json.loads(json.dumps(data))
+        coerced = coerced_values(stored, json.loads(json.dumps(checker.validated_data)))
+        for _path, steps, value in coerced:
+            _put(stored, steps, value)
+        errors = structure_errors(stored)
+        if getattr(self.parent, "instance", None) is None:
+            errors = [f"{path}: must be {_type_name(value)}" for path, _steps, value in coerced] + errors
+            if errors:
+                raise serializers.ValidationError(errors)
+        else:
+            # No ids or messages: they are pedigree content.
+            if coerced:
+                logger.warning("Pedigree updated with %d values of the wrong type", len(coerced))
+            if errors:
+                logger.warning("Pedigree updated with %d structure errors", len(errors))
+        return stored
 
     def to_representation(self, value):
         return value

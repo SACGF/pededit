@@ -62,7 +62,7 @@ generated into `backend/secret_key.txt` on first run.
 - `Pedigree` — UUID primary key, nullable `owner`, `title`, `data` JSONField
   that mirrors `layout-engine/src/types.ts` exactly. `PedigreeDataSerializer`
   only validates the known fields; `PedigreeDataField` then stores the
-  submitted JSON untouched, so unknown fields survive and absent optional
+  submitted JSON (with wrong types replaced on update, below), so unknown fields survive and absent optional
   fields stay absent (the JSON format promises this). Do not store
   `validated_data`: DRF drops undeclared keys and fills defaults. Still add new `types.ts` fields to
   the serializer so they get validated.
@@ -70,9 +70,20 @@ generated into `backend/secret_key.txt` on first run.
   in the Conditions and tags dialog). Pedigrees always
   carry their own copy of tags, so presets are a convenience only.
 
+- The serializers apply the field rules of `docs/pedigree-json-schema.json`,
+  which the JSON importer reads directly; `SerializerMatchesSchemaTests`
+  compares every field (type, enum, required, `allow_blank` against
+  `minLength`, minimums). Strings may be blank and are never trimmed, except
+  the ids the schema gives `minLength: 1`. DRF reads some wrong types as the
+  right one (`"yes"` as true, `"1"` as 1, 5 as `"5"`), which the importer
+  refuses: `coerced_values` finds them by comparing the body with
+  `validated_data`. A create with any is a 400 naming each path; an update
+  stores the body with each replaced by what DRF read, so the stored JSON is
+  always what was validated, and logs the count.
 - `structure_errors` (`api/serializers.py`) is the server's copy of the JSON
   importer's reference checks (`frontend/src/io/json/importer.ts`: ids that
-  exist, one set of parents, no cycles). Keep the two in step. The editor
+  exist, one set of parents, no cycles, `leftPartner` and `drawnBeside`
+  naming one of the couple). Keep the two in step. The editor
   throws on a cycle and draws the rest wrongly, so a create (`POST`) with any
   of them is a 400 whose messages start with the path. An update (`PUT`,
   `PATCH`) stores it and logs a warning with the count only: the editor

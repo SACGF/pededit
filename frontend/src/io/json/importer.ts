@@ -1,40 +1,15 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { JSON_FORMAT, JSON_VERSION, JsonIssueCode } from "./types.js";
 import type { JsonImportResult, JsonValidationIssue } from "./types.js";
-import { CLINICAL_DETAIL_FIELDS } from "../../pedigree/clinicalDetails";
-
-const SEX_VALUES = ["male", "female", "unknown"];
-const TAG_STYLES = ["quadrant", "dot", "text"];
-const LIFE_STATUS_VALUES = ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"];
-const CHILDLESS_VALUES = ["infertility", "byChoice"];
-const ADOPTION_VALUES = ["in", "out"];
-const REPRODUCTIVE_ROLE_VALUES = ["donor", "surrogate"];
-const NAME_LABEL_VALUES = ["wrap", "truncate"];
-const GENDER_IDENTITY_VALUES = ["man", "woman", "nonbinary"];
-const SYMBOLS_SHOW_VALUES = ["gender", "sex"];
-const NOTATION_VALUES = ["nsgc2022", "nsgc2008"];
-const TAG_FILL_VALUES = ["solid", "horizontal", "vertical", "diagonal", "crosshatch", "dots", "shade"];
-const TAG_FILL_MODE_VALUES = ["color", "monochrome"];
-const LAYOUT_WIDTH_VALUES = ["minimal", "relaxed"];
-const ZYGOSITY_VALUES = ["monozygotic", "dizygotic", "unknown"];
-const SIBLING_ORDER_MODES = ["insertion", "manual", "birthDate"];
-const EVALUATION_RESULT_VALUES = ["positive", "negative", "uninformative"];
+import { isObject, shapeIssues } from "./schemaCheck";
 
 type Obj = Record<string, unknown>;
-
-function isObject(v: unknown): v is Obj {
-  return typeof v === "object" && v !== null && !Array.isArray(v);
-}
 
 function isFiniteNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
 }
 
-function isStringArray(v: unknown): v is string[] {
-  return Array.isArray(v) && v.every(x => typeof x === "string");
-}
-
-/** Collects issues and offers typed field checks. Unknown fields are never touched. */
+/** Collects issues. Unknown fields are never touched. */
 class Checker {
   readonly issues: JsonValidationIssue[] = [];
 
@@ -49,28 +24,6 @@ class Checker {
   }
   get hasErrors(): boolean {
     return this.issues.some(i => i.severity === "error");
-  }
-
-  /** Required field: reports MISSING_FIELD or WRONG_TYPE. Returns true if usable. */
-  required(obj: Obj, key: string, path: string, typeName: string, test: (v: unknown) => boolean): boolean {
-    if (!(key in obj) || obj[key] === undefined) {
-      this.error(JsonIssueCode.MISSING_FIELD, `${path}.${key} is required`, `${path}.${key}`);
-      return false;
-    }
-    if (!test(obj[key])) {
-      this.error(JsonIssueCode.WRONG_TYPE, `${path}.${key} must be ${typeName}`, `${path}.${key}`);
-      return false;
-    }
-    return true;
-  }
-
-  /** Optional field: absent or null is fine, otherwise must pass the type test. */
-  optional(obj: Obj, key: string, path: string, typeName: string, test: (v: unknown) => boolean): void {
-    const v = obj[key];
-    if (v === undefined || v === null) return;
-    if (!test(v)) {
-      this.error(JsonIssueCode.WRONG_TYPE, `${path}.${key} must be ${typeName} when present`, `${path}.${key}`);
-    }
   }
 }
 
@@ -148,160 +101,70 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
   const p = (k: string) => (base ? `${base}.${k}` : k);
   const path = base || "pedigree";
 
-  const haveInds = c.required(ped, "individuals", path, "an array", Array.isArray);
-  const havePartners = c.required(ped, "partnerships", path, "an array", Array.isArray);
-  const haveParentOf = c.required(ped, "parentOf", path, "an object", isObject);
-
   // siblingOrder: required by the type, but default it with a warning so hand-written files are easy
   if (ped.siblingOrder === undefined || ped.siblingOrder === null) {
     c.warning(JsonIssueCode.DEFAULT_APPLIED, `${path}.siblingOrder missing; defaulting to insertion order`, p("siblingOrder"));
     ped.siblingOrder = { mode: "insertion", affectedFirst: false };
-  } else if (!isObject(ped.siblingOrder)) {
-    c.error(JsonIssueCode.WRONG_TYPE, `${path}.siblingOrder must be an object`, p("siblingOrder"));
-  } else {
-    const so = ped.siblingOrder;
-    c.required(so, "mode", p("siblingOrder"), SIBLING_ORDER_MODES.map(m => `"${m}"`).join(" | "),
-      v => typeof v === "string" && SIBLING_ORDER_MODES.includes(v));
-    c.required(so, "affectedFirst", p("siblingOrder"), "a boolean", v => typeof v === "boolean");
   }
 
-  if (!haveInds || !havePartners || !haveParentOf) return null;
+  // Field types, enums and required fields come from the schema. The rest of
+  // this function is what the schema cannot say: how the parts refer to each
+  // other, checked on a pedigree whose fields are already the right types.
+  const shape = shapeIssues(ped, "Pedigree", base, "pedigree");
+  for (const s of shape) {
+    c.error(s.kind === "missing" ? JsonIssueCode.MISSING_FIELD : JsonIssueCode.WRONG_TYPE, s.message, s.path);
+  }
+  if (shape.length > 0) return null;
+  const pedigree = ped as unknown as Pedigree;
 
   // ---- Individuals ----
   const individualIds = new Set<string>();
   const tagRefs: { tagId: string; path: string }[] = [];
-  (ped.individuals as unknown[]).forEach((raw, i) => {
+  pedigree.individuals.forEach((ind, i) => {
     const ip = p(`individuals[${i}]`);
-    if (!isObject(raw)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${ip} must be an object`, ip);
-      return;
+    if (individualIds.has(ind.id)) {
+      c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate individual id '${ind.id}'`, ip, [ind.id]);
     }
-    if (c.required(raw, "id", ip, "a non-empty string", v => typeof v === "string" && v.length > 0)) {
-      const id = raw.id as string;
-      if (individualIds.has(id)) {
-        c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate individual id '${id}'`, ip, [id]);
-      }
-      individualIds.add(id);
-    }
-    c.required(raw, "sex", ip, SEX_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && SEX_VALUES.includes(v));
-    c.optional(raw, "genderIdentity", ip, GENDER_IDENTITY_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && GENDER_IDENTITY_VALUES.includes(v));
-    c.required(raw, "affected", ip, "a boolean", v => typeof v === "boolean");
-    c.required(raw, "sibOrder", ip, "a number", isFiniteNumber);
-    c.optional(raw, "deceased", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "carrier", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "proband", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "consultand", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "familyHistoryUnknown", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "placeholder", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "presymptomatic", ip, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "evaluations", ip, "an array of evaluations", Array.isArray);
-    if (Array.isArray(raw.evaluations)) {
-      raw.evaluations.forEach((e, k) => {
-        const ep = `${ip}.evaluations[${k}]`;
-        if (!isObject(e)) { c.error(JsonIssueCode.WRONG_TYPE, `${ep} must be an object`, ep); return; }
-        c.optional(e, "result", ep, EVALUATION_RESULT_VALUES.map(s => `"${s}"`).join(" | "),
-          v => typeof v === "string" && EVALUATION_RESULT_VALUES.includes(v));
-        c.optional(e, "detail", ep, "a string", v => typeof v === "string");
-        c.optional(e, "documented", ep, "a boolean", v => typeof v === "boolean");
-      });
-    }
-    c.optional(raw, "lifeStatus", ip, LIFE_STATUS_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && LIFE_STATUS_VALUES.includes(v));
-    c.optional(raw, "adopted", ip, ADOPTION_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && ADOPTION_VALUES.includes(v));
-    c.optional(raw, "reproductiveRole", ip, REPRODUCTIVE_ROLE_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && REPRODUCTIVE_ROLE_VALUES.includes(v));
-    c.optional(raw, "carriedBy", ip, "an individual id", v => typeof v === "string");
-    c.optional(raw, "socialParents", ip, "an array of individual ids", isStringArray);
-    c.optional(raw, "name", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "dob", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "dod", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "age", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "notes", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "hpoTerms", ip, "an array of strings", isStringArray);
-    c.optional(raw, "tags", ip, "an array of tag ids", isStringArray);
-    if (isStringArray(raw.tags)) {
-      for (const tagId of raw.tags) tagRefs.push({ tagId, path: `${ip}.tags` });
-    }
+    individualIds.add(ind.id);
+    for (const tagId of ind.tags ?? []) tagRefs.push({ tagId, path: `${ip}.tags` });
     // Conditions carried: ids of quadrant tags, checked like `tags`.
-    c.optional(raw, "carrierTags", ip, "an array of tag ids", isStringArray);
-    if (isStringArray(raw.carrierTags)) {
-      for (const tagId of raw.carrierTags) tagRefs.push({ tagId, path: `${ip}.carrierTags` });
-    }
-    c.optional(raw, "onset", ip, "a string", v => typeof v === "string");
-    c.optional(raw, "tagOnset", ip, "an object of tag id to string",
-      v => isObject(v) && Object.values(v).every(x => typeof x === "string"));
-    // Any other property is an extension or a newer field: preserved untouched.
+    for (const tagId of ind.carrierTags ?? []) tagRefs.push({ tagId, path: `${ip}.carrierTags` });
   });
 
   // ---- Partnerships ----
   const partnershipIds = new Set<string>();
   const partnerMembers = new Map<string, [string, string]>();
-  (ped.partnerships as unknown[]).forEach((raw, i) => {
+  pedigree.partnerships.forEach((pt, i) => {
     const pp = p(`partnerships[${i}]`);
-    if (!isObject(raw)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${pp} must be an object`, pp);
-      return;
+    const { id, individual1: a, individual2: b } = pt;
+    if (partnershipIds.has(id)) {
+      c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate partnership id '${id}'`, pp, [id]);
     }
-    let id: string | null = null;
-    if (c.required(raw, "id", pp, "a non-empty string", v => typeof v === "string" && v.length > 0)) {
-      id = raw.id as string;
-      if (partnershipIds.has(id)) {
-        c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate partnership id '${id}'`, pp, [id]);
+    partnershipIds.add(id);
+    for (const [key, member] of [["individual1", a], ["individual2", b]] as const) {
+      if (!individualIds.has(member)) {
+        c.error(JsonIssueCode.UNKNOWN_INDIVIDUAL,
+          `Partnership '${id}' refers to unknown individual '${member}'`, `${pp}.${key}`, [member]);
       }
-      partnershipIds.add(id);
     }
-    const ok1 = c.required(raw, "individual1", pp, "a string", v => typeof v === "string");
-    const ok2 = c.required(raw, "individual2", pp, "a string", v => typeof v === "string");
-    c.optional(raw, "consanguineous", pp, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "consanguinityLabel", pp, "a string", v => typeof v === "string");
-    c.optional(raw, "childless", pp, CHILDLESS_VALUES.map(s => `"${s}"`).join(" | "),
-      v => typeof v === "string" && CHILDLESS_VALUES.includes(v));
-    c.optional(raw, "childlessReason", pp, "a string", v => typeof v === "string");
-    c.optional(raw, "ended", pp, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "donorConception", pp, "a boolean", v => typeof v === "boolean");
-    c.optional(raw, "leftPartner", pp, "the id of individual1 or individual2",
-      v => typeof v === "string" && (v === raw.individual1 || v === raw.individual2));
-    c.optional(raw, "drawnBeside", pp, "the id of individual1 or individual2",
-      v => typeof v === "string" && (v === raw.individual1 || v === raw.individual2));
-    c.optional(raw, "twins", pp, "an array of twin sets", Array.isArray);
-    if (Array.isArray(raw.twins)) {
-      raw.twins.forEach((t, k) => {
-        const tp = `${pp}.twins[${k}]`;
-        if (!isObject(t)) { c.error(JsonIssueCode.WRONG_TYPE, `${tp} must be an object`, tp); return; }
-        c.required(t, "members", tp, "an array of at least two individual ids", v => isStringArray(v) && v.length >= 2);
-        c.required(t, "zygosity", tp, ZYGOSITY_VALUES.map(s => `"${s}"`).join(" | "),
-          v => typeof v === "string" && ZYGOSITY_VALUES.includes(v));
-      });
+    if (a === b) {
+      c.error(JsonIssueCode.SELF_PARTNERSHIP, `Partnership '${id}' pairs individual '${a}' with itself`, pp, [a]);
     }
-    if (ok1 && ok2) {
-      const a = raw.individual1 as string;
-      const b = raw.individual2 as string;
-      for (const [key, member] of [["individual1", a], ["individual2", b]] as const) {
-        if (!individualIds.has(member)) {
-          c.error(JsonIssueCode.UNKNOWN_INDIVIDUAL,
-            `Partnership '${id ?? i}' refers to unknown individual '${member}'`, `${pp}.${key}`, [member]);
-        }
+    for (const key of ["leftPartner", "drawnBeside"] as const) {
+      const v = pt[key];
+      if (v != null && v !== a && v !== b) {
+        c.error(JsonIssueCode.WRONG_TYPE, `${path}.partnerships[${i}].${key} must be the id of individual1 or individual2 when present`, `${pp}.${key}`, [v]);
       }
-      if (a === b) {
-        c.error(JsonIssueCode.SELF_PARTNERSHIP, `Partnership '${id ?? i}' pairs individual '${a}' with itself`, pp, [a]);
-      }
-      if (id !== null) partnerMembers.set(id, [a, b]);
     }
+    partnerMembers.set(id, [a, b]);
   });
 
   // ---- parentOf ----
   const childToPartnership = new Map<string, string>();
-  for (const [pid, children] of Object.entries(ped.parentOf as Obj)) {
+  for (const [pid, children] of Object.entries(pedigree.parentOf)) {
     const cp = p(`parentOf["${pid}"]`);
     if (!partnershipIds.has(pid)) {
       c.error(JsonIssueCode.UNKNOWN_PARTNERSHIP, `parentOf key '${pid}' is not a partnership id`, cp, [pid]);
-    }
-    if (!isStringArray(children)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${cp} must be an array of individual ids`, cp);
-      continue;
     }
     const members = partnerMembers.get(pid);
     const seen = new Set<string>();
@@ -338,157 +201,63 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
 
   // ---- Twin sets: members must be children of their partnership, in one set only ----
   const inSet = new Set<string>();
-  (ped.partnerships as unknown[]).forEach((raw, i) => {
-    if (!isObject(raw) || !Array.isArray(raw.twins)) return;
-    const pid = typeof raw.id === "string" ? raw.id : "";
-    const children = new Set(isStringArray((ped.parentOf as Obj)[pid]) ? ((ped.parentOf as Obj)[pid] as string[]) : []);
-    const kept: unknown[] = [];
-    raw.twins.forEach((t, k) => {
-      if (!isObject(t) || !isStringArray(t.members)) return;
-      const tp = p(`partnerships[${i}].twins[${k}]`);
+  pedigree.partnerships.forEach((pt, i) => {
+    if (!pt.twins) return;
+    const children = new Set(pedigree.parentOf[pt.id] ?? []);
+    const kept = pt.twins.filter((t, k) => {
       const outsiders = t.members.filter(m => !children.has(m));
       const repeated = t.members.filter(m => inSet.has(m));
-      if (t.members.length < 2 || outsiders.length || repeated.length) {
-        const why = outsiders.length ? `${outsiders.map(m => `'${m}'`).join(", ")} not a child of partnership '${pid}'`
-          : repeated.length ? `${repeated.map(m => `'${m}'`).join(", ")} already in another twin set`
-          : "fewer than two members";
-        c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `Twin set dropped: ${why}`, tp, t.members);
-        return;
+      if (outsiders.length || repeated.length) {
+        const why = outsiders.length ? `${outsiders.map(m => `'${m}'`).join(", ")} not a child of partnership '${pt.id}'`
+          : `${repeated.map(m => `'${m}'`).join(", ")} already in another twin set`;
+        c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `Twin set dropped: ${why}`, p(`partnerships[${i}].twins[${k}]`), t.members);
+        return false;
       }
       for (const m of t.members) inSet.add(m);
-      kept.push(t);
+      return true;
     });
-    if (kept.length !== raw.twins.length) {
-      if (kept.length) raw.twins = kept; else delete raw.twins;
+    if (kept.length !== pt.twins.length) {
+      if (kept.length) pt.twins = kept; else delete pt.twins;
     }
   });
 
   // ---- Assisted reproduction lines: drop references to nobody ----
-  (ped.individuals as unknown[]).forEach((raw, i) => {
-    if (!isObject(raw)) return;
+  pedigree.individuals.forEach((ind, i) => {
     const ip = p(`individuals[${i}]`);
-    const bad = (ref: unknown) => typeof ref !== "string" || !individualIds.has(ref) || ref === raw.id;
-    if (typeof raw.carriedBy === "string" && bad(raw.carriedBy)) {
-      c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `carriedBy '${raw.carriedBy}' dropped: not another individual in the pedigree`, `${ip}.carriedBy`, [raw.carriedBy]);
-      delete raw.carriedBy;
+    const bad = (ref: string) => !individualIds.has(ref) || ref === ind.id;
+    if (typeof ind.carriedBy === "string" && bad(ind.carriedBy)) {
+      c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `carriedBy '${ind.carriedBy}' dropped: not another individual in the pedigree`, `${ip}.carriedBy`, [ind.carriedBy]);
+      delete ind.carriedBy;
     }
-    if (isStringArray(raw.socialParents)) {
-      const dropped = raw.socialParents.filter(bad);
+    if (ind.socialParents) {
+      const dropped = ind.socialParents.filter(bad);
       if (dropped.length) {
         c.warning(JsonIssueCode.UNKNOWN_INDIVIDUAL, `socialParents ${dropped.map(d => `'${d}'`).join(", ")} dropped: not another individual in the pedigree`, `${ip}.socialParents`, dropped);
-        const kept = raw.socialParents.filter(x => !bad(x));
-        if (kept.length) raw.socialParents = kept; else delete raw.socialParents;
+        const kept = ind.socialParents.filter(x => !bad(x));
+        if (kept.length) ind.socialParents = kept; else delete ind.socialParents;
       }
     }
   });
 
-  // ---- Optional top-level fields ----
-  if (ped.pinnedPositions !== undefined && ped.pinnedPositions !== null) {
-    const pp = p("pinnedPositions");
-    if (!isObject(ped.pinnedPositions)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${pp} must be an object`, pp);
-    } else {
-      for (const [id, pos] of Object.entries(ped.pinnedPositions)) {
-        if (!isObject(pos) || !isFiniteNumber(pos.x) || !isFiniteNumber(pos.y)) {
-          c.error(JsonIssueCode.WRONG_TYPE, `${pp}["${id}"] must be { x: number, y: number }`, `${pp}["${id}"]`);
-        } else if (!individualIds.has(id)) {
-          c.warning(JsonIssueCode.DANGLING_REFERENCE, `${pp} refers to unknown individual '${id}'`, `${pp}["${id}"]`, [id]);
-        }
-      }
+  // ---- References from the optional top-level fields ----
+  for (const id of Object.keys(pedigree.pinnedPositions ?? {})) {
+    if (!individualIds.has(id)) {
+      const pp = p("pinnedPositions");
+      c.warning(JsonIssueCode.DANGLING_REFERENCE, `${pp} refers to unknown individual '${id}'`, `${pp}["${id}"]`, [id]);
     }
   }
-
-  if (ped.canvasSettings !== undefined && ped.canvasSettings !== null) {
-    const cp = p("canvasSettings");
-    if (!isObject(ped.canvasSettings)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${cp} must be an object`, cp);
-    } else {
-      const cs = ped.canvasSettings;
-      c.required(cs, "nodesMoveable", cp, "a boolean", v => typeof v === "boolean");
-      c.required(cs, "snapToGrid", cp, "a boolean", v => typeof v === "boolean");
-      c.required(cs, "snapGridSize", cp, "a number", isFiniteNumber);
-      c.optional(cs, "nameLabels", cp, NAME_LABEL_VALUES.map(s => `"${s}"`).join(" | "),
-        v => typeof v === "string" && NAME_LABEL_VALUES.includes(v));
-      c.optional(cs, "layoutWidth", cp, LAYOUT_WIDTH_VALUES.map(s => `"${s}"`).join(" | "),
-        v => typeof v === "string" && LAYOUT_WIDTH_VALUES.includes(v));
-      c.optional(cs, "showNumbers", cp, "a boolean", v => typeof v === "boolean");
-      c.optional(cs, "relationshipLabels", cp, "a boolean", v => typeof v === "boolean");
-      c.optional(cs, "showCoefficients", cp, "a boolean", v => typeof v === "boolean");
-      c.optional(cs, "symbolsShow", cp, SYMBOLS_SHOW_VALUES.map(s => `"${s}"`).join(" | "),
-        v => typeof v === "string" && SYMBOLS_SHOW_VALUES.includes(v));
-      c.optional(cs, "notation", cp, NOTATION_VALUES.map(s => `"${s}"`).join(" | "),
-        v => typeof v === "string" && NOTATION_VALUES.includes(v));
-      c.optional(cs, "tagFills", cp, TAG_FILL_MODE_VALUES.map(s => `"${s}"`).join(" | "),
-        v => typeof v === "string" && TAG_FILL_MODE_VALUES.includes(v));
-    }
-  }
-
-  c.optional(ped, "chartTitle", base, "a string", v => typeof v === "string");
-
-  if (ped.filters !== undefined && ped.filters !== null) {
-    const fp = p("filters");
-    if (!isObject(ped.filters)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${fp} must be an object`, fp);
-    } else {
-      c.optional(ped.filters, "affectedOnly", fp, "a boolean", v => typeof v === "boolean");
-      c.optional(ped.filters, "affectedCondition", fp, "a string", v => typeof v === "string");
-      c.optional(ped.filters, "bloodRelativesOnly", fp, "a boolean", v => typeof v === "boolean");
-      c.optional(ped.filters, "side", fp, '"maternal" or "paternal"', v => v === "maternal" || v === "paternal");
-    }
-  }
-
-  if (ped.clinicalDetails !== undefined && ped.clinicalDetails !== null) {
-    const kp = p("clinicalDetails");
-    if (!isObject(ped.clinicalDetails)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${kp} must be an object`, kp);
-    } else {
-      for (const field of CLINICAL_DETAIL_FIELDS) {
-        c.optional(ped.clinicalDetails, field, kp, "a string", v => typeof v === "string");
-      }
-    }
-  }
-
-  if (ped.unlockedIndividuals !== undefined && ped.unlockedIndividuals !== null) {
-    const up = p("unlockedIndividuals");
-    if (!isStringArray(ped.unlockedIndividuals)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${up} must be an array of strings`, up);
-    } else {
-      for (const id of ped.unlockedIndividuals) {
-        if (!individualIds.has(id)) {
-          c.warning(JsonIssueCode.DANGLING_REFERENCE, `${up} refers to unknown individual '${id}'`, up, [id]);
-        }
-      }
+  for (const id of pedigree.unlockedIndividuals ?? []) {
+    if (!individualIds.has(id)) {
+      const up = p("unlockedIndividuals");
+      c.warning(JsonIssueCode.DANGLING_REFERENCE, `${up} refers to unknown individual '${id}'`, up, [id]);
     }
   }
 
   const tagIds = new Set<string>();
-  if (ped.tags !== undefined && ped.tags !== null) {
-    const tp = p("tags");
-    if (!Array.isArray(ped.tags)) {
-      c.error(JsonIssueCode.WRONG_TYPE, `${tp} must be an array`, tp);
-    } else {
-      ped.tags.forEach((raw: unknown, i: number) => {
-        const tip = `${tp}[${i}]`;
-        if (!isObject(raw)) {
-          c.error(JsonIssueCode.WRONG_TYPE, `${tip} must be an object`, tip);
-          return;
-        }
-        if (c.required(raw, "id", tip, "a non-empty string", v => typeof v === "string" && v.length > 0)) {
-          const id = raw.id as string;
-          if (tagIds.has(id)) c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate tag id '${id}'`, tip, [id]);
-          tagIds.add(id);
-        }
-        c.required(raw, "label", tip, "a string", v => typeof v === "string");
-        c.required(raw, "color", tip, "a string", v => typeof v === "string");
-        c.required(raw, "style", tip, TAG_STYLES.map(s => `"${s}"`).join(" | "),
-          v => typeof v === "string" && TAG_STYLES.includes(v));
-        c.optional(raw, "abbrev", tip, "a string", v => typeof v === "string");
-        c.optional(raw, "fill", tip, TAG_FILL_VALUES.map(s => `"${s}"`).join(" | "),
-          v => typeof v === "string" && TAG_FILL_VALUES.includes(v));
-        c.optional(raw, "kind", tip, `"condition" | "trait"`, v => v === "condition" || v === "trait");
-      });
-    }
-  }
+  (pedigree.tags ?? []).forEach((tag, i) => {
+    if (tagIds.has(tag.id)) c.error(JsonIssueCode.DUPLICATE_ID, `Duplicate tag id '${tag.id}'`, p(`tags[${i}]`), [tag.id]);
+    tagIds.add(tag.id);
+  });
   for (const { tagId, path: refPath } of tagRefs) {
     if (!tagIds.has(tagId)) {
       c.warning(JsonIssueCode.DANGLING_REFERENCE, `${refPath} refers to unknown tag '${tagId}'`, refPath, [tagId]);
@@ -496,7 +265,7 @@ function validatePedigree(c: Checker, ped: Obj, base: string): Pedigree | null {
   }
 
   // The object itself is returned so that unknown properties are preserved.
-  return ped as unknown as Pedigree;
+  return pedigree;
 }
 
 /**

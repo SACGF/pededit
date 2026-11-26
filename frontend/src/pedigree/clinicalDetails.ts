@@ -29,8 +29,6 @@ export const CLINICAL_DETAIL_OPTIONS: readonly ClinicalDetailOption[] = [
   { field: "recordedOn",       label: "Date",                placeholder: "Intake or update", date: true },
 ];
 
-export const CLINICAL_DETAIL_FIELDS: readonly ClinicalDetailField[] = CLINICAL_DETAIL_OPTIONS.map(o => o.field);
-
 export interface ClinicalDetailLine {
   field: ClinicalDetailField;
   label: string;

@@ -5,6 +5,7 @@ import { usePedigreeStore } from "./usePedigreeStore";
 import { recordRecentPedigree, renameRecentPedigree, forgetRecentPedigree } from "../utils/recentPedigrees";
 import type { ExamplePedigree } from "../data/examples";
 import { DEFAULT_PEDIGREE_NAME } from "../pedigree/labels";
+import { repairShape } from "../io/json/schemaCheck";
 
 interface AppState {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -81,8 +82,20 @@ const KEEPALIVE_MAX_BYTES = 60 * 1024;
 /** The pedigree object a keepalive save is in flight for, so hide and pagehide send it once. */
 let keepaliveFor: Pedigree | null = null;
 
-/** Old saves may lack the sibling order fields; fill them in place. */
+/**
+ * Read a stored pedigree leniently, in place. A stored pedigree never passes
+ * the JSON importer, which would refuse what this repairs: a value of the
+ * wrong type is read the way the server read it (`repairShape`), a couple's
+ * leftPartner or drawnBeside naming someone else is dropped, and old saves
+ * get the sibling order fields they lack.
+ */
 function normalise(pedigree: Pedigree): Pedigree {
+  repairShape(pedigree, "Pedigree");
+  for (const p of pedigree.partnerships ?? []) {
+    for (const key of ["leftPartner", "drawnBeside"] as const) {
+      if (p[key] != null && p[key] !== p.individual1 && p[key] !== p.individual2) delete p[key];
+    }
+  }
   if (!pedigree.siblingOrder) {
     pedigree.siblingOrder = { mode: "insertion", affectedFirst: false };
   }

@@ -316,4 +316,27 @@ describe("JSON import: rejected inputs", () => {
     const result = importJson(JSON.stringify(withPedigree(p => { p.individuals[2].sex = "x"; })));
     expect(result.issues.find(i => i.code === JsonIssueCode.WRONG_TYPE)?.path).toBe("pedigree.individuals[2].sex");
   });
+
+  it("refuses what the server refuses on create, and takes blank strings it stores (#229)", () => {
+    expect(errorsOf(withPedigree(p => { p.individuals[0].descendantsHidden = "yes"; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.canvasSettings = { nodesMoveable: true, snapToGrid: false, snapGridSize: -1 }; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.partnerships[0].twins = [{ members: ["i3"], zygosity: "unknown" }]; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    expect(errorsOf(withPedigree(p => { p.individuals[0].id = ""; }))).toContain(JsonIssueCode.WRONG_TYPE);
+    const left = importJson(JSON.stringify(withPedigree(p => { p.partnerships[0].leftPartner = "i3"; })));
+    expect(left.issues.find(i => i.severity === "error")?.path).toBe("pedigree.partnerships[0].leftPartner");
+    const beside = importJson(JSON.stringify(withPedigree(p => { p.partnerships[0].drawnBeside = p.partnerships[0].individual2; })));
+    expect(beside.hasErrors).toBe(false);
+    const blank = importJson(JSON.stringify(withPedigree(p => {
+      Object.assign(p.individuals[0], { name: "", hpoTerms: [""], tags: [""], carriedBy: "", socialParents: [""] });
+    })));
+    expect(blank.hasErrors).toBe(false);
+  });
+
+  it("names the expected type in the message", () => {
+    const messages = (mutate: (p: any) => void) => importJson(JSON.stringify(withPedigree(mutate))).issues.map(i => i.message);
+    expect(messages(p => { p.individuals[0].sex = "M"; })).toContain('pedigree.individuals[0].sex must be "male" | "female" | "unknown"');
+    expect(messages(p => { p.individuals[0].deceased = 1; })).toContain("pedigree.individuals[0].deceased must be a boolean when present");
+    expect(messages(p => { delete p.individuals[0].affected; })).toContain("pedigree.individuals[0].affected is required");
+    expect(messages(p => { p.individuals[0].hpoTerms = [3]; })).toContain("pedigree.individuals[0].hpoTerms[0] must be a string");
+  });
 });

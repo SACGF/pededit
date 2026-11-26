@@ -216,10 +216,11 @@ The answer starts `{"id":"3f0c...","title":"Example family",...}`, and the pedig
 
 A create answers `400` with the reasons under `data` when:
 
-- a required field is missing or a field has the wrong type or an unknown value. The reasons are nested as the document is: `{"data": {"individuals": {"2": {"sex": ["\"m\" is not a valid choice."]}}}}`.
-- the parts do not fit together: the errors listed under "Validation on import" below (a partnership naming someone who does not exist, a `parentOf` key that is not a partnership, a child of two partnerships, circular ancestry, duplicate ids). Each reason starts with its path: `{"data": ["partnerships[0].individual2: partnership 'p1' refers to unknown individual 'i9'"]}`.
+- a required field is missing or a field has an unknown value or a type that cannot be read. The reasons are nested as the document is: `{"data": {"individuals": {"2": {"sex": ["\"m\" is not a valid choice."]}}}}`.
+- a field has the wrong type, even one that could be read as the right one: `"affected": "yes"`, `"sibOrder": "1"`, `"name": 5`. Each reason starts with its path: `{"data": ["individuals[0].affected: must be a boolean"]}`.
+- the parts do not fit together: the errors listed under "Validation on import" below (a partnership naming someone who does not exist, a `leftPartner` or `drawnBeside` that is not one of the couple, a `parentOf` key that is not a partnership, a child of two partnerships, circular ancestry, duplicate ids). Each reason starts with its path: `{"data": ["partnerships[0].individual2: partnership 'p1' refers to unknown individual 'i9'"]}`.
 
-Fix the JSON and post it again. An update is checked for field types only, so that the editor's auto-save is never turned away.
+Fix the JSON and post it again. Strings may be blank except the ids of individuals, partnerships and tags. An update is refused only for a missing field, an unknown value or a type that cannot be read, so that the editor's auto-save is never turned away: a value of the wrong type is stored as it was read (`"yes"` as `true`), and parts that do not fit together are stored as sent.
 
 ### Rate limits
 
@@ -233,7 +234,8 @@ Errors block the import:
 
 - the text is not valid JSON, or the root is not an object
 - `format` is present but not `"pededit-pedigree"`
-- a required field is missing or has the wrong type (including `sibOrder` not being a number)
+- a required field is missing, or a field has the wrong type or an unknown value (including `sibOrder` not being a number): the types, values and required fields of `docs/pedigree-json-schema.json`, which the importer reads; its `pattern`s are not checked
+- a partnership's `leftPartner` or `drawnBeside` is not one of its two partners
 - duplicate individual, partnership or tag ids
 - a partnership refers to an individual that does not exist, or pairs an individual with itself
 - a `parentOf` key is not a partnership id, or a listed child does not exist
@@ -246,7 +248,8 @@ Warnings allow the import and are shown to the user:
 - the document `version` is newer than the editor's
 - `pinnedPositions` or `unlockedIndividuals` name an individual that does not exist
 - an individual's `tags` or `carrierTags` names a tag that is not in `Pedigree.tags`
-- a twin set has fewer than two members, a member who is not a child of that partnership, or a member listed in two sets (the set is dropped)
+- a twin set has a member who is not a child of that partnership, or a member listed in two sets (the set is dropped; a set of fewer than two members is an error)
+- `carriedBy` or `socialParents` name nobody in the pedigree, or the person themselves (the reference is dropped)
 
 ## Worked example
 
@@ -285,6 +288,6 @@ The same family as a bare pedigree is just the value of `"pedigree"` on its own.
 
 - API: `backend/api/views.py` (`PedigreeViewSet`), field and structure checks in `backend/api/serializers.py`, rate limits in `backend/api/throttling.py`
 - Exporter: `frontend/src/io/json/exporter.ts` (`exportJson`)
-- Importer and validator: `frontend/src/io/json/importer.ts` (`importJson`)
+- Importer and validator: `frontend/src/io/json/importer.ts` (`importJson`), field rules read from the schema by `frontend/src/io/json/schemaCheck.ts`
 - Issue codes and envelope type: `frontend/src/io/json/types.ts`
 - Tests: `frontend/src/io/json/__tests__/json.test.ts`

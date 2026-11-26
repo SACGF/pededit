@@ -728,6 +728,23 @@
       "exportLint": []
     },
     {
+      "file": "old/blank-references.json",
+      "group": "old",
+      "purpose": "Blank strings in carriedBy, socialParents, tags and hpoTerms: imported, the references dropped or warned about, and stored by the server",
+      "import": [
+        "warning:DANGLING_REFERENCE",
+        "warning:UNKNOWN_INDIVIDUAL"
+      ],
+      "valid": true,
+      "server": "accepted",
+      "people": 3,
+      "problems": [
+        "missing-reference:c"
+      ],
+      "lint": [],
+      "exportLint": []
+    },
+    {
       "file": "old/stale-pin.json",
       "group": "old",
       "purpose": "A pinned position and an unlock for someone who no longer exists",
@@ -814,6 +831,66 @@
       "file": "refused/wrong-type.json",
       "group": "refused",
       "purpose": "sibOrder as text, not a number",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/boolean-as-text.json",
+      "group": "refused",
+      "purpose": "affected as the text \"yes\", which the server once read as true",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/number-as-text.json",
+      "group": "refused",
+      "purpose": "sibOrder as the text \"1\", which the server once read as 1",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/text-as-number.json",
+      "group": "refused",
+      "purpose": "A name that is a number, not text",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/descendants-hidden-as-text.json",
+      "group": "refused",
+      "purpose": "descendantsHidden as text, not a boolean",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/left-partner-not-a-partner.json",
+      "group": "refused",
+      "purpose": "A couple drawn with its child as the left partner",
+      "import": [
+        "error:WRONG_TYPE"
+      ],
+      "valid": false,
+      "server": "refused"
+    },
+    {
+      "file": "refused/drawn-beside-not-a-partner.json",
+      "group": "refused",
+      "purpose": "A couple drawn beside someone who is not one of its partners",
       "import": [
         "error:WRONG_TYPE"
       ],

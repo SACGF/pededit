@@ -175,35 +175,170 @@ class PedigreeRoundTripTests(APITestCase):
 
 
 class SerializerMatchesSchemaTests(APITestCase):
-    """The validating serializers must know every field in the JSON schema
-    (which a frontend test keeps in step with types.ts), with the same
-    required fields, or a new field goes unvalidated."""
+    """The validating serializers must apply the field rules of the JSON
+    schema (which a frontend test keeps in step with types.ts, and which the
+    JSON importer applies by walking it, frontend/src/io/json/schemaCheck.ts):
+    every field, required or not, its type, enum, whether a string may be
+    blank, and the minimums. Otherwise the importer and the server disagree
+    about what a valid pedigree is (#229)."""
 
-    def test_fields_and_required_match_schema(self):
+    # sibOrder is required by the format but optional here so that
+    # pedigrees saved before it existed still load.
+    LENIENT = {"individuals[].sibOrder"}
+
+    def test_every_field_matches_the_schema(self):
+        from rest_framework import serializers as f
         from . import serializers as s
 
         schema_path = Path(__file__).resolve().parents[2] / "docs" / "pedigree-json-schema.json"
         defs = json.loads(schema_path.read_text())["$defs"]
-        pairs = {
-            "Pedigree": s.PedigreeDataSerializer,
-            "Individual": s.IndividualSerializer,
-            "Partnership": s.PartnershipSerializer,
-            "Tag": s.TagSerializer,
-            "SiblingOrderSettings": s.SiblingOrderSettingsSerializer,
-            "CanvasSettings": s.CanvasSettingsSerializer,
-            "ClinicalDetails": s.ClinicalDetailsSerializer,
-            "Evaluation": s.EvaluationSerializer,
-            "ViewFilters": s.ViewFiltersSerializer,
-        }
-        # sibOrder is required by the format but optional here so that
-        # pedigrees saved before it existed still load.
-        lenient = {("Individual", "sibOrder")}
-        for name, cls in pairs.items():
-            fields = cls().fields
-            self.assertEqual(set(fields), set(defs[name]["properties"]), name)
-            required = {k for k, f in fields.items() if f.required}
-            expected = {k for k in defs[name].get("required", []) if (name, k) not in lenient}
-            self.assertEqual(required, expected, name)
+        seen = set()
+
+        def resolve(node):
+            if "$ref" in node:
+                name = node["$ref"].split("/")[-1]
+                seen.add(name)
+                return defs[name]
+            return node
+
+        def compare(field, node, path):
+            node = resolve(node)
+            with self.subTest(path or "Pedigree"):
+                if isinstance(field, f.ListSerializer):
+                    self.assertEqual(node["type"], "array")
+                    compare(field.child, node["items"], f"{path}[]")
+                elif isinstance(field, f.Serializer):
+                    self.assertEqual(node["type"], "object")
+                    fields = field.fields
+                    self.assertEqual(set(fields), set(node["properties"]))
+                    required = {k for k, sub in fields.items() if sub.required}
+                    expected = {k for k in node.get("required", []) if f"{path}.{k}".lstrip(".") not in self.LENIENT}
+                    self.assertEqual(required, expected)
+                    for key, sub in fields.items():
+                        self.assertEqual(sub.allow_null, not sub.required and f"{path}.{key}".lstrip(".") not in self.LENIENT, key)
+                        compare(sub, node["properties"][key], f"{path}.{key}".lstrip("."))
+                elif isinstance(field, f.ListField):
+                    self.assertEqual(node["type"], "array")
+                    self.assertEqual(field.min_length, node.get("minItems"))
+                    compare(field.child, node["items"], f"{path}[]")
+                elif isinstance(field, f.DictField):
+                    self.assertEqual(node["type"], "object")
+                    compare(field.child, node["additionalProperties"], f"{path}{{}}")
+                elif isinstance(field, f.ChoiceField):
+                    self.assertEqual(list(field.choices), node["enum"])
+                elif isinstance(field, f.BooleanField):
+                    self.assertEqual(node["type"], "boolean")
+                elif isinstance(field, f.FloatField):
+                    self.assertEqual(node["type"], "number")
+                    self.assertEqual(field.min_value, node.get("minimum"))
+                elif isinstance(field, f.CharField):
+                    self.assertEqual(node["type"], "string")
+                    self.assertEqual(field.allow_blank, not node.get("minLength"))
+                    self.assertFalse(field.trim_whitespace)
+                else:
+                    self.fail(f"no rule for {type(field).__name__}")
+
+        compare(s.PedigreeDataSerializer(), defs["Pedigree"], "")
+        self.assertEqual(seen, set(defs) - {"Pedigree"})
+
+
+class ImporterAgreementTests(APITestCase):
+    """What the JSON importer refuses, the server refuses on create, and what
+    the importer takes, the server stores (#229). Each rule has a file in the
+    shared data set; these tests add the update side and the messages."""
+
+    TRIO = {
+        "individuals": [
+            {"id": "f", "sex": "male", "affected": False, "sibOrder": 0},
+            {"id": "m", "sex": "female", "affected": False, "sibOrder": 0},
+            {"id": "c", "sex": "female", "affected": True, "sibOrder": 0},
+        ],
+        "partnerships": [{"id": "p", "individual1": "f", "individual2": "m"}],
+        "parentOf": {"p": ["c"]},
+    }
+
+    def trio(self, **changes):
+        data = json.loads(json.dumps(self.TRIO))
+        for key, value in changes.items():
+            where, field = key.split("__")
+            target = data["partnerships"][0] if where == "p" else data["individuals"][int(where[1:])]
+            target[field] = value
+        return data
+
+    def _url(self):
+        resp = self.client.post("/api/pedigrees/", {"title": "T", "data": self.TRIO}, format="json")
+        self.assertEqual(resp.status_code, 201, resp.content)
+        return f"/api/pedigrees/{resp.data['id']}/"
+
+    def test_a_partner_that_is_not_in_the_couple_is_refused_on_create(self):
+        for key, value in (("leftPartner", "c"), ("drawnBeside", "nobody")):
+            with self.subTest(key):
+                resp = self.client.post("/api/pedigrees/", {"data": self.trio(**{f"p__{key}": value})}, format="json")
+                self.assertEqual(resp.status_code, 400)
+                self.assertEqual(resp.json()["data"], [f"partnerships[0].{key}: {value!r} is not a partner of partnership 'p'"])
+                ok = self.client.post("/api/pedigrees/", {"data": self.trio(**{f"p__{key}": "m"})}, format="json")
+                self.assertEqual(ok.status_code, 201, ok.content)
+
+    def test_a_partner_that_is_not_in_the_couple_is_stored_on_update(self):
+        url = self._url()
+        data = self.trio(p__leftPartner="c")
+        with self.assertLogs("api.serializers", level="WARNING") as logs:
+            resp = self.client.patch(url, {"data": data}, format="json")
+        self.assertEqual(resp.status_code, 200, resp.content)
+        self.assertEqual(self.client.get(url).json()["data"], data)
+        self.assertEqual([r.getMessage() for r in logs.records], ["Pedigree updated with 1 structure errors"])
+
+    def test_blank_strings_are_stored(self):
+        data = self.trio(i2__carriedBy="", i2__socialParents=[""], i2__tags=[""], i2__hpoTerms=[""],
+                         i2__name="", p__consanguinityLabel="")
+        resp = self.client.post("/api/pedigrees/", {"data": data}, format="json")
+        self.assertEqual(resp.status_code, 201, resp.content)
+        url = f"/api/pedigrees/{resp.data['id']}/"
+        self.assertEqual(self.client.patch(url, {"data": data}, format="json").status_code, 200)
+        self.assertEqual(self.client.get(url).json()["data"], data)
+        # An id is the one string that may not be blank, as in the schema.
+        resp = self.client.post("/api/pedigrees/", {"data": self.trio(i0__id="")}, format="json")
+        self.assertEqual(resp.status_code, 400)
+
+    WRONG_TYPES = [
+        # (field, as sent, as DRF reads it, message)
+        ("i0__affected", "yes", True, "individuals[0].affected: must be a boolean"),
+        ("i0__deceased", "false", False, "individuals[0].deceased: must be a boolean"),
+        ("i0__descendantsHidden", "yes", True, "individuals[0].descendantsHidden: must be a boolean"),
+        ("i0__sibOrder", "1", 1.0, "individuals[0].sibOrder: must be a number"),
+        ("i0__name", 5, "5", "individuals[0].name: must be a string"),
+        ("i0__hpoTerms", [7], ["7"], "individuals[0].hpoTerms[0]: must be a string"),
+        ("i0__carrier", "", None, "individuals[0].carrier: must be absent or null"),
+        ("p__ended", 1, True, "partnerships[0].ended: must be a boolean"),
+    ]
+
+    def test_a_wrong_type_is_refused_on_create_with_the_path(self):
+        for key, sent, _read, message in self.WRONG_TYPES:
+            with self.subTest(key):
+                resp = self.client.post("/api/pedigrees/", {"data": self.trio(**{key: sent})}, format="json")
+                self.assertEqual(resp.status_code, 400)
+                self.assertEqual(resp.json()["data"], [message])
+
+    def test_a_wrong_type_is_stored_on_update_as_the_server_read_it(self):
+        """The editor's auto-save is never refused, but what is stored is what
+        was validated: a later load never sees "false" where a boolean goes."""
+        url = self._url()
+        for key, sent, read, _message in self.WRONG_TYPES:
+            with self.subTest(key):
+                data = self.trio(**{key: sent})
+                data["individuals"][0]["futureField"] = "yes"
+                with self.assertLogs("api.serializers", level="WARNING") as logs:
+                    resp = self.client.put(url, {"title": "T", "data": data}, format="json")
+                self.assertEqual(resp.status_code, 200, resp.content)
+                self.assertEqual([r.getMessage() for r in logs.records], ["Pedigree updated with 1 values of the wrong type"])
+                expected = self.trio(**{key: read})
+                expected["individuals"][0]["futureField"] = "yes"
+                stored = Pedigree.objects.get(pk=resp.data["id"]).data
+                self.assertEqual(stored, expected)
+                where, field = key.split("__")
+                target = stored["partnerships"][0] if where == "p" else stored["individuals"][int(where[1:])]
+                self.assertIs(type(target[field]), type(read))
+                self.assertEqual(self.client.get(url).json()["data"], expected)
 
 
 class PedigreeAccessTests(APITestCase):

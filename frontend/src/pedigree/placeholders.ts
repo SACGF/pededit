@@ -1,4 +1,4 @@
-import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
+import type { Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import { removeIndividuals } from "./removal";
 import { childrenOf, couplesOf, hasParents } from "./graph";
 
@@ -38,8 +38,15 @@ export function isUntouchedPlaceholder(ind: Individual): boolean {
   return Object.entries(ind).every(([k, v]) => BOOKKEEPING.has(k) || isEmptyValue(v));
 }
 
-/** Partnership fields the user sets; a couple carrying any of them is kept. */
-const PARTNERSHIP_FIELDS = ["consanguineous", "consanguinityLabel", "childless", "childlessReason", "ended", "donorConception", "twins"] as const;
+/**
+ * Partnership fields every couple has. A couple carrying any other field
+ * (set by the user, or unknown to this version) is kept.
+ */
+const COUPLE_BOOKKEEPING = new Set(["id", "individual1", "individual2"]);
+
+function coupleRecordsSomething(p: Partnership): boolean {
+  return Object.entries(p).some(([k, v]) => !COUPLE_BOOKKEEPING.has(k) && !isEmptyValue(v));
+}
 
 /** Everyone who is a partner in any of `partnershipIds`: the candidates to pass to the functions below. */
 export function partnersIn(pedigree: Pedigree, partnershipIds: Iterable<string>): string[] {
@@ -68,7 +75,7 @@ export function leftoverPlaceholders(pedigree: Pedigree, candidateIds: Iterable<
     const own = couplesOf(pedigree, id, { donorPairs: true });
     if (own.length > 1) continue;
     const p = own[0];
-    if (p && (childrenOf(pedigree, p.id).length > 0 || PARTNERSHIP_FIELDS.some(f => !isEmptyValue(p[f])))) continue;
+    if (p && (childrenOf(pedigree, p.id).length > 0 || coupleRecordsSomething(p))) continue;
     out.add(id);
   }
   return out;

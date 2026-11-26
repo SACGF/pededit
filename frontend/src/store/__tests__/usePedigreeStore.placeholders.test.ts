@@ -129,6 +129,21 @@ describe("placeholder partners (#107)", () => {
     expect(ind(ph)).toBeDefined();
   });
 
+  it.each([
+    ["a side chosen", (ph: string) => ({ leftPartner: ph })],
+    ["a place to be drawn beside", (_ph: string) => ({ drawnBeside: "m" })],
+    ["an ended mark", () => ({ ended: true })],
+    ["a field this version does not know", () => ({ marriedOn: "1990" })],
+  ])("keeps a placeholder whose couple has %s", (_label, patch) => {
+    const ph = singleParent();
+    const ped = structuredClone(get().pedigree);
+    const couple = ped.partnerships.find(p => p.individual1 === ph || p.individual2 === ph)!;
+    Object.assign(couple, patch(ph));
+    get().initialize(ped);
+    get().setParents("c", ["f", "g"]);
+    expect(ind(ph)).toBeDefined();
+  });
+
   it("keeps a placeholder whose sex the user set, and one filled in by Add parent", () => {
     const ph = singleParent();
     get().setSex(ph, "male");
