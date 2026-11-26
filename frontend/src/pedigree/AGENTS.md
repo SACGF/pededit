@@ -810,7 +810,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   no couple edge (`buildScene` skips it, both lints skip
   `partnership-not-drawn` for it), and its sibship edge carries `apart`: a
   line from each parent's symbol to the bar replaces the couple drop
-  (`sibshipSegments`' last argument). kinship2 lays the pair out as a
+  (`sibshipSegments`' `apart`). kinship2 lays the pair out as a
   couple, which is what puts the donor beside the other parent. A donor
   pair's ONLY child is drawn as NSGC Fig. 3 draws a pregnancy (`converge`
   on the sibship edge): no bar, a line from each parent straight to the top

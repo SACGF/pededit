@@ -61,14 +61,23 @@ export function sibBarHeight(coupleY: number, childRowY: number, barOffset = 0, 
   return coupleY + Math.min((childRowY - coupleY) / 2, maxDrop) + barOffset;
 }
 
+/** A couple's position and their children, as the sibship's lines need them. */
+export interface SibshipLineInput {
+  coupleX: number;
+  coupleY: number;
+  children: SibshipChild[];
+  /** Added to the bar's height (`sibBarHeight`), to keep it off another sibship's bar. */
+  barOffset?: number;
+  /** Parents who are not a couple (gamete donation): a line from each to the bar instead of the couple's drop. */
+  apart?: LinePoint[];
+  /** With `apart` and an only child, the parents' lines go straight to the child's top. */
+  converge?: boolean;
+  /** Furthest the bar hangs below the couple line (`sibBarHeight`). */
+  maxDrop?: number;
+}
+
 export function sibshipSegments(
-  coupleX: number,
-  coupleY: number,
-  children: SibshipChild[],
-  barOffset = 0,
-  apart?: LinePoint[],
-  converge = false,
-  maxDrop = Infinity,
+  { coupleX, coupleY, children, barOffset = 0, apart, converge = false, maxDrop = Infinity }: SibshipLineInput,
 ): Segment[] {
   if (children.length === 0) return [];
   const half = NODE_SIZE / 2;
@@ -108,10 +117,7 @@ export interface TwinQuestion { kind: "question"; x: number; y: number }
  * by a bar (monozygotic) or get a "?" between them (unknown zygosity).
  */
 export function twinForkMarks(
-  coupleY: number,
-  children: SibshipChild[],
-  barOffset = 0,
-  maxDrop = Infinity,
+  { coupleY, children, barOffset = 0, maxDrop = Infinity }: Pick<SibshipLineInput, "coupleY" | "children" | "barOffset" | "maxDrop">,
 ): (TwinMark | TwinQuestion)[] {
   const out: (TwinMark | TwinQuestion)[] = [];
   const half = NODE_SIZE / 2;
@@ -143,16 +149,9 @@ export function twinForkMarks(
 }
 
 /** The sibship lines split into solid segments and the dashed drops of adopted-in children. */
-export function sibshipPaths(
-  coupleX: number,
-  coupleY: number,
-  children: SibshipChild[],
-  barOffset = 0,
-  apart?: LinePoint[],
-  converge = false,
-  maxDrop = Infinity,
-): { solid: Segment[]; dashed: Segment[] } {
-  const segs = sibshipSegments(coupleX, coupleY, children, barOffset, apart, converge, maxDrop);
+export function sibshipPaths(input: SibshipLineInput): { solid: Segment[]; dashed: Segment[] } {
+  const { children } = input;
+  const segs = sibshipSegments(input);
   // A converged only child has no drop of its own to dash.
   const ownDrops = segs.length - children.length >= 2;
   if (segs.length === 0 || !ownDrops || !children.some(c => c.dashed)) return { solid: segs, dashed: [] };

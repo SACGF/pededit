@@ -317,7 +317,7 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
     if (!s || !t) continue;
     const who = s.individual.id;
     const hit = arcCollisions(
-      duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data.bulge, half, 48, e.data.legDx),
+      duplicateArcPoints({ a: s.position, b: t.position, half, ...e.data }, 48),
       scene.people.filter(n => n.individual.id !== who).map(n => ({
         id: n.individual.id, x: n.position.x, y: n.position.y,
         text: textBlockUnder(n.glyph, n.position.x, n.position.y),
@@ -359,7 +359,7 @@ function lintTitle(title: string, scene: Scene): LintFinding[] {
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
-    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, half, 48, e.data.legDx).some(inBox)) return found("a dashed arc between two copies");
+    if (a && b && duplicateArcPoints({ a, b, half, ...e.data }, 48).some(inBox)) return found("a dashed arc between two copies");
   }
   for (const p of consanguinityLabelPlacements(scene)) {
     const lw = Math.max(...p.lines.map(consanguinityLabelWidth));

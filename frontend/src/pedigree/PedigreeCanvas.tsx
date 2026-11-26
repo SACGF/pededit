@@ -107,15 +107,15 @@ function MinimapEdges() {
       const apart = data.apart
         ? [{ ...lp.position, sex: sexOf(lp) }, { ...rp.position, sex: sexOf(rp) }]
         : undefined;
-      paths.push(segmentsPathD(sibshipSegments(
-        (lp.position.x + rp.position.x) / 2,
-        (lp.position.y + rp.position.y) / 2,
-        kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).glyph?.lifeStatus, NODE_SIZE) })),
-        data.barOffset,
+      paths.push(segmentsPathD(sibshipSegments({
+        coupleX: (lp.position.x + rp.position.x) / 2,
+        coupleY: (lp.position.y + rp.position.y) / 2,
+        children: kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).glyph?.lifeStatus, NODE_SIZE) })),
+        barOffset: data.barOffset,
         apart,
-        data.converge,
-        data.maxDrop,
-      )));
+        converge: data.converge,
+        maxDrop: data.maxDrop,
+      })));
     } else if (edge.type === "assistedEdge") {
       const data = edge.data as AssistedEdgeData | undefined;
       if (!data) continue;

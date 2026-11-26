@@ -1,6 +1,6 @@
 import { buildPartnerSetFromPedigree, descentX, resolveCouple } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
-import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
+import type { Pedigree, LayoutResult, Individual, Partnership, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
 import { couplePortHeights, highestHop, hopGeometry, hopTurn } from "./couplePath";
 import { chooseArcRoute, duplicateArcPoints, highestDuplicateArc } from "./duplicateArc";
@@ -693,7 +693,7 @@ function buildDuplicateEdges(
     for (let i = 0; i + 1 < sorted.length; i++) {
       const a = sorted[i]!, b = sorted[i + 1]!;
       const row = Math.round(Math.max(a.position.y, b.position.y));
-      const route = chooseArcRoute(a.position, b.position, bulge, half, spacing.slotWidth, others, lines, routedOnRow.get(row));
+      const route = chooseArcRoute({ a: a.position, b: b.position, bulge, half }, { slotWidth: spacing.slotWidth, others, lines, taken: routedOnRow.get(row) });
       if (route?.legDx !== undefined) routedOnRow.set(row, [...(routedOnRow.get(row) ?? []), route.bulge]);
       const data: DuplicateArcData = { bulge, ...route };
       edges.push({ id: `duplicate-${pid}-${i}`, source: a.id, target: b.id, data });
@@ -718,7 +718,7 @@ function duplicateArcBlocks(edges: SceneLine<DuplicateArcData>[], slotPos: Map<s
   return edges.flatMap(e => {
     const a = slotPos.get(e.source), b = slotPos.get(e.target);
     if (!a || !b) return [];
-    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, NODE_SIZE / 2, 12, e.data.legDx);
+    const pts = duplicateArcPoints({ a, b, half: NODE_SIZE / 2, ...e.data });
     return pts.slice(1).map(([x, y], i) => {
       const [px, py] = pts[i]!;
       return { x: (x + px) / 2, halfWidth: Math.abs(x - px) / 2 + 1, top: Math.min(y, py) - 2, bottom: Math.max(y, py) + 2, arc: true };
@@ -789,24 +789,28 @@ function buildCoupleEdges(
       // passing through to a further partner: connect the real partners and
       // hop over whatever sits between them.
       const rc = resolveCouple(result, partners, level, slot);
+      const left = idAt(level, rc.leftSlot), right = idAt(level, rc.rightSlot);
+      const partnership = partnershipOf.get(pairKey(left, right));
       // Gamete donation: the genetic parents are not a couple, so no line.
-      if (partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.donorConception) continue;
-      const double = related(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot));
+      if (partnership?.donorConception) continue;
+      const double = related(left, right);
+      const source = `${level}-${rc.leftSlot}`, target = `${level}-${rc.rightSlot}`;
+      const hop = hopAt(result, partners, level, slot);
 
       edges.push({
         id:           `couple-${level}-${slot}`,
-        source:       `${level}-${rc.leftSlot}`,
-        target:       `${level}-${rc.rightSlot}`,
+        source,
+        target,
         // Line style from the real partners, not the slots the marker sits
         // between (see consanguinityTest).
         double,
         data:         {
-          ...hopAt(result, partners, level, slot),
+          ...hop,
           ...(rc.hop ? { hopEnds: hopEndsAt(level, slot, rc) } : {}),
-          partnershipId: partnershipOf.get(pairKey(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)))?.id,
-          ...childlessData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
-          ...endedData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot)),
-          ...(double ? labelData(idAt(level, rc.leftSlot), idAt(level, rc.rightSlot), `${level}-${rc.leftSlot}`, `${level}-${rc.rightSlot}`, hopAt(result, partners, level, slot).hopHeight ?? 0) : {}),
+          partnershipId: partnership?.id,
+          ...(partnership ? childlessData(partnership) : {}),
+          ...(partnership ? endedData(partnership) : {}),
+          ...(double && partnership ? labelData(partnership, left, right, source, target, hop.hopHeight) : {}),
         },
       });
       spans.push(rc.rightSlot - rc.leftSlot);
@@ -850,16 +854,15 @@ function buildCoupleEdges(
     };
   }
 
-  function childlessData(a: string, b: string): Pick<CoupleLineData, "childless" | "childlessReason"> {
-    const partnership = partnershipOf.get(pairKey(a, b));
-    const childless = partnership && activeChildless(partnership, pedigree);
+  function childlessData(partnership: Partnership): Pick<CoupleLineData, "childless" | "childlessReason"> {
+    const childless = activeChildless(partnership, pedigree);
     if (!childless) return {};
-    return { childless, childlessReason: partnership!.childlessReason || undefined };
+    return { childless, childlessReason: partnership.childlessReason || undefined };
   }
 
-  function labelData(a: string, b: string, left: string, right: string, hop: number): Pick<CoupleLineData, "consanguinityLabel" | "consanguinityLabelOffset"> {
-    const partnership = partnershipOf.get(pairKey(a, b));
-    const text = partnership && consanguinityLabelText(pedigree, partnership);
+  /** The label over a double line: `a` and `b` are the partners drawn at slots `left` and `right`. */
+  function labelData(partnership: Partnership, a: string, b: string, left: string, right: string, hop: number): Pick<CoupleLineData, "consanguinityLabel" | "consanguinityLabelOffset"> {
+    const text = consanguinityLabelText(pedigree, partnership);
     const l = slotPos.get(left), r = slotPos.get(right);
     if (!text || !l || !r) return {};
     const top = (id: string) => ({
@@ -879,9 +882,8 @@ function buildCoupleEdges(
     return { consanguinityLabel: lines, ...(offset.dx || offset.dy || offset.backed ? { consanguinityLabelOffset: offset } : {}) };
   }
 
-  function endedData(a: string, b: string): Pick<CoupleLineData, "ended" | "middleTaken"> {
-    const partnership = partnershipOf.get(pairKey(a, b));
-    if (!partnership?.ended) return {};
+  function endedData(partnership: Partnership): Pick<CoupleLineData, "ended" | "middleTaken"> {
+    if (!partnership.ended) return {};
     return { ended: true, middleTaken: middleTaken(partnership, pedigree) };
   }
 }

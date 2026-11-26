@@ -123,14 +123,13 @@ export function sibshipLineGeometry(data: SibshipData, nodeAt: (id: string) => S
   }));
   // The bar's offset comes from the layout, so it is as of the last
   // layout while a node is being dragged.
-  const barOffset = data.barOffset ?? 0;
   // Parents who are not a couple (gamete donation): a line from each.
   const sexOf = (n: SibshipEnd) => n.glyph?.shape;
   const apart = data.apart
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;
-  return {
-    ...sibshipPaths(coupleX, coupleY, kids, barOffset, apart, data.converge, data.maxDrop),
-    marks: twinForkMarks(coupleY, kids, barOffset, data.maxDrop),
-  };
+  // The bar's offset comes from the layout, so it is as of the last
+  // layout while a node is being dragged.
+  const input = { coupleX, coupleY, children: kids, barOffset: data.barOffset, apart, converge: data.converge, maxDrop: data.maxDrop };
+  return { ...sibshipPaths(input), marks: twinForkMarks(input) };
 }

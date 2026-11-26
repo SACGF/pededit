@@ -7,6 +7,19 @@
 import type { TextBlock } from "./geometryTypes";
 import { pathPoints } from "./couplePath";
 
+/**
+ * One dashed arc: the centres of the two copies it joins, half the symbol
+ * size, and how it runs (`DuplicateArcData`: `bulge`, and `legDx` for a
+ * routed arc).
+ */
+export interface DuplicateArcShape {
+  a: { x: number; y: number };
+  b: { x: number; y: number };
+  half: number;
+  bulge: number;
+  legDx?: number;
+}
+
 /** Corner radius (px) of a dashed arc routed between two rows. */
 const ARC_CORNER = 10;
 /** How far (px) before the lower copy a routed arc starts to turn down into its top. */
@@ -29,10 +42,8 @@ const ARC_LANDING = 36;
  * where an arc on that row runs, and down into the lower copy's top.
  * `chooseArcRoute` decides when.
  */
-export function duplicateArcD(
-  x1: number, y1: number, x2: number, y2: number,
-  bulge: number, half: number, legDx?: number,
-): string {
+export function duplicateArcD(arc: DuplicateArcShape): string {
+  const { a: { x: x1, y: y1 }, b: { x: x2, y: y2 }, bulge, half, legDx } = arc;
   // Within a symbol's height counts as one row (a pin nudged off its row).
   if (Math.abs(y1 - y2) < 2 * half) {
     const ay = y1 - half, by = y2 - half;
@@ -63,11 +74,8 @@ export function duplicateArcD(
 }
 
 /** Points along `duplicateArcD`'s line, for keeping text off it. */
-export function duplicateArcPoints(
-  x1: number, y1: number, x2: number, y2: number,
-  bulge: number, half: number, steps = 12, legDx?: number,
-): [number, number][] {
-  return pathPoints(duplicateArcD(x1, y1, x2, y2, bulge, half, legDx), steps);
+export function duplicateArcPoints(arc: DuplicateArcShape, steps = 12): [number, number][] {
+  return pathPoints(duplicateArcD(arc), steps);
 }
 
 /**
@@ -84,7 +92,7 @@ export function highestDuplicateArc(scene: {
   for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
     if (!a || !b) continue;
-    for (const [, y] of duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, half, 12, e.data.legDx)) top = Math.min(top, y);
+    for (const [, y] of duplicateArcPoints({ a, b, half, ...e.data })) top = Math.min(top, y);
   }
   return top;
 }
@@ -172,12 +180,11 @@ const FAR_SIDE_COST = 8;
  * ending on this row run at, so that two never run along each other.
  */
 export function chooseArcRoute(
-  a: { x: number; y: number }, b: { x: number; y: number },
-  bulge: number, half: number, slotWidth: number,
-  others: ArcObstacle[], lines: ArcLine[], taken: number[] = [],
+  { a, b, bulge, half }: Omit<DuplicateArcShape, "legDx">,
+  { slotWidth, others, lines, taken = [] }: { slotWidth: number; others: ArcObstacle[]; lines: ArcLine[]; taken?: number[] },
 ): { legDx?: number; bulge: number } | undefined {
   const cost = (rise: number, legDx?: number) => {
-    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, rise, half, 24, legDx);
+    const pts = duplicateArcPoints({ a, b, half, bulge: rise, legDx }, 24);
     const hit = arcCollisions(pts, others, half);
     return { hits: hit.symbols.length + hit.labels.length, cost: 1000 * hit.symbols.length + 100 * hit.labels.length + lengthAlongLines(pts, lines) };
   };

@@ -117,7 +117,7 @@ describe("sibshipBarOffsets (#80)", () => {
   });
 
   it("sibshipSegments lowers the bar and both ends of the drops by the offset", () => {
-    const [coupleDrop, barSeg, childDrop] = sibshipSegments(40, 0, [{ x: 80, y: 120 }], 12);
+    const [coupleDrop, barSeg, childDrop] = sibshipSegments({ coupleX: 40, coupleY: 0, children: [{ x: 80, y: 120 }], barOffset: 12 });
     expect(coupleDrop).toEqual([40, 0, 40, 72]);
     expect(barSeg).toEqual([40, 72, 80, 72]);
     expect(childDrop).toEqual([80, 72, 80, 100]);

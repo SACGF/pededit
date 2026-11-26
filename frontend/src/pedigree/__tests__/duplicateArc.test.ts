@@ -25,10 +25,10 @@ describe("pathPoints", () => {
   });
 
   it("gives the usual curve's ends and the routed arc's corners", () => {
-    const usual = duplicateArcPoints(0, 0, 240, 120, BULGE, HALF);
+    const usual = duplicateArcPoints({ a: { x: 0, y: 0 }, b: { x: 240, y: 120 }, bulge: BULGE, half: HALF });
     expect(usual[0]).toEqual([HALF, 0]);
     expect(usual.at(-1)).toEqual([240, 120 - HALF]);
-    const routed = duplicateArcPoints(0, 0, 240, 120, BULGE, HALF, 12, SLOT / 2);
+    const routed = duplicateArcPoints({ a: { x: 0, y: 0 }, b: { x: 240, y: 120 }, bulge: BULGE, half: HALF, legDx: SLOT / 2 });
     expect(routed[0]).toEqual([HALF, 0]);
     expect(routed.at(-1)).toEqual([240, 120 - HALF]);
     // Down the gap beside the upper copy, then along above the lower row.
@@ -40,15 +40,15 @@ describe("pathPoints", () => {
 
 describe("duplicateArcD with a leg", () => {
   it("ignores the leg for copies on one row", () => {
-    expect(duplicateArcD(0, 0, 240, 0, BULGE, HALF, 40)).toBe(duplicateArcD(0, 0, 240, 0, BULGE, HALF));
+    expect(duplicateArcD({ a: { x: 0, y: 0 }, b: { x: 240, y: 0 }, bulge: BULGE, half: HALF, legDx: 40 })).toBe(duplicateArcD({ a: { x: 0, y: 0 }, b: { x: 240, y: 0 }, bulge: BULGE, half: HALF }));
   });
 
   it("goes straight down when the lower copy is under the leg", () => {
-    expect(duplicateArcD(0, 0, 40, 120, BULGE, HALF, 40)).toBe("M 20 0 L 30 0 Q 40 0 40 10 L 40 100");
+    expect(duplicateArcD({ a: { x: 0, y: 0 }, b: { x: 40, y: 120 }, bulge: BULGE, half: HALF, legDx: 40 })).toBe("M 20 0 L 30 0 Q 40 0 40 10 L 40 100");
   });
 
   it("leaves from the side the leg is on, whichever copy is given first", () => {
-    expect(duplicateArcD(240, 120, 0, 0, BULGE, HALF, -40)).toMatch(/^M -20 0 L -30 0 Q -40 0 -40 10 /);
+    expect(duplicateArcD({ a: { x: 240, y: 120 }, b: { x: 0, y: 0 }, bulge: BULGE, half: HALF, legDx: -40 })).toMatch(/^M -20 0 L -30 0 Q -40 0 -40 10 /);
   });
 });
 
@@ -57,30 +57,30 @@ describe("chooseArcRoute", () => {
   const person = (id: string, x: number, y: number) => ({ id, x, y, text: null });
 
   it("keeps the usual curve when it passes through nobody", () => {
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("far", 400, 0)], [])).toBeUndefined();
-    expect(chooseArcRoute(a, { x: 240, y: 0 }, BULGE, HALF, SLOT, [person("between", 80, 0)], [])).toBeUndefined();
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("far", 400, 0)], lines: [] })).toBeUndefined();
+    expect(chooseArcRoute({ a, b: { x: 240, y: 0 }, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 80, 0)], lines: [] })).toBeUndefined();
   });
 
   it("flattens an arc on one row to pass under text hanging from the row above", () => {
     const text = { x: 120, halfWidth: 30, top: -100, bottom: -HALF - 12 };
-    expect(chooseArcRoute(a, { x: 240, y: 0 }, 15.4, HALF, SLOT, [{ id: "above", x: 120, y: -120, text }], [])).toEqual({ bulge: 15.4 - 7 });
+    expect(chooseArcRoute({ a, b: { x: 240, y: 0 }, bulge: 15.4, half: HALF }, { slotWidth: SLOT, others: [{ id: "above", x: 120, y: -120, text }], lines: [] })).toEqual({ bulge: 15.4 - 7 });
   });
 
   it("goes down the gap facing the lower copy when someone is between the copies", () => {
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("between", 80, 0)], [])).toEqual({ legDx: 40, bulge: BULGE });
-    expect(chooseArcRoute(b, { x: 480, y: 0 }, BULGE, HALF, SLOT, [person("between", 400, 0)], [])).toEqual({ legDx: -40, bulge: BULGE });
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 80, 0)], lines: [] })).toEqual({ legDx: 40, bulge: BULGE });
+    expect(chooseArcRoute({ a: b, b: { x: 480, y: 0 }, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 400, 0)], lines: [] })).toEqual({ legDx: -40, bulge: BULGE });
   });
 
   it("goes round the far side when a couple line leaves the facing side", () => {
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("partner", 80, 0)], [[0, 0, 80, 0]])?.legDx).toBe(-40);
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("partner", 80, 0)], lines: [[0, 0, 80, 0]] })?.legDx).toBe(-40);
   });
 
   it("runs clear of a sibship bar at the usual height, and of another routed arc", () => {
     const bar: [number, number, number, number] = [0, 120 - HALF - BULGE, 400, 120 - HALF - BULGE];
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("between", 80, 0)], [bar])).toEqual({ legDx: 40, bulge: BULGE - 7 });
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 80, 0)], lines: [bar] })).toEqual({ legDx: 40, bulge: BULGE - 7 });
     // Crossing a line costs nothing: a drop from that bar does not move the route.
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("between", 80, 0)], [[160, 60, 160, 100]])).toEqual({ legDx: 40, bulge: BULGE });
-    expect(chooseArcRoute(a, b, BULGE, HALF, SLOT, [person("between", 80, 0)], [], [BULGE])).toEqual({ legDx: 40, bulge: BULGE - 7 });
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 80, 0)], lines: [[160, 60, 160, 100]] })).toEqual({ legDx: 40, bulge: BULGE });
+    expect(chooseArcRoute({ a, b, bulge: BULGE, half: HALF }, { slotWidth: SLOT, others: [person("between", 80, 0)], lines: [], taken: [BULGE] })).toEqual({ legDx: 40, bulge: BULGE - 7 });
   });
 
   it("counts a symbol from inside its box and text from its box", () => {

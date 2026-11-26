@@ -121,7 +121,7 @@ describe("buildScene with snap on", () => {
 
 describe("sibship drops", () => {
   it("reach each child, including one pinned below its siblings' row", () => {
-    const segs = sibshipSegments(40, 0, [{ x: 0, y: 120 }, { x: 80, y: 160 }]);
+    const segs = sibshipSegments({ coupleX: 40, coupleY: 0, children: [{ x: 0, y: 120 }, { x: 80, y: 160 }] });
     const drops = segs.slice(2);
     expect(drops).toEqual([
       [0, 60, 0, 120 - NODE_SIZE / 2],
@@ -130,7 +130,7 @@ describe("sibship drops", () => {
   });
 
   it("stop at a loss triangle's apex, below the top of the symbol box (#13)", () => {
-    const segs = sibshipSegments(40, 0, [{ x: 0, y: 120 }, { x: 80, y: 120, topInset: 8 }]);
+    const segs = sibshipSegments({ coupleX: 40, coupleY: 0, children: [{ x: 0, y: 120 }, { x: 80, y: 120, topInset: 8 }] });
     expect(segs.slice(2)).toEqual([
       [0, 60, 0, 120 - NODE_SIZE / 2],
       [80, 60, 80, 120 - NODE_SIZE / 2 + 8],
@@ -138,7 +138,7 @@ describe("sibship drops", () => {
   });
 
   it("put the bar above the highest child even when the first child is the one moved", () => {
-    const segs = sibshipSegments(40, 0, [{ x: 0, y: 200 }, { x: 80, y: 120 }]);
+    const segs = sibshipSegments({ coupleX: 40, coupleY: 0, children: [{ x: 0, y: 200 }, { x: 80, y: 120 }] });
     expect(segs[1]![1]).toBe(60);
   });
 

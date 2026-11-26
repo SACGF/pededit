@@ -42,7 +42,7 @@ describe("twin fork geometry (#11)", () => {
   ];
 
   it("twins' drops start from one shared point on the bar", () => {
-    const segs = sibshipSegments(80, 0, kids);
+    const segs = sibshipSegments({ coupleX: 80, coupleY: 0, children: kids });
     const half = NODE_SIZE / 2;
     expect(segs[2]).toEqual([40, 60, 0, 120 - half]);
     expect(segs[3]).toEqual([40, 60, 80, 120 - half]);
@@ -50,17 +50,17 @@ describe("twin fork geometry (#11)", () => {
   });
 
   it("monozygotic: a bar between the midpoints of the two drops; unknown: a question mark", () => {
-    const [mark] = twinForkMarks(0, kids);
+    const [mark] = twinForkMarks({ coupleY: 0, children: kids });
     expect(mark).toEqual({ kind: "bar", segment: [20, 80, 60, 80] });
-    const q = twinForkMarks(0, kids.map(k => (k.twinSet ? { ...k, zygosity: "unknown" as const } : k)));
+    const q = twinForkMarks({ coupleY: 0, children: kids.map(k => (k.twinSet ? { ...k, zygosity: "unknown" as const } : k)) });
     expect(q).toEqual([{ kind: "question", x: 40, y: 80 }]);
-    expect(twinForkMarks(0, kids.map(k => (k.twinSet ? { ...k, zygosity: "dizygotic" as const } : k)))).toEqual([]);
+    expect(twinForkMarks({ coupleY: 0, children: kids.map(k => (k.twinSet ? { ...k, zygosity: "dizygotic" as const } : k)) })).toEqual([]);
   });
 
   it("the bar ends at the fork of twins at the end of the sibship, not over them (#104)", () => {
-    expect(sibshipSegments(80, 0, kids)[1]).toEqual([40, 60, 160, 60]);
+    expect(sibshipSegments({ coupleX: 80, coupleY: 0, children: kids })[1]).toEqual([40, 60, 160, 60]);
     // Twins as the only children: no bar beyond the shared point.
-    expect(sibshipSegments(40, 0, kids.slice(0, 2))[1]).toEqual([40, 60, 40, 60]);
+    expect(sibshipSegments({ coupleX: 40, coupleY: 0, children: kids.slice(0, 2) })[1]).toEqual([40, 60, 40, 60]);
     const twinsOnly: Pedigree = {
       individuals: [
         { id: "f", sex: "male", affected: false, sibOrder: 0 },
@@ -76,7 +76,7 @@ describe("twin fork geometry (#11)", () => {
   });
 
   it("a lone member is not a fork", () => {
-    const segs = sibshipSegments(80, 0, [kids[0]!, kids[2]!]);
+    const segs = sibshipSegments({ coupleX: 80, coupleY: 0, children: [kids[0]!, kids[2]!] });
     expect(segs[2]).toEqual([0, 60, 0, 120 - NODE_SIZE / 2]);
   });
 });

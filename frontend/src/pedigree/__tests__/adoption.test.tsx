@@ -50,11 +50,11 @@ describe("adoption brackets (#12)", () => {
 
   it("sibshipPaths splits off the drops of adopted-in children, in order", () => {
     const kids = [{ x: 0, y: 120 }, { x: 80, y: 120, dashed: true }, { x: 160, y: 120 }];
-    const all = sibshipSegments(80, 0, kids);
-    const { solid, dashed } = sibshipPaths(80, 0, kids);
+    const all = sibshipSegments({ coupleX: 80, coupleY: 0, children: kids });
+    const { solid, dashed } = sibshipPaths({ coupleX: 80, coupleY: 0, children: kids });
     expect(dashed).toEqual([all[3]]);
     expect(solid).toEqual([all[0], all[1], all[2], all[4]]);
-    expect(sibshipPaths(80, 0, kids.map(k => ({ ...k, dashed: false }))).dashed).toEqual([]);
+    expect(sibshipPaths({ coupleX: 80, coupleY: 0, children: kids.map(k => ({ ...k, dashed: false })) }).dashed).toEqual([]);
   });
 
   it("the canvas layout is lint-clean and the SVG export dashes only the adopted-in drop", () => {

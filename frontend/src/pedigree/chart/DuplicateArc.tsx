@@ -7,7 +7,7 @@ import type { LinePosition } from "../lineGeometry";
 export function DuplicateArc({ a, b, data }: { a: LinePosition; b: LinePosition; data: DuplicateArcData }) {
   return (
     <path
-      d={duplicateArcD(a.x, a.y, b.x, b.y, data.bulge, NODE_SIZE / 2, data.legDx)}
+      d={duplicateArcD({ a, b, half: NODE_SIZE / 2, ...data })}
       stroke="black" strokeWidth={1.5} strokeDasharray="6 4" fill="none"
     />
   );
