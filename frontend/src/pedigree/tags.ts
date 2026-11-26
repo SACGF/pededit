@@ -10,7 +10,7 @@ import type { TagFill } from "@pedigree-editor/layout-engine";
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
  *
- * Everything here is framework-free. The React renderer in nodes/symbols.tsx
+ * Everything here is framework-free. The React renderer in chart/symbols.tsx
  * and the string-based exporters both call into the same geometry so the
  * canvas and the exported figure agree.
  */

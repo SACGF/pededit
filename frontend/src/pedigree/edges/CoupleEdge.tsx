@@ -2,33 +2,34 @@ import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../sceneToFlow";
 import { coupleLineGeometry } from "../lineGeometry";
-import { segmentsPathD } from "../sibshipPath";
-import { ChildlessMark } from "./ChildlessMark";
+import { CoupleLine } from "../chart/CoupleLine";
 
 export type CoupleEdgeType = Edge<CoupleEdgeData, "coupleEdge">;
+export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
 
-export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) {
+/**
+ * A couple line on the canvas: `CoupleLine` between the partners' live
+ * positions, so it follows a drag, with a wide invisible stroke so the
+ * 2px line can be right-clicked (#95).
+ */
+function CoupleLineEdge({ source, target, data, double }: { source: string; target: string; data?: CoupleEdgeData; double: boolean }) {
   const nodes = useNodes();
-  const sourceNode = nodes.find(n => n.id === source);
-  const targetNode = nodes.find(n => n.id === target);
-  if (!sourceNode || !targetNode) return null;
-
-  // The geometry is shared with the SVG export (lineGeometry.ts).
-  const line = coupleLineGeometry(data, false, sourceNode.position, targetNode.position);
+  const left = nodes.find(n => n.id === source)?.position;
+  const right = nodes.find(n => n.id === target)?.position;
+  if (!left || !right || !data) return null;
   return (
-    <g data-partnership-id={data?.partnershipId}>
-      {/* Wide invisible stroke so the line can be right-clicked. */}
-      <path d={line.course} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
-      <path
-        d={line.paths[0]}
-        stroke="black"
-        strokeWidth={2}
-        fill="none"
-      />
-      {line.childless && (
-        <ChildlessMark cx={line.childless.cx} topY={line.childless.topY} status={line.childless.status} reason={line.childless.reason} />
-      )}
-      {line.ended && <path data-ended d={segmentsPathD(line.ended)} stroke="black" strokeWidth={2} fill="none" />}
+    <g data-partnership-id={data.partnershipId}>
+      <path d={coupleLineGeometry(data, double, left, right).course} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
+      <CoupleLine data={data} double={double} left={left} right={right} />
     </g>
   );
+}
+
+export function CoupleEdge({ source, target, data }: EdgeProps<CoupleEdgeType>) {
+  return <CoupleLineEdge source={source} target={target} data={data} double={false} />;
+}
+
+/** A double line: the couple are related. */
+export function ConsanguineousEdge({ source, target, data }: EdgeProps<ConsanguineousEdgeType>) {
+  return <CoupleLineEdge source={source} target={target} data={data} double />;
 }

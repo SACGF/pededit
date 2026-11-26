@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { lossTrianglePoints } from "../lifeStatus";
 import type { Individual } from "@pedigree-editor/layout-engine";
 

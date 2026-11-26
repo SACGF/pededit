@@ -17,7 +17,7 @@ import type { Pedigree, Tag, TagFill, TagFillMode } from "@pedigree-editor/layou
  *
  * `renderRegionFillSvg` / `fillLayers` are the reusable entry points: fill a
  * region (any SVG path, normally a sector from `sectorPath`) with pattern P
- * in colour C. The canvas (`RegionFill` in nodes/symbols.tsx), the legend and
+ * in colour C. The canvas (`RegionFill` in chart/symbols.tsx), the legend and
  * both exporters call them; per-condition carrier fills should too.
  */
 

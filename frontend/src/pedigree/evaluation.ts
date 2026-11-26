@@ -1,6 +1,6 @@
 /**
  * Evaluation results and the presymptomatic carrier symbol (NSGC 2008
- * Fig. 4 as revised in 2022). Framework-free: the canvas (`nodes/symbols.tsx`), both
+ * Fig. 4 as revised in 2022). Framework-free: the canvas (`chart/symbols.tsx`), both
  * SVG exporters, the legends, the CSV and the label stack (`labels.ts`) share
  * it.
  *

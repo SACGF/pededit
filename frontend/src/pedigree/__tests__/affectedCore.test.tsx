@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Individual, Tag } from "@pedigree-editor/layout-engine";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import type { Sector } from "../tags";
 
 const SIZE = 40;

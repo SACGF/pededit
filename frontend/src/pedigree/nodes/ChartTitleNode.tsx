@@ -1,5 +1,6 @@
 import type { Node, NodeProps } from "@xyflow/react";
 import { NODE_SIZE } from "../constants";
+import { ChartTitle } from "../chart/ChartTitle";
 import { TITLE_FONT_SIZE, TITLE_LINE_HEIGHT, chartTitlePlace } from "../labels";
 
 /**
@@ -9,6 +10,8 @@ import { TITLE_FONT_SIZE, TITLE_LINE_HEIGHT, chartTitlePlace } from "../labels";
  */
 export interface ChartTitleData extends Record<string, unknown> {
   title: string;
+  /** Width (px) of the node's box, which the title is centred in. */
+  width: number;
 }
 
 export type ChartTitleNodeType = Node<ChartTitleData, "chartTitle">;
@@ -34,7 +37,7 @@ export function chartTitleNode(
     id: CHART_TITLE_NODE_ID,
     type: "chartTitle",
     position: { x: place.x, y: place.y },
-    data: { title },
+    data: { title, width: place.width },
     width: place.width,
     height: place.height,
     selectable: false,
@@ -46,23 +49,12 @@ export function chartTitleNode(
 }
 
 export function ChartTitleNode({ data }: NodeProps<ChartTitleNodeType>) {
+  // The box's centre is a third of the font size above the baseline (`chartTitlePlace`).
   return (
-    <div
-      data-chart-title
-      style={{
-        width: "100%",
-        height: TITLE_LINE_HEIGHT,
-        lineHeight: `${TITLE_LINE_HEIGHT}px`,
-        textAlign: "center",
-        whiteSpace: "nowrap",
-        fontSize: TITLE_FONT_SIZE,
-        fontWeight: 700,
-        color: "#000",
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      {data.title}
+    <div data-chart-title style={{ width: "100%", height: TITLE_LINE_HEIGHT }}>
+      <svg width={data.width} height={TITLE_LINE_HEIGHT} overflow="visible" style={{ display: "block" }}>
+        <ChartTitle title={data.title} x={data.width / 2} y={TITLE_LINE_HEIGHT / 2 + TITLE_FONT_SIZE / 3} />
+      </svg>
     </div>
   );
 }

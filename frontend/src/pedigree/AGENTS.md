@@ -20,6 +20,20 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   code imports it. The export's size comes from `scene.bounds`; the canvas
   fits the view to the same box (with the title), so labels under the
   bottom row and arcs over the top one are in view.
+- `chart/` (#147): the drawing as React components that take scene data
+  and positions as props and return SVG: `symbols.tsx` (the symbol and
+  its marks, the text under it), `PersonSymbol` (everything at one person,
+  from the glyph), `CoupleLine`, `SibshipLines`, `AssistedLine`,
+  `DuplicateArc`, `ChartTitle`, and `Chart`, a whole scene. Nothing under
+  `chart/` imports React Flow or a store (`sceneImports.test.ts`), uses a
+  class name or page CSS (presentation attributes only, as the export
+  needs), or makes up its own ids: clip path and marker ids are props.
+  The canvas's nodes and edges (`nodes/`, `edges/`) are wrappers that read
+  live positions and the store and add what only the editor has: hover,
+  selection, picking, the hover pill, the pin dot and problem marker, the
+  wide invisible stroke that makes a couple line right-clickable (#95),
+  and the `data-individual-id` / `data-partnership-id` the page checks
+  select by. Draw something new in `chart/`, never in a wrapper.
 - Someone kinship2 places in several slots (cousin marriages, partners on
   both sides of the tree) is drawn once per slot that carries a line, each
   copy numbered, joined by a dashed `duplicateEdge` arc (R's `arcconnect`).
@@ -86,10 +100,10 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   canvas node still reads the pedigree from the store, for the problem
   marker only. `nameLines` is what the canvas draws (one line when names are
   truncated), `figureNameLines` what a file writes (always wrapped).
-- `nodes/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
+- `chart/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, condition and trait sections and annotation row.
-- `nodes/PedigreeSymbolNode.tsx` — wraps the symbol with hover pill, more menu,
-  name/DOB labels and pin indicator.
+- `nodes/PedigreeSymbolNode.tsx` — wraps `PersonSymbol` with the hover
+  pill, more menu, selection outline, pin indicator and problem marker.
 - `nodes/HoverPill.tsx` — add parents / child / sibling / partner buttons.
   By touch (#169) there is no hover: a tap on the symbol opens the pill and
   it stays while the person is selected, closing when the selection clears.
@@ -191,7 +205,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   which `couplePath.ts` calls with this directory's constants, so the
   engine's `pedigreeToGeometry` describes the same route (#206).
 - `edges/SibshipEdge.tsx` — looks up live node positions with `useNodes` so
-  the sibship bar follows dragged nodes. The segments come from
+  the sibship bar follows dragged nodes, and draws `chart/SibshipLines`. The segments come from
   `sibshipPath.ts`: the bar sits
   halfway to the highest child and every child gets its own drop, so a child
   pinned off its siblings' row is still reached. Bars of different couples
@@ -210,9 +224,10 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   straight line and no bar (`descentX`, layout engine).
   `buildScene` puts the offset on the edge data (`barOffset`), so during a
   drag the heights are as of the last layout; `svgExporter` reads the same
-  edge data. The U-shape export has its own geometry and does not use it. `CoupleEdge` and
-  `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
-  the dashed arc between copies; its path is `duplicateArcD` in
+  edge data. The U-shape export has its own geometry and does not use it.
+  `edges/CoupleEdge.tsx` (`CoupleEdge`, and `ConsanguineousEdge` for the
+  double line) draws `chart/CoupleLine` between partners. `DuplicateEdge`
+  is the dashed arc between copies; its path is `duplicateArcD` in
   `couplePath.ts`, shared with the SVG exporter.
 - `duplicateArc.ts` — keeps a dashed arc off other people (#192). The usual
   line is kept whenever it passes through nobody's symbol and nobody's text,
@@ -603,7 +618,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   line when rows are compact. A new mark above the symbol must be added
   there and to the lint. The text sits above the symbol tops and any
   deceased slash, or above the line where it hops higher.
-  `ConsanguineousEdge` and `svgExporter` (group `consanguinity-labels`)
+  `chart/ConsanguinityLabel` and `svgExporter` (group `consanguinity-labels`)
   draw it from `consanguinityLabelBaselines`; both raise the chart title
   over a top-row label and over the dashed arc of someone drawn twice in
   the top row (#172), through one helper (`highestAboveSymbols`, passed as
@@ -863,9 +878,9 @@ font and line height), since its spacing along the tracks is built round it.
   falls back to the pedigree's name (`useAppStore.activeTitle`), except the
   default "Untitled pedigree". On the canvas it is an extra React Flow node
   (`nodes/ChartTitleNode.tsx`, id `__chart-title`, not selectable, no
-  pointer events) added in `PedigreeCanvas` beside `rfNodes`, not by
-  `buildScene`, so lints never see it; being a node keeps
-  it in fit view. It sits `TITLE_GAP` above the highest symbol, as in the
+  pointer events, drawing `chart/ChartTitle` as SVG text) added in
+  `PedigreeCanvas` beside `rfNodes`, not by `buildScene`, so lints never
+  see it; the canvas's fit to view includes it. It sits `TITLE_GAP` above the highest symbol, as in the
   SVG export. The export dialog and `__pededit.checkExport()` pass the same
   string as `SvgExportOptions.title`.
 - Pedigree numbers (#8, "II-3"): `pedigreeNumbers(pedigree)` in

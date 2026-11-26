@@ -3,7 +3,7 @@
  * individual's symbol, for someone whose family history is unavailable
  * (adopted with no records, a donor, a partner who married in and knows
  * nothing of their family). Stored as `Individual.familyHistoryUnknown`.
- * Framework-free: the canvas (`FamilyHistoryMark` in `nodes/symbols.tsx`),
+ * Framework-free: the canvas (`FamilyHistoryMark` in `chart/symbols.tsx`),
  * both SVG exporters and the legends share this placement.
  */
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { adoptionBracketSegments, ADOPTION_BRACKET_GAP, ADOPTION_DASH } from "../adoption";
 import { sibshipPaths, sibshipSegments } from "../sibshipPath";
 import { buildScene } from "../scene";

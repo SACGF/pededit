@@ -1,7 +1,7 @@
 import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
 import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE } from "../pedigree/tags";
 import { CONDITIONS_AND_TAGS } from "../pedigree/conditions";
-import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
+import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/chart/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
 import { lifeStatusCaption } from "../pedigree/lifeStatus";
 import { type ArrowKind } from "../pedigree/proband";

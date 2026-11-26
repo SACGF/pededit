@@ -3,7 +3,7 @@
  * standard export draws it upright, the U-shape turned along its track.
  *
  * Everything here draws from the person's glyph (`pedigree/personGlyph.ts`)
- * and mirrors `SymbolShape` in `pedigree/nodes/symbols.tsx`, which
+ * and mirrors `SymbolShape` in `pedigree/chart/symbols.tsx`, which
  * draws the same on the canvas. Framework-free: strings only.
  */
 import type { Adoption, Individual, LifeStatus } from "@pedigree-editor/layout-engine";

@@ -7,7 +7,7 @@ import type { PersonGlyph } from "./personGlyph";
 
 /**
  * Where the text under a symbol goes: one geometry for the canvas
- * (`TextUnderSymbol` in `nodes/symbols.tsx`), the standard SVG export
+ * (`TextUnderSymbol` in `chart/symbols.tsx`), the standard SVG export
  * (`svgExporter.ts`), the lints and the placement of couple labels and
  * sibship bars. All of it is measured from the symbol's centre.
  */

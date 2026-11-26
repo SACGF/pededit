@@ -4,7 +4,7 @@
  * at the lower left with a "P" at its tail; a consultand (the person seeking
  * counselling, who may be unaffected) gets the same arrow without the "P".
  * Someone who is both is drawn as the proband. Framework-free, shared by the
- * canvas (`ProbandArrow` in `nodes/symbols.tsx`), both SVG exporters and the
+ * canvas (`ProbandArrow` in `chart/symbols.tsx`), both SVG exporters and the
  * legends, so they agree.
  */
 

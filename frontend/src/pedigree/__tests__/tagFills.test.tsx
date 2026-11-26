@@ -7,7 +7,7 @@ import {
 } from "../tagFills";
 import { symbolPaint, renderSectorListSvg, annotationRow, renderAnnotationItemsSvg, sectorPath } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { TagSwatchSvg } from "../../components/Legend";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";

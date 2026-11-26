@@ -109,7 +109,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   upright and slashes turn with the symbol. With `renderDeceasedSlashSvg`
   and `renderProbandArrowSvg` it is the only place a symbol is written as a
   string. A symbol change is made here and in `SymbolShape`
-  (`pedigree/nodes/symbols.tsx`) for the canvas. Order inside the symbol:
+  (`pedigree/chart/symbols.tsx`) for the canvas. Order inside the symbol:
   the role letter is under the presymptomatic line in both exports.
 - `uShapeExporter.ts` — the public entry (`layoutUShape`,
   `exportUShapeSvg`): horseshoe layout for large families (partners,

@@ -3,7 +3,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../sceneToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, CopyNumber, AnnotationRow, TextUnderSymbol } from "./symbols";
+import { PersonSymbol } from "../chart/PersonSymbol";
 import { HoverPill } from "./HoverPill";
 import { isSmallScreen } from "../../hooks/useSmallScreen";
 import { isLabelCut } from "../labels";
@@ -29,7 +29,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // component draws it and adds what only the editor shows (selection, the
   // pin dot, the problem marker, the dev id, the hover pill).
   const { individual, glyph, isPinned } = data;
-  const { nameLines, annotations, arrow } = glyph;
+  const { nameLines } = glyph;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
@@ -154,16 +154,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`}
         overflow="visible"
       >
-        <SymbolShape glyph={glyph} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
-        {glyph.deceased && <DeceasedSlash size={NODE_SIZE} />}
-        {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
-        {glyph.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
-        {glyph.documented && <DocumentedMark size={NODE_SIZE} adopted={!!glyph.adopted} />}
-        <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={textAt.annotationShift} />
-        {glyph.copy !== undefined && <CopyNumber size={NODE_SIZE} index={glyph.copy} />}
         {/* A cut name takes the mouse: hovering it shows the full name,
             clicking it selects. */}
-        <TextUnderSymbol glyph={glyph} nameLines={nameLines} size={NODE_SIZE} nameCut={nameCut} onNameHover={setIsNameHovered} />
+        <PersonSymbol glyph={glyph} clipId={`symbol-clip-${nodeId}`} nameLines={nameLines} nameCut={nameCut} onNameHover={setIsNameHovered} />
       </svg>
 
       {/* Dev-mode ID label, so a screenshot of the canvas names each node for bug

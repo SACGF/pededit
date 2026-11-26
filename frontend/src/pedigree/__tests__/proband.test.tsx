@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { arrowKind, arrowGeometry, ARROW_LEGEND_LABEL } from "../proband";
-import { ProbandArrow } from "../nodes/symbols";
+import { ProbandArrow } from "../chart/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";

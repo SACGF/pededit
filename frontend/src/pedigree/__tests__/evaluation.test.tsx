@@ -5,7 +5,7 @@ import {
   evaluationText, evaluationsCsv, documentedMarkAt, presymptomaticLine, drawsPresymptomatic,
 } from "../evaluation";
 import { detailLines, detailSections, evaluationLines, labelMaxWidth, textWidth } from "../labels";
-import { SymbolShape, standaloneGlyph, DocumentedMark } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph, DocumentedMark } from "../chart/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";

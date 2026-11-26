@@ -44,7 +44,7 @@ export function couplePortHeights(count: number, double = false): number[] {
 
 /**
  * Distance (px) from a symbol's centre to its outline `dy` px above or below
- * the centre, on the middle of the stroke (nodes/symbols.tsx: each outline
+ * the centre, on the middle of the stroke (chart/symbols.tsx: each outline
  * sits 1px inside the NODE_SIZE box). Where a line leaving the side of a
  * circle or a diamond off its centre has to start to touch it.
  */

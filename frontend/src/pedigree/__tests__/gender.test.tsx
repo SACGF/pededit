@@ -6,7 +6,7 @@ import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } fro
 import { detailLines } from "../labels";
 import { buildScene } from "../scene";
 import type { ScenePerson } from "../scene";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";

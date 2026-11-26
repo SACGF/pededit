@@ -2,7 +2,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../sceneToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, BranchCount, TextUnderSymbol } from "./symbols";
+import { PersonSymbol } from "../chart/PersonSymbol";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { branchTooltip } from "../collapse";
 
@@ -21,9 +21,6 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
   const setDescendantsHidden = usePedigreeStore(s => s.setDescendantsHidden);
   const picking = usePedigreeStore(s => s.picking);
   if (!branch) return null;
-  // The number drawn is the glyph's, the same one the exports write.
-  const n = data.glyph.groupCount ?? branch.children.length;
-
   return (
     <div
       data-collapsed-branch={branch.roots.join(" ")}
@@ -37,9 +34,7 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
       }}
     >
       <svg width={NODE_SIZE} height={NODE_SIZE} viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`} overflow="visible">
-        <SymbolShape glyph={data.glyph} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
-        <BranchCount size={NODE_SIZE} count={n} />
-        <TextUnderSymbol glyph={data.glyph} nameLines={data.glyph.nameLines} size={NODE_SIZE} />
+        <PersonSymbol glyph={data.glyph} clipId={`symbol-clip-${nodeId}`} />
       </svg>
 
       <Handle type="target" position={Position.Top} id="sibship-in" style={{ opacity: 0 }} />

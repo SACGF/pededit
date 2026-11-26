@@ -9,7 +9,7 @@ import { symbolPaint, renderSectorListSvg, keyTagRows, statusKeyRows, sectionLay
 import { renderExportKeySvg } from "../exportKey";
 import { carrierPaintFrom, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
-import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { Legend } from "../../components/Legend";
 import { ConditionsAndTags } from "../../components/ConditionsAndTags";
 import { exportSvg } from "../../io/svg/svgExporter";
