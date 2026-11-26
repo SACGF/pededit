@@ -41,7 +41,7 @@ export default {
     t.equal(p.individuals.length, 7, "seven people in three generations");
     t.equal((await t.drawn()).length, 7, "all seven are drawn");
     t.equal(await t.eval(() => window.__pededit.check()), [], "the drawing passes the render lint");
-    const built = JSON.stringify(p);
+    const built = p;
     const steps = await t.undoDepth();
     t.equal(steps, 6, "six edits, six undo steps");
 
@@ -49,9 +49,9 @@ export default {
     t.equal(await t.people(), 0, "undoing every step empties the pedigree");
     t.ok(await t.eval(() => document.querySelector('button[title="Undo"]').disabled), "Undo is disabled at the start");
     for (let i = 0; i < steps; i++) await t.press("Control+y");
-    t.equal(JSON.stringify(await t.pedigree()), built, "redoing every step gives the same pedigree back");
+    t.equal(await t.pedigree(), built, "redoing every step gives the same pedigree back");
 
     await t.reload();
-    t.equal(JSON.stringify(await t.pedigree()), built, "and it is what was saved");
+    t.equal(await t.pedigree(), built, "and it is what was saved");
   },
 };

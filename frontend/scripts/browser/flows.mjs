@@ -37,7 +37,16 @@ const show = v => {
   const s = typeof v === "string" ? JSON.stringify(v) : JSON.stringify(v);
   return s === undefined ? String(v) : s.length > 300 ? `${s.slice(0, 300)}...` : s;
 };
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+/**
+ * JSON with every object's keys in order, so two values holding the same
+ * data compare equal however their keys are ordered: a pedigree read back
+ * from PostgreSQL (jsonb) has its keys reordered, one from SQLite has not.
+ */
+const canonical = v => JSON.stringify(v, (_key, value) =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? Object.fromEntries(Object.keys(value).sort().map(k => [k, value[k]]))
+    : value);
+const same = (a, b) => canonical(a) === canonical(b);
 
 /** The object a flow drives the page with. */
 function makeT({ context, base, flags, outDir, name }) {
