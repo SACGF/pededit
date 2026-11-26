@@ -16,7 +16,7 @@ import { TextUnderSymbol, ProbandMarkerDef } from "../../../pedigree/chart/symbo
 import { ChartTitle } from "../../../pedigree/chart/ChartTitle";
 import { NODE_SIZE, HALF, PROBAND_TAIL, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
 import { walk } from "./tree";
-import { build, nodeAt, toLayout, glyphOf, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
+import { build, nodeAt, toLayout, glyphOf, outlineRotation, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
 import { trackPath, renderConnectors } from "./connectors";
 
 export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
@@ -40,7 +40,8 @@ function markup(children: ReactNode): string {
  * Each person as the standard figure and the canvas draw them
  * (`PersonMarks` and `TextUnderSymbol`, #139), turned along the track:
  * slashes and text turn with the symbol (that is the design), letters and
- * numbers are turned back upright. For anyone with a sibship hanging from the
+ * numbers are turned back upright, and a square's or diamond's outline turns only by
+ * the nearest multiple of 90 degrees (`outlineRotation`). For anyone with a sibship hanging from the
  * symbol itself (by partners who are not drawn), the line runs down through
  * the text, so it gets a white backing.
  */
@@ -67,7 +68,9 @@ export function renderSymbols(pedigree: Pedigree, b: Built, personIds = false): 
               glyph={backed ? { ...glyph, labelsBacked: true } : glyph} nameLines={glyph.figureNameLines} size={NODE_SIZE}
               fullName={glyph.name}
             />
-            <PersonMarks glyph={glyph} clipId={clipId} upright={Math.round(-pos.rotation * 10) / 10} />
+            <PersonMarks glyph={glyph} clipId={clipId} upright={r(-pos.rotation)}
+              outlineTurn={r(outlineRotation(glyph, pos.rotation) - pos.rotation)}
+            />
           </g>,
         ) +
         `</g>`,

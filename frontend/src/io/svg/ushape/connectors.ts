@@ -13,14 +13,30 @@ import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../../pedigree/twins
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../../pedigree/childless";
 import { HALF, STROKE, CONSANG_GAP, BAR_CLEARANCE, DUP_LINK_INSET, r, escapeXml } from "./constants";
 import { walk, type TNode } from "./tree";
-import { trackPoint, memberU, descentU, type Geom, type UShapeLayout, type Built } from "./layout";
+import { trackPoint, memberU, descentU, glyphOf, outlineRotation, type Geom, type UShapeLayout, type Built } from "./layout";
 
 /**
- * Where a line of descent meets the child: the top of the symbol box, lowered
- * to the apex for a loss triangle. Relative to the symbol centre.
+ * How far from its centre a line along the normal meets someone's symbol at
+ * u on the track `offset`: half the box, unless the outline is turned off
+ * the track (`outlineRotation`). Then a diamond's edge is nearer than its
+ * corner and a square's edge further than half the box.
  */
-function childDropEndOffset(ind: Individual | undefined): number {
-  return -NODE_SIZE / 2 + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
+function edgeReach(ind: Individual | undefined, pedigree: Pedigree, u: number, offset: number, g: Geom): number {
+  if (!ind) return HALF;
+  const glyph = glyphOf(ind, pedigree);
+  const rotation = (-trackPoint(u, offset, g).theta * 180) / Math.PI;
+  const off = Math.abs(((outlineRotation(glyph, rotation) - rotation) * Math.PI) / 180);
+  if (off === 0) return HALF;
+  return glyph.shape === "unknown" ? HALF / (Math.cos(off) + Math.sin(off)) : HALF / Math.cos(off);
+}
+
+/**
+ * Where a line of descent meets the child at u on the track `offset`: the
+ * top of the symbol, lowered to the apex for a loss triangle. Relative to
+ * the symbol centre.
+ */
+function childDropEndOffset(ind: Individual | undefined, pedigree: Pedigree, u: number, offset: number, g: Geom): number {
+  return -edgeReach(ind, pedigree, u, offset, g) + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
 }
 
 export const LINE_ATTRS = `fill="none" stroke="black" stroke-width="${STROKE}" stroke-linecap="round"`;
@@ -169,9 +185,10 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
       if (donor) {
         const uA = memberU(n, w.a, g);
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
-        out.push(diagonalPath(uA, track + HALF, uP, bar, g), diagonalPath(uB, track + HALF, uP, bar, g));
+        const reach = (i: number | null, u: number) => edgeReach(i === null ? undefined : byId.get(n.members[i]!.id), pedigree, u, track, g);
+        out.push(diagonalPath(uA, track + reach(w.a, uA), uP, bar, g), diagonalPath(uB, track + (w.kind === "join" ? HALF : reach(w.b, uB)), uP, bar, g));
       } else {
-        out.push(normalSeg(uP, track + (w.kind === "solo" ? HALF : 0), bar, g));
+        out.push(normalSeg(uP, track + (w.kind === "solo" ? edgeReach(byId.get(n.blood), pedigree, uP, track, g) : 0), bar, g));
       }
       // Twins share one fork point on the bar, at the mean of their positions.
       const forkU = new Map<string, number>();
@@ -189,14 +206,15 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
         const all = w.kids.every(c => links.some(m => m.kind === l.kind && m.from === l.from && m.child === c.blood));
         if (!all) continue;
         for (const c of w.kids) linkDone.add(linkKey({ ...l, child: c.blood }));
-        out.push(diagonalPath(from.u, from.depth * g.ringGap + HALF, uP, bar, g, linkAttrs(l.kind)));
+        const fromTrack = from.depth * g.ringGap;
+        out.push(diagonalPath(from.u, fromTrack + edgeReach(byId.get(l.from), pedigree, from.u, fromTrack, g), uP, bar, g, linkAttrs(l.kind)));
       }
       // A loss triangle's apex sits below the top of the symbol box. An
       // adopted-in child's drop is dashed.
       w.kids.forEach(c => {
         const ind = byId.get(c.blood);
         const attrs = ind?.adopted === "in" ? ADOPTED_IN_ATTRS : LINE_ATTRS;
-        const end = childEdge + HALF + childDropEndOffset(ind);
+        const end = childEdge + HALF + childDropEndOffset(ind, pedigree, c.u, childEdge + HALF, g);
         const key = twins.get(c.blood)?.twinSet;
         if (key !== undefined && forkU.has(key)) {
           out.push(diagonalPath(forkU.get(key)!, bar, c.u, end, g, attrs));
@@ -211,7 +229,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
         if (z === "dizygotic") continue;
         const fu = forkU.get(key)!;
         const sorted = [...members].sort((a, b) => a.u - b.u);
-        const mid = (c: TNode) => diagonalMid(fu, bar, c.u, childEdge + HALF + childDropEndOffset(byId.get(c.blood)), g);
+        const mid = (c: TNode) => diagonalMid(fu, bar, c.u, childEdge + HALF + childDropEndOffset(byId.get(c.blood), pedigree, c.u, childEdge + HALF, g), g);
         for (let i = 0; i + 1 < sorted.length; i++) {
           const pa = mid(sorted[i]!), pb = mid(sorted[i + 1]!);
           if (z === "monozygotic") out.push(`<line x1="${r(pa.x)}" y1="${r(pa.y)}" x2="${r(pb.x)}" y2="${r(pb.y)}" ${LINE_ATTRS}/>`);
@@ -227,8 +245,9 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
     const from = layout.nodes.get(link.from), child = layout.nodes.get(link.child);
     if (!from || !child || linkDone.has(linkKey(link))) continue;
     const below = child.depth > from.depth;
-    const o1 = from.depth * g.ringGap + (below ? HALF : -HALF);
-    const o2 = child.depth * g.ringGap + (below ? childDropEndOffset(byId.get(link.child)) : HALF);
+    const t1 = from.depth * g.ringGap, t2 = child.depth * g.ringGap;
+    const o1 = t1 + (below ? 1 : -1) * edgeReach(byId.get(link.from), pedigree, from.u, t1, g);
+    const o2 = t2 + (below ? childDropEndOffset(byId.get(link.child), pedigree, child.u, t2, g) : edgeReach(byId.get(link.child), pedigree, child.u, t2, g));
     out.push(diagonalPath(from.u, o1, child.u, o2, g, linkAttrs(link.kind)));
   }
 
@@ -239,8 +258,8 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
     const orig = layout.nodes.get(dup.id);
     if (!orig) continue;
     if (orig.depth === dup.depth) {
-      const top = dup.depth * g.ringGap - HALF, inset = top - DUP_LINK_INSET;
-      const stub = (u: number) => { const p = trackPoint(u, inset, g), q = trackPoint(u, top, g); return `<line x1="${r(p.x)}" y1="${r(p.y)}" x2="${r(q.x)}" y2="${r(q.y)}" ${DUP_ATTRS}/>`; };
+      const track = dup.depth * g.ringGap, inset = track - HALF - DUP_LINK_INSET;
+      const stub = (u: number) => { const p = trackPoint(u, inset, g), q = trackPoint(u, track - edgeReach(byId.get(dup.id), pedigree, u, track, g), g); return `<line x1="${r(p.x)}" y1="${r(p.y)}" x2="${r(q.x)}" y2="${r(q.y)}" ${DUP_ATTRS}/>`; };
       out.push(stub(dup.u), trackPath(dup.u, orig.u, inset, g, DUP_ATTRS), stub(orig.u));
     } else {
       out.push(`<line x1="${r(dup.x)}" y1="${r(dup.y)}" x2="${r(orig.x)}" y2="${r(orig.y)}" ${DUP_ATTRS}/>`);

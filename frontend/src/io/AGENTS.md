@@ -129,7 +129,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   in place after laying it out must make a fresh object. Symbols, labels and slashes
   rotate with the track (that is the design, labels included); only the
   pregnancy "P" is counter-rotated to stay upright (#71), since a sideways P
-  reads as another letter. Twins (#11): `sortSibs` averages a set's order
+  reads as another letter. A square's or diamond's outline (the group
+  symbol's too), with its fill, sections, adoption brackets and
+  presymptomatic line, turns only by the nearest multiple of 90 degrees
+  (`outlineRotation`, `UShapeNode.symbolRotation`), since either turned 45
+  degrees reads as the other; circles turn with the track. Slashes, the
+  arrow, marks and text still turn with the track, and lines along the
+  normal stop at the outline's edge (`edgeReach` in `connectors.ts`). Twins (#11): `sortSibs` averages a set's order
   keys so members stay side by side, the root sibship is never split between
   the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
   in track coordinates, since a straight chord between twins far apart along

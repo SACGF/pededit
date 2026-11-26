@@ -6,6 +6,8 @@ import { largerFamily } from "../../../fixtures/largerFamily";
 import { makeSyntheticFamily } from "../../../fixtures/syntheticFamily";
 import { EXAMPLES } from "../../../data/examples";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { person, M, F, couple, build } from "../../../fixtures/features";
+import { drawnPedigree, isBranchPlaceholderId } from "../../../pedigree/collapse";
 
 // To LOOK at the output rather than assert on it, run frontend/render-u.sh.
 
@@ -584,5 +586,49 @@ describe("the U-shape draws no symbol of its own (#149)", () => {
     expect(readFileSync(join(dir, "render.tsx"), "utf8")).toContain("<PersonMarks ");
     // The layout half holds no SVG at all.
     for (const f of ["tree.ts", "layout.ts"]) expect(readFileSync(join(dir, f), "utf8"), f).not.toMatch(/<[a-z]+ [a-z-]+="/);
+  });
+});
+
+describe("U-shape squares and diamonds (#171)", () => {
+  // A square turned by 45 degrees is a diamond and a diamond so turned is a
+  // square, so their outlines turn by the nearest multiple of 90 instead;
+  // circles turn with the track.
+  const rest = (deg: number) => ((((deg + 45) % 90) + 90) % 90) - 45;
+  // One wide sibship of every sex, so children run round the curve; one son
+  // has a collapsed branch of mixed sexes, drawn as a group diamond.
+  const sexes = ["unknown", "male", "female"] as const;
+  const kids = Array.from({ length: 24 }, (_, i) => person(`c${i}`, sexes[i % 3]!, i === 1 ? { descendantsHidden: true } : {}));
+  const pedigree = drawnPedigree(build(
+    [M("dad"), F("mum"), ...kids, F("w"), M("g1"), F("g2")],
+    [couple("p", "dad", "mum"), couple("q", "c1", "w")],
+    { p: kids.map(k => k.id), q: ["g1", "g2"] },
+  ));
+  const layout = layoutUShape(pedigree)!;
+  const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
+  const nodes = [...layout.nodes.values()];
+
+  for (const [shape, sex] of [["diamond", "unknown"], ["square", "male"]] as const) {
+    it(`draws a ${shape} on a 45 degree stretch of the track as a ${shape}`, () => {
+      const of = nodes.filter(n => sexOf.get(n.id) === sex);
+      const steep = of.filter(n => Math.abs(Math.abs(rest(n.rotation)) - 45) < 12);
+      expect(steep.length).toBeGreaterThan(0);
+      for (const n of of) {
+        expect(Math.abs(rest(n.symbolRotation))).toBeLessThan(1e-9);
+        // Still turned with the track, to the nearest quarter turn.
+        expect(Math.abs(n.symbolRotation - n.rotation)).toBeLessThanOrEqual(45 + 1e-9);
+      }
+    });
+  }
+
+  it("keeps the collapsed group symbol a diamond", () => {
+    const group = nodes.find(n => isBranchPlaceholderId(n.id))!;
+    expect(sexOf.get(group.id)).toBe("unknown");
+    expect(Math.abs(rest(group.symbolRotation))).toBeLessThan(1e-9);
+  });
+
+  it("turns circles with the track", () => {
+    const circles = nodes.filter(n => sexOf.get(n.id) === "female");
+    expect(circles.some(n => Math.abs(rest(n.rotation)) > 20)).toBe(true);
+    for (const n of circles) expect(n.symbolRotation).toBe(n.rotation);
   });
 });

@@ -8,6 +8,7 @@ import { type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { personGlyph, type PersonGlyph } from "../../../pedigree/personGlyph";
 import { labelMaxWidth, LABEL_CHAR_WIDTH } from "../../../pedigree/labels";
 import { labelNumbers } from "../../../pedigree/scene";
+import { usesLossTriangle } from "../../../pedigree/lifeStatus";
 import { NODE_SIZE, HALF, LABEL_LINE_HEIGHT, CONSANG_GAP, MIN_SLOT, MAX_SLOT, FAMILY_GAP, BAR_CLEARANCE, TARGET_ASPECT, MIN_ASPECT, MAX_PLACE_ATTEMPTS, FAN_MAX_WIDTH, MAX_FLAT, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH } from "./constants";
 import { coupleGap, labelRadius, kidsOf, walk, buildTree, type UShapeOptions, type Union, type TNode } from "./tree";
 import { hasParents } from "../../../pedigree/graph";
@@ -389,6 +390,8 @@ export interface UShapeNode {
   y: number;
   /** Rotation in degrees that points the symbol's "down" outward. */
   rotation: number;
+  /** Rotation in degrees the symbol's outline is drawn at (`outlineRotation`). */
+  symbolRotation: number;
 }
 
 export interface UShapeLayout {
@@ -548,16 +551,36 @@ export function nodeAt(n: TNode, i: number, g: Geom): UShapeNode {
     parentU: isBlood && n.parent ? descentU(n.parent, n.parentUnion!, g) : null,
     partnerOf: isBlood || n.isRoot ? null : n.blood,
     depth: n.depth, u, x: p.x, y: p.y, rotation: (-p.theta * 180) / Math.PI,
+    symbolRotation: (-p.theta * 180) / Math.PI,
   };
+}
+
+/**
+ * The angle a symbol's outline is drawn at, in a person turned by `rotation`
+ * along the track. A square turned by about 45 degrees is a diamond and a
+ * diamond so turned is a square, so both turn by the nearest multiple of 90
+ * degrees instead: the same outline as upright, so each keeps its shape all
+ * round the U (the collapsed group symbol too). A circle, and a loss
+ * triangle whatever the sex, turn with the track.
+ */
+export function outlineRotation(glyph: Pick<PersonGlyph, "shape" | "lifeStatus">, rotation: number): number {
+  if (glyph.shape === "female" || usesLossTriangle(glyph.lifeStatus)) return rotation;
+  // The remainder modulo 90, in [-45, 45).
+  const rest = ((((rotation + 45) % 90) + 90) % 90) - 45;
+  return rotation - rest;
 }
 
 export function toLayout(pedigree: Pedigree, b: Built): UShapeLayout {
   const nodes = new Map<string, UShapeNode>();
   const duplicates: UShapeNode[] = [];
+  const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   walk(b.root, n => {
     n.members.forEach((m, i) => {
-      if (m.dup) duplicates.push(nodeAt(n, i, b.geom));
-      else nodes.set(m.id, nodeAt(n, i, b.geom));
+      const node = nodeAt(n, i, b.geom);
+      const ind = byId.get(m.id);
+      if (ind) node.symbolRotation = outlineRotation(glyphOf(ind, pedigree), node.rotation);
+      if (m.dup) duplicates.push(node);
+      else nodes.set(m.id, node);
     });
   });
   return {

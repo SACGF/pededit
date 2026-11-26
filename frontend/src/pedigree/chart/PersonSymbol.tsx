@@ -43,17 +43,19 @@ export function PersonSymbol({ glyph, clipId, markerId, nameLines = glyph.nameLi
  * outline, fill, sections, slash, arrow, "?", "*", annotation row, copy
  * number or group count. In the box from (0, 0) to (size, size).
  */
-export function PersonMarks({ glyph, clipId, markerId = "proband-arrowhead", size = NODE_SIZE, upright }: {
+export function PersonMarks({ glyph, clipId, markerId = "proband-arrowhead", size = NODE_SIZE, upright, outlineTurn }: {
   glyph: PersonGlyph;
   clipId: string;
   markerId?: string;
   size?: number;
   /** Degrees to turn letters and numbers back by when the symbol is drawn turned (the U-shape). */
   upright?: number;
+  /** Degrees to turn the outline alone by within a turned symbol (`SymbolShape`). */
+  outlineTurn?: number;
 }) {
   return (
     <>
-      <SymbolShape glyph={glyph} size={size} clipId={clipId} upright={upright} />
+      <SymbolShape glyph={glyph} size={size} clipId={clipId} upright={upright} outlineTurn={outlineTurn} />
       {glyph.deceased && <DeceasedSlash size={size} />}
       {glyph.arrow && <ProbandArrow size={size} kind={glyph.arrow} markerId={markerId} upright={upright} />}
       {glyph.familyHistoryUnknown && <FamilyHistoryMark size={size} hasParents={glyph.hasParents} upright={upright} />}
