@@ -1,5 +1,6 @@
 import type { PedRow, ValidationIssue } from "./types.js";
 import { ValidationIssueCode } from "./types.js";
+import { capitalised } from "../../utils/text";
 
 export interface ParseOutput {
   rows: PedRow[];
@@ -264,7 +265,7 @@ function chooseSplitter(firstLine: string): (line: string) => string[] {
 function delimiterHint(text: string, tabSplit: boolean, hasHeader: boolean): string {
   const first = hasHeader ? "the header" : "the first line";
   if (tabSplit && !text.includes("\t")) {
-    return `. ${capitalise(first)} is tab-separated but this row has no tabs; use the same delimiter on every line`;
+    return `. ${capitalised(first)} is tab-separated but this row has no tabs; use the same delimiter on every line`;
   }
   if (!tabSplit && text.includes("\t")) {
     return `. This row contains tabs but ${first} is separated by spaces, so IDs containing spaces are split apart; use tabs on every line, including the header`;
@@ -276,10 +277,6 @@ function spaceHint(tabSplit: boolean): string {
   return tabSplit
     ? ". Check for a missing or extra tab"
     : ". In a space-separated file IDs cannot contain spaces; separate columns with tabs to allow them";
-}
-
-function capitalise(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function splitOnTabs(line: string): string[] {

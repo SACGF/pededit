@@ -417,6 +417,10 @@ reporting is off, and the dev server never reports.
   childless marks per couple). A section gets a heading only when it is a
   list or read-only; single-line fields use `Field inline`, the label in a
   72px column beside the control, as the panel is 240px wide).
+  `EditPanel.tsx` is the tabs and the phone sheet; each tab and section is
+  a file in `components/panel/` that reads the store itself, and
+  `panel/fields.tsx` holds what they share (`Field`, `ProblemHighlight`,
+  `CheckboxRow`, `OptionSelect`, `Hint`).
   "Conditions and tags" (`CONDITIONS_AND_TAGS`) is the user-facing name for
   what the tags dialog defines; "tag" stays the code's word. Every other
   user-facing word follows `claude/glossary.md` (#137).

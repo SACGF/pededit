@@ -1,4 +1,5 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
+import { capitalised } from "../utils/text";
 
 /**
  * How the editor's words for someone unnamed are chosen:
@@ -28,9 +29,4 @@ export function personLabel(pedigree: Pedigree, id: string, style: PersonLabelSt
 
 function sexWords(sex: Sex | undefined): string {
   return sex === "male" || sex === "female" ? sex : "unknown sex";
-}
-
-/** The first letter upper case: for words the editor wrote, never for a name. */
-export function capitalised(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }

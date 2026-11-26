@@ -27,6 +27,7 @@ import { parsePartialDate, type PartialDate } from "./labels";
 import { affectedConditions, affectedControlOn, carrierLabel, conditionMode, conditionTags, isAffected, plainAffected, plainCarrier, resolvePlainAffected, type ConditionState } from "./conditions";
 import { addYears, ageRange, certainlyBefore, minDaysApart, partialDateOf } from "./dateRanges";
 import { childrenOf, couplesOf, parentCoupleOf } from "./graph";
+import { capitalised } from "../utils/text";
 
 export type Severity = "warning" | "error";
 
@@ -280,10 +281,6 @@ function missingReferences(ind: Individual, pedigree: Pedigree, byId: Map<string
     fixed.socialParents = kept.length ? kept : undefined;
   }
   return Object.keys(fixed).length ? fixed : undefined;
-}
-
-function capitalised(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /** Text for a date in a message: as typed. */

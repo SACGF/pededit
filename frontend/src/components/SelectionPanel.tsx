@@ -3,6 +3,7 @@ import { BATCH_LOCK_TITLE, BATCH_UNLOCK_TITLE, batchLockState } from "../pedigre
 import { kinshipOf, kinshipXOf, formatCoefficient, degreeOfRelationship } from "../pedigree/relatedness";
 import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigree/relationship";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { capitalised } from "../utils/text";
 
 /**
  * The edit panel with several people selected: how many, and the
@@ -58,10 +59,6 @@ function PanelButton({ onClick, title, children }: { onClick: () => void; title?
   );
 }
 
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
 /**
  * Exactly two selected: how they are related, for any two people, not
  * only partners. The relationship is named when the drawn tree gives one
@@ -81,10 +78,10 @@ function PairRelatedness({ pedigree, a, b }: { pedigree: Pedigree; a: string; b:
       <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Relatedness</div>
       <p data-testid="pair-relationship" className="text-sm text-gray-800">
         {named
-          ? `${capitalise(label[named.subjectId])} is ${label[named.objectId]}'s ${named.term}${named.extra ? ALSO_RELATED_OTHERWISE : ""}.`
+          ? `${capitalised(label[named.subjectId])} is ${label[named.objectId]}'s ${named.term}${named.extra ? ALSO_RELATED_OTHERWISE : ""}.`
           : related
-            ? `${capitalise(label[a])} and ${label[b]} are related in more than one way.`
-            : `${capitalise(label[a])} and ${label[b]} are not related through anyone drawn.`}
+            ? `${capitalised(label[a])} and ${label[b]} are related in more than one way.`
+            : `${capitalised(label[a])} and ${label[b]} are not related through anyone drawn.`}
       </p>
       {related && (
         <>
@@ -94,7 +91,7 @@ function PairRelatedness({ pedigree, a, b }: { pedigree: Pedigree; a: string; b:
           <div data-testid="pair-kinship-x" title="The same for the X chromosome, which matters for X-linked conditions.">
             X-linked kinship <span className="font-medium">{Number.isNaN(kinshipX) ? "unknown (a sex is not recorded)" : formatCoefficient(kinshipX)}</span>
           </div>
-          <div className="text-[10px] text-gray-500">{capitalise(degreeOfRelationship(kinship) ?? "")}.</div>
+          <div className="text-[10px] text-gray-500">{capitalised(degreeOfRelationship(kinship) ?? "")}.</div>
         </>
       )}
     </div>
