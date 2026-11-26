@@ -4,6 +4,7 @@ import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
 import { highestDuplicateArc, highestHop } from "./couplePath";
 import { kinshipLabel, kinshipOf } from "./relatedness";
 import { nameCoupleRelationship } from "./relationship";
+import { wholePedigree } from "./collapse";
 
 /**
  * The degree of relationship written above a consanguineous couple's double
@@ -60,10 +61,15 @@ export function consanguinityLabelText(pedigree: Pedigree, partnership: Partners
   return `${named ? words.replace(/ \([^()\s]+\)$/, "") : words} (${phi})`;
 }
 
-/** The relationship's name, for the panel's suggestion and the setting. */
+/**
+ * The relationship's name, for the panel's suggestion and the setting. It is
+ * named on the whole family, as the double line and the kinship are, so a
+ * figure that leaves out the common ancestors still names it.
+ */
 export function namedCoupleRelationship(pedigree: Pedigree, partnership: Partnership): string | null {
   const { individual1: a, individual2: b } = partnership;
-  return nameCoupleRelationship(pedigree, a, b, kinshipOf(pedigree).kinship(a, b));
+  const whole = wholePedigree(pedigree);
+  return nameCoupleRelationship(whole, a, b, kinshipOf(whole).kinship(a, b));
 }
 
 /** What sits on a partner's symbol top: a line of descent from their parents, a "?". */

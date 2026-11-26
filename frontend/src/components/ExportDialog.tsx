@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  exportSvg, exportUShapeSvg, layoutUShape, exportPng, exportPdf,
+  exportSvg, exportUShapeSvg, exportPng, exportPdf,
   svgPixelSize, pngSizeForDpi, PNG_DPI_CHOICES, DEFAULT_PNG_DPI, CSS_PX_PER_INCH,
   DEIDENTIFY_KEEP_DEFAULTS, deidentifiableText,
 } from "../io/svg/index";
@@ -11,6 +11,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { chartTitle } from "../pedigree/labels";
 import { clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { usePedigreeStore } from "../store/usePedigreeStore";
+import { uShapeExportLayout } from "../pedigree/uShapeView";
 import { selectionLabel, selectionPedigree, selectionSubset } from "../pedigree/selectionSubset";
 
 interface ExportDialogProps {
@@ -74,13 +75,13 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
 
   // The U shape is a descendant chart of one founder couple. With nobody to
   // descend from there is nothing to bend, so the option is switched off.
-  const uLayout = useMemo(
-    () => (open ? layoutUShape(pedigree, { partners: uPartners }) : null),
+  const uFigure = useMemo(
+    () => (open ? uShapeExportLayout(pedigree, uPartners) : null),
     [open, pedigree, uPartners],
   );
-  const uAvailable = !!uLayout && uLayout.maxDepth > 0;
+  const uAvailable = !!uFigure?.layout && uFigure.layout.maxDepth > 0;
   const useU = uShape && uAvailable;
-  const omittedCount = uLayout?.omitted.length ?? 0;
+  const omittedCount = uFigure?.omitted ?? 0;
 
   // The SVG every format is made from. Built while the dialog is open so the
   // PNG option can show the pixel and printed size it will produce.
@@ -298,7 +299,8 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
                   Draws one founding couple and their descendants
                   {uPartners ? ", each with their partners." : " by blood only."}
                   {omittedCount > 0 &&
-                    ` ${omittedCount} of ${pedigree.individuals.length} individuals ${omittedCount === 1 ? "is" : "are"} outside that line and will be left out.`}
+                    ` ${omittedCount} of ${uFigure!.total} individuals ${omittedCount === 1 ? "is" : "are"} outside that line` +
+                    `${uFigure!.notDrawn > 0 ? " or not drawn on the chart" : ""} and will be left out.`}
                 </p>
               </>
             )}

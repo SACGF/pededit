@@ -7,8 +7,8 @@
  * tab. Everything here is framework-free; `UShapeView.tsx` draws it.
  */
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { renderUShape } from "../io/svg/uShapeExporter";
-import { isBranchPlaceholderId } from "./collapse";
+import { layoutUShape, renderUShape, type UShapeLayout } from "../io/svg/uShapeExporter";
+import { drawnPedigree, isBranchPlaceholderId } from "./collapse";
 
 export interface UShapeViewDrawing {
   svg: string;
@@ -28,6 +28,24 @@ export function uShapeViewDrawing(pedigree: Pedigree, title?: string): UShapeVie
   if (!layout || layout.maxDepth === 0) return null;
   const drawn = [...layout.nodes.keys()].filter(id => !isBranchPlaceholderId(id)).length;
   return { svg, drawn, total: pedigree.individuals.length };
+}
+
+/**
+ * The U-shape layout the export dialog offers, and who it leaves out. It is
+ * laid out from the people drawn (view filters and collapsed branches
+ * applied), as the view and the export are, so `omitted` counts the people
+ * of `pedigree` the figure will not show, the same count as the view's
+ * banner; `notDrawn` is how many of those the chart does not draw either.
+ */
+export function uShapeExportLayout(pedigree: Pedigree, partners: boolean): {
+  layout: UShapeLayout | null; omitted: number; notDrawn: number; total: number;
+} {
+  const drawn = drawnPedigree(pedigree);
+  const layout = layoutUShape(drawn, { partners });
+  const onChart = drawn.individuals.filter(i => !isBranchPlaceholderId(i.id)).length;
+  const onU = layout ? [...layout.nodes.keys()].filter(id => !isBranchPlaceholderId(id)).length : 0;
+  const total = pedigree.individuals.length;
+  return { layout, omitted: total - onU, notDrawn: total - onChart, total };
 }
 
 /** Why the view cannot be drawn. The export dialog says the same. */

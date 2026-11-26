@@ -28,6 +28,26 @@ describe("exportPed", () => {
     expect(line.split("\t").slice(2, 4)).toEqual(["dad", "mum"]);
   });
 
+  // A parent of unknown sex takes whichever role the other parent leaves, so a woman is never in PAT (#226).
+  it.each([
+    ["unknown", "female", "a", "b"],
+    ["female", "unknown", "b", "a"],
+    ["unknown", "male", "b", "a"],
+    ["unknown", "unknown", "a", "b"],
+  ] as const)("a couple of %s and %s: PAT and MAT by role", (sexA, sexB, pat, mat) => {
+    const ped: Pedigree = makePedigree({
+      individuals: [
+        { id: "a", sex: sexA, affected: false, sibOrder: 0 },
+        { id: "b", sex: sexB, affected: false, sibOrder: 1 },
+        { id: "kid", sex: "male", affected: false, sibOrder: 0 },
+      ],
+      partnerships: [{ id: "p", individual1: "a", individual2: "b" }],
+      parentOf: { p: ["kid"] },
+    });
+    const line = exportPed(ped).trim().split("\n").find(l => l.includes("\tkid\t"))!;
+    expect(line.split("\t").slice(2, 4)).toEqual([pat, mat]);
+  });
+
   it("keeps partnership order when neither partner is male", () => {
     const ped: Pedigree = makePedigree({
       individuals: [

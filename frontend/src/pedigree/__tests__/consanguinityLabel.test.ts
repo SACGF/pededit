@@ -14,6 +14,7 @@ import { exportSvg } from "../../io/svg/svgExporter";
 import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
 import { importJson, exportJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { drawnSubset } from "../collapse";
 
 const person = (id: string, sex: Sex, name?: string) => ({ id, sex, affected: false, sibOrder: 0, ...(name ? { name } : {}) });
 
@@ -249,5 +250,16 @@ describe("consanguinity label data (#97)", () => {
     const bad = JSON.parse(exportJson(cousins()));
     bad.pedigree.partnerships[0].consanguinityLabel = 3;
     expect(importJson(JSON.stringify(bad.pedigree)).hasErrors).toBe(true);
+  });
+});
+
+describe("a figure of part of the family (#226)", () => {
+  it("still names the couple's relationship when the common ancestors are left out", () => {
+    const p = withSetting(cousins());
+    const pc = (q: Pedigree) => q.partnerships.find(c => c.id === "pc")!;
+    expect(consanguinityLabelText(p, pc(p))).toMatch(/^first cousins/);
+    const subset = drawnSubset(p, new Set(["c1", "c2", "k"]));
+    expect(subset.individuals.map(i => i.id).sort()).toEqual(["c1", "c2", "k"]);
+    expect(consanguinityLabelText(subset, pc(subset))).toBe(consanguinityLabelText(p, pc(p)));
   });
 });

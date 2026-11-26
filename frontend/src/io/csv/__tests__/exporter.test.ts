@@ -76,12 +76,46 @@ describe("exportCsv", () => {
     expect(child.mother_id).toBe("mom");
   });
 
-  it("notes with commas are escaped as semicolons", () => {
+  it("keeps the commas in notes, inside the quoted cell", () => {
     const ped = makePedigree({
-      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, notes: "note one, note two" }],
+      individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, notes: "seen 2019, then 2021" }],
     });
     const rows = parseRows(exportCsv(ped));
-    expect(rows[0]!.notes).toBe("note one; note two");
+    expect(rows[0]!.notes).toBe("seen 2019, then 2021");
+  });
+
+  // A parent of unknown sex takes whichever role the other parent leaves (#226).
+  it.each([
+    ["unknown", "female", "a", "b"],
+    ["female", "unknown", "b", "a"],
+    ["unknown", "male", "b", "a"],
+    ["male", "unknown", "a", "b"],
+    ["unknown", "unknown", "a", "b"],
+  ] as const)("a couple of %s and %s: father and mother by role", (sexA, sexB, father, mother) => {
+    const ped = makePedigree({
+      individuals: [
+        { id: "a", sex: sexA, affected: false, sibOrder: 0 },
+        { id: "b", sex: sexB, affected: false, sibOrder: 1 },
+        { id: "kid", sex: "male", affected: false, sibOrder: 0 },
+      ],
+      partnerships: [{ id: "p", individual1: "a", individual2: "b" }],
+      parentOf: { p: ["kid"] },
+    });
+    const kid = parseRows(exportCsv(ped)).find(r => r.id === "kid")!;
+    expect([kid.father_id, kid.mother_id]).toEqual([father, mother]);
+  });
+
+  it("leaves a parent missing from the pedigree blank instead of throwing", () => {
+    const ped = makePedigree({
+      individuals: [
+        { id: "mum", sex: "female", affected: false, sibOrder: 0 },
+        { id: "kid", sex: "male", affected: false, sibOrder: 0 },
+      ],
+      partnerships: [{ id: "p", individual1: "gone", individual2: "mum" }],
+      parentOf: { p: ["kid"] },
+    });
+    const kid = parseRows(exportCsv(ped)).find(r => r.id === "kid")!;
+    expect([kid.father_id, kid.mother_id]).toEqual(["", "mum"]);
   });
 
   it("affected and deceased flags are encoded as 1/0", () => {

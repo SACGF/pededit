@@ -1,5 +1,5 @@
 import { isConditionTag, type Individual, type Pedigree, type Tag, type ViewFilters } from "@pedigree-editor/layout-engine";
-import { ancestorsOf, childrenOf, couplesOf, descendantsOf, hasParents, parentCoupleOf, partnerIn } from "./graph";
+import { ancestorsOf, childrenOf, couplesOf, descendantsOf, hasParents, parentCoupleOf, parentRoles, partnerIn } from "./graph";
 
 /**
  * View filters: global switches, saved with the pedigree in
@@ -108,16 +108,10 @@ export function bloodRelativesKept(pedigree: Pedigree, roots: string[]): Set<str
   return kept;
 }
 
-/** The genetic parent of `id` of the given sex, if their parents are in the pedigree. */
-function parentOfSex(pedigree: Pedigree, id: string, sex: "male" | "female"): string | undefined {
+/** The father or the mother of `id` (`parentRoles`), if their parents are in the pedigree. */
+function parentInRole(pedigree: Pedigree, id: string, role: "father" | "mother"): string | undefined {
   const couple = parentCoupleOf(pedigree, id);
-  if (!couple) return undefined;
-  const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
-  const [a, b] = [byId.get(couple.individual1), byId.get(couple.individual2)];
-  if (a?.sex === sex && b?.sex !== sex) return a.id;
-  if (b?.sex === sex && a?.sex !== sex) return b.id;
-  // Parents of unknown or matching sex: the father role is listed first.
-  return sex === "male" ? couple.individual1 : couple.individual2;
+  return couple ? parentRoles(pedigree, couple)[role] : undefined;
 }
 
 /** What one filter does: who it keeps, or why it changes nothing. */
@@ -141,8 +135,8 @@ function bloodRelativesResult(pedigree: Pedigree): FilterResult {
 function sideResult(pedigree: Pedigree): FilterResult {
   const refs = referencePeople(pedigree);
   if (refs.length === 0) return { noEffect: NO_PROBAND };
-  const sex = pedigree.filters?.side === "paternal" ? "male" : "female";
-  const parents = refs.map(r => parentOfSex(pedigree, r, sex)).filter((id): id is string => !!id);
+  const role = pedigree.filters?.side === "paternal" ? "father" : "mother";
+  const parents = refs.map(r => parentInRole(pedigree, r, role)).filter((id): id is string => !!id);
   if (parents.length === 0) return { noEffect: "the proband's parents are not in the pedigree" };
   const kept = bloodRelativesKept(pedigree, parents);
   // A proband without parents (one of several) is still drawn.

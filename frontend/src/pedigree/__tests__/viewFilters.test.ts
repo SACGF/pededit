@@ -315,6 +315,20 @@ describe("one side of the family (#4)", () => {
     expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
+  it("takes a parent of unknown sex as the father beside a woman, and as the mother beside a man (#226)", () => {
+    // The proband's parents recorded with the mother first, one of them of unknown sex.
+    const side = (filter: "paternal" | "maternal", unknown: string) => {
+      const p = families({ side: filter });
+      p.individuals.find(i => i.id === unknown)!.sex = "unknown";
+      Object.assign(p.partnerships.find(c => c.id === "dm")!, { individual1: "mum", individual2: "dad" });
+      return drawnIds(p);
+    };
+    expect(side("paternal", "dad")).toContain("pgf");
+    expect(side("paternal", "dad")).not.toContain("mgf");
+    expect(side("maternal", "mum")).toContain("mgf");
+    expect(side("maternal", "mum")).not.toContain("pgf");
+  });
+
   it("does nothing for a proband without parents, and says why", () => {
     const p = families({ side: "maternal" });
     p.individuals.find(i => i.id === "pro")!.proband = false;

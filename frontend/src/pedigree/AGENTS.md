@@ -653,7 +653,11 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `raisedChildrenOf` (adds a same-sex couple's donor-conceived children),
   `hasParents`, `descendantsOf`, `ancestorsOf`, `parentRoles` (father and
   mother of a couple, the man and the woman whichever way round they were
-  recorded) and `pairKey`. A frozen pedigree (everything immer produces) is
+  recorded, a partner of unknown sex taking the role the other leaves; the
+  CSV and PED exporters and the side filter use it) and `pairKey`.
+  `fatherFirst` (`store/pedigree/draft.ts`) and the U-shape's root couple
+  (`io/svg/ushape/tree.ts`) decide drawing order, not roles, and are
+  separate. A frozen pedigree (everything immer produces) is
   indexed once in a `WeakMap`; any other (a draft, one being built, a
   drawn copy) is read directly each call, so changes made in place are
   seen. The layout engine has its own copies, since it is published on its

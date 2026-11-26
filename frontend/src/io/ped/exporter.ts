@@ -1,7 +1,7 @@
 import { isAffected, type Pedigree } from "@pedigree-editor/layout-engine";
 import { consanguinityTest } from "../../pedigree/consanguinity";
 import { kinshipOf } from "../../pedigree/relatedness";
-import { childrenOf, parentCoupleOf } from "../../pedigree/graph";
+import { childrenOf, parentCoupleOf, parentRoles } from "../../pedigree/graph";
 
 export interface ExportOptions {
   familyId?: string;         // default "1"
@@ -30,25 +30,20 @@ export function exportPed(pedigree: Pedigree, options: ExportOptions = {}): stri
     header = "#FID\tIID\tPAT\tMAT\tSEX\tPHENO\n";
   }
 
-  const sexOf = new Map(pedigree.individuals.map(i => [i.id, i.sex]));
   const pedId = exportIds(pedigree, rDialect);
 
-  // Partnership members are unordered, so put the male partner in PAT: a
+  // Partnership members are unordered, so the father role decides PAT: a
   // female in PAT makes every other PED reader warn or reject the file.
-  // When neither partner is male the original order is kept.
   const parentsOf = (id: string) => {
     const couple = parentCoupleOf(pedigree, id);
-    if (!couple) return undefined;
-    const { individual1, individual2 } = couple;
-    const swap = sexOf.get(individual1) !== "male" && sexOf.get(individual2) === "male";
-    return swap ? { father: individual2, mother: individual1 } : { father: individual1, mother: individual2 };
+    return couple ? parentRoles(pedigree, couple) : undefined;
   };
 
   const lines: string[] = [];
   for (const ind of pedigree.individuals) {
     const parents = parentsOf(ind.id);
-    const pat = parents ? pedId.get(parents.father)! : "0";
-    const mat = parents ? pedId.get(parents.mother)! : "0";
+    const pat = parents ? pedId.get(parents.father) ?? "0" : "0";
+    const mat = parents ? pedId.get(parents.mother) ?? "0" : "0";
     const sex = ind.sex === "male" ? "1" : ind.sex === "female" ? "2" : "0";
     const pheno = isAffected(ind, pedigree) ? "2" : "1";
     const cells = [...(withFamily ? [fid] : []), pedId.get(ind.id)!, pat, mat, sex, ...(withAffection ? [pheno] : [])];

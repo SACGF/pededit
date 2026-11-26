@@ -7,21 +7,21 @@ import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";
 import { carrierConditions, isAffected, isCarrier } from "../../pedigree/conditions";
 import { kinshipOf } from "../../pedigree/relatedness";
-import { childrenOf } from "../../pedigree/graph";
+import { childrenOf, parentRoles } from "../../pedigree/graph";
 
 export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
   const header = "family_id,id,name,sex,dob,age,affected,deceased,carrier,proband,father_id,mother_id,notes,hpo_terms,tags,life_status,adopted,zygosity,twin_ids,onset,pedigree_number,consultand,family_history_unknown,presymptomatic,evaluations,gender_identity,reproductive_role,carried_by,social_parent_ids,dod,carrier_of,inbreeding_coefficient";
   const twins = twinMembership(pedigree);
 
-  // Build parent lookup: childId → { f: fatherId, m: motherId }
+  // Parent lookup: childId → { f: fatherId, m: motherId }. A parent who is
+  // not in the pedigree is left blank rather than written as a dangling id.
+  const present = new Set(pedigree.individuals.map(i => i.id));
   const parents = new Map<string, { f: string; m: string }>();
   for (const p of pedigree.partnerships) {
-    const children = childrenOf(pedigree, p.id);
-    const ind1 = pedigree.individuals.find(i => i.id === p.individual1)!;
-    const ind2 = pedigree.individuals.find(i => i.id === p.individual2)!;
-    const [father, mother] = ind1.sex === "male" ? [ind1, ind2] : [ind2, ind1];
-    for (const childId of children) {
-      parents.set(childId, { f: father.id, m: mother.id });
+    const { father, mother } = parentRoles(pedigree, p);
+    const known = (id: string) => (present.has(id) ? id : "");
+    for (const childId of childrenOf(pedigree, p.id)) {
+      parents.set(childId, { f: known(father), m: known(mother) });
     }
   }
 
@@ -48,7 +48,7 @@ export function exportCsv(pedigree: Pedigree, familyId = "FAM001"): string {
       ind.proband ? "1" : "0",
       p?.f ?? "",
       p?.m ?? "",
-      (ind.notes ?? "").replace(/,/g, ";"), // escape commas in notes
+      ind.notes ?? "",
       (ind.hpoTerms ?? []).join(";"),
       (ind.tags ?? []).map(id => tagLabels.get(id) ?? id).join(";"),
       ind.lifeStatus ?? "",
