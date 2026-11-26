@@ -1,17 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { usePedigreeStore } from "../usePedigreeStore";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { F, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "./undoSteps";
 
-function singlePerson(): Pedigree {
-  return {
-    individuals: [
-      { id: "a", sex: "female", affected: false, sibOrder: 0, name: "", notes: "" },
-    ],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+const singlePerson = () => build([F("a")], [], {});
 
 const get = () => usePedigreeStore.getState();
 const ind = (id: string) => get().pedigree.individuals.find(i => i.id === id)!;
@@ -23,7 +15,6 @@ describe("usePedigreeStore setCarrier", () => {
 
   it("starts with carrier unset", () => {
     expect(ind("a").carrier).toBeUndefined();
-    expect(get().past).toHaveLength(0);
     expect(get().isDirty).toBe(false);
   });
 
@@ -40,10 +31,7 @@ describe("usePedigreeStore setCarrier", () => {
   });
 
   it("is a no-op for an unknown id", () => {
-    get().setCarrier("nope", true);
-    expect(ind("a").carrier).toBeUndefined();
-    expect(get().past).toHaveLength(0);
-    expect(get().isDirty).toBe(false);
+    expectNoEdit(() => get().setCarrier("nope", true));
   });
 
   it("keeps the affected flag untouched", () => {
@@ -53,35 +41,32 @@ describe("usePedigreeStore setCarrier", () => {
     expect(ind("a").carrier).toBe(true);
   });
 
-  it("pushes one undo entry per call", () => {
-    get().setCarrier("a", true);
-    expect(get().past).toHaveLength(1);
-    expect(get().future).toHaveLength(0);
+  it("is one undo step per call", () => {
+    expectOneUndoStep(() => get().setCarrier("a", true));
+    expectOneUndoStep(() => get().setCarrier("a", false));
   });
 
   it("is undone by undo and reapplied by redo", () => {
     get().setCarrier("a", true);
     get().undo();
     expect(ind("a").carrier).toBeUndefined();
-    expect(get().future).toHaveLength(1);
     get().redo();
     expect(ind("a").carrier).toBe(true);
-    expect(get().future).toHaveLength(0);
+    expectNoEdit(() => get().redo()); // nothing left to redo
   });
 
   it("clears the redo stack when a new change is made after undo", () => {
     get().setCarrier("a", true);
     get().undo();
     get().setAffected("a", true);
-    expect(get().future).toHaveLength(0);
+    expectNoEdit(() => get().redo());
     expect(ind("a").carrier).toBeFalsy();
   });
 
   it("keeps the redo stack when an action after undo changes nothing", () => {
     get().setCarrier("a", true);
     get().undo();
-    get().setCarrier("a", false);
-    expect(get().past).toHaveLength(0);
+    expectNoEdit(() => get().setCarrier("a", false));
     get().redo();
     expect(ind("a").carrier).toBe(true);
   });

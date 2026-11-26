@@ -6,33 +6,34 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 
 /**
  * gf = gm → son, dau; son = wife → gc1; hus = dau → gc2; gc1 = gc2 (first
  * cousins) → kid. wife and hus married in.
  */
 function cousins(): Pedigree {
-  return {
-    individuals: [
-      { id: "gf", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gm", sex: "female", affected: false, sibOrder: 1 },
-      { id: "son", sex: "male", affected: false, sibOrder: 0 },
-      { id: "dau", sex: "female", affected: false, sibOrder: 1 },
-      { id: "wife", sex: "female", affected: false, sibOrder: 2 },
-      { id: "hus", sex: "male", affected: false, sibOrder: 3 },
-      { id: "gc1", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gc2", sex: "female", affected: false, sibOrder: 0 },
-      { id: "kid", sex: "unknown", affected: false, sibOrder: 0 },
+  return build(
+    [
+      M("gf"),
+      F("gm"),
+      M("son"),
+      F("dau"),
+      F("wife"),
+      M("hus"),
+      M("gc1"),
+      F("gc2"),
+      U("kid"),
     ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm" },
-      { id: "sw", individual1: "son", individual2: "wife" },
-      { id: "hd", individual1: "hus", individual2: "dau" },
-      { id: "cc", individual1: "gc1", individual2: "gc2" },
+    [
+      couple("g", "gf", "gm"),
+      couple("sw", "son", "wife"),
+      couple("hd", "hus", "dau"),
+      couple("cc", "gc1", "gc2"),
     ],
-    parentOf: { g: ["son", "dau"], sw: ["gc1"], hd: ["gc2"], cc: ["kid"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
+    { g: ["son", "dau"], sw: ["gc1"], hd: ["gc2"], cc: ["kid"] },
+  );
 }
 
 function withIndividual(p: Pedigree, id: string, patch: object): Pedigree {
@@ -102,7 +103,7 @@ describe("consanguinityTest (#85)", () => {
 
   it("unknown ids and an empty pedigree are single", () => {
     expect(consanguinityTest(cousins())("gc1", "nobody")).toBe(false);
-    const empty: Pedigree = { individuals: [], partnerships: [], parentOf: {}, siblingOrder: { mode: "insertion", affectedFirst: false } };
+    const empty = build([], [], {});
     expect(consanguinityTest(empty)("a", "b")).toBe(false);
   });
 });
@@ -176,11 +177,10 @@ describe("store (#85)", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("setPartnershipConsanguineous sets and removes the override, one undo step each", () => {
-    store().setPartnershipConsanguineous("sw", true);
+    expectOneUndoStep(() => store().setPartnershipConsanguineous("sw", true));
     expect(flag("sw")).toBe(true);
-    expect(store().past).toHaveLength(1);
     expect(doubleOnCanvas(ped())).toEqual(["gc1-gc2", "son-wife"]);
-    store().setPartnershipConsanguineous("sw", false);
+    expectOneUndoStep(() => store().setPartnershipConsanguineous("sw", false));
     expect("consanguineous" in ped().partnerships.find(p => p.id === "sw")!).toBe(false);
     expect(doubleOnCanvas(ped())).toEqual(["gc1-gc2"]);
     store().undo();
@@ -190,12 +190,10 @@ describe("store (#85)", () => {
   });
 
   it("is a no-op when nothing would change or the couple is unknown", () => {
-    store().setPartnershipConsanguineous("sw", false);
-    store().setPartnershipConsanguineous("nope", true);
-    expect(store().past).toHaveLength(0);
+    expectNoEdit(() => store().setPartnershipConsanguineous("sw", false));
+    expectNoEdit(() => store().setPartnershipConsanguineous("nope", true));
     store().setPartnershipConsanguineous("sw", true);
-    store().setPartnershipConsanguineous("sw", true);
-    expect(store().past).toHaveLength(1);
+    expectNoEdit(() => store().setPartnershipConsanguineous("sw", true));
   });
 
   it("the line follows later edits: adoption turns a cousin couple single, and back", () => {

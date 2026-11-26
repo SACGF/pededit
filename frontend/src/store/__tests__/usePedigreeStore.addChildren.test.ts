@@ -1,31 +1,17 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore, MAX_ADD_CHILDREN } from "../usePedigreeStore";
+import { F, M, build, couple } from "../../fixtures/features";
+import { expectOneUndoStep } from "./undoSteps";
 
-function loneMale(): Pedigree {
-  return {
-    individuals: [
-      { id: "p1", sex: "male", affected: false, sibOrder: 0, name: "", notes: "" },
-    ],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+const loneMale = () => build([M("p1")], [], {});
 
-function coupleWithTwoKids(): Pedigree {
-  return {
-    individuals: [
-      { id: "p1", sex: "male", affected: false, sibOrder: 0, name: "", notes: "" },
-      { id: "p2", sex: "female", affected: false, sibOrder: 0, name: "", notes: "" },
-      { id: "c1", sex: "male", affected: false, sibOrder: 0, name: "", notes: "" },
-      { id: "c2", sex: "female", affected: false, sibOrder: 4, name: "", notes: "" },
-    ],
-    partnerships: [{ id: "pp", individual1: "p1", individual2: "p2" }],
-    parentOf: { pp: ["c1", "c2"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+/** c2's sibOrder has a gap below it (4), which new children must follow. */
+const coupleWithTwoKids = (): Pedigree => {
+  const p = build([M("p1"), F("p2"), M("c1"), F("c2")], [couple("pp", "p1", "p2")], { pp: ["c1", "c2"] });
+  p.individuals.find(i => i.id === "c2")!.sibOrder = 4;
+  return p;
+};
 
 const store = () => usePedigreeStore.getState();
 
@@ -57,8 +43,7 @@ describe("addChildren", () => {
 
   it("is a single undo step", () => {
     store().initialize(loneMale());
-    store().addChildren("p1", 3, "female");
-    expect(store().past).toHaveLength(1);
+    expectOneUndoStep(() => store().addChildren("p1", 3, "female"));
 
     store().undo();
     expect(store().pedigree.individuals).toHaveLength(1);
@@ -86,8 +71,8 @@ describe("addChildren", () => {
 
   it("adds to the chosen partnership when the individual has several", () => {
     const ped = coupleWithTwoKids();
-    ped.individuals.push({ id: "p3", sex: "female", affected: false, sibOrder: 0, name: "", notes: "" });
-    ped.partnerships.push({ id: "pq", individual1: "p1", individual2: "p3" });
+    ped.individuals.push(F("p3"));
+    ped.partnerships.push(couple("pq", "p1", "p3"));
     ped.parentOf["pq"] = [];
     store().initialize(ped);
     store().addChildren("p1", 2, "male", "pq");

@@ -5,28 +5,29 @@ import { lintScene } from "../renderLint";
 import { buildScene } from "../scene";
 import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 
 /** gf = gm → son, dau (twins); son = wife → gc1; orphan and loner have no parents. */
 function pedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "gf", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gm", sex: "female", affected: false, sibOrder: 1 },
-      { id: "son", sex: "male", affected: false, sibOrder: 0 },
-      { id: "dau", sex: "female", affected: false, sibOrder: 1 },
-      { id: "wife", sex: "female", affected: false, sibOrder: 2 },
-      { id: "gc1", sex: "male", affected: false, sibOrder: 0 },
-      { id: "orphan", sex: "female", affected: false, sibOrder: 3, name: "Orphan" },
-      { id: "loner", sex: "unknown", affected: false, sibOrder: 4 },
-      { id: "preg", sex: "unknown", affected: false, sibOrder: 5, lifeStatus: "pregnancy" },
+  return build(
+    [
+      M("gf"),
+      F("gm"),
+      M("son"),
+      F("dau"),
+      F("wife"),
+      M("gc1"),
+      F("orphan", { name: "Orphan" }),
+      U("loner"),
+      U("preg", { lifeStatus: "pregnancy" }),
     ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm", twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }], childless: undefined },
-      { id: "sw", individual1: "son", individual2: "wife" },
+    [
+      couple("g", "gf", "gm", { twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }] }),
+      couple("sw", "son", "wife"),
     ],
-    parentOf: { g: ["son", "dau"], sw: ["gc1"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
+    { g: ["son", "dau"], sw: ["gc1"] },
+  );
 }
 
 describe("setParentsProblem (#36)", () => {
@@ -102,14 +103,11 @@ describe("setParents (#36)", () => {
   });
 
   it("refuses with the rule's message and no undo entry", () => {
-    expect(store().setParents("gf", ["gc1"])).toMatch(/descendant/);
-    expect(store().past).toHaveLength(0);
+    expect(expectNoEdit(() => store().setParents("gf", ["gc1"]))).toMatch(/descendant/);
   });
 
   it("is one undo step", () => {
-    store().setParents("orphan", ["son", "wife"]);
-    store().undo();
-    expect(ped()).toEqual(pedigree());
+    expectOneUndoStep(() => store().setParents("orphan", ["son", "wife"]));
   });
 });
 

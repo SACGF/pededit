@@ -5,6 +5,8 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { lintScene } from "../renderLint";
 import { buildScene } from "../scene";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 
 /**
  *   gf = gm             (founders)
@@ -16,32 +18,33 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
  *   loner               unrelated
  */
 function pedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "gf", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gm", sex: "female", affected: false, sibOrder: 1 },
-      { id: "son", sex: "male", affected: false, sibOrder: 0 },
-      { id: "dau", sex: "female", affected: false, sibOrder: 1 },
-      { id: "wife", sex: "female", affected: false, sibOrder: 2 },
-      { id: "uncle", sex: "male", affected: false, sibOrder: 3 },
-      { id: "aunt", sex: "female", affected: false, sibOrder: 4 },
-      { id: "cousin", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gc1", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gc2", sex: "female", affected: false, sibOrder: 1 },
-      { id: "gc3", sex: "unknown", affected: false, sibOrder: 0 },
-      { id: "loner", sex: "unknown", affected: false, sibOrder: 5 },
+  return build(
+    [
+      M("gf"),
+      F("gm"),
+      M("son"),
+      F("dau"),
+      F("wife"),
+      M("uncle"),
+      F("aunt"),
+      M("cousin"),
+      M("gc1"),
+      F("gc2"),
+      U("gc3"),
+      U("loner"),
     ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm", twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }] },
-      { id: "sw", individual1: "son", individual2: "wife" },
-      { id: "ua", individual1: "uncle", individual2: "aunt" },
-      { id: "dc", individual1: "dau", individual2: "cousin", consanguineous: true },
+    [
+      couple("g", "gf", "gm", { twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }] }),
+      couple("sw", "son", "wife"),
+      couple("ua", "uncle", "aunt"),
+      couple("dc", "dau", "cousin", { consanguineous: true }),
     ],
-    parentOf: { g: ["son", "dau"], sw: ["gc1", "gc2"], ua: ["cousin"], dc: ["gc3"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    pinnedPositions: { gc2: { x: 10, y: 20 }, gf: { x: 0, y: 0 } },
-    unlockedIndividuals: ["gc2", "gf"],
-  };
+    { g: ["son", "dau"], sw: ["gc1", "gc2"], ua: ["cousin"], dc: ["gc3"] },
+    {
+      pinnedPositions: { gc2: { x: 10, y: 20 }, gf: { x: 0, y: 0 } },
+      unlockedIndividuals: ["gc2", "gf"],
+    },
+  );
 }
 
 const sorted = (s: Set<string>) => [...s].sort();
@@ -109,21 +112,18 @@ describe("removeWithDescendants / removeWithAncestors (#34)", () => {
     p.partnerships = p.partnerships.filter(q => ["g", "sw"].includes(q.id));
     p.parentOf = { g: ["son", "dau"], sw: ["gc1", "gc2"] };
     store().initialize(p);
-    expect(store().removeWithDescendants(["gf"])).toBe(0);
-    expect(store().pedigree.individuals).toHaveLength(7);
-    expect(store().past).toHaveLength(0);
+    expect(expectNoEdit(() => store().removeWithDescendants(["gf"]))).toBe(0);
     expect(store().notice?.kind).toBe("error");
   });
 
   it("is one undo step", () => {
-    store().removeWithDescendants(["gf"]);
+    expectOneUndoStep(() => store().removeWithDescendants(["gf"]));
     expect(store().pedigree.individuals).toHaveLength(4);
     store().undo();
     expect(store().pedigree).toEqual(pedigree());
   });
 
   it("ignores unknown ids", () => {
-    expect(store().removeWithAncestors(["nobody"])).toBe(0);
-    expect(store().past).toHaveLength(0);
+    expect(expectNoEdit(() => store().removeWithAncestors(["nobody"]))).toBe(0);
   });
 });

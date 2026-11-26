@@ -1,30 +1,14 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { usePedigreeStore, hasPartnerOrChild } from "../usePedigreeStore";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
-
-function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
-  return {
-    individuals: [],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    ...overrides,
-  };
-}
+import { F, M, U, build, couple } from "../../fixtures/features";
+import { expectNoEdit } from "./undoSteps";
 
 /** Parents "dad" and "mum" with one child "kid" and one unrelated "solo". */
-function familyPedigree(): Pedigree {
-  return makePedigree({
-    individuals: [
-      { id: "dad",  sex: "male",    affected: false, sibOrder: 0 },
-      { id: "mum",  sex: "female",  affected: false, sibOrder: 1 },
-      { id: "kid",  sex: "unknown", affected: false, sibOrder: 0 },
-      { id: "solo", sex: "female",  affected: false, sibOrder: 2 },
-    ],
-    partnerships: [{ id: "p1", individual1: "dad", individual2: "mum" }],
-    parentOf: { p1: ["kid"] },
-  });
-}
+const familyPedigree = () => build(
+  [M("dad"), F("mum"), U("kid"), F("solo")],
+  [couple("p1", "dad", "mum")],
+  { p1: ["kid"] },
+);
 
 const store = () => usePedigreeStore.getState();
 const find = (id: string) => store().pedigree.individuals.find(i => i.id === id)!;
@@ -80,16 +64,11 @@ describe("setLifeStatus", () => {
   });
 
   it("refuses to mark an individual with a partner or children", () => {
-    const before = store().past.length;
-    store().setLifeStatus("dad", "miscarriage");
-    expect(find("dad").lifeStatus).toBeUndefined();
-    expect(store().past.length).toBe(before);   // no undo entry, no-op
+    expectNoEdit(() => store().setLifeStatus("dad", "miscarriage"));
   });
 
   it("allows clearing even when the individual has a partner (defensive)", () => {
-    const before = store().pedigree;
-    store().setLifeStatus("dad", undefined);
-    expect(store().pedigree).toBe(before);
+    expectNoEdit(() => store().setLifeStatus("dad", undefined));
   });
 
   it("marks a solo individual who then cannot gain a partner or child", () => {
@@ -112,12 +91,7 @@ describe("add child / add partner on a pregnancy or loss", () => {
   it.each(["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"] as const)(
     "addChild is refused for a %s", (status) => {
       store().setLifeStatus("kid", status);
-      const n = store().pedigree.individuals.length;
-      const before = store().past.length;
-      store().addChild("kid", "male");
-      expect(store().pedigree.individuals.length).toBe(n);
-      expect(store().pedigree.partnerships).toHaveLength(1);
-      expect(store().past.length).toBe(before);
+      expectNoEdit(() => store().addChild("kid", "male"));
       },
   );
 

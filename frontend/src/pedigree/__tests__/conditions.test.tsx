@@ -28,6 +28,7 @@ import { affectedOnlySeeds } from "../viewFilters";
 import { batchStatus } from "../batch";
 import { findProblems } from "../validation";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 import { pedigreeApi } from "../../api/client";
 
 const CF: Tag = { id: "cf", label: "Cystic fibrosis", color: "#d62728", style: "quadrant" };
@@ -763,18 +764,15 @@ describe("store actions (#115)", () => {
   beforeEach(() => get().initialize(family()));
 
   it("setConditionStatus is one undo step, and a no-op makes none", () => {
-    get().setConditionStatus("d", "cf", "carrier");
+    expectOneUndoStep(() => get().setConditionStatus("d", "cf", "carrier"));
     expect(who("d")).toMatchObject({ carrierTags: ["cf"], affected: true });
-    expect(get().past).toHaveLength(1);
-    get().setConditionStatus("d", "cf", "carrier");
-    expect(get().past).toHaveLength(1);
+    expectNoEdit(() => get().setConditionStatus("d", "cf", "carrier"));
     get().undo();
     expect(who("d").carrierTags).toBeUndefined();
   });
 
   it("setConditionStatusMany marks several in one step", () => {
-    get().setConditionStatusMany(["a", "b", "d"], "ts", "carrier");
-    expect(get().past).toHaveLength(1);
+    expectOneUndoStep(() => get().setConditionStatusMany(["a", "b", "d"], "ts", "carrier"));
     for (const id of ["a", "b", "d"]) expect(who(id).carrierTags).toContain("ts");
     expect(get().notice?.text).toBe("Marked 3 carriers of Tay-Sachs.");
   });

@@ -1,24 +1,14 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { usePedigreeStore } from "../usePedigreeStore";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { F, M, U, build, couple } from "../../fixtures/features";
+import { expectNoEdit } from "./undoSteps";
 
 /** "dad" = "mum" with child "kid"; "dad" = "wife2" with no children. */
-function familyPedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "dad",   sex: "male",    affected: false, sibOrder: 0 },
-      { id: "mum",   sex: "female",  affected: false, sibOrder: 1 },
-      { id: "wife2", sex: "female",  affected: false, sibOrder: 2 },
-      { id: "kid",   sex: "unknown", affected: false, sibOrder: 0 },
-    ],
-    partnerships: [
-      { id: "p1", individual1: "dad", individual2: "mum" },
-      { id: "p2", individual1: "dad", individual2: "wife2" },
-    ],
-    parentOf: { p1: ["kid"], p2: [] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+const familyPedigree = () => build(
+  [M("dad"), F("mum"), F("wife2"), U("kid")],
+  [couple("p1", "dad", "mum"), couple("p2", "dad", "wife2")],
+  { p1: ["kid"], p2: [] },
+);
 
 const store = () => usePedigreeStore.getState();
 const partnership = (id: string) => store().pedigree.partnerships.find(p => p.id === id)!;
@@ -54,10 +44,7 @@ describe("setPartnershipChildless (#15)", () => {
   });
 
   it("refuses a couple with children", () => {
-    const before = store().past.length;
-    store().setPartnershipChildless("p1", "infertility");
-    expect(partnership("p1").childless).toBeUndefined();
-    expect(store().past.length).toBe(before);
+    expectNoEdit(() => store().setPartnershipChildless("p1", "infertility"));
   });
 
   it("adding a child clears the mark and reason", () => {
@@ -88,7 +75,6 @@ describe("setPartnershipChildless (#15)", () => {
   });
 
   it("is a no-op for an unknown partnership", () => {
-    store().setPartnershipChildless("nope", "infertility");
-    expect(store().pedigree).toEqual(familyPedigree());
+    expectNoEdit(() => store().setPartnershipChildless("nope", "infertility"));
   });
 });

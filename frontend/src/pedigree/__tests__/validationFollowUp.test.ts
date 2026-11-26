@@ -13,20 +13,22 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { ProblemFixes, fixAllLike } from "../../components/ProblemFixes";
 import { stepProblem, resetProblemStep } from "../../components/ProblemsMenu";
 import { EXAMPLES } from "../../data/examples";
+import { M, F, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 
 const TODAY = new Date(2026, 10, 13);
 
-const ind = (id: string, o: Partial<Individual> = {}): Individual => ({ id, sex: "female", affected: false, sibOrder: 0, ...o });
+/** A woman unless `o` gives a sex: most of these rules are about mothers. */
+const ind = (id: string, o: Partial<Individual> = {}): Individual => F(id, o);
 
 /** Father f, mother m, and their children (with any extra people and partnerships). */
 function family(children: Individual[], o: { father?: Partial<Individual>; mother?: Partial<Individual>; couple?: Partial<Partnership>; extra?: Individual[]; ped?: Partial<Pedigree> } = {}): Pedigree {
-  return {
-    individuals: [ind("f", { sex: "male", ...o.father }), ind("m", o.mother), ...children, ...(o.extra ?? [])],
-    partnerships: [{ id: "p", individual1: "f", individual2: "m", ...o.couple }],
-    parentOf: { p: children.map(c => c.id) },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    ...o.ped,
-  };
+  return build(
+    [M("f", o.father), F("m", o.mother), ...children, ...(o.extra ?? [])],
+    [couple("p", "f", "m", o.couple)],
+    { p: children.map(c => c.id) },
+    o.ped,
+  );
 }
 
 const rules = (p: Pedigree) => findProblems(p, RULES, TODAY).map(x => x.id);
@@ -93,12 +95,11 @@ describe("follow-up checks (#116)", () => {
     expect(only(family([ind("c", { dob: "2000" })], { mother: { dob: "1945" } }), "mother-too-old")).toEqual([]);
     expect(only(family([ind("c", { dob: "2000" })], { father: { dob: "1930" } }), "mother-too-old")).toEqual([]);
     // An egg donor (#45) is the genetic mother; the intended mother carried the pregnancy.
-    const egg: Pedigree = {
-      individuals: [ind("f", { sex: "male" }), ind("m", { dob: "1940" }), ind("d", { dob: "1975", reproductiveRole: "donor" }), ind("c", { dob: "2000", carriedBy: "m" })],
-      partnerships: [{ id: "p", individual1: "f", individual2: "m" }, { id: "q", individual1: "f", individual2: "d", donorConception: true }],
-      parentOf: { q: ["c"] },
-      siblingOrder: { mode: "insertion", affectedFirst: false },
-    };
+    const egg = build(
+      [M("f"), F("m", { dob: "1940" }), F("d", { dob: "1975", reproductiveRole: "donor" }), F("c", { dob: "2000", carriedBy: "m" })],
+      [couple("p", "f", "m"), couple("q", "f", "d", { donorConception: true })],
+      { q: ["c"] },
+    );
     expect(only(egg, "mother-too-old")).toEqual([]);
   });
 
@@ -281,12 +282,10 @@ describe("problems list (#116 follow-up)", () => {
 
   it("Fix all like this is one undo step", () => {
     usePedigreeStore.getState().initialize(old());
-    const before = usePedigreeStore.getState().past.length;
     const first = problemsOf(usePedigreeStore.getState().pedigree).all.find(x => x.rule === "living-over-110")!;
-    expect(fixAllLike(first, "Mark deceased")).toBe(4);
+    expect(expectOneUndoStep(() => fixAllLike(first, "Mark deceased"))).toBe(4);
     const s = usePedigreeStore.getState();
     expect(s.pedigree.individuals.every(i => i.deceased)).toBe(true);
-    expect(s.past.length).toBe(before + 1);
     s.undo();
     expect(usePedigreeStore.getState().pedigree.individuals.some(i => i.deceased)).toBe(false);
   });
@@ -347,8 +346,6 @@ describe("problems list (#116 follow-up)", () => {
   });
 
   it("groupEdits leaves no step when nothing was edited", () => {
-    const before = usePedigreeStore.getState().past.length;
-    usePedigreeStore.getState().groupEdits(() => {});
-    expect(usePedigreeStore.getState().past.length).toBe(before);
+    expectNoEdit(() => usePedigreeStore.getState().groupEdits(() => {}));
   });
 });

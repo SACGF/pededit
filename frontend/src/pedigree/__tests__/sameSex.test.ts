@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
-import type { Individual, Pedigree, Sex } from "@pedigree-editor/layout-engine";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectOneUndoStep } from "../../store/__tests__/undoSteps";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { assistedLinks } from "../assisted";
 import { isSameSexCouple, donorPairFor } from "../sameSex";
@@ -20,26 +22,17 @@ import { raisedChildrenOf } from "../graph";
  * parents may not, so a same-sex couple's child is one partner's and a
  * donor's, the other partner a social parent (NSGC 2022 Fig. 5, 1b).
  */
-const person = (id: string, sex: Sex, extra: Partial<Individual> = {}): Individual =>
-  ({ id, sex, affected: false, sibOrder: 0, name: id, notes: "", ...extra });
-
 /** gf = gm → ann; ann and bea unpartnered; cal a man; kid a child of x = y. */
-function family(): Pedigree {
-  return {
-    individuals: [
-      person("gf", "male"), person("gm", "female"),
-      person("ann", "female", { name: "Ann" }), person("bea", "female", { name: "Bea" }),
-      person("cal", "male", { name: "Cal" }), person("dan", "male", { name: "Dan" }),
-      person("x", "male"), person("y", "female", { placeholder: true, name: "", notes: "" }), person("kid", "unknown", { name: "Kid" }),
-    ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm" },
-      { id: "xy", individual1: "x", individual2: "y" },
-    ],
-    parentOf: { g: ["ann"], xy: ["kid"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+const family = (): Pedigree => build(
+  [
+    M("gf"), F("gm"),
+    F("ann", { name: "Ann" }), F("bea", { name: "Bea" }),
+    M("cal", { name: "Cal" }), M("dan", { name: "Dan" }),
+    M("x"), F("y", { placeholder: true }), U("kid", { name: "Kid" }),
+  ],
+  [couple("g", "gf", "gm"), couple("xy", "x", "y")],
+  { g: ["ann"], xy: ["kid"] },
+);
 
 const store = () => usePedigreeStore.getState();
 const ped = () => store().pedigree;
@@ -103,7 +96,7 @@ describe("same-sex couples: children (#105)", () => {
   it("Add child from a partner: hers and a new sperm donor's, her partner a social parent (Fig. 5, 1b)", () => {
     store().setPartnershipChildless(ab, "byChoice");
     const before = ped();
-    store().addChild("ann", "male");
+    expectOneUndoStep(() => store().addChild("ann", "male"));
     const [donor, child] = [newKids(before).find(i => i.reproductiveRole === "donor")!, newKids(before).find(i => !i.reproductiveRole)!];
     expect(donor).toMatchObject({ sex: "male", reproductiveRole: "donor" });
     expect(child.sex).toBe("male");
@@ -115,7 +108,6 @@ describe("same-sex couples: children (#105)", () => {
     // Bea is joined by the couple line only; nobody else gets a line.
     expect(assistedLinks(ped())).toEqual([]);
     expect(store().notice!.text).toMatch(/sperm donor/);
-    expect(store().past).toHaveLength(3); // link, childless mark, add: one step each
 
     const k = kinshipCoefficients(ped());
     expect(k.kinship("ann", child.id)).toBe(1 / 4);

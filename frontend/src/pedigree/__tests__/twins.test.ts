@@ -12,27 +12,15 @@ import { importJson } from "../../io/json/importer";
 import { exportJson } from "../../io/json/exporter";
 import { NODE_SIZE } from "../constants";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit } from "../../store/__tests__/undoSteps";
 
 /** f = m with children a, b (MZ twins, both male), c, d (twins of unknown zygosity), e. */
-function pedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "f", sex: "male",   affected: false, sibOrder: 0 },
-      { id: "m", sex: "female", affected: false, sibOrder: 1 },
-      { id: "a", sex: "male",   affected: false, sibOrder: 0, name: "Al" },
-      { id: "b", sex: "male",   affected: true,  sibOrder: 1, name: "Bob" },
-      { id: "c", sex: "female", affected: false, sibOrder: 2 },
-      { id: "d", sex: "male",   affected: false, sibOrder: 3 },
-      { id: "e", sex: "unknown", affected: false, sibOrder: 4 },
-    ],
-    partnerships: [{
-      id: "p", individual1: "f", individual2: "m",
-      twins: [{ members: ["a", "b"], zygosity: "monozygotic" }, { members: ["c", "d"], zygosity: "unknown" }],
-    }],
-    parentOf: { p: ["a", "b", "c", "d", "e"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-}
+const pedigree = (): Pedigree => build(
+  [M("f"), F("m"), M("a", { name: "Al" }), M("b", { affected: true, name: "Bob" }), F("c"), M("d"), U("e")],
+  [couple("p", "f", "m", { twins: [{ members: ["a", "b"], zygosity: "monozygotic" }, { members: ["c", "d"], zygosity: "unknown" }] })],
+  { p: ["a", "b", "c", "d", "e"] },
+);
 
 describe("twin fork geometry (#11)", () => {
   const kids = [
@@ -61,17 +49,11 @@ describe("twin fork geometry (#11)", () => {
     expect(sibshipSegments({ coupleX: 80, coupleY: 0, children: kids })[1]).toEqual([40, 60, 160, 60]);
     // Twins as the only children: no bar beyond the shared point.
     expect(sibshipSegments({ coupleX: 40, coupleY: 0, children: kids.slice(0, 2) })[1]).toEqual([40, 60, 40, 60]);
-    const twinsOnly: Pedigree = {
-      individuals: [
-        { id: "f", sex: "male", affected: false, sibOrder: 0 },
-        { id: "m", sex: "female", affected: false, sibOrder: 0 },
-        { id: "a", sex: "female", affected: false, sibOrder: 0 },
-        { id: "b", sex: "male", affected: false, sibOrder: 1 },
-      ],
-      partnerships: [{ id: "p", individual1: "f", individual2: "m", twins: [{ members: ["a", "b"], zygosity: "unknown" }] }],
-      parentOf: { p: ["a", "b"] },
-      siblingOrder: { mode: "insertion", affectedFirst: false },
-    };
+    const twinsOnly = build(
+      [M("f"), F("m"), F("a"), M("b")],
+      [couple("p", "f", "m", { twins: [{ members: ["a", "b"], zygosity: "unknown" }] })],
+      { p: ["a", "b"] },
+    );
     expect(lintExport(twinsOnly)).toEqual([]);
   });
 
@@ -156,9 +138,7 @@ describe("setTwins / removeTwin / setSex (#11)", () => {
   });
 
   it("refuses with a message and changes nothing", () => {
-    const before = store().past.length;
-    expect(store().setTwins("p", ["c", "e"], "monozygotic")).toMatch(/same sex/);
-    expect(store().past.length).toBe(before);
+    expect(expectNoEdit(() => store().setTwins("p", ["c", "e"], "monozygotic"))).toMatch(/same sex/);
   });
 
   it("changes zygosity of an existing set in place", () => {

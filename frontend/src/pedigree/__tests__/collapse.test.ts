@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { person, M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 import { collapseInfo, drawnPedigree, asDrawn, rootsHidingNew, hasDescendants, branchPlaceholderId, isBranchPlaceholderId, branchTooltip } from "../collapse";
 import { batchCollapseState } from "../selection";
 import { parseExportSvg } from "../../io/svg/exportLint";
@@ -24,31 +26,32 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
  *   loner               unrelated
  */
 function pedigree(flags: Record<string, true> = {}): Pedigree {
-  const p: Pedigree = {
-    individuals: [
-      { id: "gf", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gm", sex: "female", affected: false, sibOrder: 1 },
-      { id: "son", sex: "male", affected: false, sibOrder: 0 },
-      { id: "dau", sex: "female", affected: false, sibOrder: 1 },
-      { id: "wife", sex: "female", affected: true, sibOrder: 2 },
-      { id: "uncle", sex: "male", affected: false, sibOrder: 3 },
-      { id: "aunt", sex: "female", affected: false, sibOrder: 4 },
-      { id: "cousin", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gc1", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gc2", sex: "female", affected: false, sibOrder: 1 },
-      { id: "gc3", sex: "unknown", affected: false, sibOrder: 0 },
-      { id: "loner", sex: "unknown", affected: false, sibOrder: 5 },
+  const p: Pedigree = build(
+    [
+      M("gf"),
+      F("gm"),
+      M("son"),
+      F("dau"),
+      F("wife", { affected: true }),
+      M("uncle"),
+      F("aunt"),
+      M("cousin"),
+      M("gc1"),
+      F("gc2"),
+      U("gc3"),
+      U("loner"),
     ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm", twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }] },
-      { id: "sw", individual1: "son", individual2: "wife" },
-      { id: "ua", individual1: "uncle", individual2: "aunt" },
-      { id: "dc", individual1: "dau", individual2: "cousin" },
+    [
+      couple("g", "gf", "gm", { twins: [{ members: ["son", "dau"], zygosity: "dizygotic" }] }),
+      couple("sw", "son", "wife"),
+      couple("ua", "uncle", "aunt"),
+      couple("dc", "dau", "cousin"),
     ],
-    parentOf: { g: ["son", "dau"], sw: ["gc1", "gc2"], ua: ["cousin"], dc: ["gc3"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    pinnedPositions: { gc2: { x: 10, y: 20 } },
-  };
+    { g: ["son", "dau"], sw: ["gc1", "gc2"], ua: ["cousin"], dc: ["gc3"] },
+    {
+      pinnedPositions: { gc2: { x: 10, y: 20 } },
+    },
+  );
   for (const i of p.individuals) if (flags[i.id]) i.descendantsHidden = true;
   return p;
 }
@@ -199,14 +202,12 @@ describe("setDescendantsHidden (#94)", () => {
 
   it("hides and shows as one undo step each, dropping hidden people from the selection", () => {
     store().setSelection(["gc1", "son"], "gc1");
-    store().setDescendantsHidden(["son"], true);
+    expectOneUndoStep(() => store().setDescendantsHidden(["son"], true));
     expect(store().pedigree.individuals.find(i => i.id === "son")!.descendantsHidden).toBe(true);
     expect(store().pedigree.individuals).toHaveLength(12); // nothing deleted
     expect(store().selectedIds).toEqual(["son"]);
-    expect(store().past).toHaveLength(1);
-    store().setDescendantsHidden(["son"], true); // no change, no undo entry
-    expect(store().past).toHaveLength(1);
-    store().setDescendantsHidden(["son"], false);
+    expectNoEdit(() => store().setDescendantsHidden(["son"], true));
+    expectOneUndoStep(() => store().setDescendantsHidden(["son"], false));
     expect(store().pedigree.individuals.find(i => i.id === "son")!.descendantsHidden).toBeUndefined();
     store().undo();
     expect(store().pedigree.individuals.find(i => i.id === "son")!.descendantsHidden).toBe(true);
@@ -311,26 +312,27 @@ describe("collapsed branch diamond (#1)", () => {
  *   └ d        condition tag     drawn as herself
  */
 function sibship(sexOfE: "male" | "female" = "female"): Pedigree {
-  return {
-    individuals: [
-      { id: "p1", sex: "male", affected: false, sibOrder: 0, descendantsHidden: true },
-      { id: "p2", sex: "female", affected: false, sibOrder: 1 },
-      { id: "a", sex: "male", affected: false, sibOrder: 0 },
-      { id: "b", sex: "male", affected: false, sibOrder: 1 },
-      { id: "c", sex: "female", affected: true, sibOrder: 2, deceased: true },
-      { id: "d", sex: "female", affected: false, sibOrder: 3, tags: ["t1"] },
-      { id: "e", sex: sexOfE, affected: false, sibOrder: 4 },
-      { id: "h", sex: "male", affected: false, sibOrder: 5 },
-      { id: "k", sex: "male", affected: true, sibOrder: 0 },
+  return build(
+    [
+      M("p1", { descendantsHidden: true }),
+      F("p2"),
+      M("a"),
+      M("b"),
+      F("c", { affected: true, deceased: true }),
+      F("d", { tags: ["t1"] }),
+      person("e", sexOfE),
+      M("h"),
+      M("k", { affected: true }),
     ],
-    partnerships: [
-      { id: "pp", individual1: "p1", individual2: "p2" },
-      { id: "ch", individual1: "c", individual2: "h" },
+    [
+      couple("pp", "p1", "p2"),
+      couple("ch", "c", "h"),
     ],
-    parentOf: { pp: ["a", "b", "c", "d", "e"], ch: ["k"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    tags: [{ id: "t1", label: "Cancer", color: "#d62728", style: "quadrant" }],
-  };
+    { pp: ["a", "b", "c", "d", "e"], ch: ["k"] },
+    {
+      tags: [{ id: "t1", label: "Cancer", color: "#d62728", style: "quadrant" }],
+    },
+  );
 }
 
 describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {

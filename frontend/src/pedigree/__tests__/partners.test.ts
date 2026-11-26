@@ -5,34 +5,35 @@ import { lintScene } from "../renderLint";
 import { buildScene } from "../scene";
 import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, U, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 
 /**
  * gf = gm → son, dau; son = wife → gc1; dau = hus → gc2 (gc1 and gc2 are
  * first cousins). loner and stranger have no relatives.
  */
 function pedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "gf", sex: "male", affected: false, sibOrder: 0 },
-      { id: "gm", sex: "female", affected: false, sibOrder: 1 },
-      { id: "son", sex: "male", affected: false, sibOrder: 0 },
-      { id: "dau", sex: "female", affected: false, sibOrder: 1 },
-      { id: "wife", sex: "female", affected: false, sibOrder: 2 },
-      { id: "hus", sex: "male", affected: false, sibOrder: 3 },
-      { id: "gc1", sex: "male", affected: false, sibOrder: 0, name: "Cousin A" },
-      { id: "gc2", sex: "female", affected: false, sibOrder: 0, name: "Cousin B" },
-      { id: "loner", sex: "unknown", affected: false, sibOrder: 4 },
-      { id: "stranger", sex: "female", affected: false, sibOrder: 5 },
-      { id: "preg", sex: "unknown", affected: false, sibOrder: 6, lifeStatus: "pregnancy" },
+  return build(
+    [
+      M("gf"),
+      F("gm"),
+      M("son"),
+      F("dau"),
+      F("wife"),
+      M("hus"),
+      M("gc1", { name: "Cousin A" }),
+      F("gc2", { name: "Cousin B" }),
+      U("loner"),
+      F("stranger"),
+      U("preg", { lifeStatus: "pregnancy" }),
     ],
-    partnerships: [
-      { id: "g", individual1: "gf", individual2: "gm" },
-      { id: "sw", individual1: "son", individual2: "wife" },
-      { id: "dh", individual1: "hus", individual2: "dau" },
+    [
+      couple("g", "gf", "gm"),
+      couple("sw", "son", "wife"),
+      couple("dh", "hus", "dau"),
     ],
-    parentOf: { g: ["son", "dau"], sw: ["gc1"], dh: ["gc2"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
+    { g: ["son", "dau"], sw: ["gc1"], dh: ["gc2"] },
+  );
 }
 
 describe("linkPartnerProblem (#84)", () => {
@@ -91,16 +92,12 @@ describe("linkPartner (#84)", () => {
   });
 
   it("refuses with the reason and changes nothing", () => {
-    expect(store().linkPartner("son", "wife")).toMatch(/already partners/);
-    expect(store().linkPartner("gc1", "preg")).toMatch(/pregnancy/);
-    expect(ped()).toEqual(pedigree());
-    expect(store().past).toHaveLength(0);
+    expect(expectNoEdit(() => store().linkPartner("son", "wife"))).toMatch(/already partners/);
+    expect(expectNoEdit(() => store().linkPartner("gc1", "preg"))).toMatch(/pregnancy/);
   });
 
   it("is one undo step", () => {
-    store().linkPartner("gc1", "gc2");
-    store().undo();
-    expect(ped()).toEqual(pedigree());
+    expectOneUndoStep(() => store().linkPartner("gc1", "gc2"));
   });
 
   it("children can then be added to the linked couple", () => {

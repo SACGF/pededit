@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { alignPedigreeByFamily, drawnLeftPartner } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, F, couple, build } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 import { swapSidesPlan } from "../partners";
 import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
@@ -12,28 +14,27 @@ import { EXAMPLES } from "../../data/examples";
 
 /** H1 = W = H2: W has a child with each husband; W's parents F, M are drawn. */
 function pedigree(): Pedigree {
-  return {
-    individuals: [
-      { id: "F", sex: "male", affected: false, sibOrder: 0 },
-      { id: "M", sex: "female", affected: false, sibOrder: 1 },
-      { id: "W", sex: "female", affected: false, sibOrder: 0 },
-      { id: "S", sex: "male", affected: false, sibOrder: 1 },
-      { id: "H1", sex: "male", affected: false, sibOrder: 2 },
-      { id: "H2", sex: "male", affected: false, sibOrder: 3 },
-      { id: "a", sex: "male", affected: false, sibOrder: 0 },
-      { id: "b", sex: "female", affected: false, sibOrder: 0 },
-      { id: "x", sex: "male", affected: false, sibOrder: 4 },
-      { id: "y", sex: "female", affected: false, sibOrder: 5 },
+  return build(
+    [
+      M("F"),
+      F("M"),
+      F("W"),
+      M("S"),
+      M("H1"),
+      M("H2"),
+      M("a"),
+      F("b"),
+      M("x"),
+      F("y"),
     ],
-    partnerships: [
-      { id: "FM", individual1: "F", individual2: "M" },
-      { id: "W1", individual1: "H1", individual2: "W" },
-      { id: "W2", individual1: "H2", individual2: "W" },
-      { id: "xy", individual1: "x", individual2: "y" },
+    [
+      couple("FM", "F", "M"),
+      couple("W1", "H1", "W"),
+      couple("W2", "H2", "W"),
+      couple("xy", "x", "y"),
     ],
-    parentOf: { FM: ["W", "S"], W1: ["a"], W2: ["b"], xy: [] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
+    { FM: ["W", "S"], W1: ["a"], W2: ["b"], xy: [] },
+  );
 }
 
 const store = () => usePedigreeStore.getState();
@@ -44,7 +45,7 @@ describe("swap sides (#106)", () => {
 
   it("swaps a childless couple, as one undo step, pinning nobody", () => {
     expect(leftOf(store().pedigree, "xy")).toBe("x");
-    expect(store().swapPartnerSides("xy")).toBeNull();
+    expect(expectOneUndoStep(() => store().swapPartnerSides("xy"))).toBeNull();
     expect(store().pedigree.partnerships.find(p => p.id === "xy")!.leftPartner).toBe("y");
     expect(leftOf(store().pedigree, "xy")).toBe("y");
     expect(store().pedigree.pinnedPositions ?? {}).toEqual({});
@@ -81,11 +82,9 @@ describe("swap sides (#106)", () => {
     const ex = EXAMPLES.find(e => e.label === "Half-sib triangle")!;
     const refused = ex.data.partnerships.find(p => "problem" in swapSidesPlan(ex.data, p.id))!;
     store().initialize(ex.data);
-    const problem = store().swapPartnerSides(refused.id);
+    const problem = expectNoEdit(() => store().swapPartnerSides(refused.id));
     expect(problem).toMatch(/cannot swap sides/);
     expect(store().notice?.text).toBe(problem);
-    expect(store().past.length).toBe(0);
-    expect(store().pedigree.partnerships.some(p => p.leftPartner)).toBe(false);
   });
 
   it("survives a JSON round trip, and the importer checks the id", () => {

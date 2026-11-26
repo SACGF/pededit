@@ -1,19 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE } from "../usePedigreeStore";
+import { F, M } from "../../fixtures/features";
+import { family } from "../../data/pedigreeBuilder";
+import { expectOneUndoStep } from "./undoSteps";
 
-function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
-  return {
-    individuals: [
-      { id: "a", sex: "male", affected: false, sibOrder: 0 },
-      { id: "b", sex: "female", affected: false, sibOrder: 1 },
-    ],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    ...overrides,
-  };
-}
+// No canvas settings unless a test gives them: the defaults are under test.
+const makePedigree = (overrides: Partial<Pedigree> = {}): Pedigree => family([M("a"), F("b")], [], {}, overrides);
 
 const store = () => usePedigreeStore.getState();
 
@@ -88,9 +81,7 @@ describe("updateCanvasSettings snap to grid", () => {
 
   it("applies a grid size change as one undo entry", () => {
     store().updateCanvasSettings({ snapToGrid: true });
-    const n = store().past.length;
-    store().updateCanvasSettings({ snapGridSize: 45 });
-    expect(store().past).toHaveLength(n + 1);
+    expectOneUndoStep(() => store().updateCanvasSettings({ snapGridSize: 45 }));
     expect(store().pedigree.pinnedPositions?.a).toEqual({ x: 90, y: 225 });
   });
 
@@ -101,8 +92,7 @@ describe("updateCanvasSettings snap to grid", () => {
   });
 
   it("undo restores both the positions and the setting in one step", () => {
-    store().updateCanvasSettings({ snapToGrid: true });
-    expect(store().past).toHaveLength(1);
+    expectOneUndoStep(() => store().updateCanvasSettings({ snapToGrid: true }));
 
     store().undo();
     expect(store().pedigree.canvasSettings).toBeUndefined();

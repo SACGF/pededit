@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { freeze } from "immer";
-import { M, F, couple, build as buildFixture } from "../../fixtures/features";
+import { M, F, person, couple, build as buildFixture } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "../../store/__tests__/undoSteps";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { affectedOnlyKept, affectedOnlySeeds, bloodRelativesKept, filterHidden, filterBannerText } from "../viewFilters";
 import { collapseInfo, drawnPedigree, branchPlaceholderId, branchTooltip, isBranchPlaceholderId, filterHidingNew } from "../collapse";
@@ -16,14 +17,12 @@ type Spec = [id: string, sex: Individual["sex"], extra?: Partial<Individual>];
 
 /** A pedigree from individuals, couples "id:a+b" and their children. */
 function build(people: Spec[], couples: Record<string, [string, string, string[]]>, on = true): Pedigree {
-  const p: Pedigree = {
-    individuals: people.map(([id, sex, extra], i) => ({ id, sex, affected: false, sibOrder: i, ...extra })),
-    partnerships: Object.entries(couples).map(([id, [a, b]]) => ({ id, individual1: a, individual2: b })),
-    parentOf: Object.fromEntries(Object.entries(couples).map(([id, [, , kids]]) => [id, kids])),
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-  };
-  if (on) p.filters = { affectedOnly: true };
-  return p;
+  return buildFixture(
+    people.map(([id, sex, extra]) => person(id, sex, extra)),
+    Object.entries(couples).map(([id, [a, b]]) => couple(id, a, b)),
+    Object.fromEntries(Object.entries(couples).map(([id, [, , kids]]) => [id, kids])),
+    on ? { filters: { affectedOnly: true } } : {},
+  );
 }
 
 const sorted = (s: Iterable<string>) => [...s].sort();
@@ -216,13 +215,11 @@ describe("setViewFilter (#4)", () => {
 
   it("switches the filter as one undo step, dropping hidden people from the selection", () => {
     store().setSelection(["x", "y"], "y");
-    store().setViewFilter("affectedOnly", true);
+    expectOneUndoStep(() => store().setViewFilter("affectedOnly", true));
     expect(store().pedigree.filters).toEqual({ affectedOnly: true });
     expect(store().selectedIds).toEqual(["x"]);
-    expect(store().past).toHaveLength(1);
-    store().setViewFilter("affectedOnly", true);
-    expect(store().past).toHaveLength(1);
-    store().setViewFilter("affectedOnly", false);
+    expectNoEdit(() => store().setViewFilter("affectedOnly", true));
+    expectOneUndoStep(() => store().setViewFilter("affectedOnly", false));
     expect(store().pedigree.filters).toBeUndefined();
     store().undo();
     expect(store().pedigree.filters).toEqual({ affectedOnly: true });

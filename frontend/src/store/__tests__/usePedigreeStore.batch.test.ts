@@ -1,30 +1,30 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { usePedigreeStore } from "../usePedigreeStore";
-import type { Individual, Pedigree, Sex } from "@pedigree-editor/layout-engine";
+import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { batchSexProblem, batchStatus } from "../../pedigree/batch";
-
-const person = (id: string, sex: Sex, extra: Partial<Individual> = {}): Individual =>
-  ({ id, sex, affected: false, sibOrder: 0, name: id, notes: "", ...extra });
+import { F, M, U, build, couple } from "../../fixtures/features";
+import { expectNoEdit, expectOneUndoStep } from "./undoSteps";
 
 /** Couple f + m with children a, b (monozygotic twins) and c; d unrelated. */
 function family(): Pedigree {
-  return {
-    individuals: [
-      person("f", "male"),
-      person("m", "female", { carrier: true, onset: "40y" }),
-      person("a", "female", { sibOrder: 1 }),
-      person("b", "female", { sibOrder: 2 }),
-      person("c", "male", { sibOrder: 3, presymptomatic: true, deceased: true, dod: "2001" }),
-      person("d", "unknown", { tags: ["t1"], tagOnset: { t1: "30y" } }),
+  return build(
+    [
+      M("f"),
+      F("m", { carrier: true, onset: "40y" }),
+      F("a"),
+      F("b"),
+      M("c", { presymptomatic: true, deceased: true, dod: "2001" }),
+      U("d", { tags: ["t1"], tagOnset: { t1: "30y" } }),
     ],
-    partnerships: [{ id: "p", individual1: "f", individual2: "m", twins: [{ members: ["a", "b"], zygosity: "monozygotic" }] }],
-    parentOf: { p: ["a", "b", "c"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    tags: [
-      { id: "t1", label: "Breast cancer", color: "#f00", style: "quadrant" },
-      { id: "t2", label: "Ovarian cancer", color: "#00f", style: "quadrant" },
-    ],
-  };
+    [couple("p", "f", "m", { twins: [{ members: ["a", "b"], zygosity: "monozygotic" }] })],
+    { p: ["a", "b", "c"] },
+    {
+      tags: [
+        { id: "t1", label: "Breast cancer", color: "#f00", style: "quadrant" },
+        { id: "t2", label: "Ovarian cancer", color: "#00f", style: "quadrant" },
+      ],
+    },
+  );
 }
 
 const get = () => usePedigreeStore.getState();
@@ -34,10 +34,9 @@ describe("batch status changes (#35)", () => {
   beforeEach(() => get().initialize(family()));
 
   it("marks everyone affected in one undo step, and undo restores all", () => {
-    get().setAffectedMany(["a", "c", "d"], true);
+    expectOneUndoStep(() => get().setAffectedMany(["a", "c", "d"], true));
     expect(["a", "c", "d"].map(id => ind(id).affected)).toEqual([true, true, true]);
     expect(ind("b").affected).toBe(false);
-    expect(get().past).toHaveLength(1);
     expect(get().notice?.text).toBe("Marked 3 affected.");
     get().undo();
     expect(["a", "c", "d"].map(id => ind(id).affected)).toEqual([false, false, false]);
@@ -54,10 +53,8 @@ describe("batch status changes (#35)", () => {
     get().setAffectedMany(["a"], true);
     get().setAffectedMany(["a", "b"], true);
     expect(get().notice?.text).toBe("Marked 1 affected.");
-    const steps = get().past.length;
-    get().setAffectedMany(["a", "b"], true);
-    get().setAffectedMany(["nope"], true);
-    expect(get().past).toHaveLength(steps);
+    expectNoEdit(() => get().setAffectedMany(["a", "b"], true));
+    expectNoEdit(() => get().setAffectedMany(["nope"], true));
   });
 
   it("marks deceased and living; living clears the date of death", () => {
@@ -74,21 +71,20 @@ describe("batch status changes (#35)", () => {
   });
 
   it("keeps carrier and presymptomatic exclusive", () => {
-    get().setCarrierStatusMany(["m", "c", "d"], "presymptomatic");
+    expectOneUndoStep(() => get().setCarrierStatusMany(["m", "c", "d"], "presymptomatic"));
     for (const id of ["m", "c", "d"]) {
       expect(ind(id).presymptomatic).toBe(true);
       expect(ind(id).carrier).toBeFalsy();
     }
-    get().setCarrierStatusMany(["m", "c", "d"], "carrier");
+    expectOneUndoStep(() => get().setCarrierStatusMany(["m", "c", "d"], "carrier"));
     for (const id of ["m", "c", "d"]) {
       expect(ind(id).carrier).toBe(true);
       expect(ind(id).presymptomatic).toBeUndefined();
     }
-    get().setCarrierStatusMany(["m", "c"], "none");
+    expectOneUndoStep(() => get().setCarrierStatusMany(["m", "c"], "none"));
     expect(ind("m").carrier).toBe(false);
     expect(ind("c").presymptomatic).toBeUndefined();
     expect(ind("d").carrier).toBe(true);
-    expect(get().past).toHaveLength(3);
     get().undo();
     get().undo();
     get().undo();
@@ -98,19 +94,16 @@ describe("batch status changes (#35)", () => {
   });
 
   it("sets sex, monozygotic twins following, as one undo step", () => {
-    expect(get().setSexMany(["a", "d"], "male")).toBeNull();
+    expect(expectOneUndoStep(() => get().setSexMany(["a", "d"], "male"))).toBeNull();
     expect(["a", "b", "d"].map(id => ind(id).sex)).toEqual(["male", "male", "male"]);
-    expect(get().past).toHaveLength(1);
     get().undo();
     expect(["a", "b", "d"].map(id => ind(id).sex)).toEqual(["female", "female", "unknown"]);
   });
 
   it("refuses a sex that would give a child two genetic parents of the same known sex", () => {
-    const why = get().setSexMany(["f", "m"], "male");
+    const why = expectNoEdit(() => get().setSexMany(["f", "m"], "male"));
     expect(why).toMatch(/genetic parents/);
     expect(get().notice?.kind).toBe("error");
-    expect(ind("m").sex).toBe("female");
-    expect(get().past).toHaveLength(0);
     // One partner alone, into the other's sex: refused as the single Sex menu greys it out.
     expect(get().setSexMany(["m", "d"], "male")).not.toBeNull();
     // Unknown is always allowed.
@@ -138,13 +131,12 @@ describe("batch status changes (#35)", () => {
   });
 
   it("ignores an unknown tag", () => {
-    get().setIndividualTagMany(["a"], "nope", true);
-    expect(get().past).toHaveLength(0);
+    expectNoEdit(() => get().setIndividualTagMany(["a"], "nope", true));
   });
 
   it("deletes a selection in one step through deleteIndividuals", () => {
     get().setSelection(["a", "c"]);
-    expect(get().deleteIndividuals(["a", "c"])).toBe(2);
+    expect(expectOneUndoStep(() => get().deleteIndividuals(["a", "c"]))).toBe(2);
     expect(get().pedigree.individuals.map(i => i.id)).toEqual(["f", "m", "b", "d"]);
     expect(get().selectedIds).toEqual([]);
     get().undo();
