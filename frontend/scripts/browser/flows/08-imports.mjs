@@ -1,10 +1,10 @@
-// Import a PED file and a JSON file by upload and land on the canvas with the
+// Import a PED file, a Phenopackets family and a JSON file by upload and land on the canvas with the
 // right people.
 import { readFileSync } from "node:fs";
 
 export default {
   name: "imports",
-  about: "A PED file and a JSON file imported by upload open on the canvas with the right number of people; a bad file is refused",
+  about: "A PED file, a Phenopackets family and a JSON file imported by upload open on the canvas with the right number of people; a bad file is refused",
   async run(t) {
     const importFile = async file => {
       await t.open("/");
@@ -23,6 +23,22 @@ export default {
     t.equal((await t.drawn()).length, lines, "PED: everyone is drawn");
     t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "PED: the drawing passes the render lint");
     t.ok(p.individuals.every(i => !!i.name), "PED: the file's ids become the names");
+
+    // A Phenopackets Family: only its pedigree is read, recognised by content.
+    await importFile(t.file("test-data/phenopackets/family.json"));
+    t.match(await t.text('[role="dialog"]'), /Only the family's pedigree is read/, "Phenopackets: says the rest of the Family is not read");
+    await t.click('[role="dialog"] button:has-text("Import")');
+    await t.waitFor('button[title="Add male"]');
+    t.currentId();
+    p = await t.pedigree();
+    const persons = JSON.parse(readFileSync(t.file("test-data/phenopackets/family.json"), "utf8")).pedigree.persons;
+    const named = p.individuals.filter(i => i.name);
+    t.equal(named.map(i => i.name).sort(), persons.map(x => x.individualId).sort(), "Phenopackets: one named person for each person in the file");
+    t.equal(named.find(i => i.name === "Ines")?.sex, "female", "Phenopackets: FEMALE is female");
+    t.equal(named.find(i => i.name === "Kit")?.sex, "unknown", "Phenopackets: UNKNOWN_SEX is unknown");
+    t.ok(named.find(i => i.name === "Greta")?.affected, "Phenopackets: AFFECTED is affected");
+    t.equal((await t.drawn()).length, p.individuals.length, "Phenopackets: everyone is drawn");
+    t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "Phenopackets: the drawing passes the render lint");
 
     // The lossless format: what comes in is exactly what the file holds.
     const file = t.file("test-data/pedigrees/drawn/couples.json");

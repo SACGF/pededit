@@ -6,6 +6,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { pedExportLosses } from "../io/ped/exporter.js";
+import { exportPhenopackets } from "../io/phenopackets/index.js";
 import { downloadText } from "../utils/download";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { exportCsv } from "../io/csv/exporter";
@@ -65,10 +66,12 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const small = useSmallScreen();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
-  type PedDialect = NonNullable<ExportOptions["dialect"]>;
+  // A PED dialect, or the Phenopackets pedigree, which holds what PED holds.
+  type PedDialect = NonNullable<ExportOptions["dialect"]> | "phenopackets";
   // PED has no column for pregnancy / loss status, so warn before writing
   // those individuals as ordinary children. Holds the chosen dialect too.
   const [pedWarning, setPedWarning] = useState<{ lines: string[]; dialect: PedDialect } | null>(null);
+  const pedWarningFormat = pedWarning?.dialect === "phenopackets" ? "A Phenopackets pedigree" : "PED";
 
   const { toggle: toggleUShapeView } = useUShapeToggle();
   // In the U-shape view the add buttons and Reset layout do nothing useful.
@@ -88,7 +91,11 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
 
   function handleExportPed(dialect: PedDialect) {
     setPedWarning(null);
-    downloadText(exportPed(pedigree, { familyId: "1", dialect }), "text/plain", `${activeTitle ?? "pedigree"}.ped`);
+    if (dialect === "phenopackets") {
+      downloadText(exportPhenopackets(pedigree, { familyId: "1" }), "application/json", `${activeTitle ?? "pedigree"}.phenopackets.json`);
+    } else {
+      downloadText(exportPed(pedigree, { familyId: "1", dialect }), "text/plain", `${activeTitle ?? "pedigree"}.ped`);
+    }
   }
 
   function handleExportCsv() {
@@ -115,9 +122,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
       <Dialog open={pedWarning !== null} onOpenChange={open => { if (!open) setPedWarning(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>PED cannot carry everything in this pedigree</DialogTitle>
+            <DialogTitle>{pedWarningFormat} cannot carry everything in this pedigree</DialogTitle>
             <DialogDescription>
-              PED has no column for pregnancy, pregnancy loss, twins, adoption, a childless couple mark, an ended relationship, donors and surrogates, or consanguinity it cannot work out from the parents, so{" "}
+              {pedWarningFormat} has no field for pregnancy, pregnancy loss, twins, adoption, a childless couple mark, an ended relationship, donors and surrogates, or consanguinity it cannot work out from the parents, so{" "}
               {pedWarning?.lines.length === 1 ? "this will be lost" : `these ${pedWarning?.lines.length} will be lost`}{" "}
               (pregnancies and losses become ordinary children). Download JSON keeps them.
             </DialogDescription>
@@ -130,7 +137,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
             <Button variant="outline" size="sm" onClick={() => { setPedWarning(null); handleExportJson(); }}>
               Download JSON
             </Button>
-            <Button size="sm" onClick={() => pedWarning && handleExportPed(pedWarning.dialect)}>Export PED anyway</Button>
+            <Button size="sm" onClick={() => pedWarning && handleExportPed(pedWarning.dialect)}>{pedWarning?.dialect === "phenopackets" ? "Export anyway" : "Export PED anyway"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -236,6 +243,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
             <PedFormatItem label="SVG, PNG or PDF" detail="the chart as a figure" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
             <PedFormatItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
             <PedFormatItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
+            <PedFormatItem label="Phenopackets pedigree (JSON)" detail="GA4GH v2 Pedigree, persons" onClick={() => { setExportMenuOpen(false); handleExportPedClick("phenopackets"); }} />
             <PedFormatItem label="CSV" detail="one row per person" onClick={() => { setExportMenuOpen(false); handleExportCsv(); }} />
             <PedFormatItem label="JSON" detail="lossless, re-importable" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
           </PopoverContent>
@@ -248,7 +256,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
             <Button
               variant="ghost" size="sm"
               className="h-7 px-2 gap-1 text-xs"
-              title="Export as PED file (sex, affected status and parents only; pregnancy / loss status is not carried)"
+              title="Export as PED file or Phenopackets pedigree (sex, affected status and parents only; pregnancy / loss status is not carried)"
               disabled={!hasPedigree}
             >
               <Download size={12} />
@@ -265,6 +273,11 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
               label="R (pedtools, kinship2)"
               detail="id fid mid sex aff, tabs, header"
               onClick={() => handleExportPedClick("r")}
+            />
+            <PedFormatItem
+              label="Phenopackets pedigree (JSON)"
+              detail="GA4GH v2 Pedigree, persons"
+              onClick={() => handleExportPedClick("phenopackets")}
             />
           </PopoverContent>
         </Popover>

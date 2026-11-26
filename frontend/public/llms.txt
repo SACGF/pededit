@@ -7,8 +7,8 @@ No account is needed. Creating a pedigree while signed out saves it on the serve
 What it does:
 
 - Draws NSGC symbols (Bennett et al. 2008 and the 2022 revision): affected and carrier status for several conditions in one chart, deceased, pregnancies and losses, adoption, twins, consanguinity, donors and surrogates, proband and consultand, gender identity.
-- Imports PED files (the 6-column PLINK layout) and PedEdit JSON files.
-- Exports PedEdit JSON (lossless), PED, CSV, SVG, PNG and PDF, with a de-identify option on the figure exports. Exports are made in the browser.
+- Imports PED files (the 6-column PLINK layout and the R layout read by pedtools and kinship2), GA4GH Phenopackets v2 pedigrees (a `Pedigree` message, or the `pedigree` of a `Family`, as JSON) and PedEdit JSON files.
+- Exports PedEdit JSON (lossless), PED, a Phenopackets pedigree (JSON), CSV, SVG, PNG and PDF, with a de-identify option on the figure exports. Exports are made in the browser.
 - Calculates kinship and inbreeding coefficients from the drawn family.
 
 To hand a family to PedEdit, write it as a PedEdit JSON file (format below) or a PED file and import it from the home page with "Import from PED or JSON file". Or create it directly: `POST https://pededit.com/api/pedigrees/` with `{"title": ..., "data": <pedigree>}` needs no account and returns an `id`, and the pedigree is then at https://pededit.com/p/<id> for the person to open and edit. The format page says what a minimal pedigree needs, what is refused and the rate limits.

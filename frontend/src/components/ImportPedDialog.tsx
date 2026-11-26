@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { importPed, ValidationIssueCode } from "../io/ped/index.js";
 import type { IssueSeverity } from "../io/ped/index.js";
 import { importJson } from "../io/json/index.js";
+import { importPhenopackets, isPhenopacketsJson } from "../io/phenopackets/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /** Common shape of a PED or JSON import result, as rendered by this dialog. */
@@ -38,13 +39,16 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
     // Derive default title from filename (strip extension)
     const name = file.name.replace(/\.(ped|fam|json)$/i, "");
     setBaseTitle(name);
-    const isJson = /\.json$/i.test(file.name);
-
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result as string;
+      // Decided by content: a PED file never starts with "{", and a .json
+      // file is either PedEdit's own or a Phenopackets pedigree or family.
+      const isJson = /\.json$/i.test(file.name) || text.trimStart().startsWith("{");
       let imported: DialogResult;
-      if (isJson) {
+      if (isJson && isPhenopacketsJson(text)) {
+        imported = importPhenopackets(text);
+      } else if (isJson) {
         const json = importJson(text);
         if (json.title) setBaseTitle(json.title);
         imported = {

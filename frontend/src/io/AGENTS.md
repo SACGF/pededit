@@ -58,7 +58,31 @@ letter, `carriedBy`, `socialParents`; a donor is written as the genetic
 parent, which is right), or consanguinity it cannot work out from the
 parents. `pedExportLosses` in `exporter.ts` lists what a file would drop, one
 line per person or couple (from the `pedLost*` functions there); the toolbar
-shows the lines before writing.
+shows the lines before writing, for PED and for a Phenopackets pedigree.
+
+## phenopackets/ — GA4GH Phenopackets v2 pedigree
+
+A Phenopackets `Pedigree` message is PED with named fields (`persons`, each
+with `familyId`, `individualId`, `paternalId`, `maternalId`, `sex`,
+`affectedStatus`), so it reuses the PED code both ways:
+- Import turns persons into `PedRow`s and calls `importPedRows` in
+  `ped/index.ts`, so the PED validator's checks and the converter (names
+  from the IDs, invented partner of a single parent, current notation)
+  apply unchanged. A bare Pedigree or a whole `Family` (its `pedigree` only;
+  the other keys are reported as not read) is accepted. The import dialog
+  picks it by content (`isPhenopacketsJson`): a PedEdit file has `pedigree`
+  too, but with `individuals`. A parent `"0"` (the specification's founder),
+  `""` or a field left out is missing, as protobuf JSON drops default
+  values; so is a left-out `sex` (UNKNOWN_SEX) or `affectedStatus` (MISSING).
+  Proto names (`individual_id`) and enum numbers are read too. The enum
+  numbers are not PED's codes: FEMALE is 1, MALE is 2. OTHER_SEX is drawn
+  as unknown sex with a warning.
+- Export (`exportPhenopackets`) writes a Pedigree message with every field,
+  enums as strings, with `exportIds` (R dialect, spaces kept) from
+  `ped/exporter.ts` and the father role from `parentRoles`, so the IDs and
+  who is the father are PED's. It holds what PED holds, so the toolbar shows
+  the same `pedExportLosses` warning first. Test files:
+  `test-data/phenopackets/`.
 
 ## json/ — native lossless format
 

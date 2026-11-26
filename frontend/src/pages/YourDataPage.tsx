@@ -119,7 +119,7 @@ function YourData() {
         <>
           A chart can be drawn without names, dates or notes. SVG, PNG and PDF exports can{" "}
           <span className={name}>De-identify</span>: pedigree numbers (I-1, II-2) replace names, and dates,
-          notes, the chart title and clinical details are left out. CSV, PED and JSON exports cannot.
+          notes, the chart title and clinical details are left out. CSV, PED, Phenopackets and JSON exports cannot.
         </>
       ),
     },

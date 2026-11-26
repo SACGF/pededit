@@ -1,5 +1,5 @@
 // Download every export and read the file: SVG, PNG, PDF, U-shape and
-// de-identified from the dialog; CSV, PED and JSON from the toolbar.
+// de-identified from the dialog; CSV, PED, Phenopackets and JSON from the toolbar.
 import { readFileSync } from "node:fs";
 
 export default {
@@ -83,6 +83,20 @@ export default {
     const lines = ped.trim().split("\n").filter(l => !l.startsWith("#"));
     t.equal(lines.length, await t.people(), "PED: one line a person");
     t.ok(lines.every(l => l.split(/\s+/).length === 6), "PED: six columns");
+
+    // The Phenopackets pedigree holds what PED holds, so it warns the same way.
+    await t.click('button[title^="Export as PED file"]');
+    await t.click('[data-radix-popper-content-wrapper] button:has-text("Phenopackets pedigree")');
+    t.match(await t.text('[role="dialog"]'), /Phenopackets pedigree cannot carry/, "Phenopackets: a warning says what the format cannot carry");
+    const ppFile = await t.download('[role="dialog"] button:has-text("Export anyway")');
+    t.match(ppFile, /\.phenopackets\.json$/, "Phenopackets: the file is .phenopackets.json");
+    const pp = JSON.parse(readFileSync(ppFile, "utf8"));
+    const people = (await t.pedigree()).individuals;
+    t.equal(Object.keys(pp), ["persons"], "Phenopackets: a Pedigree message");
+    t.equal(pp.persons.length, people.length, "Phenopackets: one person each");
+    t.equal(pp.persons.map(p => p.sex), people.map(i => ({ male: "MALE", female: "FEMALE" })[i.sex] ?? "UNKNOWN_SEX"), "Phenopackets: biological sex");
+    t.ok(pp.persons.every(p => p.familyId && p.individualId && p.paternalId && p.maternalId && /^(UN)?AFFECTED$/.test(p.affectedStatus)), "Phenopackets: every field written");
+    t.ok(pp.persons.some(p => p.paternalId !== "0"), "Phenopackets: parents written");
 
     // #225: a couple's childless reason is free text, dropped unless asked for.
     await t.openFixture("fixture:couples");
