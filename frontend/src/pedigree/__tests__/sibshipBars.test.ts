@@ -127,7 +127,7 @@ describe("sibshipBarOffsets (#80)", () => {
 describe("overlapping sibship bars on the canvas and in the export (#80)", () => {
   const barOf = (flow: ReturnType<typeof buildScene>, childId: string) => {
     const node = flow.people.find(n => n.individual.id === childId)!;
-    return flow.sibships.find(e => e.data!.childIds.includes(node.id))!.data!;
+    return flow.sibships.find(e => e.data.childIds.includes(node.id))!.data;
   };
 
   for (const compact of [false, true]) {
@@ -151,8 +151,8 @@ describe("overlapping sibship bars on the canvas and in the export (#80)", () =>
     const ped = shifted();
     const flow = buildScene(ped);
     for (const e of flow.sibships) {
-      e.data!.sibBarY -= e.data!.barOffset;
-      e.data!.barOffset = 0;
+      e.data.sibBarY -= e.data.barOffset;
+      e.data.barOffset = 0;
     }
     const found = lintScene(ped, flow);
     expect(found.map(f => f.code)).toEqual(["sibship-bars-overlap", "sibship-bars-overlap"]);
@@ -229,7 +229,7 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
   it("passes every sibship bar under the names of the people above it", () => {
     let lowered = 0;
     for (const e of flow.sibships) {
-      const d = e.data!, xs = [d.coupleX, ...d.childXs];
+      const d = e.data, xs = [d.coupleX, ...d.childXs];
       if (d.barOffset > 0) lowered++;
       for (const n of flow.people) {
         const box = textBlockUnder(n.glyph, n.position.x, n.position.y);
@@ -248,11 +248,11 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
 
   it("draws one straight line to an only child who is all but under the parents", () => {
     const aemma = flow.people.find(n => n.individual.id === "Aemma_Arryn")!;
-    const edge = flow.sibships.find(e => e.data!.childIds.includes(aemma.id))!;
-    expect(edge.data!.childIds).toHaveLength(1);
-    expect(edge.data!.coupleX).toBe(aemma.position.x);
-    const parents = [edge.data!.leftParentId, edge.data!.rightParentId].map(id => flow.people.find(n => n.id === id)!.position.x);
-    expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeLessThanOrEqual(10);
-    expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeGreaterThan(0);
+    const edge = flow.sibships.find(e => e.data.childIds.includes(aemma.id))!;
+    expect(edge.data.childIds).toHaveLength(1);
+    expect(edge.data.coupleX).toBe(aemma.position.x);
+    const parents = [edge.data.leftParentId, edge.data.rightParentId].map(id => flow.people.find(n => n.id === id)!.position.x);
+    expect(Math.abs(edge.data.coupleX - (parents[0]! + parents[1]!) / 2)).toBeLessThanOrEqual(10);
+    expect(Math.abs(edge.data.coupleX - (parents[0]! + parents[1]!) / 2)).toBeGreaterThan(0);
   });
 });

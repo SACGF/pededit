@@ -230,16 +230,16 @@ function searchLabelPlace(o: Parameters<typeof placeConsanguinityLabel>[0], bloc
 /** Where each couple label of a scene sits, for drawing, bounds and the title. */
 export function consanguinityLabelPlacements(scene: {
   people: { id: string; position: { x: number; y: number } }[];
-  couples: { source: string; target: string; data?: { hopHeight?: number; consanguinityLabel?: string[]; consanguinityLabelOffset?: ConsanguinityLabelOffset } }[];
+  couples: { source: string; target: string; data: { hopHeight: number; consanguinityLabel?: string[]; consanguinityLabelOffset?: ConsanguinityLabelOffset } }[];
 }): { x: number; cy: number; hop: number; dy: number; lines: string[]; backed: boolean }[] {
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   const out: { x: number; cy: number; hop: number; dy: number; lines: string[]; backed: boolean }[] = [];
   for (const e of scene.couples) {
-    const lines = e.data?.consanguinityLabel;
+    const lines = e.data.consanguinityLabel;
     const s = pos.get(e.source), t = pos.get(e.target);
     if (!lines?.length || !s || !t) continue;
-    const off = e.data?.consanguinityLabelOffset ?? { dx: 0, dy: 0 };
-    const hop = e.data?.hopHeight ?? 0;
+    const off = e.data.consanguinityLabelOffset ?? { dx: 0, dy: 0 };
+    const hop = e.data.hopHeight;
     // Over a hop the label sits on its raised part, level above the higher partner.
     out.push({ x: (s.x + t.x) / 2 + off.dx, cy: hop > 0 ? Math.min(s.y, t.y) : (s.y + t.y) / 2, hop, dy: off.dy, lines, backed: !!off.backed });
   }

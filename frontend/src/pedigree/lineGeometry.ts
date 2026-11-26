@@ -49,18 +49,18 @@ export interface CoupleLineGeometry {
  * children does (`sibshipLineGeometry`); the ended mark and a consanguinity
  * label stay on the raised part.
  */
-export function coupleLineGeometry(data: CoupleLineData | undefined, double: boolean, left: LinePosition, right: LinePosition): CoupleLineGeometry {
+export function coupleLineGeometry(data: CoupleLineData, double: boolean, left: LinePosition, right: LinePosition): CoupleLineGeometry {
   const half = NODE_SIZE / 2;
   const sx = left.x + half, tx = right.x - half;
-  const hop = data?.hopHeight ?? 0;
-  const from = { x: left.x, y: left.y, ...data?.hopEnds?.source }, to = { x: right.x, y: right.y, ...data?.hopEnds?.target };
+  const hop = data.hopHeight;
+  const from = { x: left.x, y: left.y, ...data.hopEnds?.source }, to = { x: right.x, y: right.y, ...data.hopEnds?.target };
   const course = couplePathD(from, to, hop);
   const cx = (sx + tx) / 2, cy = (left.y + right.y) / 2;
   const out: CoupleLineGeometry = {
     paths: double ? consanguineousPathsD(from, to, hop, CONSANGUINEOUS_GAP) : [course],
     course, cx, cy, hop,
   };
-  if (data?.childless) {
+  if (data.childless) {
     // From the middle of the line, or the level end of a hopping one.
     const level = hop <= 0 ? undefined
       : from.drop !== undefined ? { x: from.x + from.drop, y: from.y }
@@ -74,7 +74,7 @@ export function coupleLineGeometry(data: CoupleLineData | undefined, double: boo
       reason: data.childlessReason, reasonY: childlessReasonBaselineY(topY),
     };
   }
-  if (data?.ended) {
+  if (data.ended) {
     // Across the horizontal run, between the two lines of a double line:
     // the middle of the raised part of a hopping line, which nothing hangs from.
     const [ax, bx] = hopRisers(from, to);
@@ -102,7 +102,7 @@ export interface SibshipLineGeometry {
  */
 export function sibshipLineGeometry(data: SibshipData, nodeAt: (id: string) => SibshipEnd | undefined): SibshipLineGeometry | null {
   const leftParent = nodeAt(data.leftParentId), rightParent = nodeAt(data.rightParentId);
-  const children = (data.childIds ?? []).map(nodeAt).filter((n): n is SibshipEnd => !!n);
+  const children = data.childIds.map(nodeAt).filter((n): n is SibshipEnd => !!n);
   if (!leftParent || !rightParent || children.length === 0) return null;
 
   // Where the drop hangs from the couple line: its middle, or, when the line

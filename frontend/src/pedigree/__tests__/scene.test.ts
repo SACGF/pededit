@@ -157,7 +157,7 @@ describe("buildScene — simpleFamily", () => {
 
     it("gen-1 sibship geometry: coupleX midpoint, correct bar and child positions", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
+      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
       // grandparents at pos≈[1,2] → midpoint ≈ 1.5 × SLOT_WIDTH
       expect(coupleX).toBeCloseTo(1.5 * SLOT_WIDTH, 0);
       expect(coupleY).toBe(py(0));
@@ -177,7 +177,7 @@ describe("buildScene — simpleFamily", () => {
 
     it("gen-2 sibship geometry: three children, correct positions", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
+      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
       // parents i3 at pos≈0.5 and i5 at pos≈1.5 → midpoint ≈ 1.0 × SLOT_WIDTH
       expect(coupleX).toBeCloseTo(1.0 * SLOT_WIDTH, 0);
       expect(coupleY).toBe(py(1));
@@ -255,7 +255,7 @@ describe("buildScene — consanguineousFamily", () => {
     it("gen-1 sibship: i3+i4 under i1–i2", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
       expect(edge).toBeDefined();
-      const { coupleX, sibBarY, childXs } = edge.data!;
+      const { coupleX, sibBarY, childXs } = edge.data;
       expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
       expect(sibBarY).toBeCloseTo((1 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
       expect(childXs[0]).toBeCloseTo(px(0), 5);
@@ -265,7 +265,7 @@ describe("buildScene — consanguineousFamily", () => {
     it("gen-2 sibship: i5+i6 under i3–i4", () => {
       const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
       expect(edge).toBeDefined();
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data!;
+      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
       expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
       expect(coupleY).toBeCloseTo(py(1), 5);
       expect(sibBarY).toBeCloseTo((2 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
@@ -348,8 +348,8 @@ describe("buildScene: duplicated individuals", () => {
     const { people: nodes, couples: coupleEdges, sibships: sibshipEdges } = buildScene(dfc);
     const idOf = (id: string) => nodes.find(n => n.id === id)!.individual.id;
     const [first, second] = nodes.filter(n => n.individual.id === "a1").map(n => n.id);
-    const pA = sibshipEdges.find(e => idOf(e.data!.leftParentId) === "A1")!;
-    expect(pA.data!.childIds).toContain(first);
+    const pA = sibshipEdges.find(e => idOf(e.data.leftParentId) === "A1")!;
+    expect(pA.data.childIds).toContain(first);
     expect(coupleEdges.some(e => e.source === second || e.target === second)).toBe(true);
   });
 
@@ -412,7 +412,7 @@ describe("buildScene: duplicated individuals", () => {
     for (const e of flow.couples) expect(ids.has(e.source) && ids.has(e.target)).toBe(true);
     const pairs = new Set(flow.couples.map(e => [idOf(e.source), idOf(e.target)].sort().join("=")));
     expect([...pairs].sort()).toEqual(["h2=w2", "h3=w3", "m=w1", "m=w2", "m=w3"]);
-    const kids = new Set(flow.sibships.flatMap(e => e.data!.childIds.map(idOf)));
+    const kids = new Set(flow.sibships.flatMap(e => e.data.childIds.map(idOf)));
     expect([...kids].sort()).toEqual(["c1", "c2", "c3", "d2", "d3"]);
     expect(lintScene(ped, flow)).toEqual([]);
   });
@@ -443,7 +443,7 @@ describe("buildScene — man with three wives", () => {
   });
 
   it("joins the man to each wife; the far wife's edge hops over the near one", () => {
-    const pairs = coupleEdges.map(e => ({ pair: [idOf(e.source), idOf(e.target)].sort().join("-"), hop: e.data!.hopHeight }));
+    const pairs = coupleEdges.map(e => ({ pair: [idOf(e.source), idOf(e.target)].sort().join("-"), hop: e.data.hopHeight }));
     expect(pairs.filter(p => p.hop === 0).map(p => p.pair).sort()).toEqual(["m-w1", "m-w2"]);
     const far = pairs.find(p => p.hop > 0)!;
     expect(far.pair).toBe("m-w3");
@@ -451,15 +451,15 @@ describe("buildScene — man with three wives", () => {
   });
 
   it("the hop leaves the man's side above the line to the wife beside him, and meets the far wife at her centre (#177)", () => {
-    const far = coupleEdges.find(e => e.data!.hopHeight > 0)!;
-    const ends = far.data!.hopEnds!;
+    const far = coupleEdges.find(e => e.data.hopHeight > 0)!;
+    const ends = far.data.hopEnds!;
     const [manEnd, wifeEnd] = idOf(far.source) === "m" ? [ends.source, ends.target] : [ends.target, ends.source];
     expect(manEnd).toMatchObject({ shape: "male", port: COUPLE_PORT_STEP });
     expect(wifeEnd).toMatchObject({ shape: "female", port: 0 });
     // It turns up as far before the wife it passes as it comes down after her.
     expect(manEnd.turn).toBe(wifeEnd.turn);
     // A line between neighbours is straight, at the centre.
-    expect(coupleEdges.filter(e => e.data!.hopHeight === 0).every(e => e.data!.hopEnds === undefined)).toBe(true);
+    expect(coupleEdges.filter(e => e.data.hopHeight === 0).every(e => e.data.hopEnds === undefined)).toBe(true);
   });
 
   it("never draws a couple edge between two wives", () => {
@@ -492,14 +492,14 @@ describe("buildScene — man with three wives", () => {
     const flow = buildScene(five);
     const man = flow.people.find(n => n.individual.id === "m")!.id;
     // Hops that leave the man on the same side.
-    const right = flow.couples.filter(e => e.source === man && e.data!.hopHeight > 0);
-    const left  = flow.couples.filter(e => e.target === man && e.data!.hopHeight > 0);
+    const right = flow.couples.filter(e => e.source === man && e.data.hopHeight > 0);
+    const left  = flow.couples.filter(e => e.target === man && e.data.hopHeight > 0);
     const sides = [right, left].filter(s => s.length > 1);
     expect(sides.length).toBeGreaterThan(0);
     for (const side of sides) {
-      const turns = side.map(e => (e.source === man ? e.data!.hopEnds!.source : e.data!.hopEnds!.target).turn);
+      const turns = side.map(e => (e.source === man ? e.data.hopEnds!.source : e.data.hopEnds!.target).turn);
       expect(new Set(turns).size).toBe(turns.length);
-      const ports = side.map(e => (e.source === man ? e.data!.hopEnds!.source : e.data!.hopEnds!.target).port);
+      const ports = side.map(e => (e.source === man ? e.data.hopEnds!.source : e.data.hopEnds!.target).port);
       expect(new Set(ports).size).toBe(ports.length);
       expect(Math.min(...ports)).toBeGreaterThan(0);
     }
@@ -508,15 +508,15 @@ describe("buildScene — man with three wives", () => {
   });
 
   it("the far wife's child hangs from the level end of the hop, beside her", () => {
-    const hopping = sibshipEdges.filter(e => e.data!.hopDrop);
+    const hopping = sibshipEdges.filter(e => e.data.hopDrop);
     expect(hopping).toHaveLength(1);
-    expect(hopping[0]!.data!.childIds.map(idOf)).toEqual(["c3"]);
-    const { parentId, dx } = hopping[0]!.data!.hopDrop!;
+    expect(hopping[0]!.data.childIds.map(idOf)).toEqual(["c3"]);
+    const { parentId, dx } = hopping[0]!.data.hopDrop!;
     expect(idOf(parentId)).toBe("w3");
 
     // The couple line comes down past the wife in between, before the drop.
-    const far = coupleEdges.find(e => e.data!.hopHeight > 0)!;
-    const wifeEnd = far.source === parentId ? far.data!.hopEnds!.source : far.data!.hopEnds!.target;
+    const far = coupleEdges.find(e => e.data.hopHeight > 0)!;
+    const wifeEnd = far.source === parentId ? far.data.hopEnds!.source : far.data.hopEnds!.target;
     const wife = nodes.find(n => n.id === parentId)!;
     const gapToBetween = Math.min(...nodes
       .filter(n => n !== wife && n.position.y === wife.position.y)
@@ -526,7 +526,7 @@ describe("buildScene — man with three wives", () => {
     expect(wifeEnd.turn!).toBeGreaterThan(Math.abs(dx) + 4);
     expect(wifeEnd.turn!).toBeLessThan(gapToBetween - NODE_SIZE / 2 - 4);
     // The drop starts at the row, on the level stretch: nothing hangs from the raised part.
-    const geometry = sibshipLineGeometry(hopping[0]!.data!, id => nodes.find(x => x.id === id))!;
+    const geometry = sibshipLineGeometry(hopping[0]!.data, id => nodes.find(x => x.id === id))!;
     expect(geometry.solid[0]!.slice(0, 2)).toEqual([wife.position.x + dx, wife.position.y]);
   });
 });
@@ -573,7 +573,7 @@ describe("buildScene: compact option", () => {
   it("compact=true derives sibship geometry from the compact positions", () => {
     const { sibships: sibshipEdges } = buildScene(simpleFamily, { compact: true });
     const gen1 = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
-    const data = gen1.data!;
+    const data = gen1.data;
     expect(data.coupleY).toBeCloseTo(0);
     expect(data.childY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE);
     expect(data.sibBarY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE * SIB_BAR_FACTOR);

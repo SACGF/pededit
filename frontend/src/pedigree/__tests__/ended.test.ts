@@ -61,7 +61,7 @@ describe("ended relationship on the canvas and in exports (#98)", () => {
     p.partnerships[1]!.ended = undefined;
     const flow = buildScene(p);
     expect(lintScene(p, flow)).toEqual([]);
-    const data = flow.couples.map(e => e.data!).sort((x, y) => (x.partnershipId! < y.partnershipId! ? -1 : 1));
+    const data = flow.couples.map(e => e.data).sort((x, y) => (x.partnershipId! < y.partnershipId! ? -1 : 1));
     expect(data[0]).toMatchObject({ partnershipId: "ab", ended: true, middleTaken: true });
     expect(data[1]?.ended).toBeUndefined();
   });

@@ -213,12 +213,12 @@ export function consanguineousPathsD(left: CoupleEnd, right: CoupleEnd, hopHeigh
  */
 export function highestHop(scene: {
   people: { id: string; position: { x: number; y: number } }[];
-  couples: { source: string; target: string; data?: { hopHeight?: number } }[];
+  couples: { source: string; target: string; data: { hopHeight: number } }[];
 }): number {
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   let top = Infinity;
   for (const e of scene.couples) {
-    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
+    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data.hopHeight;
     if (a && b && hop > 0) top = Math.min(top, Math.min(a.y, b.y) - hop - 3);
   }
   return top;
@@ -231,14 +231,14 @@ export function highestHop(scene: {
  */
 export function highestDuplicateArc(scene: {
   people: { id: string; position: { x: number; y: number } }[];
-  duplicates: { source: string; target: string; data?: { bulge?: number; legDx?: number } }[];
+  duplicates: { source: string; target: string; data: { bulge: number; legDx?: number } }[];
 }, half: number): number {
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   let top = Infinity;
   for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
     if (!a || !b) continue;
-    for (const [, y] of duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 12, e.data?.legDx)) top = Math.min(top, y);
+    for (const [, y] of duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, half, 12, e.data.legDx)) top = Math.min(top, y);
   }
   return top;
 }

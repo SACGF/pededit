@@ -206,7 +206,7 @@ export function sibshipJoinPoint(
 export interface AssistedEdgeLike {
   source: string;
   target: string;
-  data?: { kind: AssistedLink["kind"]; bar?: { leftParentId: string; rightParentId: string; childIds: string[]; barOffset: number } };
+  data: { kind: AssistedLink["kind"]; bar?: { leftParentId: string; rightParentId: string; childIds: string[]; barOffset: number } };
 }
 
 /**
@@ -223,7 +223,7 @@ export function assistedEdgeSegment(
   if (!a || !b) return null;
   // The shape drawn (gender identity), which the line leaves from.
   const from: LinePoint = { ...a.position, sex: a.glyph?.shape };
-  const bar = edge.data?.bar;
+  const bar = edge.data.bar;
   if (bar) {
     const l = nodeAt(bar.leftParentId), r = nodeAt(bar.rightParentId);
     const kids = bar.childIds.map(nodeAt).filter((n): n is NonNullable<typeof n> => !!n);

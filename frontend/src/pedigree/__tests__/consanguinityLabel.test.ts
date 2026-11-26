@@ -44,7 +44,7 @@ const withSetting = (p: Pedigree): Pedigree =>
   ({ ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, relationshipLabels: true } });
 
 const labelsByPartnership = (p: Pedigree) =>
-  Object.fromEntries(buildScene(p).couples.map(e => [e.data!.partnershipId, e.data!.consanguinityLabel]));
+  Object.fromEntries(buildScene(p).couples.map(e => [e.data.partnershipId, e.data.consanguinityLabel]));
 
 describe("nameCoupleRelationship (#97)", () => {
   const name = (p: Pedigree, a: string, b: string) => nameCoupleRelationship(p, a, b, kinshipCoefficients(p).kinship(a, b));
@@ -225,7 +225,7 @@ describe("keeping the label off the text above (#109)", () => {
     const p = withSetting(ex.data);
     const count = (compact: boolean) => consanguinityLabelPlacements(buildScene(p, { compact })).length;
     expect(lintExport(p, { compact: true })).toEqual([]);
-    expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && buildScene(p).couples.some(e => e.data?.partnershipId === x.id && e.double)).length);
+    expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && buildScene(p).couples.some(e => e.data.partnershipId === x.id && e.double)).length);
     // Nearly every couple here is more closely related than their name says, so
     // the labels carry a kinship and compact rows have room for fewer of them.
     expect(count(true)).toBe(8);

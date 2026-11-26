@@ -140,7 +140,7 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
         individuals: [a, b],
       });
     }
-    const hop = e.data?.hopHeight ?? 0;
+    const hop = e.data.hopHeight;
     const x1 = Math.min(s.position.x, t.position.x), x2 = Math.max(s.position.x, t.position.x);
     couples.push({ y: (s.position.y + t.position.y) / 2, x1, x2, hop, ids: [a, b] });
     if (hop === 0 && Math.abs(s.position.y - t.position.y) < EPS) {
@@ -192,7 +192,6 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
   const hasLineFrom = new Map<string, Set<string>>(); // child id -> pair keys of couples it hangs from
   for (const e of scene.sibships) {
     const d = e.data;
-    if (!d) continue;
     const ids = [d.leftParentId, d.rightParentId, ...d.childIds];
     const missing = ids.filter(id => !nodeById.has(id));
     if (missing.length) {
@@ -245,7 +244,7 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
   }
 
   // 3a. Lines of assisted reproduction.
-  const linked = new Set(scene.assisted.flatMap(e => (e.data?.children ?? []).map(c => `${indOf(e.source)}>${c}`)));
+  const linked = new Set(scene.assisted.flatMap(e => e.data.children.map(c => `${indOf(e.source)}>${c}`)));
   for (const link of assistedLinks(pedigree)) {
     if (!drawn.has(link.from) || !drawn.has(link.child) || linked.has(`${link.from}>${link.child}`)) continue;
     out.push({
@@ -318,7 +317,7 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
     if (!s || !t) continue;
     const who = s.individual.id;
     const hit = arcCollisions(
-      duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx),
+      duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data.bulge, half, 48, e.data.legDx),
       scene.people.filter(n => n.individual.id !== who).map(n => ({
         id: n.individual.id, x: n.position.x, y: n.position.y,
         text: textBlockUnder(n.glyph, n.position.x, n.position.y),
@@ -363,7 +362,7 @@ function lintTitle(title: string, scene: Scene): LintFinding[] {
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
-    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx).some(inBox)) return found("a dashed arc between two copies");
+    if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, half, 48, e.data.legDx).some(inBox)) return found("a dashed arc between two copies");
   }
   for (const p of consanguinityLabelPlacements(scene)) {
     const lw = Math.max(...p.lines.map(consanguinityLabelWidth));
@@ -372,7 +371,7 @@ function lintTitle(title: string, scene: Scene): LintFinding[] {
     }
   }
   for (const e of scene.couples) {
-    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
+    const a = pos.get(e.source), b = pos.get(e.target), hop = e.data.hopHeight;
     if (!a || !b || hop <= 0) continue;
     const y = Math.min(a.y, b.y) - hop;
     if (overlaps([Math.min(a.x, b.x), y - 1, Math.max(a.x, b.x), y + 1])) return found("a couple line hopping over a symbol");

@@ -15,7 +15,7 @@ const HALF = 20, SLOT = 80, BULGE = 28;
 const arcCodes = (p: Pedigree, flow: Scene) => lintScene(p, flow).filter(f => f.code.startsWith("arc-")).map(f => `${f.code} ${f.individuals[1]}`);
 /** The flow with every arc drawn as the usual curve. */
 const unrouted = (flow: Scene): Scene =>
-  ({ ...flow, duplicates: flow.duplicates.map(e => ({ ...e, data: { bulge: e.data!.bulge } })) });
+  ({ ...flow, duplicates: flow.duplicates.map(e => ({ ...e, data: { bulge: e.data.bulge } })) });
 const example = (label: string) => EXAMPLES.find(e => e.label === label)!.data;
 
 describe("pathPoints", () => {
@@ -101,7 +101,7 @@ describe("dashed arcs keep off other people (#192)", () => {
     const p = example("House Targaryen");
     for (const compact of [false, true]) {
       const flow = buildScene(p, { compact });
-      expect(flow.duplicates.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Daemon-0"]);
+      expect(flow.duplicates.filter(e => e.data.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Daemon-0"]);
       expect(arcCodes(p, flow)).toEqual([]);
       expect(arcCodes(p, unrouted(flow))).toEqual(expect.arrayContaining(["arc-through-symbol Aegon_Baelon", "arc-through-symbol Alicent_Hightower", "arc-through-label Viserys_I"]));
     }
@@ -110,7 +110,7 @@ describe("dashed arcs keep off other people (#192)", () => {
   it("Spanish Habsburgs: Philip IV's arc goes down between the labels beside him", () => {
     const p = example("Spanish Habsburgs");
     const flow = buildScene(p);
-    expect(flow.duplicates.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Philip_IV-0"]);
+    expect(flow.duplicates.filter(e => e.data.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Philip_IV-0"]);
     expect(arcCodes(p, flow)).toEqual([]);
     expect(arcCodes(p, unrouted(flow))).toEqual(["arc-through-label Maria_Anna_of_Austria"]);
   });
@@ -120,9 +120,9 @@ describe("dashed arcs keep off other people (#192)", () => {
     const p = importPed(fs.readFileSync(file, "utf8")).pedigrees[0]!.pedigree;
     for (const compact of [false, true]) {
       const flow = buildScene(p, { compact });
-      const routed = flow.duplicates.filter(e => e.data?.legDx !== undefined);
+      const routed = flow.duplicates.filter(e => e.data.legDx !== undefined);
       expect(routed.length).toBe(2);
-      expect(new Set(routed.map(e => e.data!.bulge)).size).toBe(2);
+      expect(new Set(routed.map(e => e.data.bulge)).size).toBe(2);
       expect(arcCodes(p, flow)).toEqual([]);
       expect(arcCodes(p, unrouted(flow)).filter(c => c.startsWith("arc-through-symbol")).length).toBeGreaterThan(8);
       expect(lintExport(p, { compact }).filter(f => f.code.startsWith("arc-"))).toEqual([]);
@@ -131,7 +131,7 @@ describe("dashed arcs keep off other people (#192)", () => {
 
   it("an arc that passes through nobody is left as the usual curve", () => {
     for (const ex of EXAMPLES.filter(e => !["House Targaryen", "Spanish Habsburgs"].includes(e.label))) {
-      expect(buildScene(ex.data).duplicates.filter(e => e.data?.legDx !== undefined).map(e => `${ex.label} ${e.id}`)).toEqual([]);
+      expect(buildScene(ex.data).duplicates.filter(e => e.data.legDx !== undefined).map(e => `${ex.label} ${e.id}`)).toEqual([]);
     }
   });
 });

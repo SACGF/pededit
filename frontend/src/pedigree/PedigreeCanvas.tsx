@@ -111,13 +111,15 @@ function MinimapEdges() {
         (lp.position.x + rp.position.x) / 2,
         (lp.position.y + rp.position.y) / 2,
         kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).glyph?.lifeStatus, NODE_SIZE) })),
-        data.barOffset ?? 0,
+        data.barOffset,
         apart,
         data.converge,
         data.maxDrop,
       )));
     } else if (edge.type === "assistedEdge") {
-      const seg = assistedEdgeSegment(edge as Edge<AssistedEdgeData>, nodeAt);
+      const data = edge.data as AssistedEdgeData | undefined;
+      if (!data) continue;
+      const seg = assistedEdgeSegment({ source: edge.source, target: edge.target, data }, nodeAt);
       if (seg) paths.push(`M ${seg[0]} ${seg[1]} L ${seg[2]} ${seg[3]}`);
     }
   }

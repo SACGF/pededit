@@ -74,7 +74,7 @@ describe("canvasSettings.layoutWidth (#82)", () => {
     const flow = buildScene(pedigree("relaxed"));
     // No sibship's bar reaches into the next couple's: the #80 overlap is gone
     // without lowering any bar.
-    const bars = flow.sibships.map(e => e.data!).map(d =>
+    const bars = flow.sibships.map(e => e.data).map(d =>
       ({ y: d.sibBarY, x1: Math.min(d.coupleX, ...d.childXs), x2: Math.max(d.coupleX, ...d.childXs) }));
     for (let i = 0; i < bars.length; i++) {
       for (let j = i + 1; j < bars.length; j++) {

@@ -276,9 +276,9 @@ describe("collapsed branch diamond (#1)", () => {
     const lo = Math.min(son.position.x, wife.position.x), hi = Math.max(son.position.x, wife.position.x);
     expect(diamond.position.x).toBeGreaterThanOrEqual(lo);
     expect(diamond.position.x).toBeLessThanOrEqual(hi);
-    const sib = flow.sibships.find(e => e.data!.childIds.includes(diamond.id))!;
-    expect(new Set([sib.data!.leftParentId, sib.data!.rightParentId])).toEqual(new Set([son.id, wife.id]));
-    expect(sib.data!.childIds).toEqual([diamond.id]);
+    const sib = flow.sibships.find(e => e.data.childIds.includes(diamond.id))!;
+    expect(new Set([sib.data.leftParentId, sib.data.rightParentId])).toEqual(new Set([son.id, wife.id]));
+    expect(sib.data.childIds).toEqual([diamond.id]);
     expect(lintScene(p, flow)).toEqual([]);
     // No affected people hidden: no note under the diamond.
     expect(diamond.glyph.detailLines).toEqual([]);
@@ -379,7 +379,7 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     // c (2) and d (1) come before b (3), so the group symbol is last.
     expect(x("d")).toBeLessThan(x("c"));
     expect(x("c")).toBeLessThan(x(sym));
-    const sib = flow.sibships.find(e => e.data!.childIds.length === 3)!;
+    const sib = flow.sibships.find(e => e.data.childIds.length === 3)!;
     expect(sib).toBeDefined();
     expect(lintScene(p, flow)).toEqual([]);
     const node = flow.people.find(n => n.individual.id === sym)!;

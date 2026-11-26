@@ -412,14 +412,14 @@ function clearLabelsOfBars(nodes: ScenePerson[], sibshipEdges: SceneLine<Sibship
   const drawn = sibshipEdges.filter(e => e.data && e.data.childXs.length > 0 && !e.data.converge);
   const { lower, through } = barsUnderLabels(
     drawn.map(e => {
-      const d = e.data!, xs = [d.coupleX, ...d.childXs];
+      const d = e.data, xs = [d.coupleX, ...d.childXs];
       return { x1: Math.min(...xs), x2: Math.max(...xs), y: d.sibBarY, childY: d.childY };
     }),
     labelled.map(l => l.box),
   );
   drawn.forEach((e, i) => {
-    e.data!.barOffset += lower[i]!;
-    e.data!.sibBarY += lower[i]!;
+    e.data.barOffset += lower[i]!;
+    e.data.sibBarY += lower[i]!;
   });
   for (const k of through) {
     const { node } = labelled[k]!;
@@ -439,7 +439,7 @@ export function labelsOverLines(
   assistedEdges: SceneLine<AssistedLineData>[],
 ): Set<string> {
   const out = new Set<string>();
-  if (assistedEdges.length === 0 && !sibshipEdges.some(e => e.data?.converge)) return out;
+  if (assistedEdges.length === 0 && !sibshipEdges.some(e => e.data.converge)) return out;
   const byId = new Map(nodes.map(n => [n.id, n]));
   const below = (from: string, x: number, y: number) => {
     const n = byId.get(from);
@@ -483,7 +483,7 @@ function buildAssistedEdges(
   const indOf = (nodeId: string) => nodeById.get(nodeId)?.individual.id;
   // The sibship edge each child hangs from.
   const sibshipOf = new Map<string, SceneLine<SibshipData>>();
-  for (const e of sibshipEdges) for (const c of e.data?.childIds ?? []) { const id = indOf(c); if (id) sibshipOf.set(id, e); }
+  for (const e of sibshipEdges) for (const c of e.data.childIds) { const id = indOf(c); if (id) sibshipOf.set(id, e); }
   const nearest = (froms: ScenePerson[], to: { x: number; y: number }) => {
     const d = (n: ScenePerson) => (n.position.x - to.x) ** 2 + (n.position.y - to.y) ** 2;
     return froms.reduce((a, b) => (d(b) < d(a) ? b : a));
@@ -497,11 +497,11 @@ function buildAssistedEdges(
     const kids = copies.get(link.child), froms = copies.get(link.from);
     if (!kids?.length || !froms?.length) continue;
     const sib = sibshipOf.get(link.child);
-    const sibKids = sib ? sib.data!.childIds.map(indOf).filter((x): x is string => !!x) : [];
+    const sibKids = sib ? sib.data.childIds.map(indOf).filter((x): x is string => !!x) : [];
     const whole = sibKids.length > 1 && sibKids.every(k => links.some(l => l.kind === link.kind && l.from === link.from && l.child === k));
     if (whole) {
       for (const k of sibKids) done.add(`${link.kind}|${link.from}|${k}`);
-      const d = sib!.data!;
+      const d = sib!.data;
       edges.push({
         id:     `assisted-${link.kind}-${link.from}-${sib!.id}`,
         source: nearest(froms, { x: d.coupleX, y: d.sibBarY }).id,
@@ -515,7 +515,7 @@ function buildAssistedEdges(
       continue;
     }
     done.add(key);
-    const child = kids.find(k => sib?.data?.childIds.includes(k.id)) ?? kids[0]!;
+    const child = kids.find(k => sib?.data.childIds.includes(k.id)) ?? kids[0]!;
     edges.push({
       id:     `assisted-${link.kind}-${link.from}-${link.child}`,
       source: nearest(froms, child.position).id,
@@ -655,7 +655,7 @@ function buildDuplicateEdges(
     ...coupleEdges.flatMap((e): ArcLine[] => {
       const s = at.get(e.source), t = at.get(e.target);
       if (!s || !t) return [];
-      const hop = e.data?.hopHeight ?? 0;
+      const hop = e.data.hopHeight;
       if (hop <= 0) return [[s.x, s.y, t.x, t.y]];
       const top = Math.min(s.y, t.y) - hop;
       return [[s.x, top, t.x, top]];
@@ -705,7 +705,7 @@ function duplicateArcBlocks(edges: SceneLine<DuplicateArcData>[], slotPos: Map<s
   return edges.flatMap(e => {
     const a = slotPos.get(e.source), b = slotPos.get(e.target);
     if (!a || !b) return [];
-    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? DUPLICATE_ARC_BULGE, NODE_SIZE / 2, 12, e.data?.legDx);
+    const pts = duplicateArcPoints(a.x, a.y, b.x, b.y, e.data.bulge, NODE_SIZE / 2, 12, e.data.legDx);
     return pts.slice(1).map(([x, y], i) => {
       const [px, py] = pts[i]!;
       return { x: (x + px) / 2, halfWidth: Math.abs(x - px) / 2 + 1, top: Math.min(y, py) - 2, bottom: Math.max(y, py) + 2, arc: true };
@@ -723,7 +723,6 @@ function sibshipBlocks(edges: SceneLine<SibshipData>[], nodes: ScenePerson[]): T
   const twinSetOf = new Map(nodes.map(n => [n.id, n.twinSet]));
   return edges.flatMap(e => {
     const d = e.data;
-    if (!d) return [];
     const xs = [d.coupleX, ...d.childXs];
     const lo = Math.min(...xs), hi = Math.max(...xs);
     const forkX = new Map<string, number[]>();
@@ -810,7 +809,7 @@ function buildCoupleEdges(
       side.sort((a, b) => spans[a]! - spans[b]!);
       const heights = couplePortHeights(side.length, side.some(i => edges[i]!.double));
       side.forEach((i, n) => {
-        const hopEnds = edges[i]!.data!.hopEnds;
+        const hopEnds = edges[i]!.data.hopEnds;
         if (hopEnds) hopEnds[end].port = heights[n]!;
       });
     }
@@ -960,10 +959,10 @@ function buildSibshipEdges(
   }
 
   // Bars that would run along the same line get a height each.
-  const offsets = sibshipBarOffsets(edges.map(e => e.data!));
+  const offsets = sibshipBarOffsets(edges.map(e => e.data));
   edges.forEach((e, i) => {
-    e.data!.barOffset = offsets[i]!;
-    e.data!.sibBarY += offsets[i]!;
+    e.data.barOffset = offsets[i]!;
+    e.data.sibBarY += offsets[i]!;
   });
 
   return edges;

@@ -24,7 +24,7 @@ export function layoutCost(scene: Scene): LayoutCost {
   const xs = scene.people.map(n => n.position.x);
   return {
     duplicates: scene.people.filter(n => (n.glyph.copy !== undefined)).length,
-    hops: scene.couples.filter(e => (e.data?.hopHeight ?? 0) > 0).length,
+    hops: scene.couples.filter(e => e.data.hopHeight > 0).length,
     arcLength: Math.round(arcLength),
     width: xs.length ? Math.round(Math.max(...xs) - Math.min(...xs)) : 0,
   };

@@ -244,15 +244,15 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(couples).not.toContain("ar_d1=ar_w1");
     expect(couples).not.toContain("ar_d2=ar_h2");
     expect(couples).toContain("ar_h1=ar_w1");
-    const apart = flow.sibships.filter(e => e.data?.apart).map(e => e.data!.childIds.map(ind).join());
+    const apart = flow.sibships.filter(e => e.data.apart).map(e => e.data.childIds.map(ind).join());
     expect(apart.sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
-    expect(flow.sibships.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
+    expect(flow.sibships.filter(e => e.data.converge).map(e => e.data.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
     expect(couples).toContain("ar_m5=ar_p5"); // the female couple (#105)
     // Scenario 1: no line from the intended father; scenario 2: the child hangs
     // from the couple and the egg donor has her own line; scenario 4: none from the wife.
-    const links = flow.assisted.map(e => `${e.data!.kind}:${ind(e.source)}>${e.data!.children.join()}`).sort();
+    const links = flow.assisted.map(e => `${e.data.kind}:${ind(e.source)}>${e.data.children.join()}`).sort();
     expect(links).toEqual(["carrier:ar_s3>ar_c3", "genetic:ar_d2>ar_c2"]);
-    const hangs = flow.sibships.map(e => `${ind(e.data!.leftParentId)}=${ind(e.data!.rightParentId)}>${e.data!.childIds.map(ind).join()}`);
+    const hangs = flow.sibships.map(e => `${ind(e.data.leftParentId)}=${ind(e.data.rightParentId)}>${e.data.childIds.map(ind).join()}`);
     expect(hangs.find(h => h.endsWith(">ar_c2"))!.split(">")[0]!.split("=").sort()).toEqual(["ar_h2", "ar_w2"]);
     // The pregnancy sits below the woman carrying it (NSGC Fig. 3), or below
     // the couple when she is half of it.
