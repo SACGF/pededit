@@ -8,6 +8,12 @@ import { TAG_FILL_MODE_OPTIONS, tagFillMode } from "../pedigree/tagFills";
 import { nameLabelMode } from "../pedigree/labels";
 import { symbolsShowMode } from "../pedigree/gender";
 import { NOTATION_OPTIONS, notationOf } from "../pedigree/notation";
+import { SettingSelect, SettingToggle } from "./SettingControls";
+
+const SYMBOLS_SHOW_OPTIONS: { value: SymbolsShowMode; label: string }[] = [
+  { value: "gender", label: "Gender identity where recorded" },
+  { value: "sex", label: "Biological sex" },
+];
 
 interface SettingsPanelProps {
   open: boolean;
@@ -77,134 +83,75 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
             <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
               Display
             </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={showMinimap}
-                onChange={e => onToggleMinimap(e.target.checked)}
-              />
-              <div>
-                <div className="text-sm">Show minimap</div>
-                <div className="text-xs text-gray-400">
-                  Overview of the full pedigree in the bottom-right corner
-                </div>
-              </div>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                checked={compact}
-                onChange={e => onToggleCompact(e.target.checked)}
-              />
-              <div>
-                <div className="text-sm">Compact layout</div>
-                <div className="text-xs text-gray-400">
-                  Tighter spacing between generations so larger pedigrees fit on screen. Pinned positions are scaled to match.
-                </div>
-              </div>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                name="truncateNames"
-                checked={truncateNames}
-                onChange={e => updateCanvasSettings({ nameLabels: e.target.checked ? "truncate" : "wrap" })}
-              />
-              <div>
-                <div className="text-sm">Truncate long names</div>
-                <div className="text-xs text-gray-400">
-                  Names too long for their slot are cut to one line, not wrapped onto two. Hover a name to read it in full. Exports still wrap.
-                </div>
-              </div>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                name="showNumbers"
-                checked={pedigree.canvasSettings?.showNumbers === true}
-                onChange={e => updateCanvasSettings({ showNumbers: e.target.checked })}
-              />
-              <div>
-                <div className="text-sm">Show pedigree numbers</div>
-                <div className="text-xs text-gray-400">
-                  Generation and position (II-3) on its own line under each symbol, below the name and age, on the canvas and in exports. Numbers follow the layout, so adding someone renumbers the people to their right.
-                </div>
-              </div>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                name="relationshipLabels"
-                checked={pedigree.canvasSettings?.relationshipLabels === true}
-                onChange={e => updateCanvasSettings({ relationshipLabels: e.target.checked })}
-              />
-              <div>
-                <div className="text-sm">Name consanguineous relationships</div>
-                <div className="text-xs text-gray-400">
-                  Write the relationship ("first cousins") above every double line it can be worked out for, with the kinship when they are more closely related than that ("siblings (3/8)" when their parents are siblings too). Text set on a couple on the Person tab is always shown.
-                </div>
-              </div>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer mt-2">
-              <input
-                type="checkbox"
-                name="showCoefficients"
-                checked={pedigree.canvasSettings?.showCoefficients === true}
-                onChange={e => updateCanvasSettings({ showCoefficients: e.target.checked })}
-              />
-              <div>
-                <div className="text-sm">Show kinship and inbreeding coefficients</div>
-                <div className="text-xs text-gray-400">
-                  Write the inbreeding coefficient under anyone whose parents are related ("F = 1/16") and the kinship coefficient above a related couple's double line ("φ = 1/16"), on the canvas and in exports. Worked out from the pedigree as drawn, so they change as relatives are added.
-                </div>
-              </div>
-            </label>
-            <div className="mt-2">
-              <div className="text-sm">Symbols show</div>
-              <select
-                name="symbolsShow"
-                aria-label="Symbols show"
-                value={symbolsShowMode(pedigree)}
-                onChange={e => updateCanvasSettings({ symbolsShow: e.target.value as SymbolsShowMode })}
-                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-              >
-                <option value="gender">Gender identity where recorded</option>
-                <option value="sex">Biological sex</option>
-              </select>
-              <div className="text-xs text-gray-400 mt-1">
-                With gender identity, a person whose gender is recorded gets that gender's symbol with AMAB, AFAB or UAAB under it (NSGC 2022). Layout, kinship and PED export always use biological sex.
-              </div>
-            </div>
-            <div className="mt-2">
-              <div className="text-sm">Notation</div>
-              <select
-                name="notation"
-                aria-label="Notation"
-                value={notationOf(pedigree)}
-                onChange={e => updateCanvasSettings({ notation: e.target.value as NotationEdition })}
-                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-              >
-                {NOTATION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <div className="text-xs text-gray-400 mt-1">
-                Edition of the NSGC pedigree nomenclature. 2022 writes test results under the symbol as "BRCA1 +"; 2008 uses the E notation, "E+ (BRCA1)".
-              </div>
-            </div>
-            <div className="mt-2">
-              <div className="text-sm">Conditions and tags drawn in</div>
-              <select
-                name="tagFills"
-                aria-label="Conditions and tags drawn in"
-                value={tagFillMode(pedigree)}
-                onChange={e => updateCanvasSettings({ tagFills: e.target.value as TagFillMode })}
-                className="mt-1 w-full h-7 border rounded px-2 text-sm bg-white focus:outline-hidden focus:ring-1 focus:ring-black"
-              >
-                {TAG_FILL_MODE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <div className="text-xs text-gray-400 mt-1">
-                Black and white draws every condition and tag in black and gives each condition and trait a pattern (its own, or one chosen for it), on the canvas and in exports, for print and journals.
-              </div>
-            </div>
+            <SettingToggle
+              label="Show minimap"
+              description="Overview of the full pedigree in the bottom-right corner"
+              checked={showMinimap}
+              onChange={onToggleMinimap}
+            />
+            <SettingToggle
+              className="mt-2"
+              label="Compact layout"
+              description="Tighter spacing between generations so larger pedigrees fit on screen. Pinned positions are scaled to match."
+              checked={compact}
+              onChange={onToggleCompact}
+            />
+            <SettingToggle
+              className="mt-2"
+              name="truncateNames"
+              label="Truncate long names"
+              description="Names too long for their slot are cut to one line, not wrapped onto two. Hover a name to read it in full. Exports still wrap."
+              checked={truncateNames}
+              onChange={on => updateCanvasSettings({ nameLabels: on ? "truncate" : "wrap" })}
+            />
+            <SettingToggle
+              className="mt-2"
+              name="showNumbers"
+              label="Show pedigree numbers"
+              description="Generation and position (II-3) on its own line under each symbol, below the name and age, on the canvas and in exports. Numbers follow the layout, so adding someone renumbers the people to their right."
+              checked={pedigree.canvasSettings?.showNumbers === true}
+              onChange={on => updateCanvasSettings({ showNumbers: on })}
+            />
+            <SettingToggle
+              className="mt-2"
+              name="relationshipLabels"
+              label="Name consanguineous relationships"
+              description={<>Write the relationship ("first cousins") above every double line it can be worked out for, with the kinship when they are more closely related than that ("siblings (3/8)" when their parents are siblings too). Text set on a couple on the Person tab is always shown.</>}
+              checked={pedigree.canvasSettings?.relationshipLabels === true}
+              onChange={on => updateCanvasSettings({ relationshipLabels: on })}
+            />
+            <SettingToggle
+              className="mt-2"
+              name="showCoefficients"
+              label="Show kinship and inbreeding coefficients"
+              description={<>Write the inbreeding coefficient under anyone whose parents are related ("F = 1/16") and the kinship coefficient above a related couple's double line ("φ = 1/16"), on the canvas and in exports. Worked out from the pedigree as drawn, so they change as relatives are added.</>}
+              checked={pedigree.canvasSettings?.showCoefficients === true}
+              onChange={on => updateCanvasSettings({ showCoefficients: on })}
+            />
+            <SettingSelect<SymbolsShowMode>
+              name="symbolsShow"
+              label="Symbols show"
+              value={symbolsShowMode(pedigree)}
+              options={SYMBOLS_SHOW_OPTIONS}
+              onChange={symbolsShow => updateCanvasSettings({ symbolsShow })}
+              description="With gender identity, a person whose gender is recorded gets that gender's symbol with AMAB, AFAB or UAAB under it (NSGC 2022). Layout, kinship and PED export always use biological sex."
+            />
+            <SettingSelect<NotationEdition>
+              name="notation"
+              label="Notation"
+              value={notationOf(pedigree)}
+              options={NOTATION_OPTIONS}
+              onChange={notation => updateCanvasSettings({ notation })}
+              description={<>Edition of the NSGC pedigree nomenclature. 2022 writes test results under the symbol as "BRCA1 +"; 2008 uses the E notation, "E+ (BRCA1)".</>}
+            />
+            <SettingSelect<TagFillMode>
+              name="tagFills"
+              label="Conditions and tags drawn in"
+              value={tagFillMode(pedigree)}
+              options={TAG_FILL_MODE_OPTIONS}
+              onChange={tagFills => updateCanvasSettings({ tagFills })}
+              description="Black and white draws every condition and tag in black and gives each condition and trait a pattern (its own, or one chosen for it), on the canvas and in exports, for print and journals."
+            />
           </div>
 
           <div>
@@ -212,33 +159,19 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               Layout
             </div>
             <div className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={canvasSettings.nodesMoveable}
-                  onChange={e => updateCanvasSettings({ nodesMoveable: e.target.checked })}
-                />
-                <div>
-                  <div className="text-sm">Nodes moveable by default</div>
-                  <div className="text-xs text-gray-400">
-                    All nodes can be dragged without unlocking individually
-                  </div>
-                </div>
-              </label>
+              <SettingToggle
+                label="Nodes moveable by default"
+                description="All nodes can be dragged without unlocking individually"
+                checked={canvasSettings.nodesMoveable}
+                onChange={nodesMoveable => updateCanvasSettings({ nodesMoveable })}
+              />
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={canvasSettings.snapToGrid}
-                  onChange={e => updateCanvasSettings({ snapToGrid: e.target.checked })}
-                />
-                <div>
-                  <div className="text-sm">Snap to grid</div>
-                  <div className="text-xs text-gray-400">
-                    Dragged nodes snap to a fixed grid. Turning this on also snaps nodes you have already moved.
-                  </div>
-                </div>
-              </label>
+              <SettingToggle
+                label="Snap to grid"
+                description="Dragged nodes snap to a fixed grid. Turning this on also snaps nodes you have already moved."
+                checked={canvasSettings.snapToGrid}
+                onChange={snapToGrid => updateCanvasSettings({ snapToGrid })}
+              />
 
               {canvasSettings.snapToGrid && (
                 <label className="flex items-center gap-2 ml-6">
@@ -251,20 +184,13 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
                 </label>
               )}
 
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="minimiseWidth"
-                  checked={canvasSettings.layoutWidth !== "relaxed"}
-                  onChange={e => updateCanvasSettings({ layoutWidth: e.target.checked ? "minimal" : "relaxed" })}
-                />
-                <div>
-                  <div className="text-sm">Minimise width</div>
-                  <div className="text-xs text-gray-400">
-                    Keep a wide pedigree no wider than its widest generation (the kinship2 default). Turn off to let it grow up to two symbols wider, so children sit more directly under their parents. Nodes you have moved stay where they are.
-                  </div>
-                </div>
-              </label>
+              <SettingToggle
+                name="minimiseWidth"
+                label="Minimise width"
+                description="Keep a wide pedigree no wider than its widest generation (the kinship2 default). Turn off to let it grow up to two symbols wider, so children sit more directly under their parents. Nodes you have moved stay where they are."
+                checked={canvasSettings.layoutWidth !== "relaxed"}
+                onChange={on => updateCanvasSettings({ layoutWidth: on ? "minimal" : "relaxed" })}
+              />
             </div>
           </div>
 
@@ -292,19 +218,13 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               ))}
             </div>
 
-            <label className="flex items-center gap-2 mt-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={affectedFirst}
-                onChange={e => updateSiblingOrderSettings({ affectedFirst: e.target.checked })}
-              />
-              <div>
-                <div className="text-sm">Affected first</div>
-                <div className="text-xs text-gray-400">
-                  Affected people appear leftmost within each sibling group
-                </div>
-              </div>
-            </label>
+            <SettingToggle
+              className="mt-3"
+              label="Affected first"
+              description="Affected people appear leftmost within each sibling group"
+              checked={affectedFirst}
+              onChange={on => updateSiblingOrderSettings({ affectedFirst: on })}
+            />
           </div>
           {activePedigreeId && (
             <div className="border-t pt-4">

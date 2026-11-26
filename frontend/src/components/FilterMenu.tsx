@@ -7,6 +7,7 @@ import { VIEW_FILTERS, activeFilters, filterLabel } from "../pedigree/viewFilter
 import { conditionTags } from "../pedigree/conditions";
 import { useSmallScreen } from "../hooks/useSmallScreen";
 import { useUShapeToggle } from "../hooks/useUShapeToggle";
+import { SettingToggle } from "./SettingControls";
 
 /**
  * The view filters as a toolbar menu of switches, so they can be turned
@@ -45,36 +46,27 @@ export function FilterMenu({ disabled }: { disabled?: boolean }) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-2 space-y-2" side="bottom" align="end">
         {small && (
-          <label className="flex items-start gap-2 cursor-pointer border-b pb-2">
-            <input
-              type="checkbox"
-              name="uShapeView"
-              data-testid="u-shape-toggle"
-              className="mt-0.5"
-              checked={uShape.on}
-              onChange={() => { uShape.toggle(); setOpen(false); }}
-            />
-            <div>
-              <div className="text-sm">U-shape view</div>
-              <div className="text-xs text-gray-400">Draw the family bent round a U, for wide families. Some people are not drawn; edit on the Person tab.</div>
-            </div>
-          </label>
+          <SettingToggle
+            align="start"
+            className="border-b pb-2"
+            name="uShapeView"
+            inputProps={{ "data-testid": "u-shape-toggle" }}
+            label="U-shape view"
+            description="Draw the family bent round a U, for wide families. Some people are not drawn; edit on the Person tab."
+            checked={uShape.on}
+            onChange={() => { uShape.toggle(); setOpen(false); }}
+          />
         )}
         {VIEW_FILTERS.filter(f => !f.group).map(f => (
           <div key={f.id}>
-            <label className="flex items-start gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name={f.id}
-                className="mt-0.5"
-                checked={f.on(pedigree.filters)}
-                onChange={e => updateViewFilters(f.patch(e.target.checked))}
-              />
-              <div>
-                <div className="text-sm">{f.label}</div>
-                <div className="text-xs text-gray-400">{f.description}</div>
-              </div>
-            </label>
+            <SettingToggle
+              align="start"
+              name={f.id}
+              label={f.label}
+              description={f.description}
+              checked={f.on(pedigree.filters)}
+              onChange={on => updateViewFilters(f.patch(on))}
+            />
             {f.id === "affectedOnly" && f.on(pedigree.filters) && conditions.length >= 2 && (
               <select
                 name="affectedCondition"
