@@ -1,6 +1,6 @@
 import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
-import type { AssistedEdgeData, RFNodeData } from "../layoutToFlow";
+import type { AssistedEdgeData, RFNodeData } from "../sceneToFlow";
 import { assistedEdgeSegment } from "../assisted";
 import { ADOPTION_DASH } from "../adoption";
 

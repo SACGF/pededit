@@ -201,7 +201,7 @@ export function sibshipJoinPoint(
   return { x: (left.x + right.x) / 2, y: (coupleY + Math.min(...childYs)) / 2 + barOffset };
 }
 
-/** What `assistedEdgeSegment` needs of an AssistedEdge (layoutToFlow.ts). */
+/** What `assistedEdgeSegment` needs of an AssistedEdge (scene.ts). */
 export interface AssistedEdgeLike {
   source: string;
   target: string;

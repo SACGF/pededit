@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { chartTitle, detailLines, labelMaxWidth, titleWidth, DEFAULT_PEDIGREE_NAME, ELLIPSIS } from "../labels";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, SLOT_WIDTH } from "../constants";
 import { highestDuplicateArc, highestHop } from "../couplePath";
@@ -56,12 +56,12 @@ describe("approximate age under the symbol (#20)", () => {
     expect(line!.length).toBeLessThanOrEqual(12);
   });
 
-  it("layoutToFlow puts it on the node data and the canvas lint stays clean", () => {
-    const flow = layoutToFlow(family());
-    const data = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.data;
+  it("buildScene puts it on the node data and the canvas lint stays clean", () => {
+    const flow = buildScene(family());
+    const data = (id: string) => flow.people.find(n => n.individual.id === id)!;
     expect(data("f").glyph.detailLines).toEqual(["d. 72"]);
     expect(data("c2").glyph.detailLines).toEqual(["b. 1962"]);
-    expect(lintFlow(family(), flow)).toEqual([]);
+    expect(lintScene(family(), flow)).toEqual([]);
   });
 
   it("the SVG export draws it in the labels group, and the export lint passes", () => {
@@ -112,14 +112,14 @@ describe("chart title (#20)", () => {
   });
 
   it("the canvas title node sits centred above the highest symbol", () => {
-    const flow = layoutToFlow(family());
-    const node = chartTitleNode("Smith family", flow.nodes)!;
-    const xs = flow.nodes.map(n => n.position.x), ys = flow.nodes.map(n => n.position.y);
+    const flow = buildScene(family());
+    const node = chartTitleNode("Smith family", flow.people)!;
+    const xs = flow.people.map(n => n.position.x), ys = flow.people.map(n => n.position.y);
     expect(node.position.x).toBeCloseTo((Math.min(...xs) + Math.max(...xs)) / 2);
     expect(node.position.y).toBeLessThan(Math.min(...ys) - 20 - 20);
     expect(node.selectable).toBe(false);
     expect(node.draggable).toBe(false);
-    expect(chartTitleNode("", flow.nodes)).toBeNull();
+    expect(chartTitleNode("", flow.people)).toBeNull();
     expect(chartTitleNode("x", [])).toBeNull();
   });
 
@@ -155,15 +155,15 @@ describe("chart title (#20)", () => {
 
   it("is raised above the dashed arc of someone drawn twice in the top row (#172)", () => {
     const p = drawnTwiceInTopRow();
-    const flow = layoutToFlow(p);
-    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const flow = buildScene(p);
+    const topRow = Math.min(...flow.people.map(n => n.position.y));
     const arcTop = highestDuplicateArc(flow, NODE_SIZE / 2);
     // The fixture does what it is for: an arc rises above the top row's symbols.
     expect(arcTop).toBeLessThan(topRow - NODE_SIZE / 2 - 10);
     expect(highestAboveSymbols(flow)).toBe(arcTop);
 
     // Canvas: the bottom of the title box is above the top of the arc.
-    const node = chartTitleNode("Quadruple half first cousins", flow.nodes, highestAboveSymbols(flow))!;
+    const node = chartTitleNode("Quadruple half first cousins", flow.people, highestAboveSymbols(flow))!;
     expect(node.position.y + node.height! / 2).toBeLessThan(arcTop);
 
     // Export: the title's baseline is above the arc, and the lint agrees.
@@ -184,17 +184,17 @@ describe("chart title (#20)", () => {
       parentOf: Object.fromEntries(wives.map(i => [`p${i}`, [`k${i}`]])),
       siblingOrder: { mode: "insertion", affectedFirst: false },
     };
-    const flow = layoutToFlow(p);
-    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const flow = buildScene(p);
+    const topRow = Math.min(...flow.people.map(n => n.position.y));
     const hopTop = highestHop(flow);
     // The fixture does what it is for: a hop rises into where the title would be.
     expect(hopTop).toBeLessThan(topRow - NODE_SIZE / 2 - 20);
     expect(highestAboveSymbols(flow)).toBe(hopTop);
 
     // Canvas: the bottom of the title box is above the highest hop, and the lint agrees.
-    const node = chartTitleNode("Seven partners", flow.nodes, highestAboveSymbols(flow))!;
+    const node = chartTitleNode("Seven partners", flow.people, highestAboveSymbols(flow))!;
     expect(node.position.y + node.height! / 2).toBeLessThan(hopTop);
-    expect(lintFlow(p, flow, { title: "Seven partners" })).toEqual([]);
+    expect(lintScene(p, flow, { title: "Seven partners" })).toEqual([]);
 
     // Export: the title's baseline is above the hop, and the lint agrees.
     const options = { title: "Seven partners" };
@@ -207,13 +207,13 @@ describe("chart title (#20)", () => {
 
   it("the export lint catches a title drawn through an arc or a symbol (#172)", () => {
     const p = drawnTwiceInTopRow();
-    const flow = layoutToFlow(p);
+    const flow = buildScene(p);
     const svg = exportSvg(p, { title: "Quadruple half first cousins" });
     const moved = (dy: number) => svg.replace(TITLE_Y, (_m, pre: string, y: string) => `${pre}${Number(y) + dy}"`);
     const messages = (s: string) => lintExportSvg(p, flow, s).filter(f => f.code === "title-collides").map(f => f.message).join();
     expect(messages(svg)).toBe("");
     // Where the title was before the fix: the arc's height lower.
-    const topRow = Math.min(...flow.nodes.map(n => n.position.y));
+    const topRow = Math.min(...flow.people.map(n => n.position.y));
     const bulge = topRow - NODE_SIZE / 2 - highestDuplicateArc(flow, NODE_SIZE / 2);
     expect(messages(moved(bulge))).toContain("is drawn through a dashed arc between two copies");
     // Lower still, onto the symbols.

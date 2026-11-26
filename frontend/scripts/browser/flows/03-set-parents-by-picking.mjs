@@ -24,8 +24,8 @@ export default {
     t.equal(after.parentOf[couple.id], [child.id], "with the new person as their child");
     t.equal(couple.individual1, "g3a", "the father is first in the couple");
     t.equal(await t.eval(() => window.__pededit.usePedigreeStore.getState().picking), null, "picking is over");
-    const edge = await t.eval(id => window.__pededit.layout().coupleEdges.find(e => e.data.partnershipId === id)?.type, couple.id);
-    t.equal(edge, "consanguineousEdge", "their couple line is double");
+    const double = await t.eval(id => window.__pededit.layout().couples.find(e => e.data.partnershipId === id)?.double, couple.id);
+    t.equal(double, true, "their couple line is double");
     t.ok(couple.consanguineous === undefined, "from their kinship, with nothing stored on the couple");
     t.equal(await t.count(`[data-partnership-id="${couple.id}"] path[stroke="black"]`), 2, "and two lines are drawn on the canvas");
 

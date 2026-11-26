@@ -7,8 +7,8 @@ export default {
     const id = await t.openFixture("example:Three generations");
     const node = '[data-individual-id="g3c"]';
     const where = () => t.eval(() => {
-      const n = window.__pededit.layout().nodes.find(n => n.data.individual.id === "g3c");
-      return { x: Math.round(n.position.x), y: Math.round(n.position.y), pinned: n.data.isPinned };
+      const n = window.__pededit.layout().people.find(n => n.individual.id === "g3c");
+      return { x: Math.round(n.position.x), y: Math.round(n.position.y), pinned: n.isPinned };
     });
     const start = await where();
     t.equal(start.pinned, false, "nobody is pinned to begin with");

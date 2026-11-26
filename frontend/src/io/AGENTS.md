@@ -77,15 +77,17 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 
 ## svg/ — figure export
 
-- `svgExporter.ts` draws everything from `layoutToFlow`'s output (#143):
-  positions from its nodes, couple and sibship lines from its edges through
-  `pedigree/lineGeometry.ts`, assisted lines and duplicate arcs from theirs.
+- `svgExporter.ts` draws everything from the scene (`buildScene`, #143,
+  #146): positions from its people, couple and sibship lines through
+  `pedigree/lineGeometry.ts`, assisted lines and duplicate arcs from theirs,
+  and the figure's size from `scene.bounds`. Nothing under `io/` imports
+  React Flow (`sceneImports.test.ts`).
   It never calls the layout engine and imports only types from it (a test in
   `svgExporter.test.ts` holds it to that). What is drawn for each person
-  (shape, fill, marks, lines of text) is the node's `glyph` (#144,
+  (shape, fill, marks, lines of text) is the person's `glyph` (#144,
   `pedigree/personGlyph.ts`); `uShapeExporter.ts` gets the same glyph from
   `personGlyph` through its `glyphOf`. Anything the export needs that
-  the edge or node data lacks is added to that data in `layoutToFlow`, not
+  the scene lacks is added to it in `buildScene`, not
   worked out again here.
 - `svgExporter.ts` — standard layout as an SVG string, including the key
   (`renderExportKeySvg` in `pedigree/exportKey.ts`, its rows from
@@ -172,7 +174,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   on purpose (it is not a label), so it has a check of its own,
   `title-collides` (#172): the `class="chart-title"` text against the
   symbols, the dashed arcs and the consanguinity labels. The canvas title
-  is a React Flow node outside `layoutToFlow`'s output, so `lintFlow` takes
+  is a React Flow node added by the canvas, not part of the scene, so `lintScene` takes
   the title as an option and places it with the same `chartTitlePlace`
   (#188); `lint.mjs` and `__pededit.check()` pass the pedigree's title.
   `uShapeLint.ts` has its own `title-collides`: the U-shape draws the title

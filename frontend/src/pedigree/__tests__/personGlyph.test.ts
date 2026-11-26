@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FEATURE_FIXTURES } from "../../fixtures/features";
-import { layoutToFlow } from "../layoutToFlow";
+import { buildScene } from "../scene";
 import { drawnPedigree } from "../collapse";
 import { personGlyph } from "../personGlyph";
 import { labelMaxWidth } from "../labels";
@@ -16,16 +16,16 @@ describe("personGlyph", () => {
 
   it("is plain data: it survives JSON unchanged", () => {
     for (const fx of FEATURE_FIXTURES) {
-      for (const node of layoutToFlow(fx.data).nodes) {
-        expect(JSON.parse(JSON.stringify(node.data.glyph)), `${fx.slug} ${node.data.individual.id}`).toEqual(node.data.glyph);
+      for (const node of buildScene(fx.data).people) {
+        expect(JSON.parse(JSON.stringify(node.glyph)), `${fx.slug} ${node.individual.id}`).toEqual(node.glyph);
       }
     }
   });
 
-  it("is the only description of the person on a node (#174)", () => {
+  it("is the only description of the person in the scene (#174)", () => {
     for (const fx of FEATURE_FIXTURES) {
-      for (const node of layoutToFlow(fx.data).nodes) {
-        expect(Object.keys(node.data).filter(k => k !== "glyph" && k in node.data.glyph), fx.slug).toEqual([]);
+      for (const node of buildScene(fx.data).people) {
+        expect(Object.keys(node).filter(k => k !== "glyph" && k in node.glyph), fx.slug).toEqual([]);
       }
     }
   });
@@ -55,7 +55,7 @@ describe("personGlyph", () => {
   it("carries the caption of a stillbirth and the count of a collapsed branch", () => {
     expect(glyph(text, "k3")).toMatchObject({ caption: "SB", lifeStatus: "stillbirth" });
     const collapsed = FEATURE_FIXTURES.find(f => f.slug === "collapsed")!.data;
-    const counts = layoutToFlow(collapsed).nodes.map(n => n.data.glyph.groupCount).filter(c => c !== undefined);
+    const counts = buildScene(collapsed).people.map(n => n.glyph.groupCount).filter(c => c !== undefined);
     expect(counts.sort()).toEqual([1, 2, 3]);
   });
 });

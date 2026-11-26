@@ -2,7 +2,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "./constants";
 
 /**
- * Snap-to-grid rules shared by the canvas (layoutToFlow), the store and the
+ * Snap-to-grid rules shared by the canvas (buildScene), the store and the
  * SVG exporter. Framework-free.
  *
  * When snap is on, every node is drawn on the grid, not only dragged ones:

@@ -1,6 +1,6 @@
 import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
-import type { SibshipEdgeData, RFNodeData } from "../layoutToFlow";
+import type { SibshipEdgeData, RFNodeData } from "../sceneToFlow";
 import { sibshipLineGeometry } from "../lineGeometry";
 import { segmentsPathD } from "../sibshipPath";
 import { ADOPTION_DASH } from "../adoption";
@@ -16,7 +16,7 @@ export function SibshipEdge({ data }: EdgeProps<SibshipEdgeType>) {
   // with the SVG export (lineGeometry.ts).
   const lines = sibshipLineGeometry(data, id => {
     const n = nodes.find(x => x.id === id);
-    return n && { position: n.position, data: n.data as RFNodeData | undefined };
+    return n && { position: n.position, ...(n.data as RFNodeData | undefined) };
   });
   if (!lines) return null;
   const { solid, dashed, marks } = lines;

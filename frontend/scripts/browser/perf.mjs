@@ -62,7 +62,7 @@ none did), with the time to the first frame alone in a second table:
            (17 ms is the full 60 frames a second)
   drop     releasing them, which pins them (the layout is reused too)
 and, in the dev build, three computations run on their own in the page: the
-layout engine, layoutToFlow (engine included) and the editor's problems.
+layout engine, buildScene (engine included) and the editor's problems.
 The pedigree is drawn fitted to a 1440x900 window with nodes unlocked
 (canvasSettings.nodesMoveable), so that a drag needs no hover pill.
 ${COMMON_HELP}`;
@@ -154,7 +154,7 @@ function installPerf({ expected, fixtureUrl }) {
   };
 }
 
-/** The layout engine, layoutToFlow and the problems, each run `n` times on the editor's pedigree. Dev build only. */
+/** The layout engine, buildScene and the problems, each run `n` times on the editor's pedigree. Dev build only. */
 async function computeTimes({ n }) {
   const hooks = window.__pededit;
   if (!hooks) return null;
@@ -170,7 +170,7 @@ async function computeTimes({ n }) {
   };
   return {
     engine: engine?.alignPedigreeByFamily ? time(() => engine.alignPedigreeByFamily(pedigree, { improve: true })) : null,
-    layoutToFlow: time(() => hooks.layoutToFlow(pedigree, { compact: false })),
+    buildScene: time(() => hooks.buildScene(pedigree, { compact: false })),
     // The problems are cached per pedigree object, so give it a new one.
     problems: time(() => hooks.problems({ ...pedigree })),
   };
@@ -475,7 +475,7 @@ const cell = xs => {
 };
 
 const COLUMNS = [
-  ["engine", "layout engine"], ["layoutToFlow", "layoutToFlow"], ["problems", "problems"], ["open", "open"], ["select", "select"],
+  ["engine", "layout engine"], ["buildScene", "buildScene"], ["problems", "problems"], ["open", "open"], ["select", "select"],
   ["edit", "edit"], ["hover", "hover"], ["zoom", "zoom"], ["drag", "drag update"], ["drop", "drop"],
 ];
 const FIRST_FRAME = [["openFrame", "open"], ["selectFrame", "select"], ["editFrame", "edit"], ["hoverFrame", "hover"], ["zoomFrame", "zoom"], ["dragWorst", "longest wait in the drag"], ["dropFrame", "drop"]];
@@ -566,7 +566,7 @@ await main(async () => {
           row.reps.push(await oneRep(context, fixture, appBase, rate));
           process.stderr.write(`${fixture.title} ${rate}x ${i + 1}/${reps}: open ${fmt(row.reps[i].open)} ms, edit ${fmt(row.reps[i].edit)} ms\n`);
         }
-        build ??= row.reps[0].layoutToFlow === undefined ? "production build" : "development build (unminified React in StrictMode, slower than production)";
+        build ??= row.reps[0].buildScene === undefined ? "production build" : "development build (unminified React in StrictMode, slower than production)";
         const lines = table([row], COLUMNS).split("\n");
         process.stderr.write(`${(rows.length === 1 ? lines : lines.slice(-1)).join("\n")}\n`);
         writeOut(false);

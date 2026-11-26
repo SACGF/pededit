@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { affectedOnlyKept, affectedOnlySeeds, bloodRelativesKept, filterHidden, filterBannerText } from "../viewFilters";
 import { collapseInfo, drawnPedigree, branchPlaceholderId, branchTooltip, isBranchPlaceholderId, filterHidingNew } from "../collapse";
-import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene, pedigreeNumbers } from "../scene";
+import { lintScene } from "../renderLint";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportCsv } from "../../io/csv/exporter";
@@ -81,7 +81,7 @@ describe("affectedOnlyKept (#4)", () => {
   it("keeps the double couple line's partnership and lints clean", () => {
     const p = loop();
     expect(drawnPedigree(p).partnerships.map(q => q.id).sort()).toEqual(["cc", "g", "gg", "pa", "pb"]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("half sibs: keeps the kept child's parents; the other partner's children are not drawn", () => {
@@ -93,7 +93,7 @@ describe("affectedOnlyKept (#4)", () => {
     expect(groupOf(p, "p1")!.children).toEqual(["k2"]);
     expect(groupOf(p, "p2")).toBeUndefined();
     expect(drawnPedigree(p).partnerships.map(q => q.id)).toEqual(["p1"]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("an affected founder with unaffected children keeps their partner, and the children are one symbol", () => {
@@ -105,7 +105,7 @@ describe("affectedOnlyKept (#4)", () => {
     expect(g.children).toEqual(["k1", "k2"]);
     // The grouped children, their partners and descendants.
     expect(sorted(g.hidden)).toEqual(["gk", "k1", "k2", "kw"]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("an affected person who married in keeps their partner and the partner's ancestors", () => {
@@ -159,7 +159,7 @@ describe("affected only with hidden descendants (#94, #1)", () => {
     const g = groupOf(p, "pa")!;
     expect(g.roots).toEqual(["a"]);
     expect(g.children).toEqual(["c1", "s1"]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("a collapsed person the filter leaves out hides nothing of their own", () => {
@@ -191,8 +191,8 @@ describe("drawing and exporting with affected only (#4)", () => {
   for (const ex of EXAMPLES) {
     it(`${ex.label}: canvas and export lint clean with the filter on`, () => {
       const p: Pedigree = { ...ex.data, filters: { affectedOnly: true } };
-      expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
-      expect(lintFlow(p, layoutToFlow(p, { compact: true }))).toEqual([]);
+      expect(lintScene(p, buildScene(p))).toEqual([]);
+      expect(lintScene(p, buildScene(p, { compact: true }))).toEqual([]);
       expect(lintExport(p).map(f => `${f.code}: ${f.message}`)).toEqual([]);
       expect(lintExport(p, { deidentify: true, title: "T" }).map(f => `${f.code}: ${f.message}`)).toEqual([]);
     });
@@ -201,7 +201,7 @@ describe("drawing and exporting with affected only (#4)", () => {
     for (const ex of EXAMPLES) {
       it(`${ex.label}: canvas and export lint clean with ${JSON.stringify(filters)}`, () => {
         const p: Pedigree = { ...ex.data, filters };
-        expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+        expect(lintScene(p, buildScene(p))).toEqual([]);
         expect(lintExport(p).map(f => `${f.code}: ${f.message}`)).toEqual([]);
       });
     }
@@ -287,7 +287,7 @@ describe("blood relatives only (#4)", () => {
     // Nobody is grouped: sp's parents' couple is not drawn at all.
     expect(collapseInfo(p).placeholders.size).toBe(0);
     expect(filterBannerText(p, collapseInfo(p).filtered)).toBe("Blood relatives only: 3 people not drawn");
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("uses the consultand when nobody is proband, and does nothing with neither", () => {
@@ -306,13 +306,13 @@ describe("one side of the family (#4)", () => {
     const p = families({ side: "maternal" });
     expect(drawnIds(p)).toEqual(sorted(["mgf", "mgm", "mum", "uncle", "dad", "pro", "sib", "sp", "gc"]));
     expect(collapseInfo(p).placeholders.size).toBe(0);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("father's side: his family and his child by an earlier partner", () => {
     const p = families({ side: "paternal" });
     expect(drawnIds(p)).toEqual(sorted(["pgf", "pgm", "dad", "aunt", "uh", "cousin", "ex", "hk", "mum", "pro", "sib", "sp", "gc"]));
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("does nothing for a proband without parents, and says why", () => {

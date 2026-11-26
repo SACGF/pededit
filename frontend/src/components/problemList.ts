@@ -7,7 +7,7 @@
  */
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { findProblems, type Problem, type ProblemField } from "../pedigree/validation";
-import { pedigreeNumbers } from "../pedigree/layoutToFlow";
+import { pedigreeNumbers } from "../pedigree/scene";
 
 export interface ProblemIndex {
   all: Problem[];

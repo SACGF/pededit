@@ -16,8 +16,8 @@ export default {
     // The canvas writes each line where the export does: the same baselines, from the symbol's centre.
     const baselines = await t.eval(async () => {
       const { textUnder } = await import("/src/pedigree/labelBlock.ts");
-      const node = window.__pededit.layout(window.__pededit.pedigree(), { compact: false }).nodes.find(n => n.data.individual.id === "gf");
-      const at = textUnder(node.data.glyph, node.data.glyph.nameLines);
+      const node = window.__pededit.layout(window.__pededit.pedigree(), { compact: false }).people.find(n => n.individual.id === "gf");
+      const at = textUnder(node.glyph, node.glyph.nameLines);
       const canvas = [...document.querySelectorAll('[data-individual-id="gf"] [data-name-label] text, [data-individual-id="gf"] [data-detail-label] text')]
         .map(e => Number(e.getAttribute("y")));
       return { canvas, layout: [...at.nameY, ...at.detailY] };

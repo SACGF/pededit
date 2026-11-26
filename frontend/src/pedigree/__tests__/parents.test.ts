@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { setParentsProblem } from "../parents";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { lintFlow } from "../renderLint";
-import { layoutToFlow } from "../layoutToFlow";
+import { lintScene } from "../renderLint";
+import { buildScene } from "../scene";
 import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -59,7 +59,7 @@ describe("setParents (#36)", () => {
     expect(ped().partnerships).toHaveLength(2);
     expect(ped().individuals.find(i => i.id === "orphan")!.sibOrder).toBe(1);
     expect(store().notice).toMatchObject({ kind: "info", undoable: true });
-    expect(lintFlow(ped(), layoutToFlow(ped()))).toEqual([]);
+    expect(lintScene(ped(), buildScene(ped()))).toEqual([]);
   });
 
   it("creates a partnership for two unrelated parents, father role first", () => {
@@ -74,7 +74,7 @@ describe("setParents (#36)", () => {
     const p = ped().partnerships.find(q => (ped().parentOf[q.id] ?? []).includes("orphan"))!;
     expect(p.consanguineous).toBeUndefined();
     expect(consanguinityTest(ped())(p.individual1, p.individual2)).toBe(true);
-    expect(lintFlow(ped(), layoutToFlow(ped()))).toEqual([]);
+    expect(lintScene(ped(), buildScene(ped()))).toEqual([]);
   });
 
   it("a single parent gets a placeholder partner of the opposite sex", () => {
@@ -177,7 +177,7 @@ describe("detachFromParents and removePartnership (#104)", () => {
     expect(p.parentOf.g).toEqual(["son"]);
     expect(p.partnerships.find(x => x.id === "g")!.twins).toBeUndefined();
     expect(p.individuals.length).toBe(pedigree().individuals.length);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
     st().undo();
     expect(st().pedigree.parentOf.g).toEqual(["son", "dau"]);
   });

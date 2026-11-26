@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { endedBreakX, endedMarkSegments, middleTaken, ENDED_STROKE_DX, ENDED_STROKE_DY, ENDED_STROKE_GAP } from "../ended";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -54,12 +54,12 @@ describe("ended relationship geometry (#98)", () => {
 });
 
 describe("ended relationship on the canvas and in exports (#98)", () => {
-  it("layoutToFlow flags the ended couples' edges", () => {
+  it("buildScene flags the ended couples' edges", () => {
     const p = pedigree();
     p.partnerships[1]!.ended = undefined;
-    const flow = layoutToFlow(p);
-    expect(lintFlow(p, flow)).toEqual([]);
-    const data = flow.coupleEdges.map(e => e.data!).sort((x, y) => (x.partnershipId! < y.partnershipId! ? -1 : 1));
+    const flow = buildScene(p);
+    expect(lintScene(p, flow)).toEqual([]);
+    const data = flow.couples.map(e => e.data!).sort((x, y) => (x.partnershipId! < y.partnershipId! ? -1 : 1));
     expect(data[0]).toMatchObject({ partnershipId: "ab", ended: true, middleTaken: true });
     expect(data[1]?.ended).toBeUndefined();
   });

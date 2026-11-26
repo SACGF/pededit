@@ -1,6 +1,6 @@
 import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
-import type { DuplicateEdgeData } from "../layoutToFlow";
+import type { DuplicateEdgeData } from "../sceneToFlow";
 import { NODE_SIZE } from "../constants";
 import { duplicateArcD } from "../couplePath";
 

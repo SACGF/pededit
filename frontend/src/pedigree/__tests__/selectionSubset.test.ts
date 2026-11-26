@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { selectionLabel, selectionPedigree, selectionSubset } from "../selectionSubset";
 import { branchPlaceholderId, collapseInfo, drawnPedigree, isBranchPlaceholderId } from "../collapse";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { keyRows } from "../keyRows";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -88,9 +88,9 @@ describe("selectionSubset (#215)", () => {
   it("keeps the double line of a related couple whose common ancestors are left out", () => {
     const drawn = figure(loop(), ["c1", "c2", "x", "y"]);
     expect(drawn.individuals).toHaveLength(4);
-    expect(layoutToFlow(drawn).coupleEdges.filter(e => e.type === "consanguineousEdge")).toHaveLength(1);
+    expect(buildScene(drawn).couples.filter(e => e.double)).toHaveLength(1);
     expect(lintExport(drawn, {})).toEqual([]);
-    expect(lintFlow(drawn, layoutToFlow(drawn))).toEqual([]);
+    expect(lintScene(drawn, buildScene(drawn))).toEqual([]);
   });
 
   it("says so when the selected people cannot be joined", () => {
@@ -174,16 +174,16 @@ describe("a figure of the selected people (#215)", () => {
   });
 
   it("draws someone once, with no dashed line, when the loop that drew them twice is cut", () => {
-    const example = EXAMPLES.find(e => layoutToFlow(e.data).duplicateEdges.length > 0)!;
-    const full = layoutToFlow(example.data);
-    const twice = full.duplicateEdges[0]!;
-    const id = full.nodes.find(n => n.id === twice.source)!.data.individual.id as string;
+    const example = EXAMPLES.find(e => buildScene(e.data).duplicates.length > 0)!;
+    const full = buildScene(example.data);
+    const twice = full.duplicates[0]!;
+    const id = full.people.find(n => n.id === twice.source)!.individual.id as string;
     // The person drawn twice with the family they were born into.
     const parents = example.data.partnerships.find(p => (example.data.parentOf[p.id] ?? []).includes(id))!;
     const drawn = figure(example.data, [id, parents.individual1, parents.individual2]);
-    const flow = layoutToFlow(drawn);
-    expect(flow.duplicateEdges).toEqual([]);
-    expect(flow.nodes.filter(n => n.data.individual?.id === id)).toHaveLength(1);
+    const flow = buildScene(drawn);
+    expect(flow.duplicates).toEqual([]);
+    expect(flow.people.filter(n => n.individual?.id === id)).toHaveLength(1);
     expect(exportSvg(drawn, {})).toContain('<g class="duplicate-arcs">\n</g>');
     expect(lintExport(drawn, {})).toEqual([]);
   });
@@ -195,7 +195,7 @@ describe("a figure of the selected people (#215)", () => {
       const s = selectionSubset(p, ids);
       if (!s.joined) continue;
       const drawn = selectionPedigree(p, s);
-      expect(lintFlow(drawn, layoutToFlow(drawn)), example.name).toEqual([]);
+      expect(lintScene(drawn, buildScene(drawn)), example.name).toEqual([]);
       expect(lintExport(drawn, {}), example.name).toEqual([]);
     }
   });

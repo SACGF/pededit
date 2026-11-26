@@ -7,8 +7,8 @@ import { isSameSexCouple, donorPairFor, coupleChildren } from "../sameSex";
 import { activeChildless } from "../childless";
 import { setParentsProblem } from "../parents";
 import { batchSexProblem } from "../batch";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportPed } from "../../io/ped/exporter";
 import { importJson, exportJson } from "../../io/json";
@@ -49,7 +49,7 @@ const parentsOf = (p: Pedigree, id: string) => {
 };
 const newKids = (before: Pedigree) => ped().individuals.filter(i => !before.individuals.some(b => b.id === i.id));
 const clean = (p: Pedigree) => {
-  expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+  expect(lintScene(p, buildScene(p))).toEqual([]);
   expect(lintExport(p)).toEqual([]);
   expect(lintExport(p, { deidentify: true })).toEqual([]);
 };

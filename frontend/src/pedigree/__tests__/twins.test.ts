@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { sibshipSegments, twinForkMarks } from "../sibshipPath";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
@@ -82,17 +82,17 @@ describe("twin fork geometry (#11)", () => {
 });
 
 describe("twins on the canvas and in exports (#11)", () => {
-  it("layoutToFlow tags twin nodes and the drawing is lint-clean", () => {
+  it("buildScene tags twin nodes and the drawing is lint-clean", () => {
     const p = pedigree();
-    const flow = layoutToFlow(p);
-    expect(lintFlow(p, flow)).toEqual([]);
-    const byId = new Map(flow.nodes.map(n => [n.data.individual.id, n.data]));
+    const flow = buildScene(p);
+    expect(lintScene(p, flow)).toEqual([]);
+    const byId = new Map(flow.people.map(n => [n.individual.id, n]));
     expect(byId.get("a")!.twinSet).toBe("p:0");
     expect(byId.get("b")!.zygosity).toBe("monozygotic");
     expect(byId.get("d")!.twinSet).toBe("p:1");
     expect(byId.get("e")!.twinSet).toBeUndefined();
     // Twins sit side by side.
-    const x = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const x = (id: string) => flow.people.find(n => n.individual.id === id)!.position.x;
     expect(Math.abs(x("a") - x("b"))).toBeCloseTo(80);
     expect(Math.abs(x("c") - x("d"))).toBeCloseTo(80);
   });

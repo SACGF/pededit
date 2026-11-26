@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { wrapLabel, labelMaxWidth, LABEL_CHAR_WIDTH, ELLIPSIS, linesWidth, nameLabelMode, isLabelCut } from "../labels";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { SLOT_WIDTH } from "../constants";
 import { EXAMPLES } from "../../data/examples";
@@ -53,9 +53,9 @@ function pair(name: string, dx = SLOT_WIDTH, other = "Bea"): Pedigree {
 }
 
 describe("labels on the canvas, in exports and in the lint (#68)", () => {
-  it("layoutToFlow puts the wrapped lines on the node data", () => {
-    const flow = layoutToFlow(pair("Ferdinand of Aragon"));
-    expect(flow.nodes.find(n => n.data.individual.id === "a")!.data.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
+  it("buildScene puts the wrapped lines on the node data", () => {
+    const flow = buildScene(pair("Ferdinand of Aragon"));
+    expect(flow.people.find(n => n.individual.id === "a")!.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
     expect(linesWidth(["Ferdinand of", "Aragon"])).toBeLessThanOrEqual(max);
   });
 
@@ -69,19 +69,19 @@ describe("labels on the canvas, in exports and in the lint (#68)", () => {
 
   it("the lint reports labels that run together only when they do", () => {
     const p = pair("Ferdinand of Aragon");
-    expect(lintFlow(p, layoutToFlow(p)).filter(f => f.code === "labels-overlap")).toEqual([]);
+    expect(lintScene(p, buildScene(p)).filter(f => f.code === "labels-overlap")).toEqual([]);
     // Two wrapped names a slot apart fit; dragged half a slot closer they collide.
     const wide = pair("Ferdinand of Aragon", SLOT_WIDTH, "Isabella of Portugal");
-    expect(lintFlow(wide, layoutToFlow(wide)).filter(f => f.code === "labels-overlap")).toEqual([]);
+    expect(lintScene(wide, buildScene(wide)).filter(f => f.code === "labels-overlap")).toEqual([]);
     const close = pair("Ferdinand of Aragon", 50, "Isabella of Portugal");
-    const found = lintFlow(close, layoutToFlow(close));
+    const found = lintScene(close, buildScene(close));
     expect(found.some(f => f.code === "labels-overlap")).toBe(true);
   });
 
   it("no example's labels overlap, in normal or compact spacing", () => {
     for (const ex of EXAMPLES) {
       for (const compact of [false, true]) {
-        const found = lintFlow(ex.data, layoutToFlow(ex.data, { compact })).filter(f => f.code === "labels-overlap");
+        const found = lintScene(ex.data, buildScene(ex.data, { compact })).filter(f => f.code === "labels-overlap");
         expect({ label: ex.label, compact, found }).toEqual({ label: ex.label, compact, found: [] });
       }
     }
@@ -102,12 +102,12 @@ describe("name label setting: wrap or truncate (#68)", () => {
 
   it("truncate gives one line on the canvas, cut with an ellipsis", () => {
     const p = truncated(pair("Ferdinand of Aragon"));
-    const lines = layoutToFlow(p).nodes[0]!.data.glyph.nameLines;
+    const lines = buildScene(p).people[0]!.glyph.nameLines;
     expect(lines).toHaveLength(1);
     expect(lines[0]!.endsWith(ELLIPSIS)).toBe(true);
     expect(linesWidth(lines)).toBeLessThanOrEqual(max);
-    expect(layoutToFlow(truncated(pair("Mary"))).nodes[0]!.data.glyph.nameLines).toEqual(["Mary"]);
-    expect(layoutToFlow(pair("Ferdinand of Aragon")).nodes[0]!.data.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
+    expect(buildScene(truncated(pair("Mary"))).people[0]!.glyph.nameLines).toEqual(["Mary"]);
+    expect(buildScene(pair("Ferdinand of Aragon")).people[0]!.glyph.nameLines).toEqual(["Ferdinand of", "Aragon"]);
   });
 
   it("knows when a label leaves part of the name out", () => {
@@ -128,7 +128,7 @@ describe("name label setting: wrap or truncate (#68)", () => {
     for (const ex of EXAMPLES) {
       for (const compact of [false, true]) {
         const p = truncated(ex.data);
-        const found = lintFlow(p, layoutToFlow(p, { compact })).filter(f => f.code === "labels-overlap");
+        const found = lintScene(p, buildScene(p, { compact })).filter(f => f.code === "labels-overlap");
         expect({ label: ex.label, compact, found }).toEqual({ label: ex.label, compact, found: [] });
       }
     }

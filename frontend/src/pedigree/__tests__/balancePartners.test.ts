@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { layoutCost } from "../layoutCost";
 import { importPed } from "../../io/ped/index.js";
 import { EXAMPLES } from "../../data/examples";
@@ -28,40 +28,40 @@ function corpus(): [string, Pedigree][] {
   return out;
 }
 
-const rowOf = (flow: ReturnType<typeof layoutToFlow>, name: string) => {
-  const node = flow.nodes.find(n => n.data.individual.name === name && !n.data.isDuplicate)!;
-  return flow.nodes
+const rowOf = (flow: ReturnType<typeof buildScene>, name: string) => {
+  const node = flow.people.find(n => n.individual.name === name && !(n.glyph.copy !== undefined))!;
+  return flow.people
     .filter(n => Math.abs(n.position.y - node.position.y) < 1)
     .sort((a, b) => a.position.x - b.position.x)
-    .map(n => n.data.individual.name);
+    .map(n => n.individual.name);
 };
 
 describe("spouse-hint balancing (#76)", () => {
   const targaryen = corpus().find(([n]) => n === "fiction/targaryen.ped#TARG")![1];
 
   it("puts Rhaenyra between Daemon and Laenor with no pass-through line", () => {
-    const on = layoutToFlow(targaryen);
+    const on = buildScene(targaryen);
     const row = rowOf(on, "Rhaenyra");
     const i = row.indexOf("Rhaenyra");
     expect(new Set([row[i - 1], row[i + 1]])).toEqual(new Set(["Daemon", "Laenor_Velaryon"]));
     expect(layoutCost(on).hops).toBe(0);
-    expect(lintFlow(targaryen, on)).toEqual([]);
+    expect(lintScene(targaryen, on)).toEqual([]);
     // The plain port (what R draws) has the hop and both husbands on one side.
-    const off = layoutToFlow(targaryen, { improveLayout: false });
+    const off = buildScene(targaryen, { improveLayout: false });
     expect(layoutCost(off).hops).toBe(1);
     expect(rowOf(off, "Rhaenyra").slice(-3)).toEqual(["Daemon", "Laenor_Velaryon", "Rhaenyra"]);
   });
 
   it("every pass together is no worse than the plain port on every fixture, and moves nobody without a gain", () => {
     for (const [name, p] of corpus()) {
-      const off = layoutToFlow(p, { improveLayout: false });
-      const on = layoutToFlow(p);
+      const off = buildScene(p, { improveLayout: false });
+      const on = buildScene(p);
       const a = layoutCost(off), b = layoutCost(on);
       expect(b.duplicates, name).toBeLessThanOrEqual(a.duplicates);
       expect(b.hops, name).toBeLessThanOrEqual(a.hops);
-      expect(lintFlow(p, on).length, name).toBeLessThanOrEqual(lintFlow(p, off).length);
+      expect(lintScene(p, on).length, name).toBeLessThanOrEqual(lintScene(p, off).length);
       if (b.duplicates === a.duplicates && b.hops === a.hops) {
-        expect(on.nodes.map(n => [n.id, n.position]), name).toEqual(off.nodes.map(n => [n.id, n.position]));
+        expect(on.people.map(n => [n.id, n.position]), name).toEqual(off.people.map(n => [n.id, n.position]));
       }
     }
   });
@@ -70,12 +70,12 @@ describe("spouse-hint balancing (#76)", () => {
 describe("family swaps (#77)", () => {
   const all = corpus();
   const named = (label: string) => all.find(([n]) => n === label)![1];
-  const copiesOf = (flow: ReturnType<typeof layoutToFlow>, name: string) =>
-    flow.nodes.filter(n => n.data.individual.name === name).length;
+  const copiesOf = (flow: ReturnType<typeof buildScene>, name: string) =>
+    flow.people.filter(n => n.individual.name === name).length;
 
   it("draws Rhaenyra's sibship beside the Velaryons, so Laenor is drawn once", () => {
     const p = named("fiction/targaryen.ped#TARG");
-    const off = layoutToFlow(p, { improveLayout: false }), on = layoutToFlow(p);
+    const off = buildScene(p, { improveLayout: false }), on = buildScene(p);
     expect(copiesOf(off, "Laenor_Velaryon")).toBe(2);
     expect(copiesOf(on, "Laenor_Velaryon")).toBe(1);
     // Laenor is in his parents' sibship and beside his wife: the two
@@ -86,17 +86,17 @@ describe("family swaps (#77)", () => {
     const a = layoutCost(off), b = layoutCost(on);
     expect([a.duplicates, b.duplicates]).toEqual([5, 3]);
     expect(b.arcLength).toBeLessThan(a.arcLength * 0.6);
-    expect(lintFlow(p, on)).toEqual([]);
+    expect(lintScene(p, on)).toEqual([]);
   });
 
   it("removes a duplicate on the other examples it changes, and only on those", () => {
     const fewer = all.filter(([, p]) =>
-      layoutCost(layoutToFlow(p)).duplicates < layoutCost(layoutToFlow(p, { improveLayout: false })).duplicates).map(([n]) => n);
+      layoutCost(buildScene(p)).duplicates < layoutCost(buildScene(p, { improveLayout: false })).duplicates).map(([n]) => n);
     expect(fewer.filter(n => !n.includes("/")).sort()).toEqual(["Double second cousins (A)", "House Targaryen", "The Buendías"]);
     expect(fewer).toContain("large/kinship2_sample.ped#1");
     const buendia = named("The Buendías");
-    expect(copiesOf(layoutToFlow(buendia, { improveLayout: false }), "Úrsula")).toBe(2);
-    expect(copiesOf(layoutToFlow(buendia), "Úrsula")).toBe(1);
+    expect(copiesOf(buildScene(buendia, { improveLayout: false }), "Úrsula")).toBe(2);
+    expect(copiesOf(buildScene(buendia), "Úrsula")).toBe(1);
   });
 
   it("leaves a couple whose side the user chose as it was drawn without the pass", () => {

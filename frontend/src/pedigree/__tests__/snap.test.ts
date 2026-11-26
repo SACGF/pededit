@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { snapValue, snapSlotPositions, backgroundDotGap, activeSnapGrid } from "../snap";
 import { sibshipSegments } from "../sibshipPath";
 import { layoutSpacing, scalePinnedPosition, unscalePinnedPosition } from "../spacing";
@@ -51,19 +51,19 @@ describe("snap helpers", () => {
   });
 });
 
-describe("layoutToFlow with snap on", () => {
+describe("buildScene with snap on", () => {
   for (const compact of [false, true]) {
     for (const grid of [4, 5, 45, 80]) {
       it(`puts every node of every example on the ${grid}px grid${compact ? " in compact" : ""}, rows flat`, () => {
         for (const ex of EXAMPLES) {
           const p = withSnap(ex.data, grid);
-          const flow = layoutToFlow(p, { compact });
+          const flow = buildScene(p, { compact });
           const rowY = new Map<string, number>();
-          for (const n of flow.nodes) {
+          for (const n of flow.people) {
             expect({ ex: ex.label, id: n.id, ok: onGrid(n.position.x, grid) && onGrid(n.position.y, grid) })
               .toEqual({ ex: ex.label, id: n.id, ok: true });
             const level = n.id.split("-")[0]!;
-            if (!n.data.isPinned) {
+            if (!n.isPinned) {
               if (!rowY.has(level)) rowY.set(level, n.position.y);
               expect(n.position.y).toBe(rowY.get(level));
             }
@@ -75,7 +75,7 @@ describe("layoutToFlow with snap on", () => {
     it(`adds no render lint findings at a 5px grid${compact ? " in compact" : ""}`, () => {
       for (const ex of EXAMPLES) {
         const codes = (p: Pedigree) =>
-          [...new Set(lintFlow(p, layoutToFlow(p, { compact })).map(f => f.code))].sort();
+          [...new Set(lintScene(p, buildScene(p, { compact })).map(f => f.code))].sort();
         expect({ ex: ex.label, codes: codes(withSnap(ex.data, 5)) })
           .toEqual({ ex: ex.label, codes: codes(ex.data) });
       }
@@ -84,22 +84,22 @@ describe("layoutToFlow with snap on", () => {
 
   it("puts example 2's i2a on the grid so a drag can line up under it", () => {
     const ex = EXAMPLES[2]!.data;
-    const plain = layoutToFlow(ex).nodes.find(n => n.data.individual.id === "i2a")!;
+    const plain = buildScene(ex).people.find(n => n.individual.id === "i2a")!;
     expect(onGrid(plain.position.x, 5)).toBe(false); // 129.6 without snap
-    const snapped = layoutToFlow(withSnap(ex, 5)).nodes.find(n => n.data.individual.id === "i2a")!;
+    const snapped = buildScene(withSnap(ex, 5)).people.find(n => n.individual.id === "i2a")!;
     expect(snapped.position.x).toBe(130);
   });
 
   it("puts compact rows on the grid, so a horizontal drag stays on its row", () => {
-    const flow = layoutToFlow(withSnap(EXAMPLES[2]!.data, 5), { compact: true });
-    const ys = [...new Set(flow.nodes.map(n => n.position.y))].sort((a, b) => a - b);
+    const flow = buildScene(withSnap(EXAMPLES[2]!.data, 5), { compact: true });
+    const ys = [...new Set(flow.people.map(n => n.position.y))].sort((a, b) => a - b);
     expect(ys).toEqual([0, 85, 170, 250].slice(0, ys.length));
   });
 
   it("shows a pin snapped in normal coordinates on the grid in compact", () => {
     // 255, 130 is on the 5px grid at normal spacing but scales to 216.75, 91.
     const p = withSnap(simpleFamily, 5, { pinnedPositions: { i6: { x: 255, y: 130 } } });
-    const n6 = layoutToFlow(p, { compact: true }).nodes.find(n => n.data.individual.id === "i6")!;
+    const n6 = buildScene(p, { compact: true }).people.find(n => n.individual.id === "i6")!;
     expect(n6.position).toEqual({ x: 215, y: 90 });
   });
 
@@ -143,8 +143,8 @@ describe("sibship drops", () => {
 
   it("are drawn to the pinned child's own row in the SVG export", () => {
     // i7 sits in the third row of simpleFamily at y=240; pin it 40px lower.
-    const flow = layoutToFlow(simpleFamily);
-    const n7 = flow.nodes.find(n => n.data.individual.id === "i7")!;
+    const flow = buildScene(simpleFamily);
+    const n7 = flow.people.find(n => n.individual.id === "i7")!;
     const p: Pedigree = { ...simpleFamily, pinnedPositions: { i7: { x: n7.position.x, y: 280 } } };
     const svg = exportSvg(p, { padding: 0 });
     const tops = [...svg.matchAll(/<line x1="([-\d.]+)" y1="([-\d.]+)" x2="\1" y2="([-\d.]+)"/g)].map(m => Number(m[3]));

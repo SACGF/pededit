@@ -5,7 +5,7 @@
  * their right. Only drawn people are numbered (hidden descendants get
  * none), so the figure reads I-1, I-2, I-3 with no gaps.
  *
- * `pedigreeNumbers` in `layoutToFlow.ts` is the entry point for a whole
+ * `pedigreeNumbers` in `scene.ts` is the entry point for a whole
  * pedigree; this module is the counting, kept free of the canvas code.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Structural checks on what the canvas will draw (the output of layoutToFlow),
+ * Structural checks on what the canvas will draw (the output of buildScene),
  * not on the kinship2 layout itself. The layout can match R slot for slot and
  * the drawing still be wrong when nodes are dropped or lines join the wrong
  * slots downstream, so these look for the shapes a reader would misread:
@@ -32,7 +32,7 @@ import { placementParentOf } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
-import type { FlowData } from "./layoutToFlow";
+import type { Scene, ScenePerson } from "./scene";
 import { NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
 import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth, highestAboveSymbols } from "./consanguinityLabel";
@@ -76,18 +76,18 @@ const MIN_SYMBOL_GAP = 8;
 /** Two sibship bars closer than this (px) vertically read as one line where they overlap. */
 const MIN_BAR_GAP = 4;
 
-export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: string } = {}): LintFinding[] {
+export function lintScene(full: Pedigree, scene: Scene, options: { title?: string } = {}): LintFinding[] {
   const pedigree = drawnPedigree(full); // hidden descendants are meant to be missing
   const out: LintFinding[] = [];
-  const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
-  const indOf = (nodeId: string) => nodeById.get(nodeId)?.data.individual.id;
+  const nodeById = new Map(scene.people.map(n => [n.id, n]));
+  const indOf = (nodeId: string) => nodeById.get(nodeId)?.individual.id;
   const label = (id: string) => {
     const ind = pedigree.individuals.find(i => i.id === id);
     return ind?.name ? `${ind.name} (${id})` : id;
   };
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
   // A node id is a layout slot ("level-slot"). When one is not drawn, name the
-  // person kinship2 put in that slot, from the same layout layoutToFlow uses.
+  // person kinship2 put in that slot, from the same layout buildScene uses.
   let layout: LayoutResult | undefined;
   const slotLabel = (nodeId: string) => {
     layout ??= cachedLayout(pedigree);
@@ -102,7 +102,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   for (const p of pedigree.partnerships) partnerPairs.set(pairKey(p.individual1, p.individual2), p.id);
 
   // 1. Everyone is drawn at least once.
-  const drawn = new Set(flow.nodes.map(n => n.data.individual.id));
+  const drawn = new Set(scene.people.map(n => n.individual.id));
   for (const ind of pedigree.individuals) {
     if (!drawn.has(ind.id)) {
       out.push({ code: "missing-individual", message: `${label(ind.id)} has no symbol`, individuals: [ind.id] });
@@ -112,10 +112,10 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   // 2. Couple lines.
   const drawnPairs = new Set<string>();
   const couples: { y: number; x1: number; x2: number; hop: number; ids: [string, string] }[] = [];
-  for (const e of flow.coupleEdges) {
+  for (const e of scene.couples) {
     const s = nodeById.get(e.source), t = nodeById.get(e.target);
     if (!s || !t) {
-      const present = [s, t].filter(Boolean).map(n => n!.data.individual.id);
+      const present = [s, t].filter(Boolean).map(n => n!.individual.id);
       out.push({
         code: "missing-node",
         message: `couple line ${e.id} ends at a node that is not drawn (${slotLabel(!s ? e.source : e.target)})`,
@@ -123,7 +123,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
       });
       continue;
     }
-    const a = s.data.individual.id, b = t.data.individual.id;
+    const a = s.individual.id, b = t.individual.id;
     const key = pairKey(a, b);
     drawnPairs.add(key);
     if (!partnerPairs.has(key)) {
@@ -144,11 +144,11 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     const x1 = Math.min(s.position.x, t.position.x), x2 = Math.max(s.position.x, t.position.x);
     couples.push({ y: (s.position.y + t.position.y) / 2, x1, x2, hop, ids: [a, b] });
     if (hop === 0 && Math.abs(s.position.y - t.position.y) < EPS) {
-      for (const n of flow.nodes) {
+      for (const n of scene.people) {
         if (n === s || n === t) continue;
         if (Math.abs(n.position.y - s.position.y) >= NODE_SIZE / 2) continue;
         if (n.position.x > x1 + EPS && n.position.x < x2 - EPS) {
-          const c = n.data.individual.id;
+          const c = n.individual.id;
           out.push({
             code: "couple-through-symbol",
             message: `couple line ${label(a)} = ${label(b)} runs through ${label(c)}`,
@@ -190,7 +190,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   for (const [pid, kids] of Object.entries(placementParentOf(pedigree))) for (const k of kids) parentsOf.set(k, pid);
   const partnershipById = new Map(pedigree.partnerships.map(p => [p.id, p]));
   const hasLineFrom = new Map<string, Set<string>>(); // child id -> pair keys of couples it hangs from
-  for (const e of flow.sibshipEdges) {
+  for (const e of scene.sibships) {
     const d = e.data;
     if (!d) continue;
     const ids = [d.leftParentId, d.rightParentId, ...d.childIds];
@@ -245,7 +245,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   }
 
   // 3a. Lines of assisted reproduction.
-  const linked = new Set(flow.assistedEdges.flatMap(e => (e.data?.children ?? []).map(c => `${indOf(e.source)}>${c}`)));
+  const linked = new Set(scene.assisted.flatMap(e => (e.data?.children ?? []).map(c => `${indOf(e.source)}>${c}`)));
   for (const link of assistedLinks(pedigree)) {
     if (!drawn.has(link.from) || !drawn.has(link.child) || linked.has(`${link.from}>${link.child}`)) continue;
     out.push({
@@ -257,7 +257,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
 
   // 3b. Sibship bars of different couples along the same line. Bars
   // that only meet end to end count too: they still read as one bar.
-  const bars = flow.sibshipEdges.flatMap(e => {
+  const bars = scene.sibships.flatMap(e => {
     const d = e.data;
     if (!d || d.childXs.length === 0 || d.converge) return [];
     const kids = d.childIds.map(indOf).filter((x): x is string => !!x);
@@ -279,12 +279,12 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   // 4. Symbols on top of each other, or touching. Touching symbols (half a slot
   // apart) read as one shape, so they count too.
   const near = NODE_SIZE + MIN_SYMBOL_GAP;
-  for (let i = 0; i < flow.nodes.length; i++) {
-    for (let j = i + 1; j < flow.nodes.length; j++) {
-      const A = flow.nodes[i]!, B = flow.nodes[j]!;
+  for (let i = 0; i < scene.people.length; i++) {
+    for (let j = i + 1; j < scene.people.length; j++) {
+      const A = scene.people[i]!, B = scene.people[j]!;
       const dx = Math.abs(A.position.x - B.position.x), dy = Math.abs(A.position.y - B.position.y);
       if (dx < near && dy < near) {
-        const a = A.data.individual.id, b = B.data.individual.id;
+        const a = A.individual.id, b = B.individual.id;
         const how = dx < NODE_SIZE - EPS && dy < NODE_SIZE - EPS ? "overlap" : "touch";
         out.push({ code: "symbols-overlap", message: `${label(a)} and ${label(b)} ${how}`, individuals: [a, b] });
       }
@@ -293,17 +293,17 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
 
   // 5. Labels on one row running into each other. Names are wrapped to
   // the slot width, so this catches dragged nodes and long dates.
-  const labelW = (n: FlowData["nodes"][0]) =>
-    Math.max(linesWidth(n.data.glyph.nameLines), linesWidth(n.data.glyph.detailLines));
-  for (let i = 0; i < flow.nodes.length; i++) {
-    for (let j = i + 1; j < flow.nodes.length; j++) {
-      const A = flow.nodes[i]!, B = flow.nodes[j]!;
+  const labelW = (n: ScenePerson) =>
+    Math.max(linesWidth(n.glyph.nameLines), linesWidth(n.glyph.detailLines));
+  for (let i = 0; i < scene.people.length; i++) {
+    for (let j = i + 1; j < scene.people.length; j++) {
+      const A = scene.people[i]!, B = scene.people[j]!;
       if (Math.abs(A.position.y - B.position.y) >= NODE_SIZE / 2) continue;
       const wa = labelW(A), wb = labelW(B);
       if (wa === 0 || wb === 0) continue;
       const gap = Math.abs(A.position.x - B.position.x) - (wa + wb) / 2;
       if (gap < 2) {
-        const a = A.data.individual.id, b = B.data.individual.id;
+        const a = A.individual.id, b = B.individual.id;
         if (a === b) continue; // two copies of one person never share a row this closely unless pinned
         out.push({ code: "labels-overlap", message: `the labels of ${label(a)} and ${label(b)} overlap`, individuals: [a, b] });
       }
@@ -313,15 +313,15 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   // 6. Dashed arcs between two copies of someone: through nobody else's
   // symbol and nobody else's text. Lines are crossed, as any arc must.
   const half = NODE_SIZE / 2;
-  for (const e of flow.duplicateEdges) {
+  for (const e of scene.duplicates) {
     const s = nodeById.get(e.source), t = nodeById.get(e.target);
     if (!s || !t) continue;
-    const who = s.data.individual.id;
+    const who = s.individual.id;
     const hit = arcCollisions(
       duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx),
-      flow.nodes.filter(n => n.data.individual.id !== who).map(n => ({
-        id: n.data.individual.id, x: n.position.x, y: n.position.y,
-        text: textBlockUnder(n.data.glyph, n.position.x, n.position.y),
+      scene.people.filter(n => n.individual.id !== who).map(n => ({
+        id: n.individual.id, x: n.position.x, y: n.position.y,
+        text: textBlockUnder(n.glyph, n.position.x, n.position.y),
       })),
       half,
     );
@@ -333,7 +333,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
     }
   }
 
-  if (options.title) out.push(...lintTitle(options.title, flow));
+  if (options.title) out.push(...lintTitle(options.title, scene));
   return out;
 }
 
@@ -345,9 +345,9 @@ const SLASH_REACH = 4;
  * everything drawn near the top of the chart. The title is raised to clear
  * `highestAboveSymbols`, so a finding means that missed something.
  */
-function lintTitle(title: string, flow: FlowData): LintFinding[] {
+function lintTitle(title: string, scene: Scene): LintFinding[] {
   const half = NODE_SIZE / 2;
-  const place = chartTitlePlace(title, flow.nodes, half, highestAboveSymbols(flow));
+  const place = chartTitlePlace(title, scene.people, half, highestAboveSymbols(scene));
   if (!place) return [];
   const w = titleWidth(title);
   const box = [place.x - w / 2, place.y - place.height / 2, place.x + w / 2, place.y + place.height / 2] as const;
@@ -356,22 +356,22 @@ function lintTitle(title: string, flow: FlowData): LintFinding[] {
   const found = (what: string, individuals: string[] = []): LintFinding[] =>
     [{ code: "title-collides", message: `the chart title "${title}" is drawn through ${what}`, individuals }];
 
-  for (const n of flow.nodes) {
+  for (const n of scene.people) {
     const { x, y } = n.position;
-    if (overlaps([x - half, y - half - SLASH_REACH, x + half, y + half])) return found(`the symbol of ${n.data.individual.id}`, [n.data.individual.id]);
+    if (overlaps([x - half, y - half - SLASH_REACH, x + half, y + half])) return found(`the symbol of ${n.individual.id}`, [n.individual.id]);
   }
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
-  for (const e of flow.duplicateEdges) {
+  const pos = new Map(scene.people.map(n => [n.id, n.position]));
+  for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
     if (a && b && duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx).some(inBox)) return found("a dashed arc between two copies");
   }
-  for (const p of consanguinityLabelPlacements(flow)) {
+  for (const p of consanguinityLabelPlacements(scene)) {
     const lw = Math.max(...p.lines.map(consanguinityLabelWidth));
     if (overlaps([p.x - lw / 2, consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy), p.x + lw / 2, consanguinityLabelBaseline(p.cy, p.hop) + p.dy + 3])) {
       return found(`the label "${p.lines.join(" ")}" above a double line`);
     }
   }
-  for (const e of flow.coupleEdges) {
+  for (const e of scene.couples) {
     const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
     if (!a || !b || hop <= 0) continue;
     const y = Math.min(a.y, b.y) - hop;

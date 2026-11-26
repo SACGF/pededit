@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { descendantsOf, ancestorsOf, removeWithDescendantsSet, removeWithAncestorsSet } from "../removal";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { lintFlow } from "../renderLint";
-import { layoutToFlow } from "../layoutToFlow";
+import { lintScene } from "../renderLint";
+import { buildScene } from "../scene";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
@@ -94,7 +94,7 @@ describe("removeWithDescendants / removeWithAncestors (#34)", () => {
     expect(p.unlockedIndividuals).toEqual(["gf"]);
     expect(store().selectedId).toBeNull();
     expect(store().notice).toMatchObject({ kind: "info", text: "Removed 4 individuals.", undoable: true });
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("remove with ancestors makes the descendants founders", () => {

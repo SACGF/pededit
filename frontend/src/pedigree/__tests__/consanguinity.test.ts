@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { consanguinityTest, coupleConsanguinity } from "../consanguinity";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -44,11 +44,11 @@ function withPartnership(p: Pedigree, id: string, patch: object): Pedigree {
 
 /** Which couples the canvas draws with a double line, as sorted "a-b" pairs. */
 function doubleOnCanvas(p: Pedigree): string[] {
-  const flow = layoutToFlow(p);
-  expect(lintFlow(p, flow)).toEqual([]);
-  const idOf = (nodeId: string) => flow.nodes.find(n => n.id === nodeId)!.data.individual.id;
-  return flow.coupleEdges
-    .filter(e => e.type === "consanguineousEdge")
+  const flow = buildScene(p);
+  expect(lintScene(p, flow)).toEqual([]);
+  const idOf = (nodeId: string) => flow.people.find(n => n.id === nodeId)!.individual.id;
+  return flow.couples
+    .filter(e => e.double)
     .map(e => [idOf(e.source), idOf(e.target)].sort().join("-"))
     .sort();
 }

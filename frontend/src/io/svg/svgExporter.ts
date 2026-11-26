@@ -3,28 +3,23 @@ import { NODE_SIZE } from "../../pedigree/constants";
 import { duplicateArcD } from "../../pedigree/couplePath";
 import { coupleLineGeometry, sibshipLineGeometry } from "../../pedigree/lineGeometry";
 import { TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { titleWidth, LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
+import { titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { assistedEdgeSegment } from "../../pedigree/assisted";
 import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
-import { layoutToFlow } from "../../pedigree/layoutToFlow";
-import type { PersonGlyph } from "../../pedigree/personGlyph";
 import {
-  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestAboveSymbols,
+  CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements,
 } from "../../pedigree/consanguinityLabel";
-import { TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT, COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../../pedigree/labelBlock";
-import type { FlowData } from "../../pedigree/layoutToFlow";
+import { CAPTION_SHIFT, COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../../pedigree/labelBlock";
+import { buildScene, type Scene } from "../../pedigree/scene";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
 import { renderFamilyHistorySvg } from "../../pedigree/familyHistory";
 import { renderDocumentedMarkSvg } from "../../pedigree/evaluation";
-import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "../../pedigree/proband";
 import { renderExportKeySvg } from "../../pedigree/exportKey";
 import {
   STROKE, DECEASED_OVERHANG, seg, renderPersonShapeSvg, renderDeceasedSlashSvg, renderProbandArrowSvg, renderLifeStatusCaption,
 } from "./symbolSvg";
 import type { SvgExportOptions } from "./types";
-
-const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
 
 // ── Slot positions ────────────────────────────────────────────────────────────
 
@@ -32,18 +27,18 @@ type SlotPos = Map<string, { x: number; y: number }>;
 
 /**
  * Map from "level-slot" to canvas pixel position, taken from the canvas's own
- * layoutToFlow so the export matches it: pins applied (to the nearest copy of
+ * buildScene so the export matches it: pins applied (to the nearest copy of
  * someone drawn twice), and copies with no line left out. A slot missing from
  * the map is not drawn.
  */
-function buildSlotPositions(flow: FlowData): SlotPos {
-  return new Map(flow.nodes.map(n => [n.id, n.position]));
+function buildSlotPositions(scene: Scene): SlotPos {
+  return new Map(scene.people.map(n => [n.id, n.position]));
 }
 
 /** Dashed arcs joining the copies of anyone drawn more than once. */
-function renderDuplicateArcs(flow: FlowData, slotPos: SlotPos): string[] {
+function renderDuplicateArcs(scene: Scene, slotPos: SlotPos): string[] {
   const half = NODE_SIZE / 2;
-  return flow.duplicateEdges.map(e => {
+  return scene.duplicates.map(e => {
     const a = slotPos.get(e.source)!, b = slotPos.get(e.target)!;
     const d = duplicateArcD(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, e.data?.legDx);
     return `<path d="${d}" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>`;
@@ -59,46 +54,14 @@ interface CanvasBounds {
   height: number;
 }
 
-function computeBounds(
-  pedigree: Pedigree,
-  glyphs: PersonGlyph[],
-  slotPos: SlotPos,
-  options: SvgExportOptions,
-  aboveTop = Infinity,
-  duplicates = false,
-): CanvasBounds {
+/** Where the drawing sits in the figure, and the figure's size, from the scene's bounds. */
+function computeBounds(pedigree: Pedigree, scene: Scene, options: SvgExportOptions, duplicates: boolean): CanvasBounds {
   const padding = options.padding ?? 40;
   // The title's baseline is at padding + 16, TITLE_GAP above the top row of
   // symbols plus room for a deceased slash, which reaches DECEASED_OVERHANG
   // above the row.
   const titleHeight = options.title ? 16 + TITLE_GAP + DECEASED_OVERHANG : 0;
-
-  let rawMinX = Infinity, rawMaxX = -Infinity;
-  let rawMinY = Infinity, rawMaxY = -Infinity;
-  for (const { x, y } of slotPos.values()) {
-    if (x < rawMinX) rawMinX = x;
-    if (x > rawMaxX) rawMaxX = x;
-    if (y < rawMinY) rawMinY = y;
-    if (y > rawMaxY) rawMaxY = y;
-  }
-
-  const hasProband = glyphs.some(g => g.arrow);
-  const probandExtra = hasProband ? PROBAND_TAIL + 4 : 0;
-
-  const hasAnnotations = glyphs.some(g => g.annotations.length > 0);
-  const hasCaption = glyphs.some(g => g.caption);
-  // Names wrap to the slot width, the age or DOB takes a line, so
-  // does each age of onset and the pedigree number, so allow for
-  // the most lines anyone takes.
-  const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
-  const labelHeight = TEXT_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
-    + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
-
-  // Consanguinity labels and the dashed arcs between two copies of
-  // someone over the top row reach above the symbols.
-  const aboveExtra = Math.max(0, Math.ceil(rawMinY - NODE_SIZE / 2 - aboveTop));
-  const contentW = rawMaxX - rawMinX + NODE_SIZE + probandExtra;
-  const contentH = rawMaxY - rawMinY + NODE_SIZE + labelHeight + probandExtra + aboveExtra;
+  const b = scene.bounds!;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
   const legend = options.key === false ? { width: 0, height: 0 } : renderExportKeySvg(pedigree, 0, 0, { duplicates });
@@ -106,15 +69,12 @@ function computeBounds(
 
   // A title wider than the drawing widens the figure; the drawing is then
   // centred under it.
-  const innerW = Math.max(contentW, legend.width, options.title ? titleWidth(options.title) : 0);
-  const offsetX = padding + (innerW - Math.max(contentW, legend.width)) / 2 + NODE_SIZE / 2 + probandExtra - rawMinX;
-  const offsetY = padding + NODE_SIZE / 2 + titleHeight + aboveExtra - rawMinY;
-
+  const innerW = Math.max(b.width, legend.width, options.title ? titleWidth(options.title) : 0);
   return {
-    offsetX,
-    offsetY,
+    offsetX: padding + (innerW - Math.max(b.width, legend.width)) / 2 - b.left,
+    offsetY: padding + titleHeight - b.top,
     width:  Math.ceil(innerW + 2 * padding),
-    height: Math.ceil(contentH + 2 * padding + titleHeight + legendExtra),
+    height: Math.ceil(b.height + 2 * padding + titleHeight + legendExtra),
   };
 }
 
@@ -136,13 +96,13 @@ function svgDefs(): string {
  * (`coupleLineGeometry`), so a line, its hop and the marks on it are where
  * the canvas has them.
  */
-function renderCoupleLines(flow: FlowData, slotPos: SlotPos): string[] {
+function renderCoupleLines(scene: Scene, slotPos: SlotPos): string[] {
   const lines: string[] = [];
   const path = (d: string) => `<path d="${d}" stroke="black" stroke-width="${STROKE}" fill="none"/>`;
-  for (const edge of flow.coupleEdges) {
+  for (const edge of scene.couples) {
     const left = slotPos.get(edge.source), right = slotPos.get(edge.target);
     if (!left || !right) continue;
-    const line = coupleLineGeometry(edge.data, edge.type === "consanguineousEdge", left, right);
+    const line = coupleLineGeometry(edge.data, edge.double, left, right);
     for (const d of line.paths) lines.push(path(d));
     // Ended relationship: two strokes across the line.
     for (const [x1, y1, x2, y2] of line.ended ?? []) lines.push(seg(x1, y1, x2, y2, false, true));
@@ -158,8 +118,8 @@ function renderCoupleLines(flow: FlowData, slotPos: SlotPos): string[] {
 }
 
 /** Degree of relationship above double couple lines, placed as on the canvas. */
-function renderConsanguinityLabels(flow: FlowData): string[] {
-  return consanguinityLabelPlacements(flow).flatMap(({ x, cy, hop, dy, lines, backed }) => {
+function renderConsanguinityLabels(scene: Scene): string[] {
+  return consanguinityLabelPlacements(scene).flatMap(({ x, cy, hop, dy, lines, backed }) => {
     const baselines = consanguinityLabelBaselines(cy, hop, lines.length, dy);
     // On a dashed arc between two copies: the arc passes behind it.
     const b = backed ? consanguinityLabelBacking(x, baselines, lines) : null;
@@ -171,13 +131,14 @@ function renderConsanguinityLabels(flow: FlowData): string[] {
 // ── Sibship lines ─────────────────────────────────────────────────────────────
 
 /** Lines of descent, from the edges the canvas draws (`sibshipLineGeometry`). */
-function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
+function renderSibshipLines(scene: Scene, slotPos: SlotPos): string[] {
   const lines: string[] = [];
-  const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
-  for (const edge of flow.sibshipEdges) {
+  const nodeById = new Map(scene.people.map(n => [n.id, n]));
+  for (const edge of scene.sibships) {
     const geometry = edge.data && sibshipLineGeometry(edge.data, id => {
       const position = slotPos.get(id);
-      return position && { position, data: nodeById.get(id)?.data };
+      const person = nodeById.get(id);
+      return position && { position, glyph: person?.glyph, twinSet: person?.twinSet, zygosity: person?.zygosity };
     });
     if (!geometry) continue;
     for (const [x1, y1, x2, y2] of geometry.solid) lines.push(seg(x1, y1, x2, y2));
@@ -191,12 +152,12 @@ function renderSibshipLines(flow: FlowData, slotPos: SlotPos): string[] {
 }
 
 /** Lines of assisted reproduction, from the same edges the canvas draws. */
-function renderAssistedLines(flow: FlowData, slotPos: SlotPos): string[] {
-  const nodeById = new Map(flow.nodes.map(n => [n.id, n]));
-  return flow.assistedEdges.flatMap(e => {
+function renderAssistedLines(scene: Scene, slotPos: SlotPos): string[] {
+  const nodeById = new Map(scene.people.map(n => [n.id, n]));
+  return scene.assisted.flatMap(e => {
     const s = assistedEdgeSegment(e, id => {
       const p = slotPos.get(id);
-      return p && { position: p, glyph: nodeById.get(id)?.data.glyph };
+      return p && { position: p, glyph: nodeById.get(id)?.glyph };
     });
     return s ? [seg(s[0], s[1], s[2], s[3], e.data?.kind === "social")] : [];
   });
@@ -210,15 +171,15 @@ function renderDuplicateMark(index: number): string {
   return `<text x="${at.x}" y="${at.y}" font-family="sans-serif" font-size="${COPY_NUMBER_FONT_SIZE}" fill="black">${index}</text>`;
 }
 
-function renderSymbols(slotPos: SlotPos, flow: FlowData): string[] {
+function renderSymbols(slotPos: SlotPos, scene: Scene): string[] {
   const elems: string[] = [];
 
   // One symbol for each node the canvas draws, in its order (row by row),
   // from the node's glyph: nothing here asks the pedigree what to draw.
-  for (const node of flow.nodes) {
+  for (const node of scene.people) {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
-    const glyph = node.data.glyph;
+    const glyph = node.glyph;
     const { x: cx, y: cy } = pos;
 
     elems.push(`<g transform="translate(${cx} ${cy})">`);
@@ -246,7 +207,7 @@ function escapeXml(s: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
+function renderLabels(slotPos: SlotPos, scene: Scene): string[] {
   const elems: string[] = [];
   const rect = (cx: number, cy: number, b: TextBacking) =>
     `<rect x="${cx + b.x}" y="${cy + b.y}" width="${b.width}" height="${b.height}" fill="white"/>`;
@@ -255,10 +216,10 @@ function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
 
   // Text goes under every copy of someone drawn more than once, as on the
   // canvas: a copy with no name can only be told by following its dashed arc.
-  for (const node of flow.nodes) {
+  for (const node of scene.people) {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
-    const glyph = node.data.glyph;
+    const glyph = node.glyph;
     const { x: cx, y: cy } = pos;
     // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
     // row, name, then the detail lines in NSGC order (age, onset, number),
@@ -293,10 +254,10 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   // What the canvas draws: hidden descendants left out.
   // The one layout: everything below is drawn from what the canvas draws (#143).
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  const flow    = layoutToFlow(working, { compact: options.compact });
-  const slotPos = buildSlotPositions(flow);
-  const duplicates = flow.duplicateEdges.length > 0;
-  const bounds  = computeBounds(working, flow.nodes.map(n => n.data.glyph), slotPos, options, highestAboveSymbols(flow), duplicates);
+  const scene    = buildScene(working, { compact: options.compact });
+  const slotPos = buildSlotPositions(scene);
+  const duplicates = scene.duplicates.length > 0;
+  const bounds  = computeBounds(working, scene, options, duplicates);
   const { offsetX, offsetY, width, height } = bounds;
 
   const lines: string[] = [
@@ -316,13 +277,13 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
   // The group classes are what the export lint (exportLint.ts) reads.
   const group = (cls: string, body: string[]) => lines.push(`<g class="${cls}">`, ...body, `</g>`);
-  group("couple-lines", renderCoupleLines(flow, slotPos));
-  group("sibship-lines", renderSibshipLines(flow, slotPos));
-  group("assisted-lines", renderAssistedLines(flow, slotPos));
-  group("duplicate-arcs", renderDuplicateArcs(flow, slotPos));
-  group("symbols", renderSymbols(slotPos, flow));
-  group("labels", renderLabels(slotPos, flow));
-  group("consanguinity-labels", renderConsanguinityLabels(flow));
+  group("couple-lines", renderCoupleLines(scene, slotPos));
+  group("sibship-lines", renderSibshipLines(scene, slotPos));
+  group("assisted-lines", renderAssistedLines(scene, slotPos));
+  group("duplicate-arcs", renderDuplicateArcs(scene, slotPos));
+  group("symbols", renderSymbols(slotPos, scene));
+  group("labels", renderLabels(slotPos, scene));
+  group("consanguinity-labels", renderConsanguinityLabels(scene));
   lines.push(`</g>`);
 
   const padding = options.padding ?? 40;

@@ -1,6 +1,6 @@
 import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
-import type { RFNodeData } from "../layoutToFlow";
+import type { RFNodeData } from "../sceneToFlow";
 import { NODE_SIZE } from "../constants";
 import { SymbolShape, BranchCount, TextUnderSymbol } from "./symbols";
 import { usePedigreeStore } from "../../store/usePedigreeStore";

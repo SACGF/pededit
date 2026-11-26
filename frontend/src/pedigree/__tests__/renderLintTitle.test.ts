@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 // The title as it would be placed if nothing drawn over the symbols were
@@ -10,7 +10,7 @@ vi.mock("../consanguinityLabel", async importOriginal => ({
   highestAboveSymbols: () => Infinity,
 }));
 
-describe("lintFlow: a chart title that is not raised", () => {
+describe("lintScene: a chart title that is not raised", () => {
   const base = {
     individuals: [
       { id: "f", sex: "male", affected: false, sibOrder: 0 },
@@ -23,11 +23,11 @@ describe("lintFlow: a chart title that is not raised", () => {
   } as Pedigree;
 
   it("is reported when it is drawn through a couple line hopping over the top row", () => {
-    const flow = layoutToFlow(base);
-    flow.coupleEdges = flow.coupleEdges.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
-    const found = lintFlow(base, flow, { title: "A family" }).filter(f => f.code === "title-collides");
+    const flow = buildScene(base);
+    flow.couples = flow.couples.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
+    const found = lintScene(base, flow, { title: "A family" }).filter(f => f.code === "title-collides");
     expect(found.map(f => f.message)).toEqual(['the chart title "A family" is drawn through a couple line hopping over a symbol']);
     // No title, no check.
-    expect(lintFlow(base, flow).filter(f => f.code === "title-collides")).toEqual([]);
+    expect(lintScene(base, flow).filter(f => f.code === "title-collides")).toEqual([]);
   });
 });

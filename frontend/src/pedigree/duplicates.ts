@@ -1,5 +1,5 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { layoutToFlow } from "./layoutToFlow";
+import { buildScene } from "./scene";
 
 const cache = new WeakMap<Pedigree, boolean>();
 
@@ -12,7 +12,7 @@ const cache = new WeakMap<Pedigree, boolean>();
 export function drawsDuplicates(pedigree: Pedigree): boolean {
   let out = cache.get(pedigree);
   if (out === undefined) {
-    out = layoutToFlow(pedigree).duplicateEdges.length > 0;
+    out = buildScene(pedigree).duplicates.length > 0;
     cache.set(pedigree, out);
   }
   return out;

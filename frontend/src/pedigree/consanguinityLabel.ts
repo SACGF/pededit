@@ -221,14 +221,14 @@ function searchLabelPlace(o: Parameters<typeof placeConsanguinityLabel>[0], bloc
   return null;
 }
 
-/** Where each couple label of a laid-out flow sits, for drawing, bounds and the title. */
-export function consanguinityLabelPlacements(flow: {
-  nodes: { id: string; position: { x: number; y: number } }[];
-  coupleEdges: { source: string; target: string; data?: { hopHeight?: number; consanguinityLabel?: string[]; consanguinityLabelOffset?: ConsanguinityLabelOffset } }[];
+/** Where each couple label of a scene sits, for drawing, bounds and the title. */
+export function consanguinityLabelPlacements(scene: {
+  people: { id: string; position: { x: number; y: number } }[];
+  couples: { source: string; target: string; data?: { hopHeight?: number; consanguinityLabel?: string[]; consanguinityLabelOffset?: ConsanguinityLabelOffset } }[];
 }): { x: number; cy: number; hop: number; dy: number; lines: string[]; backed: boolean }[] {
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  const pos = new Map(scene.people.map(n => [n.id, n.position]));
   const out: { x: number; cy: number; hop: number; dy: number; lines: string[]; backed: boolean }[] = [];
-  for (const e of flow.coupleEdges) {
+  for (const e of scene.couples) {
     const lines = e.data?.consanguinityLabel;
     const s = pos.get(e.source), t = pos.get(e.target);
     if (!lines?.length || !s || !t) continue;
@@ -241,8 +241,8 @@ export function consanguinityLabelPlacements(flow: {
 }
 
 /** The highest point any couple label reaches, or Infinity when there is none. */
-export function highestConsanguinityLabel(flow: Parameters<typeof consanguinityLabelPlacements>[0]): number {
-  return Math.min(Infinity, ...consanguinityLabelPlacements(flow).map(p => consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy)));
+export function highestConsanguinityLabel(scene: Parameters<typeof consanguinityLabelPlacements>[0]): number {
+  return Math.min(Infinity, ...consanguinityLabelPlacements(scene).map(p => consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy)));
 }
 
 /**
@@ -252,8 +252,8 @@ export function highestConsanguinityLabel(flow: Parameters<typeof consanguinityL
  * raised to clear it, on the canvas (`chartTitleNode`) and in the export
  * (`computeBounds`).
  */
-export function highestAboveSymbols(flow: Parameters<typeof consanguinityLabelPlacements>[0] & Parameters<typeof highestDuplicateArc>[0]): number {
-  return Math.min(highestConsanguinityLabel(flow), highestDuplicateArc(flow, NODE_SIZE / 2), highestHop(flow));
+export function highestAboveSymbols(scene: Parameters<typeof consanguinityLabelPlacements>[0] & Parameters<typeof highestDuplicateArc>[0]): number {
+  return Math.min(highestConsanguinityLabel(scene), highestDuplicateArc(scene, NODE_SIZE / 2), highestHop(scene));
 }
 
 /**

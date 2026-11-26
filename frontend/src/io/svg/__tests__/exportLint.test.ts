@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { EXAMPLES } from "../../../data/examples";
-import { layoutToFlow } from "../../../pedigree/layoutToFlow";
+import { buildScene } from "../../../pedigree/scene";
 import { exportSvg } from "../svgExporter";
 import { lintExport, lintExportSvg, parseExportSvg } from "../exportLint";
 
@@ -37,7 +37,7 @@ describe("export lint over every example", () => {
     const ex = EXAMPLES.find(e => e.data.partnerships.length > 2)!;
     const parsed = parseExportSvg(exportSvg(ex.data));
     expect(parsed.structured).toBe(true);
-    expect(parsed.symbols.length).toBe(layoutToFlow(ex.data).nodes.length);
+    expect(parsed.symbols.length).toBe(buildScene(ex.data).people.length);
     expect(parsed.couples.length).toBeGreaterThanOrEqual(ex.data.partnerships.length);
     expect(parsed.sibs.length).toBeGreaterThan(0);
   });
@@ -59,7 +59,7 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
     parentOf: { p: ["c"] },
     siblingOrder: { mode: "insertion", affectedFirst: false },
   } as Pedigree;
-  const flow = layoutToFlow(trio);
+  const flow = buildScene(trio);
   const svg = exportSvg(trio);
   const codes = (s: string) => lintExportSvg(trio, flow, s).map(f => f.code);
   const section = (s: string, cls: string) => {
@@ -95,7 +95,7 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
   it("reports a couple line between the wrong people and a child under them", () => {
     // Move the end of Dad = Mum onto Other, beyond: it now joins Dad and Other
     // and runs through Mum, and the child hangs from it.
-    const pos = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position;
+    const pos = (id: string) => flow.people.find(n => n.individual.id === id)!.position;
     const f = pos("f"), m = pos("m"), x = pos("x");
     // A couple line runs between the facing edges of the two symbol boxes.
     const from = `M ${f.x + 20} ${f.y} L ${m.x - 20} ${m.y}`;
@@ -107,7 +107,7 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
   });
 
   it("reports a sibship drop that ends in empty space", () => {
-    const c = flow.nodes.find(n => n.data.individual.id === "c")!.position;
+    const c = flow.people.find(n => n.individual.id === "c")!.position;
     const re = new RegExp(`(<line x1="${c.x}" y1="[^"]+" x2="${c.x}" y2=")([^"]+)(")`);
     expect(svg).toMatch(re);
     const found = codes(svg.replace(re, (_, a, y, b) => `${a}${Number(y) - 15}${b}`));

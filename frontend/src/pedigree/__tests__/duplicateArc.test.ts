@@ -7,15 +7,15 @@ import { importPed } from "../../io/ped";
 import { lintExport } from "../../io/svg/exportLint";
 import { duplicateArcD, duplicateArcPoints, pathPoints } from "../couplePath";
 import { arcCollisions, chooseArcRoute } from "../duplicateArc";
-import { layoutToFlow } from "../layoutToFlow";
-import type { FlowData } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import type { Scene } from "../scene";
+import { lintScene } from "../renderLint";
 
 const HALF = 20, SLOT = 80, BULGE = 28;
-const arcCodes = (p: Pedigree, flow: FlowData) => lintFlow(p, flow).filter(f => f.code.startsWith("arc-")).map(f => `${f.code} ${f.individuals[1]}`);
+const arcCodes = (p: Pedigree, flow: Scene) => lintScene(p, flow).filter(f => f.code.startsWith("arc-")).map(f => `${f.code} ${f.individuals[1]}`);
 /** The flow with every arc drawn as the usual curve. */
-const unrouted = (flow: FlowData): FlowData =>
-  ({ ...flow, duplicateEdges: flow.duplicateEdges.map(e => ({ ...e, data: { bulge: e.data!.bulge } })) });
+const unrouted = (flow: Scene): Scene =>
+  ({ ...flow, duplicates: flow.duplicates.map(e => ({ ...e, data: { bulge: e.data!.bulge } })) });
 const example = (label: string) => EXAMPLES.find(e => e.label === label)!.data;
 
 describe("pathPoints", () => {
@@ -100,8 +100,8 @@ describe("dashed arcs keep off other people (#192)", () => {
   it("House Targaryen: Daemon's arc is routed, and as a plain curve it would run through his brother, Alicent and Viserys I", () => {
     const p = example("House Targaryen");
     for (const compact of [false, true]) {
-      const flow = layoutToFlow(p, { compact });
-      expect(flow.duplicateEdges.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Daemon-0"]);
+      const flow = buildScene(p, { compact });
+      expect(flow.duplicates.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Daemon-0"]);
       expect(arcCodes(p, flow)).toEqual([]);
       expect(arcCodes(p, unrouted(flow))).toEqual(expect.arrayContaining(["arc-through-symbol Aegon_Baelon", "arc-through-symbol Alicent_Hightower", "arc-through-label Viserys_I"]));
     }
@@ -109,8 +109,8 @@ describe("dashed arcs keep off other people (#192)", () => {
 
   it("Spanish Habsburgs: Philip IV's arc goes down between the labels beside him", () => {
     const p = example("Spanish Habsburgs");
-    const flow = layoutToFlow(p);
-    expect(flow.duplicateEdges.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Philip_IV-0"]);
+    const flow = buildScene(p);
+    expect(flow.duplicates.filter(e => e.data?.legDx !== undefined).map(e => e.id)).toEqual(["duplicate-Philip_IV-0"]);
     expect(arcCodes(p, flow)).toEqual([]);
     expect(arcCodes(p, unrouted(flow))).toEqual(["arc-through-label Maria_Anna_of_Austria"]);
   });
@@ -119,8 +119,8 @@ describe("dashed arcs keep off other people (#192)", () => {
     const file = path.resolve(__dirname, "../../../../test-data/ped/large/kinship2_sample.ped");
     const p = importPed(fs.readFileSync(file, "utf8")).pedigrees[0]!.pedigree;
     for (const compact of [false, true]) {
-      const flow = layoutToFlow(p, { compact });
-      const routed = flow.duplicateEdges.filter(e => e.data?.legDx !== undefined);
+      const flow = buildScene(p, { compact });
+      const routed = flow.duplicates.filter(e => e.data?.legDx !== undefined);
       expect(routed.length).toBe(2);
       expect(new Set(routed.map(e => e.data!.bulge)).size).toBe(2);
       expect(arcCodes(p, flow)).toEqual([]);
@@ -131,7 +131,7 @@ describe("dashed arcs keep off other people (#192)", () => {
 
   it("an arc that passes through nobody is left as the usual curve", () => {
     for (const ex of EXAMPLES.filter(e => !["House Targaryen", "Spanish Habsburgs"].includes(e.label))) {
-      expect(layoutToFlow(ex.data).duplicateEdges.filter(e => e.data?.legDx !== undefined).map(e => `${ex.label} ${e.id}`)).toEqual([]);
+      expect(buildScene(ex.data).duplicates.filter(e => e.data?.legDx !== undefined).map(e => `${ex.label} ${e.id}`)).toEqual([]);
     }
   });
 });

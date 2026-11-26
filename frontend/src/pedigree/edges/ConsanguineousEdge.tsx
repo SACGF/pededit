@@ -1,6 +1,6 @@
 import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
-import type { CoupleEdgeData } from "../layoutToFlow";
+import type { CoupleEdgeData } from "../sceneToFlow";
 import { coupleLineGeometry } from "../lineGeometry";
 import { segmentsPathD } from "../sibshipPath";
 import { ChildlessMark } from "./ChildlessMark";

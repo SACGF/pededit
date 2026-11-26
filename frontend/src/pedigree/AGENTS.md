@@ -1,13 +1,25 @@
 # frontend/src/pedigree/ — agent notes
 
-The canvas renderer. Converts a `Pedigree` into React Flow nodes and edges and
-draws NSGC symbols.
+The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
 
-- `layoutToFlow.ts` — the bridge from `alignPedigree()` output to React Flow.
-  Produces `pedigreeSymbol` nodes, `coupleEdge` / `consanguineousEdge` edges
-  between partners, and one `sibshipEdge` per partnership with children.
-  Applies `pinnedPositions` overrides. Read `claude/layout_engine_guide.md`
-  first; the three rendering rules there are implemented here.
+- `scene.ts` (#146): `buildScene(pedigree, options)` turns the layout
+  engine's output into a `Scene`, the whole drawing as plain data: `people`
+  (slot id, symbol centre, glyph, pin, draggable), `couples` (`double` for a
+  consanguineous line), `sibships`, `duplicates` (dashed arcs), `assisted`
+  lines, the couple text on the couple lines' data, `aboveTop` and the
+  `bounds` of everything drawn. Lines name their ends by slot id
+  ("level-slot"). It applies `pinnedPositions` overrides and snapping. It
+  imports nothing of React Flow (a test holds it and everything under
+  `io/` and the lints to that), so the exports, the lints, de-identification
+  and the dev hooks read it as it is, and it can be built in Node.
+  Read `claude/layout_engine_guide.md` first; the three rendering rules
+  there are implemented here.
+- `sceneToFlow.ts`: the canvas's React Flow nodes (`pedigreeSymbol`,
+  `collapsedBranch`) and edges (`coupleEdge` / `consanguineousEdge`,
+  `sibshipEdge`, `duplicateEdge`, `assistedEdge`) for a scene. Only canvas
+  code imports it. The export's size comes from `scene.bounds`; the canvas
+  fits the view to the same box (with the title), so labels under the
+  bottom row and arcs over the top one are in view.
 - Someone kinship2 places in several slots (cousin marriages, partners on
   both sides of the tree) is drawn once per slot that carries a line, each
   copy numbered, joined by a dashed `duplicateEdge` arc (R's `arcconnect`).
@@ -15,7 +27,7 @@ draws NSGC symbols.
   "tidy" them: an earlier version did, and drew 7 of the 13 historic and
   classic examples wrong while the R oracle tests still passed. A pin is
   stored per individual, so it moves only the copy laid out nearest to it.
-  `svgExporter` takes its positions from `layoutToFlow` so it matches.
+  `svgExporter` takes its positions from `buildScene` so it matches.
 - `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40. The layout
   engine's `pedigreeToGeometry` and the SVG exporters use the same numbers;
   change them together.
@@ -58,7 +70,7 @@ draws NSGC symbols.
 - `personGlyph.ts` (#144): everything drawn at one person, as plain data
   (`PersonGlyph`: shape, paint, brackets, letter, slash, arrow, "?", "*",
   caption, annotation row, name and detail lines, white backings, copy
-  number, group count). `layoutToFlow` puts it on every node
+  number, group count). `buildScene` puts it on every node
   (`RFNodeData.glyph`), which holds nothing that repeats it (#174);
   `PedigreeSymbolNode`, `svgExporter`, the lints and the minimap read it there,
   and the U-shape export, which has its own layout, calls `personGlyph` per
@@ -130,7 +142,7 @@ draws NSGC symbols.
   Unnamed people have no label in production.
 - `labels.ts` — name labels wrap to the slot width (#68): `wrapLabel` gives
   at most two lines, cut with an ellipsis, from an estimated 5.8px per
-  character; `layoutToFlow` puts the lines on the glyph (`nameLines`),
+  character; `buildScene` puts the lines on the glyph (`nameLines`),
   `svgExporter` writes one text element per line with the full name in a
   `<title>`, and the U-shape wraps at its widest slot. The `labels-overlap`
   lint code uses the same estimate, so names fit by construction and it
@@ -149,7 +161,7 @@ draws NSGC symbols.
 - `lineGeometry.ts` (#143): what is drawn for a couple line
   (`coupleLineGeometry`: the path or the two paths of a double line, its hop,
   the childless and ended marks) and for a sibship (`sibshipLineGeometry`),
-  from the edge data `layoutToFlow` made and the positions of the symbols at
+  from the edge data `buildScene` made and the positions of the symbols at
   the ends. The canvas edge components call it with live node positions and
   `svgExporter` with the laid out ones, so the two cannot disagree. A couple line runs between the facing edges of the
   two symbol boxes, never centre to centre. Add anything new on a line
@@ -170,7 +182,7 @@ draws NSGC symbols.
   stretch, in the middle of the gap, and so does a childless mark: a line of
   descent only ever leaves a level couple line (the maintainer's rule, and
   what Madeline draws). Nothing hangs from the raised part; the ended mark
-  and a consanguinity label sit on it. `layoutToFlow` puts the heights,
+  and a consanguinity label sit on it. `buildScene` puts the heights,
   shapes and turns on the edge (`CoupleEdgeData.hopEnds`) and the drop on
   the sibship (`SibshipEdgeData.hopDrop`), both measured from the far
   partner, so the two stay joined while a node is dragged and the renderers
@@ -196,7 +208,7 @@ draws NSGC symbols.
   text reaches the symbols below, which a backing would cover. An only child
   within a quarter of a symbol of the middle of its parents gets one
   straight line and no bar (`descentX`, layout engine).
-  `layoutToFlow` puts the offset on the edge data (`barOffset`), so during a
+  `buildScene` puts the offset on the edge data (`barOffset`), so during a
   drag the heights are as of the last layout; `svgExporter` reads the same
   edge data. The U-shape export has its own geometry and does not use it. `CoupleEdge` and
   `ConsanguineousEdge` (double line) connect partners. `DuplicateEdge` is
@@ -205,7 +217,7 @@ draws NSGC symbols.
 - `duplicateArc.ts` — keeps a dashed arc off other people (#192). The usual
   line is kept whenever it passes through nobody's symbol and nobody's text,
   so most arcs are R's. Otherwise `chooseArcRoute` (called from
-  `layoutToFlow`, result on the edge data) picks: for copies on one row a
+  `buildScene`, result on the edge data) picks: for copies on one row a
   flatter arc (a smaller `bulge`) that passes under text hanging from the
   row above; for copies on different rows `legDx`, which sends the arc out
   of the upper copy's side, down the gap beside it and along above the lower
@@ -223,7 +235,7 @@ draws NSGC symbols.
   8px of the symbol tops the arc ends at is not counted, since no arc could
   pass under it (compact rows with four lines of text). The U-shape export
   has its own links and does not use any of this.
-- `snap.ts` — snap to grid. With snap on, `layoutToFlow` and `svgExporter`
+- `snap.ts` — snap to grid. With snap on, `buildScene` and `svgExporter`
   round every node to the grid, auto-placed ones included, so a dragged node
   can line up with them. Whole rows round together (couple lines stay flat)
   and auto-placed neighbours keep at least a symbol's width apart on coarse
@@ -305,7 +317,7 @@ draws NSGC symbols.
   `symbolSex(ind, pedigree)` is the one rule for which shape is drawn and
   `assignedAtBirthText` for the AMAB / AFAB / UAAB line (a `gender` section
   in `labels.ts` `detailSections`). Everything that draws a person's shape
-  must call it rather than read `ind.sex`: `layoutToFlow` puts it on the
+  must call it rather than read `ind.sex`: `buildScene` puts it on the
   glyph as `shape` (`SymbolShape` draws it, the minimap picks its shape by it),
   both exporters' `renderShape`, the legend and the export key swatches.
   Nothing genetic may call it: layout, kinship, twins, PED and the CSV
@@ -584,7 +596,7 @@ draws NSGC symbols.
   keeps that "(...)" on its own last line and cuts the name when both do not
   fit. Null, so nothing drawn, only when the closest common ancestors fit no
   single relationship (two people who are not a couple, or reached at
-  different distances). Never drawn on a single line. `layoutToFlow` puts the
+  different distances). Never drawn on a single line. `buildScene` puts the
   wrapped lines on the double edge's data (`consanguinityLabel`): wrapped to
   `consanguinityLabelRoom`, which keeps clear of what lands on each symbol
   top (the line of descent, the "?" of #100) and runs over a bare top; one
@@ -599,7 +611,7 @@ draws NSGC symbols.
   anything new drawn above the top row's symbols belongs in it. The
   canvas lint checks it (`title-collides` in `renderLint.ts`, #188, with
   the title placed by `chartTitlePlace` in `labels.ts`, which
-  `chartTitleNode` also uses). Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
+  `chartTitleNode` also uses). Placement (#109, `placeConsanguinityLabel`): `buildScene`
   hands it every obstacle near a label as a box (`TextBlock`): the text
   under each symbol as a figure writes it (`textBlockUnder` in
   `labelBlock.ts`; the canvas's is the same or shorter, a name cut to one line),
@@ -633,7 +645,7 @@ draws NSGC symbols.
   remove with descendants). `drawnPedigree` / `collapseInfo` give the
   stripped copy, cached per pedigree object and returning the input itself
   when nothing is hidden. Everything that draws calls it at its entry point
-  (`layoutToFlow`, `lintFlow`, `Legend`, the export key, `exportSvg`,
+  (`buildScene`, `lintScene`, `Legend`, the export key, `exportSvg`,
   `exportUShapeSvg`, `deidentify`), so the layout runs on drawn people only
   and nothing downstream needs to know. A new drawing path must do the same.
   Data exports (JSON, PED, CSV) keep everyone. `collapseInfo(...).branches`
@@ -707,7 +719,7 @@ draws NSGC symbols.
   `FilterMenu` and the banner read that list; rows sharing a `group` are
   alternatives, drawn as one row of radio buttons.
 - `twins.ts` — twin sets (#11). `twinMembership` maps each drawable member
-  to a set key and zygosity; `layoutToFlow` copies that onto the node data
+  to a set key and zygosity; `buildScene` copies that onto the node data
   so `SibshipEdge` (and `svgExporter`, from the pedigree directly) can fork:
   in `sibshipPath.ts` every member's drop starts at the set's shared point
   on the bar (the mean of their x), and `twinForkMarks` gives the bar across
@@ -731,7 +743,7 @@ draws NSGC symbols.
   a pregnancy (a surrogate, or a child's `carriedBy`) cannot be made male:
   `batchSexProblem` refuses it for every Sex control, `setReproductiveRole`
   refuses S on a man, and `validation.ts` flags imports that have either. Such a pair gets
-  no couple edge (`layoutToFlow` skips it, both lints skip
+  no couple edge (`buildScene` skips it, both lints skip
   `partnership-not-drawn` for it), and its sibship edge carries `apart`: a
   line from each parent's symbol to the bar replaces the couple drop
   (`sibshipSegments`' last argument). kinship2 lays the pair out as a
@@ -780,7 +792,7 @@ draws NSGC symbols.
 - `childless.ts` — childless couple marks (#15): segments hung from the
   middle of the couple line (from the level end of a line that hops, beside
   the further partner; on a consanguineous double line, from the lower
-  line). `layoutToFlow` puts
+  line). `buildScene` puts
   `childless` / `childlessReason` on the couple edge data only when the
   partnership has no children (`activeChildless`), so a stale flag on a
   couple with children is never drawn; `edges/ChildlessMark.tsx` draws it on
@@ -852,12 +864,12 @@ font and line height), since its spacing along the tracks is built round it.
   default "Untitled pedigree". On the canvas it is an extra React Flow node
   (`nodes/ChartTitleNode.tsx`, id `__chart-title`, not selectable, no
   pointer events) added in `PedigreeCanvas` beside `rfNodes`, not by
-  `layoutToFlow`, so lints never see it; being a node keeps
+  `buildScene`, so lints never see it; being a node keeps
   it in fit view. It sits `TITLE_GAP` above the highest symbol, as in the
   SVG export. The export dialog and `__pededit.checkExport()` pass the same
   string as `SvgExportOptions.title`.
 - Pedigree numbers (#8, "II-3"): `pedigreeNumbers(pedigree)` in
-  `layoutToFlow.ts` (counting and Roman numerals in `numbering.ts`) numbers
+  `scene.ts` (counting and Roman numerals in `numbering.ts`) numbers
   the drawn pedigree from the same `alignPedigreeByFamily` layout the
   canvas and SVG export draw, row by row in slot order, skipping the
   lineless copies the canvas leaves out. Pins do not renumber: a dragged
@@ -870,12 +882,12 @@ font and line height), since its spacing along the tracks is built round it.
   uses the standard figure's numbers so the two exports agree. Tests:
   `__tests__/numbering.test.ts`.
 
-Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
+Tests: `__tests__/scene.test.ts`, `__tests__/tags.test.ts` and
 `__tests__/symbols.test.tsx`.
 
 - `layoutCost.ts` — duplicates, hops, arc length and width of a drawn
   layout, the regression guard for layout passes beyond kinship2 (#76, see
-  `layout-engine/AGENTS.md`). `layoutToFlow`'s `improveLayout: false` gives
+  `layout-engine/AGENTS.md`). `buildScene`'s `improveLayout: false` gives
   the plain port to compare against.
 
 ## U-shape view (#220)
@@ -912,7 +924,7 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
   (`layoutCache.ts`), never `alignPedigreeByFamily` directly.** The engine's
   quadratic program is nearly all of the cost of an edit on a large pedigree
   (4.8 s of a 5 s edit at 513 people), so its result is kept while the
-  structure is unchanged: `layoutToFlow`, `pedigreeNumbers`, the swap sides
+  structure is unchanged: `buildScene`, `pedigreeNumbers`, the swap sides
   check and the render lint share one layout, and marking someone affected,
   typing a name or dropping a dragged person does not lay out again.
 - **It is correct by construction, not by a list of what matters.** The
@@ -936,7 +948,7 @@ Tests: `__tests__/layoutToFlow.test.ts`, `__tests__/tags.test.ts` and
 
 ## Render lint
 
-`renderLint.ts` checks `layoutToFlow`'s output for drawings a reader would
+`renderLint.ts` checks `buildScene`'s output for drawings a reader would
 misread (lines through symbols, lines to dropped nodes, children with no line
 from their parents, couple lines between non-partners, sibship bars of two
 couples along one line, overlapping symbols or labels).

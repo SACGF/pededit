@@ -121,8 +121,11 @@ indexing convention inherited from R, and the three rendering rules.
   R refuses families the editor accepts (a father recorded as female), and
   the script skips those.
 - `pedigreeToGeometry.ts` — turns a Pedigree into pixel coordinates using the
-  same constants as the frontend (slot 80, row 120, node 40). Useful for tests
-  and headless export; the U-shape exporter and SVG exporter build on this.
+  same constants as the frontend (slot 80, row 120, node 40). It is the
+  package's pixel geometry for users who draw without the editor (README).
+  The editor does not draw with it: the canvas and the exports draw the
+  frontend's scene (`frontend/src/pedigree/scene.ts`, #146), which adds
+  pins, snapping, labels, duplicate arcs and assisted lines.
   A hopping couple line's route (#206) comes from `hopLine.ts`, which the
   frontend's `couplePath.ts` calls with its own constants, so the package
   and the editor draw it the same way;
@@ -185,7 +188,7 @@ demonstrably worse, while keeping the port as the tested baseline:
   `frontend/src/pedigree/__tests__/balancePartners.test.ts` is the guard: no
   worse on every example and oracle fixture, every other fixture's node
   positions identical unless a duplicate or a hop went, Targaryen's hop gone.
-  `layoutToFlow(p, { improveLayout: false })` gives the plain port for such
+  `buildScene(p, { improveLayout: false })` gives the plain port for such
   comparisons.
 - The second pass is `swapFamilies` in `autohint.ts` (#77). The fixup moves a
   duplicate to the edge of its own sibship and never reorders the generation

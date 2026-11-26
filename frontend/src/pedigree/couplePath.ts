@@ -211,13 +211,13 @@ export function consanguineousPathsD(left: CoupleEnd, right: CoupleEnd, hopHeigh
  * the stroke. A hop over several people in the top row rises well above the
  * symbols.
  */
-export function highestHop(flow: {
-  nodes: { id: string; position: { x: number; y: number } }[];
-  coupleEdges: { source: string; target: string; data?: { hopHeight?: number } }[];
+export function highestHop(scene: {
+  people: { id: string; position: { x: number; y: number } }[];
+  couples: { source: string; target: string; data?: { hopHeight?: number } }[];
 }): number {
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  const pos = new Map(scene.people.map(n => [n.id, n.position]));
   let top = Infinity;
-  for (const e of flow.coupleEdges) {
+  for (const e of scene.couples) {
     const a = pos.get(e.source), b = pos.get(e.target), hop = e.data?.hopHeight ?? 0;
     if (a && b && hop > 0) top = Math.min(top, Math.min(a.y, b.y) - hop - 3);
   }
@@ -229,13 +229,13 @@ export function highestHop(flow: {
  * when there is none. An arc on one row rises `bulge` above the symbols, so
  * in the top row it is the highest thing drawn.
  */
-export function highestDuplicateArc(flow: {
-  nodes: { id: string; position: { x: number; y: number } }[];
-  duplicateEdges: { source: string; target: string; data?: { bulge?: number; legDx?: number } }[];
+export function highestDuplicateArc(scene: {
+  people: { id: string; position: { x: number; y: number } }[];
+  duplicates: { source: string; target: string; data?: { bulge?: number; legDx?: number } }[];
 }, half: number): number {
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  const pos = new Map(scene.people.map(n => [n.id, n.position]));
   let top = Infinity;
-  for (const e of flow.duplicateEdges) {
+  for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
     if (!a || !b) continue;
     for (const [, y] of duplicateArcPoints(a.x, a.y, b.x, b.y, e.data?.bulge ?? 28, half, 12, e.data?.legDx)) top = Math.min(top, y);

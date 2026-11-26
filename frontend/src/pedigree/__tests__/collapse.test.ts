@@ -3,8 +3,9 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { collapseInfo, drawnPedigree, asDrawn, rootsHidingNew, hasDescendants, branchPlaceholderId, isBranchPlaceholderId, branchTooltip } from "../collapse";
 import { batchCollapseState } from "../selection";
 import { parseExportSvg } from "../../io/svg/exportLint";
-import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene, pedigreeNumbers } from "../scene";
+import { sceneToFlow } from "../sceneToFlow";
+import { lintScene } from "../renderLint";
 import { sectionConditions } from "../tags";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -132,10 +133,10 @@ describe("collapseInfo / drawnPedigree (#94)", () => {
 describe("drawing with hidden descendants (#94)", () => {
   it("lays out and draws only the drawn people, lint clean", () => {
     const p = pedigree({ gm: true });
-    const flow = layoutToFlow(p);
-    expect(new Set(flow.nodes.map(n => n.data.individual.id))).toEqual(new Set(ids(drawnPedigree(p))));
-    expect(lintFlow(p, flow)).toEqual([]);
-    expect(flow.nodes.find(n => n.data.individual.id === "gm")!.data.individual.descendantsHidden).toBe(true);
+    const flow = buildScene(p);
+    expect(new Set(flow.people.map(n => n.individual.id))).toEqual(new Set(ids(drawnPedigree(p))));
+    expect(lintScene(p, flow)).toEqual([]);
+    expect(flow.people.find(n => n.individual.id === "gm")!.individual.descendantsHidden).toBe(true);
   });
 
   it("exports draw the mark and the key row, and not the hidden people", () => {
@@ -257,30 +258,30 @@ describe("collapsed branch diamond (#1)", () => {
     expect(placeholders.has(branchPlaceholderId("sw2"))).toBe(false);
     expect(drawnPedigree(p).parentOf.sw2).toEqual(["gc5"]);
     expect(branches.get("son")!.size).toBe(2);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("sits on the row below the couple, under them, joined by their sibship line", () => {
     const p = pedigree({ son: true });
-    const flow = layoutToFlow(p);
-    const node = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!;
+    const flow = buildScene(p);
+    const node = (id: string) => flow.people.find(n => n.individual.id === id)!;
     const diamond = node(branchPlaceholderId("sw"));
-    expect(diamond.type).toBe("collapsedBranch");
+    expect(diamond.branch).toBeDefined();
     expect(diamond.draggable).toBe(false);
-    expect(diamond.selectable).toBe(false);
-    expect(diamond.data.branch!.hidden.size).toBe(2);
+    expect(sceneToFlow(flow).nodes.find(n => n.id === diamond.id)!.selectable).toBe(false);
+    expect(diamond.branch!.hidden.size).toBe(2);
     const son = node("son"), wife = node("wife");
     expect(diamond.position.y).toBeGreaterThan(son.position.y);
     const lo = Math.min(son.position.x, wife.position.x), hi = Math.max(son.position.x, wife.position.x);
     expect(diamond.position.x).toBeGreaterThanOrEqual(lo);
     expect(diamond.position.x).toBeLessThanOrEqual(hi);
-    const sib = flow.sibshipEdges.find(e => e.data!.childIds.includes(diamond.id))!;
+    const sib = flow.sibships.find(e => e.data!.childIds.includes(diamond.id))!;
     expect(new Set([sib.data!.leftParentId, sib.data!.rightParentId])).toEqual(new Set([son.id, wife.id]));
     expect(sib.data!.childIds).toEqual([diamond.id]);
-    expect(lintFlow(p, flow)).toEqual([]);
+    expect(lintScene(p, flow)).toEqual([]);
     // No affected people hidden: no note under the diamond.
-    expect(diamond.data.glyph.detailLines).toEqual([]);
-    expect(node(branchPlaceholderId("sw")).data.glyph.nameLines).toEqual([]);
+    expect(diamond.glyph.detailLines).toEqual([]);
+    expect(node(branchPlaceholderId("sw")).glyph.nameLines).toEqual([]);
   });
 
   it("puts the count inside the diamond in the export", () => {
@@ -363,7 +364,7 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     expect(placeholders.size).toBe(0);
     expect(sorted(hidden)).toEqual(["h", "k"]);
     expect(drawn.parentOf.pp).toEqual(["c", "d"]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 
   it("lays the symbol out on the sibship line in the first grouped child's birth order place", () => {
@@ -371,18 +372,18 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     p.individuals.find(i => i.id === "a")!.sibOrder = 9; // b is now the first grouped child
     p.individuals.find(i => i.id === "b")!.sibOrder = 3;
     p.individuals.find(i => i.id === "d")!.sibOrder = 1;
-    const flow = layoutToFlow(p);
-    const x = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const flow = buildScene(p);
+    const x = (id: string) => flow.people.find(n => n.individual.id === id)!.position.x;
     const sym = branchPlaceholderId("pp");
     // c (2) and d (1) come before b (3), so the group symbol is last.
     expect(x("d")).toBeLessThan(x("c"));
     expect(x("c")).toBeLessThan(x(sym));
-    const sib = flow.sibshipEdges.find(e => e.data!.childIds.length === 3)!;
+    const sib = flow.sibships.find(e => e.data!.childIds.length === 3)!;
     expect(sib).toBeDefined();
-    expect(lintFlow(p, flow)).toEqual([]);
-    const node = flow.nodes.find(n => n.data.individual.id === sym)!;
-    expect(node.type).toBe("collapsedBranch");
-    expect(node.data.glyph.detailLines).toEqual([]);
+    expect(lintScene(p, flow)).toEqual([]);
+    const node = flow.people.find(n => n.individual.id === sym)!;
+    expect(node.branch).toBeDefined();
+    expect(node.glyph.detailLines).toEqual([]);
   });
 
   it("numbers the drawn affected children and skips the group symbol (#8)", () => {
@@ -411,7 +412,7 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
     const { drawn, placeholders } = collapseInfo(p);
     expect(placeholders.size).toBe(0);
     expect(ids(drawn)).toEqual(sorted(["p1", "p2", "a", "b", "c", "d", "e"]));
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
     expect(lintExport(p)).toEqual([]);
   });
 

@@ -16,8 +16,8 @@ import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { lintUShape } from "../../io/svg/uShapeLint";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
 import { exportPed, importPed } from "../../io/ped";
@@ -455,7 +455,7 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
     expect(legend).toContain(`<path d="${sectorPath(14, 14, 16, 0, 360)}" fill="#000000"`);
     expect(lintExport(p)).toEqual([]);
     expect(lintUShape(p)).toEqual([]);
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
   });
 });
 
@@ -535,7 +535,7 @@ describe("renderers (#115)", () => {
         expect(lintExport(p)).toEqual([]);
         expect(lintUShape(p)).toEqual([]);
         expect(exportUShapeSvg(p)).toContain("Tay-Sachs carrier");
-        expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+        expect(lintScene(p, buildScene(p))).toEqual([]);
         const key = renderExportKeySvg(p, 0, 0).markup.join("");
         if (notation === "nsgc2008") expect(key).toMatch(/<circle[^>]*r="2.4" fill="black"/);
         else expect(key).toContain("legend-plain-carrier");
@@ -721,7 +721,7 @@ describe("every example in both notations and in black and white (#115)", () => 
           const p: Pedigree = { ...ex.data, canvasSettings: { ...ex.data.canvasSettings!, notation, tagFills } };
           expect(lintExport(p), "export").toEqual([]);
           expect(lintUShape(p), "u-shape").toEqual([]);
-          expect(lintFlow(p, layoutToFlow(p)), "render").toEqual([]);
+          expect(lintScene(p, buildScene(p)), "render").toEqual([]);
         }
       });
     }

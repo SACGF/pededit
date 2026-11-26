@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Render lint: check what the canvas draws for a pedigree (layoutToFlow's
+// Render lint: check what the canvas draws for a pedigree (buildScene's
 // output) for lines through symbols, lines to missing nodes, children with no
 // line from their parents, couple lines between non-partners and overlapping
 // symbols, then the same for the SVG export (which PNG and PDF are made from).
@@ -70,8 +70,8 @@ await main(async () => {
           const set = fixtures
             ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data, title: f.label }))
             : (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data, title: e.label }));
-          const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
-          const { lintFlow } = await import("/src/pedigree/renderLint.ts");
+          const { buildScene } = await import("/src/pedigree/scene.ts");
+          const { lintScene } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
@@ -82,7 +82,7 @@ await main(async () => {
             const title = chartTitle(e.data, e.title) || undefined;
             return {
               name: e.name,
-              findings: lintFlow(withNames(e.data), layoutToFlow(withNames(e.data), { compact }), { title }),
+              findings: lintScene(withNames(e.data), buildScene(withNames(e.data), { compact }), { title }),
               exportFindings: exportOpts ? lintExport(withNames(e.data), { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
             };
           });
@@ -91,15 +91,15 @@ await main(async () => {
         const fixture = await loadFixture(spec, context, base);
         const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named, name }) => {
           const pedigree = Object.keys(named).length ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, ...named } } : raw;
-          const { layoutToFlow } = await import("/src/pedigree/layoutToFlow.ts");
-          const { lintFlow } = await import("/src/pedigree/renderLint.ts");
+          const { buildScene } = await import("/src/pedigree/scene.ts");
+          const { lintScene } = await import("/src/pedigree/renderLint.ts");
           const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
           const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
           const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
           const { chartTitle } = await import("/src/pedigree/labels.ts");
           const title = chartTitle(pedigree, name) || undefined;
           return [{
-            findings: lintFlow(pedigree, layoutToFlow(pedigree, { compact }), { title }),
+            findings: lintScene(pedigree, buildScene(pedigree, { compact }), { title }),
             exportFindings: exportOpts ? lintExport(pedigree, { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
           }];
         }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts, named, name: fixture.title });

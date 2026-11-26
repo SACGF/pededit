@@ -11,9 +11,9 @@ import { ROW_HEIGHT, SLOT_WIDTH } from "../constants";
 import { drawnPedigree } from "../collapse";
 import { keyRows } from "../keyRows";
 import { detailLines, labelMaxWidth } from "../labels";
-import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
+import { buildScene, pedigreeNumbers } from "../scene";
 import { inbreedingLabel, kinshipLabel } from "../relatedness";
-import { lintFlow } from "../renderLint";
+import { lintScene } from "../renderLint";
 
 const BASE: CanvasSettings = { nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" };
 const person = (id: string, sex: "male" | "female", extra = {}) => ({ id, sex, affected: false, sibOrder: 0, ...extra });
@@ -38,7 +38,7 @@ function cousins(settings: Partial<CanvasSettings> = {}, extra: Partial<Pedigree
 const ON = { showCoefficients: true };
 const max = labelMaxWidth(SLOT_WIDTH);
 const couple = (p: Pedigree, id = "p3") => p.partnerships.find(x => x.id === id)!;
-const under = (p: Pedigree, id: string) => layoutToFlow(p).nodes.find(n => n.data.individual.id === id)!.data.glyph.detailLines;
+const under = (p: Pedigree, id: string) => buildScene(p).people.find(n => n.individual.id === id)!.glyph.detailLines;
 const texts = (svg: string) => [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(m => m[1]);
 
 describe("coefficients on the figure (#86)", () => {
@@ -135,7 +135,7 @@ describe("coefficients on the figure (#86)", () => {
   it("draws cleanly, in compact rows too", () => {
     const p = cousins({ ...ON, relationshipLabels: true, showNumbers: true });
     for (const compact of [false, true]) {
-      expect(lintFlow(p, layoutToFlow(p, { compact }))).toEqual([]);
+      expect(lintScene(p, buildScene(p, { compact }))).toEqual([]);
       expect(lintExport(p, { compact })).toEqual([]);
     }
   });

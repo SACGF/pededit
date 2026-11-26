@@ -154,7 +154,7 @@ node frontend/scripts/browser/eval.mjs --fixture example:0 '__pededit.pedigree()
 node frontend/scripts/browser/eval.mjs --fixture example:0 --click '[data-individual-id="c1"]' --press Delete \
     '({ ids: __pededit.pedigree().individuals.map(i => i.id), undo: __pededit.usePedigreeStore.getState().past.length })'
 node frontend/scripts/browser/eval.mjs --fixture example:0 \
-    'return __pededit.layout().nodes.map(n => [n.data.individual.id, n.position])'
+    'return __pededit.layout().people.map(n => [n.individual.id, n.position])'
 ```
 
 Evaluates an expression (or a function body, if it does not parse as an
@@ -164,14 +164,19 @@ goes to stdout; the `served:` line and the findings summary go to stderr, so
 `--one-line` prints the result as single-line JSON.
 
 In the dev build `window.__pededit` holds `usePedigreeStore`, `useAppStore`,
-`layoutToFlow`, `lintFlow`, `importPed`, `exportPed`, `importJson`, `exportJson`, `EXAMPLES`, `commit`
+`buildScene`, `lintScene`, `importPed`, `exportPed`, `importJson`, `exportJson`, `EXAMPLES`, `commit`
 and the shortcuts (see `frontend/src/devHooks.ts`; production builds do not
 include it):
 
 - `pedigree()`: the pedigree in the editor.
-- `layout(pedigree?, options?)`: `{ nodes, coupleEdges, sibshipEdges }` as the canvas
-  computes them, compact mode included (read from `localStorage`, the way
-  the canvas reads it).
+- `layout(pedigree?, options?)`: the scene (`pedigree/scene.ts`, #146) as the
+  canvas draws it, compact mode included (read from `localStorage`, the way
+  the canvas reads it): `people` (each with `id`, `position` at the symbol's
+  centre, `individual`, `glyph`, `isPinned`), `couples` (with `double`),
+  `sibships`, `duplicates`, `assisted`, `bounds`. Before #146 it gave React
+  Flow's `{ nodes, coupleEdges, ... }` with the person under `n.data`; a
+  script written for that reads `n.data.individual.id` where it now needs
+  `n.individual.id`.
 - `align(pedigree?)`: the raw kinship2 `LayoutResult` from `alignPedigree`,
   for comparing with R. The canvas lays out each family separately
   (`alignPedigreeByFamily`, #64), so for a file with several families this
@@ -201,7 +206,7 @@ node frontend/scripts/browser/lint.mjs --fixture test-data/ped/historic/habsburg
 node frontend/scripts/browser/lint.mjs /p/<id> --click ... # the editor's pedigree after steps
 ```
 
-Structural checks on what the canvas draws (`layoutToFlow`'s output, in
+Structural checks on what the canvas draws (`buildScene`'s output, in
 `frontend/src/pedigree/renderLint.ts`): someone with no symbol, a line to a
 node that is not drawn, a couple line between non-partners or through
 another symbol, two couple lines overlapping on one row, a slanted couple
@@ -430,7 +435,7 @@ node frontend/scripts/browser/perf.mjs --app http://localhost:5215/ --profile   
 ```
 
 ```
-| pedigree | people | CPU | layout engine | layoutToFlow | problems | open | select | edit | hover | zoom | drag update | drop |
+| pedigree | people | CPU | layout engine | buildScene | problems | open | select | edit | hover | zoom | drag update | drop |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | House Targaryen | 96 | 1x | 27 (26 to 29) | 29 (28 to 31) | 0.8 (0.8 to 0.9) | 281 (270 to 301) | ... |
 ```
@@ -449,11 +454,11 @@ average; run it on a quiet machine and say so with the numbers.
 
 What the columns are:
 
-- `layout engine`, `layoutToFlow`, `problems`: the computation alone, called
+- `layout engine`, `buildScene`, `problems`: the computation alone, called
   three times in the page after it has loaded (dev build only, through
-  `__pededit`): `alignPedigreeByFamily` as the canvas calls it, `layoutToFlow`
+  `__pededit`): `alignPedigreeByFamily` as the canvas calls it, `buildScene`
   (the engine plus turning its result into nodes and edges), and the editor's
-  problems. No rendering is in these, so `edit` minus `layoutToFlow` is
+  problems. No rendering is in these, so `edit` minus `buildScene` is
   roughly what React and the browser cost.
 - `open`: from the pedigree's data arriving to every symbol being on the
   page and visible. Loading the app's own code is left out (in the dev build
@@ -504,7 +509,7 @@ node scripts/browser/perf.mjs --app http://localhost:5215/ --profile
 `__pededit`, so the three computation columns are left out, and its function
 names are minified: with `--sourcemap` the profile names packages and source
 files, and this repository's functions by source line
-(`layoutToFlow.ts`, "line 280").
+(`scene.ts`, "line 280").
 
 ## CI
 

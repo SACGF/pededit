@@ -6,9 +6,9 @@ import {
   assistedLinks, applyAddDonor, addDonorProblem, applyAddSurrogate, addSurrogateProblem,
   assistedLinkSegment, donorDescentSegments, symbolExitPoint, reproductiveRoleProblem,
 } from "../assisted";
-import { layoutToFlow } from "../layoutToFlow";
+import { buildScene } from "../scene";
 import { sibshipSegments } from "../sibshipPath";
-import { lintFlow } from "../renderLint";
+import { lintScene } from "../renderLint";
 import { nameRelationship } from "../relationship";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -238,40 +238,40 @@ describe("assisted reproduction: drawing (#45)", () => {
 
   it("the canvas: no couple line between donor and parent, a line from each, and the extra lines", () => {
     const p = assisted();
-    const flow = layoutToFlow(p);
-    const ind = (nodeId: string) => flow.nodes.find(n => n.id === nodeId)!.data.individual.id;
-    const couples = flow.coupleEdges.map(e => [ind(e.source), ind(e.target)].sort().join("="));
+    const flow = buildScene(p);
+    const ind = (nodeId: string) => flow.people.find(n => n.id === nodeId)!.individual.id;
+    const couples = flow.couples.map(e => [ind(e.source), ind(e.target)].sort().join("="));
     expect(couples).not.toContain("ar_d1=ar_w1");
     expect(couples).not.toContain("ar_d2=ar_h2");
     expect(couples).toContain("ar_h1=ar_w1");
-    const apart = flow.sibshipEdges.filter(e => e.data?.apart).map(e => e.data!.childIds.map(ind).join());
+    const apart = flow.sibships.filter(e => e.data?.apart).map(e => e.data!.childIds.map(ind).join());
     expect(apart.sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
-    expect(flow.sibshipEdges.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
+    expect(flow.sibships.filter(e => e.data?.converge).map(e => e.data!.childIds.map(ind).join()).sort()).toEqual(["ar_c1", "ar_c4", "ar_c5"]);
     expect(couples).toContain("ar_m5=ar_p5"); // the female couple (#105)
     // Scenario 1: no line from the intended father; scenario 2: the child hangs
     // from the couple and the egg donor has her own line; scenario 4: none from the wife.
-    const links = flow.assistedEdges.map(e => `${e.data!.kind}:${ind(e.source)}>${e.data!.children.join()}`).sort();
+    const links = flow.assisted.map(e => `${e.data!.kind}:${ind(e.source)}>${e.data!.children.join()}`).sort();
     expect(links).toEqual(["carrier:ar_s3>ar_c3", "genetic:ar_d2>ar_c2"]);
-    const hangs = flow.sibshipEdges.map(e => `${ind(e.data!.leftParentId)}=${ind(e.data!.rightParentId)}>${e.data!.childIds.map(ind).join()}`);
+    const hangs = flow.sibships.map(e => `${ind(e.data!.leftParentId)}=${ind(e.data!.rightParentId)}>${e.data!.childIds.map(ind).join()}`);
     expect(hangs.find(h => h.endsWith(">ar_c2"))!.split(">")[0]!.split("=").sort()).toEqual(["ar_h2", "ar_w2"]);
     // The pregnancy sits below the woman carrying it (NSGC Fig. 3), or below
     // the couple when she is half of it.
-    const at = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.position;
+    const at = (id: string) => flow.people.find(n => n.individual.id === id)!.position;
     expect(at("ar_c1").x).toBeCloseTo(at("ar_w1").x, 3);
     expect(at("ar_c2").x).toBeCloseTo((at("ar_h2").x + at("ar_w2").x) / 2, 3);
     expect(at("ar_c3").x).toBeCloseTo(at("ar_s3").x, 3);
     expect(at("ar_c4").x).toBeCloseTo(at("ar_d4").x, 3);
     expect(at("ar_c5").x).toBeCloseTo(at("ar_m5").x, 3); // NSGC 2022 Fig. 5 1b (#105)
     // A line runs straight down through the labels of those carrying women: white backing.
-    expect(flow.nodes.filter(n => n.data.glyph.labelsBacked).map(n => n.data.individual.id).sort()).toEqual(["ar_d4", "ar_m5", "ar_s3", "ar_w1"]);
+    expect(flow.people.filter(n => n.glyph.labelsBacked).map(n => n.individual.id).sort()).toEqual(["ar_d4", "ar_m5", "ar_s3", "ar_w1"]);
     // Kinship and PED still follow the genetic parents.
     const k = kinshipCoefficients(p);
     expect(k.kinship("ar_d2", "ar_c2")).toBe(1 / 4);
     expect(k.kinship("ar_w2", "ar_c2")).toBe(0);
     expect(k.kinship("ar_w4", "ar_c4")).toBe(0);
-    expect(lintFlow(p, flow)).toEqual([]);
+    expect(lintScene(p, flow)).toEqual([]);
     // The lint notices a missing line.
-    expect(lintFlow(p, { ...flow, assistedEdges: [] }).map(f => f.code)).toContain("assisted-not-drawn");
+    expect(lintScene(p, { ...flow, assisted: [] }).map(f => f.code)).toContain("assisted-not-drawn");
   });
 
   it("the SVG export draws the letters, the lines and the key, and lints clean", () => {
@@ -287,7 +287,7 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(lintExport(p)).toEqual([]);
     expect(lintExport(p, { deidentify: true })).toEqual([]);
     // With the lines taken out, the export lint notices.
-    const flow = layoutToFlow(p);
+    const flow = buildScene(p);
     const stripped = svg.replace(/<g class="assisted-lines">[^]*?<\/g>/, '<g class="assisted-lines"></g>');
     expect(lintExportSvg(p, flow, stripped).map(f => f.code)).toContain("assisted-not-drawn");
     const key = renderExportKeySvg(p, 0, 0).markup.join("");

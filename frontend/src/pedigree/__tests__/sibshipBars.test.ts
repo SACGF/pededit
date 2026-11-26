@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { importPed } from "../../io/ped/index.js";
 import { exportSvg } from "../../io/svg/svgExporter";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { SIB_BAR_STEP, barsUnderLabels, sibshipBarOffsets, sibshipSegments } from "../sibshipPath";
 import { EXAMPLES } from "../../data/examples";
 import { selectionPedigree, selectionSubset } from "../selectionSubset";
@@ -126,15 +126,15 @@ describe("sibshipBarOffsets (#80)", () => {
 });
 
 describe("overlapping sibship bars on the canvas and in the export (#80)", () => {
-  const barOf = (flow: ReturnType<typeof layoutToFlow>, childId: string) => {
-    const node = flow.nodes.find(n => n.data.individual.id === childId)!;
-    return flow.sibshipEdges.find(e => e.data!.childIds.includes(node.id))!.data!;
+  const barOf = (flow: ReturnType<typeof buildScene>, childId: string) => {
+    const node = flow.people.find(n => n.individual.id === childId)!;
+    return flow.sibships.find(e => e.data!.childIds.includes(node.id))!.data!;
   };
 
   for (const compact of [false, true]) {
     it(`gives each of the three shifted sibships its own bar height${compact ? " in compact mode" : ""}`, () => {
       const ped = shifted();
-      const flow = layoutToFlow(ped, { compact });
+      const flow = buildScene(ped, { compact });
       const [a, b, c] = ["c1", "c3", "c4"].map(id => barOf(flow, id));
       // Leftmost lowest, so no drop crosses another couple's bar.
       expect(a!.sibBarY).toBeGreaterThan(b!.sibBarY);
@@ -144,18 +144,18 @@ describe("overlapping sibship bars on the canvas and in the export (#80)", () =>
       // Sibships that overlap nothing stay halfway.
       expect(barOf(flow, "D1").barOffset).toBe(0);
       expect(barOf(flow, "e1").barOffset).toBe(0);
-      expect(lintFlow(ped, flow)).toEqual([]);
+      expect(lintScene(ped, flow)).toEqual([]);
     });
   }
 
   it("the lint reports bars drawn along one line", () => {
     const ped = shifted();
-    const flow = layoutToFlow(ped);
-    for (const e of flow.sibshipEdges) {
+    const flow = buildScene(ped);
+    for (const e of flow.sibships) {
       e.data!.sibBarY -= e.data!.barOffset;
       e.data!.barOffset = 0;
     }
-    const found = lintFlow(ped, flow);
+    const found = lintScene(ped, flow);
     expect(found.map(f => f.code)).toEqual(["sibship-bars-overlap", "sibship-bars-overlap"]);
     expect(found[0]!.individuals).toEqual(["c1", "c2", "c3"]);
     expect(found[1]!.individuals).toEqual(["c3", "c4"]);
@@ -163,7 +163,7 @@ describe("overlapping sibship bars on the canvas and in the export (#80)", () =>
 
   it("the SVG export draws the bars at the same heights as the canvas", () => {
     const ped = shifted();
-    const flow = layoutToFlow(ped);
+    const flow = buildScene(ped);
     const svg = exportSvg(ped);
     const exported = [...new Set(
       [...svg.matchAll(/<line x1="([\d.-]+)" y1="([\d.-]+)" x2="([\d.-]+)" y2="([\d.-]+)"/g)]
@@ -225,18 +225,18 @@ describe("barsUnderLabels: a bar never runs through the text above it", () => {
 describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
   const whole = EXAMPLES.find(e => e.slug === "targaryen")!.data;
   const part = selectionPedigree(whole, selectionSubset(whole, ["Jaehaerys_I", "Alysanne", "Baelon", "Alyssa", "Rodrik_Arryn", "Daella_JA", "Aemon_JA", "Aemon_Dragonknight", "Jocelyn_Baratheon", "Daemon", "Aegon_Uncrowned", "Aegon_JA", "Aegon_Baelon", "Alicent_Hightower", "Viserys_I", "Aemma_Arryn", "Corlys_Velaryon", "Rhaenys_QWNW", "Aegon_II", "Helaena", "Aemond", "Daeron_VA", "Rhaenyra", "Laenor_Velaryon", "Laena_Velaryon", "Jaehaerys_AH", "Jaehaera", "Maelor", "Aegon_III", "Daenaera_Velaryon", "Viserys_II", "Larra_Rogare", "Jacaerys", "Lucerys", "Joffrey", "Baela", "Rhaena_Aenys", "Rhaena_Daemon", "Rhaena_AD"]));
-  const flow = layoutToFlow(part);
+  const flow = buildScene(part);
 
   it("passes every sibship bar under the names of the people above it", () => {
     const labelMax = labelMaxWidth(SLOT_WIDTH);
     let lowered = 0;
-    for (const e of flow.sibshipEdges) {
+    for (const e of flow.sibships) {
       const d = e.data!, xs = [d.coupleX, ...d.childXs];
       if (d.barOffset > 0) lowered++;
-      for (const n of flow.nodes) {
-        const box = textBlockUnder(n.data.glyph, n.position.x, n.position.y);
+      for (const n of flow.people) {
+        const box = textBlockUnder(n.glyph, n.position.x, n.position.y);
         if (!box || box.top >= d.sibBarY || box.x + box.halfWidth <= Math.min(...xs) || box.x - box.halfWidth >= Math.max(...xs)) continue;
-        expect(box.bottom, `${n.data.individual.name} over ${e.id}`).toBeLessThanOrEqual(d.sibBarY + 1);
+        expect(box.bottom, `${n.individual.name} over ${e.id}`).toBeLessThanOrEqual(d.sibBarY + 1);
       }
     }
     // Laena Velaryon: a tag row and a two-line name.
@@ -244,16 +244,16 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
   });
 
   it("names every copy of Daemon in the export", () => {
-    expect(flow.nodes.filter(n => n.data.individual.id === "Daemon")).toHaveLength(3);
+    expect(flow.people.filter(n => n.individual.id === "Daemon")).toHaveLength(3);
     expect(exportSvg(part).match(/>Daemon</g)).toHaveLength(3);
   });
 
   it("draws one straight line to an only child who is all but under the parents", () => {
-    const aemma = flow.nodes.find(n => n.data.individual.id === "Aemma_Arryn")!;
-    const edge = flow.sibshipEdges.find(e => e.data!.childIds.includes(aemma.id))!;
+    const aemma = flow.people.find(n => n.individual.id === "Aemma_Arryn")!;
+    const edge = flow.sibships.find(e => e.data!.childIds.includes(aemma.id))!;
     expect(edge.data!.childIds).toHaveLength(1);
     expect(edge.data!.coupleX).toBe(aemma.position.x);
-    const parents = [edge.data!.leftParentId, edge.data!.rightParentId].map(id => flow.nodes.find(n => n.id === id)!.position.x);
+    const parents = [edge.data!.leftParentId, edge.data!.rightParentId].map(id => flow.people.find(n => n.id === id)!.position.x);
     expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeLessThanOrEqual(10);
     expect(Math.abs(edge.data!.coupleX - (parents[0]! + parents[1]!) / 2)).toBeGreaterThan(0);
   });

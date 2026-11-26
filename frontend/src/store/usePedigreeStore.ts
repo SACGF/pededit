@@ -1939,7 +1939,7 @@ export const usePedigreeStore = create<PedigreeState>()((set, get) => {
         }
         // Turning snap on, or changing the grid size while snap is on, snaps every
         // pinned (manually moved) node so existing nodes line up with the grid.
-        // Auto-laid-out nodes have no stored position; layoutToFlow rounds
+        // Auto-laid-out nodes have no stored position; buildScene rounds
         // them to the grid when it draws them (pedigree/snap.ts).
         const { snapToGrid, snapGridSize } = draft.canvasSettings;
         const sizeChanged = settings.snapGridSize !== undefined;

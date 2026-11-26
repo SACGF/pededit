@@ -14,7 +14,7 @@ import {
   cachedLayout, clearLayoutCache, layoutCacheStats, layoutInput,
   COUPLE_FIELDS_NOT_LAID_OUT, PERSON_FIELDS_NOT_LAID_OUT,
 } from "../layoutCache";
-import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
+import { buildScene, pedigreeNumbers } from "../scene";
 
 const SCHEMA = JSON.parse(readFileSync(join(__dirname, "../../../../docs/pedigree-json-schema.json"), "utf-8"));
 
@@ -96,7 +96,7 @@ describe("cachedLayout", () => {
 
   it("lays out once for the canvas, the pedigree numbers and an edit that changes no structure", () => {
     reset();
-    layoutToFlow(targaryen);
+    buildScene(targaryen);
     expect(layoutCacheStats).toMatchObject({ misses: 1, hits: 0 });
 
     pedigreeNumbers({ ...targaryen });
@@ -106,11 +106,11 @@ describe("cachedLayout", () => {
       pinnedPositions: { [targaryen.individuals[3]!.id]: { x: 10, y: 20 } },
       individuals: targaryen.individuals.map((ind, i) => (i === 0 ? { ...ind, name: "Renamed", affected: !ind.affected, deceased: true } : ind)),
     };
-    const flow = layoutToFlow(renamed);
+    const flow = buildScene(renamed);
     expect(layoutCacheStats.misses).toBe(1);
     expect(layoutCacheStats.hits).toBe(2);
     // What is drawn still follows the edit: only the engine's result is reused.
-    expect(JSON.stringify(flow.nodes)).toContain("Renamed");
+    expect(JSON.stringify(flow.people)).toContain("Renamed");
   });
 
   it("lays out again when the structure changes, and reuses the families that did not", () => {

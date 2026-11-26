@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { childlessMarkSegments, childlessReasonBaselineY, activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP } from "../childless";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { renderExportKeySvg } from "../exportKey";
@@ -49,12 +49,12 @@ describe("childless mark geometry (#15)", () => {
 });
 
 describe("childless mark on the canvas and in exports (#15)", () => {
-  it("layoutToFlow puts the mark on the childless couple's edge only", () => {
+  it("buildScene puts the mark on the childless couple's edge only", () => {
     const p = pedigree();
-    const flow = layoutToFlow(p);
-    expect(lintFlow(p, flow)).toEqual([]);
-    const byPair = new Map(flow.coupleEdges.map(e => {
-      const ids = [e.source, e.target].map(id => flow.nodes.find(n => n.id === id)!.data.individual.id).sort();
+    const flow = buildScene(p);
+    expect(lintScene(p, flow)).toEqual([]);
+    const byPair = new Map(flow.couples.map(e => {
+      const ids = [e.source, e.target].map(id => flow.people.find(n => n.id === id)!.individual.id).sort();
       return [ids.join("|"), e.data];
     }));
     expect(byPair.get("a|b")).toMatchObject({ childless: "infertility", childlessReason: "azoospermia" });

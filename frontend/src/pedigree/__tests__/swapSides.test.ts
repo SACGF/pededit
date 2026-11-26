@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { alignPedigreeByFamily, drawnLeftPartner } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { swapSidesPlan } from "../partners";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { importJson, exportJson } from "../../io/json";
 import { EXAMPLES } from "../../data/examples";
@@ -57,22 +57,22 @@ describe("swap sides (#106)", () => {
   });
 
   it("trades the places of a person's two partners", () => {
-    const before = layoutToFlow(store().pedigree);
-    const x0 = (id: string) => before.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const before = buildScene(store().pedigree);
+    const x0 = (id: string) => before.people.find(n => n.individual.id === id)!.position.x;
     expect(x0("H1")).toBeLessThan(x0("W"));
     expect(x0("H2")).toBeGreaterThan(x0("W"));
     expect(store().swapPartnerSides("W1")).toBeNull();
     const sides = Object.fromEntries(store().pedigree.partnerships.map(p => [p.id, p.leftPartner]));
     expect(sides).toMatchObject({ W1: "W", W2: "H2" });
-    const after = layoutToFlow(store().pedigree);
-    const x1 = (id: string) => after.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const after = buildScene(store().pedigree);
+    const x1 = (id: string) => after.people.find(n => n.individual.id === id)!.position.x;
     expect(x1("H2")).toBeLessThan(x1("W"));
     expect(x1("H1")).toBeGreaterThan(x1("W"));
-    expect(lintFlow(store().pedigree, after)).toEqual([]);
+    expect(lintScene(store().pedigree, after)).toEqual([]);
     // And back again.
     expect(store().swapPartnerSides("W2")).toBeNull();
-    const again = layoutToFlow(store().pedigree);
-    const x2 = (id: string) => again.nodes.find(n => n.data.individual.id === id)!.position.x;
+    const again = buildScene(store().pedigree);
+    const x2 = (id: string) => again.people.find(n => n.individual.id === id)!.position.x;
     expect(x2("H1")).toBeLessThan(x2("W"));
     expect(x2("H2")).toBeGreaterThan(x2("W"));
   });

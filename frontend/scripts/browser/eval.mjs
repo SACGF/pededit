@@ -19,7 +19,7 @@ Examples:
   eval.mjs --fixture example:0 '__pededit.pedigree().individuals.length'
   eval.mjs --fixture example:0 --click '[data-individual-id="c1"]' \\
       '__pededit.usePedigreeStore.getState().selectedId'
-  eval.mjs --fixture example:0 'const l = __pededit.layout(); return l.nodes.map(n => [n.data.individual.id, n.position])'
+  eval.mjs --fixture example:0 'const l = __pededit.layout(); return l.people.map(n => [n.individual.id, n.position])'
   eval.mjs --fixture example:18 '__pededit.check()'          # render lint findings
   eval.mjs --fixture example:5 '__pededit.align().pos'       # raw kinship2 layout
 

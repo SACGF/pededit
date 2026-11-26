@@ -1,7 +1,7 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { twinMembership, twinSetOf } from "../../pedigree/twins";
 import { onsetsOf, onsetSubject } from "../../pedigree/onset";
-import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
+import { pedigreeNumbers } from "../../pedigree/scene";
 import { evaluationsCsv } from "../../pedigree/evaluation";
 import { notationOf } from "../../pedigree/notation";
 import { genderIdentityOf } from "../../pedigree/gender";

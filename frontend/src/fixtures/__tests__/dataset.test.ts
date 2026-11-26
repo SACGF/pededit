@@ -6,8 +6,8 @@ import { DATASET, DATASET_TODAY, datasetFileText, type DatasetCase } from "../da
 import { importJson, exportJson } from "../../io/json";
 import { JsonIssueCode } from "../../io/json/types";
 import { importPed, exportPed } from "../../io/ped";
-import { layoutToFlow } from "../../pedigree/layoutToFlow";
-import { lintFlow } from "../../pedigree/renderLint";
+import { buildScene } from "../../pedigree/scene";
+import { lintScene } from "../../pedigree/renderLint";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { findProblems, RULES } from "../../pedigree/validation";
@@ -90,7 +90,7 @@ function describeCase(c: DatasetCase): ManifestEntry {
   if (!p) return entry;
   entry.people = p.individuals.length;
   entry.problems = findProblems(p, RULES, TODAY).map(x => x.id).sort();
-  entry.lint = unique(lintFlow(p, layoutToFlow(p)).map(f => f.code));
+  entry.lint = unique(lintScene(p, buildScene(p)).map(f => f.code));
   if (!c.timingOnly) entry.exportLint = unique(lintExport(p, {}).map(f => f.code));
   return entry;
 }
@@ -130,7 +130,7 @@ describe("test data set: files and manifest", () => {
       const before = new Set(result.issues.map(i => i.code));
       expect(again.issues.filter(i => i.severity !== "info" && !before.has(i.code)).map(i => i.code), `${c.file} exports and imports again`).toEqual([]);
       expect(again.pedigree).toEqual(p);
-      expect(layoutToFlow(p, { compact: true }).nodes.length).toBeGreaterThan(0);
+      expect(buildScene(p, { compact: true }).people.length).toBeGreaterThan(0);
       if (!c.timingOnly) expect(exportUShapeSvg(p)).toContain("<svg");
     }, 120_000);
   }

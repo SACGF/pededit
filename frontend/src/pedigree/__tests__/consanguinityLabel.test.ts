@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
-import { layoutToFlow } from "../layoutToFlow";
+import { buildScene } from "../scene";
 import { nameCoupleRelationship } from "../relationship";
 import {
   consanguinityLabelText, consanguinityLabelRoom, wrapConsanguinityLabel, consanguinityLabelBaseline, consanguinityLabelTop,
@@ -43,7 +43,7 @@ const withSetting = (p: Pedigree): Pedigree =>
   ({ ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, relationshipLabels: true } });
 
 const labelsByPartnership = (p: Pedigree) =>
-  Object.fromEntries(layoutToFlow(p).coupleEdges.map(e => [e.data!.partnershipId, e.data!.consanguinityLabel]));
+  Object.fromEntries(buildScene(p).couples.map(e => [e.data!.partnershipId, e.data!.consanguinityLabel]));
 
 describe("nameCoupleRelationship (#97)", () => {
   const name = (p: Pedigree, a: string, b: string) => nameCoupleRelationship(p, a, b, kinshipCoefficients(p).kinship(a, b));
@@ -152,7 +152,7 @@ describe("the label in exports and over the title (#97)", () => {
     // The title baseline sits well above the founders' label.
     const titleY = Number(/class="chart-title"[^>]* y="([\d.]+)"/.exec(svg)![1]);
     const translateY = Number(/<g transform="translate\([\d.e+-]+ ([\d.e+-]+)\)">/.exec(svg)![1]);
-    const top = highestConsanguinityLabel(layoutToFlow(p)) + translateY;
+    const top = highestConsanguinityLabel(buildScene(p)) + translateY;
     expect(titleY).toBeLessThan(top - 10);
   });
 
@@ -162,8 +162,8 @@ describe("the label in exports and over the title (#97)", () => {
     expect(lintExport(p)).toEqual([]);
     expect(lintExport(p, { compact: true })).toEqual([]);
     // A label forced over a "?" is caught.
-    const flow = layoutToFlow(p);
-    const gm = flow.nodes.find(n => n.data.individual.id === "gm")!;
+    const flow = buildScene(p);
+    const gm = flow.people.find(n => n.individual.id === "gm")!;
     const svg = exportSvg(p).replace('<g class="consanguinity-labels">',
       `<g class="consanguinity-labels"><text x="${gm.position.x}" y="${gm.position.y - NODE_SIZE / 2 - 7}" font-size="9">x</text>`);
     expect(lintExportSvg(p, flow, svg).map(f => f.message).join()).toContain('"?"');
@@ -171,16 +171,16 @@ describe("the label in exports and over the title (#97)", () => {
 
   it("the canvas title is raised the same way", () => {
     const p = cousins();
-    const flow = layoutToFlow(p);
-    const plain = chartTitleNode("T", flow.nodes)!;
-    const raised = chartTitleNode("T", flow.nodes, highestConsanguinityLabel(flow))!;
+    const flow = buildScene(p);
+    const plain = chartTitleNode("T", flow.people)!;
+    const raised = chartTitleNode("T", flow.people, highestConsanguinityLabel(flow))!;
     expect(raised.position.y).toBeLessThan(plain.position.y);
   });
 
   it("the export lint catches a label drawn over a symbol", () => {
     const p = cousins();
-    const flow = layoutToFlow(p);
-    const node = flow.nodes.find(n => n.data.individual.id === "s1")!;
+    const flow = buildScene(p);
+    const node = flow.people.find(n => n.individual.id === "s1")!;
     const svg = exportSvg(p).replace('<g class="consanguinity-labels">',
       `<g class="consanguinity-labels"><text x="${node.position.x}" y="${node.position.y}" font-size="9">third cousins</text>`);
     expect(lintExportSvg(p, flow, svg).map(f => f.code)).toContain("consanguinity-label-collides");
@@ -222,9 +222,9 @@ describe("keeping the label off the text above (#109)", () => {
   it("House Targaryen in compact rows: no label touches a name, and the normal layout keeps every one", () => {
     const ex = EXAMPLES.find(e => e.label === "House Targaryen")!;
     const p = withSetting(ex.data);
-    const count = (compact: boolean) => consanguinityLabelPlacements(layoutToFlow(p, { compact })).length;
+    const count = (compact: boolean) => consanguinityLabelPlacements(buildScene(p, { compact })).length;
     expect(lintExport(p, { compact: true })).toEqual([]);
-    expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && layoutToFlow(p).coupleEdges.some(e => e.data?.partnershipId === x.id && e.type === "consanguineousEdge")).length);
+    expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && buildScene(p).couples.some(e => e.data?.partnershipId === x.id && e.double)).length);
     // Nearly every couple here is more closely related than their name says, so
     // the labels carry a kinship and compact rows have room for fewer of them.
     expect(count(true)).toBe(8);

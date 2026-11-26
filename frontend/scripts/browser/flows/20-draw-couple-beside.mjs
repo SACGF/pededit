@@ -11,10 +11,10 @@ export default {
     /** How many people each row draws more than once, top row first. */
     const twicePerRow = () => t.eval(() => {
       const rows = new Map();
-      for (const n of window.__pededit.layout().nodes) {
+      for (const n of window.__pededit.layout().people) {
         const y = Math.round(n.position.y);
         if (!rows.has(y)) rows.set(y, new Set());
-        if (n.data.isDuplicate) rows.get(y).add(n.data.individual.id);
+        if ((n.glyph.copy !== undefined)) rows.get(y).add(n.individual.id);
       }
       return [...rows.entries()].sort((a, b) => a[0] - b[0]).map(r => r[1].size);
     });

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { importPed } from "../../io/ped/index.js";
 import { exportSvg } from "../../io/svg/svgExporter";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { SLOT_WIDTH } from "../constants";
 
 /** Ten slots wide, with three sibships that cannot sit under their parents (#82, the pedigree of #80). */
@@ -46,7 +46,7 @@ function pedigree(layoutWidth?: "minimal" | "relaxed"): Pedigree {
 }
 
 const span = (xs: number[]) => Math.max(...xs) - Math.min(...xs);
-const drawnWidth = (ped: Pedigree) => span(layoutToFlow(ped).nodes.map(n => n.position.x));
+const drawnWidth = (ped: Pedigree) => span(buildScene(ped).people.map(n => n.position.x));
 const svgWidth = (ped: Pedigree) => Number(exportSvg(ped).match(/<svg[^>]* width="([\d.]+)"/)![1]);
 
 describe("canvasSettings.layoutWidth (#82)", () => {
@@ -55,14 +55,14 @@ describe("canvasSettings.layoutWidth (#82)", () => {
     const extra = drawnWidth(relaxed) - drawnWidth(minimal);
     expect(extra).toBeGreaterThan(0);
     expect(extra).toBeLessThanOrEqual(2 * SLOT_WIDTH + 2);
-    expect(layoutToFlow(relaxed).nodes.map(n => n.data.individual.id).sort())
-      .toEqual(layoutToFlow(minimal).nodes.map(n => n.data.individual.id).sort());
-    expect(lintFlow(relaxed, layoutToFlow(relaxed))).toEqual([]);
+    expect(buildScene(relaxed).people.map(n => n.individual.id).sort())
+      .toEqual(buildScene(minimal).people.map(n => n.individual.id).sort());
+    expect(lintScene(relaxed, buildScene(relaxed))).toEqual([]);
   });
 
   it("\"minimal\" is the same as leaving it out", () => {
-    expect(layoutToFlow(pedigree("minimal")).nodes.map(n => n.position))
-      .toEqual(layoutToFlow(pedigree()).nodes.map(n => n.position));
+    expect(buildScene(pedigree("minimal")).people.map(n => n.position))
+      .toEqual(buildScene(pedigree()).people.map(n => n.position));
   });
 
   it("the SVG export follows the setting, by the same amount as the canvas", () => {
@@ -71,10 +71,10 @@ describe("canvasSettings.layoutWidth (#82)", () => {
   });
 
   it("each sibship sits under or beside its own parents", () => {
-    const flow = layoutToFlow(pedigree("relaxed"));
+    const flow = buildScene(pedigree("relaxed"));
     // No sibship's bar reaches into the next couple's: the #80 overlap is gone
     // without lowering any bar.
-    const bars = flow.sibshipEdges.map(e => e.data!).map(d =>
+    const bars = flow.sibships.map(e => e.data!).map(d =>
       ({ y: d.sibBarY, x1: Math.min(d.coupleX, ...d.childXs), x2: Math.max(d.coupleX, ...d.childXs) }));
     for (let i = 0; i < bars.length; i++) {
       for (let j = i + 1; j < bars.length; j++) {

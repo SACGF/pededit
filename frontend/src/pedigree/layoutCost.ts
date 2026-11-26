@@ -1,4 +1,4 @@
-import type { FlowData } from "./layoutToFlow";
+import type { Scene } from "./scene";
 
 /**
  * Cheap measures of how readable a drawn layout is: people drawn more
@@ -14,17 +14,17 @@ export interface LayoutCost {
   width: number;
 }
 
-export function layoutCost(flow: FlowData): LayoutCost {
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+export function layoutCost(scene: Scene): LayoutCost {
+  const pos = new Map(scene.people.map(n => [n.id, n.position]));
   let arcLength = 0;
-  for (const e of flow.duplicateEdges) {
+  for (const e of scene.duplicates) {
     const a = pos.get(e.source), b = pos.get(e.target);
     if (a && b) arcLength += Math.hypot(a.x - b.x, a.y - b.y);
   }
-  const xs = flow.nodes.map(n => n.position.x);
+  const xs = scene.people.map(n => n.position.x);
   return {
-    duplicates: flow.nodes.filter(n => n.data.isDuplicate).length,
-    hops: flow.coupleEdges.filter(e => (e.data?.hopHeight ?? 0) > 0).length,
+    duplicates: scene.people.filter(n => (n.glyph.copy !== undefined)).length,
+    hops: scene.couples.filter(e => (e.data?.hopHeight ?? 0) > 0).length,
     arcLength: Math.round(arcLength),
     width: xs.length ? Math.round(Math.max(...xs) - Math.min(...xs)) : 0,
   };

@@ -13,8 +13,8 @@ export default {
     await t.hover(node);
     await t.click('button[title="Unlock to drag"]');
     const where = () => t.eval(() => {
-      const n = window.__pededit.layout().nodes.find(n => n.data.individual.id === "g3c");
-      return { x: Math.round(n.position.x), y: Math.round(n.position.y), pinned: n.data.isPinned };
+      const n = window.__pededit.layout().people.find(n => n.individual.id === "g3c");
+      return { x: Math.round(n.position.x), y: Math.round(n.position.y), pinned: n.isPinned };
     });
     const start = await where();
 

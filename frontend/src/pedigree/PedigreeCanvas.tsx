@@ -13,6 +13,7 @@ import {
   type Node,
   type NodeChange,
   type OnNodeDrag,
+  type Rect,
   useReactFlow,
   useNodes,
   useEdges,
@@ -22,7 +23,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useDismissableLayerSurface } from "@radix-ui/react-dismissable-layer";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE, usePedigreeFields } from "../store/usePedigreeStore";
-import { layoutToFlow } from "./layoutToFlow";
+import { buildScene } from "./scene";
+import { sceneToFlow } from "./sceneToFlow";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
 import { CoupleEdge }         from "./edges/CoupleEdge";
@@ -30,12 +32,11 @@ import { ConsanguineousEdge } from "./edges/ConsanguineousEdge";
 import { SibshipEdge }        from "./edges/SibshipEdge";
 import { DuplicateEdge }      from "./edges/DuplicateEdge";
 import { AssistedEdge }       from "./edges/AssistedEdge";
-import type { RFNodeData, CoupleEdgeData, SibshipEdgeData, AssistedEdgeData } from "./layoutToFlow";
+import type { RFNodeData, CoupleEdgeData, SibshipEdgeData, AssistedEdgeData } from "./sceneToFlow";
 import { sibshipSegments, segmentsPathD } from "./sibshipPath";
 import { assistedEdgeSegment } from "./assisted";
 import { symbolTopInset } from "./lifeStatus";
 import { NODE_SIZE } from "./constants";
-import { highestAboveSymbols } from "./consanguinityLabel";
 import { layoutSpacing, unscalePinnedPosition } from "./spacing";
 import { activeSnapGrid, backgroundDotGap } from "./snap";
 import { endMouseGesturesOverDisabled } from "../utils/mouseupOverDisabled";
@@ -110,7 +111,7 @@ function MinimapEdges() {
       paths.push(segmentsPathD(sibshipSegments(
         (lp.position.x + rp.position.x) / 2,
         (lp.position.y + rp.position.y) / 2,
-        kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).individual?.lifeStatus, NODE_SIZE) })),
+        kids.map(k => ({ ...k.position, topInset: symbolTopInset((k.data as Partial<RFNodeData>).glyph?.lifeStatus, NODE_SIZE) })),
         data.barOffset ?? 0,
         apart,
         data.converge,
@@ -191,9 +192,15 @@ function PedigreeMinimap({ pedigree }: { pedigree: Pedigree }) {
  * ahead of the canvas's own node state) is in React Flow at its new position
  * and measured. Node ids are layout slots ("0-0") and a filter reuses them
  * at other places, so matching ids alone is not enough.
+ *
+ * It fits `box`, everything drawn (`Scene.bounds` and the title), not just
+ * the nodes: the text under the bottom row and the arcs over the top one
+ * reach outside them.
  */
-function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: Node[] }) {
-  const { fitView } = useReactFlow();
+function FitOnLayoutChange({ compact, expected, box }: { compact: boolean; expected: Node[]; box: Rect | null }) {
+  const { fitView, fitBounds } = useReactFlow();
+  const fitBox = useRef(box);
+  fitBox.current = box;
   const flowStore = useStoreApi();
   const resetCount = usePedigreeStore(s => s.layoutResetCount);
   // Switching a view filter changes the drawing's size a lot.
@@ -220,11 +227,11 @@ function FitOnLayoutChange({ compact, expected }: { compact: boolean; expected: 
       });
       if (!ready) return;
       pending.current = false;
-      void fitView();
+      void (fitBox.current ? fitBounds(fitBox.current, { padding: 0.1 }) : fitView());
     };
     tryFit();
     return flowStore.subscribe(tryFit);
-  }, [key, expected, flowStore, fitView]);
+  }, [key, expected, flowStore, fitView, fitBounds]);
   return null;
 }
 
@@ -321,10 +328,8 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
   // A drag let go over a disabled hover pill button must still end (#185).
   useEffect(() => endMouseGesturesOverDisabled(), []);
 
-  const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges, assistedEdges } = useMemo(
-    () => layoutToFlow(pedigree, { compact }),
-    [pedigree, compact],
-  );
+  const scene = useMemo(() => buildScene(pedigree, { compact }), [pedigree, compact]);
+  const { nodes: computedNodes, coupleEdges, sibshipEdges, duplicateEdges, assistedEdges } = useMemo(() => sceneToFlow(scene), [scene]);
 
   // Rubber band in progress (Shift+drag): the React Flow node ids inside
   // it so far, or null. While set, React Flow's own select changes drive the
@@ -389,10 +394,23 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
   const pedigreeName = useAppStore(s => s.activeTitle);
   const title = chartTitle(pedigree, pedigreeName);
   const titleNode = useMemo(
-    () => chartTitleNode(title, computedNodes, highestAboveSymbols({ nodes: computedNodes, coupleEdges, duplicateEdges })),
-    [title, computedNodes, coupleEdges, duplicateEdges],
+    () => chartTitleNode(title, scene.people, scene.aboveTop),
+    [title, scene],
   );
   const flowNodes = titleNode ? [...rfNodes, titleNode as unknown as Node<RFNodeData>] : rfNodes;
+  // Everything drawn, the title included, for fitting the view.
+  const fitBox = useMemo((): Rect | null => {
+    const b = scene.bounds;
+    if (!b) return null;
+    if (!titleNode) return { x: b.left, y: b.top, width: b.width, height: b.height };
+    const t = { x: titleNode.position.x - titleNode.width! / 2, y: titleNode.position.y - titleNode.height! / 2 };
+    const x = Math.min(b.left, t.x), y = Math.min(b.top, t.y);
+    return {
+      x, y,
+      width: Math.max(b.left + b.width, t.x + titleNode.width!) - x,
+      height: Math.max(b.top + b.height, t.y + titleNode.height!) - y,
+    };
+  }, [scene, titleNode]);
   const fitExpected = useMemo(
     () => titleNode ? [...computedNodes, titleNode as unknown as Node] : computedNodes,
     [computedNodes, titleNode],
@@ -553,7 +571,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
         <PickingBanner />
         <FilterBanner />
         <Background gap={dotGap} size={DOT_SIZE} offset={DOT_SIZE / 2 - dotGap / 2} />
-        <FitOnLayoutChange compact={compact} expected={fitExpected} />
+        <FitOnLayoutChange compact={compact} expected={fitExpected} box={fitBox} />
         <RevealOnRequest />
         <KeepSelectedInView />
         <Controls />

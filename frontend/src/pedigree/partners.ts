@@ -2,7 +2,7 @@ import type { LayoutResult, Partnership, Pedigree } from "@pedigree-editor/layou
 import { drawnBesideChoices, drawnBesideConflict, drawnLeftPartner } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
-import { layoutToFlow, type FlowData } from "./layoutToFlow";
+import { buildScene, type Scene } from "./scene";
 
 /**
  * Linking two existing individuals as partners: the rules,
@@ -148,14 +148,14 @@ export function couplePartnerLabel(pedigree: Pedigree, partnershipId: string, id
   return left === id ? "the partner on the left" : "the partner on the right";
 }
 
-function drawnTwice(flow: FlowData): Set<string> {
-  return new Set(flow.nodes.filter(n => n.data.isDuplicate).map(n => n.data.individual.id));
+function drawnTwice(scene: Scene): Set<string> {
+  return new Set(scene.people.filter(n => (n.glyph.copy !== undefined)).map(n => n.individual.id));
 }
 
-function sameDrawing(a: FlowData, b: FlowData): boolean {
-  return a.nodes.length === b.nodes.length && a.nodes.every((n, i) => {
-    const m = b.nodes[i]!;
-    return n.data.individual.id === m.data.individual.id && n.position.x === m.position.x && n.position.y === m.position.y;
+function sameDrawing(a: Scene, b: Scene): boolean {
+  return a.people.length === b.people.length && a.people.every((n, i) => {
+    const m = b.people[i]!;
+    return n.individual.id === m.individual.id && n.position.x === m.position.x && n.position.y === m.position.y;
   });
 }
 
@@ -193,7 +193,7 @@ export function drawBesidePlan(pedigree: Pedigree, partnershipId: string, beside
   const p = pedigree.partnerships.find(q => q.id === partnershipId);
   if (!p) return { unchanged: "Unknown partnership." };
   // Pins hold people where they were dragged, whatever the layout says.
-  const flowOf = (q: Pedigree) => layoutToFlow({ ...q, pinnedPositions: undefined });
+  const sceneOf = (q: Pedigree) => buildScene({ ...q, pinnedPositions: undefined });
   const withChoice = (drawnBeside: string | undefined, leftPartner: string | undefined): Pedigree => ({
     ...pedigree,
     partnerships: pedigree.partnerships.map(q => {
@@ -202,8 +202,8 @@ export function drawBesidePlan(pedigree: Pedigree, partnershipId: string, beside
       return { ...rest, ...(drawnBeside ? { drawnBeside } : {}), ...(leftPartner ? { leftPartner } : {}) };
     }),
   });
-  const before = flowOf(pedigree);
-  const plan = (drawnBeside: string | undefined, leftPartner: string | undefined, after: FlowData): DrawBesidePlan => {
+  const before = sceneOf(pedigree);
+  const plan = (drawnBeside: string | undefined, leftPartner: string | undefined, after: Scene): DrawBesidePlan => {
     const was = drawnTwice(before), now = [...drawnTwice(after)];
     const same = now.length === was.size && now.every(id => was.has(id));
     const earlier = was.size === 0 ? "nobody was" : `${was.size} ${was.size === 1 ? "was" : "were"}`;
@@ -215,7 +215,7 @@ export function drawBesidePlan(pedigree: Pedigree, partnershipId: string, beside
 
   if (besideId === null) {
     if (!p.drawnBeside) return { unchanged: "The layout already chooses where this couple is drawn." };
-    return plan(undefined, undefined, flowOf(withChoice(undefined, undefined)));
+    return plan(undefined, undefined, sceneOf(withChoice(undefined, undefined)));
   }
   if (besideId !== p.individual1 && besideId !== p.individual2) return { unchanged: "That person is not one of this couple." };
   const name = couplePartnerLabel(pedigree, partnershipId, besideId);
@@ -227,20 +227,20 @@ export function drawBesidePlan(pedigree: Pedigree, partnershipId: string, beside
   const base = laidOutWith(pedigree, partnershipId);
   const drawnLeft = drawnLeftPartner(base, cachedLayout(base), partnershipId) ?? p.individual1;
   const sides = p.leftPartner ? [p.leftPartner] : [drawnLeft, drawnLeft === p.individual1 ? p.individual2 : p.individual1];
-  let pick: { left: string; flow: FlowData } | null = null;
+  let pick: { left: string; scene: Scene } | null = null;
   for (const left of sides) {
     const chosen = withChoice(besideId, left);
     // Together with the choices made for other couples, this one may be more than the layout can draw.
     if (drawnBesideConflict(drawnPedigree(chosen))) continue;
-    const flow = flowOf(chosen);
-    if (!pick || drawnTwice(flow).size < drawnTwice(pick.flow).size) pick = { left, flow };
+    const scene = sceneOf(chosen);
+    if (!pick || drawnTwice(scene).size < drawnTwice(pick.scene).size) pick = { left, scene };
   }
   if (!pick) {
     return { unchanged: `This couple cannot be drawn beside ${name} together with the choices made for other couples. Set one of those to Automatic first.` };
   }
   // Nothing moves, or only what the side alone would move: the layout already draws the couple there.
-  const already = sameDrawing(pick.flow, before)
-    || (!p.drawnBeside && sameDrawing(pick.flow, flowOf(withChoice(undefined, pick.left))));
+  const already = sameDrawing(pick.scene, before)
+    || (!p.drawnBeside && sameDrawing(pick.scene, sceneOf(withChoice(undefined, pick.left))));
   if (already) return { unchanged: `This couple is already drawn beside ${name}, so nothing changes.` };
-  return plan(besideId, pick.left, pick.flow);
+  return plan(besideId, pick.left, pick.scene);
 }

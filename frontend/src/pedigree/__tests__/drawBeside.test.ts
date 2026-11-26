@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { drawnBesideConflict } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { coupleOfPair, couplePartnerLabel, drawBesideOptions, drawBesidePlan } from "../partners";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { importJson, exportJson } from "../../io/json";
 import { EXAMPLES } from "../../data/examples";
@@ -17,9 +17,9 @@ const couple = (p: Pedigree, id: string) => p.partnerships.find(q => q.id === id
 /** Ids along each row as drawn, a "*" on every copy of someone drawn more than once. */
 function rows(p: Pedigree): string[] {
   const by = new Map<number, string[]>();
-  for (const n of [...layoutToFlow(p).nodes].sort((a, b) => a.position.x - b.position.x)) {
+  for (const n of [...buildScene(p).people].sort((a, b) => a.position.x - b.position.x)) {
     const y = Math.round(n.position.y);
-    by.set(y, [...(by.get(y) ?? []), n.data.individual.id + (n.data.isDuplicate ? "*" : "")]);
+    by.set(y, [...(by.get(y) ?? []), n.individual.id + ((n.glyph.copy !== undefined) ? "*" : "")]);
   }
   return [...by.entries()].sort((a, b) => a[0] - b[0]).map(r => r[1].join(" "));
 }
@@ -36,7 +36,7 @@ describe("the Quadruple half first cousins example", () => {
   it("draws three people twice, all in the grandparents' row", () => {
     expect(twicePerRow(example())).toEqual([3, 0, 0]);
     expect(rows(example())[1]).toBe("F1 M1 M2 F2");
-    expect(lintFlow(example(), layoutToFlow(example()))).toEqual([]);
+    expect(lintScene(example(), buildScene(example()))).toEqual([]);
   });
 
   it("drew four people twice, over two rows, before the couples were placed", () => {
@@ -70,7 +70,7 @@ describe("draw this couple beside (#205)", () => {
     const before = twicePerRow(store().pedigree);
     expect(store().setCoupleDrawnBeside("A+D", "D")).toBeNull();
     expect(twicePerRow(store().pedigree)).not.toEqual(before);
-    expect(lintFlow(store().pedigree, layoutToFlow(store().pedigree))).toEqual([]);
+    expect(lintScene(store().pedigree, buildScene(store().pedigree))).toEqual([]);
   });
 
   it("names the people in the notice when they have names", () => {
@@ -114,7 +114,7 @@ describe("draw this couple beside (#205)", () => {
     store().initialize(sided);
     expect(store().setCoupleDrawnBeside("C+B", "B")).toMatch(/cannot be drawn beside the woman together with the choices made for other couples/);
     expect(store().pedigree).toBe(sided);
-    expect(lintFlow(sided, layoutToFlow(sided))).toEqual([]);
+    expect(lintScene(sided, buildScene(sided))).toEqual([]);
   });
 
   it("any two choices on the ring are drawn cleanly or change nothing", () => {
@@ -128,7 +128,7 @@ describe("draw this couple beside (#205)", () => {
         const said = store().setCoupleDrawnBeside(second.id, b);
         const p = store().pedigree;
         expect(drawnBesideConflict(p), `${first.id} ${a}, ${second.id} ${b}`).toBe(false);
-        expect(lintFlow(p, layoutToFlow(p)), `${first.id} ${a}, ${second.id} ${b}`).toEqual([]);
+        expect(lintScene(p, buildScene(p)), `${first.id} ${a}, ${second.id} ${b}`).toEqual([]);
         if (said !== null) expect(p).toBe(afterFirst);
       }
     }
@@ -158,7 +158,7 @@ describe("drawnBeside on every couple of every example and fixture", () => {
     ...FEATURE_FIXTURES.map(f => [`fixture:${f.slug}`, f.data] as [string, Pedigree]),
   ];
   const STRUCTURE = new Set(["missing-individual", "missing-node", "couple-not-partners", "partnership-not-drawn", "child-without-parents", "child-wrong-parents", "assisted-not-drawn"]);
-  const broken = (p: Pedigree) => lintFlow(p, layoutToFlow(p)).filter(f => STRUCTURE.has(f.code)).map(f => f.code).sort();
+  const broken = (p: Pedigree) => lintScene(p, buildScene(p)).filter(f => STRUCTURE.has(f.code)).map(f => f.code).sort();
 
   it("never loses a couple or a child's line, whichever partner is chosen, offered or not", () => {
     let offered = 0;

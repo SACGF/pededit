@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { pedigreeToGeometry } from "@pedigree-editor/layout-engine";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { layoutToFlow } from "../layoutToFlow";
-import type { CoupleEdgeData, SibshipEdgeData } from "../layoutToFlow";
+import { buildScene } from "../scene";
 import { coupleLineGeometry, sibshipLineGeometry } from "../lineGeometry";
 import { pathPoints } from "../couplePath";
 import { build, couple, F, M } from "../../fixtures/features";
@@ -16,8 +15,8 @@ import { build, couple, F, M } from "../../fixtures/features";
  */
 function compare(pedigree: Pedigree) {
   const geo = pedigreeToGeometry(pedigree);
-  const flow = layoutToFlow(pedigree, { improveLayout: false });
-  const pos = new Map(flow.nodes.map(n => [n.id, n.position]));
+  const flow = buildScene(pedigree, { improveLayout: false });
+  const pos = new Map(flow.people.map(n => [n.id, n.position]));
   // Same layout, possibly translated.
   const first = geo.nodes[0]!, p0 = pos.get(`${first.level}-${first.slot}`)!;
   const dx = p0.x - first.cx, dy = p0.y - first.cy;
@@ -28,11 +27,11 @@ function compare(pedigree: Pedigree) {
 
   const hops = geo.couples.filter(c => c.hopHeight > 0);
   expect(hops.length).toBeGreaterThan(0);
-  const idOf = new Map(flow.nodes.map(n => [n.id, n.data.individual.id]));
+  const idOf = new Map(flow.people.map(n => [n.id, n.individual.id]));
   for (const c of hops) {
-    const edge = flow.coupleEdges.find(e => idOf.get(e.source) === c.leftId && idOf.get(e.target) === c.rightId)!;
+    const edge = flow.couples.find(e => idOf.get(e.source) === c.leftId && idOf.get(e.target) === c.rightId)!;
     expect(edge, `${c.leftId}-${c.rightId}`).toBeDefined();
-    const line = coupleLineGeometry(edge.data as CoupleEdgeData, false, pos.get(edge.source)!, pos.get(edge.target)!);
+    const line = coupleLineGeometry(edge.data, false, pos.get(edge.source)!, pos.get(edge.target)!);
     const drawn = pathPoints(line.course).map(([x, y]) => [x - dx, y - dy]);
     expect(drawn).toHaveLength(c.points.length);
     drawn.forEach(([x, y], i) => {
@@ -42,11 +41,11 @@ function compare(pedigree: Pedigree) {
     });
   }
 
-  for (const e of flow.sibshipEdges) {
-    const data = e.data as SibshipEdgeData;
+  for (const e of flow.sibships) {
+    const data = e.data;
     const lines = sibshipLineGeometry(data, id => {
-      const n = flow.nodes.find(m => m.id === id);
-      return n && { position: n.position, data: n.data };
+      const n = flow.people.find(m => m.id === id);
+      return n;
     })!;
     const [x, y] = lines.solid[0]!;
     const s = geo.sibships.find(t => Math.abs(t.coupleX - (x - dx)) < 1e-6 && t.coupleY + dy < y + 1 && t.childY + dy > y)!;

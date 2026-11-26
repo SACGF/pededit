@@ -5,7 +5,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import type { Problem } from "../pedigree/validation";
 import { adjacentProblem, problemsOf, problemSubject, problemTarget } from "./problemList";
-import { pedigreeNumbers } from "../pedigree/layoutToFlow";
+import { pedigreeNumbers } from "../pedigree/scene";
 import { ProblemFixes } from "./ProblemFixes";
 
 /** The problem gone to last, by the list or the keyboard, and where it was in the list. */

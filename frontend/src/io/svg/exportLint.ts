@@ -1,6 +1,6 @@
 /**
  * Render lint for the standard SVG export. The canvas lint
- * (`pedigree/renderLint.ts`) checks layoutToFlow's output. `exportSvg` draws
+ * (`pedigree/renderLint.ts`) checks buildScene's output. `exportSvg` draws
  * from that same output, but it is a second renderer writing its own SVG,
  * so this one parses the exported file and checks what it actually draws against
  * the pedigree:
@@ -38,8 +38,8 @@
  */
 import { placementParentOf, type Pedigree, type Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
-import { layoutToFlow } from "../../pedigree/layoutToFlow";
-import type { FlowData } from "../../pedigree/layoutToFlow";
+import { buildScene } from "../../pedigree/scene";
+import type { Scene } from "../../pedigree/scene";
 import { textWidth, titleWidth } from "../../pedigree/labels";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { pathPoints, symbolSideDx } from "../../pedigree/couplePath";
@@ -231,7 +231,7 @@ const segsOf = (pts: Pt[]): Seg[] => pts.slice(1).map((p, i) => [pts[i]![0], pts
  * Lint an exported SVG. `pedigree` is what was drawn (already de-identified if
  * the export was) and `flow` the canvas layout of it, used to name symbols.
  */
-export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): ExportLintFinding[] {
+export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): ExportLintFinding[] {
   const out: ExportLintFinding[] = [];
   const parsed = parseExportSvg(svg);
   if (!parsed.structured) {
@@ -249,7 +249,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
   const at = ([x, y]: Pt) => `(${Math.round(x)}, ${Math.round(y)})`;
 
   // exportSvg draws in canvas coordinates inside one translated group.
-  const nodes = flow.nodes;
+  const nodes = scene.people;
   const shift = parsed.origin;
   const toCanvas = ([x, y]: Pt): Pt => [x - shift[0], y - shift[1]];
 
@@ -262,7 +262,7 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
       out.push({ code: "symbol-not-on-canvas", message: `the export draws a symbol at ${at([x, y])}, where the canvas has none`, individuals: [] });
       continue;
     }
-    symbols.push({ pos: [x, y], id: node.data.individual.id, shape: node.data.glyph.shape });
+    symbols.push({ pos: [x, y], id: node.individual.id, shape: node.glyph.shape });
   }
   const drawn = new Set(symbols.map(s => s.id));
   for (const ind of pedigree.individuals) {
@@ -536,5 +536,5 @@ export function lintExportSvg(pedigree: Pedigree, flow: FlowData, svg: string): 
 /** Export a pedigree as SVG (standard layout) and lint what it draws. */
 export function lintExport(pedigree: Pedigree, options: SvgExportOptions = {}): ExportLintFinding[] {
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  return lintExportSvg(working, layoutToFlow(working, { compact: options.compact }), exportSvg(pedigree, { ...options, uShape: false }));
+  return lintExportSvg(working, buildScene(working, { compact: options.compact }), exportSvg(pedigree, { ...options, uShape: false }));
 }

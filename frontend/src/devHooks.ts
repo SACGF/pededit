@@ -7,7 +7,7 @@
  *
  *   __pededit.pedigree().individuals.length
  *   __pededit.usePedigreeStore.getState().past.length
- *   __pededit.layout().nodes.map(n => [n.id, n.position])
+ *   __pededit.layout().people.map(n => [n.id, n.position])
  *   __pededit.check()          // render lint: [] when the canvas draws cleanly
  *   __pededit.checkExport()    // the same for the SVG export (io/svg/exportLint.ts)
  *   __pededit.problems()       // editor warnings: [] when nothing looks wrong
@@ -18,9 +18,9 @@
  */
 import { usePedigreeStore } from "./store/usePedigreeStore";
 import { useAppStore } from "./store/useAppStore";
-import { layoutToFlow } from "./pedigree/layoutToFlow";
-import type { LayoutToFlowOptions } from "./pedigree/layoutToFlow";
-import { lintFlow } from "./pedigree/renderLint";
+import { buildScene } from "./pedigree/scene";
+import type { SceneOptions } from "./pedigree/scene";
+import { lintScene } from "./pedigree/renderLint";
 import { lintExport } from "./io/svg/exportLint";
 import { exportSvg } from "./io/svg/svgExporter";
 import { exportUShapeSvg } from "./io/svg/uShapeExporter";
@@ -34,30 +34,32 @@ import { EXAMPLES } from "./data/examples";
 import type { KinshipOptions, Pedigree } from "@pedigree-editor/layout-engine";
 
 /** The canvas reads compact mode from localStorage at mount and writes it on toggle. */
-function canvasOptions(): LayoutToFlowOptions {
+function canvasOptions(): SceneOptions {
   try { return { compact: localStorage.getItem("compactLayout") === "true" }; } catch { return {}; }
 }
 
 const hooks = {
   usePedigreeStore,
   useAppStore,
-  layoutToFlow,
+  buildScene,
   importPed,
   exportPed,
   importJson,
   exportJson,
-  lintFlow,
+  lintScene,
   EXAMPLES,
   /** Commit the dev server was serving when this page loaded (see vite.config.ts). */
   commit: __PEDEDIT_COMMIT__,
   /** The pedigree currently in the editor. */
   pedigree: (): Pedigree => usePedigreeStore.getState().getPedigree(),
   /**
-   * React Flow nodes and edges for a pedigree (default: the current one), as
-   * the canvas computes them, including compact mode. Override with options.
+   * The scene for a pedigree (default: the current one), as the canvas
+   * draws it, including compact mode: `people` (each with `individual`,
+   * `glyph` and `position`, the symbol's centre), `couples`, `sibships`,
+   * `duplicates`, `assisted`, `bounds`. Override with options.
    */
-  layout: (pedigree?: Pedigree, options?: LayoutToFlowOptions) =>
-    layoutToFlow(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
+  layout: (pedigree?: Pedigree, options?: SceneOptions) =>
+    buildScene(pedigree ?? usePedigreeStore.getState().getPedigree(), { ...canvasOptions(), ...options }),
   /** The raw kinship2 LayoutResult (alignPedigree) for a pedigree, default the current one. */
   align: (pedigree?: Pedigree) => alignPedigree(pedigree ?? usePedigreeStore.getState().getPedigree()),
   /** Kinship and inbreeding coefficients: `.kinship(a, b)` and `.inbreeding(id)`; `{ chromosome: "X" }` for X-linked. */
@@ -67,11 +69,11 @@ const hooks = {
    * Render lint (pedigree/renderLint.ts): lines through symbols, lines to
    * missing nodes, children with no parent line, and so on. [] means clean.
    */
-  check: (pedigree?: Pedigree, options?: LayoutToFlowOptions) => {
+  check: (pedigree?: Pedigree, options?: SceneOptions) => {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
     // With the chart title the canvas draws.
     const title = chartTitle(p, useAppStore.getState().activeTitle) || undefined;
-    return lintFlow(p, layoutToFlow(p, { ...canvasOptions(), ...options }), { title });
+    return lintScene(p, buildScene(p, { ...canvasOptions(), ...options }), { title });
   },
   /**
    * Export lint (io/svg/exportLint.ts): what the standard SVG export (and so

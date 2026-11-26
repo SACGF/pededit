@@ -71,7 +71,7 @@ export const TWIN_QUESTION_FONT_SIZE = 11;
 
 /**
  * Individual id to twin set key ("partnershipId:index") and zygosity, for
- * every drawable set. Used by `layoutToFlow` so the sibship edges can fork.
+ * every drawable set. Used by `buildScene` so the sibship edges can fork.
  */
 export function twinMembership(pedigree: Pedigree): Map<string, { twinSet: string; zygosity: Zygosity }> {
   const out = new Map<string, { twinSet: string; zygosity: Zygosity }>();

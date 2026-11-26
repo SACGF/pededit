@@ -1,6 +1,6 @@
 /**
- * What is drawn for a couple line and for a sibship, from the edge data
- * `layoutToFlow` made and the positions of the symbols at its ends.
+ * What is drawn for a couple line and for a sibship, from the line's data in
+ * the scene (`scene.ts`) and the positions of the symbols at its ends.
  *
  * One function per kind of line, used by the canvas edge components (with
  * live node positions, so a line follows a drag) and by the SVG export (with
@@ -9,7 +9,7 @@
  * Framework-free.
  */
 import { descentX, type ChildlessStatus } from "@pedigree-editor/layout-engine";
-import type { CoupleEdgeData, RFNodeData, SibshipEdgeData } from "./layoutToFlow";
+import type { CoupleLineData, ScenePerson, SibshipData } from "./scene";
 import { NODE_SIZE } from "./constants";
 import { couplePathD, consanguineousPathsD, hopRisers } from "./couplePath";
 import { childlessMarkSegments, childlessReasonBaselineY } from "./childless";
@@ -49,7 +49,7 @@ export interface CoupleLineGeometry {
  * children does (`sibshipLineGeometry`); the ended mark and a consanguinity
  * label stay on the raised part.
  */
-export function coupleLineGeometry(data: CoupleEdgeData | undefined, double: boolean, left: LinePosition, right: LinePosition): CoupleLineGeometry {
+export function coupleLineGeometry(data: CoupleLineData | undefined, double: boolean, left: LinePosition, right: LinePosition): CoupleLineGeometry {
   const half = NODE_SIZE / 2;
   const sx = left.x + half, tx = right.x - half;
   const hop = data?.hopHeight ?? 0;
@@ -84,11 +84,8 @@ export function coupleLineGeometry(data: CoupleEdgeData | undefined, double: boo
   return out;
 }
 
-/** A symbol at one end of a sibship's lines: where it is and what `layoutToFlow` put on its node. */
-export interface SibshipEnd {
-  position: LinePosition;
-  data?: Pick<RFNodeData, "glyph" | "twinSet" | "zygosity">;
-}
+/** A symbol at one end of a sibship's lines: where it is and what the scene says of it. */
+export type SibshipEnd = { position: LinePosition } & Partial<Pick<ScenePerson, "glyph" | "twinSet" | "zygosity">>;
 
 export interface SibshipLineGeometry {
   solid: Segment[];
@@ -103,7 +100,7 @@ export interface SibshipLineGeometry {
  * node id, or undefined when it is not drawn. Null when there is nothing to
  * draw (a parent or every child missing).
  */
-export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) => SibshipEnd | undefined): SibshipLineGeometry | null {
+export function sibshipLineGeometry(data: SibshipData, nodeAt: (id: string) => SibshipEnd | undefined): SibshipLineGeometry | null {
   const leftParent = nodeAt(data.leftParentId), rightParent = nodeAt(data.rightParentId);
   const children = (data.childIds ?? []).map(nodeAt).filter((n): n is SibshipEnd => !!n);
   if (!leftParent || !rightParent || children.length === 0) return null;
@@ -121,16 +118,16 @@ export function sibshipLineGeometry(data: SibshipEdgeData, nodeAt: (id: string) 
   // Drops end at the top of each child symbol, or at a loss triangle's apex.
   const kids: SibshipChild[] = children.map(c => ({
     ...c.position,
-    topInset: symbolTopInset(c.data?.glyph.lifeStatus, NODE_SIZE),
-    dashed: c.data?.glyph.adopted === "in",
-    twinSet: c.data?.twinSet,
-    zygosity: c.data?.zygosity,
+    topInset: symbolTopInset(c.glyph?.lifeStatus, NODE_SIZE),
+    dashed: c.glyph?.adopted === "in",
+    twinSet: c.twinSet,
+    zygosity: c.zygosity,
   }));
   // The bar's offset comes from the layout, so it is as of the last
   // layout while a node is being dragged.
   const barOffset = data.barOffset ?? 0;
   // Parents who are not a couple (gamete donation): a line from each.
-  const sexOf = (n: SibshipEnd) => n.data?.glyph.shape;
+  const sexOf = (n: SibshipEnd) => n.glyph?.shape;
   const apart = data.apart
     ? [{ ...leftParent.position, sex: sexOf(leftParent) }, { ...rightParent.position, sex: sexOf(rightParent) }]
     : undefined;

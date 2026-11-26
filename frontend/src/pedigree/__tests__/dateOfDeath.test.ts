@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { ageLines, ageAtDeath, parsePartialDate, detailLines, detailsBacked, labelMaxWidth } from "../labels";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { SLOT_WIDTH } from "../constants";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -73,12 +73,12 @@ describe("date of death under the symbol (#103)", () => {
   });
 
   it("canvas, SVG and U-shape draw it, and the lints stay clean", () => {
-    const flow = layoutToFlow(family());
-    const data = (id: string) => flow.nodes.find(n => n.data.individual.id === id)!.data;
+    const flow = buildScene(family());
+    const data = (id: string) => flow.people.find(n => n.individual.id === id)!;
     expect(data("f").glyph.detailLines).toEqual(["d. 71y"]);
     expect(data("m").glyph.detailLines).toEqual(["b. 1938", "d. 2010"]);
     expect(data("c1").glyph.detailLines).toEqual(["d. 1999"]);
-    expect(lintFlow(family(), flow)).toEqual([]);
+    expect(lintScene(family(), flow)).toEqual([]);
     const svg = exportSvg(family());
     for (const t of ["d. 71y", "b. 1938", "d. 2010", "d. 1999"]) expect(svg).toContain(`>${t}</text>`);
     expect(svg).not.toContain("2007-03-14");

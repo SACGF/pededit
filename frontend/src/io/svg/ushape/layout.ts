@@ -7,7 +7,7 @@
 import { type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { personGlyph, type PersonGlyph } from "../../../pedigree/personGlyph";
 import { labelMaxWidth, LABEL_CHAR_WIDTH } from "../../../pedigree/labels";
-import { labelNumbers } from "../../../pedigree/layoutToFlow";
+import { labelNumbers } from "../../../pedigree/scene";
 import { NODE_SIZE, HALF, LABEL_LINE_HEIGHT, CONSANG_GAP, MIN_SLOT, MAX_SLOT, FAMILY_GAP, BAR_CLEARANCE, TARGET_ASPECT, MIN_ASPECT, MAX_PLACE_ATTEMPTS, FAN_MAX_WIDTH, MAX_FLAT, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH } from "./constants";
 import { coupleGap, labelRadius, kidsOf, walk, buildTree, type UShapeOptions, type Union, type TNode } from "./tree";
 

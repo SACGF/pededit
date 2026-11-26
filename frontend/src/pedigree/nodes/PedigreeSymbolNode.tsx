@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
-import type { RFNodeData } from "../layoutToFlow";
+import type { RFNodeData } from "../sceneToFlow";
 import { NODE_SIZE } from "../constants";
 import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, CopyNumber, AnnotationRow, TextUnderSymbol } from "./symbols";
 import { HoverPill } from "./HoverPill";

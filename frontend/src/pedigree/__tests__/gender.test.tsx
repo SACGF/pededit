@@ -4,8 +4,8 @@ import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } from "../gender";
 import { detailLines } from "../labels";
-import { layoutToFlow } from "../layoutToFlow";
-import type { RFNodeData } from "../layoutToFlow";
+import { buildScene } from "../scene";
+import type { ScenePerson } from "../scene";
 import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { renderExportKeySvg } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -77,8 +77,8 @@ describe("gender identity on the symbol (#26)", () => {
   });
 
   it("gives the canvas node its drawn shape, and the canvas draws it", () => {
-    const nodes = layoutToFlow(family()).nodes;
-    const data = (id: string) => nodes.find(n => (n.data as RFNodeData).individual.id === id)!.data as RFNodeData;
+    const nodes = buildScene(family()).people;
+    const data = (id: string) => nodes.find(n => n.individual.id === id)!;
     expect(data("t").glyph.shape).toBe("male");
     expect(data("t").glyph.detailLines).toContain("AFAB");
     expect(data("n").glyph.shape).toBe("unknown");
@@ -88,7 +88,7 @@ describe("gender identity on the symbol (#26)", () => {
   });
 
   it("does not move anyone: the layout follows sex, not the drawing", () => {
-    const pos = (p: Pedigree) => layoutToFlow(p).nodes.map(n => [n.id, n.position.x, n.position.y]);
+    const pos = (p: Pedigree) => buildScene(p).people.map(n => [n.id, n.position.x, n.position.y]);
     expect(pos(family())).toEqual(pos(family("sex")));
     const none = { ...family(), individuals: family().individuals.map(i => ({ ...i, genderIdentity: undefined })) };
     expect(pos(family())).toEqual(pos(none));

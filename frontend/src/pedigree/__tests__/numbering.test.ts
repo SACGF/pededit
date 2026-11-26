@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { toRoman } from "../numbering";
-import { layoutToFlow, pedigreeNumbers } from "../layoutToFlow";
+import { buildScene, pedigreeNumbers } from "../scene";
 import { nameLabelText, detailLines, detailsBacked } from "../labels";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -70,11 +70,11 @@ describe("pedigreeNumbers", () => {
     const p = family();
     const numbers = pedigreeNumbers(p);
     expect(numbers.size).toBe(p.individuals.length);
-    const flow = layoutToFlow(p);
+    const flow = buildScene(p);
     const byLevel = new Map<number, { x: number; id: string }[]>();
-    for (const n of flow.nodes) {
+    for (const n of flow.people) {
       const level = Number(n.id.split("-")[0]);
-      byLevel.set(level, [...(byLevel.get(level) ?? []), { x: n.position.x, id: n.data.individual.id }]);
+      byLevel.set(level, [...(byLevel.get(level) ?? []), { x: n.position.x, id: n.individual.id }]);
     }
     for (const [level, row] of byLevel) {
       row.sort((a, b) => a.x - b.x);
@@ -127,18 +127,18 @@ describe("labels with numbers", () => {
   });
 
   it("draws the number on the canvas only when the setting is on", () => {
-    const off = layoutToFlow(family());
-    const gfOff = off.nodes.find(n => n.data.individual.id === "gf")!;
-    expect(gfOff.data.glyph.nameLines).toEqual(["Grandpa"]);
-    expect(gfOff.data.glyph.detailLines).toEqual([]);
-    const on = layoutToFlow(withNumbers(family()));
-    const gf = on.nodes.find(n => n.data.individual.id === "gf")!;
-    expect(gf.data.glyph.nameLines).toEqual(["Grandpa"]);
-    expect(gf.data.glyph.detailLines).toEqual(["I-1"]);
-    expect(gf.data.glyph.detailsBacked).toBe(true);
-    const a2 = on.nodes.find(n => n.data.individual.id === "a2")!;
-    expect(a2.data.glyph.nameLines).toEqual([]);
-    expect(a2.data.glyph.detailLines).toEqual([pedigreeNumbers(family()).get("a2")]);
+    const off = buildScene(family());
+    const gfOff = off.people.find(n => n.individual.id === "gf")!;
+    expect(gfOff.glyph.nameLines).toEqual(["Grandpa"]);
+    expect(gfOff.glyph.detailLines).toEqual([]);
+    const on = buildScene(withNumbers(family()));
+    const gf = on.people.find(n => n.individual.id === "gf")!;
+    expect(gf.glyph.nameLines).toEqual(["Grandpa"]);
+    expect(gf.glyph.detailLines).toEqual(["I-1"]);
+    expect(gf.glyph.detailsBacked).toBe(true);
+    const a2 = on.people.find(n => n.individual.id === "a2")!;
+    expect(a2.glyph.nameLines).toEqual([]);
+    expect(a2.glyph.detailLines).toEqual([pedigreeNumbers(family()).get("a2")]);
   });
 
   it("draws the numbers in the SVG and U-shape exports, and they lint clean", () => {

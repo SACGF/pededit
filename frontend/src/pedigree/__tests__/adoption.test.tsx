@@ -3,8 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { SymbolShape, standaloneGlyph } from "../nodes/symbols";
 import { adoptionBracketSegments, ADOPTION_BRACKET_GAP, ADOPTION_DASH } from "../adoption";
 import { sibshipPaths, sibshipSegments } from "../sibshipPath";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportCsv } from "../../io/csv/exporter";
 import { renderExportKeySvg } from "../exportKey";
@@ -56,7 +56,7 @@ describe("adoption brackets (#12)", () => {
 
   it("the canvas layout is lint-clean and the SVG export dashes only the adopted-in drop", () => {
     const p = pedigree();
-    expect(lintFlow(p, layoutToFlow(p))).toEqual([]);
+    expect(lintScene(p, buildScene(p))).toEqual([]);
     const svg = exportSvg(p);
     expect(svg.match(/data-adopted="in"/g)!.length).toBe(1);
     expect(svg.match(/data-adopted="out"/g)!.length).toBe(1);

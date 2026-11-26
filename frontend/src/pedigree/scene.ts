@@ -1,4 +1,3 @@
-import type { Node, Edge } from "@xyflow/react";
 import { buildPartnerSetFromPedigree, descentX, resolveCouple } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
@@ -13,51 +12,95 @@ import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { middleTaken } from "./ended";
 import { consanguinityLabelLimits, consanguinityLabelRoom, consanguinityLabelText, placeConsanguinityLabel, wrapConsanguinityLabel } from "./consanguinityLabel";
-import type { ConsanguinityLabelOffset, TextBlock } from "./consanguinityLabel";
-import { copyNumberBlock, textBlockUnder } from "./labelBlock";
+import { highestAboveSymbols, type ConsanguinityLabelOffset, type TextBlock } from "./consanguinityLabel";
+import { copyNumberBlock, textBlockUnder, TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { barsUnderLabels, sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
-import { labelMaxWidth, nameLabelMode, canvasLabelLines } from "./labels";
+import { labelMaxWidth, nameLabelMode, canvasLabelLines, LABEL_LINE_HEIGHT } from "./labels";
+import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "./proband";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
 import { symbolSex } from "./gender";
 import { assistedLinks, assistedEdgeSegment, type AssistedLink, type LinePoint } from "./assisted";
 
+/**
+ * The drawing as plain data (#146): who is drawn where, every line and the
+ * text above couple lines, with no React Flow in it. `buildScene` makes it
+ * from a pedigree; the canvas turns it into React Flow nodes and edges
+ * (`sceneToFlow.ts`), and the exports, the lints, de-identification and the
+ * dev hooks read it as it is. Positions are symbol centres, in px.
+ */
+
 // ── Output types ──────────────────────────────────────────────────────────────
 
-export interface RFNodeData extends Record<string, unknown> {
+/** One drawn symbol: a person, or one copy of someone drawn more than once. */
+export type ScenePerson = {
+  /** The layout slot, "level-slot": one per drawn copy. Lines name their ends by it. */
+  id: string;
+  /** Centre of the symbol. */
+  position: { x: number; y: number };
   individual: Individual;
-  /**
-   * Everything drawn at this person, decided once (`personGlyph`): the
-   * canvas node, the SVG export, the lints and the minimap draw from it.
-   */
+  /** Everything drawn at this person, decided once (`personGlyph`). */
   glyph: PersonGlyph;
   /**
-   * True when the same individual is drawn in more than one slot (kinship2
-   * could not place them both with their siblings and beside every partner).
-   * Every copy is drawn with its copy number, joined by a dashed duplicateEdge.
-   */
-  isDuplicate: boolean;
-  /**
-   * True if this node sits at the individual's pinned (dragged) position. For
+   * True if this symbol sits at the individual's pinned (dragged) position. For
    * someone drawn more than once only the copy nearest the pin is moved.
    */
   isPinned: boolean;
+  /** The canvas lets this symbol be dragged. */
+  draggable: boolean;
   /** Twin set key ("partnershipId:index") and zygosity when the individual is a twin. */
   twinSet?: string;
   zygosity?: Zygosity;
   /**
-   * Set on the diamond standing for a collapsed branch, whose
-   * `individual` is a stand-in that is not in the stored pedigree. Such a
-   * node has type "collapsedBranch" and can be neither selected nor dragged.
+   * Set on the symbol standing for a collapsed branch, whose `individual`
+   * is a stand-in that is not in the stored pedigree. It can be neither
+   * selected nor dragged.
    */
   branch?: CollapsedBranch;
+};
+
+/** A line between two drawn symbols, named by their slot ids. */
+export interface SceneLine<D> {
+  id: string;
+  source: string;
+  target: string;
+  data: D;
+}
+
+/** A couple line: `source` is the left partner, `target` the right. */
+export interface SceneCoupleLine extends SceneLine<CoupleLineData> {
+  /** Drawn double: the couple are related (`consanguinityTest`). */
+  double: boolean;
+}
+
+/** The box everything is drawn in, symbols, text under them and marks above, before any title or key. */
+export interface SceneBounds { left: number; top: number; width: number; height: number }
+
+export interface Scene {
+  people: ScenePerson[];
+  couples: SceneCoupleLine[];
+  sibships: SceneLine<SibshipData>[];
+  /** One per pair of consecutive copies of someone drawn more than once. */
+  duplicates: SceneLine<DuplicateArcData>[];
+  /** Lines of assisted reproduction: carrier and social parent to child. */
+  assisted: SceneLine<AssistedLineData>[];
+  /** The width (px) names and details under a symbol are wrapped to. */
+  labelMax: number;
+  /**
+   * The highest point drawn above the symbols (couple text, the dashed arcs
+   * between copies, hopping couple lines), Infinity when nothing is: the
+   * chart title is raised to clear it (`highestAboveSymbols`).
+   */
+  aboveTop: number;
+  /** Null when nobody is drawn. */
+  bounds: SceneBounds | null;
 }
 
 /**
- * One end of a hopping couple line: see `CoupleEdgeData.hopEnds`. `turn` is
+ * One end of a hopping couple line: see `CoupleLineData.hopEnds`. `turn` is
  * where the line turns between the row and its raised part (px from this
  * partner's centre). The end at the further partner also says where a
  * childless mark hangs from the level stretch there (`drop`): see `hopTurn`.
@@ -70,7 +113,7 @@ export interface HopEnd { shape?: Sex; port: number; turn?: number; drop?: numbe
  * three or more partners) and the line rises by that many px to pass over the
  * slot(s) between them.
  */
-export interface CoupleEdgeData extends Record<string, unknown> {
+export type CoupleLineData = {
   hopHeight: number;
   /**
    * How a hopping line meets the left partner's symbol (`source`) and the
@@ -93,7 +136,7 @@ export interface CoupleEdgeData extends Record<string, unknown> {
   consanguinityLabel?: string[];
   /** Where the label goes when its usual place is taken by text above. */
   consanguinityLabelOffset?: ConsanguinityLabelOffset;
-}
+};
 
 /**
  * All geometry for a sibship connection. The SibshipEdge renderer uses
@@ -102,7 +145,7 @@ export interface CoupleEdgeData extends Record<string, unknown> {
  * The pre-computed coupleX/Y/sibBarY/childXs/childY values are the layout's
  * own geometry, read by `renderLint`.
  */
-export interface SibshipEdgeData extends Record<string, unknown> {
+export type SibshipData = {
   /** React Flow node ID of the left parent. */
   leftParentId: string;
   /** React Flow node ID of the right parent. */
@@ -144,7 +187,7 @@ export interface SibshipEdgeData extends Record<string, unknown> {
    * runs straight to the top of its symbol (see `sibshipSegments`).
    */
   converge?: boolean;
-}
+};
 
 /**
  * A line of assisted reproduction from a woman who carried the child
@@ -153,16 +196,16 @@ export interface SibshipEdgeData extends Record<string, unknown> {
  * every child of a sibship, one line runs to the point where the sibship's
  * line of descent meets the bar instead (`bar`), so it is not repeated.
  */
-export interface AssistedEdgeData extends Record<string, unknown> {
+export type AssistedLineData = {
   kind: AssistedLink["kind"];
   /** Individual ids of the children the line stands for. */
   children: string[];
-  /** The sibship the line joins: the same ids as its SibshipEdgeData, to find the join point live. */
+  /** The sibship the line joins: the same ids as its SibshipData, to find the join point live. */
   bar?: { leftParentId: string; rightParentId: string; childIds: string[]; barOffset: number };
-}
+};
 
 /** Dashed arc joining two copies of the same person. */
-export interface DuplicateEdgeData extends Record<string, unknown> {
+export type DuplicateArcData = {
   /**
    * How far (px) the arc rises above the higher of the two symbol tops
    * (less than usual when text hangs in its way); for a routed arc
@@ -175,21 +218,9 @@ export interface DuplicateEdgeData extends Record<string, unknown> {
    * signed) from the upper copy's centre instead (`duplicateArcD`).
    */
   legDx?: number;
-}
+};
 
-export interface FlowData {
-  nodes: Node<RFNodeData>[];
-  coupleEdges: Edge<CoupleEdgeData>[];
-  sibshipEdges: Edge<SibshipEdgeData>[];
-  /** One per pair of consecutive copies of someone drawn more than once. */
-  duplicateEdges: Edge<DuplicateEdgeData>[];
-  /** Lines of assisted reproduction: carrier and social parent to child. */
-  assistedEdges: Edge<AssistedEdgeData>[];
-  /** The width (px) names and details under a symbol are wrapped to. */
-  labelMax: number;
-}
-
-export interface LayoutToFlowOptions {
+export interface SceneOptions {
   /**
    * Compact mode: rows are placed at 70% of ROW_HEIGHT and slots at 85% of
    * SLOT_WIDTH so larger pedigrees fit on screen. Pinned positions (stored
@@ -279,11 +310,14 @@ export function labelNumbers(pedigree: Pedigree): Map<string, string> | undefine
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
-export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}): FlowData {
+export function buildScene(full: Pedigree, options: SceneOptions = {}): Scene {
   // Hidden descendants are not laid out or drawn.
   const pedigree = drawnPedigree(full);
   if (pedigree.individuals.length === 0) {
-    return { nodes: [], coupleEdges: [], sibshipEdges: [], duplicateEdges: [], assistedEdges: [], labelMax: labelMaxWidth(layoutSpacing(options.compact).slotWidth) };
+    return {
+      people: [], couples: [], sibships: [], duplicates: [], assisted: [],
+      labelMax: labelMaxWidth(layoutSpacing(options.compact).slotWidth), aboveTop: Infinity, bounds: null,
+    };
   }
   const result: LayoutResult = cachedLayout(pedigree, { improve: options.improveLayout ?? true });
   const spacing = layoutSpacing(options.compact);
@@ -300,7 +334,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   // With snap on, every node is drawn on the grid (see snap.ts).
   const grid = activeSnapGrid(pedigree);
   if (grid > 0) {
-    const pinned = new Set(nodes.filter(n => n.data.isPinned).map(n => n.id));
+    const pinned = new Set(nodes.filter(n => n.isPinned).map(n => n.id));
     const snapped = snapSlotPositions(slotPos, pinned, grid);
     for (const node of nodes) node.position = snapped.get(node.id) ?? node.position;
     for (const [id, p] of snapped) slotPos.set(id, p);
@@ -313,7 +347,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
     const n = nodes.find(x => x.id === id);
-    if (n) n.data.glyph.labelsBacked = true;
+    if (n) n.glyph.labelsBacked = true;
   }
 
   const text = textBlocks(nodes), bars = sibshipBlocks(sibshipEdges, nodes);
@@ -323,13 +357,44 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
   if (duplicateEdges.length) {
     coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...duplicateArcBlocks(duplicateEdges, slotPos), ...bars]);
   }
+  const aboveTop = highestAboveSymbols({ people: nodes, couples: coupleEdges, duplicates: duplicateEdges });
   return {
-    nodes,
-    coupleEdges,
-    sibshipEdges,
-    duplicateEdges,
-    assistedEdges,
+    people: nodes,
+    couples: coupleEdges,
+    sibships: sibshipEdges,
+    duplicates: duplicateEdges,
+    assisted: assistedEdges,
     labelMax: labelMaxWidth(spacing.slotWidth),
+    aboveTop,
+    bounds: sceneBounds(nodes, aboveTop),
+  };
+}
+
+/**
+ * The box of everything drawn: the symbols, the proband's arrow on the left
+ * and below, room under the lowest row for the most lines of text anyone
+ * has, and whatever is drawn above the top row. The export's size and the
+ * canvas's fit to view are both worked out from it.
+ */
+function sceneBounds(people: ScenePerson[], aboveTop: number): SceneBounds {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const { position: { x, y } } of people) {
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+  }
+  const glyphs = people.map(p => p.glyph);
+  const proband = glyphs.some(g => g.arrow) ? ARROW_TAIL + PROBAND_LETTER_SIZE + 4 : 0;
+  // Names wrap to the slot width, the age or DOB takes a line, so does each
+  // age of onset and the pedigree number: allow for the most lines anyone takes.
+  const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
+  const labelHeight = TEXT_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
+    + (glyphs.some(g => g.annotations.length > 0) ? ANNOTATION_SHIFT : 0) + (glyphs.some(g => g.caption) ? CAPTION_SHIFT : 0);
+  const above = Math.max(0, Math.ceil(minY - NODE_SIZE / 2 - aboveTop));
+  return {
+    left: minX - NODE_SIZE / 2 - proband,
+    top: minY - NODE_SIZE / 2 - above,
+    width: maxX - minX + NODE_SIZE + proband,
+    height: maxY - minY + NODE_SIZE + labelHeight + proband + above,
   };
 }
 
@@ -338,9 +403,9 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
  * to pass under the text, or, where it cannot be, the text gets a white
  * backing (`barsUnderLabels`). Changes the edges and nodes in place.
  */
-function clearLabelsOfBars(nodes: Node<RFNodeData>[], sibshipEdges: Edge<SibshipEdgeData>[]): void {
+function clearLabelsOfBars(nodes: ScenePerson[], sibshipEdges: SceneLine<SibshipData>[]): void {
   const labelled = nodes.flatMap(node => {
-    const box = textBlockUnder(node.data.glyph, node.position.x, node.position.y);
+    const box = textBlockUnder(node.glyph, node.position.x, node.position.y);
     return box ? [{ node, box }] : [];
   });
   const drawn = sibshipEdges.filter(e => e.data && e.data.childXs.length > 0 && !e.data.converge);
@@ -357,7 +422,7 @@ function clearLabelsOfBars(nodes: Node<RFNodeData>[], sibshipEdges: Edge<Sibship
   });
   for (const k of through) {
     const { node } = labelled[k]!;
-    node.data.glyph.labelsBacked = true;
+    node.glyph.labelsBacked = true;
   }
 }
 
@@ -368,9 +433,9 @@ function clearLabelsOfBars(nodes: Node<RFNodeData>[], sibshipEdges: Edge<Sibship
  * reproduction that leaves the symbol at the bottom middle.
  */
 export function labelsOverLines(
-  nodes: Node<RFNodeData>[],
-  sibshipEdges: Edge<SibshipEdgeData>[],
-  assistedEdges: Edge<AssistedEdgeData>[],
+  nodes: ScenePerson[],
+  sibshipEdges: SceneLine<SibshipData>[],
+  assistedEdges: SceneLine<AssistedLineData>[],
 ): Set<string> {
   const out = new Set<string>();
   if (assistedEdges.length === 0 && !sibshipEdges.some(e => e.data?.converge)) return out;
@@ -386,7 +451,7 @@ export function labelsOverLines(
     below(d.rightParentId, d.childXs[0]!, d.childYs[0]!);
   }
   for (const e of assistedEdges) {
-    const seg = assistedEdgeSegment(e, id => byId.get(id) && { position: byId.get(id)!.position, glyph: byId.get(id)!.data.glyph });
+    const seg = assistedEdgeSegment(e, id => byId.get(id) && { position: byId.get(id)!.position, glyph: byId.get(id)!.glyph });
     if (seg) below(e.source, seg[2], seg[3]);
   }
   return out;
@@ -396,34 +461,34 @@ export function labelsOverLines(
 
 /**
  * One edge per carrier or social parent and child, or per sibship when they
- * are linked to all of it (see AssistedEdgeData). Someone drawn twice is
+ * are linked to all of it (see AssistedLineData). Someone drawn twice is
  * joined from the copy nearest the child; the child end is the copy that
  * hangs from its parents.
  */
 function buildAssistedEdges(
   pedigree: Pedigree,
-  nodes: Node<RFNodeData>[],
-  sibshipEdges: Edge<SibshipEdgeData>[],
-): Edge<AssistedEdgeData>[] {
+  nodes: ScenePerson[],
+  sibshipEdges: SceneLine<SibshipData>[],
+): SceneLine<AssistedLineData>[] {
   const links = assistedLinks(pedigree);
   if (links.length === 0) return [];
-  const copies = new Map<string, Node<RFNodeData>[]>();
+  const copies = new Map<string, ScenePerson[]>();
   for (const n of nodes) {
-    const id = n.data.individual.id;
+    const id = n.individual.id;
     if (!copies.has(id)) copies.set(id, []);
     copies.get(id)!.push(n);
   }
   const nodeById = new Map(nodes.map(n => [n.id, n]));
-  const indOf = (nodeId: string) => nodeById.get(nodeId)?.data.individual.id;
+  const indOf = (nodeId: string) => nodeById.get(nodeId)?.individual.id;
   // The sibship edge each child hangs from.
-  const sibshipOf = new Map<string, Edge<SibshipEdgeData>>();
+  const sibshipOf = new Map<string, SceneLine<SibshipData>>();
   for (const e of sibshipEdges) for (const c of e.data?.childIds ?? []) { const id = indOf(c); if (id) sibshipOf.set(id, e); }
-  const nearest = (froms: Node<RFNodeData>[], to: { x: number; y: number }) => {
-    const d = (n: Node) => (n.position.x - to.x) ** 2 + (n.position.y - to.y) ** 2;
+  const nearest = (froms: ScenePerson[], to: { x: number; y: number }) => {
+    const d = (n: ScenePerson) => (n.position.x - to.x) ** 2 + (n.position.y - to.y) ** 2;
     return froms.reduce((a, b) => (d(b) < d(a) ? b : a));
   };
 
-  const edges: Edge<AssistedEdgeData>[] = [];
+  const edges: SceneLine<AssistedLineData>[] = [];
   const done = new Set<string>();
   for (const link of links) {
     const key = `${link.kind}|${link.from}|${link.child}`;
@@ -440,7 +505,6 @@ function buildAssistedEdges(
         id:     `assisted-${link.kind}-${link.from}-${sib!.id}`,
         source: nearest(froms, { x: d.coupleX, y: d.sibBarY }).id,
         target: d.childIds[0]!,
-        type:   "assistedEdge",
         data:   {
           kind: link.kind,
           children: sibKids,
@@ -455,7 +519,6 @@ function buildAssistedEdges(
       id:     `assisted-${link.kind}-${link.from}-${link.child}`,
       source: nearest(froms, child.position).id,
       target: child.id,
-      type:   "assistedEdge",
       data:   { kind: link.kind, children: [link.child] },
     });
   }
@@ -479,7 +542,7 @@ function buildNodes(
   result: LayoutResult,
   hidden: Set<string>,
   spacing: LayoutSpacing,
-): Node<RFNodeData>[] {
+): ScenePerson[] {
   const { slotWidth, rowHeight } = spacing;
 
   // Drawn slots per individual, in reading order.
@@ -526,7 +589,7 @@ function buildNodes(
   const labelLines = canvasLabelLines(nameLabelMode(pedigree));
   const numbers = showsNumbers(pedigree) ? numberFromLayout(pedigree, result, hidden) : undefined;
 
-  const nodes: Node<RFNodeData>[] = [];
+  const nodes: ScenePerson[] = [];
   for (let level = 0; level < result.n.length; level++) {
     for (let slot = 0; slot < result.n[level]; slot++) {
       const id = `${level}-${slot}`;
@@ -546,22 +609,13 @@ function buildNodes(
 
       nodes.push({
         id,
-        type:     branch ? "collapsedBranch" : "pedigreeSymbol",
         position: isPinned && pinnedPos ? scalePinnedPosition(pinnedPos, spacing) : autoPos(level, slot),
+        individual,
+        glyph,
+        isPinned,
         draggable: !branch && (nodesMoveable || unlockedSet.has(individual.id)),
-        // Not selectable or draggable, so React Flow would turn its pointer
-        // events off; the diamond is clicked to show the branch again.
-        ...(branch ? { selectable: false, style: { pointerEvents: "all" as const } } : {}),
-        width:  NODE_SIZE,
-        height: NODE_SIZE,
-        data: {
-          individual,
-          glyph,
-          isDuplicate,
-          isPinned,
-          ...(twins.get(individual.id) ?? {}),
-          ...(branch ? { branch } : {}),
-        },
+        ...(twins.get(individual.id) ?? {}),
+        ...(branch ? { branch } : {}),
       });
     }
   }
@@ -578,13 +632,13 @@ function buildNodes(
  * run at their own height.
  */
 function buildDuplicateEdges(
-  nodes: Node<RFNodeData>[], spacing: LayoutSpacing,
-  sibshipEdges: Edge<SibshipEdgeData>[], coupleEdges: Edge<CoupleEdgeData>[],
-): Edge<DuplicateEdgeData>[] {
-  const byPerson = new Map<string, Node<RFNodeData>[]>();
+  nodes: ScenePerson[], spacing: LayoutSpacing,
+  sibshipEdges: SceneLine<SibshipData>[], coupleEdges: SceneCoupleLine[],
+): SceneLine<DuplicateArcData>[] {
+  const byPerson = new Map<string, ScenePerson[]>();
   for (const n of nodes) {
-    if (!n.data.isDuplicate) continue;
-    const pid = n.data.individual.id;
+    if (n.glyph.copy === undefined) continue;
+    const pid = n.individual.id;
     if (!byPerson.has(pid)) byPerson.set(pid, []);
     byPerson.get(pid)!.push(n);
   }
@@ -593,8 +647,8 @@ function buildDuplicateEdges(
   const half = NODE_SIZE / 2;
   const bulge = DUPLICATE_ARC_BULGE * (spacing.rowHeight / 2 - half);
   const obstacles: ArcObstacle[] = nodes.map(n => ({
-    id: n.data.individual.id, x: n.position.x, y: n.position.y,
-    text: textBlockUnder(n.data.glyph, n.position.x, n.position.y),
+    id: n.individual.id, x: n.position.x, y: n.position.y,
+    text: textBlockUnder(n.glyph, n.position.x, n.position.y),
   }));
   const at = new Map(nodes.map(n => [n.id, n.position]));
   const lines: ArcLine[] = [
@@ -618,7 +672,7 @@ function buildDuplicateEdges(
     }),
   ];
 
-  const edges: Edge<DuplicateEdgeData>[] = [];
+  const edges: SceneLine<DuplicateArcData>[] = [];
   const routedOnRow = new Map<number, number[]>();
   for (const [pid, copies] of byPerson) {
     const sorted = [...copies].sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y);
@@ -628,8 +682,8 @@ function buildDuplicateEdges(
       const row = Math.round(Math.max(a.position.y, b.position.y));
       const route = chooseArcRoute(a.position, b.position, bulge, half, spacing.slotWidth, others, lines, routedOnRow.get(row));
       if (route?.legDx !== undefined) routedOnRow.set(row, [...(routedOnRow.get(row) ?? []), route.bulge]);
-      const data: DuplicateEdgeData = { bulge, ...route };
-      edges.push({ id: `duplicate-${pid}-${i}`, source: a.id, target: b.id, type: "duplicateEdge", data });
+      const data: DuplicateArcData = { bulge, ...route };
+      edges.push({ id: `duplicate-${pid}-${i}`, source: a.id, target: b.id, data });
     }
   }
   return edges;
@@ -639,15 +693,15 @@ function buildDuplicateEdges(
  * The text under every drawn symbol, as the export writes it, and the copy
  * number beside the top of a symbol drawn twice, for placing couple labels.
  */
-function textBlocks(nodes: Node<RFNodeData>[]): TextBlock[] {
+function textBlocks(nodes: ScenePerson[]): TextBlock[] {
   return nodes.flatMap(n => [
-    ...[textBlockUnder(n.data.glyph, n.position.x, n.position.y) ?? []].flat(),
-    ...(n.data.glyph.copy !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.data.glyph.copy)] : []),
+    ...[textBlockUnder(n.glyph, n.position.x, n.position.y) ?? []].flat(),
+    ...(n.glyph.copy !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.glyph.copy)] : []),
   ]);
 }
 
 /** The dashed arcs between copies of someone, as a thin box per stretch, for placing couple labels. */
-function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<string, { x: number; y: number }>): TextBlock[] {
+function duplicateArcBlocks(edges: SceneLine<DuplicateArcData>[], slotPos: Map<string, { x: number; y: number }>): TextBlock[] {
   return edges.flatMap(e => {
     const a = slotPos.get(e.source), b = slotPos.get(e.target);
     if (!a || !b) return [];
@@ -665,8 +719,8 @@ function duplicateArcBlocks(edges: Edge<DuplicateEdgeData>[], slotPos: Map<strin
  * on the bar, over the gap between twins who are partners, so it is a run of
  * short boxes along the slant.
  */
-function sibshipBlocks(edges: Edge<SibshipEdgeData>[], nodes: Node<RFNodeData>[]): TextBlock[] {
-  const twinSetOf = new Map(nodes.map(n => [n.id, n.data.twinSet]));
+function sibshipBlocks(edges: SceneLine<SibshipData>[], nodes: ScenePerson[]): TextBlock[] {
+  const twinSetOf = new Map(nodes.map(n => [n.id, n.twinSet]));
   return edges.flatMap(e => {
     const d = e.data;
     if (!d) return [];
@@ -704,8 +758,8 @@ function buildCoupleEdges(
   slotPos: Map<string, { x: number; y: number }>,
   rowHeight: number,
   blocks: TextBlock[],
-): Edge<CoupleEdgeData>[] {
-  const edges: Edge<CoupleEdgeData>[] = [];
+): SceneCoupleLine[] {
+  const edges: SceneCoupleLine[] = [];
   const related = consanguinityTest(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]!.id;
   const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
@@ -733,11 +787,9 @@ function buildCoupleEdges(
         id:           `couple-${level}-${slot}`,
         source:       `${level}-${rc.leftSlot}`,
         target:       `${level}-${rc.rightSlot}`,
-        sourceHandle: "couple-out",  // right edge of left partner
-        targetHandle: "couple-in",   // left edge of right partner
         // Line style from the real partners, not the slots the marker sits
         // between (see consanguinityTest).
-        type:         double ? "consanguineousEdge" : "coupleEdge",
+        double,
         data:         {
           ...hopAt(result, partners, level, slot),
           ...(rc.hop ? { hopEnds: hopEndsAt(level, slot, rc) } : {}),
@@ -758,7 +810,7 @@ function buildCoupleEdges(
     edges.forEach((e, i) => sides.set(e[end], [...(sides.get(e[end]) ?? []), i]));
     for (const side of sides.values()) {
       side.sort((a, b) => spans[a]! - spans[b]!);
-      const heights = couplePortHeights(side.length, side.some(i => edges[i]!.type === "consanguineousEdge"));
+      const heights = couplePortHeights(side.length, side.some(i => edges[i]!.double));
       side.forEach((i, n) => {
         const hopEnds = edges[i]!.data!.hopEnds;
         if (hopEnds) hopEnds[end].port = heights[n]!;
@@ -788,14 +840,14 @@ function buildCoupleEdges(
     };
   }
 
-  function childlessData(a: string, b: string): Pick<CoupleEdgeData, "childless" | "childlessReason"> {
+  function childlessData(a: string, b: string): Pick<CoupleLineData, "childless" | "childlessReason"> {
     const partnership = partnershipOf.get(pairKey(a, b));
     const childless = partnership && activeChildless(partnership, pedigree);
     if (!childless) return {};
     return { childless, childlessReason: partnership!.childlessReason || undefined };
   }
 
-  function labelData(a: string, b: string, left: string, right: string, hop: number): Pick<CoupleEdgeData, "consanguinityLabel" | "consanguinityLabelOffset"> {
+  function labelData(a: string, b: string, left: string, right: string, hop: number): Pick<CoupleLineData, "consanguinityLabel" | "consanguinityLabelOffset"> {
     const partnership = partnershipOf.get(pairKey(a, b));
     const text = partnership && consanguinityLabelText(pedigree, partnership);
     const l = slotPos.get(left), r = slotPos.get(right);
@@ -817,7 +869,7 @@ function buildCoupleEdges(
     return { consanguinityLabel: lines, ...(offset.dx || offset.dy || offset.backed ? { consanguinityLabelOffset: offset } : {}) };
   }
 
-  function endedData(a: string, b: string): Pick<CoupleEdgeData, "ended" | "middleTaken"> {
+  function endedData(a: string, b: string): Pick<CoupleLineData, "ended" | "middleTaken"> {
     const partnership = partnershipOf.get(pairKey(a, b));
     if (!partnership?.ended) return {};
     return { ended: true, middleTaken: middleTaken(partnership, pedigree) };
@@ -839,8 +891,8 @@ function buildSibshipEdges(
   partners: PartnerSet,
   slotPos: Map<string, { x: number; y: number }>,
   rowHeight: number,
-): Edge<SibshipEdgeData>[] {
-  const edges: Edge<SibshipEdgeData>[] = [];
+): SceneLine<SibshipData>[] {
+  const edges: SceneLine<SibshipData>[] = [];
   const maxDrop = rowHeight / 2;
   const apart = donorPairs(pedigree);
   const idAt = (level: number, slot: number) => pedigree.individuals[result.nid[level][slot] - 1]?.id ?? "";
@@ -895,9 +947,6 @@ function buildSibshipEdges(
         id:           `sibship-${level}-${f}`,
         source:       `${level - 1}-${leftParentSlot}`,
         target:       resolvedChildIds[0]!,
-        sourceHandle: "sibship-out",
-        targetHandle: "sibship-in",
-        type:         "sibshipEdge",
         data:         {
           leftParentId:  `${level - 1}-${leftParentSlot}`,
           rightParentId: `${level - 1}-${rightParentSlot}`,

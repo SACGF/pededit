@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EXAMPLES } from "../../data/examples";
-import { layoutToFlow } from "../layoutToFlow";
-import { lintFlow } from "../renderLint";
+import { buildScene } from "../scene";
+import { lintScene } from "../renderLint";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**
@@ -17,7 +17,7 @@ const KNOWN_BROKEN_COMPACT_EXTRA: Record<string, string[]> = {};
 
 // With the example's name as the chart title, as the canvas draws it (#188).
 const codes = (p: Pedigree, compact = false, title?: string) =>
-  [...new Set(lintFlow(p, layoutToFlow(p, { compact }), { title }).map(f => f.code))].sort();
+  [...new Set(lintScene(p, buildScene(p, { compact }), { title }).map(f => f.code))].sort();
 
 describe("render lint over every example", () => {
   for (const ex of EXAMPLES) {
@@ -40,7 +40,7 @@ describe("render lint over every example", () => {
   });
 });
 
-describe("lintFlow", () => {
+describe("lintScene", () => {
   const base: Pedigree = {
     individuals: [
       { id: "f", sex: "male", affected: false, sibOrder: 0 },
@@ -53,31 +53,31 @@ describe("lintFlow", () => {
   } as Pedigree;
 
   it("is clean on a trio", () => {
-    expect(lintFlow(base, layoutToFlow(base))).toEqual([]);
-    expect(lintFlow(base, layoutToFlow(base), { title: "A family" })).toEqual([]);
+    expect(lintScene(base, buildScene(base))).toEqual([]);
+    expect(lintScene(base, buildScene(base), { title: "A family" })).toEqual([]);
   });
 
   it("has nothing to report when the title is raised over a couple line hopping high above the top row", () => {
     // What it reports when the title is not raised is in renderLintTitle.test.ts.
-    const flow = layoutToFlow(base);
-    flow.coupleEdges = flow.coupleEdges.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
-    expect(lintFlow(base, flow, { title: "A family" }).filter(f => f.code === "title-collides")).toEqual([]);
+    const flow = buildScene(base);
+    flow.couples = flow.couples.map(e => ({ ...e, data: { ...e.data!, hopHeight: 50 } }));
+    expect(lintScene(base, flow, { title: "A family" }).filter(f => f.code === "title-collides")).toEqual([]);
   });
 
   it("reports a child whose parent line is gone", () => {
-    const flow = layoutToFlow(base);
-    flow.sibshipEdges = [];
-    expect(lintFlow(base, flow).map(f => f.code)).toEqual(["child-without-parents"]);
+    const flow = buildScene(base);
+    flow.sibships = [];
+    expect(lintScene(base, flow).map(f => f.code)).toEqual(["child-without-parents"]);
   });
 
   it("reports a couple line to a node that is not drawn and the missing person", () => {
-    const flow = layoutToFlow(base);
-    const mother = flow.nodes.find(n => n.data.individual.id === "m")!;
-    flow.nodes = flow.nodes.filter(n => n !== mother);
-    const found = lintFlow(base, flow).map(f => f.code);
+    const flow = buildScene(base);
+    const mother = flow.people.find(n => n.individual.id === "m")!;
+    flow.people = flow.people.filter(n => n !== mother);
+    const found = lintScene(base, flow).map(f => f.code);
     expect(found).toContain("missing-individual");
     expect(found).toContain("missing-node");
-    const msg = lintFlow(base, flow).find(f => f.code === "missing-node")!.message;
+    const msg = lintScene(base, flow).find(f => f.code === "missing-node")!.message;
     expect(msg).toContain(`slot ${mother.id}, m`);
   });
 
@@ -87,28 +87,28 @@ describe("lintFlow", () => {
       individuals: [...base.individuals, { id: "d", sex: "male", affected: false, sibOrder: 1 }],
       parentOf: { p: ["c", "d"] },
     } as Pedigree;
-    const flow = layoutToFlow(sibs);
-    const mother = flow.nodes.find(n => n.data.individual.id === "m")!;
+    const flow = buildScene(sibs);
+    const mother = flow.people.find(n => n.individual.id === "m")!;
     mother.position = { ...mother.position, y: mother.position.y + 30 };
-    const d = flow.nodes.find(n => n.data.individual.id === "d")!;
+    const d = flow.people.find(n => n.individual.id === "d")!;
     d.position = { ...d.position, y: d.position.y + 40 };
-    const found = lintFlow(sibs, flow).map(f => f.code);
+    const found = lintScene(sibs, flow).map(f => f.code);
     expect(found).toContain("couple-line-slanted");
     // Each child has its own drop (sibshipPath.ts), so an off-row child is still reached.
     expect(found).not.toContain("child-off-row");
   });
 
   it("reports overlapping symbols", () => {
-    const flow = layoutToFlow(base);
-    flow.nodes[1]!.position = { ...flow.nodes[0]!.position };
-    expect(lintFlow(base, flow).map(f => f.code)).toContain("symbols-overlap");
+    const flow = buildScene(base);
+    flow.people[1]!.position = { ...flow.people[0]!.position };
+    expect(lintScene(base, flow).map(f => f.code)).toContain("symbols-overlap");
   });
 
   it("reports symbols that touch (#74)", () => {
-    const flow = layoutToFlow(base);
-    const [a, b] = flow.nodes;
+    const flow = buildScene(base);
+    const [a, b] = flow.people;
     b!.position = { x: a!.position.x + 40, y: a!.position.y };
-    const found = lintFlow(base, flow).filter(f => f.code === "symbols-overlap");
+    const found = lintScene(base, flow).filter(f => f.code === "symbols-overlap");
     expect(found.map(f => f.message)).toEqual(["f and m touch"]);
   });
 });

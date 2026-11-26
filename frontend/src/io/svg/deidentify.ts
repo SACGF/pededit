@@ -1,5 +1,5 @@
 import type { Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
-import { pedigreeNumbers } from "../../pedigree/layoutToFlow";
+import { pedigreeNumbers } from "../../pedigree/scene";
 import { DEIDENTIFY_KEEP_DEFAULTS } from "./types";
 import type { DeidentifyKeep, SvgExportOptions } from "./types";
 import { parsePartialDate } from "../../pedigree/labels";

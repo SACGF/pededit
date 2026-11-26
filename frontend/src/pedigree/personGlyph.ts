@@ -1,6 +1,6 @@
 /**
  * Everything drawn at one person, as plain data, decided once for
- * the canvas node, the SVG export and the U-shape export. `layoutToFlow`
+ * the canvas node, the SVG export and the U-shape export. `buildScene`
  * puts the result on every node (`RFNodeData.glyph`), where the canvas node
  * and `exportSvg` read it; the U-shape export, which has its own layout,
  * calls it per person. A renderer draws what the glyph says and asks the
@@ -57,7 +57,7 @@ export interface PersonGlyph {
   detailLines: string[];
   /** The detail lines reach the sibship bar below, so they get a white backing. */
   detailsBacked: boolean;
-  /** A line runs down through the text, so all of it gets a white backing. Set by `layoutToFlow`. */
+  /** A line runs down through the text, so all of it gets a white backing. Set by `buildScene`. */
   labelsBacked?: boolean;
   /** 1, 2, ... beside each copy of someone drawn more than once. */
   copy?: number;

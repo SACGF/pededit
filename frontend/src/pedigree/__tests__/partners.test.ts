@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { linkPartnerProblem } from "../partners";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { lintFlow } from "../renderLint";
-import { layoutToFlow } from "../layoutToFlow";
+import { lintScene } from "../renderLint";
+import { buildScene } from "../scene";
 import { consanguinityTest } from "../consanguinity";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -119,9 +119,9 @@ describe("linkPartner (#84)", () => {
     ["unrelated", "gc1", "stranger"],
   ])("draws cleanly after linking %s, childless and with a child", (_what, a, b) => {
     expect(store().linkPartner(a, b)).toBeNull();
-    expect(lintFlow(ped(), layoutToFlow(ped()))).toEqual([]);
+    expect(lintScene(ped(), buildScene(ped()))).toEqual([]);
     store().addChildren(a, 1, "unknown", ped().partnerships[3]!.id);
-    expect(lintFlow(ped(), layoutToFlow(ped()))).toEqual([]);
+    expect(lintScene(ped(), buildScene(ped()))).toEqual([]);
   });
 });
 
