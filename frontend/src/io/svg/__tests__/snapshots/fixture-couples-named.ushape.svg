@@ -1,90 +1,90 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="971" height="869"
-     viewBox="0 0 971 869">
+<svg xmlns="http://www.w3.org/2000/svg" width="971" height="830"
+     viewBox="0 0 971 830">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="971" height="869" fill="white"/>
+<rect width="971" height="830" fill="white"/>
 <text class="chart-title" x="485.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Couples and lines, relationships named</text>
-<g transform="translate(525 301.4)">
-<path d="M -42.2 120 L 37.8 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-2.2" y1="120" x2="-2.2" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -227 -165.5 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 218.3 53.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-227" y1="-165.5" x2="-239" y2="-165.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-193" y1="101" x2="-202.6" y2="108.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -94.9 163.3 L -111.2 162.1 L -127.6 159.3 L -143.9 154.7 L -159.9 148.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -94.9 163.3 L -79.5 168.9 L -63.4 173 L -50.9 176 L -39.4 179" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 128.5 152.3 L 119.3 162.5 L 108.8 172.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 128.5 152.3 L 142.4 152.1 L 156.5 150.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 218.3 53.3 L 215.2 69.4 L 210.5 85.4 L 204.1 101.1 L 196 116.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 218.3 53.3 L 225.6 38.6 L 231.5 23 L 235.9 6.6 L 239 -7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-127.6" y1="159.3" x2="-63.4" y2="173" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="221" y="58.1" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<path d="M 245.7 71.4 A 199 199 0 0 0 259 0 L 259 -7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="260.8" y1="41.6" x2="250.1" y2="33.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="261.7" y1="36.7" x2="250.9" y2="28.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="256.6" y1="30.6" x2="303.1" y2="37.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 303.1 37.9 A 246 246 0 0 0 306 3.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="306" y1="3.3" x2="318" y2="3.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 257 -7 L 257 -165.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 261 -7 L 261 -165.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="259" y1="-86.1" x2="306" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 306 -54.6 L 306 -86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="306" y1="-54.6" x2="318" y2="-54.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 35 199 L 60 199 A 199 199 0 0 0 114.3 191.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="66.7" y1="198.9" x2="67.3" y2="216.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="60.3" y1="217.1" x2="74.3" y2="216.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="60.2" y1="213.1" x2="74.2" y2="212.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="67.7" y="227.9" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
-<path d="M -171.1 165.1 A 199 199 0 0 0 -97.6 195.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-146.4" y1="186" x2="-136.2" y2="177.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-141.9" y1="188" x2="-131.6" y2="179.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-135.9" y1="184" x2="-142.7" y2="200.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-149.2" y1="197.9" x2="-136.3" y2="203.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -252.9 48.7 A 199 199 0 0 0 -218.5 120.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-239.3" y1="86.3" x2="-281.7" y2="106.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-281.7" y1="106.7" x2="-292.5" y2="111.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -259 -165.5 L -259 -85.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-259" y1="-125.5" x2="-306" y2="-125.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-306" y1="-125.5" x2="-318" y2="-125.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -336 -125.5 L -336 0 A 276 276 0 0 0 -308.7 119.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -340 -125.5 L -340 0 A 280 280 0 0 0 -312.3 121.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-338" y1="-35.8" x2="-385" y2="-35.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -146.7 L -385 -35.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-385" y1="-146.7" x2="-397" y2="-146.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -59.1 L -389 -68.8 L -393 -78.6 L -397 -88.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>
-<path d="M -385 -59.1 L -389 -49.4 L -393 -39.6 L -397 -29.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<text x="-391" y="-55.3" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
-<g data-id="gf" transform="translate(-42.2 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="gm" transform="translate(37.8 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y6a" transform="translate(245.7 71.4) rotate(-69)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t6" transform="translate(259 -7) rotate(-90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
-<g data-id="y6b" transform="translate(259 -165.2) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="h2" transform="translate(338 -54.6) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="h1" transform="translate(338 3.8) rotate(-89.2)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t5" transform="translate(211.2 129.4) rotate(-49.5)"><polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t4" transform="translate(167.3 167.6) rotate(-32.6)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y3" transform="translate(35 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t3" transform="translate(114.3 191.5) rotate(-15.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t2" transform="translate(-39.4 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="t1" transform="translate(-171.1 165.1) rotate(33.9)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="y1" transform="translate(-97.6 195.4) rotate(10.9)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="x2" transform="translate(-252.9 48.7) rotate(75.8)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="s2" transform="translate(-218.5 120.3) rotate(52.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="k2" transform="translate(-310.5 120.5) rotate(64.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="s1" transform="translate(-259 -165.5) rotate(90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="x1" transform="translate(-259 -85.5) rotate(90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="k1" transform="translate(-338 -125.5) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z3" transform="translate(-417 -29.9) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z2" transform="translate(-417 -88.3) rotate(90)"><g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="z1" transform="translate(-417 -146.7) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><g data-adopted="out"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g transform="translate(525 262.1)">
+<path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="0" y1="120" x2="0" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -227 -126.1 L -227 0 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 205.2 82.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-227" y1="-126.1" x2="-239" y2="-126.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-197.8" y1="94.3" x2="-207.7" y2="101.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -113.1 158.3 L -128 155.8 L -143 151.8 L -157.7 146.4 L -172.2 139.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -113.1 158.3 L -99.6 165.3 L -85.2 171.1 L -70.2 175.7 L -56.3 179" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 102.5 161.5 L 91.7 170.1 L 79.8 177.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 102.5 161.5 L 116.2 163.6 L 130.4 164.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 205.2 82.5 L 199.7 96.8 L 192.9 110.8 L 184.6 124.3 L 175 137.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 205.2 82.5 L 214.7 70.5 L 223.2 57.5 L 230.5 43.5 L 236.7 28.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-143" y1="151.8" x2="-85.2" y2="171.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="208" y="88" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
+<path d="M 228.3 106.1 A 199 199 0 0 0 256.4 31.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="248.4" y1="80.9" x2="239.5" y2="70.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="250.3" y1="76.3" x2="241.4" y2="66.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="246.1" y1="70.4" x2="290.1" y2="87" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 290.1 87 A 246 246 0 0 0 301.8 45.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="301.8" y1="45.1" x2="313.6" y2="47.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 254.5 31.5 A 197 197 0 0 0 257 0 L 257 -126.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 258.4 32.1 A 201 201 0 0 0 261 0 L 261 -126.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="259" y1="-53.5" x2="306" y2="-53.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 306 -7.2 L 306 -53.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="306" y1="-7.2" x2="318" y2="-7.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 2.1 199 L 60 199 A 199 199 0 0 0 82 197.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="37.7" y1="199" x2="37.7" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="30.7" y1="217" x2="44.7" y2="217" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="30.7" y1="213" x2="44.7" y2="213" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="37.7" y="228" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">azoospermia</text>
+<path d="M -184.7 155.1 A 199 199 0 0 0 -114.1 191.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-161.9" y1="178" x2="-150.9" y2="170.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-157.5" y1="180.3" x2="-146.5" y2="172.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-151.2" y1="176.9" x2="-159.5" y2="192.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-165.7" y1="189.7" x2="-153.2" y2="196.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -255.1 39.2 A 199 199 0 0 0 -224.2 112.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-243.4" y1="77.4" x2="-286.7" y2="95.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-286.7" y1="95.6" x2="-297.7" y2="100.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -259 -126.1 L -259 -46.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-259" y1="-86.1" x2="-306" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-306" y1="-86.1" x2="-318" y2="-86.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -336 -86.1 L -336 0 A 276 276 0 0 0 -314.3 107.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -340 -86.1 L -340 0 A 280 280 0 0 0 -318 108.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-338" y1="-19.1" x2="-385" y2="-19.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -385 -103.1 L -385 -19.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-385" y1="-103.1" x2="-397" y2="-103.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -385 -20.1 L -389 -28.3 L -393 -36.5 L -397 -44.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>
+<path d="M -385 -20.1 L -389 -11.8 L -393 -3.6 L -396.8 12.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<text x="-391" y="-16.2" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="black">?</text>
+<g data-id="gf" transform="translate(-40 120) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="gm" transform="translate(40 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y6a" transform="translate(228.3 106.1) rotate(-57.8)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t6" transform="translate(256.4 31.8) rotate(-80.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="y6b" transform="translate(259 -126.3) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="h2" transform="translate(338 -7.2) rotate(-90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="h1" transform="translate(333.3 50.9) rotate(-79.4)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t5" transform="translate(187.9 152.5) rotate(-40)"><polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t4" transform="translate(138.3 183) rotate(-23.2)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y3" transform="translate(2.1 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t3" transform="translate(82 197.8) rotate(-6.4)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t2" transform="translate(-56.3 199) rotate(0)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="t1" transform="translate(-184.7 155.1) rotate(38.8)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="y1" transform="translate(-114.1 191.5) rotate(15.8)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="x2" transform="translate(-255.1 39.2) rotate(78.6)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="s2" transform="translate(-224.2 112.4) rotate(55.6)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="k2" transform="translate(-316.1 108.1) rotate(67.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Bryony</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="s1" transform="translate(-259 -126.1) rotate(90)"><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="x1" transform="translate(-259 -46.1) rotate(90)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="k1" transform="translate(-338 -86.1) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Aspen</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z3" transform="translate(-416.7 13.7) rotate(87.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z2" transform="translate(-417 -44.7) rotate(90)"><g data-adopted="in"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/></g>
+<g data-id="z1" transform="translate(-417 -103.1) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F = 1/16</text><g data-adopted="out"><line x1="-24" y1="-22" x2="-24" y2="22" stroke="black" stroke-width="2"/><line x1="-24" y1="-22" x2="-19" y2="-22" stroke="black" stroke-width="2"/><line x1="-24" y1="22" x2="-19" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="24" y2="22" stroke="black" stroke-width="2"/><line x1="24" y1="-22" x2="19" y2="-22" stroke="black" stroke-width="2"/><line x1="24" y1="22" x2="19" y2="22" stroke="black" stroke-width="2"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
 <g class="consanguinity-labels">
-<g transform="translate(259 -86.1) rotate(-90)"><text x="0" y="-6" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant cousins</text></g>
-<g transform="translate(-338 -0.4) rotate(90)"><text x="0" y="-13.8" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins (φ = 1/16)</text></g>
+<g transform="translate(259 -47.2) rotate(-90)"><text x="0" y="-6" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">distant cousins</text></g>
+<g transform="translate(-337.7 12.4) rotate(87.4)"><text x="0" y="-13.8" text-anchor="middle" font-family="sans-serif" font-size="9" fill="black">first cousins (φ = 1/16)</text></g>
 </g>
 </g>
-<g class="pedigree-key" transform="translate(0 589)">
+<g class="pedigree-key" transform="translate(0 550)">
 <circle cx="48" cy="10" r="8" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
 <text x="48" y="33.5" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">F</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Inbreeding coefficient</text>
 <line x1="38.4" y1="42.4" x2="38.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="42.4" x2="43.4" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="38.4" y1="57.6" x2="43.4" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="57.6" y2="57.6" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="42.4" x2="52.6" y2="42.4" stroke="black" stroke-width="1.5"/><line x1="57.6" y1="57.6" x2="52.6" y2="57.6" stroke="black" stroke-width="1.5"/><rect x="42.4" y="44.4" width="11.2" height="11.2" fill="white" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Adopted in (dashed line to adoptive parents)</text>

@@ -1,142 +1,142 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1369" height="917"
-     viewBox="0 0 1369 917">
+<svg xmlns="http://www.w3.org/2000/svg" width="1195" height="878"
+     viewBox="0 0 1195 878">
 <defs>
   <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
     <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
   </marker>
 </defs>
-<rect width="1369" height="917" fill="white"/>
-<text class="chart-title" x="684.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Spanish Habsburgs</text>
-<g transform="translate(705.1 242.8)">
-<path d="M -23.2 120 L 56.8 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="16.8" y1="120" x2="16.8" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -212 69.1 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 194.1 99.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-212" y1="69.1" x2="-222.9" y2="74.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="194.1" y1="99.5" x2="203.7" y2="106.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 160.6 171.7 A 199 199 0 0 0 219.8 118.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="192.9" y1="148.1" x2="224.3" y2="183.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 86.3 244.6 A 246 246 0 0 0 300.3 52.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="86.3" y1="244.6" x2="87.6" y2="256.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="193.7" y1="206.5" x2="200.3" y2="216.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="300.3" y1="52.6" x2="312" y2="55.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 331.6 59.5 A 278 278 0 0 0 338 0 L 338 -20.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="337.9" y1="6.7" x2="384.9" y2="7.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 226 279.4 A 325 325 0 0 0 385 0 L 385 -107" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="226" y1="279.4" x2="232.1" y2="289.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="314.6" y1="202" x2="324" y2="209.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="385" y1="-107" x2="397" y2="-107" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 417 -27 L 417 -107" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="417" y1="-67" x2="464" y2="-67" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="464" y1="-67" x2="476" y2="-67" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 338.1 220.6 A 355 355 0 0 0 380.2 153.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 341.3 223.1 A 359 359 0 0 0 383.8 155" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="362.7" y1="189.2" x2="402.6" y2="214.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 355 276.1 A 404 404 0 0 0 437.4 144.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="355" y1="276.1" x2="363.7" y2="284.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="437.4" y1="144.1" x2="448.6" y2="148.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M 467.3 155.5 A 436 436 0 0 0 488.9 78.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="479.8" y1="117.6" x2="525.1" y2="130.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="525.1" y1="130.2" x2="536.7" y2="133.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -258.9 4.9 A 199 199 0 0 0 -241.2 82.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-254" y1="44.5" x2="-299.8" y2="55.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -306 -58.1 L -306 0 A 246 246 0 0 0 -205.9 198.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-306" y1="-58.1" x2="-318" y2="-58.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-205.9" y1="198.1" x2="-213" y2="207.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -223.7 222.2 A 276 276 0 0 0 -60 276 L 60 276 A 276 276 0 0 0 89.5 274.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -226.1 225.4 A 280 280 0 0 0 -60 280 L 60 280 A 280 280 0 0 0 89.9 278.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-31.7" y1="278" x2="-31.7" y2="325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -178.2 302.7 A 325 325 0 0 0 -60 325 L -31.7 325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-178.2" y1="302.7" x2="-182.6" y2="313.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -355.5 196.8 A 355 355 0 0 0 -189.2 330.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -358.8 199 A 359 359 0 0 0 -190.6 334.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-283.9" y1="278.1" x2="-313.3" y2="314.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -313.3 314.7 A 404 404 0 0 0 -280.3 338.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-280.3" y1="338.6" x2="-286.9" y2="348.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -336 -58.1 L -336 0 A 276 276 0 0 0 -335.1 21.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -340 -58.1 L -340 0 A 280 280 0 0 0 -339.1 22" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-338" y1="-24.3" x2="-385" y2="-24.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -385 -106.8 L -385 0 A 325 325 0 0 0 -330.5 180.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-385" y1="-106.8" x2="-397" y2="-106.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-330.5" y1="180.2" x2="-340.5" y2="186.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -391.8 126.2 A 355 355 0 0 0 -355.5 196.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -395.5 127.7 A 359 359 0 0 0 -358.8 199" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-377.4" y1="163.5" x2="-419.2" y2="185" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-419.2" y1="185" x2="-429.8" y2="190.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -445.8 198.7 A 434 434 0 0 0 -403.1 265.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -449.4 200.5 A 438 438 0 0 0 -406.3 268.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-427.7" y1="234.3" x2="-467.3" y2="259.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -511.4 171.7 A 483 483 0 0 0 -406.3 336.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-511.4" y1="171.7" x2="-522.7" y2="176" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-406.3" y1="336.7" x2="-414.9" y2="345" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -427.9 357.6 A 513 513 0 0 0 -368.1 410.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -430.7 360.4 A 517 517 0 0 0 -370.5 413.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-400.3" y1="386.5" x2="-431.4" y2="421.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-431.4" y1="421.8" x2="-439.3" y2="430.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -539.5 182.4 A 513 513 0 0 0 -505.5 254.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -543.2 183.8 A 517 517 0 0 0 -509 256.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-525.7" y1="219.9" x2="-568.2" y2="239.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-568.2" y1="239.9" x2="-579.1" y2="245.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -415 -106.8 L -415 -26.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<path d="M -419 -106.8 L -419 -26.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-417" y1="-66.8" x2="-464" y2="-66.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="-464" y1="-66.8" x2="-476" y2="-66.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<line x1="382" y1="154.1" x2="496" y2="-67" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-311.2" y1="19.8" x2="-317.2" y2="20.3" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<path d="M -311.2 19.8 A 252 252 0 0 0 -60 252 L 60 252 A 252 252 0 0 0 197 211.5" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="197" y1="211.5" x2="200.3" y2="216.5" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-393.7" y1="126.9" x2="-496" y2="-66.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-384.1" y1="251.1" x2="-388.9" y2="254.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<path d="M -384.1 251.1 A 410 410 0 0 0 -60 410 L 60 410 A 410 410 0 0 0 359.4 280.2" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="359.4" y1="280.2" x2="363.7" y2="284.3" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-353.7" y1="391" x2="-357.3" y2="395.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<path d="M -353.7 391 A 489 489 0 0 0 -60 489 L 60 489 A 489 489 0 0 0 530.9 131.9" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="530.9" y1="131.9" x2="536.7" y2="133.5" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-507.2" y1="255.4" x2="-452.5" y2="445.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="-391" y1="-26.8" x2="-397" y2="-26.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<path d="M -391 -26.8 L -391 0 A 331 331 0 0 0 -60 331 L 60 331 A 331 331 0 0 0 229.1 284.6" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="229.1" y1="284.6" x2="232.1" y2="289.7" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
-<g data-id="Ferdinand_of_Aragon" transform="translate(-23.2 120) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand of Aragon</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Elizabeth_of_Castile" transform="translate(56.8 120) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elizabeth of Castile</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Philip_I" transform="translate(160.6 171.7) rotate(-30.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip I</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Joanna_I" transform="translate(219.8 118.6) rotate(-53.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Joanna I</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Ferdinand_I" transform="translate(331.6 59.5) rotate(-77.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand I</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Anna_of_Hungary" transform="translate(338 -20.1) rotate(-90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Hungary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Albert_V_of_Bavaria" transform="translate(417 -27) rotate(-90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Albert V of Bavaria</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Anna" transform="translate(417 -107) rotate(-90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Mary" transform="translate(496 -67) rotate(-90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Charles_II_of_Austria" transform="translate(339.7 221.9) rotate(-51.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Archduke Charles II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Mary" transform="translate(382 154.1) rotate(-64.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Ferdinand_II" transform="translate(467.3 155.5) rotate(-69.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Maria_Anna_of_Bavaria" transform="translate(488.9 78.6) rotate(-79.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria Anna of Bavaria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Ferdinand_III" transform="translate(555.9 138.9) rotate(-74.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Margaret_of_Austria" transform="translate(378.3 297.9) rotate(-46.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Margaret of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Maximilian_II" transform="translate(242.3 306.9) rotate(-30.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maximilian II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Charles_I" transform="translate(211.1 233.3) rotate(-32.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles I (Charles V)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Catherine" transform="translate(89.7 276.4) rotate(-6.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Catherine</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Manuel_I" transform="translate(-258.9 4.9) rotate(88.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Manuel I of Portugal</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Mary_of_Aragon" transform="translate(-241.2 82.4) rotate(65.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary of Aragon</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="John_III" transform="translate(-224.9 223.8) rotate(36.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">John III of Portugal</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Mary_of_Portugal" transform="translate(-189.9 332.5) rotate(21.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary of Portugal</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Don_Carlos" transform="translate(-297.8 365.4) rotate(33.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles (Don Carlos)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Isabella_of_Portugal" transform="translate(-338 -58.1) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Isabella of Portugal</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Charles_I" transform="translate(-337.1 21.9) rotate(85.5)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles I (Charles V)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Anna_of_Austria" transform="translate(-393.7 126.9) rotate(69.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Philip_II" transform="translate(-357.1 197.9) rotate(56.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Philip_III" transform="translate(-447.6 199.6) rotate(62.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Margaret_of_Austria" transform="translate(-404.7 267) rotate(52.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Margaret of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Maria_Anna_of_Austria" transform="translate(-429.3 359) rotate(45.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Ferdinand_III" transform="translate(-369.3 411.8) rotate(36.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Mariana_of_Austria" transform="translate(-452.5 445.8) rotate(41.4)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mariana of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Philip_IV" transform="translate(-541.4 183.1) rotate(69.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip IV</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Mariana_of_Austria" transform="translate(-507.2 255.4) rotate(60.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mariana of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Charles_II" transform="translate(-597.1 253.6) rotate(64.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white" transform="rotate(-64.73 -42 42)"/><text class="proband-letter" x="-42" y="47" transform="rotate(-64.73 -42 42)" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
-<g data-id="Maria" transform="translate(-417 -106.8) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-dup-of="Maximilian_II" transform="translate(-417 -26.8) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maximilian II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
-<g data-id="Anna_of_Austria" transform="translate(-496 -66.8) rotate(90)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<rect width="1195" height="878" fill="white"/>
+<text class="chart-title" x="597.5" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Spanish Habsburgs</text>
+<g transform="translate(599.7 104.1)">
+<path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="0" y1="120" x2="0" y2="167" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -149.8 140.8 A 167 167 0 0 0 -60 167 L 60 167 A 167 167 0 0 0 108.6 159.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-149.8" y1="140.8" x2="-156.2" y2="150.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="108.6" y1="159.8" x2="112" y2="171.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 38.7 199 L 60 199 A 199 199 0 0 0 117.9 190.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="71.7" y1="198.7" x2="74.4" y2="245.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -2.6 246 L 60 246 A 246 246 0 0 0 220.3 186.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-2.6" y1="246" x2="-2.6" y2="258" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="119" y1="238.8" x2="121.9" y2="250.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="220.3" y1="186.6" x2="228.2" y2="195.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 241.2 210.8 A 278 278 0 0 0 293.6 150.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="269.6" y1="182.7" x2="305" y2="213.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 132.8 316.7 A 325 325 0 0 0 383.7 28.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="132.8" y1="316.7" x2="135.5" y2="328.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="240.9" y1="270" x2="247.5" y2="280" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="383.7" y1="28.9" x2="395.7" y2="30" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 399.6 110 A 357 357 0 0 0 415.6 31.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="409.8" y1="71.3" x2="455.9" y2="80.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="455.9" y1="80.7" x2="467.6" y2="83.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 257.5 295 A 355 355 0 0 0 318.2 243.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 259.8 298.3 A 359 359 0 0 0 321.1 246.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="290.6" y1="272.5" x2="320.9" y2="308.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 272.2 343.8 A 404 404 0 0 0 363.9 266.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="272.2" y1="343.8" x2="278.5" y2="354" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="363.9" y1="266.3" x2="372.9" y2="274.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M 387.9 287.3 A 436 436 0 0 0 434.8 222.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="412.9" y1="256.1" x2="450.9" y2="283.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="450.9" y1="283.7" x2="460.6" y2="290.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -224.1 112.6 A 199 199 0 0 0 -167 167.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-198.3" y1="143.1" x2="-231" y2="176.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -290.9 84.9 A 246 246 0 0 0 -137.1 233.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-290.9" y1="84.9" x2="-302.1" y2="89.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-137.1" y1="233.6" x2="-140.9" y2="245" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -146.5 262.1 A 276 276 0 0 0 -60 276 L -2.6 276" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -147.8 265.9 A 280 280 0 0 0 -60 280 L -2.6 280" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-50.4" y1="278" x2="-50.4" y2="325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -78.3 324.5 A 325 325 0 0 0 -60 325 L -50.4 325" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-78.3" y1="324.5" x2="-78.9" y2="336.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -279.6 278.9 A 355 355 0 0 0 -80 354.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -282.1 282.1 A 359 359 0 0 0 -80.2 358.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-186.3" y1="333.9" x2="-202.9" y2="377.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -202.9 377.9 A 404 404 0 0 0 -164.1 390.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-164.1" y1="390.3" x2="-167.2" y2="401.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -319 95.3 A 276 276 0 0 0 -281.3 164.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -322.8 96.7 A 280 280 0 0 0 -284.5 167.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-304.4" y1="132.4" x2="-345.8" y2="154.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -383.7 28.9 A 325 325 0 0 0 -261.1 255.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-383.7" y1="28.9" x2="-395.7" y2="30" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-261.1" y1="255.3" x2="-268.5" y2="264.8" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -336.1 223.1 A 355 355 0 0 0 -279.6 278.9" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -339.2 225.6 A 359 359 0 0 0 -282.1 282.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-310.8" y1="254" x2="-343.9" y2="287.5" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-343.9" y1="287.5" x2="-352.3" y2="296" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -364.9 308.8 A 434 434 0 0 0 -303.5 359.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -367.8 311.7 A 438 438 0 0 0 -305.7 362.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-336.6" y1="337" x2="-366.5" y2="373.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -435.7 303.5 A 483 483 0 0 0 -284.5 427.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-435.7" y1="303.5" x2="-445" y2="311.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-284.5" y1="427.6" x2="-290.1" y2="438.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -298.5 454.2 A 513 513 0 0 0 -225.3 485.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -300.3 457.7 A 517 517 0 0 0 -226.6 489.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-263.3" y1="473.2" x2="-281.8" y2="516.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-281.8" y1="516.4" x2="-286.6" y2="527.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -459 322.4 A 513 513 0 0 0 -404.3 380.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -462.1 324.9 A 517 517 0 0 0 -407 383.2" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-434.3" y1="353.8" x2="-468.4" y2="386" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-468.4" y1="386" x2="-477.1" y2="394.3" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -413.6 31.6 A 355 355 0 0 0 -397.7 109.4" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M -417.6 32 A 359 359 0 0 0 -401.5 110.6" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-409.8" y1="71.3" x2="-455.9" y2="80.7" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="-455.9" y1="80.7" x2="-467.6" y2="83.1" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<line x1="319.6" y1="245.1" x2="487.2" y2="87.1" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-262.1" y1="150.6" x2="-266.9" y2="154.1" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M -262.1 150.6 A 252 252 0 0 0 -60 252 L 60 252 A 252 252 0 0 0 120.5 244.6" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="120.5" y1="244.6" x2="121.9" y2="250.5" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-337.7" y1="224.4" x2="-487.2" y2="87.1" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-290" y1="339.4" x2="-293.4" y2="344.4" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M -290 339.4 A 410 410 0 0 0 -60 410 L 60 410 A 410 410 0 0 0 275.4 348.9" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="275.4" y1="348.9" x2="278.5" y2="354" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-217.6" y1="462.9" x2="-219.5" y2="468.6" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M -217.6 462.9 A 489 489 0 0 0 -60 489 L 60 489 A 489 489 0 0 0 455.8 287.2" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="455.8" y1="287.2" x2="460.6" y2="290.7" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-405.7" y1="381.7" x2="-294.5" y2="545.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="-374.9" y1="102" x2="-380.6" y2="103.8" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<path d="M -374.9 102 A 331 331 0 0 0 -60 331 L 60 331 A 331 331 0 0 0 134.2 322.6" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="134.2" y1="322.6" x2="135.5" y2="328.4" fill="none" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>
+<g data-id="Ferdinand_of_Aragon" transform="translate(-40 120) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand of Aragon</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Elizabeth_of_Castile" transform="translate(40 120) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Elizabeth of Castile</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Philip_I" transform="translate(38.7 199) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip I</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Joanna_I" transform="translate(117.9 190.4) rotate(-16.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Joanna I</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Ferdinand_I" transform="translate(241.2 210.8) rotate(-40.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand I</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Anna_of_Hungary" transform="translate(293.6 150.7) rotate(-57.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Hungary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Albert_V_of_Bavaria" transform="translate(399.6 110) rotate(-72.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Albert V of Bavaria</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Anna" transform="translate(415.6 31.8) rotate(-84.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Mary" transform="translate(487.2 87.1) rotate(-78.5)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Charles_II_of_Austria" transform="translate(258.7 296.6) rotate(-33.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Archduke Charles II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Mary" transform="translate(319.6 245.1) rotate(-46.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Ferdinand_II" transform="translate(387.9 287.3) rotate(-48.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Maria_Anna_of_Bavaria" transform="translate(434.8 222.7) rotate(-59.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria Anna of Bavaria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Ferdinand_III" transform="translate(476.8 302.5) rotate(-54)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Margaret_of_Austria" transform="translate(289 371) rotate(-31.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Margaret of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Maximilian_II" transform="translate(140 347.9) rotate(-12.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maximilian II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Charles_I" transform="translate(126.7 269.9) rotate(-13.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles I (Charles V)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Catherine" transform="translate(-2.6 278) rotate(0)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Catherine</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Manuel_I" transform="translate(-224.1 112.6) rotate(55.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Manuel I of Portugal</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Mary_of_Aragon" transform="translate(-167 167.8) rotate(32.5)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary of Aragon</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="John_III" transform="translate(-147.1 264) rotate(18.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">John III of Portugal</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Mary_of_Portugal" transform="translate(-80.1 356.4) rotate(3.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mary of Portugal</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Don_Carlos" transform="translate(-172.4 421.3) rotate(14.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles (Don Carlos)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Isabella_of_Portugal" transform="translate(-320.9 96) rotate(69.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Isabella of Portugal</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Charles_I" transform="translate(-282.9 166.1) rotate(53.3)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles I (Charles V)</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Anna_of_Austria" transform="translate(-337.7 224.4) rotate(51.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Philip_II" transform="translate(-280.9 280.5) rotate(38.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Philip_III" transform="translate(-366.3 310.2) rotate(44.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Margaret_of_Austria" transform="translate(-304.6 360.9) rotate(34.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Margaret of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Maria_Anna_of_Austria" transform="translate(-299.4 456) rotate(27.7)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Ferdinand_III" transform="translate(-226 487.5) rotate(18.8)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Ferdinand III</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Mariana_of_Austria" transform="translate(-294.5 545.8) rotate(23.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mariana of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Philip_IV" transform="translate(-460.6 323.7) rotate(51.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Philip IV</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Mariana_of_Austria" transform="translate(-405.7 381.7) rotate(42.2)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Mariana of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Charles_II" transform="translate(-491.7 408) rotate(46.6)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Charles II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="black"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white" transform="rotate(-46.61 -42 42)"/><text class="proband-letter" x="-42" y="47" transform="rotate(-46.61 -42 42)" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
+<g data-id="Maria" transform="translate(-415.6 31.8) rotate(84.9)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-dup-of="Maximilian_II" transform="translate(-399.6 110) rotate(72.1)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maximilian II</text><rect x="-20" y="-20" width="40" height="40" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
+<g data-id="Anna_of_Austria" transform="translate(-487.2 87.1) rotate(78.5)"><text x="0" y="33" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Anna of Austria</text><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/></g>
 <g class="consanguinity-labels">
 </g>
 </g>
-<g class="pedigree-key" transform="translate(0 777)">
+<g class="pedigree-key" transform="translate(0 738)">
 <rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
 <rect x="40" y="22" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="19" x2="59" y2="41" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
 <line x1="47.2" y1="50.8" x2="52.46" y2="45.54" stroke="black" stroke-width="1.5"/><polygon points="56,42 54.23,47.3 50.7,43.77" fill="black"/><text x="46.7" y="58" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>

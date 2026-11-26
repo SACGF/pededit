@@ -149,7 +149,7 @@ describe("U-shape layout", () => {
   it("centres each couple over its children", () => {
     const l = layoutUShape(wide())!;
     for (const { parent, uP, kids } of sibships(l)) {
-      if (parent.parent === null) continue; // the founders slide to level the arms
+      if (parent.parent === null) continue; // the founders' children slide under them to level the arms
       const us = kids.map(k => k.u);
       expect(uP).toBeGreaterThanOrEqual(Math.min(...us) - 1e-6);
       expect(uP).toBeLessThanOrEqual(Math.max(...us) + 1e-6);
@@ -185,6 +185,20 @@ describe("U-shape layout", () => {
       expect(left).toBeGreaterThan(l.flat + (Math.PI * l.r0) / 2); // it really has arms
       expect(Math.abs(left - right)).toBeLessThan(l.slot);
     }
+  });
+
+  it("keeps the founders at the bottom centre when one child's branch is most of the family", () => {
+    // Tytos's branch is most of the family and his brother Jason's is small:
+    // the sibship bar runs round the bottom under the founders, who stay there.
+    for (const label of ["House Lannister (TV show)", "Multi-branch family"]) {
+      const l = layoutUShape(EXAMPLES.find(e => e.label === label)!.data)!;
+      const [a, b] = l.founders.map(id => l.nodes.get(id)!);
+      expect(Math.abs(a.u + b.u) / 2, label).toBeLessThan(2);
+      const us = [...l.nodes.values()].map(n => n.u);
+      expect(Math.abs(Math.min(...us) + Math.max(...us)), label).toBeLessThan(l.slot);
+    }
+    const l = layoutUShape(EXAMPLES.find(e => e.label === "House Lannister (TV show)")!.data)!;
+    expect(-Math.min(...[...l.nodes.values()].map(n => n.u))).toBeGreaterThan(l.flat + (Math.PI * l.r0) / 2); // it really has arms
   });
 
   it("keeps the founders at the bottom centre when the family fits on the curve", () => {

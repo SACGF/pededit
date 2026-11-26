@@ -98,13 +98,22 @@ What shape the figure takes (`build()`):
   with no arms, it is drawn that way with the founders at the bottom centre,
   however lopsided it is. `r0` grows until it fits. Sliding the founders to
   balance a small family only skews it.
-- U. Otherwise it needs the arms. The founders' children are split between the
-  two sides and the founders slide along the U (`u0`, found by bisection) until
-  both arms end at the same height. The split and the slide are chosen
-  together. A very lopsided family can push its founders part way up one arm.
-  That is deliberate: level arms keep the figure compact, which is the point
-  of the option. `r0` grows until height / width is at most `TARGET_ASPECT`
-  (1.35, a portrait page).
+- U. Otherwise it needs the arms. The founders stay at the bottom centre and
+  their children are packed as one row, left to right, that slides along the
+  U under them until both arms end at the same height. The founders' line of
+  descent may land anywhere on the sibship bar, so a family whose one big
+  branch hangs from one child wraps that branch round the bottom instead of
+  pushing the founders up an arm (House Lannister). Only when the bar is too
+  short to level the arms do the founders slide too, by what is still
+  missing (House Targaryen, whose three children span 150px). Packing is not
+  continuous in where the row starts (outer tracks change spacing on the
+  curve, joins re-pack), so the slide takes a few steps of half the
+  imbalance and keeps the most level; the arms can stay a little uneven.
+  Level arms keep the figure compact, which is the point of the option.
+  A founder with two sibships keeps the older way: the sibships are split
+  either side of the founder and the founder slides along the U (`u0`,
+  found by bisection), the split and the slide chosen together. `r0` grows
+  until height / width is at most `TARGET_ASPECT` (1.35, a portrait page).
 
 Label size drives spacing: more label lines widen `ringGap`, longer names widen
 the slot along the track (capped at `MAX_SLOT`).

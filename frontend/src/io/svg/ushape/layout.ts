@@ -221,15 +221,86 @@ export function packTree(root: TNode, g: Geom, slide: boolean): number {
   }
   if (splits.length === 0 && groups.length === 1) splits.push(kids.length);
   const firstMin = groups.length > 1 ? Math.max(...groups.map(coupleGap)) / 2 : -Infinity;
+  const armStart = g.flat + g.vb;
 
-  // Two ways to even out the arms: choose where the sibship is split between
+  // One sibship and arms to level: the founders stay at the bottom centre and
+  // their children are laid out as one row that slides along the U under them
+  // until the arms are level, as far as the line of descent still lands on the
+  // sibship bar. One big branch then wraps round the bottom of the U rather
+  // than pushing the founders up an arm. Only when the bar is too short for
+  // that do the founders slide as well, by what is still missing.
+  if (slide && groups.length === 1) {
+    const first = kids[0], lastKid = kids[kids.length - 1];
+    const span = packSide(kids, 1, g, centre(0)) + 2 * g.slot;
+    const layRow = (start: number) => packSide(kids, 1, g, start);
+    // [arms, sym] for the row as laid: arms is positive when the left arm ends
+    // higher than the right one. Within the curve both arms count as level,
+    // and sym, positive when the family reaches further left, centres it.
+    const balance = (): [number, number] => {
+      let uMin = Infinity, uMax = -Infinity;
+      walk(root, n => n.members.forEach((_, i) => {
+        const u = memberU(n, i, g);
+        uMin = Math.min(uMin, u); uMax = Math.max(uMax, u);
+      }));
+      return [-Math.min(uMin, -armStart) - Math.max(uMax, armStart), -(uMin + uMax)];
+    };
+    const tilt = ([arms, sym]: [number, number]) => (arms !== 0 ? arms : sym);
+    // Moving the row, or the founders with it, by x moves both arm ends by x,
+    // so it changes the imbalance by 2x. Packing is not quite continuous in
+    // where it starts (outer tracks change spacing on the curve, joins
+    // re-pack), so a few steps are taken and the most level kept.
+    const STEPS = 4;
+    // The row start that puts child c's symbol at u.
+    const startWith = (c: TNode, u: number): number => {
+      let s = u - span / 2;
+      for (let i = 0; i < 3; i++) { layRow(s); s += u - c.u; }
+      return s;
+    };
+    // With the founders at u0: the row start that levels the arms best while
+    // the line of descent lands on the sibship bar, and how uneven they are left.
+    const levelRow = (u0: number): { start: number; rest: [number, number] } => {
+      const d = centre(u0);
+      const lo = startWith(lastKid, d), hi = startWith(first, d);
+      let best: { start: number; rest: [number, number] } | null = null;
+      let s = (lo + hi) / 2;
+      for (let i = 0; i < STEPS; i++) {
+        layRow(s);
+        const rest = balance();
+        if (!best || Math.abs(tilt(rest)) < Math.abs(tilt(best.rest))) best = { start: s, rest };
+        const next = Math.min(hi, Math.max(lo, s + tilt(rest) / 2));
+        if (Math.abs(next - s) < 0.5) break;
+        s = next;
+      }
+      return best!;
+    };
+    // If the bar is too short to level the arms, the founders slide too, by
+    // the steps above while they close in on the level point and by halving
+    // the interval known to hold it when a step would leave it.
+    let u0 = 0;
+    let { start, rest: [arms] } = levelRow(0);
+    let lo = arms > 0 ? 0 : -Infinity, hi = arms > 0 ? Infinity : 0;
+    for (let i = 0, u = 0, a = arms; i < 2 * STEPS && Math.abs(arms) > 1 && hi - lo > 1; i++) {
+      u += a / 2;
+      if (u <= lo || u >= hi) u = (lo + hi) / 2;
+      const r = levelRow(u);
+      a = r.rest[0];
+      if (a > 0) lo = u; else hi = u;
+      if (Math.abs(a) < Math.abs(arms)) { u0 = u; start = r.start; arms = a; }
+    }
+    centre(u0);
+    layRow(start);
+    return u0;
+  }
+
+  // Otherwise the children are split between the two sides of the founders'
+  // line of descent: a fan, or a founder with two sibships, one each side. Two
+  // ways to even out the arms: choose where the sibship is split between
   // them, and slide the founders along the U. A family that fits on the curve
   // has no arms to level, so its founders stay at the bottom centre.
   //
   // imbalance() is positive when the left arm ends higher than the right one.
   // It falls steadily as the founders move right, so bisection finds the level
   // point.
-  const armStart = g.flat + g.vb;
   const limit = packSide(kids, 1, g, centre(0));
   const level = (k: number): { u0: number; cost: number } => {
     const reaches = (u0: number): [number, number] => {
@@ -448,10 +519,9 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
     if (w > FAN_MAX_WIDTH || h / w < MIN_ASPECT) break;
     if (reach <= trial.flat + trial.vb + HALF && h / w <= TARGET_ASPECT) { geom = trial; break; }
   }
-  const slide = geom === null;
 
-  // Otherwise it needs the arms, and they are levelled by sliding the
-  // founders along the U. A bigger founder radius makes a wider, shorter
+  // Otherwise it needs the arms, and they are levelled by sliding the family
+  // along the U (packTree). A bigger founder radius makes a wider, shorter
   // figure, because more of the family fits around the curve. Grow it until
   // the figure is no taller than the target aspect ratio.
   if (!geom) {
@@ -462,7 +532,6 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
       if (h / w <= TARGET_ASPECT) break;
     }
   }
-  geom!.u0 = packTree(root, geom!, slide);
 
   return { root, geom: geom!, maxDepth, labelLines };
 }
