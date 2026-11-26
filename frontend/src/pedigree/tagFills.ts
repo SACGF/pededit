@@ -179,7 +179,7 @@ function n(v: number): string {
  * Path data for a line pattern covering the box (extending past it, so the
  * clip shapes it). "diagonal" runs "/", lower left to upper right.
  */
-export function patternLinesD(fill: TagFill, box: FillBox): string {
+function patternLinesD(fill: TagFill, box: FillBox): string {
   const { x, y, size } = box;
   const s = patternSpacing(size);
   const segs: string[] = [];
@@ -205,7 +205,7 @@ export function patternLinesD(fill: TagFill, box: FillBox): string {
 }
 
 /** Path data for the dot pattern: a staggered grid of small filled circles. */
-export function patternDotsD(box: FillBox): string {
+function patternDotsD(box: FillBox): string {
   const { x, y, size } = box;
   const s = patternSpacing(size);
   const r = s / 4;

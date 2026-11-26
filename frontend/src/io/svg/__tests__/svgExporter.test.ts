@@ -5,18 +5,12 @@ import { lintExport, parseExportSvg } from "../exportLint";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { family } from "../../../data/pedigreeBuilder";
 import { NODE_SIZE, ROW_HEIGHT, SLOT_WIDTH } from "../../../pedigree/constants";
-import { lossTrianglePoints } from "../../../pedigree/lifeStatus";
+import { lifeStatusCaption, lossTrianglePoints } from "../../../pedigree/lifeStatus";
 
-function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
-  return {
-    individuals: [],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    ...overrides,
-  };
-}
+/** NSGC 2008 (no notation saved), as these tests were written for. */
+const makePedigree = (overrides: Partial<Pedigree> = {}): Pedigree => family([], [], {}, overrides);
 
 /**
  * The markup of the people alone: the page background is a <rect>, and the
@@ -152,38 +146,15 @@ describe("exportSvg, pregnancy and pregnancy loss", () => {
     individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, ...ind }],
   })).replace(/<g class="pedigree-key"[^]*$/, "");
 
-  it("pregnancy → sex symbol with a P inside", () => {
-    const svg = one({ sex: "male", lifeStatus: "pregnancy" });
-    expect(svg).toContain("<rect");
-    expect(svg).toMatch(/<text[^>]*>P<\/text>/);
-    expect(svg).not.toContain(TRIANGLE);
-  });
-
-  it("miscarriage → small triangle instead of the sex symbol", () => {
-    const svg = one({ sex: "female", lifeStatus: "miscarriage" });
-    expect(svg).toContain(TRIANGLE);
-    expect(svg).not.toContain("<circle cx=\"20\" cy=\"20\" r=\"19\"");
-    expect(svg).not.toContain("<text");
-  });
-
-  it("termination → triangle plus a slash line through it", () => {
-    const svg = one({ lifeStatus: "termination" });
-    expect(svg).toContain(TRIANGLE);
-    expect(svg).toMatch(new RegExp(`${TRIANGLE.replace(/[.*+?^$()|[\]\\]/g, "\\$&")}[^]*?<line`));
-  });
-
-  it("stillbirth → sex symbol, slash and an SB caption above the name", () => {
-    const svg = one({ sex: "male", lifeStatus: "stillbirth", name: "Baby" });
-    expect(svg).toContain("<rect");
-    expect(svg).toMatch(/<line[^>]*x1="-\d/);           // deceased-style slash
-    expect(svg).toMatch(/<text[^>]*>SB<\/text>/);
-    expect(svg.indexOf(">SB<")).toBeLessThan(svg.indexOf("Baby"));
-  });
-
-  it("ectopic → triangle with an ECT caption", () => {
-    const svg = one({ lifeStatus: "ectopic" });
-    expect(svg).toContain(TRIANGLE);
-    expect(svg).toMatch(/<text[^>]*>ECT<\/text>/);
+  // What each status draws is symbols.test.tsx: the export draws with the
+  // same SymbolShape, so this only checks that the file contains it.
+  it("the export contains each pregnancy and loss symbol, with its caption", () => {
+    for (const lifeStatus of ["pregnancy", "miscarriage", "termination", "stillbirth", "ectopic"] as const) {
+      const svg = one({ sex: "male", lifeStatus });
+      expect(svg.includes(TRIANGLE), lifeStatus).toBe(["miscarriage", "termination", "ectopic"].includes(lifeStatus));
+      const caption = lifeStatusCaption(lifeStatus) ?? (lifeStatus === "pregnancy" ? "P" : undefined);
+      if (caption) expect(svg, lifeStatus).toContain(`>${caption}</text>`);
+    }
   });
 
   it("a caption adds a label line to the canvas height", () => {
@@ -191,16 +162,6 @@ describe("exportSvg, pregnancy and pregnancy loss", () => {
     const sb    = one({ sex: "male", lifeStatus: "stillbirth" });
     const h = (s: string) => parseInt(s.match(/height="(\d+)"/)![1]);
     expect(h(sb)).toBeGreaterThan(h(plain));
-  });
-
-  it("quadrant tags on a loss triangle are clipped to the triangle", () => {
-    const svg = exportSvg(makePedigree({
-      individuals: [{ id: "i1", sex: "female", affected: false, sibOrder: 0, lifeStatus: "miscarriage", tags: ["q"] }],
-      tags: [{ id: "q", label: "Anomaly", color: "#d62728", style: "quadrant" }],
-    }));
-    const clip = svg.match(/<clipPath id="[^"]+">(.*?)<\/clipPath>/)!;
-    expect(clip[1]).toContain(TRIANGLE);
-    expect(svg).toContain('fill="#d62728"');
   });
 
   it("stacks the caption, then the tag row, then the name below the symbol", () => {

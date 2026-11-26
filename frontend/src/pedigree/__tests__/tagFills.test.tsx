@@ -1,37 +1,39 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree, Tag, TagFill } from "@pedigree-editor/layout-engine";
-import {
-  tagPaint, tagFillMode, fillLayers, patternLinesD, patternDotsD, tint,
-  MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR,
-} from "../tagFills";
-import { symbolPaint, annotationRow, sectorPath } from "../tags";
-import { exportKeyMarkup } from "../exportKey";
+import { tagPaint, tagFillMode, fillLayers, MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR } from "../tagFills";
+import { symbolPaint, annotationRow } from "../tags";
 import { SymbolShape, standaloneGlyph, AnnotationRow } from "../chart/symbols";
 import { TagSwatchSvg } from "../chart/keySwatches";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { importJson, exportJson } from "../../io/json";
 import { EXAMPLES } from "../../data/examples";
+import { F, M, U, couple, build } from "../../fixtures/features";
 
 const q = (id: string, color: string, fill?: TagFill): Tag => ({ id, label: id.toUpperCase(), color, style: "quadrant", ...(fill ? { fill } : {}) });
 
+/** NSGC 2008 (no notation saved), so one condition in black and white keeps its pattern. */
 function ped(tags: Tag[], mono = false, indTags: string[] = tags.map(t => t.id), affected = false): Pedigree {
-  return {
-    individuals: [
-      { id: "f", sex: "male", affected, sibOrder: 0, tags: indTags },
-      { id: "m", sex: "female", affected: false, sibOrder: 1, tags: indTags },
-      { id: "c", sex: "unknown", affected: false, sibOrder: 0 },
-    ],
-    partnerships: [{ id: "p", individual1: "f", individual2: "m" }],
-    parentOf: { p: ["c"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    tags,
-    ...(mono ? { canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, tagFills: "monochrome" as const } } : {}),
-  };
+  const p = build(
+    [M("f", { affected, tags: indTags }), F("m", { tags: indTags }), U("c")],
+    [couple("p", "f", "m")],
+    { p: ["c"] },
+    { tags, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, tagFills: "monochrome" } },
+  );
+  if (!mono) delete p.canvasSettings;
+  return p;
 }
 
 const BOX = { x: 0, y: 0, size: 40 };
+/** The marks a pattern draws over its white base, as path data. */
+const marks = (fill: TagFill, box = BOX) => fillLayers(fill, "#000000", "M0 0Z", box)[1]!.d;
+/** The `data-tag-fill` of each region a rendering fills, in order. */
+const fillsDrawn = (html: string) => [...html.matchAll(/data-tag-fill="([^"]+)"/g)].map(m => m[1]);
+const symbolHtml = (p: Pedigree, clipId = "k") => {
+  const ind = p.individuals[0]!;
+  return renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId={clipId} /></svg>);
+};
 
 describe("tagPaint (#67)", () => {
   it("colour mode draws each tag as set; dot and text tags never take a fill", () => {
@@ -62,36 +64,35 @@ describe("tagPaint (#67)", () => {
 
 describe("pattern geometry", () => {
   it("line patterns are fine textures, about 4px apart on a 40px symbol", () => {
-    const count = (f: TagFill) => (patternLinesD(f, BOX).match(/M/g) ?? []).length;
+    const count = (f: TagFill) => (marks(f).match(/M/g) ?? []).length;
     expect(count("horizontal")).toBe(10);
     expect(count("vertical")).toBe(10);
     expect(count("diagonal")).toBeGreaterThanOrEqual(12);
     expect(count("crosshatch")).toBeGreaterThan(count("diagonal"));
-    expect(patternLinesD("horizontal", BOX)).toMatch(/^M0 2H40/);
-    expect(patternLinesD("vertical", BOX)).toMatch(/^M2 0V40/);
   });
 
   it("the diagonal hatch runs / (up to the right), not the \\ of the deceased slash", () => {
-    const [, x1, y1, x2, y2] = /M(-?[\d.]+) (-?[\d.]+)L(-?[\d.]+) (-?[\d.]+)/.exec(patternLinesD("diagonal", BOX))!.map(Number);
+    const [, x1, y1, x2, y2] = /M(-?[\d.]+) (-?[\d.]+)L(-?[\d.]+) (-?[\d.]+)/.exec(marks("diagonal"))!.map(Number);
     expect(x2! > x1!).toBe(true);
     expect(y2! < y1!).toBe(true);
   });
 
-  it("dots are a staggered grid of small circles, much smaller than the carrier dot", () => {
-    const d = patternDotsD(BOX);
-    const dots = (d.match(/M/g) ?? []).length;
-    expect(dots).toBeGreaterThan(80);
-    expect(d).toContain("a1 1 0 1 0 2 0");
+  it("dots are a grid of many small marks", () => {
+    expect((marks("dots").match(/M/g) ?? []).length).toBeGreaterThan(80);
   });
 
   it("patterns follow the box, so the legend swatch and the symbol share the code", () => {
-    expect(patternLinesD("horizontal", { x: 6, y: 6, size: 16 })).toMatch(/^M6 7.25H22/);
+    // Every point of the marks lies within the box they are drawn for.
+    const box = { x: 6, y: 6, size: 16 };
+    const xs = [...marks("horizontal", box).matchAll(/[MH](-?[\d.]+)/g)].map(m => Number(m[1]));
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(6);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(22);
+    expect((marks("horizontal", box).match(/M/g) ?? []).length).toBeLessThan((marks("horizontal").match(/M/g) ?? []).length);
   });
 
   it("shade is a light tint: black becomes light grey", () => {
-    expect(tint("#000000")).toBe("#bfbfbf");
-    expect(tint("#fff")).toBe("#ffffff");
     expect(fillLayers("shade", "#000000", "M0 0Z", BOX)).toEqual([{ d: "M0 0Z", fill: "#bfbfbf", clip: false }]);
+    expect(fillLayers("shade", "#fff", "M0 0Z", BOX)[0]!.fill).toBe("#ffffff");
   });
 
   it("solid is one region path; a pattern is a white base then the marks, clipped", () => {
@@ -116,26 +117,11 @@ describe("renderers draw the pattern (#67)", () => {
     ]);
   });
 
-  it("export sectors: patterns in the tag colour, solid as before", () => {
-    const p = ped(tags);
-    const ind = p.individuals[0]!;
-    const svg = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="clip" /></svg>);
-    expect(svg).toContain(`stroke="#d62728"`);
-    expect(svg).toContain(`<clipPath id="clip-s0">`);
-    expect(svg).toContain(`clip-path="url(#clip-s1)"`);
-    expect(svg).toContain(`fill="#2ca02c"`);
-    expect(svg).toContain(`clip-path="url(#clip)"`);
-  });
-
-  it("canvas symbol draws the same layers", () => {
-    const p = ped(tags);
-    const ind = p.individuals[0]!;
-    const html = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="k" /></svg>);
-    expect(html).toContain(`data-tag-fill="diagonal"`);
-    expect(html).toContain(`data-tag-fill="dots"`);
-    expect(html).toContain(`stroke="#d62728"`);
-    expect(html).toContain(`<clipPath id="k-s0">`);
-    expect(html).toContain(`fill="#2ca02c"`);
+  // The canvas and the exports draw the symbol with this one component.
+  it("the symbol fills each section with its pattern, in the tag colour", () => {
+    const html = symbolHtml(ped(tags));
+    expect(fillsDrawn(html)).toEqual(["diagonal", "dots", "solid"]);
+    for (const t of tags) expect(html).toContain(t.color);
   });
 
   it("an affected patterned symbol keeps its black centre over a white pattern base", () => {
@@ -148,14 +134,10 @@ describe("renderers draw the pattern (#67)", () => {
     expect(core).toBeGreaterThan(base);
   });
 
-  it("legend swatches (app and export key) show the pattern", () => {
-    const p = ped(tags);
-    const app = renderToStaticMarkup(<TagSwatchSvg tag={tags[0]!} pedigree={p} />);
-    expect(app).toContain(`data-tag-fill="diagonal"`);
-    expect(app).toContain(`stroke="#d62728"`);
-    const key = exportKeyMarkup(p, 0, 0).markup.join("");
-    expect(key).toContain(`legend-clip-a-fill`);
-    expect(key).toContain(`stroke="#d62728"`);
+  it("the key swatch (legend and export key) shows the pattern", () => {
+    const html = renderToStaticMarkup(<TagSwatchSvg tag={tags[0]!} pedigree={ped(tags)} />);
+    expect(fillsDrawn(html)).toEqual(["diagonal"]);
+    expect(html).toContain("#d62728");
   });
 
   it("monochrome: dot and text tags turn black too", () => {
@@ -170,12 +152,15 @@ describe("renderers draw the pattern (#67)", () => {
 
   it("monochrome SVG and U-shape exports use no tag colour, and pattern every quadrant tag", () => {
     const p = ped(tags, true);
+    expect(symbolPaint(p.individuals[0]!, p).sectors.map(s => [s.color, s.fill])).toEqual([
+      [MONOCHROME_COLOR, "diagonal"], [MONOCHROME_COLOR, "dots"], [MONOCHROME_COLOR, "horizontal"],
+    ]);
+    // The files, key included, keep none of the tag colours.
     for (const svg of [exportSvg(p), exportUShapeSvg(p)]) {
       for (const t of tags) expect(svg).not.toContain(t.color);
-      expect(svg).toContain(`stroke="#000000"`); // diagonal and the auto pattern for c
-      expect(svg).toContain(" 0 1 0 "); // dots
+      expect(fillsDrawn(svg)).toEqual(expect.arrayContaining(["diagonal", "dots", "horizontal"]));
+      expect(fillsDrawn(svg)).not.toContain("solid");
     }
-    expect(exportKeyMarkup(p, 0, 0).markup.join("")).not.toContain("#2ca02c");
   });
 
   it("every example with tags exports in monochrome with no colour left in its tags", () => {
@@ -186,15 +171,12 @@ describe("renderers draw the pattern (#67)", () => {
     }
   });
 
-  it("sectorPath regions stay the clip for a pie slice of five tags", () => {
+  it("five tags are five equal slices, each with its pattern", () => {
     const five = Array.from({ length: 5 }, (_, i) => q(`t${i}`, "#d62728", "vertical"));
     const p = ped(five);
     const sectors = symbolPaint(p.individuals[0]!, p).sectors;
-    expect(sectors).toHaveLength(5);
-    const ind = p.individuals[0]!;
-    const svg = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="c" /></svg>);
-    expect((svg.match(/<clipPath id="c-s\d">/g) ?? []).length).toBe(5);
-    expect(svg).toContain(sectorPath(20, 20, 40, 0, 72));
+    expect(sectors.map(s => [s.start, s.end])).toEqual([[0, 72], [72, 144], [144, 216], [216, 288], [288, 360]]);
+    expect(fillsDrawn(symbolHtml(p))).toEqual(Array(5).fill("vertical"));
   });
 });
 

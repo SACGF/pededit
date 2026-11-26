@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { Pedigree, Individual } from "@pedigree-editor/layout-engine";
 import { symbolSex, assignedAtBirthText, assignedAtBirthInUse, drawsGender } from "../gender";
 import { detailLines, detailSections } from "../labels";
 import { buildScene } from "../scene";
-import { SymbolShape, standaloneGlyph } from "../chart/symbols";
+import { F, M, couple, build } from "../../fixtures/features";
 import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -18,19 +17,20 @@ import { usePedigreeStore } from "../../store/usePedigreeStore";
 
 /** A trans man (female, man), his cis brother, a non-binary sib and their parents. */
 function family(symbolsShow?: "gender" | "sex"): Pedigree {
-  return {
-    individuals: [
-      { id: "f", sex: "male", affected: false, sibOrder: 0, name: "Dad" },
-      { id: "m", sex: "female", affected: false, sibOrder: 1, name: "Mum", genderIdentity: "woman" },
-      { id: "t", sex: "female", affected: true, sibOrder: 0, name: "Sam", genderIdentity: "man" },
-      { id: "b", sex: "male", affected: false, sibOrder: 1, name: "Ben", genderIdentity: "man" },
-      { id: "n", sex: "male", affected: false, sibOrder: 2, name: "Alex", genderIdentity: "nonbinary" },
+  const p = build(
+    [
+      M("f", { name: "Dad" }),
+      F("m", { name: "Mum", genderIdentity: "woman" }),
+      F("t", { affected: true, name: "Sam", genderIdentity: "man" }),
+      M("b", { name: "Ben", genderIdentity: "man" }),
+      M("n", { name: "Alex", genderIdentity: "nonbinary" }),
     ],
-    partnerships: [{ id: "p", individual1: "f", individual2: "m" }],
-    parentOf: { p: ["t", "b", "n"] },
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    ...(symbolsShow ? { canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, symbolsShow } } : {}),
-  };
+    [couple("p", "f", "m")],
+    { p: ["t", "b", "n"] },
+    { canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...(symbolsShow ? { symbolsShow } : {}) } },
+  );
+  if (!symbolsShow) delete p.canvasSettings;
+  return p;
 }
 
 const ind = (p: Pedigree, id: string) => p.individuals.find(i => i.id === id)!;
@@ -75,15 +75,14 @@ describe("gender identity on the symbol (#26)", () => {
     expect(detailLines(detailSections(ind(family("sex"), "t"), 74, family("sex")))).toEqual([]);
   });
 
-  it("gives the canvas node its drawn shape, and the canvas draws it", () => {
+  // That SymbolShape draws a shape as its outline is symbols.test.tsx.
+  it("gives the canvas node its drawn shape", () => {
     const nodes = buildScene(family()).people;
     const data = (id: string) => nodes.find(n => n.individual.id === id)!;
     expect(data("t").glyph.shape).toBe("male");
     expect(data("t").glyph.detailLines).toContain("AFAB");
     expect(data("n").glyph.shape).toBe("unknown");
-    const t = ind(family(), "t");
-    expect(renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(t), shape: "male" }} size={40} /></svg>)).toContain("<rect");
-    expect(renderToStaticMarkup(<svg><SymbolShape glyph={standaloneGlyph(t)} size={40} /></svg>)).toContain("<circle");
+    expect(buildScene(family("sex")).people.find(n => n.individual.id === "t")!.glyph.shape).toBe("female");
   });
 
   it("does not move anyone: the layout follows sex, not the drawing", () => {
@@ -114,10 +113,10 @@ describe("gender identity on the symbol (#26)", () => {
     const sex = exportSvg(family("sex"));
     expect(sex).not.toContain("AFAB");
     expect(sex).not.toContain("assigned");
-    // Two circles (mother, Sam) in sex mode; one (mother) in gender mode.
-    const circles = (s: string) => (s.match(/<circle cx="20" cy="20"[^>]*fill="(white|black)"/g) ?? []).length;
-    expect(circles(sex)).toBe(2);
-    expect(circles(svg)).toBe(1);
+    // The export draws the scene's glyphs: two women's shapes (mother, Sam) by sex, one (mother) by gender.
+    const women = (p: Pedigree) => buildScene(p).people.filter(n => n.glyph.shape === "female").map(n => n.individual.id);
+    expect(women(family("sex"))).toEqual(["m", "t"]);
+    expect(women(family())).toEqual(["m"]);
   });
 
   it("lists only the codes in use in the export key (the app legend is checked in the browser)", () => {
