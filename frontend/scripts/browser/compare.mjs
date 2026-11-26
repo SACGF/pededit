@@ -56,7 +56,9 @@ const CHART_ONLY_CSS = `
   [data-problem-marker] { display: none !important; }
   /* the dev-only id under each symbol */
   [data-individual-id] > div[style*="monospace"] { display: none !important; }
-  * { caret-color: transparent !important; transition: none !important; animation: none !important; }
+  /* nothing still moving, and no scrollbar to come and go as the window is resized */
+  *, *::before, *::after { caret-color: transparent !important; transition: none !important; animation: none !important; }
+  * { scrollbar-width: none !important; }
 `;
 
 const slug = s => s.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
@@ -107,6 +109,8 @@ async function legendShot(page) {
   const tab = page.locator('[data-testid="panel-tab-pedigree"]');
   if (!(await tab.count())) return null;
   await tab.click();
+  // The click leaves the tab focused; no focus ring in the picture.
+  await page.evaluate(() => document.activeElement?.blur());
   const legend = page.locator('[data-testid="legend"]');
   if (!(await legend.count())) return null;
   const size = page.viewportSize();
@@ -252,6 +256,12 @@ await main(async () => {
         await routeFixture(page, fixture);
         await gotoAndSettle(page, `${side.url}/p/${FIXTURE_ID}`, flags.wait ?? 1500);
         await page.addStyleTag({ content: CHART_ONLY_CSS });
+        // Text drawn in a fallback font until the web font arrives.
+        await page.evaluate(() => document.fonts.ready);
+        // Vite reloads the page for some edits to the served checkout
+        // (index.html, a module that cannot be hot-updated), which drops the
+        // styles above and the zoom: its pictures then mean nothing.
+        page.on("load", () => errors.push("the page reloaded part way (an edit to the served checkout?); run again"));
         await page.mouse.move(2, 2);
         const svgs = await page.evaluate(({ o, title, drawings }) => (window.__pededit ? {
           export: drawings.includes("export") ? window.__pededit.exportSvg({ ...o, title: o.deidentify ? undefined : title }) : null,
@@ -261,7 +271,7 @@ await main(async () => {
         return { ...side, page, svgs, errors, bounds: drawings.includes("canvas") ? await flowBounds(page) : null };
       }));
       const [a, b] = opened;
-      const item = { spec, differences: [], errors: opened.flatMap(s => s.errors.map(e => `${s.name}: ${e}`)) };
+      const item = { spec, differences: [], errors: [] };
       const record = async (drawing, pngA, pngB, note) => {
         const d = await diffPngs(tool, pngA, pngB);
         if (!d.pixels && !note) return;
@@ -300,6 +310,8 @@ await main(async () => {
           writeFileSync(path.join(outDir, `${slug(spec)}.${drawing}.after.svg`), b.svgs[drawing]);
         }
       }
+      // Gathered after the pictures, so a reload while they were taken is seen.
+      item.errors.unshift(...opened.flatMap(s => s.errors.map(e => `${s.name}: ${e}`)));
       await Promise.all(opened.map(s => s.page.close()));
       results.push(item);
     }

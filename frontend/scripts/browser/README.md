@@ -271,6 +271,16 @@ the changed pixels in red, boxed) and, for exports, the two SVG files. An
 export whose text changed but draws the same is noted and does not fail. Exit
 0 when nothing differs. About 3 seconds a pedigree.
 
+Before each picture it waits for the web fonts, turns transitions,
+animations and scrollbars off, clears focus, moves the mouse to a corner and
+takes the picture again until two in a row agree. With all that, comparing a
+commit with itself (`--base-url` of `servers.mjs up --worktree HEAD`) over
+every example and fixture reports nothing (#195); a difference of a few
+pixels is a real one. Some edits to the served checkout make Vite reload
+its pages (`index.html`, a module that cannot be hot-updated), which undoes
+all of that; a reload is reported as an error on that pedigree, and a run
+during edits should be repeated.
+
 It is not in CI: screenshots depend on the machine's fonts and chromium, so
 it compares two commits on one machine and commits no images. Paste its report
 on the issue of a refactoring change. The base runs with this checkout's
