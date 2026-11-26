@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="257" height="413"
-     viewBox="0 0 257 413">
+<svg xmlns="http://www.w3.org/2000/svg" width="257" height="417"
+     viewBox="0 0 257 417">
 <defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="257" height="413" fill="white"/>
+<rect width="257" height="417" fill="white"/>
 <g class="chart-title"><text x="128.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">5/8 siblings</text></g>
 <g transform="translate(60 100)">
 <g class="couple-lines">
@@ -24,6 +24,6 @@
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 353)">
-<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="black"></rect></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
 </g>
 </svg>

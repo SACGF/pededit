@@ -3,13 +3,16 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { arrowKind, arrowGeometry, ARROW_LEGEND_LABEL } from "../proband";
 import { ProbandArrow } from "../chart/symbols";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+
+/** A figure without its key, whose swatches draw the same marks. */
+const drawing = (svg: string) => svg.replace(/<g class="pedigree-key"[^]*$/, "");
 
 function family(): Pedigree {
   return {
@@ -55,20 +58,20 @@ describe("proband and consultand arrows (#99)", () => {
 
   it("draws one P and two arrows in the SVG and U-shape exports, which lint clean", () => {
     const svg = exportSvg(family());
-    expect(svg.match(PROBAND_P)).toHaveLength(1);
+    expect(drawing(svg).match(PROBAND_P)).toHaveLength(1);
     expect(svg.match(/marker-end="url\(#proband-arrowhead\)"/g)).toHaveLength(2);
     expect(lintExport(family())).toEqual([]);
     const u = exportUShapeSvg(family());
-    expect(u.match(PROBAND_P)).toHaveLength(1);
+    expect(drawing(u).match(PROBAND_P)).toHaveLength(1);
     expect(u.match(/marker-end="url\(#proband-arrowhead\)"/g)).toHaveLength(2);
   });
 
   it("explains both arrows in the export key, only when used", () => {
-    const key = renderExportKeySvg(family(), 0, 0).markup.join("");
+    const key = exportKeyMarkup(family(), 0, 0).markup.join("");
     expect(key).toContain(ARROW_LEGEND_LABEL.proband);
     expect(key).toContain(ARROW_LEGEND_LABEL.consultand);
     const none = { ...family(), individuals: family().individuals.map(i => ({ ...i, proband: undefined, consultand: undefined })) };
-    const plain = renderExportKeySvg(none, 0, 0).markup.join("");
+    const plain = exportKeyMarkup(none, 0, 0).markup.join("");
     expect(plain).not.toContain(ARROW_LEGEND_LABEL.proband);
     expect(plain).not.toContain(ARROW_LEGEND_LABEL.consultand);
   });

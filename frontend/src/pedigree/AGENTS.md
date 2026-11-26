@@ -91,7 +91,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   person. None of the three imports `symbolPaint`, `annotationRow`,
   `arrowKind`, `symbolSex` or the label functions any more (a test holds
   them to that), so a renderer cannot decide differently from the others.
-  The symbol renderers (`SymbolShape`, `renderPersonShapeSvg`) take the
+  The symbol renderer (`SymbolShape`, `PersonMarks`) takes the
   glyph and never the person; a legend swatch, which has no pedigree, gets
   one from `standaloneGlyph`.
   Add a new mark or line of text for a person as a field of the glyph first.
@@ -287,7 +287,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   never gain empty wedges. An affected person with any section keeps
   a black centre (the outline scaled by `AFFECTED_CORE_SCALE`, white rim),
   otherwise four tagged quarters hide the affected fill. `symbols.tsx`
-  (`AffectedCore`) and `renderAffectedCoreSvg` draw it; keep them in step.
+  (`AffectedCore`) draws it for the canvas, the legend and the exports.
   Black is last in `TAG_PALETTE` so a new tag never defaults to it.
 - `tagFills.ts` — pattern fills and the monochrome setting (#67). A
   condition's or trait's `fill` (solid, diagonal, horizontal, vertical, crosshatch,
@@ -299,9 +299,9 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   legends call `tagPaint` (cached per pedigree object, like `kinshipOf`).
   Patterns are plain clipped paths, not SVG `<pattern>`, so svg2pdf draws
   them (checked by rendering an exported PDF with Ghostscript).
-  `fillLayers` is the geometry, `renderRegionFillSvg` (exporters, export
-  key) and `RegionFill` in `symbols.tsx` (canvas, app legend) its
-  two renderers; per-condition carrier fills (#115) use them.
+  `fillLayers` is the geometry and `RegionFill` in `chart/symbols.tsx` its
+  one renderer (canvas, legend, export key, exports); per-condition carrier
+  fills (#115) use it.
 - `lifeStatus.ts` — pregnancy and pregnancy-loss symbols (NSGC 2008), shared
   with the exporters. Miscarriage, termination and ectopic replace the sex
   symbol with a small triangle; sections are clipped to that triangle.
@@ -321,9 +321,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   the proband's arrow has a bold "P" below-left of its tail, a consultand's
   (`Individual.consultand`, several allowed) has none, and someone who is
   both is drawn as the proband (`arrowKind`). `arrowGeometry` is shared by
-  `ProbandArrow` on the canvas and the legend, `renderArrowSvg` by both
-  exporters (the U-shape turns the P upright), `renderArrowKeySwatchSvg` by
-  the export key, which had no proband row before. The P ends 4px left of
+  `ProbandArrow` everywhere it is drawn (the U-shape turns the P upright
+  with its `upright` prop). The P ends 4px left of
   the tail so it clears the line of descent that drops half a slot gap left
   of a proband whose partner is on their left; a white box behind it gives
   any other line a gap instead of running through the letter.
@@ -334,7 +333,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   in `labels.ts` `detailSections`). Everything that draws a person's shape
   must call it rather than read `ind.sex`: `buildScene` puts it on the
   glyph as `shape` (`SymbolShape` draws it, the minimap picks its shape by it),
-  both exporters' `renderShape`, the legend and the export key swatches.
+  which every drawing of a person goes through, and the key swatches.
   Nothing genetic may call it: layout, kinship, twins, PED and the CSV
   father/mother columns read `sex`. A non-binary person always gets the
   code (the diamond alone does not say their sex); a man who is male or a
@@ -346,8 +345,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   centred, or 9px left of centre when a line of descent comes into the top
   of the symbol (the person has parents drawn). Set from the Person tab
   checkbox and the more / right-click menus. `FamilyHistoryMark` on the
-  canvas and legend, `renderFamilyHistorySvg` in both exporters (upright in
-  the U-shape). It reaches about 13px above the row, inside the title gap.
+  canvas, the legend and both exports (upright in the U-shape). It reaches about 13px above the row, inside the title gap.
 
 - `notation.ts`: `canvasSettings.notation`, which NSGC edition is drawn.
   Absent means "nsgc2008" (#115): pedigrees saved before the setting keep
@@ -404,10 +402,11 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   legend on the Pedigree tab and for the key of the exports:
   `keyRows(pedigree, "legend" | "export")` gives the tag, symbol,
   relationship and clinical detail rows, each with a `kind`, a label and
-  what its swatch shows. `components/Legend.tsx` (`KeySwatch`) and
-  `exportKey.ts` (`renderKeySwatchSvg`) each draw a
-  row through a switch on its kind ending in a `never` check, so a new kind
-  does not compile until both draw it. A new row for the key is a member of
+  what its swatch shows. `chart/keySwatches.tsx` (`KeySwatch`) draws a
+  row's swatch through a switch on its kind ending in a `never` check, so a
+  new kind does not compile until it is drawn; the legend shows the swatch
+  as it is and the export key (`exportKey.tsx`) scales it from the legend's
+  24px symbols to its own 16px (tag swatches are already 16px). A new row for the key is a member of
   `KeyRow`, a line in `keyRows` and a place in `SYMBOL_ORDER` or
   `RELATIONSHIP_ORDER`, never a test of the pedigree in either renderer.
   The two lists differ on purpose, and every difference is in that file
@@ -431,7 +430,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   the symbol's lower right corner (outside adoption brackets), canvas and
   both exporters. `Individual.presymptomatic` is a
   vertical line through the symbol, drawn inside `SymbolShape` (from
-  `SymbolPaint.line`) and by `renderPresymptomaticLineSvg`. It is not drawn on
+  `SymbolPaint.line`). It is not drawn on
   anyone `isAffected` (the flag or any condition), the same test as the
   "presymptomatic-affected" warning, so the warning never says a line is
   hidden that is in fact drawn. With no conditions defined the editor
@@ -684,7 +683,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `branchOf` say what it stands for (`children` is the number drawn inside,
   `hidden` everyone hidden under the couple for the tooltip, the collapsed
   partner or partners whose flag it clears). Each renderer adds only the
-  count inside (`renderBranchCountSvg`, `CollapsedBranchNode`). On the canvas it is its own node type
+  count inside (`BranchCount`, kept upright in the U-shape). On the canvas it is its own node type
   (`collapsedBranch`), not selectable or draggable, so it needs
   `style.pointerEvents: "all"` or React Flow makes it click-through. Code
   that walks the drawn pedigree's people as people (legend sex rows,

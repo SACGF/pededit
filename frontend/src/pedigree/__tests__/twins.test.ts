@@ -5,7 +5,7 @@ import { lintScene } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { twinSetProblem, twinMembership, zygositiesInUse } from "../twins";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { importJson } from "../../io/json/importer";
@@ -101,7 +101,7 @@ describe("twins on the canvas and in exports (#11)", () => {
     const p = pedigree();
     const svg = exportSvg(p);
     expect(svg).toContain(">?</text>");
-    const key = renderExportKeySvg(p, 0, 0).markup.join("");
+    const key = exportKeyMarkup(p, 0, 0).markup.join("");
     expect(key).toContain("Monozygotic twins");
     expect(key).toContain("Twins, zygosity unknown");
     expect(key).not.toContain("Dizygotic twins");

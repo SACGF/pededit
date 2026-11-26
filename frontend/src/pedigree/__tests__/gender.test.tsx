@@ -7,7 +7,7 @@ import { detailLines } from "../labels";
 import { buildScene } from "../scene";
 import type { ScenePerson } from "../scene";
 import { SymbolShape, standaloneGlyph } from "../chart/symbols";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
@@ -123,10 +123,10 @@ describe("gender identity on the symbol (#26)", () => {
 
   it("lists only the codes in use in the export key (the app legend is checked in the browser)", () => {
     expect(assignedAtBirthInUse(family()).map(c => c.code)).toEqual(["AMAB", "AFAB"]);
-    const key = renderExportKeySvg(family(), 0, 0).markup.join("");
+    const key = exportKeyMarkup(family(), 0, 0).markup.join("");
     expect(key).toContain("Assigned male at birth");
     expect(key).not.toContain("Unassigned");
-    expect(renderExportKeySvg(family("sex"), 0, 0).markup.join("")).not.toContain("at birth");
+    expect(exportKeyMarkup(family("sex"), 0, 0).markup.join("")).not.toContain("at birth");
   });
 
   it("keeps the gender identity in a de-identified export", () => {

@@ -358,7 +358,17 @@ export async function inApp(context, base, fn, arg) {
   const page = await context.newPage();
   try {
     const blank = new URL("/__pededit_fixture_loader__", base).toString();
-    await page.route(blank, route => route.fulfill({ contentType: "text/html", body: "<!doctype html><title>loader</title>" }));
+    // Vite's React preamble, as index.html has it: modules that import .tsx
+    // (the exports draw with the chart components, #139) refuse to load
+    // without it in the dev server.
+    const preamble = `<script type="module">
+import RefreshRuntime from "/@react-refresh";
+RefreshRuntime.injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;
+window.__vite_plugin_react_preamble_installed__ = true;
+</script>`;
+    await page.route(blank, route => route.fulfill({ contentType: "text/html", body: `<!doctype html><title>loader</title>${preamble}` }));
     await page.goto(blank);
     return await page.evaluate(fn, arg);
   } finally {

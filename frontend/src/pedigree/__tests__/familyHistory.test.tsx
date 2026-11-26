@@ -3,13 +3,16 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { familyHistoryMarkAt } from "../familyHistory";
 import { FamilyHistoryMark } from "../chart/symbols";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+
+/** A figure without its key, whose swatches draw the same marks. */
+const drawing = (svg: string) => svg.replace(/<g class="pedigree-key"[^]*$/, "");
 
 function family(): Pedigree {
   return {
@@ -41,17 +44,17 @@ describe("family history not known (#100)", () => {
   });
 
   it("draws one ? per flagged person in both exports, which lint clean", () => {
-    expect(exportSvg(family()).match(MARK)).toHaveLength(2);
+    expect(drawing(exportSvg(family())).match(MARK)).toHaveLength(2);
     expect(lintExport(family())).toEqual([]);
-    expect(exportUShapeSvg(family()).match(MARK)).toHaveLength(2);
+    expect(drawing(exportUShapeSvg(family())).match(MARK)).toHaveLength(2);
     const none = { ...family(), individuals: family().individuals.map(i => ({ ...i, familyHistoryUnknown: undefined })) };
     expect(exportSvg(none)).not.toMatch(MARK);
   });
 
   it("has a row in the export key only when used", () => {
-    expect(renderExportKeySvg(family(), 0, 0).markup.join("")).toContain("Family history not known");
+    expect(exportKeyMarkup(family(), 0, 0).markup.join("")).toContain("Family history not known");
     const none = { ...family(), individuals: family().individuals.map(i => ({ ...i, familyHistoryUnknown: undefined })) };
-    expect(renderExportKeySvg(none, 0, 0).markup.join("")).not.toContain("Family history");
+    expect(exportKeyMarkup(none, 0, 0).markup.join("")).not.toContain("Family history");
   });
 
   it("round-trips through JSON and has a CSV column", () => {

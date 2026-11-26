@@ -13,7 +13,7 @@ import { nameRelationship } from "../relationship";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportPed, pedLostAssisted } from "../../io/ped/exporter";
 import { exportCsv } from "../../io/csv/exporter";
 import { importJson, exportJson } from "../../io/json";
@@ -290,7 +290,7 @@ describe("assisted reproduction: drawing (#45)", () => {
     const flow = buildScene(p);
     const stripped = svg.replace(/<g class="assisted-lines">[^]*?<\/g>/, '<g class="assisted-lines"></g>');
     expect(lintExportSvg(p, flow, stripped).map(f => f.code)).toContain("assisted-not-drawn");
-    const key = renderExportKeySvg(p, 0, 0).markup.join("");
+    const key = exportKeyMarkup(p, 0, 0).markup.join("");
     for (const text of ["Sperm or egg donor (D)", "Surrogate (S)", "Carried the pregnancy"]) expect(key).toContain(text);
     // No dashed line in the example any more (the intended parents are linked by their couple lines).
     expect(key).not.toContain("Not a genetic parent");
@@ -304,7 +304,7 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(svg).not.toMatch(/stroke-dasharray="5 3"/);
     const q = produce(p, d => { d.individuals.find(i => i.id === "c1")!.socialParents = ["gf"]; });
     expect(exportUShapeSvg(q)).toMatch(/stroke-dasharray="5 3"/); // a social parent with no such link
-    expect(renderExportKeySvg(q, 0, 0).markup.join("")).toContain("Not a genetic parent");
+    expect(exportKeyMarkup(q, 0, 0).markup.join("")).toContain("Not a genetic parent");
   });
 });
 

@@ -2,13 +2,13 @@ import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree, Tag, TagFill } from "@pedigree-editor/layout-engine";
 import {
-  tagPaint, tagFillMode, fillLayers, renderRegionFillSvg, patternLinesD, patternDotsD, tint,
+  tagPaint, tagFillMode, fillLayers, patternLinesD, patternDotsD, tint,
   MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR,
 } from "../tagFills";
-import { symbolPaint, renderSectorListSvg, annotationRow, renderAnnotationItemsSvg, sectorPath } from "../tags";
-import { renderExportKeySvg } from "../exportKey";
-import { SymbolShape, standaloneGlyph } from "../chart/symbols";
-import { TagSwatchSvg } from "../../components/Legend";
+import { symbolPaint, annotationRow, sectorPath } from "../tags";
+import { exportKeyMarkup } from "../exportKey";
+import { SymbolShape, standaloneGlyph, AnnotationRow } from "../chart/symbols";
+import { TagSwatchSvg } from "../chart/keySwatches";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { importJson, exportJson } from "../../io/json";
@@ -104,13 +104,6 @@ describe("pattern geometry", () => {
     expect(fillLayers("plaid" as TagFill, "#d62728", "M0 0Z", BOX)).toHaveLength(1);
   });
 
-  it("renderRegionFillSvg clips the marks to the region and to the outer clip", () => {
-    const svg = renderRegionFillSvg("horizontal", "#000000", "M0 0L40 0L40 40Z", BOX, "r1", "outline");
-    expect(svg).toContain(`<clipPath id="r1"><path d="M0 0L40 0L40 40Z"/></clipPath>`);
-    expect(svg).toContain(`fill="white" clip-path="url(#outline)"`);
-    expect(svg).toMatch(/<g clip-path="url\(#outline\)"><path d="M0 2H40[^"]*" fill="none" stroke="#000000" stroke-width="1" clip-path="url\(#r1\)"\/><\/g>/);
-    expect(renderRegionFillSvg("solid", "#000000", "M0 0Z", BOX, "r1")).toBe(`<path d="M0 0Z" fill="#000000"/>`);
-  });
 });
 
 describe("renderers draw the pattern (#67)", () => {
@@ -125,11 +118,13 @@ describe("renderers draw the pattern (#67)", () => {
 
   it("export sectors: patterns in the tag colour, solid as before", () => {
     const p = ped(tags);
-    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "clip");
+    const ind = p.individuals[0]!;
+    const svg = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="clip" /></svg>);
     expect(svg).toContain(`stroke="#d62728"`);
     expect(svg).toContain(`<clipPath id="clip-s0">`);
     expect(svg).toContain(`clip-path="url(#clip-s1)"`);
-    expect(svg).toContain(`fill="#2ca02c" clip-path="url(#clip)"`);
+    expect(svg).toContain(`fill="#2ca02c"`);
+    expect(svg).toContain(`clip-path="url(#clip)"`);
   });
 
   it("canvas symbol draws the same layers", () => {
@@ -158,7 +153,7 @@ describe("renderers draw the pattern (#67)", () => {
     const app = renderToStaticMarkup(<TagSwatchSvg tag={tags[0]!} pedigree={p} />);
     expect(app).toContain(`data-tag-fill="diagonal"`);
     expect(app).toContain(`stroke="#d62728"`);
-    const key = renderExportKeySvg(p, 0, 0).markup.join("");
+    const key = exportKeyMarkup(p, 0, 0).markup.join("");
     expect(key).toContain(`legend-clip-a-fill`);
     expect(key).toContain(`stroke="#d62728"`);
   });
@@ -168,7 +163,7 @@ describe("renderers draw the pattern (#67)", () => {
     const text: Tag = { id: "t", label: "Gene", color: "#ff7f0e", style: "text", abbrev: "+/-" };
     const p = ped([dot, text], true);
     expect(annotationRow(p.individuals[0]!, p).map(i => i.color)).toEqual([MONOCHROME_COLOR, MONOCHROME_COLOR]);
-    const svg = renderAnnotationItemsSvg(annotationRow(p.individuals[0]!, p), 40);
+    const svg = renderToStaticMarkup(<svg><AnnotationRow items={annotationRow(p.individuals[0]!, p)} size={40} /></svg>);
     expect(svg).not.toContain("#2ca02c");
     expect(svg).not.toContain("#ff7f0e");
   });
@@ -180,7 +175,7 @@ describe("renderers draw the pattern (#67)", () => {
       expect(svg).toContain(`stroke="#000000"`); // diagonal and the auto pattern for c
       expect(svg).toContain(" 0 1 0 "); // dots
     }
-    expect(renderExportKeySvg(p, 0, 0).markup.join("")).not.toContain("#2ca02c");
+    expect(exportKeyMarkup(p, 0, 0).markup.join("")).not.toContain("#2ca02c");
   });
 
   it("every example with tags exports in monochrome with no colour left in its tags", () => {
@@ -196,9 +191,10 @@ describe("renderers draw the pattern (#67)", () => {
     const p = ped(five);
     const sectors = symbolPaint(p.individuals[0]!, p).sectors;
     expect(sectors).toHaveLength(5);
-    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "c");
+    const ind = p.individuals[0]!;
+    const svg = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(ind), paint: symbolPaint(ind, p) }} size={40} clipId="c" /></svg>);
     expect((svg.match(/<clipPath id="c-s\d">/g) ?? []).length).toBe(5);
-    expect(svg).toContain(sectorPath(0, 0, 40, 0, 72));
+    expect(svg).toContain(sectorPath(20, 20, 40, 0, 72));
   });
 });
 

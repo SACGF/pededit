@@ -6,13 +6,16 @@ import {
 } from "../evaluation";
 import { detailLines, detailSections, evaluationLines, labelMaxWidth, textWidth } from "../labels";
 import { SymbolShape, standaloneGlyph, DocumentedMark } from "../chart/symbols";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
 import { exportCsv } from "../../io/csv/exporter";
 import { exportJson, importJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
+
+/** A figure without its key, whose swatches draw the same marks. */
+const drawing = (svg: string) => svg.replace(/<g class="pedigree-key"[^]*$/, "");
 
 function family(): Pedigree {
   return {
@@ -72,7 +75,7 @@ describe("evaluation results, NSGC 2022 (#114)", () => {
     expect(svg).not.toContain("E+");
     expect(lintExport(family())).toEqual([]);
     expect(exportUShapeSvg(family())).toContain("echo u");
-    const key = renderExportKeySvg(family(), 0, 0).markup.join("");
+    const key = exportKeyMarkup(family(), 0, 0).markup.join("");
     expect(key).toContain("Result: + positive");
     expect(key).toContain(">+/-</text>");
     expect(key).not.toContain("Evaluation:");
@@ -80,8 +83,8 @@ describe("evaluation results, NSGC 2022 (#114)", () => {
 
   it("needs no key row for detail text with no result", () => {
     const detailOnly = { ...family(), individuals: family().individuals.map(i => ({ ...i, evaluations: i.evaluations && [{ detail: "echo" }] })) };
-    expect(renderExportKeySvg(detailOnly, 0, 0).markup.join("")).not.toContain("Result:");
-    expect(renderExportKeySvg({ ...detailOnly, canvasSettings: family2008().canvasSettings }, 0, 0).markup.join("")).toContain("Evaluation:");
+    expect(exportKeyMarkup(detailOnly, 0, 0).markup.join("")).not.toContain("Result:");
+    expect(exportKeyMarkup({ ...detailOnly, canvasSettings: family2008().canvasSettings }, 0, 0).markup.join("")).toContain("Evaluation:");
   });
 
   it("a pedigree saved without the setting is drawn in NSGC 2008 (#115)", () => {
@@ -140,22 +143,22 @@ describe("evaluation notation, NSGC 2008 setting (#101)", () => {
 
   it("draws the * and the evaluation lines in both exports, which lint clean", () => {
     const svg = exportSvg(family2008());
-    expect(svg.match(STAR)).toHaveLength(1);
+    expect(drawing(svg).match(STAR)).toHaveLength(1);
     expect(svg).toContain(">E+ (BRCA1</text>");
     expect(svg).toContain(">c.5266dupC)</text>");
     expect(svg).toContain("E2u (echo)");
     expect(lintExport(family2008())).toEqual([]);
     const u = exportUShapeSvg(family2008());
-    expect(u.match(STAR)).toHaveLength(1);
+    expect(drawing(u).match(STAR)).toHaveLength(1);
     expect(u).toContain("E1-");
   });
 
   it("has key rows for the notation and the * only when used", () => {
-    const key = renderExportKeySvg(family2008(), 0, 0).markup.join("");
+    const key = exportKeyMarkup(family2008(), 0, 0).markup.join("");
     expect(key).toContain("Evaluation: + positive");
     expect(key).toContain("Documented evaluation");
     const none = { ...family2008(), individuals: family().individuals.map(i => ({ ...i, evaluations: undefined, presymptomatic: undefined })) };
-    const plain = renderExportKeySvg(none, 0, 0).markup.join("");
+    const plain = exportKeyMarkup(none, 0, 0).markup.join("");
     expect(plain).not.toContain("Evaluation");
     expect(plain).not.toContain("Presymptomatic");
   });
@@ -163,10 +166,10 @@ describe("evaluation notation, NSGC 2008 setting (#101)", () => {
   it("keeps the evaluations in a de-identified export when asked, the result alone by default (#111)", () => {
     const svg = exportSvg(family(), { deidentify: true, deidentifyKeep: { evaluationDetail: true } });
     expect(svg).toContain("c.5266dupC +");
-    expect(svg.match(STAR)).toHaveLength(1);
+    expect(drawing(svg).match(STAR)).toHaveLength(1);
     const plain = exportSvg(family(), { deidentify: true });
     expect(plain).not.toContain("c.5266dupC");
-    expect(plain.match(STAR)).toHaveLength(1);
+    expect(drawing(plain).match(STAR)).toHaveLength(1);
   });
 });
 
@@ -197,9 +200,9 @@ describe("presymptomatic carrier (#101)", () => {
   });
 
   it("is drawn in both exports, with a key row", () => {
-    expect(exportSvg(family()).match(LINE)).toHaveLength(1);
-    expect(exportUShapeSvg(family()).match(LINE)).toHaveLength(1);
-    expect(renderExportKeySvg(family(), 0, 0).markup.join("")).toContain("Presymptomatic carrier");
+    expect(drawing(exportSvg(family())).match(LINE)).toHaveLength(1);
+    expect(drawing(exportUShapeSvg(family())).match(LINE)).toHaveLength(1);
+    expect(exportKeyMarkup(family(), 0, 0).markup.join("")).toContain("Presymptomatic carrier");
   });
 });
 

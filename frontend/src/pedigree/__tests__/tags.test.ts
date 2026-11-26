@@ -1,7 +1,15 @@
 import { describe, it, expect } from "vitest";
 import type { Pedigree, Tag } from "@pedigree-editor/layout-engine";
-import { sectorAngles, symbolPaint, sectorPath, annotationRow, tagsInUse, tagsOf, nextTagColor, TAG_PALETTE, renderSectorListSvg, hasAnnotationRow, renderAffectedCoreSvg } from "../tags";
-import { renderExportKeySvg } from "../exportKey";
+import { sectorAngles, symbolPaint, sectorPath, annotationRow, tagsInUse, tagsOf, nextTagColor, TAG_PALETTE } from "../tags";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SymbolShape, standaloneGlyph } from "../chart/symbols";
+import type { SymbolPaint } from "../tags";
+
+/** A symbol drawn by the canvas and export component, with the given paint. */
+const symbolSvg = (ind: Pedigree["individuals"][number], paint: SymbolPaint, clipId: string) =>
+  renderToStaticMarkup(createElement("svg", null, createElement(SymbolShape, { glyph: { ...standaloneGlyph(ind), paint }, size: 40, clipId })));
+import { exportKeyMarkup } from "../exportKey";
 
 const tremor: Tag   = { id: "t1", label: "Tremor", color: "#000000", style: "quadrant" };
 const seizure: Tag  = { id: "t2", label: "Tonic-clonic seizures", color: "#d62728", style: "quadrant" };
@@ -92,8 +100,7 @@ describe("annotationRow", () => {
     const left = row[0]!.x - row[0]!.width / 2;
     const right = row[1]!.x + row[1]!.width / 2;
     expect(left).toBeCloseTo(-right, 5);
-    expect(hasAnnotationRow(p.individuals[0]!, p)).toBe(true);
-    expect(hasAnnotationRow(p.individuals[1]!, p)).toBe(false);
+    expect(annotationRow(p.individuals[1]!, p)).toEqual([]);
   });
 
   it("starts a proband's row at the symbol's left edge, clear of the arrow", () => {
@@ -125,11 +132,11 @@ describe("nextTagColor", () => {
   });
 });
 
-describe("string SVG rendering", () => {
+describe("SVG rendering", () => {
   it("renders one clipped path per sector in the tag colour", () => {
     const p = makePedigree([tremor, seizure], { a: ["t1", "t2"] });
-    const svg = renderSectorListSvg(symbolPaint(p.individuals[0]!, p).sectors, 40, "clip-x");
-    expect(svg.match(/<path /g)).toHaveLength(2);
+    const svg = symbolSvg(p.individuals[0]!, symbolPaint(p.individuals[0]!, p), "clip-x");
+    expect(svg.match(/<path d=/g)).toHaveLength(2);
     expect(svg).toContain('fill="#d62728"');
     expect(svg).toContain('clip-path="url(#clip-x)"');
   });
@@ -137,7 +144,7 @@ describe("string SVG rendering", () => {
   it("export key has a row per tag in use and escapes labels", () => {
     const weird: Tag = { id: "w", label: "A & B <c>", color: "#000", style: "dot" };
     const p = makePedigree([tremor, weird, seizure], { a: ["w", "t2"] });
-    const legend = renderExportKeySvg(p, 10, 10);
+    const legend = exportKeyMarkup(p, 10, 10);
     expect(legend.markup).toHaveLength(2);
     expect(legend.height).toBeGreaterThan(0);
     expect(legend.markup.join("")).toContain("A &amp; B &lt;c&gt;");
@@ -146,11 +153,10 @@ describe("string SVG rendering", () => {
 
   it("text tags in the key leave a gap before their label", () => {
     const p = makePedigree([genotype], { a: ["g1"] });
-    const row = renderExportKeySvg(p, 0, 0).markup.join("");
+    const row = exportKeyMarkup(p, 0, 0).markup.join("");
     const xs = [...row.matchAll(/<text x="([\d.]+)"/g)].map(m => parseFloat(m[1]!));
-    // swatch text starts at 0 and is about 5 characters of 9px bold; the label starts past it
-    expect(xs[0]).toBe(0);
-    expect(xs[1]!).toBeGreaterThanOrEqual("exp/+".length * 5.2 + 4);
+    // The swatch's text is about 5 characters of 9px bold from x 0; the label starts past it.
+    expect(xs[xs.length - 1]!).toBeGreaterThanOrEqual("exp/+".length * 5.2 + 4);
   });
 
   it("export key lists Affected, Carrier and Deceased before the tags", () => {
@@ -158,24 +164,24 @@ describe("string SVG rendering", () => {
     p.individuals[0]!.affected = true;
     p.individuals[1]!.carrier = true;
     p.individuals[1]!.deceased = true;
-    const key = renderExportKeySvg(p, 0, 0);
+    const key = exportKeyMarkup(p, 0, 0);
     const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
     expect(labels).toEqual(["Affected", "Affected, with conditions (black centre)", "Carrier", "Deceased", "Tremor"]);
-    expect(key.height).toBe(5 * 20);
+    expect(key.height).toBe(5 * 24);
   });
 
   it("export key lists pregnancies and losses present, labelled as in the legend (#13)", () => {
     const p = makePedigree([tremor]);
     p.individuals[0]!.lifeStatus = "miscarriage";
     p.individuals[1]!.lifeStatus = "stillbirth";
-    const key = renderExportKeySvg(p, 0, 0);
+    const key = exportKeyMarkup(p, 0, 0);
     const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
     expect(labels).toEqual(["Miscarriage", "Stillbirth (SB)"]);
     expect(key.markup[0]).toContain("<polygon");
   });
 
   it("export key is empty with no status and no tags", () => {
-    expect(renderExportKeySvg(makePedigree([tremor]), 0, 0).markup).toEqual([]);
+    expect(exportKeyMarkup(makePedigree([tremor]), 0, 0).markup).toEqual([]);
   });
 });
 
@@ -192,8 +198,9 @@ describe("affected core", () => {
   });
 
   it("renders a scaled black copy of the outline", () => {
-    const svg = renderAffectedCoreSvg(`<rect x="-20" y="-20" width="40" height="40"`);
-    expect(svg).toContain('transform="scale(0.55)"');
+    const ind = { id: "a", sex: "male" as const, affected: true, sibOrder: 0 };
+    const svg = symbolSvg(ind, { sectors: [], base: "white", core: true, dot: false }, "c");
+    expect(svg).toContain("scale(0.55)");
     expect(svg).toContain('fill="black"');
   });
 });

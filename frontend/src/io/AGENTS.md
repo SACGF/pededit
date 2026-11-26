@@ -90,7 +90,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   the scene lacks is added to it in `buildScene`, not
   worked out again here.
 - `svgExporter.ts` — standard layout as an SVG string, including the key
-  (`renderExportKeySvg` in `pedigree/exportKey.ts`, its rows from
+  (`exportKeyMarkup` in `pedigree/exportKey.tsx`, its rows from
   `keyRows(pedigree, "export")`, #148: Affected, Carrier, Deceased
   rows when present, then tags in use), in a `<g class="pedigree-key">`.
   The "Same person drawn more than once" row (#124) cannot be read off the
@@ -100,17 +100,17 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   Tests find symbols by `<g transform="translate(..)">` followed by a shape,
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.
-- `symbolSvg.ts` (#149): a person's symbol as SVG markup, for both figure
-  exports. `renderPersonShapeSvg(glyph, clipId, { rotation,
-  captionShift })` draws the outline, fill, sections, brackets, dot, letter,
-  presymptomatic line, pregnancy and loss marks and the annotation row from
-  the person's glyph; the standard export calls it upright, the U-shape
-  turned along its track, where letters ("D", "S", "P") are turned back
-  upright and slashes turn with the symbol. With `renderDeceasedSlashSvg`
-  and `renderProbandArrowSvg` it is the only place a symbol is written as a
-  string. A symbol change is made here and in `SymbolShape`
-  (`pedigree/chart/symbols.tsx`) for the canvas. Order inside the symbol:
-  the role letter is under the presymptomatic line in both exports.
+- One renderer (#139): `svgExporter.tsx` and the U-shape draw people,
+  lines and text with the canvas's components (`pedigree/chart/`),
+  rendered to markup with `renderToStaticMarkup` inside an `<svg>` root
+  (React needs one for SVG children). Nothing under `io/` writes a symbol,
+  mark or line of text as a string; a drawing change is made once, in
+  `chart/`. The markup carries data-* attributes (`data-copy-number`,
+  `data-twin-mark`, `data-childless`, `data-ended`...) that the lints and
+  tests read; never person ids, which could be names after a PED import.
+  A server render nested in another server render clears the outer
+  component's hook state, so a component that exports during its own
+  render (the guides' `GuideFigure`, in the prerender) must use no hooks.
 - `uShapeExporter.ts` — the public entry (`layoutUShape`,
   `exportUShapeSvg`): horseshoe layout for large families (partners,
   consanguinity, flat bottom, fan for small families). Plan in
@@ -120,10 +120,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   coordinate system, the packing along the tracks and the public
   `UShapeLayout` (no SVG in it, so it could move beside the layout engine),
   `connectors.ts` draws the lines along the tracks (this geometry is the
-  U-shape's own and stays so), `render.ts` draws the text beside each symbol
+  U-shape's own and stays so), `render.tsx` places each person (`PersonMarks`
+  and `TextUnderSymbol`, turned along the track with letters kept upright)
   and the consanguinity labels and assembles the figure, `constants.ts` has
-  the shared sizes. No symbol is drawn in `ushape/`: `render.ts` calls
-  `symbolSvg.ts`. `glyphOf` in `layout.ts` caches each person's glyph per
+  the shared sizes. No symbol or text under one is drawn in `ushape/`. `glyphOf` in `layout.ts` caches each person's glyph per
   pedigree object, so, as with `kinshipOf`, a test that changes a pedigree
   in place after laying it out must make a fresh object. Symbols, labels and slashes
   rotate with the track (that is the design, labels included); only the
@@ -162,11 +162,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   FILE.svg` renders it to PNG to read back.
 - `exportLint.ts` (#72) — render lint for the standard SVG export, run by
   `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
-  example. It parses the SVG, so `svgExporter.ts` must keep writing its
+  example. It parses the SVG, so `svgExporter.tsx` must keep writing its
   group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
   `symbols`, `labels`, `consanguinity-labels`, whose white `<rect>` marks a
-  label the dashed arcs may pass behind, #109) and `class="mark"` on lines that join nobody
-  (childless and twin marks). A dashed arc is read back with `pathPoints`
+  label the dashed arcs may pass behind, #109, and `chart-title`), and the
+  chart components their `data-childless`, `data-ended` and `data-twin-mark`
+  on marks that join nobody. Sibship lines are read from their paths'
+  "M x y L x y" runs. A dashed arc is read back with `pathPoints`
   and checked against other people's symbols and text
   (`arc-through-symbol`, `arc-through-label`, #192, the canvas lint's
   `arcCollisions`), with the lines of text under a symbol taken as one
@@ -193,7 +195,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `await import("/src/io/svg/index.ts")` inside `eval.mjs` and return the
   blob as base64.
 - Clinical key fields (#102, `Pedigree.clinicalDetails`) are drawn by
-  `renderExportKeySvg` as "Label: value" text lines in a
+  `exportKeyMarkup` as "Label: value" text lines in a
   `<g class="clinical-details">` under the symbol rows, so every exporter
   (standard, U-shape, PNG, PDF) gets them with no code of its own. Text is
   wrapped by character count (`wrapText`), continuation lines take a fixed

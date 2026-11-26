@@ -3,7 +3,7 @@ import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
 import { childlessMarkSegments, childlessReasonBaselineY, activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP } from "../childless";
 import { exportSvg } from "../../io/svg/svgExporter";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /** Two couples on one row: a = b (childless, infertility) and c = d with a child. */
@@ -66,7 +66,7 @@ describe("childless mark on the canvas and in exports (#15)", () => {
     const svg = exportSvg(p);
     expect(svg).toContain(">azoospermia</text>");
     // Drop plus two bars for infertility: three line elements beyond the sibship and couple lines of c = d.
-    const key = renderExportKeySvg(p, 0, 0);
+    const key = exportKeyMarkup(p, 0, 0);
     expect(key.markup.join("")).toContain("Infertility");
     expect(key.markup.join("")).not.toContain("No children by choice");
   });
@@ -78,6 +78,6 @@ describe("childless mark on the canvas and in exports (#15)", () => {
     delete p.partnerships[1]!.childless;
     const svg = exportSvg(p);
     expect(svg).not.toContain("azoospermia");
-    expect(renderExportKeySvg(p, 0, 0).markup.join("")).not.toContain("Infertility");
+    expect(exportKeyMarkup(p, 0, 0).markup.join("")).not.toContain("Infertility");
   });
 });

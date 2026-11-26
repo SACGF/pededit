@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="393" height="723"
-     viewBox="0 0 393 723">
+<svg xmlns="http://www.w3.org/2000/svg" width="393" height="739"
+     viewBox="0 0 393 739">
 <defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="393" height="723" fill="white"/>
+<rect width="393" height="739" fill="white"/>
 <g class="chart-title"><text x="196.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Breast and ovarian cancer</text></g>
 <g transform="translate(92 100)">
 <g class="couple-lines">
@@ -24,9 +24,9 @@
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 603)">
-<rect x="40" y="2" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><line x1="37" y1="-1" x2="59" y2="21" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
-<line x1="47.2" y1="30.8" x2="52.46" y2="25.54" stroke="black" stroke-width="1.5"/><polygon points="56,22 54.23,27.3 50.7,23.77" fill="black"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Consultand (seeking counselling)</text>
-<clipPath id="legend-clip-bc"><rect x="40" y="42" width="16" height="16"/></clipPath><rect x="40" y="42" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 50 L 48 66 A 16 16 0 0 1 48 34 Z" fill="#1f77b4" clip-path="url(#legend-clip-bc)"/><rect x="40" y="42" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Breast cancer</text>
-<clipPath id="legend-clip-oc"><rect x="40" y="62" width="16" height="16"/></clipPath><rect x="40" y="62" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"/><path d="M 48 70 L 48 54 A 16 16 0 0 1 48 86 Z" fill="#d62728" clip-path="url(#legend-clip-oc)"/><rect x="40" y="62" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">Ovarian cancer</text>
+<g transform="translate(56 12) scale(0.667) translate(-18 -18)"><svg width="36" height="36" viewBox="-6 -6 36 36"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="white"></rect><line x1="-4" y1="-4" x2="28" y2="28" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Deceased</text>
+<g transform="translate(56 36) scale(0.667) translate(-23 -23)"><svg width="46" height="46" viewBox="-30 -2 56 56"><defs><marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="black"></polygon></marker></defs><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle><g data-arrow="consultand"><line x1="-18" y1="42" x2="0" y2="24" stroke="black" stroke-width="2" marker-end="url(#legend-arrowhead)"></line></g></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Consultand (seeking counselling)</text>
+<g transform="translate(56 60) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-bc"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-bc)"><g data-tag-fill="solid"><path d="M 14 14 L 14 30 A 16 16 0 0 1 14 -2 Z" fill="#1f77b4"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Breast cancer</text>
+<g transform="translate(56 84) scale(1) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><clipPath id="legend-clip-oc"><rect x="6" y="6" width="16" height="16"></rect></clipPath><rect x="6" y="6" width="16" height="16" fill="white" stroke="black" stroke-width="1.5"></rect><g clip-path="url(#legend-clip-oc)"><g data-tag-fill="solid"><path d="M 14 14 L 14 -2 A 16 16 0 0 1 14 30 Z" fill="#d62728"></path></g></g><rect x="6" y="6" width="16" height="16" fill="none" stroke="black" stroke-width="1.5"></rect></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">Ovarian cancer</text>
 </g>
 </svg>

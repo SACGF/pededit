@@ -7,7 +7,7 @@ import { buildScene, type Scene } from "../../pedigree/scene";
 import type { SibshipEnd } from "../../pedigree/lineGeometry";
 import { deidentify } from "./deidentify";
 import { drawnPedigree } from "../../pedigree/collapse";
-import { renderExportKeySvg } from "../../pedigree/exportKey";
+import { exportKeyMarkup } from "../../pedigree/exportKey";
 import { PersonMarks } from "../../pedigree/chart/PersonSymbol";
 import { TextUnderSymbol, ProbandMarkerDef } from "../../pedigree/chart/symbols";
 import { CoupleLine, CoupleText } from "../../pedigree/chart/CoupleLine";
@@ -50,7 +50,7 @@ function computeBounds(pedigree: Pedigree, scene: Scene, options: SvgExportOptio
   const b = scene.bounds!;
 
   // The tag key sits under the pedigree, bottom-left, inside the padding.
-  const legend = options.key === false ? { width: 0, height: 0 } : renderExportKeySvg(pedigree, 0, 0, { duplicates });
+  const legend = options.key === false ? { width: 0, height: 0 } : exportKeyMarkup(pedigree, 0, 0, { duplicates });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
 
   // A title wider than the drawing widens the figure; the drawing is then
@@ -130,7 +130,7 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   group("consanguinity-labels", couples.map(({ e, left, right }) => e.double ? <CoupleText key={e.id} data={e.data} left={left} right={right} /> : null));
   lines.push(`</g>`);
 
-  const legend = options.key === false ? { height: 0, markup: [] } : renderExportKeySvg(working, padding, 0, { duplicates });
+  const legend = options.key === false ? { height: 0, markup: [] } : exportKeyMarkup(working, padding, 0, { duplicates });
   if (legend.height > 0) {
     lines.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`);
     lines.push(...legend.markup);

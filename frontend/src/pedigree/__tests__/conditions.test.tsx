@@ -5,8 +5,8 @@ import {
   affectedControlOn, applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isAffected, isCarrier,
   plainAffected, plainCarrier, resolvePlainAffected, CONDITIONS_AND_TAGS,
 } from "../conditions";
-import { symbolPaint, renderSectorListSvg, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
-import { renderExportKeySvg } from "../exportKey";
+import { symbolPaint, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
+import { exportKeyMarkup } from "../exportKey";
 import { carrierPaintFrom, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape, standaloneGlyph } from "../chart/symbols";
@@ -323,7 +323,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
     expect(exportSvg(p)).toContain(boxed);
     expect(exportUShapeSvg(p)).toContain(boxed);
     expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(sectorPath(14, 14, 16, 0, 360));
-    expect(renderExportKeySvg(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
+    expect(exportKeyMarkup(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
     // NSGC 2008 keeps a quarter per defined condition.
     const old = strip(family([CF, TS]));
     expect(sectionLayout(old)).toBe("quarters");
@@ -375,9 +375,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
         // The canvas symbol has its corner at 0 0; the exporters centre it on 0 0. Radius = size.
         const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
         expect(canvas).toContain(sectorPath(20, 20, 40, start, end));
-        const centred = sectorPath(0, 0, 40, start, end);
         const boxed = sectorPath(20, 20, 40, start, end);
-        expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
         expect(exportSvg(p)).toContain(boxed);
         expect(exportUShapeSvg(p)).toContain(boxed);
       }
@@ -388,7 +386,7 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
       expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(sectorPath(14, 14, 16, start, end));
     }
     // Export key: the CF swatch is a full circle path with one condition, a left half (vertical chord) with two.
-    const keyRow = (p: Pedigree) => renderExportKeySvg(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))!;
+    const keyRow = (p: Pedigree) => exportKeyMarkup(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))!;
     expect(keyRow(family([CF], "nsgc2022"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
     expect(keyRow(family([CF, TS], "nsgc2022"))).toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
     expect(keyRow(family([CF, TS]))).not.toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
@@ -442,13 +440,11 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
     const a = byId(p, "a");
     const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
     expect(canvas).toContain(`<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`);
-    const centred = `<path d="${sectorPath(0, 0, 40, 0, 360)}" fill="#000000"`;
     const boxed = `<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`;
-    expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
     expect(exportSvg(p)).toContain(boxed);
     expect(exportUShapeSvg(p)).toContain(boxed);
     // Keys: the condition's own row, a solid black whole swatch named for it; then its carriers, hatched.
-    const key = renderExportKeySvg(p, 0, 0).markup;
+    const key = exportKeyMarkup(p, 0, 0).markup;
     const row = key.find(m => m.includes(">Cystic fibrosis<"))!;
     expect(row).toMatch(/<path d="M \S+ \S+ A 16 16 0 1 1 [^"]+" fill="#000000"/);
     expect(key.find(m => m.includes(">Cystic fibrosis carrier<"))).toContain(`stroke="#000000"`);
@@ -538,8 +534,8 @@ describe("renderers (#115)", () => {
         expect(lintUShape(p)).toEqual([]);
         expect(exportUShapeSvg(p)).toContain("Tay-Sachs carrier");
         expect(lintScene(p, buildScene(p))).toEqual([]);
-        const key = renderExportKeySvg(p, 0, 0).markup.join("");
-        if (notation === "nsgc2008") expect(key).toMatch(/<circle[^>]*r="2.4" fill="black"/);
+        const key = exportKeyMarkup(p, 0, 0).markup.join("");
+        if (notation === "nsgc2008") expect(key).toMatch(/<circle[^>]*r="3\.[56]\d*" fill="black"/);
         else expect(key).toContain("legend-plain-carrier");
       });
     }

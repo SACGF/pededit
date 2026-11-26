@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="425" height="381"
-     viewBox="0 0 425 381">
+<svg xmlns="http://www.w3.org/2000/svg" width="425" height="389"
+     viewBox="0 0 425 389">
 <defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="425" height="381" fill="white"/>
+<rect width="425" height="389" fill="white"/>
 <g class="chart-title"><text x="212.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Remarriage · half-siblings</text></g>
 <g transform="translate(92 100)">
 <g class="couple-lines">
@@ -24,7 +24,7 @@
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 301)">
-<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<line x1="47.2" y1="30.8" x2="52.46" y2="25.54" stroke="black" stroke-width="1.5"/><polygon points="56,22 54.23,27.3 50.7,23.77" fill="black"/><text x="46.7" y="38" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
+<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="black"></rect></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<g transform="translate(56 36) scale(0.667) translate(-23 -23)"><svg width="46" height="46" viewBox="-30 -2 56 56"><defs><marker id="legend-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="black"></polygon></marker></defs><circle cx="12" cy="12" r="11" stroke="black" stroke-width="2" fill="white"></circle><g data-arrow="proband"><line x1="-18" y1="42" x2="0" y2="24" stroke="black" stroke-width="2" marker-end="url(#legend-arrowhead)"></line><rect x="-30" y="42" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="51" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Proband (index case)</text>
 </g>
 </svg>

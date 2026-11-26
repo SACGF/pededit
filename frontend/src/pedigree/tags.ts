@@ -2,7 +2,7 @@ import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layou
 import { drawnPedigree } from "./collapse";
 import { drawsPresymptomatic } from "./evaluation";
 import { notationOf } from "./notation";
-import { tagPaint, carrierPaintFrom, renderRegionFillSvg, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
+import { tagPaint, carrierPaintFrom, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
 import type { TagPaint } from "./tagFills";
 import { affectedControlOn, carrierConditions, isConditionTag, carrierLabel, plainAffected, plainCarrier, plainStatusLabel } from "./conditions";
 import type { TagFill } from "@pedigree-editor/layout-engine";
@@ -413,17 +413,6 @@ export const AFFECTED_CORE_SCALE = 0.55;
 /** White rim around the core, in symbol pixels (after scaling). */
 export const AFFECTED_CORE_RIM = 1.5;
 
-/**
- * The core as SVG markup for a symbol centred on (0, 0). `geom` is the
- * unpainted, unclosed outline element the exporters build (for example
- * `<rect x=".." y=".." width=".." height=".."`).
- */
-export function renderAffectedCoreSvg(geom: string): string {
-  const k = AFFECTED_CORE_SCALE;
-  return `<g transform="scale(${k})">${geom} fill="black" stroke="white" stroke-width="${fmt((AFFECTED_CORE_RIM * 2) / k)}"/></g>`
-    + `<g transform="scale(${k})">${geom} fill="black" stroke="none"/></g>`;
-}
-
 function polar(cx: number, cy: number, r: number, deg: number): [number, number] {
   const a = (deg * Math.PI) / 180;
   return [cx + r * Math.sin(a), cy - r * Math.cos(a)];
@@ -490,56 +479,11 @@ export function annotationRow(individual: Individual, pedigree: Pedigree, size =
   });
 }
 
-export function hasAnnotationRow(individual: Individual, pedigree: Pedigree): boolean {
-  return tagsOf(individual, pedigree).some(t => t.style !== "quadrant");
-}
-
 // ── String SVG rendering (exporters) ──────────────────────────────────────────
-
-export function escapeXml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-/**
- * Sector fills (`SymbolPaint.sectors`) for a symbol centred on (0, 0) of the
- * given size, as SVG markup. `clipId` must be the id of a <clipPath> matching
- * the symbol outline that the caller has already emitted.
- */
-export function renderSectorListSvg(sectors: Sector[], size: number, clipId: string): string {
-  if (sectors.length === 0) return "";
-  const r = size; // beyond the half-diagonal, so the clip does the shaping
-  const box = { x: -size / 2, y: -size / 2, size };
-  return sectors
-    .map((s, i) => renderRegionFillSvg(s.fill, s.color, sectorPath(0, 0, r, s.start, s.end), box, `${clipId}-s${i}`, clipId))
-    .join("");
-}
-
-/**
- * Annotation row (the items of `annotationRow`) for a symbol centred on
- * (0, 0), as SVG markup. `offsetY` moves the row down, e.g. past an "SB" /
- * "ECT" caption.
- */
-export function renderAnnotationItemsSvg(items: AnnotationItem[], size: number, offsetY = 0): string {
-  if (items.length === 0) return "";
-  const cy = size / 2 + ANNOTATION_Y + offsetY;
-  return items
-    .map(({ tag, x, color }) =>
-      tag.style === "dot"
-        ? `<circle cx="${fmt(x)}" cy="${fmt(cy)}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(color)}"/>`
-        : `<text x="${fmt(x)}" y="${fmt(cy + ANNOTATION_FONT_SIZE / 2 - 1)}" text-anchor="middle" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(color)}">${escapeXml(tagCanvasText(tag))}</text>`,
-    )
-    .join("");
-}
 
 // ── Legend ────────────────────────────────────────────────────────────────────
 
 export const LEGEND_SWATCH = 16;
-export const LEGEND_ROW_HEIGHT = 20;
 export const LEGEND_FONT_SIZE = 10;
 
 /** Rough width of a text tag drawn at ANNOTATION_FONT_SIZE bold. */
@@ -553,37 +497,6 @@ export const LEGEND_CHAR_WIDTH = 6;
 /** Width of the swatch column: a square, or wider for long text tags. */
 export function swatchColumnWidth(tags: readonly Tag[]): number {
   return Math.max(LEGEND_SWATCH, ...tags.filter(t => t.style === "text").map(tagTextWidth));
-}
-
-/**
- * A legend entry for a tag: a swatch showing how the tag is drawn (quarter
- * fill, dot, or coloured text) followed by the label. Drawn with the swatch's
- * top-left at (x, y); the label starts `labelOffset` to the right, past the
- * widest swatch in the key, so text tags never run into their label.
- */
-export function renderTagLegendRowSvg(
-  tag: Tag, pedigree: Pedigree, x: number, y: number,
-  labelOffset = swatchColumnWidth([tag]) + LEGEND_LABEL_GAP,
-  carrier = false,
-): string {
-  const s = LEGEND_SWATCH;
-  const cx = x + s / 2, cy = y + s / 2;
-  const parts: string[] = [];
-  const paint = carrier ? conditionCarrierPaint(tag, pedigree) : conditionPaint(tag, pedigree);
-  if (tag.style === "quadrant") {
-    const [start, end] = conditionSection(tag, pedigree).angles;
-    const clipId = `legend-clip-${tag.id}${carrier ? "-carrier" : ""}`;
-    parts.push(`<clipPath id="${clipId}"><rect x="${x}" y="${y}" width="${s}" height="${s}"/></clipPath>`);
-    parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="white" stroke="black" stroke-width="1.5"/>`);
-    parts.push(renderRegionFillSvg(paint.fill, paint.color, sectorPath(cx, cy, s, start, end), { x, y, size: s }, `${clipId}-fill`, clipId));
-    parts.push(`<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="none" stroke="black" stroke-width="1.5"/>`);
-  } else if (tag.style === "dot") {
-    parts.push(`<circle cx="${cx}" cy="${cy}" r="${ANNOTATION_DOT_RADIUS}" fill="${escapeXml(paint.color)}"/>`);
-  } else {
-    parts.push(`<text x="${x}" y="${cy + ANNOTATION_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${ANNOTATION_FONT_SIZE}" font-weight="bold" fill="${escapeXml(paint.color)}">${escapeXml(tagCanvasText(tag))}</text>`);
-  }
-  parts.push(legendLabelSvg(carrier ? carrierLabel(tag) : tag.label, x + labelOffset, cy));
-  return parts.join("");
 }
 
 /** One key row for a tag: the tag itself, or a condition's carriers. */
@@ -608,10 +521,6 @@ export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
     if (carriers.has(tag.id)) rows.push({ tag, carrier: true, label: carrierLabel(tag) });
   }
   return rows;
-}
-
-export function legendLabelSvg(label: string, x: number, cy: number): string {
-  return `<text x="${fmt(x)}" y="${cy + LEGEND_FONT_SIZE / 2 - 1}" font-family="sans-serif" font-size="${LEGEND_FONT_SIZE}" fill="black">${escapeXml(label)}</text>`;
 }
 
 export interface TagLegendBlock {

@@ -15,10 +15,10 @@ import type { Pedigree, Tag, TagFill, TagFillMode } from "@pedigree-editor/layou
  * presymptomatic carrier, a centre dot the carrier (NSGC 2008), and a
  * "\" slash deceased, which is why the diagonal hatch runs the other way.
  *
- * `renderRegionFillSvg` / `fillLayers` are the reusable entry points: fill a
- * region (any SVG path, normally a sector from `sectorPath`) with pattern P
- * in colour C. The canvas (`RegionFill` in chart/symbols.tsx), the legend and
- * both exporters call them; per-condition carrier fills should too.
+ * `fillLayers` is the reusable entry point: fill a region (any SVG path,
+ * normally a sector from `sectorPath`) with pattern P in colour C.
+ * `RegionFill` in chart/symbols.tsx draws it for the canvas, the legend and
+ * both exports; per-condition carrier fills use it too.
  */
 
 export interface TagFillOption {
@@ -241,29 +241,3 @@ export function fillLayers(fill: TagFill, color: string, regionD: string, box: F
   return [base, { d: patternLinesD(fill, box), fill: "none", stroke: color, strokeWidth: patternLineWidth(box.size), clip: true }];
 }
 
-function escapeAttr(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-}
-
-/**
- * Fill a region with pattern `fill` in `color`, as SVG markup. `regionClipId`
- * is a fresh id this call uses for the region's own <clipPath>; `outerClipId`,
- * when given, is a clip the caller already emitted (the symbol outline) that
- * everything is clipped to as well, as tag sectors are.
- */
-export function renderRegionFillSvg(
-  fill: TagFill, color: string, regionD: string, box: FillBox,
-  regionClipId: string, outerClipId?: string,
-): string {
-  const outer = outerClipId ? ` clip-path="url(#${outerClipId})"` : "";
-  const layers = fillLayers(fill, color, regionD, box);
-  const out: string[] = [];
-  if (layers.some(l => l.clip)) out.push(`<clipPath id="${regionClipId}"><path d="${regionD}"/></clipPath>`);
-  for (const l of layers) {
-    const paint = `fill="${escapeAttr(l.fill)}"` + (l.stroke ? ` stroke="${escapeAttr(l.stroke)}" stroke-width="${n(l.strokeWidth ?? 1)}"` : "");
-    if (!l.clip) out.push(`<path d="${l.d}" ${paint}${outer}/>`);
-    else if (outerClipId) out.push(`<g${outer}><path d="${l.d}" ${paint} clip-path="url(#${regionClipId})"/></g>`);
-    else out.push(`<path d="${l.d}" ${paint} clip-path="url(#${regionClipId})"/>`);
-  }
-  return out.join("");
-}

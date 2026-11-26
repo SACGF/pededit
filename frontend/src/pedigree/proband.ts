@@ -52,26 +52,3 @@ export const ARROW_LEGEND_LABEL: Record<ArrowKind, string> = {
   consultand: "Consultand (seeking counselling)",
 };
 
-/**
- * The export key's swatch: the arrow alone, pointing up-right across a
- * `s`-px cell with top-left (x, y), its head drawn as a polygon so it does
- * not depend on the file's marker, and the "P" below-left of the tail for
- * the proband.
- */
-export function renderArrowKeySwatchSvg(kind: ArrowKind, x: number, y: number, s: number): string {
-  const tip = { x: x + s, y };
-  const tail = { x: x + s * 0.45, y: y + s * 0.55 };
-  const head = 5;
-  // Unit vector from tail to tip, and its normal, for the arrowhead.
-  const dx = tip.x - tail.x, dy = tip.y - tail.y, len = Math.hypot(dx, dy);
-  const ux = dx / len, uy = dy / len;
-  const bx = tip.x - ux * head, by = tip.y - uy * head;
-  const pts = [[tip.x, tip.y], [bx - uy * head / 2, by + ux * head / 2], [bx + uy * head / 2, by - ux * head / 2]]
-    .map(([px, py]) => `${+px!.toFixed(2)},${+py!.toFixed(2)}`).join(" ");
-  let out = `<line x1="${+tail.x.toFixed(2)}" y1="${+tail.y.toFixed(2)}" x2="${+bx.toFixed(2)}" y2="${+by.toFixed(2)}" stroke="black" stroke-width="1.5"/>`
-    + `<polygon points="${pts}" fill="black"/>`;
-  if (kind === "proband") {
-    out += `<text x="${+(tail.x - 0.5).toFixed(2)}" y="${+(y + s).toFixed(2)}" text-anchor="end" font-family="sans-serif" font-size="${PROBAND_LETTER_SIZE}" font-weight="bold" fill="black">${PROBAND_LETTER}</text>`;
-  }
-  return out;
-}

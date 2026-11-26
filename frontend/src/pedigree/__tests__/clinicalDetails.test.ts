@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { clinicalDetailLines, wrapText } from "../clinicalDetails";
-import { renderExportKeySvg, renderClinicalDetailsSvg } from "../exportKey";
+import { exportKeyMarkup, clinicalDetailsMarkup } from "../exportKey";
 import { simpleFamily } from "../../fixtures/simpleFamily";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
@@ -38,13 +38,13 @@ describe("clinical key fields (#102)", () => {
   });
 
   it("adds escaped text rows to the export key only when filled", () => {
-    const empty = renderClinicalDetailsSvg(simpleFamily, 0, 0);
+    const empty = clinicalDetailsMarkup(simpleFamily, 0, 0);
     expect(empty.height).toBe(0);
-    const block = renderClinicalDetailsSvg(withDetails(simpleFamily), 0, 0);
+    const block = clinicalDetailsMarkup(withDetails(simpleFamily), 0, 0);
     expect(block.markup.join("")).toContain("breast &amp; ovarian");
     expect(block.markup.join("")).not.toContain("Paternal ancestry");
-    const without = renderExportKeySvg(simpleFamily, 0, 0);
-    const withKey = renderExportKeySvg(withDetails(simpleFamily), 0, 0);
+    const without = exportKeyMarkup(simpleFamily, 0, 0);
+    const withKey = exportKeyMarkup(withDetails(simpleFamily), 0, 0);
     expect(withKey.height).toBeGreaterThan(without.height);
     expect(withKey.markup.join("")).toContain('class="clinical-details"');
   });
@@ -55,7 +55,7 @@ describe("clinical key fields (#102)", () => {
       partnerships: [], parentOf: {}, siblingOrder: { mode: "insertion", affectedFirst: false },
       clinicalDetails: { historian: "Self" },
     };
-    const key = renderExportKeySvg(lone, 0, 0);
+    const key = exportKeyMarkup(lone, 0, 0);
     expect(key.height).toBeGreaterThan(0);
     expect(exportSvg(lone)).toContain("Historian:");
   });

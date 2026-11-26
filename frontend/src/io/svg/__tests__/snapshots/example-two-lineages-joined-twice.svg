@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="520" height="625"
-     viewBox="0 0 520 625">
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="633"
+     viewBox="0 0 520 633">
 <defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="520" height="625" fill="white"/>
+<rect width="520" height="633" fill="white"/>
 <g class="chart-title"><text x="260" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Two lineages joined twice</text></g>
 <g transform="translate(60 100)">
 <g class="couple-lines">
@@ -25,7 +25,7 @@
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 545)">
-<rect x="40" y="2" width="16" height="16" fill="black" stroke="black" stroke-width="1.5"/><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Affected</text>
-<path d="M 41 36 Q 48 18 55 36" fill="none" stroke="black" stroke-width="1.5" stroke-dasharray="3 2"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
+<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="black"></rect></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>
+<g transform="translate(56 36) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><path d="M 4 17 Q 24 -5 44 17" stroke="black" stroke-width="2" stroke-dasharray="6 4" fill="none"></path></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Same person drawn more than once</text>
 </g>
 </svg>

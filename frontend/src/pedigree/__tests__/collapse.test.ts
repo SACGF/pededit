@@ -7,7 +7,7 @@ import { buildScene, pedigreeNumbers } from "../scene";
 import { sceneToFlow } from "../sceneToFlow";
 import { lintScene } from "../renderLint";
 import { sectionConditions } from "../tags";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { deidentify } from "../../io/svg/deidentify";
@@ -162,7 +162,7 @@ describe("drawing with hidden descendants (#94)", () => {
     expect(exportUShapeSvg(u).match(/data-branch-count=/g)).toHaveLength(1);
     expect(exportUShapeSvg(u)).not.toContain('data-id="gc1"');
     // wife is the only affected person and is hidden with gm's branch: no Affected key row.
-    expect(renderExportKeySvg(drawnPedigree(pedigree({ gm: true })), 0, 0).markup.join("")).not.toContain(">Affected<");
+    expect(exportKeyMarkup(drawnPedigree(pedigree({ gm: true })), 0, 0).markup.join("")).not.toContain(">Affected<");
     expect(exportSvg(pedigree({ gm: true }))).not.toContain('data-id="wife"');
   });
 
@@ -297,8 +297,8 @@ describe("collapsed branch diamond (#1)", () => {
   });
 
   it("the export key has a diamond row only while a branch is collapsed", () => {
-    expect(renderExportKeySvg(pedigree({ son: true }), 0, 0).markup.join("")).toContain("descendants not shown");
-    expect(renderExportKeySvg(pedigree({ loner: true }), 0, 0).markup.join("")).not.toContain("descendants not shown");
+    expect(exportKeyMarkup(pedigree({ son: true }), 0, 0).markup.join("")).toContain("descendants not shown");
+    expect(exportKeyMarkup(pedigree({ loner: true }), 0, 0).markup.join("")).not.toContain("descendants not shown");
   });
 });
 

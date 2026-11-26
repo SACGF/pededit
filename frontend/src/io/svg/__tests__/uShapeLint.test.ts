@@ -119,7 +119,7 @@ describe("U-shape chart title (#188)", () => {
     expect(lintUShapeSvg(svg)).toEqual([]);
     // A dashed link across the top of the figure, where the title is.
     const y = /class="chart-title"><text[^>]* y="([\d.]+)"/.exec(svg)![1];
-    const broken = svg.replace("</svg>", `<line x1="0" y1="${Number(y) - 4}" x2="2000" y2="${Number(y) - 4}" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>\n</svg>`);
+    const broken = svg.replace(/<\/svg>$/, `<line x1="0" y1="${Number(y) - 4}" x2="2000" y2="${Number(y) - 4}" stroke="black" stroke-width="1" stroke-dasharray="4 3"/>\n</svg>`);
     expect(lintUShapeSvg(broken).map(f => f.code)).toEqual(["title-collides"]);
   });
 });

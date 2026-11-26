@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="446"
-     viewBox="0 0 1400 446">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="462"
+     viewBox="0 0 1400 462">
 <defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
-<rect width="1400" height="446" fill="white"/>
+<rect width="1400" height="462" fill="white"/>
 <g class="chart-title"><text x="700" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Three or more partners</text></g>
 <g transform="translate(60 121)">
 <g class="couple-lines">
@@ -24,9 +24,9 @@
 </g>
 </g>
 <g class="pedigree-key" transform="translate(0 326)">
-<text x="40" y="13" font-family="sans-serif" font-size="7" textLength="16" lengthAdjust="spacingAndGlyphs" fill="black">AMAB</text><text x="64" y="14" font-family="sans-serif" font-size="10" fill="black">Assigned male at birth</text>
-<line x1="40" y1="28" x2="56" y2="28" stroke="black" stroke-width="1.5"/><line x1="40" y1="32" x2="56" y2="32" stroke="black" stroke-width="1.5"/><text x="64" y="34" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
-<line x1="40" y1="50" x2="56" y2="50" stroke="black" stroke-width="1.5"/><line x1="44.15" y1="54.2" x2="48.35" y2="45.8" stroke="black" stroke-width="1.5"/><line x1="47.65" y1="54.2" x2="51.85" y2="45.8" stroke="black" stroke-width="1.5"/><text x="64" y="54" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
-<line x1="40" y1="64" x2="56" y2="64" stroke="black" stroke-width="1.5"/><line x1="48" y1="64" x2="48" y2="76" stroke="black" stroke-width="1.5"/><line x1="44" y1="76" x2="52" y2="76" stroke="black" stroke-width="1.5"/><text x="64" y="74" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
+<g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="0 0 28 28"><text x="14" y="17" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">AMAB</text></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Assigned male at birth</text>
+<g transform="translate(56 36) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="7" x2="48" y2="7" stroke="black" stroke-width="2"></line><line x1="0" y1="13" x2="48" y2="13" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="40" font-family="sans-serif" font-size="10" fill="black">Consanguineous couple</text>
+<g transform="translate(56 60) scale(0.667) translate(-24 -10)"><svg width="48" height="20" viewBox="0 0 48 20"><line x1="0" y1="10" x2="48" y2="10" stroke="black" stroke-width="2"></line><path d="M 18.5 16 L 24.5 4 M 23.5 16 L 29.5 4" stroke="black" stroke-width="2" fill="none"></path></svg></g><text x="80" y="64" font-family="sans-serif" font-size="10" fill="black">Relationship ended</text>
+<g transform="translate(56 84) scale(0.667) translate(-24 -14)"><svg width="48" height="28" viewBox="0 0 48 28"><line x1="0" y1="4" x2="48" y2="4" stroke="black" stroke-width="2"></line><line x1="24" y1="4" x2="24" y2="22" stroke="black" stroke-width="2"></line><line x1="17" y1="22" x2="31" y2="22" stroke="black" stroke-width="2"></line></svg></g><text x="80" y="88" font-family="sans-serif" font-size="10" fill="black">No children by choice</text>
 </g>
 </svg>

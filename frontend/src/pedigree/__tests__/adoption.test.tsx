@@ -7,9 +7,12 @@ import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportCsv } from "../../io/csv/exporter";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+
+/** A figure without its key, whose swatches draw the same marks. */
+const drawing = (svg: string) => svg.replace(/<g class="pedigree-key"[^]*$/, "");
 
 /** Parents with three children: "bio" born to them, "ain" adopted in, "aout" adopted out. */
 function pedigree(): Pedigree {
@@ -58,10 +61,10 @@ describe("adoption brackets (#12)", () => {
     const p = pedigree();
     expect(lintScene(p, buildScene(p))).toEqual([]);
     const svg = exportSvg(p);
-    expect(svg.match(/data-adopted="in"/g)!.length).toBe(1);
-    expect(svg.match(/data-adopted="out"/g)!.length).toBe(1);
-    expect(svg.match(new RegExp(`stroke-dasharray="${ADOPTION_DASH}"`, "g"))!.length).toBe(1);
-    const key = renderExportKeySvg(p, 0, 0).markup.join("");
+    expect(drawing(svg).match(/data-adopted="in"/g)!.length).toBe(1);
+    expect(drawing(svg).match(/data-adopted="out"/g)!.length).toBe(1);
+    expect(drawing(svg).match(new RegExp(`stroke-dasharray="${ADOPTION_DASH}"`, "g"))!.length).toBe(1);
+    const key = exportKeyMarkup(p, 0, 0).markup.join("");
     expect(key).toContain("Adopted in (dashed line to adoptive parents)");
     expect(key).toContain("Adopted out");
   });

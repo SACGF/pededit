@@ -7,7 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { deidentify } from "../deidentify";
 import { drawnPedigree } from "../../../pedigree/collapse";
-import { renderExportKeySvg } from "../../../pedigree/exportKey";
+import { exportKeyMarkup } from "../../../pedigree/exportKey";
 import type { SvgExportOptions } from "../types";
 import { titleWidth } from "../../../pedigree/labels";
 import { CONSANGUINITY_LABEL_FONT_SIZE } from "../../../pedigree/consanguinityLabel";
@@ -120,7 +120,7 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
     minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
-  const legend = options.key === false ? { width: 0, height: 0, markup: [] } : renderExportKeySvg(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
+  const legend = options.key === false ? { width: 0, height: 0, markup: [] } : exportKeyMarkup(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
   const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
   const titleW = options.title ? titleWidth(options.title) + 2 * padding : 0;
   const drawingW = Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding);

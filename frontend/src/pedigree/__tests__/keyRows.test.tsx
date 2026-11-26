@@ -4,7 +4,7 @@ import { FEATURE_FIXTURES } from "../../fixtures/features";
 import { EXAMPLES } from "../../data/examples";
 import { drawnPedigree } from "../collapse";
 import { keyRows, KEY_DIFFERENCES, type KeyRow } from "../keyRows";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { drawsDuplicates } from "../duplicates";
 import { Legend } from "../../components/Legend";
 
@@ -92,13 +92,13 @@ describe("both draw every row of their list", () => {
       const exported = keyRows(drawn, "export");
       // The exporter tells the key whether its layout drew anyone twice.
       const duplicates = drawsDuplicates(drawn);
-      const svg = renderExportKeySvg(drawn, 0, 0, { duplicates }).markup.join("");
+      const svg = exportKeyMarkup(drawn, 0, 0, { duplicates }).markup.join("");
       for (const r of [...exported.tags, ...exported.symbols, ...exported.relationships]) expect(svg, r.label).toContain(`>${escapeXml(r.label)}</text>`);
       const rows = exported.tags.length + exported.symbols.length + exported.relationships.length;
       // One label for each row, and no row drawn that the list does not have.
       const labels = [...exported.tags, ...exported.symbols, ...exported.relationships].map(r => `>${escapeXml(r.label)}</text>`);
       expect(labels.filter(l => svg.includes(l)).length).toBe(rows);
-      expect(renderExportKeySvg(drawn, 0, 0, { duplicates }).height).toBeGreaterThanOrEqual(rows * 20);
+      expect(exportKeyMarkup(drawn, 0, 0, { duplicates }).height).toBeGreaterThanOrEqual(rows * 20);
     });
   }
 });

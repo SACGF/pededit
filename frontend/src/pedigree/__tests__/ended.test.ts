@@ -5,7 +5,7 @@ import { endedBreakX, endedMarkSegments, middleTaken, ENDED_STROKE_DX, ENDED_STR
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport } from "../../io/svg/exportLint";
-import { renderExportKeySvg } from "../exportKey";
+import { exportKeyMarkup } from "../exportKey";
 import { importJson, exportJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -70,11 +70,11 @@ describe("ended relationship on the canvas and in exports (#98)", () => {
     const p = pedigree();
     const svg = exportSvg(p);
     expect(markLines(svg)).toBe(4);
-    expect(renderExportKeySvg(p, 0, 0).markup.join("")).toContain("Relationship ended");
+    expect(exportKeyMarkup(p, 0, 0).markup.join("")).toContain("Relationship ended");
     expect(lintExport(p)).toEqual([]);
     p.partnerships.forEach(x => delete x.ended);
     expect(markLines(exportSvg(p))).toBe(0);
-    expect(renderExportKeySvg(p, 0, 0).markup.join("")).not.toContain("Relationship ended");
+    expect(exportKeyMarkup(p, 0, 0).markup.join("")).not.toContain("Relationship ended");
   });
 
   it("on a consanguineous double line too", () => {
