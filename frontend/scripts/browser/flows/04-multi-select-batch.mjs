@@ -66,8 +66,8 @@ export default {
 
     // Deleting someone else from the right-click menu leaves the selection alone.
     await t.press("Escape");
-    await t.click(node("g3a"));
-    await t.rightClick(node("g3b"));
+    await t.click(t.person("g3a"));
+    await t.rightClick(t.person("g3b"));
     await t.click('[data-context-menu] button:text-is("Delete")');
     t.ok(!(await t.pedigree()).individuals.some(i => i.id === "g3b"), "Delete in the menu of an unselected person removes them");
     t.equal(await selected(), ["g3a"], "and whoever was selected stays selected");
