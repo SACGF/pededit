@@ -15,16 +15,16 @@
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-222.6" x2="-226.5" y1="473.7" y2="485"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-103.3" x2="-104.4" y1="498.9" y2="510.9"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="23.8" x2="23.8" y1="500.8" y2="512.8"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="147.7" x2="150.3" y1="493.1" y2="507.6"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="264.2" x2="271.1" y1="457.3" y2="472.6"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="368.7" x2="379.6" y1="394.4" y2="408.4"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="147.7" x2="149.8" y1="493.1" y2="504.9"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="264.2" x2="269.1" y1="457.3" y2="468.2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="368.7" x2="376.1" y1="394.4" y2="403.8"/>
     <path d="M -306.4 472.4 A 532.8 532.8 0 0 0 -233 503.9" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-270.3" x2="-345.3" y1="489.5" y2="664.1"/>
     <path d="M -505.5 569.2 A 722.8 722.8 0 0 0 -166.1 715" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-505.5" x2="-512.9" y1="569.2" y2="578.6"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-401.3" x2="-407" y1="637.1" y2="647.7"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-287.1" x2="-290.5" y1="686.2" y2="696.6"/>
-    <line fill="none" stroke="black" stroke-dasharray="5 3" stroke-linecap="round" stroke-width="2" x1="-166.1" x2="-167.9" y1="715" y2="726.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-287.1" x2="-290.9" y1="686.2" y2="697.6"/>
+    <line fill="none" stroke="black" stroke-dasharray="5 3" stroke-linecap="round" stroke-width="2" x1="-166.1" x2="-167.9" y1="715" y2="726.8"/>
     <g transform="translate(-40 310.8) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
@@ -83,10 +83,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(38 20 20)">
-            <g>
-              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
-            </g>
+          <g>
+            <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
           </g>
         </g>
       </g>
@@ -104,10 +102,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(24.1 20 20)">
-            <g>
-              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
-            </g>
+          <g>
+            <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
           </g>
         </g>
       </g>
@@ -126,10 +122,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(10.1 20 20)">
-            <g>
-              <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
-            </g>
+          <g>
+            <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
           </g>
         </g>
       </g>
@@ -191,10 +185,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-27.5 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
@@ -252,18 +244,16 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-8.4 20 20)">
-            <g data-adopted="in">
-              <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
-              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
-              <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
-              <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
-              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
-              <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
-            </g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g data-adopted="in">
+            <line stroke="black" stroke-width="2" x1="-4" x2="-4" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="-4" x2="1" y1="42" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="44" y1="-2" y2="42"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="-2" y2="-2"/>
+            <line stroke="black" stroke-width="2" x1="44" x2="39" y1="42" y2="42"/>
+          </g>
+          <g>
+            <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
       </g>
@@ -285,10 +275,8 @@
           </g>
         </g>
         <g>
-          <g transform="rotate(-18.3 20 20)">
-            <g>
-              <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
+          <g>
+            <rect fill="black" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
       </g>
