@@ -1,51 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FEATURE_FIXTURES } from "../../fixtures/features";
 import { layoutToFlow } from "../layoutToFlow";
 import { drawnPedigree } from "../collapse";
-import { personGlyph, type PersonGlyph } from "../personGlyph";
+import { personGlyph } from "../personGlyph";
 import { labelMaxWidth } from "../labels";
 import { SLOT_WIDTH } from "../constants";
-
-/*
- * #144: what is drawn for a person is decided once, by `personGlyph`.
- *
- * The glyph of every person in every feature fixture (#140) is written to
- * ./glyphs/<slug>.json and compared, so a change in what anyone is drawn
- * with shows as a diff in data before it shows in a picture. Rewrite with
- * `npm -w frontend run test -- -u personGlyph` when the change is meant.
- */
-
-const DIR = join(__dirname, "glyphs");
-
-/** A glyph without the bulk: a tag by its id, numbers rounded. */
-function brief(g: PersonGlyph) {
-  const n = (x: number) => Math.round(x * 1000) / 1000;
-  return {
-    ...g,
-    paint: {
-      base: g.paint.base, core: g.paint.core, dot: g.paint.dot, line: !!g.paint.line,
-      sectors: g.paint.sectors.map(s => `${s.tag.id}${s.carrier ? " carrier" : ""}: ${n(s.start)} to ${n(s.end)}, ${s.fill} ${s.color}`),
-    },
-    annotations: g.annotations.map(a => `${a.tag.id}: x ${n(a.x)}, width ${n(a.width)}, ${a.color}`),
-  };
-}
-
-describe("personGlyph: every fixture person", () => {
-  for (const fx of FEATURE_FIXTURES) {
-    it(fx.slug, async () => {
-      const flow = layoutToFlow(fx.data);
-      const out: Record<string, unknown> = {};
-      for (const node of flow.nodes) out[`${node.data.individual.id} @ ${node.id}`] = brief(node.data.glyph);
-      await expect(JSON.stringify(out, null, 1) + "\n").toMatchFileSnapshot(join(DIR, `${fx.slug}.json`));
-    });
-  }
-
-  it("has no glyph file left over from a removed fixture", () => {
-    expect(readdirSync(DIR).filter(f => !FEATURE_FIXTURES.some(x => `${x.slug}.json` === f))).toEqual([]);
-  });
-});
 
 describe("personGlyph", () => {
   const status = FEATURE_FIXTURES.find(f => f.slug === "status")!.data;

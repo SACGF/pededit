@@ -65,8 +65,8 @@ draws NSGC symbols.
   `arrowKind`, `symbolSex` or the label functions any more (a test holds
   them to that), so a renderer cannot decide differently from the others.
   Add a new mark or line of text for a person as a field of the glyph first.
-  `__tests__/glyphs/<fixture>.json` records the glyph of every fixture
-  person: a change in what anyone is drawn with shows there as data. The
+  The SVG snapshots (#69) are the record of what is drawn; glyphs are not
+  recorded as well (#175). The
   canvas node still reads the pedigree from the store, for the problem
   marker only. `nameLines` is what the canvas draws (one line when names are
   truncated), `figureNameLines` what a file writes (always wrapped).
