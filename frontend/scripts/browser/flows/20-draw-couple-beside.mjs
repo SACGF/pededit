@@ -54,7 +54,7 @@ export default {
     // the group of each couple, headed by the other partner, and
     // on the menu of the two partners selected together.
     // Whoever is drawn twice has two symbols; either copy will do.
-    const node = id => `[data-individual-id="${id}"] >> nth=0`;
+    const node = id => `${t.person(id)} >> nth=0`;
     await t.rightClick(node("B"));
     t.match(await t.text("[data-context-menu]"), /With [^\n]+\n[\s\S]*Draw this couple beside/i, "a partner's own menu offers it in the group of each of their couples");
     t.equal(await t.count('[data-context-menu] [data-draw-beside="C+B"] [aria-checked="true"]:has-text("(male)")'), 1, "with the same tick as the couple line's menu");

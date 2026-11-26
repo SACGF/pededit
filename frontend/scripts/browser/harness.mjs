@@ -28,13 +28,36 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 
 // ── Arguments ────────────────────────────────────────────────────────────────
 
-/** Flags that become ordered interaction steps, run after the page settles. */
-const STEP_FLAGS = new Set([
-  "click", "dblclick", "right-click", "hover", "press", "key-down", "key-up", "fill", "wait-for",
-  "drag", "reload", "upload", "download", "sleep", "mouse-away", "select", "choose",
-]);
-/** Steps that take no value. */
-const BARE_STEPS = new Set(["reload", "mouse-away"]);
+/**
+ * The interaction steps, run in order after the page settles (runSteps), for
+ * the tools that take them. `value` is what the flag takes (null: nothing);
+ * the flags, their help and parseArgs all come from this table.
+ */
+const STEPS = {
+  click: { value: "SEL", help: "Click the element." },
+  dblclick: { value: "SEL", help: "Double-click it." },
+  "right-click": { value: "SEL", help: "Right-click (contextmenu), e.g. a node for its menu." },
+  hover: { value: "SEL", help: "Move the mouse over it." },
+  "wait-for": { value: "SEL", help: "Wait until one is visible." },
+  press: { value: "KEY", help: "A key or chord, e.g. Delete, Control+z." },
+  "key-down": { value: "KEY", help: "Hold a key (Shift, Control, Meta) for the clicks and\ndrags that follow; shift-click is\n--key-down Shift --click SEL --key-up Shift." },
+  "key-up": { value: "KEY", help: "Release it." },
+  fill: { value: "'SEL=>TEXT'", help: "Type into an input (replaces its value)." },
+  select: { value: "'SEL=>V'", help: "Choose an option of a native <select> by value or label." },
+  choose: { value: "'SEL=>TEXT'", help: "Click SEL (a Radix popover or menu trigger, such as the\nmore menu \"···\" or Export PED), then the item in the\npopover, menu or listbox it opened whose text (or first\nline, or title) is TEXT; a unique substring also works." },
+  drag: { value: "'SEL=>DX,DY'", help: "Drag an element by DX,DY screen pixels." },
+  upload: { value: "'SEL=>FILE'", help: "Set a file input, or click SEL and answer the file chooser." },
+  download: { value: "'SEL[=>PATH]'", help: "Click SEL and save the download (default\n<--out-dir or frontend/test-output/browser/downloads>/<name>)." },
+  reload: { value: null, help: "Wait for auto-save to finish, then reload the page." },
+  sleep: { value: "MS", help: "Wait MS milliseconds." },
+  "mouse-away": { value: null, help: "Move the mouse to the page corner (hides hover toolbars)." },
+};
+
+/** One option of a help text: the flag, then its help, continuation lines indented under it. */
+const helpRow = (flag, help) => {
+  const [first, ...rest] = help.split("\n");
+  return [`  ${flag.padEnd(19)} ${first}`, ...rest.map(l => `${" ".repeat(22)}${l}`)].join("\n");
+};
 
 /** Flags shared by every tool: name -> kind ("bool" | "string" | "number" | "multi"). */
 const COMMON_FLAGS = {
@@ -58,11 +81,15 @@ const COMMON_FLAGS = {
 };
 
 /**
- * Parse argv into { positional, flags, steps }. Step flags keep their order
- * relative to each other so `--click A --press Delete --click B` runs in that order.
+ * Parse argv into { positional, flags, steps }. A tool accepts only its own
+ * flags (`extraFlags`), the common ones unless `common` is false, and the
+ * steps when `steps` is true; anything else is a usage error. Step flags keep
+ * their order relative to each other so `--click A --press Delete --click B`
+ * runs in that order.
  */
-export function parseArgs(argv, extraFlags = {}) {
-  const kinds = { ...COMMON_FLAGS, ...extraFlags };
+export function parseArgs(argv, extraFlags = {}, { common = true, steps: takesSteps = false } = {}) {
+  const kinds = { ...(common ? COMMON_FLAGS : { help: "bool" }), ...extraFlags };
+  const isStep = name => takesSteps && Object.hasOwn(STEPS, name);
   const positional = [];
   const flags = {};
   const steps = [];
@@ -73,7 +100,7 @@ export function parseArgs(argv, extraFlags = {}) {
     let name = arg.slice(2);
     let value;
     const eq = name.indexOf("=");
-    if (eq >= 0 && !STEP_FLAGS.has(name.slice(0, eq)) && kinds[name.slice(0, eq)]) {
+    if (eq >= 0 && !isStep(name.slice(0, eq)) && kinds[name.slice(0, eq)]) {
       value = name.slice(eq + 1);
       name = name.slice(0, eq);
     }
@@ -82,8 +109,8 @@ export function parseArgs(argv, extraFlags = {}) {
       if (i + 1 >= argv.length) throw new UsageError(`--${name} needs a value`);
       return argv[++i];
     };
-    if (STEP_FLAGS.has(name)) {
-      steps.push({ kind: name, arg: BARE_STEPS.has(name) ? null : takeValue() });
+    if (isStep(name)) {
+      steps.push({ kind: name, arg: STEPS[name].value === null ? null : takeValue() });
       continue;
     }
     const kind = kinds[name];
@@ -121,40 +148,25 @@ Common options:
   --local-storage K=V Seed localStorage before the first load (repeatable),
                       e.g. compactLayout=true. Reloads keep the app's own writes.
   --as-agent          Sign in as the claude_agent user (needs Django running).
-Steps, run in order after load (a step whose element never appears, is
-disabled, or matches several visible elements is reported, not skipped):
-  --click SEL  --dblclick SEL  --hover SEL  --wait-for SEL
-  --right-click SEL   Right-click (contextmenu), e.g. a node for its menu.
-  --press KEY         A key or chord, e.g. Delete, Control+z.
-  --key-down KEY      Hold a key (Shift, Control, Meta) for the clicks and
-  --key-up KEY        drags that follow, then release it: shift-click is
-                      --key-down Shift --click SEL --key-up Shift.
-  --fill 'SEL=>TEXT'  Type into an input (replaces its value).
-  --select 'SEL=>V'   Choose an option of a native <select> by value or label.
-  --choose 'SEL=>TEXT' Click SEL (a Radix popover or menu trigger, such as the
-                      more menu "···" or Export PED), then the item in the
-                      popover, menu or listbox it opened whose text (or first
-                      line, or title) is TEXT; a unique substring also works.
-  --drag 'SEL=>DX,DY' Drag an element by DX,DY screen pixels.
-  --upload 'SEL=>FILE' Set a file input, or click SEL and answer the file chooser.
-  --download 'SEL[=>PATH]' Click SEL and save the download (default
-                      <--out-dir or frontend/test-output/browser/downloads>/<name>).
-  --reload            Wait for auto-save to finish, then reload the page.
-  --sleep MS          Wait MS milliseconds.
-  --mouse-away        Move the mouse to the page corner (hides hover toolbars).
-  --first             Let a step selector match several visible elements and
-                      use the first, instead of failing the step.
 Timing and output:
   --out-dir DIR       Where downloads (and shot.mjs PNGs) go.
   --wait MS           Extra wait after network idle (default 1500).
   --step-wait MS      Wait after each step (default 300).
   --timeout MS        How long a step waits for its element (default 5000).
+  --first             Let a step selector match several visible elements and
+                      use the first, instead of failing the step.
   --viewport WxH      Browser size (default 1440x900).
   --json              Machine-readable output.
   --verbose           Full stacks and messages in the text report.
   --allow-remote      Allow a non-localhost URL. Never point this at pededit.com.
 URLs may be paths (/p/fixture) and are resolved against ${DEFAULT_BASE}
 (override with PEDEDIT_BASE).`;
+
+/** Help for the steps, for the tools that take them (parseArgs with steps: true). */
+export const STEPS_HELP = `
+Steps, run in order after load (a step whose element never appears, is
+disabled, or matches several visible elements is reported, not skipped):
+${Object.entries(STEPS).map(([name, s]) => helpRow(s.value === null ? `--${name}` : `--${name} ${s.value}`, s.help)).join("\n")}`;
 
 // ── URL guard ────────────────────────────────────────────────────────────────
 
@@ -167,6 +179,11 @@ export function resolveTarget(target, { allowRemote = false } = {}) {
     );
   }
   return url.toString();
+}
+
+/** The dev server the tools drive (PEDEDIT_BASE), refused unless it is local. */
+export function baseUrl({ allowRemote = false } = {}) {
+  return resolveTarget("/", { allowRemote }).replace(/\/$/, "");
 }
 
 export async function assertServerUp(url) {
@@ -490,8 +507,16 @@ export async function gotoAndSettle(page, url, waitMs) {
   return response;
 }
 
-/** Split 'SEL=>VALUE'; the value is optional when allowMissing. */
+/**
+ * A step's selector and value: `sel` and `value` when the step was built
+ * with them (flows.mjs, so a value may hold "=>"), else split from
+ * 'SEL=>VALUE'. The value is optional when allowMissing.
+ */
 function splitArrow(step, { allowMissing = false } = {}) {
+  if (step.sel !== undefined) {
+    if (step.value == null && !allowMissing) throw new UsageError(`--${step.kind} needs a value`);
+    return [step.sel, step.value ?? null];
+  }
   const sep = step.arg.lastIndexOf("=>");
   if (sep < 0) {
     if (allowMissing) return [step.arg, null];
@@ -951,6 +976,21 @@ export function findingLines(f, { verbose = false } = {}) {
     lines.push(`  note  the backend added ${plural(f.persistDefaults.length, "empty default")} that were absent: ${paths.slice(0, 6).join(", ")}${paths.length > 6 ? ", ..." : ""}`);
   }
   return lines;
+}
+
+/**
+ * One line per uncaught error and console error (and with `warnings`,
+ * console warning; with `requests`, failed request), each with the source
+ * line resolveFindings found. For tools that report findings as a list.
+ */
+export function errorLines(f, { warnings = false, requests = false } = {}) {
+  const at = w => (w ? ` (${where(w)})` : "");
+  return [
+    ...f.pageErrors.map(e => `uncaught ${e.message.split("\n")[0].slice(0, 200)}${at(e.where)}${e.count > 1 ? ` (x${e.count})` : ""}`),
+    ...f.console.filter(c => c.type === "error" || warnings)
+      .map(c => `console.${c.type === "warning" ? "warn" : c.type} ${c.text.split("\n")[0].slice(0, 200)}${at(c.where)}`),
+    ...(requests ? f.requests.map(q => `${q.method} ${shortUrl(q.url)} -> ${q.status ?? q.error}`) : []),
+  ];
 }
 
 /** The real backend cannot roll back what the page wrote, so say so. */

@@ -13,6 +13,7 @@ import path from "node:path";
 import {
   DEFAULT_BASE, FRONTEND_DIR, closeBrowser, main, parseArgs, parseViewport, launchBrowser, newContext,
   assertServerUp, loadFixture, openPage, resolveFindings, resolveTarget, servedInfo, servedLines, displayPath, UsageError,
+  baseUrl, errorLines,
 } from "./harness.mjs";
 
 const HELP = `usage: node frontend/scripts/browser/phone.mjs [--fixture SPEC ...] [--viewport WxH ...]
@@ -186,11 +187,7 @@ function commonChecks(r, m) {
 }
 
 function jsChecks(r, findings) {
-  const lines = [
-    ...findings.pageErrors.map(e => `uncaught ${e.message}${e.location ? ` (${e.location})` : ""}`),
-    ...findings.console.map(c => `console.${c.type === "warning" ? "warn" : c.type} ${c.text.split("\n")[0].slice(0, 160)}`),
-    ...findings.requests.map(q => `${q.method} ${q.url} -> ${q.status ?? q.error}`),
-  ];
+  const lines = errorLines(findings, { warnings: true, requests: true });
   r.check(lines.length === 0, "no JavaScript errors or warnings", lines.join("; "));
 }
 
@@ -670,12 +667,14 @@ function CSS_ESCAPE(id) {
 }
 
 await main(async () => {
-  const { positional, flags } = parseArgs(process.argv.slice(2), { viewport: "multi", "no-landing": "bool" });
+  const { positional, flags } = parseArgs(process.argv.slice(2), {
+    fixture: "multi", viewport: "multi", "no-landing": "bool", "out-dir": "string", verbose: "bool",
+  }, { common: false });
   if (flags.help) { console.log(HELP); return 0; }
   if (positional.length) throw new UsageError("usage: phone.mjs takes no URL (it opens / and /p/fixture)");
   const viewports = (flags.viewport ?? DEFAULT_VIEWPORTS).map(spec => ({ spec, ...parseViewport(spec) }));
   const fixtures = flags.fixture ?? DEFAULT_FIXTURES;
-  const base = DEFAULT_BASE;
+  const base = baseUrl();
   await assertServerUp(base);
   const served = await servedInfo(base);
   const outDir = path.resolve(flags["out-dir"] ?? path.join(FRONTEND_DIR, "test-output", "browser", "phone"));

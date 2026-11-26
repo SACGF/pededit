@@ -9,10 +9,7 @@ export default {
     const requests = [];
     t.page.on("request", r => requests.push(r.url()));
 
-    await t.open("/");
-    await t.click('button:has-text("Create blank pedigree")');
-    await t.waitFor('button[title="Add female"]');
-    t.currentId();
+    await t.createBlank();
     await t.click('button[title="Add female"]');
     await t.fill('input[aria-label="Name"]', "Linnea");
     await t.press("Tab");

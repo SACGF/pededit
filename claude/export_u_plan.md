@@ -13,19 +13,16 @@ Code: `frontend/src/io/svg/uShapeExporter.ts`. Tests:
 
 ## Looking at the output
 
-This is a visual problem, so look at it. From `frontend/`:
+This is a visual problem, so look at it. In the editor, the toolbar's
+"U-shape" button draws it live. Without the editor, `eval.mjs` returns the
+export and `shot.mjs` renders it in headless chromium (servers up, as in
+`frontend/scripts/browser/README.md`):
 
-    ./render-u.sh            # all fixtures
-    ./render-u.sh 1800 synth # only names containing "synth", overview max 1800px
+    node frontend/scripts/browser/eval.mjs --fixture example:2 \
+      '__pededit.exportSvg({ uShape: true })' | jq -r . > u.svg
+    node frontend/scripts/browser/shot.mjs u.svg       # writes u.svg.png
 
-It renders a battery of pedigrees (`src/io/svg/__tests__/_uShapeRender.dev.ts`)
-to `frontend/test-output/` (git-ignored):
-
-- `dev-NAME.svg`: the export itself, with the generation tracks overlaid in red
-- `dev-NAME.full.png`: 1:1 screenshot, crop this to check detail
-- `dev-NAME.png`: whole figure shrunk to fit
-
-Screenshots come from headless Chromium. Do not use ImageMagick to rasterise the
+Do not use ImageMagick to rasterise the
 SVG. Its built-in renderer draws arcs and rotated groups wrongly, which makes a
 correct layout look broken.
 
@@ -181,10 +178,11 @@ omitted (and counted as omitted) rather than drawn under the wrong couple.
 
 ## Checking it
 
-`./render-u.sh 1800 ped-` runs every file in `test-data/ped/` and every in-app
-example (`src/data/examples.ts`) through the exporter, writes
-`test-output/ped-*.png`, and prints a sanity report (exceptions, NaN,
-overlapping symbols including duplicates, who was omitted).
+`node frontend/scripts/browser/lint.mjs --all-examples --u-shape` (and
+`--all-fixtures`, `--all-test-data`) lints each U-shape export: its labels
+against every line, symbol and text (`src/io/svg/uShapeLint.ts`).
+`svgSnapshots.test.ts` compares the U-shape of every example and feature
+fixture with a committed file, so a change in how one is drawn shows.
 
 The test suite also lays out 80 random families with random matings between
 blood relatives, with partners on and off, and checks that no symbols overlap

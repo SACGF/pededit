@@ -7,7 +7,6 @@ export default {
   about: "With two people selected, \"Only the 2 selected people (+2 to connect them)\" exports an SVG of them and their parents only; off by default, nothing saved",
   async run(t) {
     await t.openFixture("fixture:text");
-    const node = id => `[data-individual-id="${id}"]`;
     const box = '[data-testid="export-only-selected"]';
     const openDialog = () => t.click('button[title="Export as SVG or PNG"]');
     const cancel = () => t.click('[role="dialog"] button:has-text("Cancel")');
@@ -16,13 +15,13 @@ export default {
     await openDialog();
     t.equal(await t.count(box), 0, "with nobody selected the dialog has no tickbox");
     await cancel();
-    await t.click(node("k2"));
+    await t.click(t.person("k2"));
     await openDialog();
     t.equal(await t.count(box), 0, "nor with one person selected");
     await cancel();
 
     // Xavier and Yolanda, two of Rupert and Persephone's four children.
-    await t.holding("Shift", () => t.click(node("k3")));
+    await t.holding("Shift", () => t.click(t.person("k3")));
     await openDialog();
     t.match(await t.text('[role="dialog"]'), /Only the 2 selected people \(\+2 to connect them\)/, "two siblings selected: the tickbox counts them and their two parents");
     t.equal(await t.eval(sel => document.querySelector(sel).checked, box), false, "it is off by default");

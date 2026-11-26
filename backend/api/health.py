@@ -31,8 +31,6 @@ from peded.version import VERSION
 
 logger = logging.getLogger(__name__)
 
-HEALTH_PATH = "/api/health/"
-
 LOOPBACK_ADDRESSES = {"127.0.0.1", "::1"}
 # Any of these means a proxy passed the request on, so the real client is
 # somewhere else even though REMOTE_ADDR is loopback. The Nginx vhost sets

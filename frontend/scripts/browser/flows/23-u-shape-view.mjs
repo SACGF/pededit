@@ -30,9 +30,9 @@ export default {
     t.equal((await state()).selected, [pick], "a click on the U selects that person");
     t.equal(await t.count(`${person(pick)} [data-u-highlight]`), 1, "and outlines them");
     const blackFill = () => t.eval(sel => !!document.querySelector(sel)?.querySelector('[fill="black"]:not(text)'), person(pick));
-    const wasAffected = (await t.pedigree()).individuals.find(i => i.id === pick).affected;
+    const wasAffected = (await t.individual(pick)).affected;
     await t.click('[data-testid="panel-person"] label:has-text("Affected") input');
-    t.equal((await t.pedigree()).individuals.find(i => i.id === pick).affected, !wasAffected, "the Person tab edits whoever is selected on the U");
+    t.equal((await t.individual(pick)).affected, !wasAffected, "the Person tab edits whoever is selected on the U");
     t.equal(await blackFill(), !wasAffected, "and the U redraws with the change");
     const before = new Set((await t.pedigree()).individuals.map(i => i.id));
     await t.click('[data-testid="person-actions"] [aria-label="Add son"]');

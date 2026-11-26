@@ -301,7 +301,8 @@ reporting is off, and the dev server never reports.
   script hides `[data-prerendered]` on any path but the page's own.
   Anything these pages read while rendering must work without a browser
   (`window` is undefined there; `YourData` says "this site" for the host);
-  `src/__tests__/prerender.test.ts` checks it, since CI does not build. The
+  `src/__tests__/prerender.test.ts` checks it without a build, and CI's
+  unit job runs `npm -w frontend run build`. The
   SSR server has its own `cacheDir`, or a build would invalidate a running
   dev server's dependencies.
 - Guides (#202): `/guides` and `/guides/<slug>` (`pages/GuidePage.tsx`,
@@ -465,7 +466,7 @@ reporting is off, and the dev server never reports.
   so a slug is never changed or reused; `data/__tests__/examples.test.ts`
   pins the list. Tests and the page checks still address examples by index
   or label (`example:N`).
-- `fixtures/` — pedigrees used by tests and dev-only render scripts.
+- `fixtures/` — pedigrees used by tests.
   `fixtures/features.ts` holds the feature fixtures (#140): small artificial
   pedigrees that between them draw every symbol, line and label, each also
   in NSGC 2008 and black and white where that changes the drawing. The
@@ -495,8 +496,7 @@ reporting is off, and the dev server never reports.
 
 ## Conventions
 
-- Tests sit in `__tests__/` next to the code they cover. Files prefixed `_` and
-  suffixed `.dev.ts` are manual render helpers, not tests.
+- Tests sit in `__tests__/` next to the code they cover.
 - Use `@/` for `src/` imports in components; relative paths elsewhere are fine.
 - Draw once: the canvas and the SVG exporters render the same components in
   `pedigree/chart/`, so a drawing change goes there, and shared geometry goes

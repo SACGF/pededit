@@ -4,7 +4,7 @@
 // 4xx/5xx responses, steps that could not run, fixture import warnings, the
 // render lint, and (with --fixture-via-api) what did not persist.
 import {
-  COMMON_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
+  COMMON_HELP, STEPS_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
   assertServerUp, loadFixture, openPage, finishPage, contextOptions, resolveFindings, SourceMapper,
   summaryLine, findingLines, writesLine, hasFindings, servedInfo, servedLines, UsageError, SET_FLAGS, SET_HELP, expandSetFlags,
 } from "./harness.mjs";
@@ -17,10 +17,11 @@ ${SET_HELP}
 Prints the served commit, one summary line, then one line per finding with a
 file:line. Everything goes to stdout.
 Exits 0 when the page is clean, 1 when there are findings, 2 on usage errors.
-${COMMON_HELP}`;
+${COMMON_HELP}
+${STEPS_HELP}`;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), SET_FLAGS);
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), SET_FLAGS, { steps: true });
   if (flags.help) { console.log(HELP); return 0; }
   await expandSetFlags(flags);
   if (positional.length > 1) throw new UsageError("usage: one URL at most (use --fixture several times for several pedigrees)");

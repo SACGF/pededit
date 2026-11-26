@@ -54,7 +54,7 @@ export default {
     await t.press("Escape");
     await t.click(`[data-individual-id="${(await t.drawn())[1]}"]`);
     t.equal(await t.count('[data-testid="error-boundary"]'), 0, "selecting and editing people on a translated page does not crash the app");
-    t.ok((await t.pedigree()).individuals.find(i => i.id === first).affected, "and the edit was made");
+    t.ok((await t.individual(first)).affected, "and the edit was made");
 
     // A problem message taken out of its place, then the problem fixed, so React removes the message.
     await t.openFixture("test-data/pedigrees/problems/status.json");
@@ -69,7 +69,7 @@ export default {
     }, message);
     await t.press("a");
     t.equal(await t.count('[data-testid="error-boundary"]'), 0, "fixing a problem whose message was moved does not crash the app");
-    t.ok((await t.pedigree()).individuals.find(i => i.id === "p").affected, "and the fix was made");
+    t.ok((await t.individual("p")).affected, "and the fix was made");
     await t.click('[data-individual-id="p"]');
     t.ok(await t.visible('input[aria-label="Name"]'), "with the Person tab still usable");
     t.equal(await t.count(message), 0, "and the moved message gone");

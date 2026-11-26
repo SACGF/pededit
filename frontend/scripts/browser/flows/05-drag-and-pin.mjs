@@ -5,7 +5,7 @@ export default {
   about: "A dragged person stays where they were dropped after a reload, until Reset layout",
   async run(t) {
     const id = await t.openFixture("example:Three generations");
-    const node = '[data-individual-id="g3c"]';
+    const node = t.person("g3c");
     const where = () => t.eval(() => {
       const n = window.__pededit.layout().people.find(n => n.individual.id === "g3c");
       return { x: Math.round(n.position.x), y: Math.round(n.position.y), pinned: n.isPinned };

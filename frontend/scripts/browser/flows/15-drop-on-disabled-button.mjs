@@ -9,7 +9,7 @@ export default {
   about: "A dragged person let go over a disabled hover pill button is dropped and pinned (#185)",
   async run(t) {
     await t.openFixture("example:Three generations");
-    const node = '[data-individual-id="g3c"]';
+    const node = t.person("g3c");
     await t.hover(node);
     await t.click('button[title="Unlock to drag"]');
     const where = () => t.eval(() => {

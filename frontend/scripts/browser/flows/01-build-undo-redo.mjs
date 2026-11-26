@@ -4,11 +4,8 @@ export default {
   name: "build-undo-redo",
   about: "Build three generations from a blank pedigree, undo to empty, redo to the end",
   async run(t) {
-    await t.open("/");
-    await t.click('button:has-text("Create blank pedigree")');
-    await t.waitFor('button[title="Add male"]');
+    await t.createBlank();
     t.match(t.page.url(), /\/p\/[0-9a-f-]{36}$/, "creating a blank pedigree opens /p/<id>");
-    t.currentId();
     t.equal(await t.people(), 0, "a blank pedigree has nobody");
 
     await t.click('button[title="Add male"]');

@@ -3,7 +3,7 @@
 // function body) in it and print the result as JSON. In the dev build the
 // stores and helpers are on window.__pededit (see frontend/src/devHooks.ts).
 import {
-  COMMON_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
+  COMMON_HELP, STEPS_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, targetsFrom,
   assertServerUp, loadFixture, openPage, finishPage, contextOptions, resolveFindings, SourceMapper,
   summaryLine, findingLines, writesLine, servedInfo, servedLines, UsageError,
 } from "./harness.mjs";
@@ -24,10 +24,11 @@ Examples:
   eval.mjs --fixture example:5 '__pededit.align().pos'       # raw kinship2 layout
 
   --one-line          Print the result as single-line JSON instead of indented.
-${COMMON_HELP}`;
+${COMMON_HELP}
+${STEPS_HELP}`;
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "one-line": "bool" });
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "one-line": "bool" }, { steps: true });
   const indent = flags["one-line"] ? undefined : 2;
   if (flags.help) { console.log(HELP); return 0; }
   let urlArg, js;

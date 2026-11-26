@@ -326,6 +326,19 @@ class TagPresetTests(APITestCase):
         )
         self.assertEqual(resp.status_code, 400)
 
+    def test_an_entry_is_never_read_alone_or_edited(self):
+        # My library only lists, saves and deletes (frontend tagPresetApi).
+        self.client.force_authenticate(self.alice)
+        preset_id = self.client.post(
+            "/api/tag-presets/", {"label": "CF", "color": "#000", "style": "dot"}, format="json"
+        ).data["id"]
+        url = f"/api/tag-presets/{preset_id}/"
+        self.assertEqual(self.client.get(url).status_code, 405)
+        for method in (self.client.put, self.client.patch):
+            resp = method(url, {"label": "Changed", "color": "#000", "style": "dot"}, format="json")
+            self.assertEqual(resp.status_code, 405)
+        self.assertEqual(TagPreset.objects.get(id=preset_id).label, "CF")
+
 
 class DeleteAccountTests(APITestCase):
     """DELETE /api/auth/me/ (#183), stated on /your-data ("Signing in", `YourData`)."""
@@ -738,6 +751,58 @@ class NoPasswordSignInTests(APITestCase):
         self.assertEqual(resp.status_code, 200, resp.data)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp.data['access']}")
         self.assertEqual(self.client.get("/api/auth/me/").json()["username"], "bob")
+
+
+class SocialSignInTests(APITestCase):
+    """A successful Google or GitHub sign-in, with the provider answered
+    in the test: the user is found by email or made, and gets a token pair."""
+
+    def google(self, email, name):
+        from unittest import mock
+
+        idinfo = {"email": email, "name": name}
+        with mock.patch("api.social_auth.google_id_token.verify_oauth2_token", return_value=idinfo):
+            return self.client.post("/api/auth/google/", {"credential": "x"}, format="json")
+
+    def github(self, profile, emails=()):
+        from unittest import mock
+
+        def answer(status_code, body):
+            return mock.Mock(status_code=status_code, json=mock.Mock(return_value=body))
+
+        def get(url, **kwargs):
+            return answer(200, list(emails) if url.endswith("/emails") else profile)
+
+        with mock.patch("api.social_auth.http_requests.post", return_value=answer(200, {"access_token": "gh"})), \
+                mock.patch("api.social_auth.http_requests.get", side_effect=get):
+            return self.client.post("/api/auth/github/", {"code": "x"}, format="json")
+
+    def signed_in_as(self, resp):
+        self.assertEqual(resp.status_code, 200, resp.content)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {resp.data['access']}")
+        return self.client.get("/api/auth/me/").json()["username"]
+
+    def test_google_makes_the_user_once(self):
+        self.assertEqual(self.signed_in_as(self.google("ada@example.com", "Ada King Lovelace")), "ada@example.com")
+        user = User.objects.get(email="ada@example.com")
+        self.assertEqual((user.first_name, user.last_name), ("Ada", "King Lovelace"))
+        self.client.credentials()
+        self.assertEqual(self.signed_in_as(self.google("ada@example.com", "Someone Else")), "ada@example.com")
+        self.assertEqual(User.objects.filter(email="ada@example.com").count(), 1)
+        self.assertEqual(User.objects.get(email="ada@example.com").first_name, "Ada")
+
+    def test_github_uses_the_primary_verified_email_and_fills_a_missing_name(self):
+        User.objects.create_user("grace@example.com", email="grace@example.com")
+        resp = self.github(
+            {"login": "ghopper", "name": None, "email": None},
+            emails=[
+                {"email": "old@example.com", "primary": False, "verified": True},
+                {"email": "grace@example.com", "primary": True, "verified": True},
+            ],
+        )
+        self.assertEqual(self.signed_in_as(resp), "grace@example.com")
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(User.objects.get().first_name, "ghopper")
 
 
 HTTPS_ON = dict(

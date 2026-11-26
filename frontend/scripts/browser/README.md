@@ -349,17 +349,28 @@ export default {
 ```
 
 `t` drives the page with the same steps as the command line (`t.click`,
-`t.rightClick`, `t.hover`, `t.fill`, `t.select`, `t.choose`, `t.drag`,
+`t.rightClick`, `t.hover`, `t.fill`, `t.select`, `t.drag`,
 `t.upload`, `t.download`, `t.press`, `t.holding("Shift", fn)`, `t.reload`),
 so a step still acts on exactly one visible element and fails otherwise.
-`t.pill(id, "Add son")` and `t.menu(id, "Add partner")` are the hover pill and
-the right-click menu. `t.openFixture(spec)` saves a fixture through the API
-and opens it, `t.open(path)` goes anywhere, `t.newTab()` is a second tab in
-the same profile. Read with `t.pedigree()`, `t.drawn()`, `t.stored(id)`,
-`t.eval(fn)`, `t.text(sel)`, `t.count(sel)`. Check with `t.equal(actual,
-expected, what)`, `t.ok`, `t.match`, `t.notMatch`: `what` is a sentence
+`t.person(id)` is the selector of a person's symbol. `t.pill(id, "Add son")`
+and `t.menu(id, "Add partner")` are the hover pill and the right-click menu.
+`t.createBlank()` makes a blank pedigree from the landing page and returns
+its id, `t.openFixture(spec)` saves a fixture through the API and opens it,
+`t.open(path)` goes anywhere, `t.newTab()` is a second tab in the same
+profile. Read with `t.pedigree()`, `t.individual(id)` (of the editor's
+pedigree, or of one passed in), `t.drawn()`, `t.stored(id)`, `t.eval(fn)`,
+`t.text(sel)`, `t.count(sel)`; `t.api(path, { token, json, method })`
+calls the API. Check with `t.equal(actual, expected, what)`, `t.ok`,
+`t.match`, `t.notMatch`, and `await t.status(response, 404, what)`, which
+prints the response body when the status is wrong: `what` is a sentence
 saying what should be true, and is what a failure prints. The list is in
 `makeT` in `flows.mjs`.
+
+Every pedigree a flow saves (`t.openFixture`, `t.createBlank`,
+`t.currentId()`, or an id pushed on `t.created`) is deleted afterwards
+without a token, so an anonymous one goes and one the agent owns stays.
+The flows take only their own options (`--help`) and refuse a
+`PEDEDIT_BASE` that is not on this machine.
 
 Rules that keep them worth having:
 
@@ -528,7 +539,9 @@ with `--all-test-data` (every valid file of the test data set in
 `test-data/pedigrees/`, which includes the feature fixtures), so each of them
 must load without JS errors, draw and export cleanly, and survive a save and
 reload; then `flows.mjs`, the end-to-end flows, and `phone.mjs`, the emulated phone. On failure the job prints the tail
-of the Vite and Django logs. Reproduce a failing step locally with the same
+of the Vite and Django logs, then every traceback and 5xx response in the
+Django log with the lines round it, however early it came. The unit job
+also runs `npm -w frontend run build`, as `deploy.sh` does. Reproduce a failing step locally with the same
 command after `servers.mjs up`. The flows compare pedigrees whatever order
 their keys are in, since PostgreSQL (jsonb) reorders the keys of what it
 stores and CI's SQLite does not.
@@ -666,7 +679,8 @@ another local port (for a second checkout's Vite, for example).
 ## Safety
 
 - URLs must be on localhost; anything else is refused unless
-  `--allow-remote` is given. Never point these at pededit.com.
+  `--allow-remote` is given. Never point these at pededit.com. The flows
+  and the phone check have no `--allow-remote`.
 - Without `--fixture`, or with `--fixture-via-api`, the page talks to the
   local backend and nothing is rolled back, except that a clean
   `--fixture-via-api` run deletes the pedigree it created. Any POST/PATCH/PUT/DELETE that reached `/api/` is listed at the

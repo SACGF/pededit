@@ -8,10 +8,9 @@ export default {
   about: "Creating a pedigree while rate limited says how long to wait; the landing page and an example link (#184)",
   async run(t) {
     const ip = `203.0.113.${1 + Math.floor(Math.random() * 254)}`;
-    const create = () => fetch(new URL("/api/pedigrees/", t.base), {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Forwarded-For": ip },
-      body: JSON.stringify({ title: "rate limit flow", data: { individuals: [], partnerships: [], parentOf: {} } }),
+    const create = () => t.api("/api/pedigrees/", {
+      method: "POST", headers: { "X-Forwarded-For": ip },
+      json: { title: "rate limit flow", data: { individuals: [], partnerships: [], parentOf: {} } },
     });
     let refused = null;
     for (let i = 0; i < 40 && !refused; i++) {
@@ -53,10 +52,7 @@ export default {
 
     // Another address is not limited: the message was the limit, not a broken create.
     await t.page.context().setExtraHTTPHeaders({});
-    await t.open("/");
-    await t.click('button:has-text("Create blank pedigree")');
-    await t.sleep(1000);
+    await t.createBlank();
     t.match(new URL(t.page.url()).pathname, /^\/p\/[0-9a-f-]{36}$/, "from an address with allowance left, the same button creates one");
-    t.currentId();
   },
 };

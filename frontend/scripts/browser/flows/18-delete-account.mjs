@@ -12,16 +12,14 @@ export default {
     const token = await t.eval(() => localStorage.getItem("access_token"));
     const refresh = await t.eval(() => localStorage.getItem("refresh_token"));
     t.ok(!!token, "the throwaway agent is signed in");
-    const auth = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-    const post = async (path, body, headers) =>
-      (await fetch(new URL(path, t.base), { method: "POST", headers, body: JSON.stringify(body) })).json();
+    const post = async (path, json, signedIn) => (await t.api(path, { method: "POST", json, token: signedIn })).json();
     const data = { individuals: [], partnerships: [], parentOf: {} };
-    const owned = await post("/api/pedigrees/", { title: "Owned by the throwaway", data }, auth);
-    await post("/api/tag-presets/", { label: "Flow preset", color: "#000000", style: "dot" }, auth);
-    const anon = await post("/api/pedigrees/", { title: "Anonymous", data }, { "Content-Type": "application/json" });
+    const owned = await post("/api/pedigrees/", { title: "Owned by the throwaway", data }, token);
+    await post("/api/tag-presets/", { label: "Flow preset", color: "#000000", style: "dot" }, token);
+    const anon = await post("/api/pedigrees/", { title: "Anonymous", data });
     t.created.push(anon.id);
     // Counted, not assumed: a run cut short leaves the account with more.
-    const get = async path => (await fetch(new URL(path, t.base), { headers: auth })).json();
+    const get = async path => (await t.api(path, { token })).json();
     const nPedigrees = (await get("/api/pedigrees/")).length;
     const nLibrary = (await get("/api/tag-presets/")).length;
     const pedigreesLine = `${nPedigrees} pedigree${nPedigrees === 1 ? "" : "s"} you created while signed in`;
@@ -42,7 +40,7 @@ export default {
     t.ok(said.includes(libraryLine), "and the My library entries");
     t.match(said, /cannot be undone/, "and says it cannot be undone");
     await t.click('button:text-is("Cancel")');
-    t.equal((await fetch(new URL("/api/auth/me/", t.base), { headers: auth })).status, 200, "Cancel keeps the account");
+    await t.status(await t.api("/api/auth/me/", { token }), 200, "Cancel keeps the account");
 
     await t.click('button:text-is("Delete account")');
     await t.waitFor(`[data-testid="delete-account-dialog"] >> text=${pedigreesLine}`);
@@ -52,16 +50,13 @@ export default {
     t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${owned.id}"]`), 0, "the deleted pedigree is not under Recent on this device");
     t.ok(!(await stored()), "and leaves this browser's recent list");
 
-    t.equal((await fetch(new URL("/api/auth/me/", t.base), { headers: auth })).status, 401, "the old token no longer works");
-    const refreshed = await fetch(new URL("/api/auth/token/refresh/", t.base), {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ refresh }),
-    });
-    t.equal(refreshed.status, 401, "nor can it be refreshed");
-    t.equal((await fetch(new URL(`/api/pedigrees/${owned.id}/`, t.base))).status, 404, "the owned pedigree is gone");
+    await t.status(await t.api("/api/auth/me/", { token }), 401, "the old token no longer works");
+    await t.status(await t.api("/api/auth/token/refresh/", { method: "POST", json: { refresh } }), 401, "nor can it be refreshed");
+    await t.status(await t.api(`/api/pedigrees/${owned.id}/`), 404, "the owned pedigree is gone");
     // Signed in again as the account made afresh, nothing of the old one is there.
     const fresh = mintAgentTokens({ throwaway: true });
-    const again = async path => (await fetch(new URL(path, t.base), { headers: { Authorization: `Bearer ${fresh.access}` } })).json();
+    const again = async path => (await t.api(path, { token: fresh.access })).json();
     t.equal([(await again("/api/pedigrees/")).length, (await again("/api/tag-presets/")).length], [0, 0], "and the library and pedigrees went with the account");
-    t.equal((await fetch(new URL(`/api/pedigrees/${anon.id}/`, t.base))).status, 200, "an anonymous pedigree is kept");
+    await t.status(await t.api(`/api/pedigrees/${anon.id}/`), 200, "an anonymous pedigree is kept");
   },
 };

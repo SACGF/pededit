@@ -13,12 +13,10 @@ export default {
     const section = doc.slice(doc.indexOf("## Creating a pedigree through the API"));
     const start = section.indexOf("-d '") + 4;
     const body = JSON.parse(section.slice(start, section.indexOf("\n'", start)));
-    const post = payload => fetch(new URL("/api/pedigrees/", t.base), {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-    });
+    const post = json => t.api("/api/pedigrees/", { method: "POST", json });
 
     const res = await post(body);
-    t.equal(res.status, 201, "the documented example is accepted with no account");
+    await t.status(res.clone(), 201, "the documented example is accepted with no account");
     const { id } = await res.json();
     t.created.push(id);
 
@@ -34,13 +32,13 @@ export default {
     await t.press("Tab");
     await t.saved();
     const stored = (await t.stored(id)).data;
-    t.equal(stored.individuals.find(i => i.id === "i4").name, "Edited", "an edit in the editor is saved to the same pedigree");
+    t.equal((await t.individual("i4", stored)).name, "Edited", "an edit in the editor is saved to the same pedigree");
     t.equal(stored.individuals.length, 4, "with everyone still there");
 
     const broken = structuredClone(body);
     broken.data.partnerships[0].individual2 = "nobody";
     const refused = await post(broken);
-    t.equal(refused.status, 400, "a partnership naming someone who does not exist is refused");
+    await t.status(refused.clone(), 400, "a partnership naming someone who does not exist is refused");
     t.match((await refused.json()).data.join(" "), /^partnerships\[0\]\.individual2: /, "with a reason that starts with the path");
   },
 };

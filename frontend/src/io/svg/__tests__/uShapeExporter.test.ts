@@ -9,7 +9,8 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { person, M, F, couple, build } from "../../../fixtures/features";
 import { drawnPedigree, isBranchPlaceholderId } from "../../../pedigree/collapse";
 
-// To LOOK at the output rather than assert on it, run frontend/render-u.sh.
+// To LOOK at the output rather than assert on it, see "Looking at the output"
+// in claude/export_u_plan.md.
 
 const NODE_SIZE = 40;
 

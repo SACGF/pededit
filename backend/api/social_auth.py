@@ -28,6 +28,21 @@ def _jwt_pair(user):
     return {"access": str(refresh.access_token), "refresh": str(refresh)}
 
 
+def _user_for(email, name):
+    """The user with this email, made on first sign-in. A name from the
+    provider fills in a user who has none yet; it never replaces one."""
+    first, *rest = name.split() or [""]
+    user, created = User.objects.get_or_create(
+        email=email,
+        defaults={"username": email, "first_name": first, "last_name": " ".join(rest)},
+    )
+    if not created and not user.first_name and first:
+        user.first_name = first
+        user.last_name = " ".join(rest)
+        user.save(update_fields=["first_name", "last_name"])
+    return user
+
+
 # ── Google ───────────────────────────────────────────────────────────────────
 
 
@@ -55,22 +70,7 @@ class GoogleLoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        email = idinfo["email"]
-        name = idinfo.get("name", "")
-
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "username": email,
-                "first_name": name.split()[0] if name else "",
-                "last_name": " ".join(name.split()[1:]) if name else "",
-            },
-        )
-        if not created and not user.first_name and name:
-            user.first_name = name.split()[0]
-            user.last_name = " ".join(name.split()[1:])
-            user.save(update_fields=["first_name", "last_name"])
-
+        user = _user_for(idinfo["email"], idinfo.get("name", ""))
         return Response(_jwt_pair(user))
 
 
@@ -144,19 +144,5 @@ class GitHubLoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        name = gh_user.get("name") or gh_user.get("login") or ""
-
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "username": email,
-                "first_name": name.split()[0] if name else "",
-                "last_name": " ".join(name.split()[1:]) if name else "",
-            },
-        )
-        if not created and not user.first_name and name:
-            user.first_name = name.split()[0]
-            user.last_name = " ".join(name.split()[1:])
-            user.save(update_fields=["first_name", "last_name"])
-
+        user = _user_for(email, gh_user.get("name") or gh_user.get("login") or "")
         return Response(_jwt_pair(user))

@@ -98,7 +98,8 @@ pedigree refused.
 - `GET /api/pedigrees/` (list) requires auth and returns only owned ones.
 - Create without a token makes an anonymous pedigree; with a token it is
   owned.
-- `/api/tag-presets/` is auth only and scoped to the owner.
+- `/api/tag-presets/` is auth only and scoped to the owner, and takes
+  list, create and delete only: what My library calls.
 - An owned pedigree answers 404 to everyone but its owner, so its link is
   not a way to share it. An anonymous pedigree stays anonymous when a
   signed-in user opens or edits it: nothing ever sets `owner` after create.

@@ -39,6 +39,10 @@ jobs:
         run: npm run typecheck
       - name: Frontend tests
         run: npm run test:frontend
+      # What deploy.sh runs. It also prerenders the static pages, which
+      # throws on text they cannot render (vite.config.ts, prerenderPlugin).
+      - name: Frontend build
+        run: npm -w frontend run build
       - name: Paths named in the agent guides exist
         run: npm run test:docs
       # Reported as a warning, never fails the build: knip can be wrong about
@@ -93,9 +97,15 @@ jobs:
       # reloaded through the API, the end-to-end flows and the emulated phone.
       - name: Page checks
         run: npm run check:pages
+      # The tail of each log, then every traceback and 5xx in the Django log
+      # with the lines round it, however early in the run it came.
       - name: Server logs
         if: failure()
-        run: tail -n 100 node_modules/.cache/pededit-browser/*.log || true
+        run: |
+          cd node_modules/.cache/pededit-browser || exit 0
+          for f in *.log; do echo "::group::$f (last 100 lines)"; tail -n 100 "$f"; echo "::endgroup::"; done
+          echo "Tracebacks and 5xx responses in django.log:"
+          grep -n -B 5 -A 30 -E 'Traceback \(most recent call last\)|" 5[0-9][0-9] |Internal Server Error' django.log || echo "(none)"
       - name: Stop servers
         if: always()
         run: node frontend/scripts/browser/servers.mjs down

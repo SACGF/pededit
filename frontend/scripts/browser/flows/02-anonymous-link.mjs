@@ -6,9 +6,7 @@ export default {
   async run(t) {
     await t.open("/");
     t.equal(await t.eval(() => localStorage.getItem("access_token")), null, "nobody is signed in");
-    await t.click('button:has-text("Create blank pedigree")');
-    await t.waitFor('button[title="Add female"]');
-    const id = t.currentId();
+    const id = await t.createBlank();
     await t.click('button[title="Add female"]');
     await t.fill('input[aria-label="Name"]', "Linnea");
     await t.press("Tab");
@@ -34,7 +32,7 @@ export default {
     await t.click('button:has-text("Delete this pedigree")');
     await t.click('button:text-is("Delete permanently")');
     await t.sleep(500);
-    t.equal((await fetch(new URL(`/api/pedigrees/${id}/`, t.base))).status, 404, "deleting it from Settings while signed out removes it from the server");
+    await t.status(await t.api(`/api/pedigrees/${id}/`), 404, "deleting it from Settings while signed out removes it from the server");
     await t.open("/");
     await t.sleep(500);
     t.equal(await t.count(`[data-testid="recent-on-this-device"] button[title="/p/${id}"]`), 0, "and from Recent on this device");

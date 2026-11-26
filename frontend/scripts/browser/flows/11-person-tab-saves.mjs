@@ -17,13 +17,13 @@ export default {
     await t.press("Tab");
     const want = { name, dob: "1984-02", notes, deceased: true, dod: "2020" };
     const pick = i => ({ name: i.name, dob: i.dob, notes: i.notes, deceased: i.deceased, dod: i.dod });
-    t.equal(pick((await t.pedigree()).individuals.find(i => i.id === "k1")), want, "the store has what was typed");
+    t.equal(pick(await t.individual("k1")), want, "the store has what was typed");
     t.match(await t.text('[data-individual-id="k1"]'), /lodie/, "the name is drawn under the symbol");
     t.match(await t.text('[data-individual-id="k1"]'), /b\. 1984/, "with the year of birth, not the full date");
 
     await t.reload();
-    t.equal(pick((await t.pedigree()).individuals.find(i => i.id === "k1")), want, "after a reload it is all still there");
-    t.equal(pick((await t.stored(id)).data.individuals.find(i => i.id === "k1")), want, "and it is what the server holds");
+    t.equal(pick(await t.individual("k1")), want, "after a reload it is all still there");
+    t.equal(pick(await t.individual("k1", (await t.stored(id)).data)), want, "and it is what the server holds");
     await t.click('[data-individual-id="k1"]');
     t.equal(await t.eval(() => document.querySelector('input[aria-label="Name"]').value), name, "the Person tab shows the saved name");
     t.equal(await t.eval(() => document.querySelector('textarea[aria-label="Notes"]').value), notes, "and the notes, line break kept");

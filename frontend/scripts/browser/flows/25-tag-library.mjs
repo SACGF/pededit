@@ -9,7 +9,7 @@ export default {
   async run(t) {
     await t.open("/");
     const token = await t.eval(() => localStorage.getItem("access_token"));
-    const api = (path, init = {}) => fetch(new URL(path, t.base), { ...init, headers: { Authorization: `Bearer ${token}` } });
+    const api = (path, init = {}) => t.api(path, { ...init, token });
     const clearLibrary = async () => {
       for (const p of await (await api("/api/tag-presets/")).json()) {
         if (p.label === LABEL) await api(`/api/tag-presets/${p.id}/`, { method: "DELETE" });

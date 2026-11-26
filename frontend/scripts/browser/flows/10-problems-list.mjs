@@ -17,7 +17,7 @@ export default {
 
     await t.click('[data-problem-item="proband-unaffected:p"] [data-problem-fix="Mark affected"]');
     t.ok(!(await problems()).includes("proband-unaffected:p"), "a fix clears its problem");
-    t.equal((await t.pedigree()).individuals.find(i => i.id === "p").affected, true, "by making the edit it names");
+    t.equal((await t.individual("p")).affected, true, "by making the edit it names");
 
     const depth = await t.undoDepth();
     const unrecorded = (await problems()).filter(id => id.startsWith("condition-not-recorded:"));

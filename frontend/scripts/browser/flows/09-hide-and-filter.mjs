@@ -20,7 +20,7 @@ export default {
 
     // Hide descendants from More options, then show them again from the group symbol.
     await t.menu("pa1", "Hide descendants");
-    t.equal((await t.pedigree()).individuals.find(i => i.id === "pa1").descendantsHidden, true, "Hide descendants sets the flag");
+    t.equal((await t.individual("pa1")).descendantsHidden, true, "Hide descendants sets the flag");
     t.equal(await drawn(), total - 3, "her three children are no longer drawn");
     t.equal(await t.count('[data-collapsed-branch]'), 1, "a group symbol stands for them");
     t.match(await t.text('[data-collapsed-branch]'), /3/, "with their number inside");

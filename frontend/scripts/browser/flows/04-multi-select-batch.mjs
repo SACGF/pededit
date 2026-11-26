@@ -6,13 +6,12 @@ export default {
   async run(t) {
     await t.openFixture("example:Three generations");
     const selected = () => t.eval(() => [...window.__pededit.usePedigreeStore.getState().selectedIds].sort());
-    const node = id => `[data-individual-id="${id}"]`;
 
-    await t.click(node("g3a"));
+    await t.click(t.person("g3a"));
     t.equal(await selected(), ["g3a"], "a click selects one person");
-    await t.holding("Shift", () => t.click(node("g3b")));
+    await t.holding("Shift", () => t.click(t.person("g3b")));
     t.equal(await selected(), ["g3a", "g3b"], "Shift+click adds a second");
-    await t.holding("Shift", () => t.click(node("g3a")));
+    await t.holding("Shift", () => t.click(t.person("g3a")));
     t.equal(await selected(), ["g3b"], "Shift+click on a selected person takes them out");
 
     // Rubber band: Shift+drag on the background from above-left of the top
@@ -37,7 +36,7 @@ export default {
     const depth = await t.undoDepth();
     const affected = async () => (await t.pedigree()).individuals.filter(i => i.affected).map(i => i.id).sort();
     const was = await affected();
-    await t.rightClick(node("g1m"));
+    await t.rightClick(t.person("g1m"));
     t.match(await t.text("[data-context-menu]"), /2 selected/i, "the menu on a selected person is about both");
     await t.click('[data-context-menu] button:text-is("Mark 2 affected")');
     t.equal(await affected(), [...new Set([...was, "g1f", "g1m"])].sort(), "the batch item marks them both affected");
@@ -45,8 +44,8 @@ export default {
     await t.press("Control+z");
     t.equal(await affected(), was, "and one undo puts both back");
 
-    await t.click(node("g3a"));
-    await t.holding("Shift", () => t.click(node("g3c")));
+    await t.click(t.person("g3a"));
+    await t.holding("Shift", () => t.click(t.person("g3c")));
     await t.press("d");
     const p = await t.pedigree();
     t.equal(p.individuals.filter(i => ["g3a", "g3c"].includes(i.id)).map(i => !!i.deceased), [true, true], "the D key marks every selected person deceased");

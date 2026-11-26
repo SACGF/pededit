@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -92,13 +92,19 @@ class PedigreeViewSet(viewsets.ModelViewSet):
         return PedigreeSerializer
 
 
-class TagPresetViewSet(viewsets.ModelViewSet):
+class TagPresetViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     """
-    The signed-in user's personal tag library.
+    The signed-in user's personal tag library ("My library"). Only what the
+    frontend calls (`tagPresetApi`): an entry is saved and deleted, never
+    edited.
 
     list:    GET    /api/tag-presets/
     create:  POST   /api/tag-presets/
-    update:  PATCH  /api/tag-presets/{id}/
     destroy: DELETE /api/tag-presets/{id}/
     """
 

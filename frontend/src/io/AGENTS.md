@@ -165,7 +165,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 - To look at an export without the dialog: `__pededit.exportSvg()` in
   `eval.mjs` (`{ uShape: true }` for the U-shape) returns the SVG, and
   `node frontend/scripts/browser/shot.mjs FILE.svg` renders it to PNG. A
-  scratch entry bundled with plain esbuild does not build (#233).
+  scratch entry bundled with plain esbuild does not build: it needs the
+  layout engine alias of `vite.config.ts` and `--jsx=automatic`.
 - `exportLint.ts` (#72) — render lint for the standard SVG export, run by
   `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
   example. It parses the SVG, so `svgExporter.tsx` must keep writing its
@@ -277,10 +278,6 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   a missing file, so commit them. The export must stay the same from one run
   to the next: no ids from counters that outlive a call, no dates, no
   `Math.random`.
-
-`__tests__/_uShapePeds.dev.ts` and `_uShapeRender.dev.ts` are manual render
-helpers, not tests; their runner, `frontend/render-u.sh`, does not currently
-run (#233).
 
 ## csv/ — tabular export
 

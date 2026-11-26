@@ -7,14 +7,14 @@
 // frontend/src/io/svg/exportLint.ts and run in the browser through Vite, so
 // this is the app's own code.
 import {
-  COMMON_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, contextOptions,
-  resolveTarget, assertServerUp, loadFixture, inApp, openPage, servedInfo, servedLines, DEFAULT_BASE, UsageError,
+  COMMON_HELP, STEPS_HELP, closeBrowser, main, parseArgs, launchBrowser, newContext, contextOptions,
+  resolveTarget, assertServerUp, loadFixture, inApp, openPage, servedInfo, servedLines, baseUrl, UsageError,
+  SET_FLAGS, SET_HELP, expandSetFlags,
 } from "./harness.mjs";
 
-const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--all-fixtures] [--fixture SPEC ...] [URL] [options]
+const HELP = `usage: node frontend/scripts/browser/lint.mjs [--all-examples] [--all-fixtures] [--all-test-data] [--fixture SPEC ...] [URL] [options]
 
-  --all-examples      Lint every example in src/data/examples.ts.
-  --all-fixtures      Lint every feature fixture in src/fixtures/features.ts (#140).
+${SET_HELP}
   --fixture SPEC      Lint a fixture (repeatable; same SPECs as the other tools).
   URL                 Lint the pedigree loaded in an editor page (/p/<id>),
                       after any steps, as __pededit.check() sees it.
@@ -39,23 +39,61 @@ Prints one line per pedigree, then one line per finding. Exits 0 when every
 pedigree draws cleanly, 1 when any has findings.
 The same checks run in vitest (src/pedigree/__tests__/renderLint.test.ts,
 src/io/svg/__tests__/exportLint.test.ts).
-${COMMON_HELP}`;
+${COMMON_HELP}
+${STEPS_HELP}`;
 
 const isBad = r => r.findings.length + r.exportFindings.length > 0;
 
+/**
+ * Lint pedigrees with the app's own code, in one page: every example or
+ * every feature fixture (`set`), else `items` ({ name, data, title }).
+ */
+function lintInApp(context, base, { set = null, items = [], compact, exportOpts, named }) {
+  return inApp(context, base, async ({ set, items, compact, exportOpts, named }) => {
+    const list = set === "fixtures"
+      ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data, title: f.label }))
+      : set === "examples"
+        ? (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data, title: e.label }))
+        : items;
+    const { buildScene } = await import("/src/pedigree/scene.ts");
+    const { lintScene } = await import("/src/pedigree/renderLint.ts");
+    const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
+    const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
+    const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
+    const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
+    // The chart title the editor would draw (#20, #188), named after the pedigree; none when de-identified.
+    const { chartTitle } = await import("/src/pedigree/labels.ts");
+    return list.map(e => {
+      const pedigree = withNames(e.data);
+      const title = chartTitle(e.data, e.title) || undefined;
+      return {
+        name: e.name,
+        findings: lintScene(pedigree, buildScene(pedigree, { compact }), { title }),
+        exportFindings: exportOpts ? lintExport(pedigree, { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
+      };
+    });
+  }, { set, items, compact, exportOpts, named });
+}
+
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { "all-examples": "bool", "all-fixtures": "bool", compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool", monochrome: "bool" });
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), {
+    ...SET_FLAGS, compact: "bool", "no-export": "bool", deidentify: "bool", "relationship-labels": "bool", "u-shape": "bool", monochrome: "bool",
+  }, { steps: true });
+  if (flags.help) { console.log(HELP); return 0; }
   // Settings forced on before linting: names above double lines, monochrome tag fills.
   const named = {
     ...(flags["relationship-labels"] ? { relationshipLabels: true } : {}),
     ...(flags.monochrome ? { tagFills: "monochrome" } : {}),
   };
   const exportOpts = flags["no-export"] ? null : { compact: !!flags.compact, deidentify: !!flags.deidentify, uShape: !!flags["u-shape"] };
-  if (flags.help) { console.log(HELP); return 0; }
-  const specs = [...(flags["all-examples"] ? ["__examples__"] : []), ...(flags["all-fixtures"] ? ["__fixtures__"] : []), ...(flags.fixture ?? [])];
-  if (!specs.length && !positional.length) throw new UsageError("usage: give --all-examples, --all-fixtures, --fixture SPEC or a URL");
+  // --all-test-data becomes --fixture specs. The examples and feature
+  // fixtures are not expanded: each list is linted whole, in one page.
+  const sets = { "all-test-data": flags["all-test-data"], fixture: flags.fixture };
+  await expandSetFlags(sets);
+  const specs = [...(flags["all-examples"] ? ["__examples__"] : []), ...(flags["all-fixtures"] ? ["__fixtures__"] : []), ...(sets.fixture ?? [])];
+  if (!specs.length && !positional.length) throw new UsageError("usage: give --all-examples, --all-fixtures, --all-test-data, --fixture SPEC or a URL");
   if (positional.length > 1) throw new UsageError("usage: one URL at most");
-  const base = positional[0] ? resolveTarget(positional[0], { allowRemote: flags["allow-remote"] }) : DEFAULT_BASE;
+  const base = positional[0] ? resolveTarget(positional[0], { allowRemote: flags["allow-remote"] }) : baseUrl({ allowRemote: flags["allow-remote"] });
   await assertServerUp(base);
   const served = await servedInfo(base);
 
@@ -63,49 +101,16 @@ await main(async () => {
   const results = [];
   try {
     const context = await newContext(browser, contextOptions(flags));
+    const opts = { compact: !!flags.compact, exportOpts, named };
     for (const spec of specs) {
-      let items;
       if (spec === "__examples__" || spec === "__fixtures__") {
-        items = await inApp(context, base, async ({ compact, exportOpts, named, fixtures }) => {
-          const set = fixtures
-            ? (await import("/src/fixtures/features.ts")).FEATURE_FIXTURES.map(f => ({ name: `fixture:${f.slug} ${f.label}`, data: f.data, title: f.label }))
-            : (await import("/src/data/examples.ts")).EXAMPLES.map((e, i) => ({ name: `example:${i} ${e.label}`, data: e.data, title: e.label }));
-          const { buildScene } = await import("/src/pedigree/scene.ts");
-          const { lintScene } = await import("/src/pedigree/renderLint.ts");
-          const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
-          const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
-          const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
-          const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
-          // The chart title the editor would draw (#20, #188), named after the pedigree; none when de-identified.
-          const { chartTitle } = await import("/src/pedigree/labels.ts");
-          return set.map(e => {
-            const title = chartTitle(e.data, e.title) || undefined;
-            return {
-              name: e.name,
-              findings: lintScene(withNames(e.data), buildScene(withNames(e.data), { compact }), { title }),
-              exportFindings: exportOpts ? lintExport(withNames(e.data), { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
-            };
-          });
-        }, { compact: !!flags.compact, exportOpts, named, fixtures: spec === "__fixtures__" });
+        results.push(...await lintInApp(context, base, { ...opts, set: spec === "__fixtures__" ? "fixtures" : "examples" }));
       } else {
         const fixture = await loadFixture(spec, context, base);
-        const [one] = await inApp(context, base, async ({ pedigree: raw, compact, exportOpts, named, name }) => {
-          const pedigree = Object.keys(named).length ? { ...raw, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...raw.canvasSettings, ...named } } : raw;
-          const { buildScene } = await import("/src/pedigree/scene.ts");
-          const { lintScene } = await import("/src/pedigree/renderLint.ts");
-          const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
-          const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
-          const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
-          const { chartTitle } = await import("/src/pedigree/labels.ts");
-          const title = chartTitle(pedigree, name) || undefined;
-          return [{
-            findings: lintScene(pedigree, buildScene(pedigree, { compact }), { title }),
-            exportFindings: exportOpts ? lintExport(pedigree, { ...exportOpts, title: exportOpts.deidentify ? undefined : title }) : [],
-          }];
-        }, { pedigree: fixture.pedigree, compact: !!flags.compact, exportOpts, named, name: fixture.title });
-        items = [{ name: spec, findings: one.findings, exportFindings: one.exportFindings, warnings: fixture.warnings }];
+        const [one] = await lintInApp(context, base, { ...opts, items: [{ name: spec, data: fixture.pedigree, title: fixture.title }] });
+        // A test data file that is there to import with a warning is not reported for it.
+        results.push({ ...one, warnings: sets.expectedImportWarnings?.has(spec) ? [] : fixture.warnings });
       }
-      results.push(...items);
     }
     if (positional[0]) {
       const run = await openPage(context, { url: base, steps, flags });

@@ -8,8 +8,7 @@
         "scripts/*.mjs!",
         "scripts/browser/*.mjs!",
         "scripts/browser/flows/*.mjs!",
-        "src/lib/google-oauth-noop.tsx!",
-        "src/io/svg/__tests__/_*.dev.ts"
+        "src/lib/google-oauth-noop.tsx!"
       ],
       "project": [
         "src/**/*.{ts,tsx,css}!",

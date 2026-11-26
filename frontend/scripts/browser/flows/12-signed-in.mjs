@@ -7,11 +7,9 @@ export default {
   async run(t) {
     await t.open("/");
     t.ok(!!(await t.eval(() => localStorage.getItem("access_token"))), "the agent user is signed in");
-    await t.click('button:has-text("Create blank pedigree")');
-    await t.waitFor('button[title="Add male"]');
-    const id = new URL(t.page.url()).pathname.split("/").pop();
+    const id = await t.createBlank();
     const token = await t.eval(() => localStorage.getItem("access_token"));
-    const api = async (path, init = {}) => fetch(new URL(path, t.base), { ...init, headers: { Authorization: `Bearer ${token}` } });
+    const api = (path, init = {}) => t.api(path, { ...init, token });
     const listed = async () => (await (await api("/api/pedigrees/")).json()).map(p => [p.id, p.title]).filter(([pid]) => pid === id);
     t.equal((await listed()).length, 1, "the new pedigree belongs to the signed-in user");
 
@@ -46,7 +44,7 @@ export default {
     await t.open("/");
     await t.sleep(500);
     t.equal(await t.count(`button:has-text("${name}")`), 0, "the home page no longer lists it, under Your pedigrees or Recent");
-    t.equal((await fetch(new URL(`/api/pedigrees/${id}/`, t.base))).status, 404, "its link no longer works");
+    await t.status(await t.api(`/api/pedigrees/${id}/`), 404, "its link no longer works");
 
     // An example's first edit gives a signed-in visitor a copy they own (#150, #151).
     await t.open("/example/simple-family");

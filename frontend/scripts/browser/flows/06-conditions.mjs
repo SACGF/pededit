@@ -44,6 +44,6 @@ export default {
     t.equal(await t.eval(() => window.__pededit.problems().map(x => x.rule)), [], "nothing is flagged as a problem");
 
     await t.reload();
-    t.equal((await t.stored(id)).data.individuals.find(i => i.id === "k1").carrierTags, [cf.id], "the carrier state is saved");
+    t.equal((await t.individual("k1", (await t.stored(id)).data)).carrierTags, [cf.id], "the carrier state is saved");
   },
 };

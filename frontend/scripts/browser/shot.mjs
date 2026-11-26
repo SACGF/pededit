@@ -4,7 +4,7 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
-  COMMON_HELP, SET_FLAGS, SET_HELP, expandSetFlags, FRONTEND_DIR, REPO_ROOT, closeBrowser, main, parseArgs, parseViewport, launchBrowser, newContext,
+  COMMON_HELP, STEPS_HELP, SET_FLAGS, SET_HELP, expandSetFlags, FRONTEND_DIR, REPO_ROOT, closeBrowser, main, parseArgs, parseViewport, launchBrowser, newContext,
   targetsFrom, assertServerUp, loadFixture, openPage, finishPage, contextOptions, resolveFindings, SourceMapper,
   summaryLine, findingLines, writesLine, hasFindings, displayPath, servedInfo, servedLines, UsageError,
 } from "./harness.mjs";
@@ -37,7 +37,8 @@ ${SET_HELP}
                       (contact-sheet.png in the output directory) with every
                       shot labelled and its render lint count, to read in one go.
   --tile-cols N       Columns in the contact sheet (default 4).
-${COMMON_HELP}`;
+${COMMON_HELP}
+${STEPS_HELP}`;
 
 const SHOT_FLAGS = {
   out: "string", "out-dir": "string", measure: "multi", "measure-flow": "multi", clip: "string",
@@ -122,7 +123,7 @@ async function renderSvgFile(file, flags) {
 }
 
 await main(async () => {
-  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { ...SHOT_FLAGS, ...SET_FLAGS });
+  const { positional, flags, steps } = parseArgs(process.argv.slice(2), { ...SHOT_FLAGS, ...SET_FLAGS }, { steps: true });
   if (flags.help) { console.log(HELP); return 0; }
   if (positional.length === 1 && /\.svg$/i.test(positional[0]) && existsSync(positional[0])) {
     return renderSvgFile(positional[0], flags);
