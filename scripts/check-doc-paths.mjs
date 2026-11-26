@@ -11,6 +11,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve, basename } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SKIP_DIRS = new Set(["node_modules", ".git", ".claude", ".worktrees", "dist", ".venv", "test-output", "staticfiles", "__pycache__", "coverage"]);
@@ -88,7 +89,15 @@ function exists(path, guide) {
   const from = [dirname(guide), ...BASES.map(b => join(ROOT, b))];
   if (from.some(b => existsSync(join(b, clean)))) return true;
   // A path written from a directory the guide does not say (`chart/symbols.tsx`).
-  return files.some(f => f.endsWith("/" + clean)) || dirs.has(clean);
+  if (files.some(f => f.endsWith("/" + clean)) || dirs.has(clean)) return true;
+  // Build output and scratch folders are in .gitignore and absent from a fresh
+  // checkout or worktree.
+  return from.some(b => gitIgnored(relative(ROOT, join(b, clean))));
+}
+
+function gitIgnored(rel) {
+  if (rel.startsWith("..")) return false;
+  return spawnSync("git", ["check-ignore", "-q", "--no-index", rel], { cwd: ROOT }).status === 0;
 }
 
 let missing = 0;
