@@ -337,7 +337,8 @@ reporting is off, and the dev server never reports.
   (`2026-04-14T12:00:00Z`) to store that date.
 - `store/useAppStore.ts` — auth tokens (localStorage `access_token` /
   `refresh_token`), pedigree list, open/create/save/rename/delete. Saving
-  reads the pedigree from `usePedigreeStore`. `CanvasPage` calls
+  reads the pedigree from `usePedigreeStore`. `CanvasPage` opens, saves and
+  closes through `hooks/useEditorSession.ts`, which calls
   `closePedigree` on unmount: it saves unsaved edits and empties
   `usePedigreeStore`, so the next pedigree opened never flashes the last one,
   and an open whose fetch returns after a close or a later open is dropped.
@@ -430,8 +431,11 @@ reporting is off, and the dev server never reports.
   changes. A toolbar add selects the new person and sets `revealRequest`,
   which `RevealOnRequest` in `PedigreeCanvas.tsx` turns into a pan (never a
   zoom or a pin) when their node is off-screen (#121),
-  SettingsPanel, TagsDialog,
+  SettingsPanel (its rows are `SettingToggle` and `SettingSelect` from
+  `SettingControls.tsx`, which the Filter menu uses too), `CanvasSidebar`
+  (the editor's left column), TagsDialog,
   ExportDialog, ImportPedDialog, plus shadcn primitives in `components/ui/`.
+  A file download goes through `utils/download.ts`.
 - `hooks/useKeyboardShortcuts.ts` — Ctrl/Cmd+Z undo, Ctrl/Cmd+Y or Shift+Z
   redo, Delete/Backspace removes every selected person (Shift: with
   descendants, Alt: with ancestors, #34), A and D toggle affected and

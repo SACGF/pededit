@@ -4,6 +4,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { usePedigreeStore } from "./usePedigreeStore";
 import { recordRecentPedigree, renameRecentPedigree, forgetRecentPedigree } from "../utils/recentPedigrees";
 import type { ExamplePedigree } from "../data/examples";
+import { DEFAULT_PEDIGREE_NAME } from "../pedigree/labels";
 
 interface AppState {
   // ── Auth ───────────────────────────────────────────────────────────────────
@@ -210,7 +211,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     if (seq !== openSeq) return;
     usePedigreeStore.getState().initialize(normalise(data.data as Pedigree));
     set({ activePedigreeId: id, activeTitle: data.title ?? null, example: null, lastSaveFailed: false });
-    recordRecentPedigree(id, data.title ?? "Untitled pedigree");
+    recordRecentPedigree(id, data.title ?? DEFAULT_PEDIGREE_NAME);
   },
 
   openExample: (ex) => {

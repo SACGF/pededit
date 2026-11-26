@@ -12,6 +12,7 @@ import { listRecentPedigrees, forgetRecentPedigree, type RecentPedigree } from "
 import { requestErrorMessage } from "../api/errors";
 import { YOUR_DATA_PATH } from "./YourDataPage";
 import type { PedigreeMeta } from "../api/client";
+import { DEFAULT_PEDIGREE_NAME } from "../pedigree/labels";
 
 export default function LandingPage() {
   const { isAuthenticated, user, fetchMe, createPedigree, createPedigreeFromData, logout, pedigrees, loadPedigrees } = useAppStore();
@@ -48,7 +49,7 @@ export default function LandingPage() {
     setLoading("blank");
     setCreateError(null);
     try {
-      const id = await createPedigree("Untitled pedigree");
+      const id = await createPedigree(DEFAULT_PEDIGREE_NAME);
       navigate(`/p/${id}`);
     } catch (err) {
       setCreateError(requestErrorMessage(err, "Could not create the pedigree. Check your connection and try again."));
@@ -287,7 +288,7 @@ function RecentOnThisDevice({ disabled, hiddenIds }: { disabled: boolean; hidden
               disabled={disabled}
               title={`/p/${p.id}`}
             >
-              <span className="block text-sm font-medium truncate">{p.title || "Untitled pedigree"}</span>
+              <span className="block text-sm font-medium truncate">{p.title || DEFAULT_PEDIGREE_NAME}</span>
               <span className="block text-xs text-gray-400">
                 Opened {new Date(p.openedAt).toLocaleDateString()}
               </span>
@@ -295,7 +296,7 @@ function RecentOnThisDevice({ disabled, hiddenIds }: { disabled: boolean; hidden
             <button
               className="px-2 text-sm text-gray-400 hover:text-black rounded border hover:bg-gray-50 transition-colors"
               onClick={() => forget(p.id)}
-              aria-label={`Remove ${p.title || "Untitled pedigree"} from recent`}
+              aria-label={`Remove ${p.title || DEFAULT_PEDIGREE_NAME} from recent`}
               title="Remove from this list (the pedigree itself is not deleted)"
             >
               ×
