@@ -1,4 +1,4 @@
-import type { Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
+import type { Evaluation, Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import { pedigreeNumbers } from "../../pedigree/scene";
 import { DEIDENTIFY_KEEP_DEFAULTS } from "./types";
 import type { DeidentifyKeep, SvgExportOptions } from "./types";
@@ -18,69 +18,152 @@ function ageBucket(dob: string, referenceDate = new Date()): string {
 }
 
 /**
- * The optional free text (`DeidentifyKeep`), dropped from one individual as `keep` says.
- * Evaluation detail and onset can carry a test result or date a relative
- * did not know; text tags are often genotypes.
+ * What a field of a de-identified copy becomes:
+ * - `"keep"`: structure or drawing that names and dates nobody;
+ * - `"drop"`: always goes;
+ * - `"rewritten"`: replaced below (names by numbers, the DOB by an age range);
+ * - a `DeidentifyKeep` choice: goes unless the export keeps that free text.
+ *
+ * Every field of the type needs an entry, so a new field fails the type
+ * check until someone decides what a de-identified export does with it. The
+ * copy is built from these lists, so a field missing from them (data saved
+ * with something the types no longer name) is dropped, never passed through.
  */
-function dropFreeText(ind: Individual, keep: DeidentifyKeep, textTagIds: Set<string>): Individual {
-  const out: Individual = { ...ind };
-  if (!keep.evaluationDetail && out.evaluations) {
-    if (keep.evaluationMarks) {
-      // The result stays ("+", "E1-") and so does the documented "*". Every
-      // evaluation is kept, so the 2008 numbering matches the canvas and a
-      // bare "E" still says one was done; in 2022 an empty one draws nothing.
-      out.evaluations = out.evaluations.map(({ detail: _detail, ...ev }) => ev);
-    } else {
-      // The whole line goes, the "*" with it: a documented mark with no
-      // evaluation drawn would point at nothing.
-      delete out.evaluations;
-    }
-  }
-  if (!keep.onset) {
-    delete out.onset;
-    delete out.tagOnset;
-  }
-  if (!keep.textTags && out.tags?.some(id => textTagIds.has(id))) {
-    out.tags = out.tags.filter(id => !textTagIds.has(id));
+type FieldRule = "keep" | "drop" | "rewritten" | keyof DeidentifyKeep;
+
+const INDIVIDUAL_FIELDS: Record<keyof Individual, FieldRule> = {
+  id: "keep",
+  sex: "keep",
+  genderIdentity: "keep",
+  affected: "keep",
+  deceased: "keep",
+  carrier: "keep",
+  presymptomatic: "keep",
+  // Kept with the detail or the marks, field by field (`EVALUATION_FIELDS`).
+  evaluations: "rewritten",
+  proband: "keep",
+  consultand: "keep",
+  familyHistoryUnknown: "keep",
+  sibOrder: "keep",
+  name: "rewritten",
+  dob: "rewritten",
+  // A date of death dates someone like a DOB does.
+  dod: "drop",
+  // Free text, so it can name or date someone; age ranges come from the DOB.
+  age: "drop",
+  notes: "drop",
+  // HPO codes, not free text.
+  hpoTerms: "keep",
+  lifeStatus: "keep",
+  adopted: "keep",
+  reproductiveRole: "keep",
+  carriedBy: "keep",
+  socialParents: "keep",
+  tags: "textTags",
+  carrierTags: "keep",
+  onset: "onset",
+  tagOnset: "onset",
+  descendantsHidden: "keep",
+  placeholder: "keep",
+};
+
+const EVALUATION_FIELDS: Record<keyof Evaluation, FieldRule> = {
+  result: "keep",
+  detail: "evaluationDetail",
+  documented: "keep",
+};
+
+const PARTNERSHIP_FIELDS: Record<keyof Partnership, FieldRule> = {
+  id: "keep",
+  individual1: "keep",
+  individual2: "keep",
+  consanguineous: "keep",
+  consanguinityLabel: "consanguinityLabels",
+  childless: "keep",
+  childlessReason: "childlessReason",
+  twins: "keep",
+  ended: "keep",
+  donorConception: "keep",
+  leftPartner: "keep",
+  drawnBeside: "keep",
+};
+
+const PEDIGREE_FIELDS: Record<keyof Pedigree, FieldRule> = {
+  individuals: "rewritten",
+  partnerships: "rewritten",
+  parentOf: "keep",
+  siblingOrder: "keep",
+  pinnedPositions: "keep",
+  canvasSettings: "rewritten",
+  unlockedIndividuals: "keep",
+  // Condition and tag names are the key's rows; text tags go with the people.
+  tags: "keep",
+  // The title can name the family.
+  chartTitle: "rewritten",
+  // The recorder and historian, the visit date, and free-text reason and
+  // ancestry that can name people too: the whole block goes.
+  clinicalDetails: "drop",
+  filters: "keep",
+};
+
+/**
+ * The fields of `from` its rules keep: "keep", and a choice `keep` says to
+ * keep. Choices that keep part of a field (evaluation marks, the tags that
+ * are not text tags) are finished by the caller.
+ */
+function allowed<T extends object>(from: T, rules: Record<keyof T, FieldRule>, keep: DeidentifyKeep): Partial<T> {
+  const out: Partial<T> = {};
+  for (const key of Object.keys(from) as (keyof T)[]) {
+    const rule: FieldRule | undefined = Object.hasOwn(rules, key) ? rules[key] : undefined;
+    if (rule === undefined || rule === "drop" || rule === "rewritten") continue;
+    if (rule === "keep" || keep[rule]) out[key] = from[key];
   }
   return out;
 }
 
-/** The consanguinity text leaves the couple; the named relationship goes via canvasSettings. */
-function dropCoupleLabel(p: Partnership): Partnership {
-  if (p.consanguinityLabel === undefined) return p;
-  const out = { ...p };
-  delete out.consanguinityLabel;
+/**
+ * A de-identified person, without the rewritten fields. Evaluation detail
+ * and onset can carry a test result or date a relative did not know; text
+ * tags are often genotypes.
+ */
+function deidentifiedPerson(ind: Individual, keep: DeidentifyKeep, textTagIds: Set<string>): Omit<Individual, "name" | "dob"> {
+  const out = { ...allowed(ind, INDIVIDUAL_FIELDS, keep), id: ind.id, sex: ind.sex, affected: ind.affected, sibOrder: ind.sibOrder };
+  if (ind.evaluations && (keep.evaluationDetail || keep.evaluationMarks)) {
+    // Without the detail the result stays ("+", "E1-") and so does the
+    // documented "*". Every evaluation is kept, so the 2008 numbering matches
+    // the canvas and a bare "E" still says one was done; in 2022 an empty one
+    // draws nothing. With the marks dropped too, the whole line goes, the "*"
+    // with it: a documented mark with no evaluation drawn would point at nothing.
+    out.evaluations = ind.evaluations.map(ev => allowed(ev, EVALUATION_FIELDS, keep));
+  }
+  if (!keep.textTags && ind.tags) {
+    // The tags that are conditions, traits and dots stay.
+    const tags = ind.tags.filter(id => !textTagIds.has(id));
+    if (tags.length > 0) out.tags = tags;
+  }
   return out;
 }
 
 /**
  * The drawn pedigree (hidden descendants left out) with names replaced by
- * generation numbers, dates bucketed or dropped (the date of death always),
- * and free-text age, notes,
- * chart title and clinical key fields dropped. The optional free text
- * (evaluation detail, onset, consanguinity text, text tags) goes as
- * `options.deidentifyKeep` says, by default the detail and onset.
+ * pedigree numbers, the DOB bucketed or dropped, and every field the lists
+ * above drop left out. The optional free text (evaluation detail, onset,
+ * consanguinity text, text tags, the childless reason) goes as
+ * `options.deidentifyKeep` says, by default the detail, onset and reason.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
   // The pedigree numbers, so a de-identified figure reads like the
   // numbered one.
   const notations = pedigreeNumbers(pedigree);
-
-  // The chart title and the free-text age can name or date someone, so
-  // both go; age ranges come from the DOB only.
-  // The clinical key fields name the recorder and historian and date
-  // the visit; the reason and ancestry are free text that can name people
-  // too, so the whole block goes.
-  const rest: Pedigree = { ...pedigree };
-  delete rest.clinicalDetails;
   const keep: DeidentifyKeep = { ...DEIDENTIFY_KEEP_DEFAULTS, ...options.deidentifyKeep };
   // Dropped from the people only: the key lists tags in use, so a dropped
   // text tag leaves no row behind.
   const textTagIds = new Set((pedigree.tags ?? []).filter(t => t.style === "text").map(t => t.id));
   return asDrawn({
-    ...rest,
+    ...allowed(pedigree, PEDIGREE_FIELDS, keep),
+    parentOf: pedigree.parentOf,
+    siblingOrder: pedigree.siblingOrder,
     chartTitle: "",
     // The names are the numbers now: drawing them again would repeat them.
     // Without consanguinity text the relationship is not named either.
@@ -89,16 +172,14 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
       showNumbers: false,
       ...(keep.consanguinityLabels ? {} : { relationshipLabels: false }),
     } } : {}),
-    partnerships: keep.consanguinityLabels ? pedigree.partnerships : pedigree.partnerships.map(dropCoupleLabel),
+    partnerships: pedigree.partnerships.map(p => ({
+      ...allowed(p, PARTNERSHIP_FIELDS, keep), id: p.id, individual1: p.individual1, individual2: p.individual2,
+    })),
     individuals: pedigree.individuals.map(ind => ({
-      ...dropFreeText(ind, keep, textTagIds),
-      name:  isBranchPlaceholderId(ind.id) ? undefined : notations.get(ind.id) ?? ind.id,
-      // A date of death dates someone like a DOB does, so it goes;
-      // with age ranges, someone with both dates gets the range at death.
-      dob:   options.ageBuckets && ind.dob ? (ind.deceased && ind.dod && parsePartialDate(ind.dod.trim()) ? `d. ${ageBucket(ind.dob, new Date(ind.dod))}` : ageBucket(ind.dob)) : undefined,
-      dod:   undefined,
-      age:   undefined,
-      notes: undefined,
+      ...deidentifiedPerson(ind, keep, textTagIds),
+      name: isBranchPlaceholderId(ind.id) ? undefined : notations.get(ind.id) ?? ind.id,
+      // With age ranges, someone with both dates gets the range at death.
+      dob: options.ageBuckets && ind.dob ? (ind.deceased && ind.dod && parsePartialDate(ind.dod.trim()) ? `d. ${ageBucket(ind.dob, new Date(ind.dod))}` : ageBucket(ind.dob)) : undefined,
     })),
   }, pedigree);
 }
@@ -117,5 +198,6 @@ export function deidentifiableText(full: Pedigree): Record<Exclude<keyof Deident
     onset: inds.some(i => onsetsOf(i, pedigree).length > 0),
     consanguinityLabels: pedigree.partnerships.some(p => !!consanguinityWording(pedigree, p)),
     textTags: inds.some(i => i.tags?.some(id => textTagIds.has(id))),
+    childlessReason: pedigree.partnerships.some(p => p.childless && !!p.childlessReason?.trim()),
   };
 }

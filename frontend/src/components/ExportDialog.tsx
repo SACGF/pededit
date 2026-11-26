@@ -225,6 +225,7 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
             {freeText?.onset && keepBox("onset", "Include age of onset")}
             {freeText?.consanguinityLabels && keepBox("consanguinityLabels", "Include the relationship text above double lines")}
             {freeText?.textTags && keepBox("textTags", "Include text tags (genotypes …)")}
+            {freeText?.childlessReason && keepBox("childlessReason", "Include the reason under no-children marks")}
             {deident && clinicalDetailLines(pedigree).length > 0 && (
               <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
             )}

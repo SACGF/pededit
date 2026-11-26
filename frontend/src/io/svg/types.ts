@@ -13,8 +13,8 @@ export interface SvgExportOptions {
   ageBuckets?: boolean;
 
   /**
-   * When deidentify=true: which free text the de-identified copy keeps
-   *. Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
+   * When deidentify=true: which free text the de-identified copy keeps.
+   * Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
    * free-text age, notes, the chart title and the clinical key fields always
    * go.
    */
@@ -53,6 +53,14 @@ export interface SvgExportOptions {
 
   /** Show the parametric spine as a red dashed overlay (development aid). */
   debugSpine?: boolean;
+
+  /**
+   * U-shape only: write each person's id on their group (`data-id`, and
+   * `data-dup-of` on a second copy), so the editor's U-shape view can tell
+   * who was clicked. Default: false. Exported files never carry ids: a PED
+   * import makes the file's individual IDs the ids, and they can be names.
+   */
+  personIds?: boolean;
 }
 
 /** The free text a de-identified export can keep or drop. */
@@ -71,13 +79,20 @@ export interface DeidentifyKeep {
   consanguinityLabels: boolean;
   /** Text-style tags, such as a genotype, under the symbol and in the key. */
   textTags: boolean;
+  /** The reason under a childless or infertility mark (`Partnership.childlessReason`). */
+  childlessReason: boolean;
 }
 
-/** The maintainer's defaults on #111: drop evaluation detail and onset, keep the rest. */
+/**
+ * The maintainer's defaults on #111: drop evaluation detail and onset, keep
+ * the rest. The childless reason is clinical free text like them, so it is
+ * dropped too (#225).
+ */
 export const DEIDENTIFY_KEEP_DEFAULTS: DeidentifyKeep = {
   evaluationDetail: false,
   evaluationMarks: true,
   onset: false,
   consanguinityLabels: true,
   textTags: true,
+  childlessReason: false,
 };

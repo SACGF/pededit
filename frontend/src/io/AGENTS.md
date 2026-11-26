@@ -107,7 +107,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   mark or line of text as a string; a drawing change is made once, in
   `chart/`. The markup carries data-* attributes (`data-copy-number`,
   `data-twin-mark`, `data-childless`, `data-ended`...) that the lints and
-  tests read; never person ids, which could be names after a PED import.
+  tests read; never person ids, which could be names after a PED import
+  (the U-shape writes them only with `personIds`, for the editor's view).
   A server render nested in another server render clears the outer
   component's hook state, so a component that exports during its own
   render (the guides' `GuideFigure`, in the prerender) must use no hooks.
@@ -183,7 +184,9 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   in its own band above a margin that holds everything it draws, and no
   example, fixture or test data file has needed more (#188). It never writes ids into the SVG: symbols are
   matched to people by position, because an id can be a name after a PED
-  import and must not leak from a de-identified export.
+  import and must not leak from a de-identified export. The U-shape writes
+  `data-id` / `data-dup-of` on each person's `<g>` only with
+  `options.personIds`, which only the editor's U-shape view passes (#225).
 - `pngExporter.ts` — rasterises the SVG via canvas at a chosen DPI (#18),
   taking the SVG's CSS pixels as 96 to the inch, so the printed size is the
   same at every DPI. `pngDpi.ts` writes the DPI into a pHYs chunk after
@@ -201,8 +204,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   wrapped by character count (`wrapText`), continuation lines take a fixed
   hanging indent because the bold label's real width is unknown.
 - `pdfExporter.ts` — jsPDF + svg2pdf.js.
-- `deidentify.ts` — strips names, DOB, free-text age and notes for
-  de-identified export, blanks `chartTitle` and drops `clinicalDetails`
+- `deidentify.ts` — an allowlist (#225): `INDIVIDUAL_FIELDS`,
+  `PARTNERSHIP_FIELDS`, `EVALUATION_FIELDS` and `PEDIGREE_FIELDS` give every
+  field of the type a rule (keep, drop, rewritten, or a `DeidentifyKeep`
+  choice), typed as `Record<keyof T, ...>`, so a new field fails the type
+  check until someone decides, and the copy is built from the rules, so a
+  field the types do not name is dropped. It strips names, DOB, free-text age and notes,
+  blanks `chartTitle` and drops `clinicalDetails`
   entirely (reason and ancestry are free text that can name people); the export dialog also
   passes no title. Age ranges come from the DOB only: free text such as
   "3 mo" cannot be bucketed safely. The date of death (#103) is always
@@ -212,7 +220,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   numbered pedigree does not draw "II-3 II-3".
   Optional free text (#111) follows `options.deidentifyKeep`
   (`DeidentifyKeep` in `types.ts`, defaults `DEIDENTIFY_KEEP_DEFAULTS`, the
-  maintainer's call on #111): evaluation detail and age of onset are dropped,
+  maintainer's call on #111): evaluation detail, age of onset and a couple's
+  childless reason (#225) are dropped,
   the result marks with the documented "*", the consanguinity text (own and
   named, by turning `relationshipLabels` off on the copy) and text tags are
   kept. Dropping the marks drops the evaluations entirely. The coefficients

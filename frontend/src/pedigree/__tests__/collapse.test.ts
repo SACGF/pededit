@@ -160,7 +160,8 @@ describe("drawing with hidden descendants (#94)", () => {
     const u = plain({ son: true });
     u.individuals.find(i => i.id === "dau")!.proband = true;
     expect(exportUShapeSvg(u).match(/data-branch-count=/g)).toHaveLength(1);
-    expect(exportUShapeSvg(u)).not.toContain('data-id="gc1"');
+    expect(exportUShapeSvg(u, { personIds: true })).toContain('data-id="dau"');
+    expect(exportUShapeSvg(u, { personIds: true })).not.toContain('data-id="gc1"');
     // wife is the only affected person and is hidden with gm's branch: no Affected key row.
     expect(exportKeyMarkup(drawnPedigree(pedigree({ gm: true })), 0, 0).markup.join("")).not.toContain(">Affected<");
     expect(exportSvg(pedigree({ gm: true }))).not.toContain('data-id="wife"');

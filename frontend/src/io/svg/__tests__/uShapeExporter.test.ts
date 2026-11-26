@@ -245,7 +245,7 @@ describe("U-shape SVG", () => {
     const q = structuredClone(p);
     const ind = q.individuals.find(i => i.id === rotated.id)!;
     ind.lifeStatus = "pregnancy";
-    const svg = exportUShapeSvg(q);
+    const svg = exportUShapeSvg(q, { personIds: true });
     const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g></g>\n`))!;
     expect(group).not.toBeNull();
     // Turned back about the symbol's centre, in its box.
@@ -283,7 +283,7 @@ describe("U-shape SVG", () => {
 
   it("draws one symbol group per drawn individual", () => {
     const p = wide();
-    const svg = exportUShapeSvg(p);
+    const svg = exportUShapeSvg(p, { personIds: true });
     expect(svg.match(/<g data-id=/g)!.length).toBe(layoutUShape(p)!.nodes.size);
   });
 
@@ -320,8 +320,8 @@ describe("U-shape SVG", () => {
     };
     expect(exportUShapeSvg(empty)).toContain("<svg");
     expect(layoutUShape(empty)).toBeNull();
-    expect(exportUShapeSvg(single).match(/<g data-id=/g)!.length).toBe(1);
-    expect(exportUShapeSvg(couple).match(/<g data-id=/g)!.length).toBe(2);
+    expect(exportUShapeSvg(single, { personIds: true }).match(/<g data-id=/g)!.length).toBe(1);
+    expect(exportUShapeSvg(couple, { personIds: true }).match(/<g data-id=/g)!.length).toBe(2);
     for (const svg of [exportUShapeSvg(single), exportUShapeSvg(couple)]) expect(svg).not.toContain("NaN");
   });
 
@@ -479,7 +479,7 @@ describe("U-shape consanguinity", () => {
     expect(dup.depth).toBe(uncle.depth);
     expect(niece.depth).toBe(uncle.depth + 1);
     expect(l.nodes.get("7")!.parentU).toBeCloseTo((uncle.u + dup.u) / 2, 6);
-    const svg = exportUShapeSvg(p);
+    const svg = exportUShapeSvg(p, { personIds: true });
     expect(svg.match(/data-dup-of="6"/g)!.length).toBe(1);
     expect(svg.match(/data-id="6"/g)!.length).toBe(1);
     expect(svg).toContain("stroke-dasharray");

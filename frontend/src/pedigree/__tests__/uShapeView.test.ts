@@ -21,7 +21,7 @@ describe("uShapeViewDrawing (#220)", () => {
     expect(d.drawn).toBe(d.total);
     expect(d.svg).not.toContain("pedigree-key");
     expect(exportUShapeSvg(p, { title: "Title" })).toContain("pedigree-key");
-    expect(d.svg).toBe(exportUShapeSvg(p, { title: "Title", key: false }));
+    expect(d.svg).toBe(exportUShapeSvg(p, { title: "Title", key: false, personIds: true }));
   });
 
   it("is null with nobody to descend from", () => {

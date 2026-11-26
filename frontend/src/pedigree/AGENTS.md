@@ -438,7 +438,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   conditions, Status has a "Presymptomatic" checkbox and carriers are per
   condition (#136). The store setters keep the plain carrier and
   presymptomatic exclusive; old data with only `carrier` loads unchanged. De-identified
-  exports keep the evaluations, details included, as they keep onset.
+  exports drop the evaluation detail and onset by default (`io/AGENTS.md`, `deidentify.ts`).
 
 - `onset.ts` — age of onset (#93): `Individual.onset` for the affected
   status and `Individual.tagOnset` per condition, both free text since
@@ -912,8 +912,9 @@ Tests: `__tests__/scene.test.ts`, `__tests__/tags.test.ts` and
   the export cannot differ. Not React Flow: the SVG string is set as HTML in
   a div that is panned and zoomed with a CSS transform (pointer events for
   drag and pinch, a non-passive wheel listener, since React's is passive).
-- Who is clicked is read from the exporter's `data-id` / `data-dup-of` on
-  each person's `<g>`. The selection outline (and the dashed outline of a
+- Who is clicked is read from the `data-id` / `data-dup-of` on each
+  person's `<g>`, written only because the view passes `personIds` (exported
+  files carry no ids, #225). The selection outline (and the dashed outline of a
   hovered problem) is a `<rect data-u-highlight>` appended to that `<g>`
   after each draw, so it turns with the track.
 - It only looks. Every refusal is a notice from `U_SHAPE_REFUSALS`: a mouse

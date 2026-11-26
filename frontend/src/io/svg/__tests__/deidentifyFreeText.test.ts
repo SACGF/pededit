@@ -7,6 +7,7 @@ import { lintExport } from "../exportLint";
 import { DEIDENTIFY_KEEP_DEFAULTS } from "../types";
 import type { DeidentifyKeep } from "../types";
 import { evaluationLegend } from "../../../pedigree/evaluation";
+import { importPed } from "../../ped";
 
 // #111: the free text a de-identified export keeps or drops.
 
@@ -35,7 +36,7 @@ function family(notation: NotationEdition = "nsgc2022"): Pedigree {
       { id: "p0", individual1: "gf", individual2: "gm" },
       { id: "pa", individual1: "a", individual2: "x" },
       { id: "pb", individual1: "y", individual2: "b" },
-      { id: "pc", individual1: "c1", individual2: "c2", consanguinityLabel: "first cousins" },
+      { id: "pc", individual1: "c1", individual2: "c2", consanguinityLabel: "first cousins", childless: "infertility", childlessReason: "azoospermia" },
     ],
     parentOf: { p0: ["a", "b"], pa: ["c1"], pb: ["c2"] },
     siblingOrder: { mode: "insertion", affectedFirst: false },
@@ -54,9 +55,9 @@ const svg = (p: Pedigree, keep: Partial<DeidentifyKeep> = {}) => exportSvg(p, { 
 const keyText = (s: string) => s.match(/<g class="pedigree-key"[\s\S]*$/)?.[0] ?? "";
 
 describe("deidentify free text (#111): defaults", () => {
-  it("are the maintainer's: drop detail and onset, keep marks, couple text and text tags", () => {
+  it("are the maintainer's: drop detail, onset and the childless reason, keep marks, couple text and text tags", () => {
     expect(DEIDENTIFY_KEEP_DEFAULTS).toEqual({
-      evaluationDetail: false, evaluationMarks: true, onset: false, consanguinityLabels: true, textTags: true,
+      evaluationDetail: false, evaluationMarks: true, onset: false, consanguinityLabels: true, textTags: true, childlessReason: false,
     });
   });
 
@@ -155,23 +156,34 @@ describe("deidentify onset, couple text and text tags (#111)", () => {
     expect(keyText(dropped)).toContain("Breast cancer");
   });
 
+  it("childless reason: dropped by default, kept when asked, the mark stays", () => {
+    const out = deidentify(family());
+    const pc = out.partnerships.find(p => p.id === "pc")!;
+    expect(pc.childlessReason).toBeUndefined();
+    expect(pc.childless).toBe("infertility");
+    expect(svg(family())).not.toContain("azoospermia");
+    expect(svg(family(), { childlessReason: true })).toContain("azoospermia");
+    expect(exportSvg(family())).toContain("azoospermia");
+  });
+
   it("the U-shape export follows the same choices", () => {
-    const keepAll = { evaluationDetail: true, onset: true };
+    const keepAll = { evaluationDetail: true, onset: true, childlessReason: true };
     const u = (k: Partial<DeidentifyKeep>) => exportUShapeSvg(family(), { deidentify: true, deidentifyKeep: k });
     const all = u(keepAll);
     expect(all).toContain("BRCA1");
     expect(all).toContain("45y");
     expect(all).toContain("first cousins");
     expect(all).toContain("exp/+");
+    expect(all).toContain("azoospermia");
     const none = u({ consanguinityLabels: false, textTags: false });
-    for (const t of ["BRCA1", "45y", "first cousins", "exp/+"]) expect(none).not.toContain(t);
+    for (const t of ["BRCA1", "45y", "first cousins", "exp/+", "azoospermia"]) expect(none).not.toContain(t);
   });
 });
 
 describe("deidentify free text (#111): export lint and dialog offers", () => {
   const combos: Partial<DeidentifyKeep>[] = [
     {},
-    { evaluationDetail: true, onset: true },
+    { evaluationDetail: true, onset: true, childlessReason: true },
     { evaluationMarks: false, consanguinityLabels: false, textTags: false },
   ];
   it.each(combos)("lint is clean with %o", keep => {
@@ -181,10 +193,70 @@ describe("deidentify free text (#111): export lint and dialog offers", () => {
   });
 
   it("offers only what the pedigree has", () => {
-    expect(deidentifiableText(family())).toEqual({ evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true });
+    expect(deidentifiableText(family())).toEqual({ evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true });
     const bare = family();
     bare.individuals = bare.individuals.map(i => ({ ...i, evaluations: undefined, onset: undefined, tagOnset: undefined, tags: undefined }));
-    bare.partnerships = bare.partnerships.map(p => ({ ...p, consanguinityLabel: undefined }));
-    expect(deidentifiableText(bare)).toEqual({ evaluationDetail: false, onset: false, consanguinityLabels: false, textTags: false });
+    bare.partnerships = bare.partnerships.map(p => ({ ...p, consanguinityLabel: undefined, childlessReason: undefined }));
+    expect(deidentifiableText(bare)).toEqual({ evaluationDetail: false, onset: false, consanguinityLabels: false, textTags: false, childlessReason: false });
+  });
+});
+
+describe("deidentify is an allowlist (#225)", () => {
+  // The rule lists in deidentify.ts are typed over every field of Individual,
+  // Partnership, Evaluation and Pedigree, so a new field fails the type check
+  // until it is given a rule. What the types do not name is dropped.
+  it("drops fields it has no rule for", () => {
+    const p = family();
+    Object.assign(ind(p, "c1"), { nickname: "Johnny" });
+    Object.assign(p.partnerships.find(q => q.id === "pc")!, { note: "met at school" });
+    Object.assign(ind(p, "c1").evaluations![0]!, { lab: "St Elsewhere" });
+    Object.assign(p, { referrer: "Dr Who" });
+    const out = deidentify(p, { deidentifyKeep: { evaluationDetail: true } });
+    expect(JSON.stringify(out)).not.toMatch(/Johnny|met at school|St Elsewhere|Dr Who/);
+    expect(ind(out, "c1").evaluations![0]!.detail).toBe("BRCA1 c.5266dupC");
+  });
+
+  it("drops names, dates, age, notes, the title and clinical details whatever is kept", () => {
+    const p = family();
+    Object.assign(ind(p, "c1"), { name: "John Smith", dob: "1980-02-03", dod: "2020-01-01", deceased: true, age: "about 40", notes: "lives in Adelaide" });
+    p.chartTitle = "The Smith family";
+    p.clinicalDetails = { referralReason: "sister's cancer", historian: "Jane Smith" };
+    const all = { evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true };
+    const out = deidentify(p, { deidentifyKeep: all });
+    expect(JSON.stringify(out)).not.toMatch(/Smith|1980|2020|about 40|Adelaide|sister/);
+    for (const s of [exportSvg(p, { deidentify: true, deidentifyKeep: all }), exportUShapeSvg(p, { deidentify: true, deidentifyKeep: all })]) {
+      expect(s).not.toMatch(/Smith|1980|2020|about 40|Adelaide|sister/);
+    }
+  });
+});
+
+describe("exports carry no person ids (#225)", () => {
+  // A PED import makes the file's individual IDs the ids.
+  const ped = [
+    "FAM JohnSmith 0 0 1 1",
+    "FAM JaneSmith 0 0 2 1",
+    "FAM KidSmith JohnSmith JaneSmith 1 2",
+    "FAM KidSmithToo JohnSmith JaneSmith 2 1",
+  ].join("\n");
+  const imported = () => importPed(ped).pedigrees[0]!.pedigree;
+
+  it("the PED import uses the file's IDs", () => {
+    expect(imported().individuals.map(i => i.id)).toContain("JaneSmith");
+  });
+
+  it("a de-identified standard or U-shape SVG contains none of them", () => {
+    for (const s of [exportSvg(imported(), { deidentify: true }), exportUShapeSvg(imported(), { deidentify: true })]) {
+      expect(s).not.toContain("Smith");
+    }
+  });
+
+  it("no export tags people with ids (a PED import names people by them, so they show as names)", () => {
+    for (const s of [exportSvg(imported()), exportUShapeSvg(imported())]) {
+      expect(s).not.toMatch(/data-id=|data-dup-of=/);
+    }
+  });
+
+  it("the U-shape view asks for them", () => {
+    expect(exportUShapeSvg(imported(), { personIds: true })).toContain('data-id="JaneSmith"');
   });
 });

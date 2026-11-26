@@ -1,7 +1,8 @@
 /**
  * The editor's U-shape view (#220): the U-shape export's figure drawn live
  * in place of the chart, for looking at a wide family. It is drawn by
- * `renderUShape`, so it is exactly what "Render in U shape" exports, and it
+ * `renderUShape`, so it is exactly what "Render in U shape" exports (with
+ * the person ids the export leaves out, to tell who is clicked), and it
  * can only be looked at: people are selected on it and edited on the Person
  * tab. Everything here is framework-free; `UShapeView.tsx` draws it.
  */
@@ -23,7 +24,7 @@ export interface UShapeViewDrawing {
  * the Pedigree tab, as it is for the chart.
  */
 export function uShapeViewDrawing(pedigree: Pedigree, title?: string): UShapeViewDrawing | null {
-  const { svg, layout } = renderUShape(pedigree, { title: title || undefined, key: false });
+  const { svg, layout } = renderUShape(pedigree, { title: title || undefined, key: false, personIds: true });
   if (!layout || layout.maxDepth === 0) return null;
   const drawn = [...layout.nodes.keys()].filter(id => !isBranchPlaceholderId(id)).length;
   return { svg, drawn, total: pedigree.individuals.length };

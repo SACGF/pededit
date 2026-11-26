@@ -44,7 +44,7 @@ function markup(children: ReactNode): string {
  * symbol itself (by partners who are not drawn), the line runs down through
  * the text, so it gets a white backing.
  */
-export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
+export function renderSymbols(pedigree: Pedigree, b: Built, personIds = false): string[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const out: string[] = [];
   let seq = 0;
@@ -58,8 +58,9 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       // What is drawn for the person, as the standard figure and the canvas have it.
       const glyph = glyphOf(ind, pedigree);
       const backed = solo && m.id === n.blood;
+      const id = personIds ? ` ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}"` : "";
       out.push(
-        `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
+        `<g${id} transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
         markup(
           <g transform={`translate(${-HALF} ${-HALF})`}>
             <TextUnderSymbol
@@ -139,7 +140,7 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
   out.push(`<g transform="translate(${r(margin - minX + shiftX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout, working));
-  out.push(...renderSymbols(working, b));
+  out.push(...renderSymbols(working, b, options.personIds));
   out.push(`<g class="consanguinity-labels">`, ...renderCoupleLabels(layout.coupleLabels), `</g>`);
   out.push(`</g>`);
   if (legend.height > 0) {
