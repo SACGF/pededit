@@ -5,7 +5,8 @@ import {
   affectedControlOn, applyAffected, applyCarrier, applyConditionState, carrierConditions, conditionMode, isAffected, isCarrier,
   plainAffected, plainCarrier, resolvePlainAffected, CONDITIONS_AND_TAGS,
 } from "../conditions";
-import { symbolPaint, keyTagRows, statusKeyRows, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
+import { keyTagRows, statusKeyRows } from "../keyRows";
+import { symbolPaint, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
 import { exportKeyMarkup } from "../exportKey";
 import { carrierPaintFrom, tagPaint } from "../tagFills";
 import { notationOf, withCurrentNotation } from "../notation";

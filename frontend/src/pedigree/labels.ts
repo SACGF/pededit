@@ -20,6 +20,7 @@ import type { NotationEdition } from "@pedigree-editor/layout-engine";
 import { assignedAtBirthText } from "./gender";
 import { inbreedingLabel } from "./relatedness";
 import { DECEASED_OVERHANG } from "./constants";
+import { ageAtDeath, parsePartialDate } from "./dateRanges";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -198,34 +199,6 @@ export function ageLines(ind: Pick<Individual, "age" | "dob" | "dod" | "deceased
 export function ageText(ind: Pick<Individual, "age" | "dob" | "dod" | "deceased">): string | undefined {
   const lines = ageLines(ind);
   return lines.length ? lines.join(", ") : undefined;
-}
-
-export interface PartialDate { y: number; m?: number; d?: number }
-
-/** "2007", "2007-03" or "2007-03-14" (often only the year of death is known); anything else is undefined. */
-export function parsePartialDate(text: string): PartialDate | undefined {
-  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(text);
-  if (!m) return undefined;
-  const y = +m[1]!, mo = m[2] ? +m[2] : undefined, d = m[3] ? +m[3] : undefined;
-  if (mo !== undefined && (mo < 1 || mo > 12)) return undefined;
-  if (d !== undefined && (d < 1 || d > 31)) return undefined;
-  return { y, ...(mo ? { m: mo } : {}), ...(d ? { d } : {}) };
-}
-
-/**
- * Age at death from two full dates: "72y", or "4 mo" under a year, "5 d"
- * under a month. Undefined when either date lacks a month or day (a year
- * alone leaves the age a year out) or death comes before birth.
- */
-export function ageAtDeath(birth: PartialDate, death: PartialDate): string | undefined {
-  if (birth.m === undefined || birth.d === undefined || death.m === undefined || death.d === undefined) return undefined;
-  const before = death.m < birth.m || (death.m === birth.m && death.d < birth.d);
-  const years = death.y - birth.y - (before ? 1 : 0);
-  if (years >= 1) return `${years}y`;
-  const months = (death.y - birth.y) * 12 + death.m - birth.m - (death.d < birth.d ? 1 : 0);
-  if (months >= 1) return `${months} mo`;
-  const days = Math.round((Date.UTC(death.y, death.m - 1, death.d) - Date.UTC(birth.y, birth.m - 1, birth.d)) / 86_400_000);
-  return days >= 0 ? `${days} d` : undefined;
 }
 
 /**

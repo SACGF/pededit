@@ -249,8 +249,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `edges/CoupleEdge.tsx` (`CoupleEdge`, and `ConsanguineousEdge` for the
   double line) draws `chart/CoupleLine` between partners. `DuplicateEdge`
   is the dashed arc between copies; its path is `duplicateArcD` in
-  `couplePath.ts`, shared with the SVG exporter.
-- `duplicateArc.ts` — keeps a dashed arc off other people (#192). The usual
+  `duplicateArc.ts`, shared with the SVG exporter.
+- `duplicateArc.ts` — the dashed arc's path, and keeps it off other people (#192). The usual
   line is kept whenever it passes through nobody's symbol and nobody's text,
   so most arcs are R's. Otherwise `chooseArcRoute` (called from
   `buildScene`, result on the edge data) picks: for copies on one row a
@@ -415,7 +415,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   conditions a 2008 person affected only with recorded ones has quarters on
   white, as NSGC 2008 shades a quadrant per condition. Canvas, both exporters and the legends read it; never
   test `ind.affected` / `ind.carrier` for drawing. `statusKeyRows` and
-  `keyTagRows` work out the affected, carrier and tag rows of the key for
+  `keyTagRows` (in `keyRows.ts`) work out the affected, carrier and tag rows of the key for
   `keyRows` (below).
 - `keyRows.ts` (#148): the rows of the chart's key as plain data, for the
   legend on the Pedigree tab and for the key of the exports:
@@ -651,7 +651,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `chart/ConsanguinityLabel` and `svgExporter` (group `consanguinity-labels`)
   draw it from `consanguinityLabelBaselines`; both raise the chart title
   over a top-row label and over the dashed arc of someone drawn twice in
-  the top row (#172), through one helper (`highestAboveSymbols`, passed as
+  the top row (#172), through one helper (`highestAboveSymbols` in `scene.ts`, passed as
   `chartTitleNode`'s `aboveTop` and to the export's `computeBounds`):
   anything new drawn above the top row's symbols belongs in it. The
   canvas lint checks it (`title-collides` in `renderLint.ts`, #188, with

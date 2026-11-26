@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ageLines, ageAtDeath, parsePartialDate, detailLines, detailsBacked, labelMaxWidth, detailSections } from "../labels";
+import { ageLines, detailLines, detailsBacked, labelMaxWidth, detailSections } from "../labels";
+import { ageAtDeath, parsePartialDate } from "../dateRanges";
 import { buildScene } from "../scene";
 import { lintScene } from "../renderLint";
 import { SLOT_WIDTH } from "../constants";

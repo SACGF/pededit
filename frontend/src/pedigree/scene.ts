@@ -2,8 +2,8 @@ import { buildPartnerSetFromPedigree, descentX, resolveCouple } from "@pedigree-
 import { cachedLayout } from "./layoutCache";
 import type { Pedigree, LayoutResult, Individual, PartnerSet, ChildlessStatus, Zygosity, Sex } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DUPLICATE_ARC_BULGE } from "./constants";
-import { couplePortHeights, duplicateArcPoints, hopGeometry, hopTurn } from "./couplePath";
-import { chooseArcRoute } from "./duplicateArc";
+import { couplePortHeights, highestHop, hopGeometry, hopTurn } from "./couplePath";
+import { chooseArcRoute, duplicateArcPoints, highestDuplicateArc } from "./duplicateArc";
 import type { ArcLine, ArcObstacle } from "./duplicateArc";
 import { layoutSpacing, scalePinnedPosition } from "./spacing";
 import { consanguinityTest } from "./consanguinity";
@@ -12,7 +12,7 @@ import { activeSnapGrid, snapSlotPositions } from "./snap";
 import { activeChildless } from "./childless";
 import { middleTaken } from "./ended";
 import { consanguinityLabelLimits, consanguinityLabelRoom, consanguinityLabelText, placeConsanguinityLabel, wrapConsanguinityLabel } from "./consanguinityLabel";
-import { highestAboveSymbols, type ConsanguinityLabelOffset } from "./consanguinityLabel";
+import { highestConsanguinityLabel, type ConsanguinityLabelOffset } from "./consanguinityLabel";
 import type { TextBlock, LinePoint } from "./geometryTypes";
 import { copyNumberBlock, textBlockUnder, TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
@@ -100,6 +100,17 @@ export interface Scene {
   aboveTop: number;
   /** Null when nobody is drawn. */
   bounds: SceneBounds | null;
+}
+
+/**
+ * The highest point of anything drawn over the symbols, or Infinity when
+ * there is nothing: the couple labels, the dashed arcs between two copies of
+ * someone and the couple lines that hop over a partner. The chart title is
+ * raised to clear it, on the canvas (`chartTitleNode`) and in the export
+ * (`computeBounds`).
+ */
+export function highestAboveSymbols(scene: Pick<Scene, "people" | "couples" | "duplicates">): number {
+  return Math.min(highestConsanguinityLabel(scene), highestDuplicateArc(scene, NODE_SIZE / 2), highestHop(scene));
 }
 
 /**

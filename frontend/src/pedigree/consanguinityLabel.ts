@@ -2,7 +2,6 @@ import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
 import type { TextBlock } from "./geometryTypes";
 import { CONSANGUINEOUS_GAP, DECEASED_OVERHANG, NODE_SIZE, ROW_HEIGHT } from "./constants";
 import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
-import { highestDuplicateArc, highestHop } from "./couplePath";
 import { kinshipLabel, kinshipOf } from "./relatedness";
 import { nameCoupleRelationship } from "./relationship";
 import { wholePedigree } from "./collapse";
@@ -239,17 +238,6 @@ export function consanguinityLabelPlacements(scene: {
 /** The highest point any couple label reaches, or Infinity when there is none. */
 export function highestConsanguinityLabel(scene: Parameters<typeof consanguinityLabelPlacements>[0]): number {
   return Math.min(Infinity, ...consanguinityLabelPlacements(scene).map(p => consanguinityLabelTop(p.cy, p.hop, p.lines.length, p.dy)));
-}
-
-/**
- * The highest point of anything drawn over the symbols, or Infinity when
- * there is nothing: the couple labels, the dashed arcs between two copies of
- * someone and the couple lines that hop over a partner. The chart title is
- * raised to clear it, on the canvas (`chartTitleNode`) and in the export
- * (`computeBounds`).
- */
-export function highestAboveSymbols(scene: Parameters<typeof consanguinityLabelPlacements>[0] & Parameters<typeof highestDuplicateArc>[0]): number {
-  return Math.min(highestConsanguinityLabel(scene), highestDuplicateArc(scene, NODE_SIZE / 2), highestHop(scene));
 }
 
 /**

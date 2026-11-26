@@ -42,6 +42,12 @@ function withSides(p: Pedigree, sides: Record<string, string>): Pedigree {
   return { ...p, partnerships: p.partnerships.map(q => sides[q.id] ? { ...q, leftPartner: sides[q.id] } : q) };
 }
 
+/** The pedigree the canvas lays out when it draws this couple (hidden branches and filters applied). */
+function laidOutWith(pedigree: Pedigree, partnershipId: string): Pedigree {
+  const drawn = drawnPedigree(pedigree);
+  return drawn.partnerships.some(q => q.id === partnershipId) ? drawn : pedigree;
+}
+
 /**
  * The `Partnership.leftPartner` values that swap which side the partners of
  * `partnershipId` are drawn on, or the reason it cannot be done.
@@ -57,8 +63,7 @@ function withSides(p: Pedigree, sides: Record<string, string>): Pedigree {
 export function swapSidesPlan(pedigree: Pedigree, partnershipId: string): { sides: Record<string, string> } | { problem: string } {
   const p = pedigree.partnerships.find(q => q.id === partnershipId);
   if (!p) return { problem: "Unknown partnership." };
-  const drawn = drawnPedigree(pedigree);
-  const base = drawn.partnerships.some(q => q.id === partnershipId) ? drawn : pedigree;
+  const base = laidOutWith(pedigree, partnershipId);
   const before = cachedLayout(base);
   const left = drawnLeftPartner(base, before, partnershipId);
   if (!left) return { problem: "These partners are not drawn side by side, so there is no side to swap." };
@@ -108,12 +113,6 @@ export function coupleOfPair(pedigree: Pedigree, ids: string[]): Partnership | u
 }
 
 // ── Draw this couple beside ─────────────────────────────────────────────────
-
-/** The pedigree the canvas lays out when it draws this couple (hidden branches and filters applied). */
-function laidOutWith(pedigree: Pedigree, partnershipId: string): Pedigree {
-  const drawn = drawnPedigree(pedigree);
-  return drawn.partnerships.some(q => q.id === partnershipId) ? drawn : pedigree;
-}
 
 /**
  * The partners "Draw this couple beside" can offer for a couple: both, or

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { findProblems, dateBefore, worstSeverity, RULES, type Rule } from "../validation";
+import { findProblems, worstSeverity, RULES, type Rule } from "../validation";
+import { certainlyBefore } from "../dateRanges";
 import { problemsOf, fieldProblems, problemSubject, problemTarget } from "../../components/problemList";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -57,10 +58,10 @@ describe("editor warnings (#116): starter rules", () => {
     expect(prob).toMatchObject({ severity: "error", field: "dod" });
   });
 
-  it("dateBefore", () => {
-    expect(dateBefore({ y: 2000 }, { y: 2001 })).toBe(true);
-    expect(dateBefore({ y: 2001, m: 2 }, { y: 2001 })).toBe(false);
-    expect(dateBefore({ y: 2001, m: 2, d: 3 }, { y: 2001, m: 2, d: 4 })).toBe(true);
+  it("certainlyBefore", () => {
+    expect(certainlyBefore({ y: 2000 }, { y: 2001 })).toBe(true);
+    expect(certainlyBefore({ y: 2001, m: 2 }, { y: 2001 })).toBe(false);
+    expect(certainlyBefore({ y: 2001, m: 2, d: 3 }, { y: 2001, m: 2, d: 4 })).toBe(true);
   });
 
   it("dod-not-deceased: a date of death on someone not marked deceased, fixed by marking them", () => {

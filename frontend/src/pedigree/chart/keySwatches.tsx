@@ -1,4 +1,4 @@
-import type { Pedigree, Tag, LifeStatus } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Tag, LifeStatus, Sex } from "@pedigree-editor/layout-engine";
 import type { Zygosity, ChildlessStatus, Adoption, ReproductiveRole } from "@pedigree-editor/layout-engine";
 import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE } from "../tags";
 import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "./symbols";
@@ -17,8 +17,6 @@ import { LINE_WIDTH } from "../constants";
  * export key (`exportKey.tsx`) scales them into its rows. Symbols are drawn
  * by the canvas's own components.
  */
-
-type Sex = "male" | "female" | "unknown";
 
 /** Size (px) of the symbols in the legend's swatches. */
 export const LEGEND_SYMBOL_SIZE = 24;

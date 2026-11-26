@@ -16,8 +16,8 @@ import type {
 } from "@pedigree-editor/layout-engine";
 import { collapseInfo, isBranchPlaceholderId, COLLAPSED_BRANCH_LABEL } from "./collapse";
 import { symbolSex, anyDrawnByGender, assignedAtBirthInUse } from "./gender";
-import { statusKeyRows, keyTagRows, pedigreeTags, tagsInUse } from "./tags";
-import { carrierLabel } from "./conditions";
+import { pedigreeTags, symbolPaint, tagsInUse, PLAIN_CARRIER_TAG } from "./tags";
+import { carrierConditions, carrierLabel, plainAffected, plainStatusLabel } from "./conditions";
 import { inbreedingLabel, kinshipLabel } from "./relatedness";
 import { evaluationKeyInfo, evaluationLegend, PRESYMPTOMATIC_LEGEND_LABEL, DOCUMENTED_LEGEND_LABEL } from "./evaluation";
 import { notationOf } from "./notation";
@@ -252,5 +252,82 @@ export function keyRows(pedigree: Pedigree, target: KeyTarget, options: KeyRowsO
     symbols: ordered(SYMBOL_ORDER[target]),
     relationships: ordered(RELATIONSHIP_ORDER[target]),
     details: clinicalDetailLines(pedigree).map(d => ({ kind: "clinicalDetail" as const, field: d.field, label: d.label, value: d.value })),
+  };
+}
+
+// ── Tag rows ──────────────────────────────────────────────────────────────────
+
+/** One key row for a tag: the tag itself, or a condition's carriers. */
+export interface KeyTagRow {
+  tag: Tag;
+  carrier: boolean;
+  label: string;
+}
+
+/**
+ * The tag rows of a key, in pedigree tag order: each tag someone has, and
+ * right after a condition the "<condition> carrier" row when someone is a
+ * carrier of it. A condition with carriers only lists just that row.
+ */
+export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
+  const affected = new Set(tagsInUse(pedigree).map(t => t.id));
+  const carriers = new Set<string>();
+  for (const ind of pedigree.individuals) for (const t of carrierConditions(ind, pedigree)) carriers.add(t.id);
+  const rows: KeyTagRow[] = [];
+  for (const tag of pedigreeTags(pedigree)) {
+    if (affected.has(tag.id)) rows.push({ tag, carrier: false, label: tag.label });
+    if (carriers.has(tag.id)) rows.push({ tag, carrier: true, label: carrierLabel(tag) });
+  }
+  return rows;
+}
+
+// ── Affected and carrier rows ─────────────────────────────────────────────────
+
+/**
+ * The Affected / Carrier rows of a key, shared by the in-app legend
+ * and the export key: who each row's swatch is drawn for (its shape), and its
+ * label. Follows what is drawn (`symbolPaint`):
+ * - NSGC 2008: "Affected" for a black fill, "Affected, with conditions (black
+ *   centre)", "Carrier" for the dot, as before;
+ * - NSGC 2022: "Affected" only for a solid black fill (affected with no
+ *   condition recorded), "Affected, condition not recorded (black centre)"
+ *   for the black fill under sectors, "Carrier" for the dotted half.
+ * With two or more conditions a plain flag's label adds "(condition not
+ * recorded)" (`plainStatusLabel`).
+ */
+export interface StatusKeyRows {
+  affected?: Individual;
+  affectedLabel: string;
+  core?: Individual;
+  coreLabel: string;
+  carrier?: Individual;
+  carrierLabel: string;
+  /** The carrier row is the 2022 dotted half, not the dot. */
+  carrierHalf: boolean;
+}
+
+export function statusKeyRows(pedigree: Pedigree, inds: readonly Individual[] = pedigree.individuals): StatusKeyRows {
+  const paints = inds.map(i => ({ i, p: symbolPaint(i, pedigree) }));
+  const y2008 = notationOf(pedigree) === "nsgc2008";
+  const anyPlainAffected = inds.some(i => plainAffected(i, pedigree));
+  if (y2008) {
+    return {
+      affected: paints.find(({ p }) => p.base === "black")?.i,
+      affectedLabel: anyPlainAffected ? plainStatusLabel("Affected", pedigree) : "Affected",
+      core: paints.find(({ p }) => p.core)?.i,
+      coreLabel: "Affected, with conditions (black centre)",
+      carrier: paints.find(({ p }) => p.dot)?.i,
+      carrierLabel: plainStatusLabel("Carrier", pedigree),
+      carrierHalf: false,
+    };
+  }
+  return {
+    affected: paints.find(({ p }) => p.base === "black" && p.sectors.length === 0)?.i,
+    affectedLabel: plainStatusLabel("Affected", pedigree),
+    core: paints.find(({ p }) => p.core)?.i,
+    coreLabel: "Affected, condition not recorded (black centre)",
+    carrier: paints.find(({ p }) => p.sectors.some(s => s.tag === PLAIN_CARRIER_TAG))?.i,
+    carrierLabel: plainStatusLabel("Carrier", pedigree),
+    carrierHalf: true,
   };
 }

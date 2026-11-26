@@ -2,8 +2,7 @@
  * U-shape export, step 4: the figure. Symbols and the text beside them, the
  * consanguinity labels, title and key, assembled into the SVG.
  */
-import type { ReactNode } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { svgMarkup } from "../../../pedigree/svgMarkup";
 import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { deidentify } from "../deidentify";
 import { drawnPedigree } from "../../../pedigree/collapse";
@@ -33,11 +32,6 @@ export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
     `</g>`);
 }
 
-/** SVG markup for some SVG elements, rendered inside an `<svg>` root as React needs. */
-function markup(children: ReactNode): string {
-  return renderToStaticMarkup(<svg>{children}</svg>).slice("<svg>".length, -"</svg>".length);
-}
-
 /**
  * Each person as the standard figure and the canvas draw them
  * (`PersonMarks` and `TextUnderSymbol`, #139), turned along the track:
@@ -64,7 +58,7 @@ export function renderSymbols(pedigree: Pedigree, b: Built, personIds = false): 
       const id = personIds ? ` ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}"` : "";
       out.push(
         `<g${id} transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
-        markup(
+        svgMarkup(
           <g transform={`translate(${-HALF} ${-HALF})`}>
             <TextUnderSymbol
               glyph={backed ? { ...glyph, labelsBacked: true } : glyph} nameLines={glyph.figureNameLines} size={NODE_SIZE}
@@ -138,10 +132,10 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
   const out: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
     `     viewBox="0 0 ${width} ${height}">`,
-    `<defs>${markup(<ProbandMarkerDef />)}</defs>`,
+    `<defs>${svgMarkup(<ProbandMarkerDef />)}</defs>`,
     `<rect width="${width}" height="${height}" fill="white"/>`,
   ];
-  if (options.title) out.push(`<g class="chart-title">${markup(<ChartTitle title={options.title} x={width / 2} y={padding / 2 + 14} />)}</g>`);
+  if (options.title) out.push(`<g class="chart-title">${svgMarkup(<ChartTitle title={options.title} x={width / 2} y={padding / 2 + 14} />)}</g>`);
   out.push(`<g transform="translate(${r(margin - minX + shiftX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout, working));

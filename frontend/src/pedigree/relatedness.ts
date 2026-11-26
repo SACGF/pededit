@@ -2,6 +2,7 @@ import { kinshipCoefficients } from "@pedigree-editor/layout-engine";
 import type { KinshipCoefficients, Pedigree } from "@pedigree-editor/layout-engine";
 import { wholePedigree } from "./collapse";
 import { couplesOf, partnerIn } from "./graph";
+import { ordinal } from "../utils/text";
 
 /**
  * Relatedness shown in the edit panel: how to write a coefficient, the
@@ -90,12 +91,6 @@ function asFraction(x: number, maxDen: number): string | null {
     if (Math.abs(num - Math.round(num)) < EPS) return den === 1 ? String(Math.round(num)) : `${Math.round(num)}/${den}`;
   }
   return null;
-}
-
-function ordinal(n: number): string {
-  const tens = n % 100;
-  if (tens >= 11 && tens <= 13) return `${n}th`;
-  return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 }
 
 /**

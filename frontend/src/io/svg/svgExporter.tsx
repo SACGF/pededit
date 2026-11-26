@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { svgMarkup } from "../../pedigree/svgMarkup";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE, DECEASED_OVERHANG } from "../../pedigree/constants";
 import { titleWidth, TITLE_GAP } from "../../pedigree/labels";
@@ -24,12 +24,6 @@ import type { SvgExportOptions } from "./types";
  * itself: it places the components, groups them for the export lint
  * (`exportLint.ts` reads the group classes) and adds the title and key.
  */
-
-/** SVG markup for some SVG elements. Rendered inside an `<svg>` root, which React needs for SVG children. */
-function markup(children: ReactNode): string {
-  const html = renderToStaticMarkup(<svg>{children}</svg>);
-  return html.slice("<svg>".length, -"</svg>".length);
-}
 
 // ── Bounds ────────────────────────────────────────────────────────────────────
 
@@ -93,17 +87,17 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   const lines: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
     `     viewBox="0 0 ${width} ${height}">`,
-    `<defs>${markup(<ProbandMarkerDef />)}</defs>`,
+    `<defs>${svgMarkup(<ProbandMarkerDef />)}</defs>`,
     `<rect width="${width}" height="${height}" fill="white"/>`,
   ];
 
   // The title is outside the drawing's groups: it is not a label.
-  if (options.title) lines.push(`<g class="chart-title">${markup(<ChartTitle title={options.title} x={width / 2} y={padding + 16} />)}</g>`);
+  if (options.title) lines.push(`<g class="chart-title">${svgMarkup(<ChartTitle title={options.title} x={width / 2} y={padding + 16} />)}</g>`);
 
   lines.push(`<g transform="translate(${offsetX} ${offsetY})">`);
   // The group classes are what the export lint (exportLint.ts) reads.
   const group = (cls: string, body: ReactNode) => {
-    const inner = markup(body);
+    const inner = svgMarkup(body);
     lines.push(`<g class="${cls}">`, ...(inner ? [inner] : []), `</g>`);
   };
   group("couple-lines", couples.map(({ e, left, right }) => <CoupleLine key={e.id} data={e.data} double={e.double} left={left} right={right} />));

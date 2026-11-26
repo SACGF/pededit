@@ -36,7 +36,7 @@ import type { Scene, ScenePerson } from "./scene";
 import { DECEASED_OVERHANG, NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
 import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth } from "./consanguinityLabel";
-import { duplicateArcPoints } from "./couplePath";
+import { duplicateArcPoints } from "./duplicateArc";
 import { textBlockUnder } from "./labelBlock";
 import { arcCollisions } from "./duplicateArc";
 import { pairKey } from "./graph";

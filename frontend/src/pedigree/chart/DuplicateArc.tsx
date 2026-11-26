@@ -1,5 +1,5 @@
 import { NODE_SIZE } from "../constants";
-import { duplicateArcD } from "../couplePath";
+import { duplicateArcD } from "../duplicateArc";
 import type { DuplicateArcData } from "../scene";
 import type { LinePosition } from "../lineGeometry";
 

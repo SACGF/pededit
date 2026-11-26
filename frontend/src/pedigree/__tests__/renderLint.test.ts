@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EXAMPLES } from "../../data/examples";
-import { buildScene } from "../scene";
+import { buildScene, highestAboveSymbols } from "../scene";
 import { lintScene } from "../renderLint";
-import { highestAboveSymbols } from "../consanguinityLabel";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
 /**

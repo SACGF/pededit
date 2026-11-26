@@ -1,13 +1,40 @@
 /**
- * Arithmetic on partial dates ("2007", "2007-03", "2007-03-14") for
- * the editor warnings. A partial date stands for every day it could
+ * Partial dates ("2007", "2007-03", "2007-03-14"): reading them, the age
+ * at death drawn under a symbol, and arithmetic for the editor warnings.
+ * A partial date stands for every day it could
  * be, so each comparison asks what is certain: 2007 is not certainly before
  * 2007-03-14, and someone born in 1950 is 55 or 56 in 2006. A check flags
  * only what holds for every day the dates could be.
  */
-import type { PartialDate } from "./labels";
-
 const DAY = 86_400_000;
+
+export interface PartialDate { y: number; m?: number; d?: number }
+
+/** "2007", "2007-03" or "2007-03-14" (often only the year of death is known); anything else is undefined. */
+export function parsePartialDate(text: string): PartialDate | undefined {
+  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(text);
+  if (!m) return undefined;
+  const y = +m[1]!, mo = m[2] ? +m[2] : undefined, d = m[3] ? +m[3] : undefined;
+  if (mo !== undefined && (mo < 1 || mo > 12)) return undefined;
+  if (d !== undefined && (d < 1 || d > 31)) return undefined;
+  return { y, ...(mo ? { m: mo } : {}), ...(d ? { d } : {}) };
+}
+
+/**
+ * Age at death from two full dates: "72y", or "4 mo" under a year, "5 d"
+ * under a month. Undefined when either date lacks a month or day (a year
+ * alone leaves the age a year out) or death comes before birth.
+ */
+export function ageAtDeath(birth: PartialDate, death: PartialDate): string | undefined {
+  if (birth.m === undefined || birth.d === undefined || death.m === undefined || death.d === undefined) return undefined;
+  const before = death.m < birth.m || (death.m === birth.m && death.d < birth.d);
+  const years = death.y - birth.y - (before ? 1 : 0);
+  if (years >= 1) return `${years}y`;
+  const months = (death.y - birth.y) * 12 + death.m - birth.m - (death.d < birth.d ? 1 : 0);
+  if (months >= 1) return `${months} mo`;
+  const days = Math.round((Date.UTC(death.y, death.m - 1, death.d) - Date.UTC(birth.y, birth.m - 1, birth.d)) / 86_400_000);
+  return days >= 0 ? `${days} d` : undefined;
+}
 
 /** The first and last day a partial date could be, as days since 1970-01-01 (UTC). */
 export function dayRange(d: PartialDate): [number, number] {

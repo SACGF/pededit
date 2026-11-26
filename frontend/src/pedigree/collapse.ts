@@ -173,15 +173,7 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
     if (branch.size > 0) branches.set(root, branch);
   }
 
-  // A copy for removeIndividuals to strip in place: it reassigns the arrays,
-  // but writes into parentOf, pinnedPositions and the partnership objects.
-  const drawn: Pedigree = {
-    ...withoutFilters(pedigree),
-    partnerships: pedigree.partnerships.map(p => ({ ...p })),
-    parentOf: { ...pedigree.parentOf },
-    ...(pedigree.pinnedPositions ? { pinnedPositions: { ...pedigree.pinnedPositions } } : {}),
-  };
-  removeIndividuals(drawn, hidden);
+  const drawn = withoutPeople(withoutFilters(pedigree), hidden);
   // A child drawn as themselves keeps none of their own partnerships: their
   // partners and children are part of the hidden branch. A partner drawn
   // elsewhere (a cousin) stays, without the couple line.
@@ -189,13 +181,6 @@ export function collapseInfo(pedigree: Pedigree): CollapseInfo {
   if (cut.size > 0) {
     drawn.partnerships = drawn.partnerships.filter(p => !cut.has(p.id));
     for (const id of cut) delete drawn.parentOf[id];
-  }
-  for (const p of drawn.partnerships) {
-    // Children hidden, not absent: the couple is not childless.
-    if ((pedigree.parentOf[p.id]?.length ?? 0) > 0 && (drawn.parentOf[p.id]?.length ?? 0) === 0) {
-      delete p.childless;
-      delete p.childlessReason;
-    }
   }
   drawn.individuals = drawn.individuals.map(i => {
     if (!i.descendantsHidden || branches.has(i.id)) return i;
@@ -306,26 +291,38 @@ export function drawnSubset(pedigree: Pedigree, keep: Set<string>): Pedigree {
   const source = collapseInfo(pedigree);
   const gone = new Set(source.drawn.individuals.filter(i => !keep.has(i.id)).map(i => i.id));
   if (gone.size === 0) return source.drawn;
-  const subset: Pedigree = {
-    ...source.drawn,
-    individuals: source.drawn.individuals.map(i => ({ ...i })),
-    partnerships: source.drawn.partnerships.map(p => ({ ...p })),
-    parentOf: { ...source.drawn.parentOf },
-    ...(source.drawn.pinnedPositions ? { pinnedPositions: { ...source.drawn.pinnedPositions } } : {}),
-    ...(source.drawn.unlockedIndividuals ? { unlockedIndividuals: [...source.drawn.unlockedIndividuals] } : {}),
-  };
-  removeIndividuals(subset, gone);
-  for (const p of subset.partnerships) {
-    // Children left out, not absent: the couple is not childless.
-    if ((source.drawn.parentOf[p.id]?.length ?? 0) > 0 && (subset.parentOf[p.id]?.length ?? 0) === 0) {
-      delete p.childless;
-      delete p.childlessReason;
-    }
-  }
+  const subset = withoutPeople(source.drawn, gone);
   const placeholders = new Map([...source.placeholders].filter(([id]) => keep.has(id)));
   cache.set(subset, { drawn: subset, hidden: new Set(), branches: source.branches, placeholders, filtered: source.filtered });
   wholeOf.set(subset, wholePedigree(pedigree));
   return subset;
+}
+
+/**
+ * `source` without the people in `gone`, as `removeIndividuals` leaves it,
+ * on a copy of what that writes into in place (`parentOf`, the pins, the
+ * partnership objects and anyone whose carrier or social parent is gone; it
+ * reassigns the arrays). Everyone else stays the same object, so the canvas
+ * does not redraw them. A couple whose children are all gone loses its
+ * childless mark: its children are not drawn, not absent.
+ */
+function withoutPeople(source: Pedigree, gone: Set<string>): Pedigree {
+  const linkGone = (i: Individual) => (!!i.carriedBy && gone.has(i.carriedBy)) || !!i.socialParents?.some(id => gone.has(id));
+  const copy: Pedigree = {
+    ...source,
+    individuals: source.individuals.map(i => (linkGone(i) ? { ...i } : i)),
+    partnerships: source.partnerships.map(p => ({ ...p })),
+    parentOf: { ...source.parentOf },
+    ...(source.pinnedPositions ? { pinnedPositions: { ...source.pinnedPositions } } : {}),
+  };
+  removeIndividuals(copy, gone);
+  for (const p of copy.partnerships) {
+    if ((source.parentOf[p.id]?.length ?? 0) > 0 && (copy.parentOf[p.id]?.length ?? 0) === 0) {
+      delete p.childless;
+      delete p.childlessReason;
+    }
+  }
+  return copy;
 }
 
 /** The pedigree with hidden people left out: what the canvas and exports draw. */

@@ -2,6 +2,7 @@ import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { briefCoefficient } from "./relatedness";
 import { childrenOf, parentCoupleOf } from "./graph";
 import { personLabel } from "./personLabel";
+import { ordinal } from "../utils/text";
 
 /**
  * The name of the relationship between two people: "first cousin once
@@ -63,14 +64,8 @@ function ancestorDistances(pedigree: Pedigree, id: string): Map<string, number> 
 
 const ORDINAL_WORDS = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
 
-function ordinalNumber(n: number): string {
-  const tens = n % 100;
-  if (tens >= 11 && tens <= 13) return `${n}th`;
-  return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
-}
-
 function ordinalWord(n: number): string {
-  return ORDINAL_WORDS[n] ?? ordinalNumber(n);
+  return ORDINAL_WORDS[n] ?? ordinal(n);
 }
 
 function times(n: number): string {
@@ -85,7 +80,7 @@ function bySex(sex: Sex | undefined, male: string, female: string, other: string
 function greats(k: number): string {
   if (k <= 0) return "";
   if (k <= 2) return "great-".repeat(k);
-  return `${ordinalNumber(k)} great-`;
+  return `${ordinal(k)} great-`;
 }
 
 /**

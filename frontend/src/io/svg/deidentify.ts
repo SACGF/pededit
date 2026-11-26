@@ -2,7 +2,7 @@ import type { Evaluation, Individual, Partnership, Pedigree } from "@pedigree-ed
 import { pedigreeNumbers } from "../../pedigree/scene";
 import { DEIDENTIFY_KEEP_DEFAULTS } from "./types";
 import type { DeidentifyKeep, SvgExportOptions } from "./types";
-import { parsePartialDate } from "../../pedigree/labels";
+import { parsePartialDate } from "../../pedigree/dateRanges";
 import { onsetsOf } from "../../pedigree/onset";
 import { consanguinityWording } from "../../pedigree/consanguinityLabel";
 import { asDrawn, drawnPedigree, isBranchPlaceholderId } from "../../pedigree/collapse";

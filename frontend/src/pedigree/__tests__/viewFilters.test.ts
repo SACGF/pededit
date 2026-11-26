@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
+import { freeze } from "immer";
+import { M, F, couple, build as buildFixture } from "../../fixtures/features";
 import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { affectedOnlyKept, affectedOnlySeeds, bloodRelativesKept, filterHidden, filterBannerText } from "../viewFilters";
 import { collapseInfo, drawnPedigree, branchPlaceholderId, branchTooltip, isBranchPlaceholderId, filterHidingNew } from "../collapse";
@@ -394,5 +396,22 @@ describe("affected only with one condition (#4)", () => {
     expect(store().pedigree.filters).toBeUndefined();
     store().undo();
     expect(store().pedigree.filters).toEqual({ side: "paternal", bloodRelativesOnly: true });
+  });
+});
+
+describe("the drawn pedigree under a filter", () => {
+  it("leaves the stored pedigree alone when a hidden person carried or raised someone drawn", () => {
+    const p = buildFixture(
+      [M("f", { affected: true }), F("m", { affected: true }), F("s"), M("c", { affected: true, carriedBy: "s", socialParents: ["s"] })],
+      [couple("fm", "f", "m")], { fm: ["c"] },
+      { filters: { affectedOnly: true } },
+    );
+    // The store's pedigrees are frozen (Immer), so a write into one throws.
+    freeze(p, true);
+    const drawn = drawnPedigree(p);
+    expect(drawn.individuals.map(i => i.id)).not.toContain("s");
+    expect(drawn.individuals.find(i => i.id === "c")!.carriedBy).toBeUndefined();
+    expect(p.individuals.find(i => i.id === "c")!.carriedBy).toBe("s");
+    expect(drawn.individuals.find(i => i.id === "f")).toBe(p.individuals.find(i => i.id === "f"));
   });
 });

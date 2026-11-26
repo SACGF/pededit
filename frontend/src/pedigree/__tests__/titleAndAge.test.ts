@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { chartTitle, detailLines, labelMaxWidth, titleWidth, DEFAULT_PEDIGREE_NAME, ELLIPSIS, detailSections } from "../labels";
-import { buildScene } from "../scene";
+import { buildScene, highestAboveSymbols } from "../scene";
 import { lintScene } from "../renderLint";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, SLOT_WIDTH } from "../constants";
-import { highestDuplicateArc, highestHop } from "../couplePath";
-import { highestAboveSymbols } from "../consanguinityLabel";
+import { highestHop } from "../couplePath";
+import { highestDuplicateArc } from "../duplicateArc";
 import { exportSvg } from "../../io/svg/svgExporter";
 import { exportUShapeSvg } from "../../io/svg/uShapeExporter";
 import { lintExport, lintExportSvg } from "../../io/svg/exportLint";

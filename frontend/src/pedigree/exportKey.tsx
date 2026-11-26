@@ -10,7 +10,7 @@
  * lays the rows out.
  */
 import type { ReactNode } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { svgMarkup } from "./svgMarkup";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { clinicalDetailLines, wrapText } from "./clinicalDetails";
 import {
@@ -25,14 +25,9 @@ const KEY_ROW_HEIGHT = 24;
 /** The legend's swatches are drawn for 24px symbols; the key's are 16px. */
 const SCALE = LEGEND_SWATCH / LEGEND_SYMBOL_SIZE;
 
-/** SVG markup for some SVG elements, rendered inside an `<svg>` root as React needs. */
-function markup(children: ReactNode): string {
-  return renderToStaticMarkup(<svg>{children}</svg>).slice("<svg>".length, -"</svg>".length);
-}
-
 /** A swatch (one `<svg>` with its own width and height) scaled by `scale` and centred on (cx, cy). */
 function placed(swatch: ReactNode, cx: number, cy: number, scale: number): string {
-  const svg = markup(swatch);
+  const svg = svgMarkup(swatch);
   const w = Number(/^<svg[^>]* width="([\d.]+)"/.exec(svg)?.[1] ?? 0);
   const h = Number(/^<svg[^>]* height="([\d.]+)"/.exec(svg)?.[1] ?? 0);
   return `<g transform="translate(${fmt(cx)} ${fmt(cy)}) scale(${fmt(scale)}) translate(${fmt(-w / 2)} ${fmt(-h / 2)})">${svg}</g>`;
@@ -68,7 +63,7 @@ export function exportKeyMarkup(
   const labelOffset = column + LEGEND_LABEL_GAP;
   const middle = (i: number) => y + i * KEY_ROW_HEIGHT + KEY_ROW_HEIGHT / 2;
   const row = (swatch: ReactNode, scale: number, label: string, i: number) =>
-    placed(swatch, x + column / 2, middle(i), scale) + markup(<KeyLabel label={label} x={x + labelOffset} cy={middle(i)} />);
+    placed(swatch, x + column / 2, middle(i), scale) + svgMarkup(<KeyLabel label={label} x={x + labelOffset} cy={middle(i)} />);
   const out = rows.map((r, i) => row(<KeySwatch row={r} />, SCALE, r.label, i));
   // The legend draws tag swatches at the key's own size already.
   tagRows.forEach((r, j) => out.push(row(<TagSwatchSvg tag={r.tag} pedigree={key.pedigree} carrier={r.carrier} />, 1, r.label, rows.length + j)));
@@ -109,7 +104,7 @@ export function clinicalDetailsMarkup(pedigree: Pedigree, x: number, y: number):
       const baseline = y + row * DETAIL_LINE_HEIGHT + LEGEND_FONT_SIZE;
       // A hanging indent: the bold label's real width is not known here.
       const indent = i === 0 ? 0 : DETAIL_INDENT;
-      out.push(markup(
+      out.push(svgMarkup(
         <text x={fmt(x + indent)} y={fmt(baseline)} fontFamily="sans-serif" fontSize={LEGEND_FONT_SIZE} fill="black">
           {i === 0 && <tspan fontWeight="bold">{label}:</tspan>}{i === 0 ? ` ${text}` : text}
         </text>,

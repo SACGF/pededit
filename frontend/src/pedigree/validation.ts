@@ -23,9 +23,8 @@
 import type {
   Evaluation, Individual, Partnership, Pedigree, ReproductiveRole, SiblingOrderSettings, Tag,
 } from "@pedigree-editor/layout-engine";
-import { parsePartialDate, type PartialDate } from "./labels";
 import { affectedConditions, affectedControlOn, carrierLabel, conditionMode, conditionTags, isAffected, plainAffected, plainCarrier, resolvePlainAffected, type ConditionState } from "./conditions";
-import { addYears, ageRange, certainlyBefore, minDaysApart, partialDateOf } from "./dateRanges";
+import { addYears, ageRange, certainlyBefore, minDaysApart, parsePartialDate, partialDateOf, type PartialDate } from "./dateRanges";
 import { childrenOf, couplesOf, parentCoupleOf } from "./graph";
 import { capitalised } from "../utils/text";
 
@@ -154,18 +153,6 @@ function parsed(text: string | undefined): PartialDate | undefined {
 function unparseable(text: string | undefined): boolean {
   const t = text?.trim();
   return !!t && !parsePartialDate(t);
-}
-
-/**
- * Whether `a` is certainly before `b`, comparing only the parts both dates
- * have: 2007 is not before 2007-03-14, 2007-02 is before 2007-03.
- */
-export function dateBefore(a: PartialDate, b: PartialDate): boolean {
-  if (a.y !== b.y) return a.y < b.y;
-  if (a.m === undefined || b.m === undefined) return false;
-  if (a.m !== b.m) return a.m < b.m;
-  if (a.d === undefined || b.d === undefined) return false;
-  return a.d < b.d;
 }
 
 /** "their mother, Mary" or "their father": how a message names a parent. */
@@ -308,7 +295,7 @@ export const RULES: Rule[] = [
     id: "death-before-birth",
     individual: ind => {
       const birth = parsed(ind.dob), death = parsed(ind.dod);
-      return !!birth && !!death && dateBefore(death, birth) && {
+      return !!birth && !!death && certainlyBefore(death, birth) && {
         severity: "error",
         field: "dod",
         message: "Date of death is before the date of birth.",

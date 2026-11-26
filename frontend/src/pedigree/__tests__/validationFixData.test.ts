@@ -65,6 +65,6 @@ describe("the rules are separate from the editor (#126)", () => {
   it("validation.ts imports only the data model, the graph questions, conditions, dates and text helpers", () => {
     const source = readFileSync(join(__dirname, "../validation.ts"), "utf8");
     const imports = [...source.matchAll(/^import[^;]*?from "([^"]+)";/gms)].map(m => m[1]).sort();
-    expect(imports).toEqual(["../utils/text", "./conditions", "./dateRanges", "./graph", "./labels", "@pedigree-editor/layout-engine"]);
+    expect(imports).toEqual(["../utils/text", "./conditions", "./dateRanges", "./graph", "@pedigree-editor/layout-engine"]);
   });
 });
