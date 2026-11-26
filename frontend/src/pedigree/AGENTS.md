@@ -152,6 +152,13 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   single-person items (add, proband, twins, adoption, couples...) are left
   out until one person is clicked. A new person item that is safe to apply
   to a group belongs in `BatchMenuItems` too.
+  Files: `MoreMenu.tsx` (the popover and `MoreMenuItems`),
+  `CoupleMenuItems.tsx`, `BatchMenuItems.tsx` (with the "Select" / "N
+  selected" section), `AddChildrenPanel.tsx`, and `menuParts.tsx`
+  (`MenuItem`, `MenuSection`, the tag swatch and `menuAction`, which runs
+  an item's edit and closes the menu). The menus subscribe to the pedigree
+  and the selection only and take their actions from
+  `usePedigreeStore.getState()`, since actions never change.
 - `CanvasContextMenu.tsx` — the right-click menu (#95), opened by
   `PedigreeCanvas`'s `onNodeContextMenu` / `onEdgeContextMenu` at the cursor
   (a Radix `PopoverAnchor` on a fixed zero-size span). A person gets

@@ -1,5 +1,6 @@
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
-import { MoreMenuItems, CoupleMenuItems, MENU_CONTENT_CLASS } from "./nodes/MoreMenu";
+import { MoreMenuItems, MENU_CONTENT_CLASS } from "./nodes/MoreMenu";
+import { CoupleMenuItems } from "./nodes/CoupleMenuItems";
 
 /** Where the right-click menu opens (client coordinates) and for what. */
 export type ContextMenuTarget =
