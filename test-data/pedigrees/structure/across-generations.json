@@ -12,72 +12,48 @@
         "id": "GF",
         "sex": "male",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "GM",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 1
       },
       {
         "id": "P",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "S",
         "sex": "male",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 2
       },
       {
         "id": "GC",
         "sex": "male",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "Z",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 3
       },
       {
         "id": "GGC",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "W",
         "sex": "male",
         "affected": true,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       }
     ],

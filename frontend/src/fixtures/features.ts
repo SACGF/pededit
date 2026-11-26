@@ -11,6 +11,7 @@
  * as `--fixture fixture:SLUG` and `--all-fixtures`.
  */
 import type { CanvasSettings, Individual, Partnership, Pedigree, Tag } from "@pedigree-editor/layout-engine";
+import { F, M, U, couple, family as familyOf } from "../data/pedigreeBuilder";
 
 export interface FeatureFixture {
   /** Stable name: `--fixture fixture:<slug>`, snapshot file names. */
@@ -23,33 +24,15 @@ export interface FeatureFixture {
 
 export const SETTINGS_2022: CanvasSettings = { nodesMoveable: false, snapToGrid: false, snapGridSize: 5, notation: "nsgc2022" };
 
-export type Extra = Partial<Omit<Individual, "id" | "sex">>;
-export const person = (id: string, sex: Individual["sex"], extra: Extra = {}): Individual =>
-  ({ id, sex, affected: false, sibOrder: 0, ...extra });
-export const M = (id: string, extra?: Extra) => person(id, "male", extra);
-export const F = (id: string, extra?: Extra) => person(id, "female", extra);
-export const U = (id: string, extra?: Extra) => person(id, "unknown", extra);
-export const couple = (id: string, individual1: string, individual2: string, extra: Partial<Partnership> = {}): Partnership =>
-  ({ id, individual1, individual2, ...extra });
+export { person, M, F, U, couple } from "../data/pedigreeBuilder";
 
-/** Children numbered in the order written, as the editor numbers them. */
-export function build(
+/** `family` drawn in NSGC 2022, as a new pedigree is. */
+export const build = (
   individuals: Individual[],
   partnerships: Partnership[],
   parentOf: Record<string, string[]>,
   rest: Partial<Pedigree> = {},
-): Pedigree {
-  const order = new Map<string, number>();
-  for (const kids of Object.values(parentOf)) kids.forEach((id, i) => order.set(id, i));
-  return {
-    individuals: individuals.map(i => ({ ...i, sibOrder: order.get(i.id) ?? i.sibOrder })),
-    partnerships,
-    parentOf,
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    canvasSettings: SETTINGS_2022,
-    ...rest,
-  };
-}
+): Pedigree => familyOf(individuals, partnerships, parentOf, { canvasSettings: SETTINGS_2022, ...rest });
 
 const withSettings = (p: Pedigree, patch: Partial<CanvasSettings>): Pedigree =>
   ({ ...p, canvasSettings: { ...SETTINGS_2022, ...p.canvasSettings, ...patch } });

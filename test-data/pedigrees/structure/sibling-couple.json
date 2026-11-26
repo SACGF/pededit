@@ -12,45 +12,30 @@
         "id": "GF",
         "sex": "male",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "GM",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 1
       },
       {
         "id": "S",
         "sex": "male",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       },
       {
         "id": "D",
         "sex": "female",
         "affected": false,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 1
       },
       {
         "id": "C",
         "sex": "male",
         "affected": true,
-        "deceased": false,
-        "carrier": false,
-        "proband": false,
         "sibOrder": 0
       }
     ],
@@ -63,8 +48,7 @@
       {
         "id": "S+D",
         "individual1": "S",
-        "individual2": "D",
-        "consanguineous": true
+        "individual2": "D"
       }
     ],
     "parentOf": {

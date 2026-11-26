@@ -1,6 +1,7 @@
-import type { Pedigree, Individual, Partnership, Sex, Tag, TwinSet } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { withCurrentNotation } from "../pedigree/notation";
 import { PRACTICE_FAMILIES } from "./practiceFamilies";
+import { type Row, fromRows, withCouples, withTags, withTwinsAndSocialParents } from "./exampleRows";
 
 export interface ExamplePedigree {
   /**
@@ -537,139 +538,6 @@ export const EXAMPLE_GROUPS: string[] = [...new Set(EXAMPLES.map(e => e.group ??
 // These are the same pedigrees as test-data/ped/historic and test-data/ped/classic
 // (sources and notes in test-data/ped/README.md), written as parent-pointer rows
 // so the entries stay readable. A row is [id, sex, father, mother, extras].
-
-type Row = [
-  id: string,
-  sex: Sex,
-  father: string | null,
-  mother: string | null,
-  extras?: Partial<Pick<Individual, "name" | "affected" | "carrier" | "deceased" | "proband" | "consultand" | "notes">>,
-];
-
-function fromRows(rows: Row[], defaults: { deceased?: boolean } = {}): Pedigree {
-  const individuals: Individual[] = rows.map(([id, sex, , , extras]) => ({
-    id,
-    sex,
-    affected: extras?.affected ?? false,
-    deceased: extras?.deceased ?? defaults.deceased ?? false,
-    carrier: extras?.carrier ?? false,
-    proband: extras?.proband ?? false,
-    sibOrder: 0,
-    ...(extras?.name ? { name: extras.name } : {}),
-    ...(extras?.notes ? { notes: extras.notes } : {}),
-  }));
-
-  const parentsOf = new Map<string, [string, string]>();
-  const partnerships: Partnership[] = [];
-  const parentOf: Record<string, string[]> = {};
-  for (const [id, , father, mother] of rows) {
-    if (!father || !mother) continue;
-    parentsOf.set(id, [father, mother]);
-    const pid = `${father}+${mother}`;
-    if (!parentOf[pid]) {
-      partnerships.push({ id: pid, individual1: father, individual2: mother });
-      parentOf[pid] = [];
-    }
-    parentOf[pid].push(id);
-  }
-
-  const ancestors = (id: string): Set<string> => {
-    const out = new Set<string>();
-    const stack = [id];
-    while (stack.length) {
-      const p = parentsOf.get(stack.pop()!);
-      if (!p) continue;
-      for (const a of p) {
-        if (!out.has(a)) { out.add(a); stack.push(a); }
-      }
-    }
-    return out;
-  };
-  for (const p of partnerships) {
-    const a1 = ancestors(p.individual1);
-    const a2 = ancestors(p.individual2);
-    if (a1.has(p.individual2) || a2.has(p.individual1) || [...a1].some(a => a2.has(a))) {
-      p.consanguineous = true;
-    }
-  }
-
-  const byId = new Map(individuals.map(i => [i.id, i]));
-  // Founders are numbered in row order, as the PED importer does; the layout
-  // uses sibOrder to order them.
-  individuals.filter(i => !parentsOf.has(i.id)).forEach((ind, k) => { ind.sibOrder = k; });
-  for (const children of Object.values(parentOf)) {
-    children.forEach((c, i) => { byId.get(c)!.sibOrder = i; });
-  }
-
-  return { siblingOrder, individuals, partnerships, parentOf };
-}
-
-/**
- * Add tag definitions and apply each to its members, and append extra notes.
- * Throws on an unknown id so a typo fails the example tests.
- */
-function withTags(
-  ped: Pedigree,
-  tags: Array<Tag & { members: string[] }>,
-  extraNotes: Record<string, string> = {},
-): Pedigree {
-  const byId = new Map(ped.individuals.map(i => [i.id, i]));
-  const get = (id: string) => {
-    const ind = byId.get(id);
-    if (!ind) throw new Error(`withTags: no individual ${id}`);
-    return ind;
-  };
-  for (const { members, ...tag } of tags) {
-    for (const id of members) {
-      const ind = get(id);
-      ind.tags = [...(ind.tags ?? []), tag.id];
-    }
-  }
-  for (const [id, note] of Object.entries(extraNotes)) {
-    const ind = get(id);
-    ind.notes = ind.notes ? `${ind.notes}. ${note}` : note;
-  }
-  return { ...ped, tags: tags.map(({ members: _members, ...tag }) => tag) };
-}
-
-/**
- * Set how couples are drawn: `Partnership.leftPartner` and `drawnBeside`, by
- * partnership id ("father+mother" as `fromRows` names them). Throws on an
- * unknown id so a typo fails the example tests.
- */
-function withCouples(ped: Pedigree, drawn: Record<string, Pick<Partnership, "leftPartner" | "drawnBeside">>): Pedigree {
-  for (const id of Object.keys(drawn)) {
-    if (!ped.partnerships.some(p => p.id === id)) throw new Error(`withCouples: no partnership ${id}`);
-  }
-  return { ...ped, partnerships: ped.partnerships.map(p => (drawn[p.id] ? { ...p, ...drawn[p.id] } : p)) };
-}
-
-/**
- * Add twin sets, each on the partnership whose children its members are, and
- * parents who are not genetic (`Individual.socialParents`), by child id.
- * Throws on an unknown id, or twins with different parents, so a typo fails
- * the example tests.
- */
-function withTwinsAndSocialParents(
-  ped: Pedigree,
-  twins: TwinSet[],
-  socialParents: Record<string, string[]> = {},
-): Pedigree {
-  const ids = new Set(ped.individuals.map(i => i.id));
-  const partnerships = ped.partnerships.map(p => ({ ...p }));
-  for (const set of twins) {
-    const p = partnerships.find(q => set.members.every(m => ped.parentOf[q.id]?.includes(m)));
-    if (!p) throw new Error(`withTwinsAndSocialParents: ${set.members.join(", ")} are not children of one couple`);
-    p.twins = [...(p.twins ?? []), set];
-  }
-  for (const [child, parents] of Object.entries(socialParents)) {
-    for (const id of [child, ...parents]) {
-      if (!ids.has(id)) throw new Error(`withTwinsAndSocialParents: no individual ${id}`);
-    }
-  }
-  const individuals = ped.individuals.map(i => (socialParents[i.id] ? { ...i, socialParents: socialParents[i.id] } : i));
-  return { ...ped, individuals, partnerships };
-}
 
 function historicAndClassicExamples(): ExamplePedigree[] {
   const M: Sex = "male";
