@@ -60,6 +60,15 @@ parents. `pedExportLosses` in `exporter.ts` lists what a file would drop, one
 line per person or couple (from the `pedLost*` functions there); the toolbar
 shows the lines before writing, for PED and for a Phenopackets pedigree.
 
+PED text (#218): `readPedText` in `ped/text.ts` reads text typed or pasted
+into the text box (`components/PedTextBox.tsx`) with `importPed`, for a live
+drawing. While the text has errors it returns the last good pedigree, so the
+drawing stays; with several families it takes the first and says so. The box
+is in the import dialog ("or type or paste PED text") and, read-only with
+Copy, under "View as text" in the Export PED menu; neither is offered below
+1024px. Opening the text in the editor makes a new pedigree: an existing one
+is never edited from text yet.
+
 ## phenopackets/ — GA4GH Phenopackets v2 pedigree
 
 A Phenopackets `Pedigree` message is PED with named fields (`persons`, each

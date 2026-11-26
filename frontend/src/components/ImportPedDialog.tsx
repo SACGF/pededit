@@ -6,6 +6,8 @@ import type { IssueSeverity } from "../io/ped/index.js";
 import { importJson } from "../io/json/index.js";
 import { importPhenopackets, isPhenopacketsJson } from "../io/phenopackets/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { PedTextBox } from "./PedTextBox";
+import { readPedText, type PedTextReading } from "../io/ped/text";
 
 /** Common shape of a PED or JSON import result, as rendered by this dialog. */
 interface DialogResult {
@@ -31,6 +33,10 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
   const [selectedFids, setSelectedFids] = useState<Set<string>>(new Set());
   const [baseTitle, setBaseTitle] = useState("Imported pedigree");
   const fileRef = useRef<HTMLInputElement>(null);
+  // Text mode (#218): PED typed or pasted into a box, drawn as it is typed.
+  const [textMode, setTextMode] = useState(false);
+  const [pedText, setPedText] = useState("");
+  const [reading, setReading] = useState<PedTextReading | null>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -81,7 +87,18 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
     handleClose();
   }
 
+  function handleOpenText() {
+    // Read again: the box reads after a pause, and the click may come inside it.
+    const now = readPedText(pedText);
+    if (!now.current || !now.pedigree) return;
+    onImport([{ familyId: now.familyId ?? "1", pedigree: now.pedigree, title: "Pedigree from PED text" }]);
+    handleClose();
+  }
+
   function handleClose() {
+    setTextMode(false);
+    setPedText("");
+    setReading(null);
     setResult(null);
     setSelectedFids(new Set());
     setBaseTitle("Imported pedigree");
@@ -103,6 +120,29 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
   const infos = result?.issues.filter(i => i.severity === "info") ?? [];
   const canImport = result !== null && !result.hasErrors && selectedFids.size > 0;
 
+  if (textMode) {
+    const canOpen = !!reading?.current && !!reading.pedigree;
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="max-w-5xl" aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Type or paste PED text</DialogTitle>
+          </DialogHeader>
+          <PedTextBox text={pedText} onTextChange={setPedText} onReading={setReading} />
+          <DialogFooter className="sm:justify-between">
+            <button type="button" className="text-xs text-gray-500 underline hover:text-gray-800" onClick={() => setTextMode(false)}>
+              or choose a file
+            </button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button disabled={!canOpen} onClick={handleOpenText} data-testid="ped-text-open">Open in editor</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg" aria-describedby={undefined}>
@@ -118,6 +158,15 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
             onChange={handleFileChange}
             className="block w-full text-xs text-gray-600 file:mr-2 file:py-1 file:px-2 file:text-xs file:border file:border-gray-300 file:rounded file:bg-white hover:file:bg-gray-50"
           />
+          {/* Not on small screens: a box and a chart side by side need the width. */}
+          <button
+            type="button"
+            className="max-lg:hidden text-xs text-gray-500 underline hover:text-gray-800"
+            onClick={() => { setResult(null); setTextMode(true); }}
+            data-testid="ped-text-link"
+          >
+            or type or paste PED text
+          </button>
 
           {result && (
             <>

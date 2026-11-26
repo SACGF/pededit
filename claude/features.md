@@ -64,6 +64,7 @@ checked by `npm run check` (`scripts/check-doc-paths.mjs`).
 | Feature | Issues | Start at | Guide |
 |---|---|---|---|
 | PED import and export | #31 | `frontend/src/io/ped/` | `frontend/src/io/AGENTS.md`, `test-data/ped/README.md` |
+| PED text box with a live drawing, View as text | #218 | `frontend/src/components/PedTextBox.tsx` | `frontend/src/io/AGENTS.md` |
 | Phenopackets pedigree import and export | #23 | `frontend/src/io/phenopackets/` | `frontend/src/io/AGENTS.md`, `test-data/phenopackets/README.md` |
 | JSON import and export | | `frontend/src/io/json/` | `frontend/src/io/AGENTS.md` |
 | SVG, PNG and PDF export, the key | #18, #139 | `frontend/src/io/svg/svgExporter.tsx` | `frontend/src/io/AGENTS.md` |

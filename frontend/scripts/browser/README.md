@@ -332,6 +332,7 @@ the flow. They run in CI.
 | `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, not saved over a reload |
 | `text-under-symbols` | names and details under the symbols are SVG text at the export's baselines (#145); hovering a cut name shows it in full without the pill's buttons, clicking it selects, an uncut name lets the mouse through (#68) |
 | `tag-library` | signed in: a hatched trait saved to My library from the Conditions and tags dialog is added to another pedigree still hatched and still a trait (#131) |
+| `ped-text` | the import dialog's PED text box (#218): mixed spaces and tabs drawn in the preview, a half-typed row shows its error and keeps the drawing, Open in editor; "View as text" shows what Export PED writes, and Copy |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 

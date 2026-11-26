@@ -16,6 +16,7 @@ import { exportJson } from "../io/json/index.js";
 import { useSmallScreen } from "../hooks/useSmallScreen";
 import { U_SHAPE_REFUSALS } from "../pedigree/uShapeView";
 import { useUShapeToggle } from "../hooks/useUShapeToggle";
+import { PedTextViewDialog } from "./PedTextViewDialog";
 
 // SVG icons matching NSGC pedigree symbols
 function MaleIcon() {
@@ -62,6 +63,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
   const [pedMenuOpen, setPedMenuOpen] = useState(false);
+  const [pedTextOpen, setPedTextOpen] = useState(false);
   // Small screens: the four export buttons, most of the toolbar's width, are one menu.
   const small = useSmallScreen();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -279,8 +281,16 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
               detail="GA4GH v2 Pedigree, persons"
               onClick={() => handleExportPedClick("phenopackets")}
             />
+            {/* Desktop only, like the rest of text mode (#218). */}
+            <div className="my-1 border-t" />
+            <PedFormatItem
+              label="View as text"
+              detail="the PLINK PED, to read or copy"
+              onClick={() => { setPedMenuOpen(false); setPedTextOpen(true); }}
+            />
           </PopoverContent>
         </Popover>
+        <PedTextViewDialog pedigree={pedigree} open={pedTextOpen} onClose={() => setPedTextOpen(false)} />
 
         {/* Export CSV */}
         <Button
