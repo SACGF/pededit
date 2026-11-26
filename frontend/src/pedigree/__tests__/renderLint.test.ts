@@ -121,4 +121,58 @@ describe("lintScene", () => {
     const found = lintScene(base, flow).filter(f => f.code === "symbols-overlap");
     expect(found.map(f => f.message)).toEqual(["f and m touch"]);
   });
+
+  // A trio and someone unrelated beside them, to move into the lines.
+  const withStranger: Pedigree = {
+    ...base,
+    individuals: [...base.individuals, { id: "o", sex: "male", affected: false, sibOrder: 0 }],
+  } as Pedigree;
+  const placed = () => {
+    const flow = buildScene(withStranger);
+    const at = (id: string) => flow.people.find(n => n.individual.id === id)!;
+    expect(lintScene(withStranger, flow)).toEqual([]);
+    return { flow, at };
+  };
+  const codesOf = (flow: ReturnType<typeof buildScene>) => [...new Set(lintScene(withStranger, flow).map(f => f.code))].sort();
+
+  it("reports a hopping couple line through a symbol", () => {
+    const { flow, at } = placed();
+    const f = at("f").position, m = at("m").position;
+    // The line rises 50px over the gap; someone put on its raised part.
+    flow.couples = flow.couples.map(e => ({ ...e, data: { ...e.data, hopHeight: 50 } }));
+    at("o").position = { x: (f.x + m.x) / 2, y: f.y - 50 };
+    expect(codesOf(flow)).toContain("couple-through-symbol");
+  });
+
+  it("reports a sibship line through a symbol", () => {
+    const { flow, at } = placed();
+    // The child dragged 200px down, and someone put on the drop to them.
+    const c = at("c");
+    c.position = { ...c.position, y: c.position.y + 200 };
+    at("o").position = { x: c.position.x, y: c.position.y - 80 };
+    expect(codesOf(flow)).toEqual(["line-through-symbol"]);
+  });
+
+  it("reports a line of descent that ends where nothing is drawn", () => {
+    const { flow, at } = placed();
+    // Hung from a point on the parents' row 200px right of the father, off the couple line.
+    flow.sibships = flow.sibships.map(e => ({ ...e, data: { ...e.data, hopDrop: { parentId: at("f").id, dx: 200 } } }));
+    expect(codesOf(flow)).toContain("line-ends-nowhere");
+  });
+
+  it("reports a couple line that misses its partner's side", () => {
+    const { flow } = placed();
+    // A hop leaving the left partner 30px above its centre, over the top of the symbol.
+    flow.couples = flow.couples.map(e => ({ ...e, data: { ...e.data, hopHeight: 40, hopEnds: { source: { port: 30 }, target: { port: 0 } } } }));
+    expect(codesOf(flow)).toContain("line-ends-nowhere");
+  });
+
+  it("reports text overlapping as a file writes it, though the canvas cuts it short", () => {
+    const { flow, at } = placed();
+    const f = at("f"), m = at("m");
+    // The canvas's one cut line fits beside his wife's; the file's full lines do not.
+    f.glyph = { ...f.glyph, nameLines: ["Alexander M…"], figureNameLines: ["Alexander Montgomery-Smythe", "the Third"] };
+    m.glyph = { ...m.glyph, nameLines: ["Mo"], figureNameLines: ["Mo"] };
+    expect(codesOf(flow)).toEqual(["labels-overlap"]);
+  });
 });

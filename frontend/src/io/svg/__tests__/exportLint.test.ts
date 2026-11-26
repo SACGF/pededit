@@ -71,60 +71,65 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
     expect(codes(svg)).toEqual([]);
   });
 
-  it("reports a missing child line", () => {
+  // Each break below takes something out of the file or moves it: the scene
+  // is untouched, so the render lint has nothing to say and only the file
+  // check can notice.
+  const messages = (s: string) => lintExportSvg(trio, flow, s).map(f => `${f.code}: ${f.message}`);
+
+  it("reports a line of descent left out of the file", () => {
     const [a, b] = section(svg, "sibship-lines");
-    expect(codes(svg.slice(0, a) + `<g class="sibship-lines">` + svg.slice(b))).toEqual(["child-without-parents"]);
+    expect(messages(svg.slice(0, a) + `<g class="sibship-lines">` + svg.slice(b))).toEqual(["missing-from-file: a line of descent to Kid (c) is not in the file"]);
   });
 
-  it("reports a missing couple line", () => {
+  it("reports a couple line left out of the file", () => {
     const [a] = section(svg, "couple-lines");
     const first = svg.indexOf("<path", a);
     const end = svg.indexOf("</path>", first) + "</path>".length;
-    expect(codes(svg.slice(0, first) + svg.slice(end))).toContain("partnership-not-drawn");
+    expect(codes(svg.slice(0, first) + svg.slice(end))).toEqual(["missing-from-file"]);
   });
 
-  it("reports a missing symbol", () => {
+  it("reports a symbol left out of the file, and one where the scene has none", () => {
+    // The first symbol is from its group to the next one's.
     const [a] = section(svg, "symbols");
-    const start = svg.indexOf("<g transform", a);
-    const end = svg.indexOf("</g>", start) + 4;
-    const found = codes(svg.slice(0, start) + svg.slice(end));
-    expect(found).toContain("missing-individual");
-    expect(found).toContain("missing-node");
+    const start = svg.indexOf(`<g transform`, a);
+    const end = svg.indexOf(`<g transform`, svg.indexOf("</g></g>", start));
+    expect(messages(svg.slice(0, start) + svg.slice(end))).toEqual(["missing-from-file: the symbol of Dad (f) is not in the file"]);
+    const symbol = svg.slice(start, end);
+    const moved = symbol.replace(/^<g transform="translate\(([-\d.e]+) /, (_, x) => `<g transform="translate(${Number(x) + 7} `);
+    expect(moved).not.toBe(symbol);
+    expect(codes(svg.replace(symbol, moved))).toEqual(["missing-from-file", "symbol-not-in-scene"]);
   });
 
-  it("reports a couple line between the wrong people and a child under them", () => {
-    // Move the end of Dad = Mum onto Other, beyond: it now joins Dad and Other
-    // and runs through Mum, and the child hangs from it.
+  it("reports a couple line that does not end where the scene's does", () => {
     const pos = (id: string) => flow.people.find(n => n.individual.id === id)!.position;
     const f = pos("f"), m = pos("m"), x = pos("x");
     // A couple line runs between the facing edges of the two symbol boxes.
     const from = `M ${f.x + 20} ${f.y} L ${m.x - 20} ${m.y}`;
     expect(svg).toContain(from);
-    const broken = svg.replace(from, `M ${f.x + 20} ${f.y} L ${x.x - 20} ${x.y}`);
-    const found = codes(broken);
-    expect(found).toContain("couple-not-partners");
-    expect(found).toContain("partnership-not-drawn");
+    expect(codes(svg.replace(from, `M ${f.x + 20} ${f.y} L ${x.x - 20} ${x.y}`))).toEqual(["missing-from-file"]);
   });
 
-  it("reports a sibship drop that ends in empty space", () => {
-    const c = flow.people.find(n => n.individual.id === "c")!.position;
-    // Its drop, in the sibship's path: "M x bar L x top".
-    const re = new RegExp(`(M ${c.x} [-\\d.e]+ L ${c.x} )([-\\d.e]+)`);
-    expect(svg).toMatch(re);
-    const found = codes(svg.replace(re, (_, a, y) => `${a}${Number(y) - 15}`));
-    expect(found).toContain("missing-node");
-    expect(found).toContain("child-without-parents");
+  it("reports a line of text changed or left out", () => {
+    expect(messages(svg.replace(">Kid</text>", ">Kit</text>"))).toEqual(['missing-from-file: the line "Kid" under Kid (c) is not in the file']);
   });
 
-  it("reports overlapping labels", () => {
-    // A second label on the first one's baseline, right next to it.
-    const parsed = parseExportSvg(svg);
-    const t = parsed.texts[0]!;
-    const extra = `<text x="${t.x - parsed.origin[0] + 10}" y="${t.y - parsed.origin[1]}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Someone else</text>`;
-    expect(codes(svg.replace(`<g class="labels">\n`, `<g class="labels">\n${extra}\n`))).toEqual(["labels-overlap"]);
+  it("reports the key drawn up into the drawing", () => {
+    const keyed: Pedigree = { ...trio, individuals: trio.individuals.map(i => (i.id === "c" ? { ...i, affected: true } : i)) };
+    const file = exportSvg(keyed);
+    const top = parseExportSvg(file).symbols[0]![1];
+    const raised = file.replace(/<g class="pedigree-key" transform="translate\(0 [-\d.e]+\)">/, `<g class="pedigree-key" transform="translate(0 ${top})">`);
+    expect(raised).not.toBe(file);
+    expect(lintExportSvg(keyed, buildScene(keyed), file)).toEqual([]);
+    expect(lintExportSvg(keyed, buildScene(keyed), raised).map(f => f.code)).toEqual(["key-collides"]);
+  });
+
+  it("reports a drawing wider than the figure", () => {
+    const narrow = svg.replace(/^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" width="\d+"/, `<svg xmlns="http://www.w3.org/2000/svg" width="100"`);
+    expect(narrow).not.toBe(svg);
+    expect(codes(narrow)).toEqual(["outside-figure"]);
   });
 
   it("reports an SVG with none of the export's groups", () => {
-    expect(codes(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`)).toEqual(["missing-individual"]);
+    expect(codes(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`)).toEqual(["missing-from-file"]);
   });
 });

@@ -1,6 +1,6 @@
 /**
  * Render lint for the consanguinity labels of the U-shape export.
- * The standard export's lint (`exportLint.ts`) reads rows and columns; the
+ * The standard export's drawing is checked on its scene (`renderLint.ts`); the
  * U-shape draws everything rotated with its track, so this one works on the
  * drawing itself: every line, arc, shape and piece of text in the SVG,
  * through the transforms of the groups they are in, is checked against the
@@ -23,9 +23,14 @@
  */
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { textWidth, titleWidth, TITLE_FONT_SIZE } from "../../pedigree/labels";
-import type { ExportLintFinding } from "./exportLint";
 import { exportUShapeSvg } from "./uShapeExporter";
 import type { SvgExportOptions } from "./types";
+
+export interface UShapeLintFinding {
+  code: "consanguinity-label-collides" | "title-collides";
+  message: string;
+  individuals: string[];
+}
 
 type M = [number, number, number, number, number, number]; // a b c d e f
 type P = [number, number];
@@ -127,7 +132,7 @@ function segHitsBox(a: P, b: P, box: [number, number, number, number], pad: numb
 }
 
 /** Lint the consanguinity labels in a U-shape export SVG. */
-export function lintUShapeSvg(svg: string): ExportLintFinding[] {
+export function lintUShapeSvg(svg: string): UShapeLintFinding[] {
   const shapes: { what: string; pts: P[]; pad: number; dupLink?: boolean }[] = [];
   const labels: Label[] = [];
   const titles: { text: string; box: [number, number, number, number] }[] = [];
@@ -201,7 +206,7 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     } else if (tag === "path") for (const pl of pathPolylines(a.d ?? "")) shapes.push({ what, pts: at(pl), pad });
   }
 
-  const out: ExportLintFinding[] = [];
+  const out: UShapeLintFinding[] = [];
   for (const l of labels) {
     if (!l.lines.length) continue;
     const inv = invert(l.m);
@@ -230,6 +235,6 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
 }
 
 /** Export a pedigree in the U shape and lint its consanguinity labels. */
-export function lintUShape(pedigree: Pedigree, options: SvgExportOptions = {}): ExportLintFinding[] {
+export function lintUShape(pedigree: Pedigree, options: SvgExportOptions = {}): UShapeLintFinding[] {
   return lintUShapeSvg(exportUShapeSvg(pedigree, { ...options, uShape: true }));
 }

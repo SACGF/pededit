@@ -209,34 +209,37 @@ node frontend/scripts/browser/lint.mjs /p/<id> --click ... # the editor's pedigr
 
 Structural checks on what the canvas draws (`buildScene`'s output, in
 `frontend/src/pedigree/renderLint.ts`): someone with no symbol, a line to a
-node that is not drawn, a couple line between non-partners or through
-another symbol, two couple lines overlapping on one row, a slanted couple
-line, a child off their siblings' row (the drop line misses), a partnership with
-no couple line, a child with no line from their parents or hanging from the
-wrong couple, two couples' sibship bars along one line, overlapping symbols,
-labels on one row running into each other. The kinship2 oracle tests check slots
-against R; this checks what is drawn from them. `console.mjs` and `shot.mjs`
-run it on every editor page (`render lint clean` in the summary). The same
-checks run in vitest over every example
+node that is not drawn or ending where nothing is, a couple line between
+non-partners or through another symbol, a sibship or assisted line through a
+symbol, two couple lines overlapping on one row, a slanted couple line, a
+partnership with no couple line, a child with no line from their parents or
+hanging from the wrong couple, two couples' sibship bars along one line,
+overlapping symbols, text on one row running together (measured as a file
+writes it), a dashed arc through someone else's symbol or text, the text
+over a double line running into anything, the chart title. Every check on
+the drawing is here, for the canvas and the exports alike. The kinship2
+oracle tests check slots against R; this checks what is drawn from them.
+`console.mjs` and `shot.mjs` run it on every editor page (`render lint clean`
+in the summary). The same checks run in vitest over every example
 (`src/pedigree/__tests__/renderLint.test.ts`), which lists the examples known
 to draw wrong: fixing one makes that test fail until it is removed from the
 list.
 
-The SVG export draws with the canvas's components but lays out its own
-figure (title, key, bounds), so `lint.mjs` also lints the exported SVG (`frontend/src/io/svg/exportLint.ts`,
-`export` lines in the report, `--no-export` to skip, `--deidentify` for the
-de-identified export). It parses what the SVG draws and matches symbols to
-people by position against the canvas layout, since the export carries no
-ids: someone with no symbol, a symbol where the canvas has none, a line
-ending where nothing is drawn, couple lines between non-partners, through a
-symbol or overlapping, a missing couple line, a sibship line through a
-symbol, a child whose lines lead to no couple or the wrong one, overlapping
-labels. PNG and PDF are made from this SVG, so they are covered; the
-U-shape export is not. It relies on the group classes `exportSvg` writes
-(`couple-lines`, `sibship-lines`, `symbols`, `labels`) and
-`data-childless`, `data-ended` and `data-twin-mark` on marks; keep them when changing the exporter. In vitest
-it is `src/io/svg/__tests__/exportLint.test.ts`; in a page,
-`__pededit.checkExport()`.
+The SVG export draws the scene with the canvas's components but lays out its
+own figure (title, key, bounds), so `lint.mjs` also lints the exported file
+(`frontend/src/io/svg/exportLint.ts`, `export` lines in the report,
+`--no-export` to skip, `--deidentify` for the de-identified export, whose
+scene gets the render lint as well since its text differs). It parses the
+SVG and checks that every symbol, line, dashed arc and line of text of the
+scene is in it at its place, matching symbols by position since the export
+carries no ids, and how the figure is composed: the title clear of the
+drawing, the key below it, nothing outside the figure. PNG and PDF are made
+from this SVG, so they are covered; the U-shape export has its own lint
+(`--u-shape`). It relies on the group classes `exportSvg` writes
+(`couple-lines`, `sibship-lines`, `symbols`, `labels`, ...) and
+`data-childless`, `data-ended` and `data-twin-mark` on marks; keep them when
+changing the exporter. In vitest it is `src/io/svg/__tests__/exportLint.test.ts`;
+in a page, `__pededit.checkExport()`.
 
 ### compare.mjs: did the drawing change between two commits?
 

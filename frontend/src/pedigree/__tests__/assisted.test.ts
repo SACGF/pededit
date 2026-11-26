@@ -285,10 +285,10 @@ describe("assisted reproduction: drawing (#45)", () => {
     expect(svg.slice(svg.indexOf('<g class="labels">')).match(/<rect [^>]*fill="white"/g)?.length).toBeGreaterThan(0);
     expect(lintExport(p)).toEqual([]);
     expect(lintExport(p, { deidentify: true })).toEqual([]);
-    // With the lines taken out, the export lint notices.
+    // With the lines taken out of the file, the export lint notices.
     const flow = buildScene(p);
     const stripped = svg.replace(/<g class="assisted-lines">[^]*?<\/g>/, '<g class="assisted-lines"></g>');
-    expect(lintExportSvg(p, flow, stripped).map(f => f.code)).toContain("assisted-not-drawn");
+    expect(lintExportSvg(p, flow, stripped).map(f => f.message).join()).toContain("line of assisted reproduction");
     const key = exportKeyMarkup(p, 0, 0).markup.join("");
     for (const text of ["Sperm or egg donor (D)", "Surrogate (S)", "Carried the pregnancy"]) expect(key).toContain(text);
     // No dashed line in the example any more (the intended parents are linked by their couple lines).

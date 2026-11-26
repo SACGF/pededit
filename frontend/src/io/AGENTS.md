@@ -206,23 +206,25 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `node frontend/scripts/browser/shot.mjs FILE.svg` renders it to PNG. A
   scratch entry bundled with plain esbuild does not build: it needs the
   layout engine alias of `vite.config.ts` and `--jsx=automatic`.
-- `exportLint.ts` (#72) — render lint for the standard SVG export, run by
-  `lint.mjs`, the page checks, CI and `exportLint.test.ts` over every
-  example. It parses the SVG, so `svgExporter.tsx` must keep writing its
-  group classes (`couple-lines`, `sibship-lines`, `duplicate-arcs`,
-  `symbols`, `labels`, `consanguinity-labels`, whose white `<rect>` marks a
-  label the dashed arcs may pass behind, #109, and `chart-title`), and the
-  chart components their `data-childless`, `data-ended` and `data-twin-mark`
-  on marks that join nobody. Sibship lines are read from their paths'
-  "M x y L x y" runs. A dashed arc is read back with `pathPoints`
-  and checked against other people's symbols and text
-  (`arc-through-symbol`, `arc-through-label`, #192, the canvas lint's
-  `arcCollisions`), with the lines of text under a symbol taken as one
-  block. The chart title is outside the `labels` group
-  on purpose (it is not a label), so it has a check of its own,
-  `title-collides` (#172): the text in `<g class="chart-title">` against the
-  symbols, the dashed arcs and the consanguinity labels. The canvas title
-  is a React Flow node added by the canvas, not part of the scene, so `lintScene` takes
+- `exportLint.ts` (#72, #222) — the lint for the standard SVG export as a
+  file. Everything about the drawing is checked once, on the scene, by
+  `pedigree/renderLint.ts`; `lintExport` runs that on the scene the export
+  draws (the canvas's, or a de-identified one with other text) and then
+  `lintExportSvg`, which parses the file for what only the file shows:
+  that it holds every symbol, line, dashed arc and line of text the scene
+  draws, at its place (`missing-from-file`, `symbol-not-in-scene`, a smoke
+  test against `sceneDrawing`), and how the export composed the figure
+  (`title-collides` for the title in its own band, `key-collides`,
+  `outside-figure`). `lint.mjs` and `__pededit.checkExport()` leave out the
+  render lint for a plain export, whose scene `check()` has already linted.
+  It parses the SVG, so `svgExporter.tsx` must keep writing its group
+  classes (`couple-lines`, `sibship-lines`, `assisted-lines`,
+  `duplicate-arcs`, `symbols`, `labels`, `consanguinity-labels`,
+  `chart-title`, `pedigree-key`), and the chart
+  components their `data-childless`, `data-ended` and `data-twin-mark` on
+  marks that join nobody. Sibship lines are read from their paths'
+  "M x y L x y" runs, dashed arcs with `pathPoints`. The canvas title is a
+  React Flow node added by the canvas, not part of the scene, so `lintScene` takes
   the title as an option and places it with the same `chartTitlePlace`
   (#188); `lint.mjs` and `__pededit.check()` pass the pedigree's title.
   `uShapeLint.ts` has its own `title-collides`: the U-shape draws the title

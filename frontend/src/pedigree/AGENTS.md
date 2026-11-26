@@ -267,7 +267,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   so a new command needs adding there. During a drag the route is as of the
   last layout, as the sibship bar heights are. The lints report what is
   left as `arc-through-symbol` and `arc-through-label` (`arcCollisions`,
-  shared by `renderLint.ts` and `exportLint.ts`); text that hangs to within
+  in `renderLint.ts`); text that hangs to within
   8px of the symbol tops the arc ends at is not counted, since no arc could
   pass under it (compact rows with four lines of text). The U-shape export
   has its own links and does not use any of this.
@@ -669,10 +669,10 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   siblings side by side under such a parent have no room anywhere
   (House Targaryen's Aegon and Shaera, the Habsburg uncle and niece). The
   result is `CoupleLineData.consanguinityLabelOffset`; the canvas, the
-  export and `highestConsanguinityLabel` all read it. The export lint's
-  `consanguinity-label-collides` checks the label against symbols, lines,
-  other text, copy numbers and dashed arcs (unless backed), compact rows
-  included. The U-shape export has its own rule (`claude/export_u_plan.md`).
+  export and `highestConsanguinityLabel` all read it. The render lint's
+  `consanguinity-label-collides` checks the label against symbols, "?"
+  marks, lines, the figure's text, copy numbers and dashed arcs (unless
+  backed), compact rows included. The U-shape export has its own rule (`claude/export_u_plan.md`).
   Edited in the
   panel under the "Consanguineous with" checkbox (with a "Write <name>"
   button when the pedigree names the relationship) and "Text above line..."
@@ -832,8 +832,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   sibship when the person is linked the same way to every child of it (the
   line then ends where the sibship's descent meets the bar, so siblings do
   not each get a crossing line). `assistedEdgeSegment` (`assistedLines.ts`) is the one geometry,
-  for the canvas and `svgExporter` (group `assisted-lines`,
-  read by the export lint); the U-shape draws its own along the tracks.
+  for the canvas and `Chart` (group `assisted-lines`); the U-shape draws its own along the tracks.
   Lines leave the symbol from a lower corner (`symbolExitPoint`) so they
   clear the name under it. A surrogate with no partner of her own would be
   an isolated founder: `families.ts` keeps her in the child's family and
@@ -872,7 +871,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   hops they sit in the middle of the raised part, which nothing hangs from.
   On a double line
   they are tall enough to cross both lines. Drawn by `chart/CoupleLine.tsx`
-  for the canvas and `svgExporter` (a `<path data-ended>`, which the export
+  for the canvas and the export (a `<path data-ended>`, which the export
   lint skips), the U-shape (`endedSegs`, along the track), and the legend and export key
   ("Relationship ended"). Set from the panel's "Relationship" section and
   the "Relationship" / couple-line items of the more and right-click menus
@@ -907,8 +906,7 @@ renderer:
 
 A two-line name plus the age line clears the sibship bar of the person's own
 children; anything past the age line can reach it, so then the detail block
-gets a white backing (`detailsBacked`: a white `<rect>`, which `exportLint`
-ignores in the export's labels group) and the bar shows a
+gets a white backing (`detailsBacked`: a white `<rect>`) and the bar shows a
 gap under the text rather than running through it. Which lines there are comes from the
 person's glyph (#144); where they sit is `textUnder` in `labelBlock.ts`
 (#145): first baseline 12px below the symbol, 13px lines, the caption and
@@ -1013,9 +1011,16 @@ Tests: `__tests__/scene.test.ts`, `__tests__/tags.test.ts` and
 ## Render lint
 
 `renderLint.ts` checks `buildScene`'s output for drawings a reader would
-misread (lines through symbols, lines to dropped nodes, children with no line
-from their parents, couple lines between non-partners, sibship bars of two
-couples along one line, overlapping symbols or labels).
+misread (lines through symbols, lines to dropped nodes or ending in space,
+children with no line from their parents, couple lines between
+non-partners, sibship bars of two couples along one line, overlapping
+symbols or text, couple text running into anything). It holds every check
+on the drawing, for the canvas and the exports alike (#222): the geometric
+ones run on `sceneDrawing.ts`, the lines and text the chart components
+draw, worked out with their own functions, and text is measured as a file
+writes it (`figureNameLines`; the canvas's is the same or shorter). The
+export lint (`io/svg/exportLint.ts`) runs it on the export's scene and
+checks only the file on top.
 The kinship2 oracle tests compare slots with R, so a bug in the duplicate
 handling here passes them and is only caught by this lint. Its vitest keeps a
 `KNOWN_BROKEN` list of examples; remove an entry when a fix makes it draw

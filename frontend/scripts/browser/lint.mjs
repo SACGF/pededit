@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // Render lint: check what the canvas draws for a pedigree (buildScene's
 // output) for lines through symbols, lines to missing nodes, children with no
-// line from their parents, couple lines between non-partners and overlapping
-// symbols, then the same for the SVG export (which PNG and PDF are made from).
+// line from their parents, couple lines between non-partners, overlapping
+// symbols and text, then that the SVG export (which PNG and PDF are made
+// from) holds all of it and composes the figure cleanly. A de-identified
+// export draws other text, so its scene gets the render lint too.
 // The checks live in frontend/src/pedigree/renderLint.ts and
 // frontend/src/io/svg/exportLint.ts and run in the browser through Vite, so
 // this is the app's own code.
@@ -22,7 +24,8 @@ ${SET_HELP}
                       (for a URL, the canvas's own setting is used).
   --no-export         Skip the SVG export lint (on by default; it also
                       covers PNG and PDF, which are made from the SVG).
-  --deidentify        Lint the de-identified export instead of the plain one.
+  --deidentify        Lint the de-identified export instead of the plain one
+                      (its drawing too, since its text is not the canvas's).
   --u-shape           Lint the U-shape export instead of the standard one:
                       its consanguinity labels against every line, symbol
                       and text (src/io/svg/uShapeLint.ts). Examples and
@@ -59,7 +62,8 @@ function lintInApp(context, base, { set = null, items = [], compact, exportOpts,
     const { lintScene } = await import("/src/pedigree/renderLint.ts");
     const { lintExport: lintStandard } = await import("/src/io/svg/exportLint.ts");
     const { lintUShape } = await import("/src/io/svg/uShapeLint.ts");
-    const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o));
+    // The plain export draws the canvas's scene, already linted above: only the file is checked.
+    const lintExport = (p, o) => (o.uShape ? lintUShape(p, o) : lintStandard(p, o, { drawing: !!o.deidentify }));
     const withNames = p => (Object.keys(named).length ? { ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, ...p.canvasSettings, ...named } } : p);
     // The chart title the editor would draw (#20, #188), named after the pedigree; none when de-identified.
     const { chartTitle } = await import("/src/pedigree/labels.ts");

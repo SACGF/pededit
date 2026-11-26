@@ -8,7 +8,8 @@ import { EXAMPLES } from "../../data/examples";
 import { chartTitleNode } from "../nodes/ChartTitleNode";
 import { NODE_SIZE, ROW_HEIGHT } from "../constants";
 import { exportSvg } from "../../io/svg/svgExporter";
-import { lintExport, lintExportSvg } from "../../io/svg/exportLint";
+import { lintExport } from "../../io/svg/exportLint";
+import { lintScene } from "../renderLint";
 import { importJson, exportJson } from "../../io/json";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { drawnSubset } from "../collapse";
@@ -161,10 +162,11 @@ describe("the label in exports and over the title (#97)", () => {
     expect(lintExport(p, { compact: true })).toEqual([]);
     // A label forced over a "?" is caught.
     const flow = buildScene(p);
-    const gm = flow.people.find(n => n.individual.id === "gm")!;
-    const svg = exportSvg(p).replace('<g class="consanguinity-labels">',
-      `<g class="consanguinity-labels"><text x="${gm.position.x}" y="${gm.position.y - NODE_SIZE / 2 - 7}" font-size="9">x</text>`);
-    expect(lintExportSvg(p, flow, svg).map(f => f.message).join()).toContain('"?"');
+    // The founders' label slid along its line until it is over the right partner's "?".
+    const x = (id: string) => flow.people.find(n => n.id === id)!.position.x;
+    const slid = { ...flow, couples: flow.couples.map(e => e.data.partnershipId === "g"
+      ? { ...e, data: { ...e.data, consanguinityLabelOffset: { dx: (x(e.target) - x(e.source)) / 2, dy: 0 } } } : e) };
+    expect(lintScene(p, slid).map(f => f.message).join()).toContain('"?"');
   });
 
   it("the canvas title is raised the same way", () => {
@@ -175,13 +177,14 @@ describe("the label in exports and over the title (#97)", () => {
     expect(raised.position.y).toBeLessThan(plain.position.y);
   });
 
-  it("the export lint catches a label drawn over a symbol", () => {
+  it("the render lint catches a label drawn over a symbol", () => {
     const p = cousins();
     const flow = buildScene(p);
-    const node = flow.people.find(n => n.individual.id === "s1")!;
-    const svg = exportSvg(p).replace('<g class="consanguinity-labels">',
-      `<g class="consanguinity-labels"><text x="${node.position.x}" y="${node.position.y}" font-size="9">third cousins</text>`);
-    expect(lintExportSvg(p, flow, svg).map(f => f.code)).toContain("consanguinity-label-collides");
+    expect(lintScene(p, flow)).toEqual([]);
+    // The founders' label moved down onto the row of symbols.
+    const moved = { ...flow, couples: flow.couples.map(e => e.data.consanguinityLabel?.length
+      ? { ...e, data: { ...e.data, consanguinityLabelOffset: { dx: 0, dy: NODE_SIZE } } } : e) };
+    expect(lintScene(p, moved).map(f => f.code)).toContain("consanguinity-label-collides");
   });
 });
 

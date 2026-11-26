@@ -76,14 +76,16 @@ const hooks = {
     return lintScene(p, buildScene(p, { ...canvasOptions(), ...options }), { title });
   },
   /**
-   * Export lint (io/svg/exportLint.ts): what the standard SVG export (and so
-   * PNG and PDF) draws, checked the same way. [] means clean.
+   * Export lint (io/svg/exportLint.ts): that the standard SVG export (and so
+   * PNG and PDF) holds the drawing and composes the figure cleanly, plus the
+   * render lint on a de-identified figure, whose text is not the canvas's
+   * (the plain one draws the canvas's scene, which `check()` covers). [] means clean.
    */
   checkExport: (pedigree?: Pedigree, options?: SvgExportOptions) => {
     const p = pedigree ?? usePedigreeStore.getState().getPedigree();
     // With the chart title the export dialog would draw; none when de-identified.
     const title = options?.deidentify ? undefined : chartTitle(p, useAppStore.getState().activeTitle) || undefined;
-    return lintExport(p, { ...canvasOptions(), title, ...options });
+    return lintExport(p, { ...canvasOptions(), title, ...options }, { drawing: !!options?.deidentify });
   },
   /** The SVG export of the current pedigree (save it and `shot.mjs FILE.svg` to look at it). */
   exportSvg: (options?: SvgExportOptions) => {
