@@ -13,7 +13,7 @@ import { pathToFileURL } from "node:url";
 import {
   BROWSER_DIR, FRONTEND_DIR, REPO_ROOT, UsageError, closeBrowser, main, parseArgs, launchBrowser, newContext,
   assertServerUp, loadFixture, postFixture, collect, gotoAndSettle, runSteps, waitForSaved, resolveFindings, SourceMapper,
-  servedInfo, servedLines, displayPath, baseUrl, errorLines,
+  servedInfo, servedLines, displayPath, baseUrl, errorLines, STEP_KINDS,
 } from "./harness.mjs";
 
 const HELP = `usage: node frontend/scripts/browser/flows.mjs [NAME ...] [--list] [--verbose]
@@ -101,30 +101,15 @@ function makeT({ context, base, flags, outDir, name }) {
       if (failed) throw new CheckFailed(`step --${failed.kind} ${failed.arg ?? ""} could not run: ${failed.error}`);
       return t.findings.steps.slice(before);
     },
-    // A step with a value carries it apart from the selector (valued), so a value may hold "=>".
-    click: sel => t.steps({ kind: "click", arg: sel }),
-    dblclick: sel => t.steps({ kind: "dblclick", arg: sel }),
-    rightClick: sel => t.steps({ kind: "right-click", arg: sel }),
-    hover: sel => t.steps({ kind: "hover", arg: sel }),
-    waitFor: sel => t.steps({ kind: "wait-for", arg: sel }),
-    press: key => t.steps({ kind: "press", arg: key }),
-    fill: (sel, text) => t.steps(valued("fill", sel, text)),
-    select: (sel, value) => t.steps(valued("select", sel, value)),
-    drag: (sel, dx, dy) => t.steps(valued("drag", sel, `${dx},${dy}`)),
-    upload: (sel, file) => t.steps(valued("upload", sel, file)),
-    mouseAway: () => t.steps({ kind: "mouse-away", arg: null }),
-    sleep: ms => t.steps({ kind: "sleep", arg: String(ms) }),
-    /** Wait for auto-save, then reload. */
-    reload: () => t.steps({ kind: "reload", arg: null }),
     /** Click and save the download; returns the file's path. */
     async download(sel) {
-      const [step] = await t.steps({ kind: "download", arg: sel });
+      const [step] = await t.steps(stepOf("download", [sel]));
       return path.resolve(REPO_ROOT, step.saved);
     },
     /** Shift+click, Control+click: hold a key over some actions. */
     async holding(key, fn) {
-      await t.steps({ kind: "key-down", arg: key });
-      try { await fn(); } finally { await t.steps({ kind: "key-up", arg: key }); }
+      await t.keyDown(key);
+      try { await fn(); } finally { await t.keyUp(key); }
     },
     /** Open the landing page, create a blank pedigree and wait for the editor. Returns its id. */
     async createBlank() {
@@ -214,11 +199,23 @@ function makeT({ context, base, flags, outDir, name }) {
       return errorLines(t.findings);
     },
   };
+  // One method per step of the harness, named by its flag in camelCase
+  // (t.click, t.rightClick, t.waitFor, t.mouseAway), unless defined above.
+  for (const kind of STEP_KINDS) t[kind.replace(/-(\w)/g, (_, c) => c.toUpperCase())] ??= (...args) => t.steps(stepOf(kind, args));
   return t;
 }
 
-/** A step with a selector and a value, kept apart (runSteps); `arg` is how a failure shows it. */
-const valued = (kind, sel, value) => ({ kind, sel, value: String(value), arg: `${sel}=>${value}` });
+/**
+ * A step from a flow's arguments: t.click(sel), t.sleep(ms), t.reload().
+ * With a value, t.fill(sel, text) or t.drag(sel, dx, dy), the value is kept
+ * apart from the selector (runSteps), so it may hold "=>"; `arg` is how a
+ * failure shows it.
+ */
+function stepOf(kind, [sel, ...rest]) {
+  if (!rest.length) return { kind, arg: sel === undefined ? null : String(sel) };
+  const value = rest.join(",");
+  return { kind, sel, value, arg: `${sel}=>${value}` };
+}
 
 await main(async () => {
   const { positional, flags } = parseArgs(process.argv.slice(2), {

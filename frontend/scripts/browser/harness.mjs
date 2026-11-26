@@ -31,27 +31,46 @@ const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]", "::1"]);
 /**
  * The interaction steps, run in order after the page settles (runSteps), for
  * the tools that take them. `value` is what the flag takes (null: nothing);
- * the flags, their help and parseArgs all come from this table.
+ * the flags, their help, parseArgs, runSteps and the flows' step methods all
+ * come from this table. `run(page, step, c)` does the step: `c` holds the
+ * run's options (timeout, first, wait, downloadDir), `opts` for target(),
+ * and `record`, the step's entry in findings.steps, for what it reports.
  */
 const STEPS = {
-  click: { value: "SEL", help: "Click the element." },
-  dblclick: { value: "SEL", help: "Double-click it." },
-  "right-click": { value: "SEL", help: "Right-click (contextmenu), e.g. a node for its menu." },
-  hover: { value: "SEL", help: "Move the mouse over it." },
-  "wait-for": { value: "SEL", help: "Wait until one is visible." },
-  press: { value: "KEY", help: "A key or chord, e.g. Delete, Control+z." },
-  "key-down": { value: "KEY", help: "Hold a key (Shift, Control, Meta) for the clicks and\ndrags that follow; shift-click is\n--key-down Shift --click SEL --key-up Shift." },
-  "key-up": { value: "KEY", help: "Release it." },
-  fill: { value: "'SEL=>TEXT'", help: "Type into an input (replaces its value)." },
-  select: { value: "'SEL=>V'", help: "Choose an option of a native <select> by value or label." },
-  choose: { value: "'SEL=>TEXT'", help: "Click SEL (a Radix popover or menu trigger, such as the\nmore menu \"···\" or Export PED), then the item in the\npopover, menu or listbox it opened whose text (or first\nline, or title) is TEXT; a unique substring also works." },
-  drag: { value: "'SEL=>DX,DY'", help: "Drag an element by DX,DY screen pixels." },
-  upload: { value: "'SEL=>FILE'", help: "Set a file input, or click SEL and answer the file chooser." },
-  download: { value: "'SEL[=>PATH]'", help: "Click SEL and save the download (default\n<--out-dir or frontend/test-output/browser/downloads>/<name>)." },
-  reload: { value: null, help: "Wait for auto-save to finish, then reload the page." },
-  sleep: { value: "MS", help: "Wait MS milliseconds." },
-  "mouse-away": { value: null, help: "Move the mouse to the page corner (hides hover toolbars)." },
+  click: { value: "SEL", help: "Click the element.",
+    run: async (page, step, c) => (await target(page, step.arg, c.opts)).click({ timeout: c.timeout }) },
+  dblclick: { value: "SEL", help: "Double-click it.",
+    run: async (page, step, c) => (await target(page, step.arg, c.opts)).dblclick({ timeout: c.timeout }) },
+  "right-click": { value: "SEL", help: "Right-click (contextmenu), e.g. a node for its menu.", run: rightClickStep },
+  hover: { value: "SEL", help: "Move the mouse over it.",
+    run: async (page, step, c) => (await target(page, step.arg, c.opts)).hover({ timeout: c.timeout }) },
+  "wait-for": { value: "SEL", help: "Wait until one is visible.",
+    run: (page, step, c) => target(page, step.arg, { ...c.opts, first: true }) },
+  press: { value: "KEY", help: "A key or chord, e.g. Delete, Control+z.",
+    run: (page, step) => page.keyboard.press(step.arg) },
+  "key-down": { value: "KEY", help: "Hold a key (Shift, Control, Meta) for the clicks and\ndrags that follow; shift-click is\n--key-down Shift --click SEL --key-up Shift.",
+    run: (page, step) => page.keyboard.down(step.arg) },
+  "key-up": { value: "KEY", help: "Release it.",
+    run: (page, step) => page.keyboard.up(step.arg) },
+  fill: { value: "'SEL=>TEXT'", help: "Type into an input (replaces its value).", run: fillStep },
+  select: { value: "'SEL=>V'", help: "Choose an option of a native <select> by value or label.", run: selectStep },
+  choose: { value: "'SEL=>TEXT'", help: "Click SEL (a Radix popover or menu trigger, such as the\nmore menu \"···\" or Export PED), then the item in the\npopover, menu or listbox it opened whose text (or first\nline, or title) is TEXT; a unique substring also works.", run: chooseStep },
+  drag: { value: "'SEL=>DX,DY'", help: "Drag an element by DX,DY screen pixels.", run: dragStep },
+  upload: { value: "'SEL=>FILE'", help: "Set a file input, or click SEL and answer the file chooser.", run: uploadStep },
+  download: { value: "'SEL[=>PATH]'", help: "Click SEL and save the download (default\n<--out-dir or frontend/test-output/browser/downloads>/<name>).", run: downloadStep },
+  reload: { value: null, help: "Wait for auto-save to finish, then reload the page.", run: reloadStep },
+  sleep: { value: "MS", help: "Wait MS milliseconds.",
+    run: (page, step) => {
+      const ms = Number(step.arg);
+      if (!Number.isFinite(ms)) throw new UsageError(`--sleep wants milliseconds, got ${step.arg}`);
+      return page.waitForTimeout(ms);
+    } },
+  "mouse-away": { value: null, help: "Move the mouse to the page corner (hides hover toolbars).",
+    run: page => page.mouse.move(1, 1) },
 };
+
+/** The step kinds, in the order of the help: "click", "right-click", ... */
+export const STEP_KINDS = Object.keys(STEPS);
 
 /** One option of a help text: the flag, then its help, continuation lines indented under it. */
 const helpRow = (flag, help) => {
@@ -607,112 +626,106 @@ export async function waitForSaved(page, timeout = 8000) {
   ).then(() => true, () => false);
 }
 
+/**
+ * Right-click. A straight couple line is an SVG group with a zero-height
+ * box, which Playwright never calls visible: right-click its centre.
+ */
+async function rightClickStep(page, step, c) {
+  const flat = page.locator(step.arg).first();
+  const box = (await flat.count())
+    ? await flat.evaluate(e => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; })
+    : null;
+  if (box && box.width > 0 && box.height === 0) {
+    await page.mouse.click(box.x + box.width / 2, box.y, { button: "right" });
+  } else {
+    await (await target(page, step.arg, c.opts)).click({ button: "right", timeout: c.timeout });
+  }
+}
+
+async function fillStep(page, step, c) {
+  const [sel, text] = splitArrow(step);
+  await (await target(page, sel, c.opts)).fill(text, { timeout: c.timeout });
+}
+
+async function selectStep(page, step, c) {
+  const [sel, value] = splitArrow(step);
+  const el = await target(page, sel, c.opts);
+  const options = await el.evaluate(e => [...(e.options ?? [])].map(o => [o.value, o.label]), null, { timeout: c.timeout }).catch(() => null);
+  if (!options) throw new StepError("is not a native <select>; open it with --click and click the option instead");
+  const hit = options.find(([v, l]) => v === value || l === value);
+  if (!hit) throw new StepError(`has no option ${JSON.stringify(value)}; options: ${options.map(([v, l]) => (v === l ? v : `${v} (${l})`)).join(", ")}`);
+  await el.selectOption(hit[0], { timeout: c.timeout });
+}
+
+async function chooseStep(page, step, c) {
+  const [sel, text] = splitArrow(step);
+  const trigger = await target(page, sel, c.opts);
+  if (await trigger.evaluate(e => e instanceof HTMLSelectElement).catch(() => false)) {
+    throw new StepError("is a native <select>; use --select instead");
+  }
+  await trigger.click({ timeout: c.timeout });
+  c.record.chose = await chooseItem(page, text, c.opts);
+}
+
+async function dragStep(page, step, c) {
+  const [sel, delta] = splitArrow(step);
+  const m = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(delta.replace(/\s/g, ""));
+  if (!m) throw new UsageError(`--drag wants 'SELECTOR=>DX,DY', got ${step.arg}`);
+  const box = await (await target(page, sel, c.opts)).boundingBox();
+  if (!box) throw new StepError("has no bounding box");
+  const x = box.x + box.width / 2, y = box.y + box.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + Number(m[1]), y + Number(m[2]), { steps: 12 });
+  await page.mouse.up();
+  c.record.from = { x, y };
+}
+
+async function uploadStep(page, step, c) {
+  const [sel, file] = splitArrow(step);
+  const abs = path.resolve(process.cwd(), file);
+  if (!existsSync(abs)) throw new UsageError(`--upload: ${file} does not exist`);
+  const isInput = await page.locator(sel).first()
+    .evaluate(el => el instanceof HTMLInputElement && el.type === "file", null, { timeout: c.timeout }).catch(() => false);
+  if (isInput) {
+    await (await target(page, sel, { ...c.opts, mayBeHidden: true })).setInputFiles(abs);
+  } else {
+    const el = await target(page, sel, c.opts);
+    const [chooser] = await Promise.all([page.waitForEvent("filechooser", { timeout: c.timeout }), el.click({ timeout: c.timeout })]);
+    await chooser.setFiles(abs);
+  }
+}
+
+async function downloadStep(page, step, c) {
+  const [sel, out] = splitArrow(step, { allowMissing: true });
+  const el = await target(page, sel, c.opts);
+  const [dl] = await Promise.all([page.waitForEvent("download", { timeout: c.timeout }), el.click({ timeout: c.timeout })]);
+  const dir = c.downloadDir ?? path.join(FRONTEND_DIR, "test-output", "browser", "downloads");
+  const file = path.resolve(out ?? path.join(dir, dl.suggestedFilename()));
+  mkdirSync(path.dirname(file), { recursive: true });
+  await dl.saveAs(file);
+  c.record.saved = displayPath(file);
+}
+
+async function reloadStep(page, _step, c) {
+  if (!(await waitForSaved(page))) c.record.note = "auto-save had not finished after 8 s; reloaded anyway";
+  await page.reload({ waitUntil: "networkidle" }).catch(() => page.reload({ waitUntil: "load" }));
+  await page.waitForTimeout(c.wait);
+}
+
+/**
+ * Run the steps in order, each by its STEPS entry, recording each in
+ * findings.steps. A step that cannot run is recorded as failed and the rest
+ * still run; a usage error stops the run.
+ */
 export async function runSteps(page, steps, findings, { timeout = 5000, stepWait = 300, first = false, wait = 1500, downloadDir = null } = {}) {
   const opts = { timeout, first };
   for (const step of steps) {
     const record = { ...step, ok: true };
+    const spec = STEPS[step.kind];
+    if (!spec) throw new UsageError(`no step --${step.kind}`);
     try {
-      switch (step.kind) {
-        case "click": await (await target(page, step.arg, opts)).click({ timeout }); break;
-        case "dblclick": await (await target(page, step.arg, opts)).dblclick({ timeout }); break;
-        case "right-click": {
-          // A straight couple line is an SVG group with a zero-height box,
-          // which Playwright never calls visible: right-click its centre.
-          const flat = page.locator(step.arg).first();
-          const box = (await flat.count())
-            ? await flat.evaluate(e => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; })
-            : null;
-          if (box && box.width > 0 && box.height === 0) {
-            await page.mouse.click(box.x + box.width / 2, box.y, { button: "right" });
-          } else {
-            await (await target(page, step.arg, opts)).click({ button: "right", timeout });
-          }
-          break;
-        }
-        case "hover": await (await target(page, step.arg, opts)).hover({ timeout }); break;
-        case "wait-for": await target(page, step.arg, { ...opts, first: true }); break;
-        case "press": await page.keyboard.press(step.arg); break;
-        case "key-down": await page.keyboard.down(step.arg); break;
-        case "key-up": await page.keyboard.up(step.arg); break;
-        case "sleep": {
-          const ms = Number(step.arg);
-          if (!Number.isFinite(ms)) throw new UsageError(`--sleep wants milliseconds, got ${step.arg}`);
-          await page.waitForTimeout(ms);
-          break;
-        }
-        case "mouse-away": await page.mouse.move(1, 1); break;
-        case "reload": {
-          if (!(await waitForSaved(page))) record.note = "auto-save had not finished after 8 s; reloaded anyway";
-          await page.reload({ waitUntil: "networkidle" }).catch(() => page.reload({ waitUntil: "load" }));
-          await page.waitForTimeout(wait);
-          break;
-        }
-        case "fill": {
-          const [sel, text] = splitArrow(step);
-          await (await target(page, sel, opts)).fill(text, { timeout });
-          break;
-        }
-        case "select": {
-          const [sel, value] = splitArrow(step);
-          const el = await target(page, sel, opts);
-          const options = await el.evaluate(e => [...(e.options ?? [])].map(o => [o.value, o.label]), null, { timeout }).catch(() => null);
-          if (!options) throw new StepError("is not a native <select>; open it with --click and click the option instead");
-          const hit = options.find(([v, l]) => v === value || l === value);
-          if (!hit) throw new StepError(`has no option ${JSON.stringify(value)}; options: ${options.map(([v, l]) => (v === l ? v : `${v} (${l})`)).join(", ")}`);
-          await el.selectOption(hit[0], { timeout });
-          break;
-        }
-        case "choose": {
-          const [sel, text] = splitArrow(step);
-          const trigger = await target(page, sel, opts);
-          if (await trigger.evaluate(e => e instanceof HTMLSelectElement).catch(() => false)) {
-            throw new StepError("is a native <select>; use --select instead");
-          }
-          await trigger.click({ timeout });
-          record.chose = await chooseItem(page, text, opts);
-          break;
-        }
-        case "drag": {
-          const [sel, delta] = splitArrow(step);
-          const m = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(delta.replace(/\s/g, ""));
-          if (!m) throw new UsageError(`--drag wants 'SELECTOR=>DX,DY', got ${step.arg}`);
-          const box = await (await target(page, sel, opts)).boundingBox();
-          if (!box) throw new StepError("has no bounding box");
-          const x = box.x + box.width / 2, y = box.y + box.height / 2;
-          await page.mouse.move(x, y);
-          await page.mouse.down();
-          await page.mouse.move(x + Number(m[1]), y + Number(m[2]), { steps: 12 });
-          await page.mouse.up();
-          record.from = { x, y };
-          break;
-        }
-        case "upload": {
-          const [sel, file] = splitArrow(step);
-          const abs = path.resolve(process.cwd(), file);
-          if (!existsSync(abs)) throw new UsageError(`--upload: ${file} does not exist`);
-          const isInput = await page.locator(sel).first()
-            .evaluate(el => el instanceof HTMLInputElement && el.type === "file", null, { timeout }).catch(() => false);
-          if (isInput) {
-            await (await target(page, sel, { ...opts, mayBeHidden: true })).setInputFiles(abs);
-          } else {
-            const el = await target(page, sel, opts);
-            const [chooser] = await Promise.all([page.waitForEvent("filechooser", { timeout }), el.click({ timeout })]);
-            await chooser.setFiles(abs);
-          }
-          break;
-        }
-        case "download": {
-          const [sel, out] = splitArrow(step, { allowMissing: true });
-          const el = await target(page, sel, opts);
-          const [dl] = await Promise.all([page.waitForEvent("download", { timeout }), el.click({ timeout })]);
-          const dir = downloadDir ?? path.join(FRONTEND_DIR, "test-output", "browser", "downloads");
-          const file = path.resolve(out ?? path.join(dir, dl.suggestedFilename()));
-          mkdirSync(path.dirname(file), { recursive: true });
-          await dl.saveAs(file);
-          record.saved = displayPath(file);
-          break;
-        }
-      }
+      await spec.run(page, step, { timeout, first, wait, downloadDir, opts, record });
     } catch (e) {
       if (e instanceof UsageError) throw e;
       record.ok = false;

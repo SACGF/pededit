@@ -206,16 +206,81 @@ async function checkLanding(context, base, flags, shotPath) {
   return r;
 }
 
+/** Tap a point (from tappable) and wait `ms` for the page to answer. */
+async function tapAndSettle(page, at, ms = 400) {
+  await page.touchscreen.tap(at.x, at.y);
+  await page.waitForTimeout(ms);
+}
+
+/** Tap the element matching `selector` when it can be tapped. Returns tappable's answer. */
+async function tapOn(page, selector, ms = 400) {
+  const at = await tappable(page, selector);
+  if (!at.problem) await tapAndSettle(page, at, ms);
+  return at;
+}
+
+/**
+ * Tap the sheet's close button, when `onlyIfPersonShown` only while the
+ * person's fields are on the screen.
+ */
+async function shutSheet(page, { onlyIfPersonShown = false } = {}) {
+  const toggle = await tappable(page, '[data-testid="panel-toggle"]');
+  if (!toggle.problem && (!onlyIfPersonShown || await onScreen(page, '[data-testid="panel-person"]'))) await page.touchscreen.tap(toggle.x, toggle.y);
+  await page.waitForTimeout(400);
+}
+
+/** The person panel is gone and the chart has its share of the screen back. */
+async function panelShut(page) {
+  const after = await measure(page);
+  const shareAfter = after.canvas ? (after.canvas.w * after.canvas.h) / (after.vw * after.vh) : 0;
+  return !(await onScreen(page, '[data-testid="panel-person"]')) && shareAfter >= MIN_CANVAS_SHARE;
+}
+
+/** Is the person with this id drawn inside the canvas? Null when they or the canvas are not drawn. */
+function personInView(page, id) {
+  return page.evaluate(id => {
+    const el = [...document.querySelectorAll("[data-individual-id]")].find(e => e.getAttribute("data-individual-id") === id);
+    const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
+    if (!el || !flow) return null;
+    const b = el.getBoundingClientRect();
+    return { inView: b.top >= flow.top && b.bottom <= flow.bottom && b.left >= flow.left && b.right <= flow.right, person: `${Math.round(b.top)} to ${Math.round(b.bottom)}`, canvas: `${Math.round(flow.top)} to ${Math.round(flow.bottom)}` };
+  }, id);
+}
+
+const personSelector = id => `[data-individual-id="${CSS_ESCAPE(id)}"]`;
+
 async function checkEditor(context, base, spec, flags, shotBase) {
   const r = makeReport(`editor, ${spec}`);
   const fixture = await loadFixture(spec, context, base);
   const run = await openPage(context, { url: resolveTarget("/p/fixture", { allowRemote: flags["allow-remote"] }), fixture, flags });
   const { page } = run;
-  const cdp = await context.newCDPSession(page);
+  const s = { r, page, cdp: await context.newCDPSession(page), shotBase };
   await page.screenshot({ path: `${shotBase}.png` });
 
-  // Display: what the screen shows as the link opens.
-  let m = await measure(page);
+  const { m, inside } = await checkDisplay(s);
+  const person = inside[0] ?? m.people[0];
+  const personSel = person ? personSelector(person.id) : null;
+  const selected = await checkTapSelects(s, person, personSel);
+  const paneClosed = await checkPersonTab(s, selected);
+  await checkTabBar(s, paneClosed);
+  await checkSheetHandle(s, person, personSel);
+  await checkSheetActions(s, personSel, selected);
+  await checkPersonKeptInView(s, inside);
+  await checkToolbar(s);
+  await checkSidebar(s, m);
+  const after = await checkPanAndPinch(s);
+  await checkPageZoom(s, after, m);
+  await checkUShapeView(s);
+
+  await resolveFindings(run.findings);
+  jsChecks(r, run.findings);
+  await page.close();
+  return r;
+}
+
+/** What the screen shows as the link opens. Returns the measure and the people inside the canvas. */
+async function checkDisplay({ r, page }) {
+  const m = await measure(page);
   commonChecks(r, m);
   const share = m.canvas ? (m.canvas.w * m.canvas.h) / (m.vw * m.vh) : 0;
   r.check(share >= MIN_CANVAS_SHARE, `the chart keeps at least ${pct(MIN_CANVAS_SHARE)} of the screen`,
@@ -226,45 +291,36 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   r.check(m.people.length > 0 && inside.length === m.people.length, "the whole chart is in view on open",
     `${inside.length} of ${m.people.length} people are inside the canvas`);
   if (m.people.length && m.transform) r.note(`fitted at zoom ${m.transform.zoom.toFixed(2)}: a symbol is ${Math.round(m.people[0].w)} px across`);
+  return { m, inside };
+}
 
-  // Tap selects.
-  const person = inside[0] ?? m.people[0];
-  const personSel = person ? `[data-individual-id="${CSS_ESCAPE(person.id)}"]` : null;
-  let at = personSel ? await tappable(page, personSel) : { problem: "nobody is drawn" };
-  if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
-    m = await measure(page);
-  }
+/** A tap selects the person. Returns whether it did. */
+async function checkTapSelects({ r, page }, person, personSel) {
+  const at = personSel ? await tapOn(page, personSel) : { problem: "nobody is drawn" };
+  const m = at.problem ? null : await measure(page);
   const selected = !at.problem && m.selected?.length === 1 && m.selected[0] === person.id;
   r.check(selected, "tapping a person selects them", at.problem ?? `selection is ${JSON.stringify(m.selected)}`);
+  return selected;
+}
 
-  // The tap opens the Person tab, its close button shuts it, the tab
-  // opens it again and a tap on the empty canvas shuts it.
-  let opened = selected && await onScreen(page, '[data-testid="panel-person"]', 80);
+/**
+ * The tap opened the Person tab, its close button shuts it, the tab opens
+ * it again and a tap on the empty canvas shuts it. Returns whether that
+ * last tap shut it.
+ */
+async function checkPersonTab({ r, page, shotBase }, selected) {
+  const opened = selected && await onScreen(page, '[data-testid="panel-person"]', 80);
   if (opened) await page.screenshot({ path: `${shotBase}.person.png` });
   r.check(opened, "tapping a person opens the Person tab", selected ? "the person's fields are not on the screen" : "nobody was selected");
-  const panelShut = async () => {
-    const after = await measure(page);
-    const shareAfter = after.canvas ? (after.canvas.w * after.canvas.h) / (after.vw * after.vh) : 0;
-    return !(await onScreen(page, '[data-testid="panel-person"]')) && shareAfter >= MIN_CANVAS_SHARE;
-  };
-  let closed = false;
-  at = opened ? await tappable(page, '[data-testid="panel-toggle"]') : { problem: "it did not open" };
-  if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
-    closed = await panelShut();
-  }
+
+  let at = opened ? await tapOn(page, '[data-testid="panel-toggle"]') : { problem: "it did not open" };
+  const closed = !at.problem && await panelShut(page);
   r.check(closed, "the Person tab closes and gives the screen back to the chart", at.problem ? `its close button is ${at.problem}` : "the panel is still on the screen");
-  at = closed ? await tappable(page, '[data-testid="panel-tab-person"]') : { problem: "it did not close" };
-  let reopened = false;
-  if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
-    reopened = await onScreen(page, '[data-testid="panel-person"]', 80);
-  }
+
+  at = closed ? await tapOn(page, '[data-testid="panel-tab-person"]') : { problem: "it did not close" };
+  const reopened = !at.problem && await onScreen(page, '[data-testid="panel-person"]', 80);
   r.check(reopened, "the Person tab opens from its tab", at.problem ? `its tab is ${at.problem}` : "tapped the tab and the person's fields are not on the screen");
+
   let paneClosed = false;
   if (reopened) {
     const flow = await page.locator(".react-flow__pane").boundingBox();
@@ -277,66 +333,62 @@ async function checkEditor(context, base, spec, flags, shotBase) {
       return null;
     }, { x: flow.x, y: flow.y, w: flow.width, h: flow.height });
     if (spot) {
-      await page.touchscreen.tap(spot.x, spot.y);
-      await page.waitForTimeout(400);
-      paneClosed = await panelShut();
+      await tapAndSettle(page, spot);
+      paneClosed = await panelShut(page);
     }
   }
   r.check(paneClosed, "a tap on the empty canvas closes the panel", reopened ? "the panel is still on the screen" : "it did not open again");
-  // The bar along the bottom: both tabs big enough for a finger, Pedigree
-  // opens with nobody selected, and the open tab shuts the sheet.
+  return paneClosed;
+}
+
+/**
+ * The bar along the bottom: both tabs big enough for a finger, Pedigree
+ * opens with nobody selected, the open tab shuts the sheet, and Person with
+ * nobody selected says what to do.
+ */
+async function checkTabBar({ r, page, shotBase }, paneClosed) {
   const barSizes = await page.locator('[role="tab"]').evaluateAll(all => all.map(b => { const q = b.getBoundingClientRect(); return { name: b.textContent.trim(), h: Math.round(q.height), bottom: Math.round(window.innerHeight - q.bottom) }; }));
   r.check(barSizes.length === 2 && barSizes.every(b => b.h >= 44 && b.bottom <= 1), "Person and Pedigree are a bar along the bottom of the screen, at least 44 px tall",
     barSizes.map(b => `${b.name}: ${b.h} px tall, ${b.bottom} px above the bottom`).join("; ") || "there are no tabs");
-  at = paneClosed ? await tappable(page, '[data-testid="panel-tab-pedigree"]') : { problem: "the panel did not close" };
+
+  let at = paneClosed ? await tapOn(page, '[data-testid="panel-tab-pedigree"]') : { problem: "the panel did not close" };
   let pedigreeOpen = false, pedigreeShut = false;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
     pedigreeOpen = await onScreen(page, '[data-testid="panel-pedigree"]', 80);
     if (pedigreeOpen) await page.screenshot({ path: `${shotBase}.pedigree.png` });
     const again = await tappable(page, '[data-testid="panel-tab-pedigree"]');
     if (pedigreeOpen && !again.problem) {
-      await page.touchscreen.tap(again.x, again.y);
-      await page.waitForTimeout(400);
-      pedigreeShut = await panelShut();
+      await tapAndSettle(page, again);
+      pedigreeShut = await panelShut(page);
     }
   }
   r.check(pedigreeOpen, "the Pedigree tab opens with nobody selected", at.problem ? `its tab is ${at.problem}` : "tapped the tab and the legend is not on the screen");
   r.check(pedigreeShut, "tapping the open tab shuts the sheet", pedigreeOpen ? "the panel is still on the screen" : "it did not open");
-  // Person with nobody selected says what to do.
-  at = pedigreeShut ? await tappable(page, '[data-testid="panel-tab-person"]') : { problem: "the panel did not close" };
+
+  at = pedigreeShut ? await tapOn(page, '[data-testid="panel-tab-person"]') : { problem: "the panel did not close" };
   let nobody = false;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
     nobody = await onScreen(page, '[data-testid="panel-nobody"]');
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
+    await tapAndSettle(page, at);
   }
   r.check(nobody, "the Person tab with nobody selected says to tap a person", at.problem ? `its tab is ${at.problem}` : "the hint is not on the screen");
+}
 
-  // The sheet's handle: a swipe up makes it tall with the person still in
-  // view in the strip of chart left, swipes down bring it to half and shut.
+/**
+ * The sheet's handle: a swipe up makes it tall with the person still in
+ * view in the strip of chart left, swipes down bring it to half and shut.
+ */
+async function checkSheetHandle({ r, page, cdp, shotBase }, person, personSel) {
   const sheetHeight = () => page.locator('[data-testid="panel-scroll"]').evaluate(el => Math.round(el.getBoundingClientRect().height)).catch(() => 0);
-  const personInView = () => page.evaluate(id => {
-    const el = [...document.querySelectorAll("[data-individual-id]")].find(e => e.getAttribute("data-individual-id") === id);
-    const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
-    if (!el || !flow) return false;
-    const b = el.getBoundingClientRect();
-    return b.top >= flow.top && b.bottom <= flow.bottom && b.left >= flow.left && b.right <= flow.right;
-  }, person?.id);
-  at = personSel ? await tappable(page, personSel) : { problem: "nobody is drawn" };
+  let at = personSel ? await tapOn(page, personSel, GESTURE_GAP) : { problem: "nobody is drawn" };
   let tall = null, halfAgain = null, swipedShut = false;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(GESTURE_GAP);
     const half = await sheetHeight();
     let handle = await tappable(page, '[data-testid="panel-handle"]');
     if (handle.problem) at = { problem: `the handle is ${handle.problem}` };
     else {
       await swipe(page, cdp, handle, 0, -80);
-      tall = { half, full: await sheetHeight(), inView: await personInView() };
+      tall = { half, full: await sheetHeight(), inView: !!(await personInView(page, person.id))?.inView };
       await page.screenshot({ path: `${shotBase}.tall.png` });
       handle = await tappable(page, '[data-testid="panel-handle"]');
       if (!handle.problem) {
@@ -345,7 +397,7 @@ async function checkEditor(context, base, spec, flags, shotBase) {
         handle = await tappable(page, '[data-testid="panel-handle"]');
         if (!handle.problem) {
           await swipe(page, cdp, handle, 0, 80);
-          swipedShut = await panelShut();
+          swipedShut = await panelShut(page);
         }
       }
     }
@@ -353,27 +405,22 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   r.check(tall && tall.full > tall.half + 40, "swiping the sheet's handle up makes the sheet taller", at.problem ?? (tall ? `it went from ${tall.half} to ${tall.full} px` : "the handle was not swiped"));
   r.check(tall?.inView, "the selected person is still in view above the tall sheet", tall ? "the person is outside the canvas" : "the sheet did not open");
   r.check(tall && halfAgain === tall.half && swipedShut, "swiping the handle down brings the sheet to half, then shuts it", tall ? `half is ${tall.half} px, after one swipe ${halfAgain} px, ${swipedShut ? "shut" : "not shut"} after two` : "the sheet did not open");
+}
 
-  // Select the person again for the pill below, then give the screen back.
-  at = personSel ? await tappable(page, personSel) : { problem: "nobody is drawn" };
-  if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
-    const toggle = await tappable(page, '[data-testid="panel-toggle"]');
-    if (!toggle.problem && await onScreen(page, '[data-testid="panel-person"]')) await page.touchscreen.tap(toggle.x, toggle.y);
-    await page.waitForTimeout(400);
-  }
+/**
+ * The sheet starts with the hover pill's buttons, and the pill itself is
+ * not shown: it would sit over the name of the person tapped. The person is
+ * tapped again and the sheet shut, so it is opened from its tab.
+ */
+async function checkSheetActions({ r, page, shotBase }, personSel, selected) {
+  const reselect = personSel ? await tapOn(page, personSel) : { problem: "nobody is drawn" };
+  if (!reselect.problem) await shutSheet(page, { onlyIfPersonShown: true });
 
-  // The sheet starts with the hover pill's buttons, and the pill itself is
-  // not shown: it would sit over the name of the person tapped. The person
-  // was tapped again above and the sheet shut, so open it from its tab.
   const pillShown = await onScreen(page, '[data-testid="hover-pill"]');
   r.check(selected && !pillShown, "a tap does not show the hover pill", selected ? "the pill is on the screen" : "nobody was selected");
-  at = selected ? await tappable(page, '[data-testid="panel-tab-person"]') : { problem: "nobody was selected" };
+  const at = selected ? await tapOn(page, '[data-testid="panel-tab-person"]') : { problem: "nobody was selected" };
   let actions = null, added = null, menuOpen = false;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
     actions = await page.locator('[data-testid="person-actions"] button').evaluateAll(all => all.map(b => {
       const q = b.getBoundingClientRect();
       return { title: b.title, w: Math.round(q.width), h: Math.round(q.height), on: q.left >= 0 && q.right <= window.innerWidth + 0.5 && q.top >= 0 && q.bottom <= window.innerHeight, clipped: b.scrollWidth > b.clientWidth + 1 };
@@ -384,16 +431,13 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     const son = await tappable(page, '[data-testid="person-actions"] button[title="Add son"]');
     if (!son.problem) {
       const before = await count();
-      await page.touchscreen.tap(son.x, son.y);
-      await page.waitForTimeout(600);
+      await tapAndSettle(page, son, 600);
       added = (await count()) - before;
       await page.keyboard.press("Control+z");
       await page.waitForTimeout(600);
     }
-    const more = await tappable(page, '[data-testid="person-actions"] button[title="More options"]');
+    const more = await tapOn(page, '[data-testid="person-actions"] button[title="More options"]', 500);
     if (!more.problem) {
-      await page.touchscreen.tap(more.x, more.y);
-      await page.waitForTimeout(500);
       menuOpen = await onScreen(page, "[data-radix-popper-content-wrapper]", 60);
       if (menuOpen) await page.screenshot({ path: `${shotBase}.menu.png` });
       await page.keyboard.press("Escape");
@@ -406,56 +450,38 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   r.check(added === 1, "\"Add son\" in the sheet adds a person", added === null ? "the button could not be tapped" : `the number of people changed by ${added}`);
   r.check(menuOpen, "More options opens from the sheet", at.problem ? `the Person tab is ${at.problem}` : "tapped the button and no menu showed");
   // Shut the sheet, then clear the selection.
-  {
-    const toggle = await tappable(page, '[data-testid="panel-toggle"]');
-    if (!toggle.problem) await page.touchscreen.tap(toggle.x, toggle.y);
-    await page.waitForTimeout(400);
-    await page.keyboard.press("Escape");
-    await page.waitForTimeout(GESTURE_GAP);
-  }
+  await shutSheet(page);
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(GESTURE_GAP);
+}
 
-  // A tap opens the Person tab, a sheet over half the screen: the person
-  // tapped must still be in view above it.
-  // Fitted again first: keeping people in view above the sheet has panned the chart.
-  {
-    const fit = await tappable(page, ".react-flow__controls-fitview");
-    if (!fit.problem) {
-      await page.touchscreen.tap(fit.x, fit.y);
-      await page.waitForTimeout(GESTURE_GAP);
-    }
-  }
+/**
+ * A tap opens the Person tab, a sheet over half the screen: the person
+ * tapped must still be in view above it. The chart is fitted again first:
+ * keeping people in view above the sheet has panned it.
+ */
+async function checkPersonKeptInView({ r, page, shotBase }, inside) {
+  await tapOn(page, ".react-flow__controls-fitview", GESTURE_GAP);
   const lowest = inside.reduce((a, b) => (a && a.y >= b.y ? a : b), null);
-  at = lowest ? await tappable(page, `[data-individual-id="${CSS_ESCAPE(lowest.id)}"]`) : { problem: "nobody is drawn" };
+  const at = lowest ? await tapOn(page, personSelector(lowest.id), 700) : { problem: "nobody is drawn" };
   let kept = null;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(700);
-    {
-      kept = await page.evaluate(id => {
-        const el = [...document.querySelectorAll("[data-individual-id]")].find(e => e.getAttribute("data-individual-id") === id);
-        const flow = document.querySelector(".react-flow")?.getBoundingClientRect();
-        if (!el || !flow) return null;
-        const b = el.getBoundingClientRect();
-        return { inView: b.top >= flow.top && b.bottom <= flow.bottom && b.left >= flow.left && b.right <= flow.right, person: `${Math.round(b.top)} to ${Math.round(b.bottom)}`, canvas: `${Math.round(flow.top)} to ${Math.round(flow.bottom)}` };
-      }, lowest.id);
-      await page.screenshot({ path: `${shotBase}.person-in-view.png` });
-      const toggle = await tappable(page, '[data-testid="panel-toggle"]');
-      if (!toggle.problem) await page.touchscreen.tap(toggle.x, toggle.y);
-      await page.waitForTimeout(400);
-    }
+    kept = await personInView(page, lowest.id);
+    await page.screenshot({ path: `${shotBase}.person-in-view.png` });
+    await shutSheet(page);
     await page.keyboard.press("Escape");
     await page.waitForTimeout(GESTURE_GAP);
   }
   r.check(kept?.inView, "the selected person stays in view when the Person tab opens", at.problem ?? (kept ? `the person is at y ${kept.person}, the canvas is ${kept.canvas}` : "the person is not drawn"));
+}
 
-  // The toolbar fits the screen, with the exports in one menu.
+/** The toolbar fits the screen, with the exports in one menu. */
+async function checkToolbar({ r, page, shotBase }) {
   const barFit = await page.locator('[data-testid="toolbar"]').evaluate(el => ({ scroll: el.scrollWidth, client: el.clientWidth })).catch(() => null);
   r.check(barFit && barFit.scroll <= barFit.client + 1, "the toolbar fits the screen without scrolling sideways", barFit ? `it is ${barFit.scroll} px wide in ${barFit.client} px` : "there is no toolbar");
-  at = await tappable(page, '[data-testid="export-menu"]');
+  const at = await tapOn(page, '[data-testid="export-menu"]');
   let exportItems = [];
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
     exportItems = await page.locator('[data-testid="export-menu-items"] button').evaluateAll(all => all.filter(b => {
       const q = b.getBoundingClientRect();
       return q.width > 0 && q.left >= 0 && q.right <= window.innerWidth && q.top >= 0 && q.bottom <= window.innerHeight;
@@ -467,13 +493,13 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   const wantExports = ["PED", "CSV", "JSON", "SVG"];
   const missingExports = wantExports.filter(w => !exportItems.some(t => t.includes(w)));
   r.check(!at.problem && missingExports.length === 0, "the Export menu lists every export", at.problem ? `the Export button is ${at.problem}` : `missing: ${missingExports.join(", ")} (it lists ${exportItems.join(" | ") || "nothing"})`);
+}
 
-  // The left sidebar (home, Save) is behind the toolbar's menu button.
-  at = await tappable(page, '[data-testid="sidebar-toggle"]');
+/** The left sidebar (home, Save) is behind the toolbar's menu button. */
+async function checkSidebar({ r, page, shotBase }, m) {
+  const at = await tapOn(page, '[data-testid="sidebar-toggle"]', 300);
   let sidebar = false;
   if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(300);
     sidebar = await onScreen(page, '[data-testid="sidebar"]', 80);
     if (sidebar) await page.screenshot({ path: `${shotBase}.sidebar.png` });
     // Its help is worded for touch: no click, Shift, scroll wheel or right-click.
@@ -481,13 +507,17 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     const mouseWords = (help.match(/\b(click|shift|scroll|right-click)\b/gi) ?? []);
     r.check(help.length > 0 && mouseWords.length === 0 && /tap/i.test(help), "\"Using the canvas\" is worded for touch", help ? `it says: ${[...new Set(mouseWords.map(w => w.toLowerCase()))].join(", ") || "nothing about tapping"}` : "the help is not shown");
     // Outside it, on the right edge of the screen.
-    await page.touchscreen.tap(m.vw - 10, m.vh / 2);
-    await page.waitForTimeout(300);
+    await tapAndSettle(page, { x: m.vw - 10, y: m.vh / 2 }, 300);
   }
   r.check(sidebar && !(await onScreen(page, '[data-testid="sidebar"]')), "the menu button opens the sidebar and a tap outside closes it",
     at.problem ? `the menu button is ${at.problem}` : sidebar ? "it stayed open" : "it did not open");
+}
 
-  // One finger pans the canvas, not the page.
+/**
+ * One finger pans the canvas, not the page, also when it starts on a
+ * person; two fingers zoom it. Returns the last measure.
+ */
+async function checkPanAndPinch({ r, page, cdp }) {
   const DX = 70, DY = 50;
   const dragged = async (from, what, missing) => {
     await page.waitForTimeout(GESTURE_GAP);
@@ -503,9 +533,9 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   await dragged(await blankCanvasPoint(page, DX, DY), "a one-finger drag pans the canvas", "no bare canvas to drag on");
   // On a big chart fitted to a phone most of the canvas is people, so a drag starts on one as often as not.
   // Whoever is on the screen now: keeping the selected person in view may have panned.
-  at = { problem: "nobody is on the screen" };
+  let at = { problem: "nobody is on the screen" };
   for (const p of (await measure(page)).people) {
-    const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
+    const here = await tappable(page, personSelector(p.id));
     if (!here.problem) { at = here; break; }
   }
   await page.keyboard.press("Escape");
@@ -514,7 +544,7 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   // Nor does a pinch with a finger on a person.
   at = { problem: "nobody is on the screen with room beside them" };
   for (const p of after.people) {
-    const here = await tappable(page, `[data-individual-id="${CSS_ESCAPE(p.id)}"]`);
+    const here = await tappable(page, personSelector(p.id));
     // The other finger on the bare canvas (see the pinch below for why).
     const bare = dx => page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.classList.contains("react-flow__pane"), { x: here.x + dx, y: here.y });
     const side = here.problem ? 0 : await bare(120) ? 1 : await bare(-120) ? -1 : 0;
@@ -559,30 +589,35 @@ async function checkEditor(context, base, spec, flags, shotBase) {
   after = await zoomed(60, 180, "and spreading them zooms back in");
   r.check(after.scroll.x === 0 && after.scroll.y === 0 && after.pageScale === 1, "and the browser does not zoom the page instead",
     `scroll ${after.scroll.x},${after.scroll.y}, page zoom ${after.pageScale}`);
+  return after;
+}
 
-  // Off the canvas the browser zooms the page, so small text can be
-  // magnified (#193). The canvas keeps every touch for the chart, so while
-  // the page is zoomed a notice says how to zoom it back out, and takes a
-  // pinch itself.
+/**
+ * Off the canvas the browser zooms the page, so small text can be
+ * magnified (#193). The canvas keeps every touch for the chart, so while
+ * the page is zoomed a notice says how to zoom it back out, and takes a
+ * pinch itself.
+ */
+async function checkPageZoom({ r, page, cdp }, after, m) {
   const chartZoom = after.transform?.zoom;
   const bar = await page.locator('[data-testid="toolbar"]').boundingBox().catch(() => null);
   if (bar) await pinch(page, cdp, { x: m.vw / 2, y: bar.y + bar.height / 2 }, 60, 180);
   await page.waitForTimeout(300);
-  after = await measure(page);
-  r.check(bar && after.pageScale > 1.2 && after.transform?.zoom === chartZoom, "a pinch on the toolbar zooms the page, not the chart",
-    bar ? `page zoom ${after.pageScale.toFixed(2)}, chart zoom ${chartZoom?.toFixed(2)} to ${after.transform?.zoom?.toFixed(2)}` : "there is no toolbar");
+  let now = await measure(page);
+  r.check(bar && now.pageScale > 1.2 && now.transform?.zoom === chartZoom, "a pinch on the toolbar zooms the page, not the chart",
+    bar ? `page zoom ${now.pageScale.toFixed(2)}, chart zoom ${chartZoom?.toFixed(2)} to ${now.transform?.zoom?.toFixed(2)}` : "there is no toolbar");
   const zoomNotice = await page.evaluate(() => {
     const el = document.querySelector('[data-testid="page-zoom-notice"]');
     if (!el) return null;
     const b = el.getBoundingClientRect(), vv = window.visualViewport;
     // Client rects are in layout pixels; on screen is what lies inside the visual viewport.
     const onScreen = b.left >= vv.offsetLeft - 1 && b.top >= vv.offsetTop - 1 && b.right <= vv.offsetLeft + vv.width + 1 && b.bottom <= vv.offsetTop + vv.height;
-    // Its centre in screen coordinates, for a pinch there.
-    return { text: el.textContent, onScreen, x: (b.left + b.width / 2 - vv.offsetLeft) * vv.scale, y: (b.top + b.height / 2 - vv.offsetTop) * vv.scale };
+    return { text: el.textContent, onScreen };
   });
   r.check(zoomNotice?.onScreen && /zoom it back out/.test(zoomNotice.text), "while the page is zoomed a notice on screen says how to zoom back out",
     zoomNotice ? `the notice is ${zoomNotice.onScreen ? "on" : "off"} screen` : "no notice");
   for (let i = 0; zoomNotice && i < 3 && (await measure(page)).pageScale > 1.01; i++) {
+    // The notice's centre in screen coordinates, for a pinch there.
     const at = await page.evaluate(() => {
       const el = document.querySelector('[data-testid="page-zoom-notice"]');
       const b = el?.getBoundingClientRect(), vv = window.visualViewport;
@@ -592,17 +627,10 @@ async function checkEditor(context, base, spec, flags, shotBase) {
     await pinch(page, cdp, at, 200, 20);
     await page.waitForTimeout(300);
   }
-  after = await measure(page);
+  now = await measure(page);
   const shown = await page.locator('[data-testid="page-zoom-notice"]').count();
-  r.check(zoomNotice && after.pageScale <= 1.01 && shown === 0, "a pinch on the notice zooms the page back out, and the notice goes",
-    `page zoom ${after.pageScale.toFixed(2)}, notice ${shown ? "still shown" : "gone"}`);
-
-  await checkUShapeView(r, page, cdp, shotBase);
-
-  await resolveFindings(run.findings);
-  jsChecks(r, run.findings);
-  await page.close();
-  return r;
+  r.check(zoomNotice && now.pageScale <= 1.01 && shown === 0, "a pinch on the notice zooms the page back out, and the notice goes",
+    `page zoom ${now.pageScale.toFixed(2)}, notice ${shown ? "still shown" : "gone"}`);
 }
 
 /**
@@ -610,20 +638,15 @@ async function checkEditor(context, base, spec, flags, shotBase) {
  * (no room in the toolbar), a pinch zooms it, a swipe pans it, a tap selects
  * and opens the Person tab, and the banner's button goes back to the chart.
  */
-async function checkUShapeView(r, page, cdp, shotBase) {
+async function checkUShapeView({ r, page, cdp, shotBase }) {
   const figureTransform = () => page.evaluate(() => {
     const el = document.querySelector("[data-u-shape-figure]");
     if (!el) return null;
     const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
     return { x: m.e, y: m.f, zoom: m.a };
   });
-  let at = await tappable(page, '[data-testid="filter-menu"]');
-  if (!at.problem) {
-    await page.touchscreen.tap(at.x, at.y);
-    await page.waitForTimeout(400);
-    at = await tappable(page, '[data-testid="u-shape-toggle"]');
-    if (!at.problem) { await page.touchscreen.tap(at.x, at.y); await page.waitForTimeout(600); }
-  }
+  let at = await tapOn(page, '[data-testid="filter-menu"]');
+  if (!at.problem) at = await tapOn(page, '[data-testid="u-shape-toggle"]', 600);
   const before = await figureTransform();
   r.check(!at.problem && before, "the Filter menu turns on the U-shape view", at.problem ? `its switch is ${at.problem}` : "the U is not drawn");
   if (!before) return;
@@ -651,13 +674,12 @@ async function checkUShapeView(r, page, cdp, shotBase) {
     }
     return null;
   });
-  if (person) { await page.touchscreen.tap(person.x, person.y); await page.waitForTimeout(400); }
+  if (person) await tapAndSettle(page, person);
   const selected = person && (await measure(page)).selected?.[0] === person.id;
   r.check(selected, "tapping a person on the U selects them", person ? "they are not selected" : "nobody is on the screen to tap");
   r.check(selected && await onScreen(page, '[data-testid="panel-person"]', 80), "and opens the Person tab", "the person's fields are not on the screen");
 
-  at = await tappable(page, '[data-testid="u-shape-back"]');
-  if (!at.problem) { await page.touchscreen.tap(at.x, at.y); await page.waitForTimeout(400); }
+  at = await tapOn(page, '[data-testid="u-shape-back"]');
   r.check(!at.problem && await page.locator(".react-flow").count() === 1, "the banner's button goes back to the chart", at.problem ? `the button is ${at.problem}` : "the chart is not back");
 }
 

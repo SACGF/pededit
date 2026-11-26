@@ -362,10 +362,13 @@ export default {
 };
 ```
 
-`t` drives the page with the same steps as the command line (`t.click`,
-`t.rightClick`, `t.hover`, `t.fill`, `t.select`, `t.drag`,
-`t.upload`, `t.download`, `t.press`, `t.holding("Shift", fn)`, `t.reload`),
-so a step still acts on exactly one visible element and fails otherwise.
+`t` drives the page with the same steps as the command line: every step of
+the `STEPS` table in `harness.mjs` is a method named by its flag in
+camelCase (`t.click(sel)`, `t.rightClick`, `t.waitFor`, `t.press(key)`,
+`t.fill(sel, text)`, `t.choose(sel, item)`, `t.drag(sel, dx, dy)`,
+`t.reload()`, `t.mouseAway()`), plus `t.download(sel)`, which returns the
+file's path, and `t.holding("Shift", fn)`. A step still acts on exactly one
+visible element and fails otherwise.
 `t.person(id)` is the selector of a person's symbol. `t.pill(id, "Add son")`
 and `t.menu(id, "Add partner")` are the hover pill and the right-click menu.
 `t.createBlank()` makes a blank pedigree from the landing page and returns
