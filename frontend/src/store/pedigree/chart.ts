@@ -1,10 +1,10 @@
-import type { Pedigree, SiblingOrderSettings, CanvasSettings, Tag, ClinicalDetails, ViewFilters } from "@pedigree-editor/layout-engine";
+import type { Pedigree, ViewFilters } from "@pedigree-editor/layout-engine";
 import { activeSnapGrid, snapPoint } from "../../pedigree/snap";
 import { collapseInfo } from "../../pedigree/collapse";
 import type { ViewFilterPatch } from "../../pedigree/viewFilters";
 import { newId, removeTagOnset, dropPins } from "./draft";
 import { selectionOf } from "./view";
-import type { EditTools } from "./tools";
+import type { EditTools, ChartSlice } from "./state";
 
 /**
  * Edits to the chart as a whole: title, clinical details, settings, the
@@ -14,48 +14,6 @@ import type { EditTools } from "./tools";
 
 /** Default snap grid size in canvas pixels. Used when a pedigree has no canvasSettings. */
 export const DEFAULT_SNAP_GRID_SIZE = 5;
-
-export interface ChartSlice {
-  /** Title above the chart. "" hides it; undefined falls back to the pedigree's name. */
-  setChartTitle: (title: string | undefined) => void;
-  /** Set one clinical key field; an empty value removes it, and the block goes when empty. */
-  setClinicalDetail: (field: keyof ClinicalDetails, value: string) => void;
-  updateCanvasSettings: (settings: Partial<CanvasSettings>) => void;
-  updateSiblingOrderSettings: (settings: Partial<SiblingOrderSettings>) => void;
-  addTag: (tag: Omit<Tag, "id"> & { id?: string }) => string;
-  updateTag: (id: string, updates: Partial<Omit<Tag, "id">>) => void;
-  deleteTag: (id: string) => void;
-  moveTag: (id: string, direction: -1 | 1) => void;
-  /**
-   * Hide or show everyone below these individuals; see
-   * `pedigree/collapse.ts` for who that takes. One undo step. Hidden people
-   * are dropped from the selection.
-   */
-  setDescendantsHidden: (individualIds: string[], hidden: boolean) => void;
-  /**
-   * Set a view filter field, see `pedigree/viewFilters.ts`; `false` or
-   * `undefined` removes it, and switching off `affectedOnly` drops its
-   * `affectedCondition` too.
-   * Saved with the pedigree, one undo step. Hidden people are dropped from
-   * the selection.
-   */
-  setViewFilter: <K extends keyof ViewFilters>(key: K, value: ViewFilters[K] | false | undefined) => void;
-  /** Write several view filter fields at once (`undefined` removes one), one undo step. */
-  updateViewFilters: (patch: ViewFilterPatch) => void;
-  /** Switch every view filter off, one undo step. */
-  clearViewFilters: () => void;
-  pinIndividual: (individualId: string, pos: { x: number; y: number }) => void;
-  /** Pin several individuals as one undo step (a group drag). Positions in normal spacing. */
-  pinIndividuals: (positions: Record<string, { x: number; y: number }>) => void;
-  unpinIndividual: (individualId: string) => void;
-  resetLayout: () => void;
-  unlockIndividual: (individualId: string) => void;
-  /** Unlock several individuals as one undo step. No-op when all are unlocked already. */
-  unlockIndividuals: (individualIds: string[]) => void;
-  /** Lock several individuals as one undo step, dropping their pins (back to auto layout). */
-  lockIndividuals: (individualIds: string[]) => void;
-  lockIndividual: (individualId: string) => void;
-}
 
 export function chartSlice(tools: EditTools): ChartSlice {
   const { set, get, mutate } = tools;

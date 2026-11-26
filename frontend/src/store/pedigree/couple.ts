@@ -1,55 +1,10 @@
-import type { ChildlessStatus, Zygosity } from "@pedigree-editor/layout-engine";
 import { twinSetProblem, twinSetOf } from "../../pedigree/twins";
 import { swapSidesPlan, drawBesidePlan, couplePartnerLabel } from "../../pedigree/partners";
 import { removeFromTwinSets, setOptional } from "./draft";
-import type { EditTools } from "./tools";
+import type { EditTools, CoupleSlice } from "./state";
 import { childrenOf } from "../../pedigree/graph";
 
 /** Edits to what is recorded about a couple, twins among their children included. */
-
-export interface CoupleSlice {
-  /**
-   * Make (or replace) a twin set among the children of partnershipId.
-   * Members already in another set of that partnership are moved into this
-   * one. Returns the reason when refused (fewer than two members, not all
-   * children of the couple, different sexes for monozygotic), else null.
-   */
-  setTwins: (partnershipId: string, members: string[], zygosity: Zygosity) => string | null;
-  /** Take an individual out of their twin set; a set left with one member is dropped. */
-  removeTwin: (id: string) => void;
-  /**
-   * Childless couple mark. Refused (no-op) when the partnership has
-   * children. Clearing with undefined also drops the reason.
-   */
-  setPartnershipChildless: (partnershipId: string, status: ChildlessStatus | undefined) => void;
-  /** Reason under the mark; empty clears it. */
-  setPartnershipChildlessReason: (partnershipId: string, reason: string) => void;
-  /**
-   * The double-line override: mark a couple as related when the
-   * pedigree does not show how. False removes the flag; a couple the
-   * pedigree shows to be related keeps its double line either way.
-   */
-  setPartnershipConsanguineous: (partnershipId: string, related: boolean) => void;
-  /** Text above the double line; empty clears it. */
-  setPartnershipConsanguinityLabel: (partnershipId: string, label: string) => void;
-  /** Ended relationship: two strokes across the couple line. False removes the flag. */
-  setPartnershipEnded: (partnershipId: string, ended: boolean) => void;
-  /**
-   * Draw the couple's partners the other way round, by setting
-   * `Partnership.leftPartner` (and the partner's other couple's, when they
-   * have exactly two partners). One undo step, nobody pinned. Returns the
-   * reason when refused, also shown as a notice.
-   */
-  swapPartnerSides: (partnershipId: string) => string | null;
-  /**
-   * Draw the couple where `individualId` (one of its partners) is placed, so
-   * the other partner is the one drawn twice if someone must be; null hands
-   * the choice back to the layout. Sets `Partnership.drawnBeside` and the
-   * side it acts on. One undo step, nobody pinned. A notice says who is now
-   * drawn twice, or why nothing changed (also returned).
-   */
-  setCoupleDrawnBeside: (partnershipId: string, individualId: string | null) => string | null;
-}
 
 export function coupleSlice(tools: EditTools): CoupleSlice {
   const { get, mutate, editPartnership } = tools;

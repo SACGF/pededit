@@ -1,77 +1,14 @@
-import type { Individual, Sex, LifeStatus, Adoption, ReproductiveRole, Evaluation } from "@pedigree-editor/layout-engine";
 import { twinSetOf } from "../../pedigree/twins";
 import { reproductiveRoleProblem } from "../../pedigree/assistedEdits";
-import { batchSexProblem, batchSexTargets, carrierStatusOf, type CarrierStatus } from "../../pedigree/batch";
+import { batchSexProblem, batchSexTargets, carrierStatusOf } from "../../pedigree/batch";
 import { applyAffected, applyCarrier, applyConditionState, isConditionTag, type ConditionState } from "../../pedigree/conditions";
 import { hasPartnerOrChild, dryRun, setOptional, removeTagOnset, setPlainTag } from "./draft";
-import type { EditTools } from "./tools";
+import type { EditTools, PersonSlice } from "./state";
 
 /**
  * Edits to what is recorded about a person, one at a time or for several
  * selected people as one undo step.
  */
-
-export interface PersonSlice {
-  updateIndividual: (id: string, updates: Partial<Individual>) => void;
-  setSex: (id: string, sex: Sex) => void;
-  /**
-   * The plain Affected status. With exactly one condition tag it records that
-   * condition too; unticking clears every affected condition
-   * (`applyAffected`).
-   */
-  setAffected: (id: string, affected: boolean) => void;
-  /**
-   * One person's state for one condition (quadrant tag): affected,
-   * carrier or neither (`applyConditionState`).
-   */
-  setConditionStatus: (id: string, tagId: string, state: ConditionState) => void;
-  /**
-   * Carrier with no condition recorded (the dot in 2008, the dotted half in
-   * 2022); with exactly one condition tag, a carrier of it. Setting it
-   * clears `presymptomatic`: the two are one carrier status.
-   */
-  setCarrier: (id: string, carrier: boolean) => void;
-  /** Presymptomatic carrier, a vertical line through the symbol. Setting it clears `carrier`. */
-  setPresymptomatic: (id: string, presymptomatic: boolean) => void;
-  /** Unticking deceased also clears the date of death. */
-  setDeceased: (id: string, deceased: boolean) => void;
-  /** Date of death, "YYYY", "YYYY-MM" or "YYYY-MM-DD"; a non-empty one also ticks deceased, empty removes it. */
-  setDateOfDeath: (id: string, dod: string | undefined) => void;
-  /** Pregnancy / loss status. Refused (no-op) when the individual has a partner or children. */
-  setLifeStatus: (id: string, status: LifeStatus | undefined) => void;
-  /** Replace the person's evaluations; an empty list removes the field. */
-  setEvaluations: (id: string, evaluations: Evaluation[]) => void;
-  setProband: (id: string) => void;
-  /** Consultand arrow without the "P". Several people may be consultands. */
-  setConsultand: (id: string, consultand: boolean) => void;
-  /** "?" above the symbol: family history not known. */
-  setFamilyHistoryUnknown: (id: string, unknown: boolean) => void;
-  /** Adoption brackets: "in", "out" or none. */
-  setAdopted: (id: string, status: Adoption | undefined) => void;
-  setReproductiveRole: (id: string, role: ReproductiveRole | undefined) => void;
-  /** The woman who carried the child when not its genetic mother; undefined clears it. */
-  setCarriedBy: (childId: string, carrierId: string | undefined) => void;
-  /** Parents of the child who are not genetic parents (dashed line). */
-  setSocialParents: (childId: string, parentIds: string[]) => void;
-  setIndividualTag: (individualId: string, tagId: string, on: boolean) => void;
-  /**
-   * Age of onset of the affected status (tagId null) or of a condition
-   * tag. An empty or blank value removes it.
-   */
-  setOnset: (individualId: string, tagId: string | null, value: string) => void;
-  // Batch status changes on a multiple selection. Each is one undo step
-  // and a no-op (no undo step) when nobody would change; the rules are the
-  // single-person setters' applied to each person.
-  setAffectedMany: (ids: string[], affected: boolean) => void;
-  setDeceasedMany: (ids: string[], deceased: boolean) => void;
-  /** Carrier dot, presymptomatic line or neither, kept exclusive as `setCarrier` / `setPresymptomatic` do. */
-  setCarrierStatusMany: (ids: string[], status: CarrierStatus) => void;
-  /** Refused with the reason (see `batchSexProblem`); monozygotic twins follow. */
-  setSexMany: (ids: string[], sex: Sex) => string | null;
-  setIndividualTagMany: (ids: string[], tagId: string, on: boolean) => void;
-  /** `setConditionStatus` for several people, one undo step. */
-  setConditionStatusMany: (ids: string[], tagId: string, state: ConditionState) => void;
-}
 
 export function personSlice(tools: EditTools): PersonSlice {
   const { get, mutate, editIndividual, mutateEach } = tools;

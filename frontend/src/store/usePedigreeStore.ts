@@ -4,7 +4,7 @@ import { produce } from "immer";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { applyFixEdit } from "../pedigree/validation";
 import { filterHidingNew, rootsHidingNew } from "../pedigree/collapse";
-import type { EditTools, PedigreeState } from "./pedigree/tools";
+import type { EditTools, PedigreeState } from "./pedigree/state";
 import { selectOnly, selectionOf, viewSlice } from "./pedigree/view";
 import { structureSlice } from "./pedigree/structure";
 import { personSlice } from "./pedigree/person";

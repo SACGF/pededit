@@ -1,43 +1,14 @@
 import { removeWithDescendantsSet } from "../../pedigree/removal";
 import { setParentsProblem } from "../../pedigree/parents";
 import { collapseInfo } from "../../pedigree/collapse";
-import type { Gamete } from "../../pedigree/assistedEdits";
 import { isSameSexCouple } from "../../pedigree/sameSex";
-import type { EditTools } from "./tools";
+import type { EditTools, ViewSlice } from "./state";
 
 /**
  * What is selected, hovered, being picked or shown as a notice: how the
  * editor is being looked at and used, none of it saved with the pedigree
  * or undoable.
  */
-
-/**
- * On-canvas picking: clicks choose existing individuals instead of
- * selecting. "parents" collects one or two parents for a child; "child"
- * takes one click, the individual who becomes a child of the partnership
- * (of `geneticParentId` and a donor, for a same-sex couple).
- * "partner" takes one click, the existing individual who becomes the
- * partner of individualId. "relatedness" takes one click and selects
- * that person with individualId, so the panel shows how the two are related.
- * "donor" and "surrogate" take one click, an existing person who
- * becomes the child's sperm or egg donor or the surrogate who carried them.
- */
-export type Picking =
-  | { kind: "parents"; childId: string; picked: string[] }
-  | { kind: "child"; partnershipId: string; geneticParentId?: string }
-  | { kind: "partner"; individualId: string }
-  | { kind: "relatedness"; individualId: string }
-  | { kind: "donor"; childId: string; gamete: Gamete }
-  | { kind: "surrogate"; childId: string };
-
-/** A short message for the canvas page to show (refusals, what an edit did). Not undoable. */
-export interface Notice {
-  id: number;
-  kind: "info" | "error";
-  text: string;
-  /** Offer an Undo button. */
-  undoable?: boolean;
-}
 
 /**
  * Selection fields for selecting exactly `id` (or nothing). Every store write
@@ -63,72 +34,6 @@ export function selectedPair(state: { selectedId: string | null; selectedIds: st
   if (state.selectedIds.length !== 2 || !state.selectedId) return null;
   const other = state.selectedIds.find(id => id !== state.selectedId)!;
   return [other, state.selectedId];
-}
-
-export interface ViewSlice {
-  /**
-   * Selection. `selectedIds` holds every selected individual id;
-   * `selectedId` is the primary one (the last clicked), which the edit
-   * panel and single-person actions use. With nothing selected they are
-   * [] and null; with one, [id] and id. Kept in step by the actions below,
-   * never set directly. `selectedPair` reads exactly two.
-   */
-  selectedId: string | null;
-  selectedIds: string[];
-  /** The person outlined on the canvas while a problem is hovered in the problems list. Not undoable. */
-  problemHighlightId: string | null;
-  /**
-   * A person the canvas should bring into view, panning but not zooming,
-   * if their node is off-screen: set by a toolbar add and by going to
-   * a problem. `n` changes on
-   * every request so the same id can be asked for twice. Not undoable.
-   */
-  revealRequest: { id: string; n: number } | null;
-  /** The latest notice for the page to show, or null. */
-  notice: Notice | null;
-  setNotice: (notice: Omit<Notice, "id"> | null) => void;
-  /**
-   * The canvas draws the pedigree bent round a U (#220), the U-shape
-   * export's figure, instead of the editable chart. A way of looking, so not
-   * saved with the pedigree and not undoable; opening a pedigree turns it
-   * off. Turning it on cancels any picking, which needs the chart.
-   */
-  uShapeView: boolean;
-  setUShapeView: (on: boolean) => void;
-  /** Active on-canvas picking, or null. Not undoable. */
-  picking: Picking | null;
-  startPickingParents: (childId: string) => void;
-  startPickingChild: (partnershipId: string, geneticParentId?: string) => void;
-  startPickingPartner: (individualId: string) => void;
-  startPickingRelatedness: (individualId: string) => void;
-  /** Pick an existing person as the child's sperm or egg donor, or as the surrogate. */
-  startPickingDonor: (childId: string, gamete: Gamete) => void;
-  startPickingSurrogate: (childId: string) => void;
-  cancelPicking: () => void;
-  /**
-   * Handle a click on an individual while picking. For parents: adds (or
-   * removes) them from the picked list, refusing with a notice when the
-   * rules say no, and applies as soon as two are picked. For a child or a
-   * partner: applies at once. Returns true when the click was consumed.
-   */
-  pickIndividual: (id: string) => boolean;
-  /** Apply the parents picked so far (one parent gets a placeholder partner). */
-  applyPicking: () => void;
-  /** Select only this individual, or clear the selection with null. */
-  setSelectedId: (id: string | null) => void;
-  /** Select one person and pan to them if their node is off-screen (`revealRequest`): going to a problem. */
-  selectAndReveal: (id: string) => void;
-  /** Shift / Ctrl / Cmd+click: add id to the selection (as primary) or take it out. */
-  toggleSelected: (id: string) => void;
-  /** Replace the selection (rubber band, select descendants). Primary defaults to the last id. */
-  setSelection: (ids: string[], primary?: string | null) => void;
-  /**
-   * Select a person, their descendants and the partners who married into
-   * that branch (the "remove with descendants" set), with the person
-   * as primary. Returns how many are selected.
-   */
-  selectDescendants: (id: string) => number;
-  setProblemHighlightId: (id: string | null) => void;
 }
 
 export function viewSlice(tools: EditTools): ViewSlice {

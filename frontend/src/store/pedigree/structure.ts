@@ -1,13 +1,13 @@
-import type { Pedigree, Individual, Sex, Partnership } from "@pedigree-editor/layout-engine";
+import type { Pedigree, Individual, Partnership } from "@pedigree-editor/layout-engine";
 import { removeWithDescendantsSet, removeWithAncestorsSet, removeIndividuals } from "../../pedigree/removal";
 import { setParentsProblem } from "../../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../../pedigree/placeholders";
 import { linkPartnerProblem } from "../../pedigree/partners";
 import { kinshipOf } from "../../pedigree/relatedness";
-import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, type Gamete } from "../../pedigree/assistedEdits";
+import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate } from "../../pedigree/assistedEdits";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../../pedigree/sameSex";
 import { newId, fatherFirst, nextSibOrderInFamily, nextRootSibOrder, makeIndividual, makePlaceholder, oppositeSex, addCouple, addPlaceholderFor, ensureChildPartnershipId, leaveParents, tidyCoupleLeft, clearChildless } from "./draft";
-import type { EditTools } from "./tools";
+import type { EditTools, StructureSlice } from "./state";
 import { childrenOf, couplesOf, parentCoupleOf, partnerIn, raisedChildrenOf } from "../../pedigree/graph";
 
 /**
@@ -17,75 +17,6 @@ import { childrenOf, couplesOf, parentCoupleOf, partnerIn, raisedChildrenOf } fr
 
 /** Clamp the batch size accepted by addChildren. */
 export const MAX_ADD_CHILDREN = 10;
-
-export interface StructureSlice {
-  addIndividual: (sex: Sex) => void;
-  addParent: (individualId: string, sex: Sex) => void;
-  addChild: (individualId: string, sex: Sex) => void;
-  addChildren: (individualId: string, count: number, sex: Sex, partnershipId?: string) => void;
-  addSibling: (individualId: string) => void;
-  addPartner: (individualId: string) => void;
-  /**
-   * Make two existing individuals partners, which is how a marriage
-   * between relatives is drawn. The new partnership has no children, keeps
-   * the father role first. Nothing records that they are related: the double
-   * line comes from their kinship (#85). Returns the reason when refused,
-   * else null.
-   */
-  linkPartner: (individualId: string, partnerId: string) => string | null;
-  deleteIndividual: (individualId: string) => void;
-  /**
-   * Delete several individuals as one undo step (Delete with a multiple
-   * selection); children stay, as founders. Refused, with an error
-   * notice, when nobody would be left. Returns how many were removed.
-   */
-  deleteIndividuals: (individualIds: string[]) => number;
-  /**
-   * Remove these individuals with everyone below them, plus partners who
-   * married in and have no other link. Refused, with an error notice,
-   * when nobody would be left. Returns how many were removed.
-   */
-  removeWithDescendants: (individualIds: string[]) => number;
-  /** Remove these individuals with everyone above them; their descendants become founders. */
-  removeWithAncestors: (individualIds: string[]) => number;
-  /**
-   * Make one or two existing individuals the parents of childId. Uses
-   * their existing partnership or creates one; a single parent gets a new
-   * unknown-sex partner. A
-   * child who already has parents is moved. Returns the reason when
-   * refused, else null.
-   */
-  setParents: (childId: string, parentIds: string[]) => string | null;
-  /**
-   * Take childId out of their parents' sibship: they become a founder
-   * and the parents stay, as a couple (a gamete donor pair left with no
-   * children is removed, as it is not a couple).
-   */
-  /**
-   * Make an existing person a child of a same-sex couple: of
-   * `geneticParentId` and a donor, the other partner a social parent (see
-   * `applySameSexChildren`). Returns the reason when refused.
-   */
-  setSameSexChild: (childId: string, partnershipId: string, geneticParentId: string) => string | null;
-  detachFromParents: (childId: string) => void;
-  /**
-   * Remove a partnership without removing either person, for a
-   * partner linked by mistake. Refused, with the reason, while it has
-   * children: they would lose a parent, so move them first.
-   */
-  removePartnership: (partnershipId: string) => string | null;
-  moveSibLeft: (individualId: string) => void;
-  moveSibRight: (individualId: string) => void;
-  /**
-   * Assisted reproduction. addDonor makes a new sperm or egg donor the
-   * child's genetic parent in place of one parent, who stays linked to the
-   * child (see `applyAddDonor` in pedigree/assisted.ts); addSurrogate adds
-   * the woman who carried the child. Both return a reason when refused.
-   * `existingId` makes someone already on the tree the donor or surrogate.
-   */
-  addDonor: (childId: string, gamete: Gamete, existingId?: string) => string | null;
-  addSurrogate: (childId: string, existingId?: string) => string | null;
-}
 
 export function structureSlice(tools: EditTools): StructureSlice {
   const { get, mutate, nameOr } = tools;

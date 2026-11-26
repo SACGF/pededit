@@ -353,16 +353,18 @@ reporting is off, and the dev server never reports.
   `isDirty` only if the pedigree was not edited while it ran.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
   the undo and redo stacks, and the one way an edit is made. The actions
-  are in `store/pedigree/`, one file per kind of edit, each action's type
-  beside its code: `structure.ts` (add and remove people, couples, parents,
+  are in `store/pedigree/`, one file per kind of edit: `structure.ts` (add and remove people, couples, parents,
   children, donors), `person.ts` (what is recorded about a person, and the
   batch setters), `couple.ts` (a couple's fields, twins, swap sides, draw
   beside), `chart.ts` (title, settings, conditions and tags, filters, pins,
   locks) and `view.ts` (selection, picking, notices, the U-shape view:
   nothing saved or undoable). Add new edits there, not in components.
+  Their types (one slice interface per file, `PedigreeState`, `EditTools`)
+  are all in `store/pedigree/state.ts`, which imports none of the action
+  files, so the store has no import cycle.
   - Every edit goes through `mutate` (or `editIndividual`,
     `editPartnership`, `mutateEach`, which call it), handed to each file as
-    `EditTools` (`store/pedigree/tools.ts`). It applies an Immer recipe as
+    `EditTools`. It applies an Immer recipe as
     one undo step, and a recipe that changes nothing is not an edit: no
     undo step, the redo stack is kept and `isDirty` stays as it was. So an
     action does not check first whether it would change anything; its
@@ -508,6 +510,11 @@ reporting is off, and the dev server never reports.
 ## Conventions
 
 - Tests sit in `__tests__/` next to the code they cover.
+- No import cycles: `npx madge --circular --extensions ts,tsx frontend/src`
+  (from the repo root; madge is fetched by npx, not a dependency) should
+  print "No circular dependency found". A cycle that only works because
+  its imports are used inside functions breaks at load once one is used at
+  the top level. Nothing in `npm run check` runs it.
 - Use `@/` for `src/` imports in components; relative paths elsewhere are fine.
 - Draw once: the canvas and the SVG exporters render the same components in
   `pedigree/chart/`, so a drawing change goes there, and shared geometry goes
