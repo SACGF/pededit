@@ -64,7 +64,7 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
   const codes = (s: string) => lintExportSvg(trio, flow, s).map(f => f.code);
   const section = (s: string, cls: string) => {
     const start = s.indexOf(`<g class="${cls}">`);
-    return [start, s.indexOf("\n</g>", start)] as const;
+    return [start, s.indexOf('</g><g class="', start)] as const;
   };
 
   it("is clean as exported", () => {

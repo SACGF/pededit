@@ -23,7 +23,7 @@ function makePedigree(overrides: Partial<Pedigree> = {}): Pedigree {
  * marker, labels and key have fills of their own, so a test of what a symbol
  * draws has to look here and not at the whole file.
  */
-const symbolsOf = (svg: string) => svg.match(/<g class="symbols">\n([^]*?)\n<\/g>\n<g class="labels">/)![1]!;
+const symbolsOf = (svg: string) => svg.match(/<g class="symbols">([^]*?)<\/g><g class="labels">/)![1]!;
 const one = (ind: Partial<Pedigree["individuals"][number]>) =>
   makePedigree({ individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, ...ind }] });
 
@@ -226,7 +226,7 @@ describe("exportSvg — relationship lines", () => {
     const parsed = parseExportSvg(svg);
     expect(parsed.couples).toHaveLength(simpleFamily.partnerships.length);
     const families = Object.values(simpleFamily.parentOf).filter(kids => kids.length > 0);
-    expect(svg.match(/<g class="sibship-lines">\n(.*)\n<\/g>/)![1]!.match(/<path /g)).toHaveLength(families.length);
+    expect(svg.match(/<g class="sibship-lines">(.*?)<\/g><g class="assisted-lines">/)![1]!.match(/<path /g)).toHaveLength(families.length);
     expect(lintExport(simpleFamily)).toEqual([]);
   });
 

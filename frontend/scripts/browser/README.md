@@ -235,10 +235,10 @@ scene is in it at its place, matching symbols by position since the export
 carries no ids, and how the figure is composed: the title clear of the
 drawing, the key below it, nothing outside the figure. PNG and PDF are made
 from this SVG, so they are covered; the U-shape export has its own lint
-(`--u-shape`). It relies on the group classes `exportSvg` writes
+(`--u-shape`). It relies on the group classes `Chart` writes
 (`couple-lines`, `sibship-lines`, `symbols`, `labels`, ...) and
 `data-childless`, `data-ended` and `data-twin-mark` on marks; keep them when
-changing the exporter. In vitest it is `src/io/svg/__tests__/exportLint.test.ts`;
+changing the chart. In vitest it is `src/io/svg/__tests__/exportLint.test.ts`;
 in a page, `__pededit.checkExport()`.
 
 ### compare.mjs: did the drawing change between two commits?

@@ -4,24 +4,7 @@
 <rect width="246" height="441" fill="white"/>
 <g class="chart-title"><text x="123" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Full-sib mating</text></g>
 <g transform="translate(60 100)">
-<g class="couple-lines">
-<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 82 L 48 82" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 86 L 48 86" stroke="black" stroke-width="2" fill="none"></path>
-</g>
-<g class="sibship-lines">
-<path d="M 34 0 L 34 42 M 0 42 L 68 42 M 0 42 L 0 64 M 68 42 L 68 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 84 L 34 126 M 34 126 L 34 126 M 34 126 L 34 148" stroke="black" stroke-width="2" fill="none"></path>
-</g>
-<g class="assisted-lines">
-</g>
-<g class="duplicate-arcs">
-</g>
-<g class="symbols">
-<g transform="translate(0 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(34 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g>
-</g>
-<g class="labels">
-<g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(48 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(-20 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(48 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(14 148)"><g transform="translate(20 20)" style="user-select:none"></g></g>
-</g>
-<g class="consanguinity-labels">
-</g>
+<g class="couple-lines"><path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 82 L 48 82" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 86 L 48 86" stroke="black" stroke-width="2" fill="none"></path></g><g class="sibship-lines"><path d="M 34 0 L 34 42 M 0 42 L 68 42 M 0 42 L 0 64 M 68 42 L 68 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 84 L 34 126 M 34 126 L 34 126 M 34 126 L 34 148" stroke="black" stroke-width="2" fill="none"></path></g><g class="assisted-lines"></g><g class="duplicate-arcs"></g><g class="symbols"><g transform="translate(0 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(34 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g></g><g class="labels"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(48 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(-20 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(48 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(14 148)"><g transform="translate(20 20)" style="user-select:none"></g></g></g><g class="consanguinity-labels"></g>
 </g>
 <g class="pedigree-key" transform="translate(0 353)">
 <g transform="translate(56 12) scale(0.667) translate(-14 -14)"><svg width="28" height="28" viewBox="-2 -2 28 28"><rect x="1" y="1" width="22" height="22" stroke="black" stroke-width="2" fill="black"></rect></svg></g><text x="80" y="16" font-family="sans-serif" font-size="10" fill="black">Affected</text>

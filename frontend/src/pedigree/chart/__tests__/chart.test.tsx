@@ -10,6 +10,9 @@ import { Chart } from "../Chart";
  * provider, so the same components can draw an export (#139).
  */
 
+/** The groups `Chart` draws in, bottom to top. */
+const GROUPS = ["couple-lines", "sibship-lines", "assisted-lines", "duplicate-arcs", "symbols", "labels", "consanguinity-labels"];
+
 /** Text as React writes it into markup. */
 const escapeText = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;");
 
@@ -32,7 +35,8 @@ describe("Chart renders every fixture and example to a string, with no provider"
           expect(svg).toContain(`>${escapeText(line)}</text>`);
         }
         // Presentation attributes only: nothing that needs the page's CSS.
-        expect(svg).not.toMatch(/\bclass=/);
+        // The one class is on each kind's group, for the export lint.
+        expect([...svg.matchAll(/\bclass="([^"]+)"/g)].map(m => m[1])).toEqual(GROUPS);
         // Clip path ids carry the prefix, so two charts on a page cannot clash.
         for (const m of svg.matchAll(/<clipPath id="([^"]+)"/g)) expect(m[1]!.startsWith("t-")).toBe(true);
       }

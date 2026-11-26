@@ -23,9 +23,9 @@
  *
  * Symbols are matched to people by position: the export carries no ids
  * (they could be names after a PED import, which de-identification must not
- * leak). It relies on the group classes `exportSvg` writes (couple-lines,
+ * leak). It relies on the group classes `Chart` writes (couple-lines,
  * sibship-lines, assisted-lines, duplicate-arcs, symbols, labels,
- * consanguinity-labels, chart-title, pedigree-key) and the
+ * consanguinity-labels), the exporter's chart-title and pedigree-key, and the
  * `data-childless`, `data-ended` and `data-twin-mark` on marks, which are
  * not connecting lines.
  */

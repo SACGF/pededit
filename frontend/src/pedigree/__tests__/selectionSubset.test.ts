@@ -184,7 +184,7 @@ describe("a figure of the selected people (#215)", () => {
     const flow = buildScene(drawn);
     expect(flow.duplicates).toEqual([]);
     expect(flow.people.filter(n => n.individual?.id === id)).toHaveLength(1);
-    expect(exportSvg(drawn, {})).toContain('<g class="duplicate-arcs">\n</g>');
+    expect(exportSvg(drawn, {})).toContain('<g class="duplicate-arcs"></g>');
     expect(lintExport(drawn, {})).toEqual([]);
   });
 

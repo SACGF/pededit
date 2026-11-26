@@ -118,9 +118,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 ## svg/ — figure export
 
 - `svgExporter.tsx` draws everything from the scene (`buildScene`, #143,
-  #146): positions from its people, couple and sibship lines through
-  `pedigree/lineGeometry.ts`, assisted lines and duplicate arcs from theirs,
-  and the figure's size from `scene.bounds`. Nothing under `io/` imports
+  #146) by rendering `pedigree/chart/Chart.tsx` with `figure` (names always
+  wrapped), the one mapping of a scene to the chart components, and takes
+  the figure's size from `scene.bounds`. It adds only the title band and
+  the key, worked out once per export. Nothing under `io/` imports
   React Flow (`sceneImports.test.ts`).
   It never calls the layout engine and imports only types from it (a test in
   `svgExporter.test.ts` holds it to that). What is drawn for each person
@@ -217,10 +218,10 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   (`title-collides` for the title in its own band, `key-collides`,
   `outside-figure`). `lint.mjs` and `__pededit.checkExport()` leave out the
   render lint for a plain export, whose scene `check()` has already linted.
-  It parses the SVG, so `svgExporter.tsx` must keep writing its group
-  classes (`couple-lines`, `sibship-lines`, `assisted-lines`,
-  `duplicate-arcs`, `symbols`, `labels`, `consanguinity-labels`,
-  `chart-title`, `pedigree-key`), and the chart
+  It parses the SVG, so `pedigree/chart/Chart.tsx` must keep writing its
+  group classes (`couple-lines`, `sibship-lines`, `assisted-lines`,
+  `duplicate-arcs`, `symbols`, `labels`, `consanguinity-labels`), the
+  exporter `chart-title` and `pedigree-key`, and the chart
   components their `data-childless`, `data-ended` and `data-twin-mark` on
   marks that join nobody. Sibship lines are read from their paths'
   "M x y L x y" runs, dashed arcs with `pathPoints`. The canvas title is a

@@ -25,10 +25,12 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   its marks, the text under it), `PersonSymbol` (everything at one person,
   from the glyph), `CoupleLine`, `ChildlessMark`, `SibshipLines`,
   `AssistedLine`, `DuplicateArc`, `ConsanguinityLabel`, `ChartTitle`,
-  `keySwatches` (the key's swatches), and `Chart`, a whole scene. Nothing under
-  `chart/` imports React Flow or a store (`sceneImports.test.ts`), uses a
-  class name or page CSS (presentation attributes only, as the export
-  needs), or makes up its own ids: clip path and marker ids are props.
+  `keySwatches` (the key's swatches), and `Chart`, a whole scene, which is
+  what `exportSvg` draws (the one place a scene is mapped to the
+  components for a file). Nothing under `chart/` imports React Flow or a
+  store (`sceneImports.test.ts`), uses page CSS (presentation attributes
+  only, as the export needs; `Chart`'s group classes are only for the
+  export lint), or makes up its own ids: clip path and marker ids are props.
   The canvas's nodes and edges (`nodes/`, `edges/`) are wrappers that read
   live positions and the store and add what only the editor has: hover,
   selection, picking, the hover pill, the pin dot and problem marker, the
