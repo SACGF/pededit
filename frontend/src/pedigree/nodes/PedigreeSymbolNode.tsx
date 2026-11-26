@@ -35,10 +35,9 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isNameHovered, setIsNameHovered] = useState(false);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Each read from the store is a selector giving this person's own answer,
-  // so a change elsewhere in the store (a hover sets `hoveredId`) redraws
-  // only the people whose answer changed, not every symbol (#197).
+  // so a change elsewhere in the store redraws only the people whose
+  // answer changed, not every symbol (#197).
   const id = individual.id;
-  const setHoveredId = usePedigreeStore(s => s.setHoveredId);
   const setSelectedId = usePedigreeStore(s => s.setSelectedId);
   const toggleSelected = usePedigreeStore(s => s.toggleSelected);
   const pickIndividual = usePedigreeStore(s => s.pickIndividual);
@@ -82,7 +81,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   function scheduleHide() {
     hideTimeout.current = setTimeout(() => {
       setIsPillVisible(false);
-      setHoveredId(null);
     }, 150);
   }
 
@@ -101,7 +99,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
     if (touchDown.current && isSmallScreen()) return;
     cancelHide();
     setIsPillVisible(true);
-    setHoveredId(individual.id);
   }
 
   function handleMouseLeave() {

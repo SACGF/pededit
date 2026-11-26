@@ -42,6 +42,8 @@ describe("usePedigreeStore setCarrier", () => {
   it("is a no-op for an unknown id", () => {
     get().setCarrier("nope", true);
     expect(ind("a").carrier).toBeUndefined();
+    expect(get().past).toHaveLength(0);
+    expect(get().isDirty).toBe(false);
   });
 
   it("keeps the affected flag untouched", () => {
@@ -70,8 +72,17 @@ describe("usePedigreeStore setCarrier", () => {
   it("clears the redo stack when a new change is made after undo", () => {
     get().setCarrier("a", true);
     get().undo();
-    get().setCarrier("a", false);
+    get().setAffected("a", true);
     expect(get().future).toHaveLength(0);
     expect(ind("a").carrier).toBeFalsy();
+  });
+
+  it("keeps the redo stack when an action after undo changes nothing", () => {
+    get().setCarrier("a", true);
+    get().undo();
+    get().setCarrier("a", false);
+    expect(get().past).toHaveLength(0);
+    get().redo();
+    expect(ind("a").carrier).toBe(true);
   });
 });

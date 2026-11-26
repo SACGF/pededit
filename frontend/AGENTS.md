@@ -330,19 +330,37 @@ reporting is off, and the dev server never reports.
   last save failed or an over-limit save is still running. A save clears
   `isDirty` only if the pedigree was not edited while it ran.
 - `store/usePedigreeStore.ts` — the editing model: the `Pedigree` object,
-  undo/redo stacks, selection, every structural edit
-  (addParent/addChild/addSibling/addPartner/delete/moveSib, remove with
-  descendants or ancestors, setParents and linkPartner with on-canvas
-  picking), flags, pinning,
-  canvas settings, tags. All edits go through immer `produce` and push an undo
-  snapshot. Add new edits here, not in components.
+  the undo and redo stacks, and the one way an edit is made. The actions
+  are in `store/pedigree/`, one file per kind of edit, each action's type
+  beside its code: `structure.ts` (add and remove people, couples, parents,
+  children, donors), `person.ts` (what is recorded about a person, and the
+  batch setters), `couple.ts` (a couple's fields, twins, swap sides, draw
+  beside), `chart.ts` (title, settings, conditions and tags, filters, pins,
+  locks) and `view.ts` (selection, picking, notices, the U-shape view:
+  nothing saved or undoable). Add new edits there, not in components.
+  - Every edit goes through `mutate` (or `editIndividual`,
+    `editPartnership`, `mutateEach`, which call it), handed to each file as
+    `EditTools` (`store/pedigree/tools.ts`). It applies an Immer recipe as
+    one undo step, and a recipe that changes nothing is not an edit: no
+    undo step, the redo stack is kept and `isDirty` stays as it was. So an
+    action does not check first whether it would change anything; its
+    recipe only has to assign what differs (an equal value, or deleting a
+    missing key, is no change to Immer; building a new array is one).
+  - What is not set is absent from the saved pedigree, never `false` or
+    `""`: `setOptional` in `store/pedigree/draft.ts` writes a field that
+    way. That file holds the edits to a pedigree in place that actions
+    share (a new couple, a child leaving its parents, dropping pins).
+  - Pedigrees in the store are never changed in place, so the undo stack
+    holds the objects themselves and an undo puts the same object back.
   Components read it with `usePedigreeStore(s => s.field)` or
   `usePedigreeFields("a", "b")` (a shallow pick), never the bare
-  `usePedigreeStore()`: that re-renders on any change to the store, and a
-  hover sets `hoveredId`, so it redrew every symbol on the canvas (#197, 160
+  `usePedigreeStore()`: that re-renders on any change to the store, which
+  redrew every symbol on the canvas on each hover (#197, 160
   ms a hover at 513 people). A canvas node or hover pill selects its own
   person's answer (`s.problemHighlightId === id`, its problems as a string),
-  never a list or object that is new on every edit.
+  never a list or object that is new on every edit. Code that only acts on
+  an event reads `usePedigreeStore.getState()` in the handler and
+  subscribes to nothing (`hooks/useKeyboardShortcuts.ts`).
   Selection (#21) is `selectedIds` (every selected person) plus `selectedId`,
   the primary (last clicked) one that the Person tab and single-person menu
   items read. Change it only through `setSelectedId` / `toggleSelected` /
@@ -357,7 +375,7 @@ reporting is off, and the dev server never reports.
   `setDeceasedMany`, `setCarrierStatusMany`, `setSexMany`,
   `setIndividualTagMany`) are one undo step each. The #35 setters go
   through `mutateEach`, which skips people already in the target state,
-  pushes no undo step when nobody changes, and posts an undoable notice
+  makes no undo step when nobody changes, and posts an undoable notice
   ("Marked 3 affected."). Their rules and menu counts are in
   `pedigree/batch.ts`.
 - `pedigree/` — rendering. See `src/pedigree/AGENTS.md`.

@@ -193,6 +193,27 @@ describe("detachFromParents and removePartnership (#104)", () => {
     expect(st().pedigree.parentOf.don).toBeUndefined();
   });
 
+  it("moving the last child of a donor pair to other parents removes the pair", () => {
+    st().initialize({
+      ...pedigree(),
+      partnerships: [...pedigree().partnerships, { id: "don", individual1: "loner", individual2: "orphan", donorConception: true }],
+      parentOf: { ...pedigree().parentOf, don: ["preg"] },
+    });
+    expect(st().setParents("preg", ["son", "wife"])).toBeNull();
+    expect(st().pedigree.parentOf.sw).toEqual(["gc1", "preg"]);
+    expect(st().pedigree.partnerships.some(x => x.id === "don")).toBe(false);
+    expect(st().pedigree.parentOf.don).toBeUndefined();
+  });
+
+  it("setting the parents a child already has leaves the couple and its placeholder in place", () => {
+    st().addChild("loner", "female");
+    const couple = st().pedigree.partnerships.find(x => x.individual1 === "loner")!;
+    const child = st().pedigree.parentOf[couple.id]![0]!;
+    expect(st().setParents(child, [couple.individual1, couple.individual2])).toBeNull();
+    expect(st().pedigree.partnerships.find(x => x.id === couple.id)).toEqual(couple);
+    expect(st().pedigree.parentOf[couple.id]).toEqual([child]);
+  });
+
   it("removes a childless partnership, keeping both people; refuses one with children", () => {
     expect(st().linkPartner("orphan", "loner")).toBeNull();
     const pid = st().pedigree.partnerships.find(x => x.individual1 === "loner" || x.individual2 === "loner")!.id;

@@ -9,38 +9,38 @@ function typing(): boolean {
   return !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
 }
 
+/**
+ * The editor's keyboard shortcuts. The handler reads the store when a key
+ * is pressed and subscribes to nothing, so the page that mounts it does
+ * not re-render when the store changes.
+ */
 export function useKeyboardShortcuts() {
-  const { undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, picking, cancelPicking } = usePedigreeStore();
-
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      const store = usePedigreeStore.getState();
+      const { selectedIds, picking, pedigree } = store;
       const meta = e.metaKey || e.ctrlKey;
 
-      if (meta && e.key === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
-      if (meta && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); redo(); }
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedIds.length > 0) {
-        // Guard: don't delete when typing in an input
-        if (document.activeElement?.tagName === "INPUT") return;
-        if (document.activeElement?.tagName === "TEXTAREA") return;
-        if (document.activeElement?.tagName === "SELECT") return;
+      if (meta && e.key === "z" && !e.shiftKey) { e.preventDefault(); store.undo(); }
+      if (meta && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); store.redo(); }
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedIds.length > 0 && !typing()) {
         e.preventDefault();
         // Shift: with descendants; Alt: with ancestors. Every selected person.
-        if (e.shiftKey) removeWithDescendants(selectedIds);
-        else if (e.altKey) removeWithAncestors(selectedIds);
-        else if (selectedIds.length === 1) deleteIndividual(selectedIds[0]!);
-        else deleteIndividuals(selectedIds);
+        if (e.shiftKey) store.removeWithDescendants(selectedIds);
+        else if (e.altKey) store.removeWithAncestors(selectedIds);
+        else if (selectedIds.length === 1) store.deleteIndividual(selectedIds[0]!);
+        else store.deleteIndividuals(selectedIds);
       }
       // A and D: toggle affected / deceased on everyone selected, as one
       // undo step. Mixed selections are all marked; all marked are all cleared.
       const letter = e.key.toLowerCase();
       if ((letter === "a" || letter === "d") && !meta && !e.altKey && !e.repeat && selectedIds.length > 0 && !typing()) {
-        const { pedigree, setAffectedMany, setDeceasedMany } = usePedigreeStore.getState();
         const wanted = new Set(selectedIds);
         const people = pedigree.individuals.filter(i => wanted.has(i.id));
         if (people.length > 0) {
           e.preventDefault();
-          if (letter === "a") setAffectedMany(selectedIds, !people.every(i => affectedControlOn(i, pedigree)));
-          else setDeceasedMany(selectedIds, !people.every(i => i.deceased));
+          if (letter === "a") store.setAffectedMany(selectedIds, !people.every(i => affectedControlOn(i, pedigree)));
+          else store.setDeceasedMany(selectedIds, !people.every(i => i.deceased));
         }
       }
       // F8 / Shift+F8: next / previous problem, also while typing in the
@@ -49,12 +49,12 @@ export function useKeyboardShortcuts() {
         if (stepProblem(e.shiftKey ? -1 : 1)) e.preventDefault();
       }
       if (e.key === "Escape") {
-        if (picking) cancelPicking();
-        else setSelectedId(null);
+        if (picking) store.cancelPicking();
+        else store.setSelectedId(null);
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo, redo, deleteIndividual, deleteIndividuals, removeWithDescendants, removeWithAncestors, selectedIds, setSelectedId, picking, cancelPicking]);
+  }, []);
 }

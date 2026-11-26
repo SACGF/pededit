@@ -50,5 +50,19 @@ export default {
     await t.press("d");
     const p = await t.pedigree();
     t.equal(p.individuals.filter(i => ["g3a", "g3c"].includes(i.id)).map(i => !!i.deceased), [true, true], "the D key marks every selected person deceased");
+
+    const wasAffected = await affected();
+    await t.press("a");
+    t.equal(await affected(), [...new Set([...wasAffected, "g3a", "g3c"])].sort(), "the A key marks every selected person affected");
+    const people = await t.people();
+    const steps = await t.undoDepth();
+    await t.press("Delete");
+    const left = (await t.pedigree()).individuals.map(i => i.id);
+    t.ok(!left.includes("g3a") && !left.includes("g3c"), "the Delete key removes every selected person");
+    t.equal(left.length, people - 2, "and nobody else");
+    t.equal(await selected(), [], "nobody is left selected");
+    t.equal(await t.undoDepth(), steps + 1, "as one undo step");
+    await t.press("Control+z");
+    t.equal(await t.people(), people, "and one undo brings them back");
   },
 };
