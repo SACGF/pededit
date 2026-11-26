@@ -32,6 +32,7 @@ JSON field and the frontend store mirror it.
   - Name the issue as `(#N)` in the commit subject. Never use a closing keyword (`closes`, `fixes`, `resolves`).
   - No GitHub writes beyond raising issues for major work, labelling `Human work required`, putting fixed issues on the current milestone and closing tested issues, unless the user asked.
   - Issues stay open by default. Close one only when tests or the end-to-end flows cover everything it asks; otherwise label it `Human work required` and say what the maintainer must do.
+  - An issue raised by or on behalf of anyone other than the maintainer is never closed by an agent: label it `Human work required` once its code is in.
   - Work you leave undone gets its own issue, never a list buried in a comment.
   - Issue comments cite the commit sha and say nothing about git state ("pushed", "on local main").
 - **Run the checks.** `npm run check` (engine tests, type check, frontend tests, dead code, guide paths, backend tests: about 20 s). `npm run check:pages` runs CI's page checks (servers up first: several minutes).
