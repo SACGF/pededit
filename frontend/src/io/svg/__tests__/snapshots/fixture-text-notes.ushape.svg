@@ -308,7 +308,7 @@
           <rect fill="white" height="10" transform="rotate(-34.2 -22 62)" width="8.5" x="-30" y="58"/>
           <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" transform="rotate(-34.2 -22 62)" x="-22" y="67">P</text>
         </g>
-        <text data-documented-evaluation="true" fill="black" font-family="sans-serif" font-size="14" style="user-select:none" transform="rotate(-34.2 44.5 36)" x="41" y="43">*</text>
+        <text data-documented-evaluation="true" fill="black" font-family="sans-serif" font-size="14" style="user-select:none" x="41" y="43">*</text>
         <g>
           <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">+/-</text>
         </g>

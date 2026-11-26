@@ -35,9 +35,12 @@ export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
 /**
  * Each person as the standard figure and the canvas draw them
  * (`PersonMarks` and `TextUnderSymbol`, #139), turned along the track:
- * the symbol, its outline, slashes, numbers and text all turn with the track,
- * as in the FAME figure the U-shape follows (`claude/export_u_plan.md`); only
- * letters and the "?" and "*" marks are turned back upright. For anyone with a sibship hanging from the
+ * each person's glyph (outline, fills, slash, letters, "?", "*" and the text
+ * under it) is one group turned with the track, as in the FAME figure the
+ * U-shape follows (`claude/export_u_plan.md`). The one exception is the
+ * proband's "P", kept upright: the proband and consultand arrows are read as
+ * marks laid over the chart. The title and the key stand upright too, since
+ * they are not on the track. For anyone with a sibship hanging from the
  * symbol itself (by partners who are not drawn), the line runs down through
  * the text, so it gets a white backing.
  */

@@ -171,7 +171,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   `UShapeLayout` (no SVG in it, so it could move beside the layout engine),
   `connectors.ts` draws the lines along the tracks (this geometry is the
   U-shape's own and stays so), `render.tsx` places each person (`PersonMarks`
-  and `TextUnderSymbol`, turned along the track with letters kept upright)
+  and `TextUnderSymbol`, turned along the track, the proband's "P" kept upright)
   and the consanguinity labels and assembles the figure, `constants.ts` has
   the shared sizes. No symbol or text under one is drawn in `ushape/`. `glyphOf` in `layout.ts` caches each person's glyph per
   pedigree object, so, as with `kinshipOf`, a test that changes a pedigree
@@ -179,11 +179,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   person turns with the track so "down" points outward, as in the FAME
   figure the U-shape follows (`claude/export_u_plan.md`, "Reference"): the
   outline whatever its shape (a square or diamond on a 45 degree stretch is
-  drawn tilted, #171), fills, slashes, the arrow, numbers (the group count
-  too) and the text under the symbol. Only letters inside or beside the
-  symbol (the pregnancy "P", #71, the role letters, the proband "P") and the
-  "?" and "*" marks are turned back upright (`upright`), since on their side
-  they read as other letters. Twins (#11): `sortSibs` averages a set's order
+  drawn tilted, #171), fills, slashes, letters inside the symbol (the
+  pregnancy "P", the role letters), the "?" and "*" marks, numbers (the group
+  count too) and the text under the symbol: one group per person, turned as
+  one. The exception is the proband's "P", turned back upright (`upright` on
+  `PersonMarks`): the proband and consultand arrows are read as marks laid
+  over the chart rather than part of the symbol, so the letter stays
+  relative to the page. Twins (#11): `sortSibs` averages a set's order
   keys so members stay side by side, the root sibship is never split between
   the arms inside a set (`TNode.twinSet`), and the fork is a `diagonalPath`
   in track coordinates, since a straight chord between twins far apart along

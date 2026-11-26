@@ -14,6 +14,27 @@ import { drawnPedigree, isBranchPlaceholderId } from "../../../pedigree/collapse
 
 const NODE_SIZE = 40;
 
+/**
+ * Each text in a person's group with its total turn on the page in degrees
+ * (the sum of the rotations of it and its ancestors), from the SVG string.
+ */
+function textAngles(svg: string, id: string): Array<[string, number]> {
+  const from = svg.indexOf(`<g data-id="${id}"`);
+  expect(from).toBeGreaterThanOrEqual(0);
+  const angleOf = (tag: string) =>
+    [...(/transform="([^"]*)"/.exec(tag)?.[1] ?? "").matchAll(/rotate\(\s*(-?[\d.]+)/g)].reduce((a, m) => a + Number(m[1]), 0);
+  const stack: number[] = [];
+  const out: Array<[string, number]> = [];
+  for (const m of svg.slice(from).matchAll(/<(\/?)(\w+)([^>]*?)(\/?)>([^<]*)/g)) {
+    const [, close, tag, , self, after] = m;
+    if (close) { stack.pop(); if (stack.length === 0) break; continue; }
+    const total = (stack.at(-1) ?? 0) + angleOf(m[0]!);
+    if (tag === "text" && after!.trim()) out.push([after!.trim(), Math.round(total)]);
+    if (!self) stack.push(total);
+  }
+  return out;
+}
+
 const wide = () => makeSyntheticFamily({ seed: 8, generations: 5, minChildren: 2, maxChildren: 5, partnerRate: 0.65 });
 const skewed = () => makeSyntheticFamily({ seed: 20, generations: 6, minChildren: 1, maxChildren: 4, partnerRate: 0.5 });
 
@@ -237,20 +258,29 @@ describe("U-shape SVG", () => {
     expect(svg).toMatch(/<path d="M [^"]* A /);
   });
 
-  it("keeps the pregnancy P upright on a rotated symbol (#71)", () => {
+  it("turns every letter and mark with its symbol, but keeps the proband's P upright", () => {
     const p = wide();
     const layout = layoutUShape(p)!;
-    const rotated = [...layout.nodes.values()].find(n => Math.abs(n.rotation) === 90)!;
-    expect(rotated).toBeDefined();
+    const rotated = [...layout.nodes.values()].filter(n => Math.abs(n.rotation) === 90);
+    expect(rotated.length).toBeGreaterThanOrEqual(3);
     // A fresh pedigree: glyphs are kept per pedigree object.
     const q = structuredClone(p);
-    const ind = q.individuals.find(i => i.id === rotated.id)!;
-    ind.lifeStatus = "pregnancy";
+    const at = (k: number) => q.individuals.find(i => i.id === rotated[k]!.id)!;
+    at(0).lifeStatus = "pregnancy";
+    Object.assign(at(1), { proband: true, familyHistoryUnknown: true, evaluations: [{ detail: "echo", result: "positive", documented: true }] });
+    Object.assign(at(2), { reproductiveRole: "donor" });
     const svg = exportUShapeSvg(q, { personIds: true });
-    const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g></g>\n`))!;
-    expect(group).not.toBeNull();
-    // Turned back about the symbol's centre, in its box.
-    expect(group[2]).toMatch(new RegExp(`<g transform="rotate\\(${-Number(group[1])} 20 20\\)"><text[^>]*>P</text>`));
+    // Pregnancy "P": turned with the track.
+    expect(textAngles(svg, at(0).id)).toContainEqual(["P", rotated[0]!.rotation]);
+    // The proband arrow's "P" stays upright; "?" and "*" turn with the track.
+    const marks = textAngles(svg, at(1).id);
+    expect(marks).toContainEqual(["P", 0]);
+    expect(marks).toContainEqual(["?", rotated[1]!.rotation]);
+    expect(marks).toContainEqual(["*", rotated[1]!.rotation]);
+    // Role letter "D": turned with the track.
+    expect(textAngles(svg, at(2).id)).toContainEqual(["D", rotated[2]!.rotation]);
+    // No text in a person's group is turned other than with the track or upright.
+    for (const n of rotated) for (const [, a] of textAngles(svg, n.id)) expect([0, n.rotation]).toContain(a);
   });
 
   it("draws the childless mark for a couple with no children (#15)", () => {

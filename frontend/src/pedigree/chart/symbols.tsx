@@ -72,16 +72,7 @@ interface ShapeProps {
   size: number;
   /** Unique id for this symbol's clipPath. Needed when the paint has sectors. */
   clipId?: string;
-  /**
-   * Degrees to turn the letters ("D", "S", the "P" of a pregnancy) back by,
-   * for a symbol drawn turned (the U-shape): on their side they read as other
-   * letters. Slashes turn with the symbol.
-   */
-  upright?: number;
 }
-
-/** A turn of `deg` degrees about (x, y), or nothing for none. */
-const turn = (deg: number | undefined, x: number, y: number) => (deg ? { transform: `rotate(${deg} ${x} ${y})` } : {});
 
 /**
  * Tag sectors, clipped to the symbol outline. The radius is the full symbol
@@ -331,7 +322,7 @@ export function AdoptionBrackets({ size, adopted }: { size: number; adopted: str
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright }: ShapeProps) {
+export function SymbolShape({ glyph, size, clipId: id = "symbol-clip" }: ShapeProps) {
   const { paint, shape } = glyph;
   const fill = symbolFill(paint);
   const { sectors, core } = paint;
@@ -350,7 +341,7 @@ export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright }
           : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
         {paint.line && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
-        {status === "pregnancy"  && <g {...turn(upright, size / 2, size / 2)}><PregnancyMark size={size} fill={fill} /></g>}
+        {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
         {status === "stillbirth" && (
           <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
         )}
@@ -364,7 +355,7 @@ export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright }
       <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {paint.line && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
-      {glyph.letter && <g {...turn(upright, size / 2, size / 2)}><RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} /></g>}
+      {glyph.letter && <RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} />}
     </g>
   );
 }
@@ -437,6 +428,9 @@ export function ProbandMarkerDef({ id = "proband-arrowhead" }: { id?: string }) 
   );
 }
 
+/** A turn of `deg` degrees about (x, y), or nothing for none. */
+const turn = (deg: number | undefined, x: number, y: number) => (deg ? { transform: `rotate(${deg} ${x} ${y})` } : {});
+
 /**
  * NSGC proband or consultand arrow: solid arrowhead pointing up-right
  * at the symbol's bottom-left corner, with a "P" at the tail for the proband
@@ -472,12 +466,12 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
 }
 
 /** "?" above the symbol: family history not known. Placement in `familyHistory.ts`. */
-export function FamilyHistoryMark({ size, hasParents, upright }: { size: number; hasParents: boolean; upright?: number }) {
+export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParents: boolean }) {
   const p = familyHistoryMarkAt(size, hasParents);
   return (
     <text
       data-family-history-unknown
-      x={p.x} y={p.y} {...turn(upright, p.x, p.y - FAMILY_HISTORY_FONT_SIZE / 3)}
+      x={p.x} y={p.y}
       textAnchor="middle" fontFamily="sans-serif" fontSize={FAMILY_HISTORY_FONT_SIZE} fontWeight="bold" fill="black"
       style={{ userSelect: "none" }}
     >
@@ -487,12 +481,12 @@ export function FamilyHistoryMark({ size, hasParents, upright }: { size: number;
 }
 
 /** "*" at the lower right: a documented evaluation. Placement in `evaluation.ts`. */
-export function DocumentedMark({ size, adopted, upright }: { size: number; adopted: boolean; upright?: number }) {
+export function DocumentedMark({ size, adopted }: { size: number; adopted: boolean }) {
   const p = documentedMarkAt(size, adopted);
   return (
     <text
       data-documented-evaluation
-      x={p.x} y={p.y} {...turn(upright, p.x + 3.5, p.y - DOCUMENTED_FONT_SIZE / 2)}
+      x={p.x} y={p.y}
       fontFamily="sans-serif" fontSize={DOCUMENTED_FONT_SIZE} fill="black"
       style={{ userSelect: "none" }}
     >

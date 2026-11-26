@@ -48,16 +48,20 @@ export function PersonMarks({ glyph, clipId, markerId = "proband-arrowhead", siz
   clipId: string;
   markerId?: string;
   size?: number;
-  /** Degrees to turn letters and marks back by when the symbol is drawn turned (the U-shape). */
+  /**
+   * Degrees to turn the proband's "P" back by when the symbol is drawn turned
+   * (the U-shape): the arrows are read as marks laid over the chart. Every
+   * other letter and mark turns with the symbol.
+   */
   upright?: number;
 }) {
   return (
     <>
-      <SymbolShape glyph={glyph} size={size} clipId={clipId} upright={upright} />
+      <SymbolShape glyph={glyph} size={size} clipId={clipId} />
       {glyph.deceased && <DeceasedSlash size={size} />}
       {glyph.arrow && <ProbandArrow size={size} kind={glyph.arrow} markerId={markerId} upright={upright} />}
-      {glyph.familyHistoryUnknown && <FamilyHistoryMark size={size} hasParents={glyph.hasParents} upright={upright} />}
-      {glyph.documented && <DocumentedMark size={size} adopted={!!glyph.adopted} upright={upright} />}
+      {glyph.familyHistoryUnknown && <FamilyHistoryMark size={size} hasParents={glyph.hasParents} />}
+      {glyph.documented && <DocumentedMark size={size} adopted={!!glyph.adopted} />}
       <AnnotationRow items={glyph.annotations} size={size} offsetY={textUnder(glyph, []).annotationShift} />
       {glyph.copy !== undefined && <CopyNumber size={size} index={glyph.copy} />}
       {glyph.groupCount !== undefined && <BranchCount size={size} count={glyph.groupCount} />}

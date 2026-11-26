@@ -26,9 +26,11 @@ The U-shape follows it:
   pedigree turned 90 degrees: siblings stacked, a generation per column.
 - Everything about a person turns with the track: the outline (a square or
   diamond on a 45 degree stretch is simply drawn tilted), fills, slashes, the
-  arrow, the individual numbers under the symbol and the counts inside
-  diamonds. Readers turn their heads; PedEdit keeps only letters upright,
-  which the figure does not have.
+  arrow, letters inside the symbol (pregnancy "P", "D", "S"), the "?" and
+  "*" marks, the individual numbers under the symbol and the counts inside
+  diamonds. Readers turn their heads. The one exception is the proband's
+  "P", which stays upright: the proband and consultand arrows are read as
+  marks laid over the chart, relative to the page.
 - Text sits on the outward side of the symbol, along the line of descent.
 
 Where it differs: the figure draws no partners (PedEdit draws them by

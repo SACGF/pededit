@@ -386,7 +386,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   centred, or 9px left of centre when a line of descent comes into the top
   of the symbol (the person has parents drawn). Set from the Person tab
   checkbox and the more / right-click menus. `FamilyHistoryMark` on the
-  canvas, the legend and both exports (upright in the U-shape). It reaches about 13px above the row, inside the title gap.
+  canvas, the legend and both exports (turned with the symbol in the U-shape). It reaches about 13px above the row, inside the title gap.
 
 - `notation.ts`: `canvasSettings.notation`, which NSGC edition is drawn.
   Absent means "nsgc2008" (#115): pedigrees saved before the setting keep

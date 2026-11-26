@@ -178,9 +178,7 @@
           <g>
             <polygon fill="white" points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2"/>
           </g>
-          <g>
-            <text fill="black" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
-          </g>
+          <text fill="black" font-family="sans-serif" font-size="20" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="20" y="27">P</text>
         </g>
       </g>
     </g>
@@ -262,9 +260,7 @@
           <g>
             <polygon fill="white" points="12,1 23,12 12,23 1,12" stroke="black" stroke-width="2"/>
           </g>
-          <g>
-            <text fill="black" font-family="sans-serif" font-size="12" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="16.2">P</text>
-          </g>
+          <text fill="black" font-family="sans-serif" font-size="12" font-weight="bold" style="pointer-events:none;user-select:none" text-anchor="middle" x="12" y="16.2">P</text>
         </g>
       </svg>
     </g>
