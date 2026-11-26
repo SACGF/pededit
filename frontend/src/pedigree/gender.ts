@@ -8,7 +8,7 @@
  * recorded gender identity is drawn with that gender's symbol (square for a
  * man, circle for a woman, diamond for non-binary) and, unless the gender
  * matches their sex, the sex assigned at birth is written under the symbol:
- * AMAB, AFAB or UAAB (unknown). Everyone else draws as before. Pregnancies
+ * AMAB, AFAB or UAAB (unknown). Everyone else is drawn by sex. Pregnancies
  * and losses have no gender identity. "sex" draws biological sex throughout.
  *
  * Framework-free and shared by the canvas, the legend, both SVG

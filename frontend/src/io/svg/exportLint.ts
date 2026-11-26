@@ -33,7 +33,9 @@
  * Symbols are matched to people by position, against the canvas layout:
  * the export carries no ids (they could be names after a PED import, which
  * de-identification must not leak). It relies on the group classes
- * `exportSvg` writes (couple-lines, sibship-lines, symbols, labels) and the
+ * `exportSvg` writes (couple-lines, sibship-lines, assisted-lines,
+ * duplicate-arcs, symbols, labels, consanguinity-labels, chart-title,
+ * pedigree-key) and the
  * `data-childless`, `data-ended` and `data-twin-mark` on marks, which are not
  * connecting lines.
  */
@@ -250,7 +252,7 @@ const segsOf = (pts: Pt[]): Seg[] => pts.slice(1).map((p, i) => [pts[i]![0], pts
 
 /**
  * Lint an exported SVG. `pedigree` is what was drawn (already de-identified if
- * the export was) and `flow` the canvas layout of it, used to name symbols.
+ * the export was) and `scene` the canvas layout of it, used to name symbols.
  */
 export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): ExportLintFinding[] {
   const out: ExportLintFinding[] = [];

@@ -371,7 +371,7 @@ export function filterHidingNew(before: Pedigree, after: Pedigree): boolean {
   return [...now].some(id => !was.has(id));
 }
 
-// ── Diamond ───────────────────────────────────────────────────────────────────
+// ── Group symbol ──────────────────────────────────────────────────────────────
 
 /** Legend wording for the collapsed-branch group symbol. */
 export const COLLAPSED_BRANCH_LABEL = "Unaffected siblings (number); descendants not shown";

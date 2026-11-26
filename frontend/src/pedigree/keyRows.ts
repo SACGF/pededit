@@ -96,7 +96,7 @@ export interface KeyRows {
 export const KEY_DIFFERENCES = {
   /** The legend explains the plain shapes and the plain couple line; a figure's key does not. */
   legendOnly: ["sex", "couple"] as KeyRowKind[],
-  /** The legend lists every defined condition and tag, so an unused one can be ticked; the export key lists those in use. */
+  /** The legend lists every defined condition and tag, an unused one in grey; the export key lists those in use. */
   legendListsUnusedTags: true,
   /** A stillbirth and an ectopic pregnancy name their caption in the export key ("Stillbirth (SB)"). */
   exportLabels: { stillbirth: "Stillbirth (SB)", ectopic: "Ectopic pregnancy (ECT)" } as Partial<Record<LifeStatus, string>>,
@@ -288,7 +288,7 @@ export function keyTagRows(pedigree: Pedigree): KeyTagRow[] {
  * and the export key: who each row's swatch is drawn for (its shape), and its
  * label. Follows what is drawn (`symbolPaint`):
  * - NSGC 2008: "Affected" for a black fill, "Affected, with conditions (black
- *   centre)", "Carrier" for the dot, as before;
+ *   centre)", "Carrier" for the dot;
  * - NSGC 2022: "Affected" only for a solid black fill (affected with no
  *   condition recorded), "Affected, condition not recorded (black centre)"
  *   for the black fill under sectors, "Carrier" for the dotted half.

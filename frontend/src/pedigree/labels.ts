@@ -170,7 +170,7 @@ export function detailsBacked(sections: DetailSection[]): boolean {
  * death", a year or an age rather than a full date, for privacy. The full
  * dates stay in the data, the edit panel and the CSV.
  *
- *   - the free-text age when set ("d. 60s"), alone, as it always was;
+ *   - the free-text age when set ("d. 60s"), alone;
  *   - deceased with full dates of birth and death: the age at death alone,
  *     "d. 72y" ("d. 4 mo", "d. 5 d" under a year or a month);
  *   - otherwise "b. 1935" and "d. 2007", each when known, on two lines when

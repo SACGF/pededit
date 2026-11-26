@@ -11,7 +11,7 @@
  * need the whole pedigree (for example "two or more conditions").
  *
  * `field` names the edit panel field to highlight and focus; the panel
- * wraps each such field in `data-problem-field` (see `PROBLEM_FIELDS`).
+ * wraps each such field in `data-problem-field` (`components/panel/fields.tsx`).
  * `fix` is an optional one-click repair, as data (`FixEdit`): the
  * store's `applyFix` makes the edit.
  *

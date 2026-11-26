@@ -10,9 +10,9 @@ import type { TagFill } from "@pedigree-editor/layout-engine";
 /**
  * Tag helpers shared by the canvas renderer, the SVG exporters and the legend.
  *
- * Everything here is framework-free. The React renderer in chart/symbols.tsx
- * and the string-based exporters both call into the same geometry so the
- * canvas and the exported figure agree.
+ * Everything here is framework-free. The symbol components in
+ * chart/symbols.tsx draw from it for the canvas and the exports alike, so
+ * the canvas and the exported figure agree.
  */
 
 // ── Palette ───────────────────────────────────────────────────────────────────
@@ -478,8 +478,6 @@ export function annotationRow(individual: Individual, pedigree: Pedigree, size =
     return item;
   });
 }
-
-// ── String SVG rendering (exporters) ──────────────────────────────────────────
 
 // ── Legend ────────────────────────────────────────────────────────────────────
 

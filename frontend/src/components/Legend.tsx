@@ -49,8 +49,8 @@ export function Legend({ pedigree: full, onManageTags }: LegendProps) {
   const pedigree = key.pedigree;
   const indRows = key.symbols as SwatchRow[];
   const relRows = key.relationships as SwatchRow[];
-  // Every defined tag is listed so an unused one can still be ticked; the
-  // exported key lists only tags someone carries.
+  // Every defined tag is listed, an unused one in grey; the exported key
+  // lists only tags someone carries.
   const tagRows = key.tags.flatMap(r => (r.kind === "tag" ? [r] : []));
   const details = key.details.flatMap(r => (r.kind === "clinicalDetail" ? [r] : []));
 

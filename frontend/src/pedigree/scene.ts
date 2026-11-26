@@ -153,18 +153,18 @@ export type CoupleLineData = {
 };
 
 /**
- * All geometry for a sibship connection. The SibshipEdge renderer uses
- * leftParentId/rightParentId/childIds to look up current node positions
- * dynamically (via useNodes), so edges stay correct as nodes are dragged.
- * The pre-computed coupleX/Y/sibBarY/childXs/childY values are the layout's
- * own geometry, read by `renderLint`.
+ * All geometry for a sibship connection. The lines are drawn from where
+ * the symbols named by leftParentId/rightParentId/childIds are, so on the
+ * canvas they follow a symbol being dragged (`sibshipLineGeometry`). The
+ * pre-computed coupleX/Y/sibBarY/childXs/childY values are the layout's own
+ * geometry, read by `renderLint`.
  */
 export type SibshipData = {
-  /** React Flow node ID of the left parent. */
+  /** Slot id ("level-slot") of the left parent. */
   leftParentId: string;
-  /** React Flow node ID of the right parent. */
+  /** Slot id of the right parent. */
   rightParentId: string;
-  /** React Flow node IDs of the children, in slot order. */
+  /** Slot ids of the children, in slot order. */
   childIds: string[];
   // Pre-computed geometry (the layout's, not the live node positions):
   /** x (canvas px) where the line of descent leaves the couple line: its midpoint, or an only child's x when that is all but under it (`descentX`). */

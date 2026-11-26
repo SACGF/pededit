@@ -115,9 +115,9 @@ function Sectors({ sectors, size, clipId }: { sectors: Sector[]; size: number; c
 }
 
 /**
- * Fill the region `d` with pattern `fill` in `color`: the React twin of
- * `renderRegionFillSvg` in tagFills.ts, from the same `fillLayers`. `clipId`
- * must be unique on the page; it clips the pattern marks to the region.
+ * Fill the region `d` with pattern `fill` in `color`, from `fillLayers` in
+ * tagFills.ts. `clipId` must be unique on the page; it clips the pattern
+ * marks to the region.
  * Clip to a symbol outline by wrapping this in a clipped <g>.
  */
 export function RegionFill({ fill, color, d, box, clipId }: { fill: TagFill; color: string; d: string; box: FillBox; clipId: string }) {

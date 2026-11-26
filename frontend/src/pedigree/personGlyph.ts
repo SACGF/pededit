@@ -1,7 +1,7 @@
 /**
  * Everything drawn at one person, as plain data, decided once for
  * the canvas node, the SVG export and the U-shape export. `buildScene`
- * puts the result on every node (`RFNodeData.glyph`), where the canvas node
+ * puts the result on every person (`ScenePerson.glyph`), where the canvas node
  * and `exportSvg` read it; the U-shape export, which has its own layout,
  * calls it per person. A renderer draws what the glyph says and asks the
  * pedigree nothing.

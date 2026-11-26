@@ -20,7 +20,7 @@ export { isAffected, isConditionTag };
  * (`conditionMode`), not how many are in use, so every defined condition can
  * be recorded (the drawing divides the symbol by those in use,
  * `sectionConditions` in tags.ts):
- * - none: the Affected and Carrier controls set the plain flags, as before;
+ * - none: the Affected and Carrier controls set the plain flags;
  * - one ("single"): the same controls of A, the more menu and batch also
  *   record that condition, so Affected adds the tag and Carrier adds it to
  *   `carrierTags`. The edit panel does not: it records every condition in
