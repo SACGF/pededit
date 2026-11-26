@@ -290,6 +290,35 @@ class TagPresetTests(APITestCase):
         self.assertEqual(TagPreset.objects.filter(owner=self.alice).count(), 0)
         self.assertEqual(TagPreset.objects.filter(owner=self.bob).count(), 1)
 
+    def test_fill_and_kind_round_trip(self):
+        self.client.force_authenticate(self.alice)
+        resp = self.client.post(
+            "/api/tag-presets/",
+            {"label": "Biobank", "color": "#2ca02c", "style": "quadrant", "fill": "diagonal", "kind": "trait"},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 201, resp.data)
+        [saved] = self.client.get("/api/tag-presets/").json()
+        self.assertEqual((saved["fill"], saved["kind"]), ("diagonal", "trait"))
+
+    def test_fill_and_kind_blank_when_absent(self):
+        self.client.force_authenticate(self.alice)
+        resp = self.client.post(
+            "/api/tag-presets/", {"label": "CF", "color": "#000", "style": "quadrant"}, format="json"
+        )
+        self.assertEqual(resp.status_code, 201, resp.data)
+        self.assertEqual((resp.data["fill"], resp.data["kind"]), ("", ""))
+
+    def test_rejects_unknown_fill_or_kind(self):
+        self.client.force_authenticate(self.alice)
+        for extra in ({"fill": "stripes"}, {"kind": "carrier"}):
+            resp = self.client.post(
+                "/api/tag-presets/",
+                {"label": "x", "color": "#000", "style": "quadrant", **extra},
+                format="json",
+            )
+            self.assertEqual(resp.status_code, 400, extra)
+
     def test_rejects_unknown_style(self):
         self.client.force_authenticate(self.alice)
         resp = self.client.post(

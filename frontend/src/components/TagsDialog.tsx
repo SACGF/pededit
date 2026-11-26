@@ -110,13 +110,18 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
   }
 
   function handleAddFromPreset(p: TagPresetPayload) {
-    addTag({ label: p.label, color: p.color, style: p.style, abbrev: p.abbrev || undefined });
+    addTag({
+      label: p.label, color: p.color, style: p.style, abbrev: p.abbrev || undefined,
+      fill: p.fill && p.fill !== "solid" ? p.fill : undefined,
+      kind: p.kind === "trait" ? "trait" : undefined,
+    });
   }
 
   async function handleSaveToLibrary(tag: Tag) {
     try {
       const { data } = await tagPresetApi.create({
         label: tag.label, color: tag.color, style: tag.style, abbrev: tag.abbrev ?? "",
+        fill: tag.fill ?? "", kind: tag.kind ?? "",
       });
       setPresets(prev => [...prev, data].sort((a, b) => a.label.localeCompare(b.label)));
     } catch {
@@ -137,7 +142,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     pedigree.individuals.filter(i => i.tags?.includes(tagId)).length;
 
   const inLibrary = (tag: Tag) =>
-    presets.some(p => p.label === tag.label && p.color === tag.color && p.style === tag.style);
+    presets.some(p => p.label === tag.label && p.color === tag.color && p.style === tag.style
+      && (p.fill || "solid") === (tag.fill ?? "solid") && (p.kind || "condition") === (tag.kind ?? "condition"));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

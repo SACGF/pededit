@@ -1,7 +1,7 @@
 import axios from "axios";
 import { withCurrentNotation } from "../pedigree/notation";
 import { isRateLimited } from "./errors";
-import type { Pedigree } from "@pedigree-editor/layout-engine";
+import type { Pedigree, TagFill, TagKind } from "@pedigree-editor/layout-engine";
 
 export const apiClient = axios.create({
   baseURL: "/api",
@@ -166,6 +166,10 @@ export interface TagPresetPayload {
   color: string;
   style: "quadrant" | "dot" | "text";
   abbrev: string;
+  /** Tag.fill; "" when the tag has none (solid). */
+  fill: TagFill | "";
+  /** Tag.kind; "" when the tag has none (a condition). */
+  kind: TagKind | "";
   created: string;
 }
 

@@ -328,6 +328,7 @@ the flow. They run in CI.
 | `translated-page` | every text node replaced the way browser page translation does it (not Chrome's translator): opening and closing Clinical details and marking a person affected do not reach the error boundary (`src/domGuard.ts`) |
 | `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, not saved over a reload |
 | `text-under-symbols` | names and details under the symbols are SVG text at the export's baselines (#145); hovering a cut name shows it in full without the pill's buttons, clicking it selects, an uncut name lets the mouse through (#68) |
+| `tag-library` | signed in: a hatched trait saved to My library from the Conditions and tags dialog is added to another pedigree still hatched and still a trait (#131) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 
