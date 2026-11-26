@@ -10,6 +10,8 @@ import type { SymbolPaint } from "../tags";
 const symbolSvg = (ind: Pedigree["individuals"][number], paint: SymbolPaint, clipId: string) =>
   renderToStaticMarkup(createElement("svg", null, createElement(SymbolShape, { glyph: { ...standaloneGlyph(ind), paint }, size: 40, clipId })));
 import { exportKeyMarkup } from "../exportKey";
+import { F, M } from "../../fixtures/features";
+import { family } from "../../data/pedigreeBuilder";
 
 const tremor: Tag   = { id: "t1", label: "Tremor", color: "#000000", style: "quadrant" };
 const seizure: Tag  = { id: "t2", label: "Tonic-clonic seizures", color: "#d62728", style: "quadrant" };
@@ -18,18 +20,9 @@ const focal: Tag    = { id: "t4", label: "Focal seizures", color: "#f2c80f", sty
 const sequenced: Tag = { id: "s1", label: "Sequenced", color: "#2ca02c", style: "dot" };
 const genotype: Tag = { id: "g1", label: "FAME3 expansion", color: "#ff7f0e", style: "text", abbrev: "exp/+" };
 
-function makePedigree(tags: Tag[], indTags: Record<string, string[]> = {}): Pedigree {
-  return {
-    individuals: [
-      { id: "a", sex: "male",   affected: false, sibOrder: 0, tags: indTags["a"] },
-      { id: "b", sex: "female", affected: false, sibOrder: 1, tags: indTags["b"] },
-    ],
-    partnerships: [],
-    parentOf: {},
-    siblingOrder: { mode: "insertion", affectedFirst: false },
-    tags,
-  };
-}
+/** NSGC 2008 (no notation saved): a quarter per condition. */
+const makePedigree = (tags: Tag[], indTags: Record<string, string[]> = {}): Pedigree =>
+  family([M("a", { tags: indTags["a"] }), F("b", { tags: indTags["b"] })], [], {}, { tags });
 
 describe("sectorAngles", () => {
   it("the first four quadrant tags get fixed quarters, upper left first then clockwise", () => {
@@ -167,7 +160,10 @@ describe("SVG rendering", () => {
     const key = exportKeyMarkup(p, 0, 0);
     const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
     expect(labels).toEqual(["Affected", "Affected, with conditions (black centre)", "Carrier", "Deceased", "Tremor"]);
-    expect(key.height).toBe(5 * 24);
+    // Every row the same height, whatever it holds.
+    const other = exportKeyMarkup(makePedigree([tremor], { a: ["t1"] }), 0, 0);
+    expect(other.markup.length).not.toBe(key.markup.length);
+    expect(key.height / key.markup.length).toBe(other.height / other.markup.length);
   });
 
   it("export key lists pregnancies and losses present, labelled as in the legend (#13)", () => {
@@ -177,7 +173,6 @@ describe("SVG rendering", () => {
     const key = exportKeyMarkup(p, 0, 0);
     const labels = key.markup.map(m => [...m.matchAll(/>([^<>]+)<\/text>/g)].map(x => x[1]).pop());
     expect(labels).toEqual(["Miscarriage", "Stillbirth (SB)"]);
-    expect(key.markup[0]).toContain("<polygon");
   });
 
   it("export key is empty with no status and no tags", () => {
@@ -200,7 +195,10 @@ describe("affected core", () => {
   it("renders a scaled black copy of the outline", () => {
     const ind = { id: "a", sex: "male" as const, affected: true, sibOrder: 0 };
     const svg = symbolSvg(ind, { sectors: [], base: "white", core: true, dot: false }, "c");
-    expect(svg).toContain("scale(0.55)");
+    // A smaller copy: scaled down about the centre, filled black.
+    const scale = Number(/scale\(([\d.]+)\)/.exec(svg)![1]);
+    expect(scale).toBeGreaterThan(0);
+    expect(scale).toBeLessThan(1);
     expect(svg).toContain('fill="black"');
   });
 });

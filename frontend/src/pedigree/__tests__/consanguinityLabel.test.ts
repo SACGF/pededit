@@ -121,10 +121,25 @@ describe("what is written above a double line (#97)", () => {
   it("keeps clear of lines of descent and ? marks on the symbol tops", () => {
     const bare = { hasParents: false, familyHistoryUnknown: false };
     const child = { hasParents: true, familyHistoryUnknown: false };
-    expect(consanguinityLabelRoom(0, 80, bare, bare)).toBe(80 + NODE_SIZE);
-    expect(consanguinityLabelRoom(0, 80, child, child)).toBe(72);
-    expect(consanguinityLabelRoom(0, 80, bare, { hasParents: false, familyHistoryUnknown: true })).toBe(64);
-    expect(consanguinityLabelRoom(0, 80, child, { hasParents: true, familyHistoryUnknown: true })).toBe(46);
+    const unknown = { hasParents: false, familyHistoryUnknown: true };
+    const childUnknown = { hasParents: true, familyHistoryUnknown: true };
+    // Partners at x 0 and 80; the label is centred at 40. Its left and right edges:
+    const edges = (l: typeof bare, r: typeof bare) => {
+      const room = consanguinityLabelRoom(0, 80, l, r);
+      return [40 - room / 2, 40 + room / 2];
+    };
+    // With nothing on the symbol tops it may reach their outer edges.
+    expect(edges(bare, bare)).toEqual([-NODE_SIZE / 2, 80 + NODE_SIZE / 2]);
+    // A line of descent comes into the top centre of each: the label stays between them.
+    const [l, r] = edges(child, child);
+    expect(l).toBeGreaterThan(0);
+    expect(r).toBeLessThan(80);
+    expect(edges(child, bare)[0]).toBeGreaterThan(0);
+    expect(edges(bare, child)[1]).toBeLessThan(80);
+    // A ? over the right symbol's centre: the label stops short of it.
+    expect(edges(bare, unknown)[1]).toBeLessThan(80);
+    // A ? beside a line of descent takes more room than the line alone.
+    expect(edges(child, childUnknown)[1]).toBeLessThan(r);
   });
 
   it("wraps to the room, one line in compact rows", () => {

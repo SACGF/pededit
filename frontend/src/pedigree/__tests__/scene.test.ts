@@ -6,304 +6,116 @@ import { simpleFamily } from "../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../fixtures/consanguineous";
 import { SLOT_WIDTH, ROW_HEIGHT, COUPLE_HOP, COUPLE_PORT_STEP, NODE_SIZE } from "../constants";
 import { sibshipLineGeometry } from "../lineGeometry";
-
-// The sibship bar is drawn halfway between a couple and their children.
-const SIB_BAR_FACTOR = 0.5;
 import type { Pedigree } from "@pedigree-editor/layout-engine";
+import { M, build } from "../../fixtures/features";
 
-// Concrete layout engine output for these fixtures (verified by running alignPedigree):
-//
-// simpleFamily:
-//   n       = [2, 3, 3]
-//   nid     = [[1,2], [3,5,4], [6,7,8]]
-//   pos     = [[1,2], [0.5,1.5,2.5], [0,1,2]]   ← QP centres gen-0 over gen-1 children
-//   fam     = [[0,0], [1,0,1], [1,1,1]]
-//   spouse  = [[1,0], [1,0,0], [0,0,0]]
-//
-// consanguineousFamily:
-//   n       = [2, 2, 2]
-//   nid     = [[1,2], [3,4], [5,6]]
-//   pos     = [[0,1], [0,1], [0,1]]              ← compact symmetric family; QP leaves at 0/1
-//   fam     = [[0,0], [1,1], [1,1]]
-//   spouse  = [[1,0], [2,0], [0,0]]
+// These look people and lines up by person, not by layout slot, and check
+// relations (same row, between, under) rather than restating the layout's
+// positions: where the layout puts people is the oracle tests' business.
 
-// ── Helpers ────────────────────────────���─────────────────���─────────────────────
+/** A scene with lookups by person id. */
+function sceneOf(p: Pedigree) {
+  const scene = buildScene(p);
+  const idOf = (nodeId: string) => scene.people.find(n => n.id === nodeId)!.individual.id;
+  const at = (id: string) => scene.people.find(n => n.individual.id === id)!.position;
+  /** Each couple line as "a=b" (person ids, sorted), with whether it is double. */
+  const couples = scene.couples.map(e => ({ pair: [idOf(e.source), idOf(e.target)].sort().join("="), double: e.double }));
+  /** The sibship line under the couple `a`, `b`, if there is one. */
+  const sibshipOf = (a: string, b: string) => scene.sibships.find(e =>
+    [idOf(e.data.leftParentId), idOf(e.data.rightParentId)].sort().join("=") === [a, b].sort().join("="));
+  return { scene, idOf, at, couples, sibshipOf };
+}
 
-/** x-coordinate in canvas px for a given pos value. */
-const px = (pos: number) => pos * SLOT_WIDTH;
-/** y-coordinate in canvas px for a given level. */
-const py = (level: number) => level * ROW_HEIGHT;
+/** A sibship line joins its couple's line to each child's symbol, with the bar between the two rows. */
+function expectSibshipJoins(s: ReturnType<typeof sceneOf>, parents: [string, string], children: string[]) {
+  const edge = s.sibshipOf(...parents)!;
+  expect(edge, parents.join("=")).toBeDefined();
+  const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
+  expect(edge.data.childIds.map(s.idOf)).toEqual(children);
+  const [a, b] = parents.map(s.at);
+  expect(coupleY).toBe(a!.y);
+  expect(coupleX).toBeCloseTo((a!.x + b!.x) / 2, 6);
+  expect(childXs).toEqual(children.map(c => s.at(c).x));
+  for (const c of children) expect(s.at(c).y).toBe(childY);
+  // The bar is drawn halfway between the couple and their children.
+  expect(sibBarY).toBeCloseTo((coupleY + childY) / 2, 6);
+}
 
-// ── simpleFamily ──────────────────────────���─────────────────────────────��─────
+// ── simpleFamily ──────────────────────────────────────────────────────────────
 
-describe("buildScene — simpleFamily", () => {
-  const { people: nodes, couples: coupleEdges, sibships: sibshipEdges } = buildScene(simpleFamily);
+describe("buildScene: simpleFamily", () => {
+  const s = sceneOf(simpleFamily);
+  const ids = (list: { individual: { id: string } }[]) => list.map(n => n.individual.id).sort();
 
-  describe("nodes", () => {
-    it("produces 8 nodes (2 + 3 + 3 across three generations)", () => {
-      expect(nodes).toHaveLength(8);
-    });
-
-    it("node ids follow level-slot scheme", () => {
-      const ids = nodes.map((n) => n.id);
-      expect(ids).toContain("0-0");
-      expect(ids).toContain("0-1");
-      expect(ids).toContain("1-0");
-      expect(ids).toContain("1-1");
-      expect(ids).toContain("1-2");
-      expect(ids).toContain("2-0");
-      expect(ids).toContain("2-1");
-      expect(ids).toContain("2-2");
-    });
-
-    it("node type is pedigreeSymbol for all nodes", () => {
-      expect(nodes.every((n) => !n.branch)).toBe(true);
-    });
-
-    it("gen-0 nodes carry the correct individuals", () => {
-      const n00 = nodes.find((n) => n.id === "0-0")!;
-      const n01 = nodes.find((n) => n.id === "0-1")!;
-      expect(n00.individual.id).toBe("i1");
-      expect(n01.individual.id).toBe("i2");
-    });
-
-    it("gen-1 nodes carry the correct individuals (nid=[3,5,4])", () => {
-      // i3 at slot 0, i5 at slot 1, i4 at slot 2
-      const n10 = nodes.find((n) => n.id === "1-0")!;
-      const n11 = nodes.find((n) => n.id === "1-1")!;
-      const n12 = nodes.find((n) => n.id === "1-2")!;
-      expect(n10.individual.id).toBe("i3");
-      expect(n11.individual.id).toBe("i5");
-      expect(n12.individual.id).toBe("i4");
-    });
-
-    it("gen-2 nodes carry the correct individuals", () => {
-      const n20 = nodes.find((n) => n.id === "2-0")!;
-      const n21 = nodes.find((n) => n.id === "2-1")!;
-      const n22 = nodes.find((n) => n.id === "2-2")!;
-      expect(n20.individual.id).toBe("i6");
-      expect(n21.individual.id).toBe("i7");
-      expect(n22.individual.id).toBe("i8");
-    });
-
-    it("positions match pos × SLOT_WIDTH / level × ROW_HEIGHT", () => {
-      const n00 = nodes.find((n) => n.id === "0-0")!;
-      const n01 = nodes.find((n) => n.id === "0-1")!;
-      const n12 = nodes.find((n) => n.id === "1-2")!;
-      const n22 = nodes.find((n) => n.id === "2-2")!;
-      // QP centres grandparents over their two children at slots 0.5 and 2.5,
-      // shifting them from [0,1] to ≈[1,2]; use toBeCloseTo for QP-optimised x values.
-      expect(n00.position.x).toBeCloseTo(px(1), 0);
-      expect(n00.position.y).toBe(py(0));
-      expect(n01.position.x).toBeCloseTo(px(2), 0);
-      expect(n01.position.y).toBe(py(0));
-      expect(n12.position.x).toBeCloseTo(px(2.5), 0);
-      expect(n12.position.y).toBe(py(1));
-      // gen-2 grandchildren: QP may introduce tiny floating-point errors
-      expect(n22.position.x).toBeCloseTo(px(2), 3);
-      expect(n22.position.y).toBe(py(2));
-    });
-
-    it("no individual appears in two slots → isDuplicate is false for all", () => {
-      expect(nodes.every((n) => (n.glyph.copy !== undefined) === false)).toBe(true);
-    });
-
-    it("isDuplicate=false → duplicateIndex is undefined", () => {
-      expect(nodes.every((n) => n.glyph.copy === undefined)).toBe(true);
-    });
+  it("draws each of the 8 people once", () => {
+    expect(ids(s.scene.people)).toEqual(["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8"]);
+    expect(s.scene.people.every(n => n.glyph.copy === undefined && !n.branch)).toBe(true);
   });
 
-  describe("coupleEdges", () => {
-    it("produces exactly 2 couple edges", () => {
-      expect(coupleEdges).toHaveLength(2);
-    });
-
-    it("i1–i2 couple edge exists at gen 0 (coupleEdge type)", () => {
-      const edge = coupleEdges.find((e) => e.id === "couple-0-0");
-      expect(edge).toBeDefined();
-      expect(edge!.source).toBe("0-0");
-      expect(edge!.target).toBe("0-1");
-      expect(edge!.double).toBe(false);
-    });
-
-    it("i3–i5 couple edge exists at gen 1 (coupleEdge type)", () => {
-      const edge = coupleEdges.find((e) => e.id === "couple-1-0");
-      expect(edge).toBeDefined();
-      expect(edge!.source).toBe("1-0");
-      expect(edge!.target).toBe("1-1");
-      expect(edge!.double).toBe(false);
-    });
-
-    it("all couple edges use correct handles on the canvas", () => {
-      for (const edge of sceneToFlow(buildScene(simpleFamily)).coupleEdges) {
-        expect(edge.sourceHandle).toBe("couple-out");
-        expect(edge.targetHandle).toBe("couple-in");
-      }
-    });
+  it("puts each generation on its own row, one ROW_HEIGHT apart, and siblings in birth order", () => {
+    const row = (id: string) => s.at(id).y;
+    expect(row("i2")).toBe(row("i1"));
+    for (const id of ["i3", "i4", "i5"]) expect(row(id)).toBe(row("i1") + ROW_HEIGHT);
+    for (const id of ["i6", "i7", "i8"]) expect(row(id)).toBe(row("i1") + 2 * ROW_HEIGHT);
+    const x = (id: string) => s.at(id).x;
+    expect(x("i3")).toBeLessThan(x("i4"));
+    expect(x("i6")).toBeLessThan(x("i7"));
+    expect(x("i7")).toBeLessThan(x("i8"));
   });
 
-  describe("sibshipEdges", () => {
-    it("produces exactly 2 sibship edges", () => {
-      expect(sibshipEdges).toHaveLength(2);
-    });
+  it("draws a single line for each couple, between the partners", () => {
+    expect(s.couples).toEqual(expect.arrayContaining([{ pair: "i1=i2", double: false }, { pair: "i3=i5", double: false }]));
+    expect(s.couples).toHaveLength(2);
+  });
 
-    it("gen-1 sibship edge: i3+i4 under i1–i2 (fam=1)", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-1-1");
-      expect(edge).toBeDefined();
-      expect(edge!.data.childIds.length).toBeGreaterThan(0);
-      expect(edge!.source).toBe("0-0");  // left parent slot
-      expect(edge!.target).toBe("1-0");  // leftmost child slot
-    });
+  it("joins each couple to their children", () => {
+    expect(s.scene.sibships).toHaveLength(2);
+    expectSibshipJoins(s, ["i1", "i2"], ["i3", "i4"]);
+    expectSibshipJoins(s, ["i3", "i5"], ["i6", "i7", "i8"]);
+  });
 
-    it("gen-1 sibship geometry: coupleX midpoint, correct bar and child positions", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
-      // grandparents at pos≈[1,2] → midpoint ≈ 1.5 × SLOT_WIDTH
-      expect(coupleX).toBeCloseTo(1.5 * SLOT_WIDTH, 0);
-      expect(coupleY).toBe(py(0));
-      expect(sibBarY).toBe((1 - SIB_BAR_FACTOR) * ROW_HEIGHT);
-      expect(childY).toBe(py(1));
-      // children i3 at pos≈0.5, i4 at pos≈2.5 (slot 1 = i5 has fam=0, not a child here)
-      expect(childXs[0]).toBeCloseTo(0.5 * SLOT_WIDTH, 0);
-      expect(childXs[1]).toBeCloseTo(2.5 * SLOT_WIDTH, 0);
-    });
-
-    it("gen-2 sibship edge: i6+i7+i8 under i3–i5 (fam=1)", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-2-1");
-      expect(edge).toBeDefined();
-      expect(edge!.source).toBe("1-0");
-      expect(edge!.target).toBe("2-0");
-    });
-
-    it("gen-2 sibship geometry: three children, correct positions", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
-      // parents i3 at pos≈0.5 and i5 at pos≈1.5 → midpoint ≈ 1.0 × SLOT_WIDTH
-      expect(coupleX).toBeCloseTo(1.0 * SLOT_WIDTH, 0);
-      expect(coupleY).toBe(py(1));
-      expect(sibBarY).toBe((2 - SIB_BAR_FACTOR) * ROW_HEIGHT);
-      expect(childY).toBe(py(2));
-      // grandchildren at positions ≈[0,1,2] × SLOT_WIDTH (QP may add tiny float error)
-      expect(childXs[0]).toBeCloseTo(px(0), 3);
-      expect(childXs[1]).toBeCloseTo(px(1), 3);
-      expect(childXs[2]).toBeCloseTo(px(2), 3);
-    });
-
-    it("all sibship edges use correct handles on the canvas", () => {
-      for (const edge of sceneToFlow(buildScene(simpleFamily)).sibshipEdges) {
-        expect(edge.sourceHandle).toBe("sibship-out");
-        expect(edge.targetHandle).toBe("sibship-in");
-      }
-    });
+  it("the canvas joins lines to the symbols' couple and sibship handles", () => {
+    const flow = sceneToFlow(buildScene(simpleFamily));
+    for (const edge of flow.coupleEdges) expect([edge.sourceHandle, edge.targetHandle]).toEqual(["couple-out", "couple-in"]);
+    for (const edge of flow.sibshipEdges) expect([edge.sourceHandle, edge.targetHandle]).toEqual(["sibship-out", "sibship-in"]);
   });
 });
 
 // ── consanguineousFamily ──────────────────────────────────────────────────────
 
-describe("buildScene — consanguineousFamily", () => {
-  const { people: nodes, couples: coupleEdges, sibships: sibshipEdges } = buildScene(consanguineousFamily);
+describe("buildScene: consanguineousFamily", () => {
+  const s = sceneOf(consanguineousFamily);
 
-  describe("nodes", () => {
-    it("produces 6 nodes (2 + 2 + 2)", () => {
-      expect(nodes).toHaveLength(6);
-    });
-
-    it("i1 and i2 are at gen 0", () => {
-      expect(nodes.find((n) => n.id === "0-0")!.individual.id).toBe("i1");
-      expect(nodes.find((n) => n.id === "0-1")!.individual.id).toBe("i2");
-    });
-
-    it("i3 and i4 are at gen 1", () => {
-      expect(nodes.find((n) => n.id === "1-0")!.individual.id).toBe("i3");
-      expect(nodes.find((n) => n.id === "1-1")!.individual.id).toBe("i4");
-    });
-
-    it("i5 (proband) and i6 are at gen 2", () => {
-      expect(nodes.find((n) => n.id === "2-0")!.individual.id).toBe("i5");
-      expect(nodes.find((n) => n.id === "2-1")!.individual.id).toBe("i6");
-    });
-
-    it("no duplicates", () => {
-      expect(nodes.every((n) => (n.glyph.copy !== undefined) === false)).toBe(true);
-    });
+  it("draws each of the 6 people once", () => {
+    expect(s.scene.people.map(n => n.individual.id).sort()).toEqual(["i1", "i2", "i3", "i4", "i5", "i6"]);
+    expect(s.scene.people.every(n => n.glyph.copy === undefined)).toBe(true);
   });
 
-  describe("coupleEdges", () => {
-    it("produces exactly 2 couple edges", () => {
-      expect(coupleEdges).toHaveLength(2);
-    });
-
-    it("i1–i2 couple is a single line (coupleEdge)", () => {
-      const edge = coupleEdges.find((e) => e.id === "couple-0-0")!;
-      expect(edge.double).toBe(false);
-    });
-
-    it("i3–i4 couple is a double line (consanguineousEdge)", () => {
-      const edge = coupleEdges.find((e) => e.id === "couple-1-0")!;
-      expect(edge).toBeDefined();
-      expect(edge.source).toBe("1-0");
-      expect(edge.target).toBe("1-1");
-      expect(edge.double).toBe(true);
-    });
+  it("draws the related couple's line double and the other single", () => {
+    expect(s.couples).toEqual(expect.arrayContaining([{ pair: "i1=i2", double: false }, { pair: "i3=i4", double: true }]));
+    expect(s.couples).toHaveLength(2);
   });
 
-  describe("sibshipEdges", () => {
-    it("produces exactly 2 sibship edges", () => {
-      expect(sibshipEdges).toHaveLength(2);
-    });
-
-    it("gen-1 sibship: i3+i4 under i1–i2", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
-      expect(edge).toBeDefined();
-      const { coupleX, sibBarY, childXs } = edge.data;
-      expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
-      expect(sibBarY).toBeCloseTo((1 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
-      expect(childXs[0]).toBeCloseTo(px(0), 5);
-      expect(childXs[1]).toBeCloseTo(px(1), 5);
-    });
-
-    it("gen-2 sibship: i5+i6 under i3–i4", () => {
-      const edge = sibshipEdges.find((e) => e.id === "sibship-2-1")!;
-      expect(edge).toBeDefined();
-      const { coupleX, coupleY, sibBarY, childXs, childY } = edge.data;
-      expect(coupleX).toBeCloseTo(0.5 * SLOT_WIDTH, 5);
-      expect(coupleY).toBeCloseTo(py(1), 5);
-      expect(sibBarY).toBeCloseTo((2 - SIB_BAR_FACTOR) * ROW_HEIGHT, 5);
-      expect(childY).toBeCloseTo(py(2), 5);
-      expect(childXs[0]).toBeCloseTo(px(0), 5);
-      expect(childXs[1]).toBeCloseTo(px(1), 5);
-    });
+  it("joins each couple to their children", () => {
+    expect(s.scene.sibships).toHaveLength(2);
+    expectSibshipJoins(s, ["i1", "i2"], ["i3", "i4"]);
+    expectSibshipJoins(s, ["i3", "i4"], ["i5", "i6"]);
   });
 });
 
 // ── Edge cases ────────────────────────────────────────────────────────────────
 
-describe("buildScene — edge cases", () => {
-  it("empty pedigree returns no nodes or edges (alignPedigree throws on empty input, buildScene guards it)", () => {
-    const { people: nodes, couples: coupleEdges, sibships: sibshipEdges } = buildScene({
-      individuals: [],
-      partnerships: [],
-      parentOf: {},
-      siblingOrder: { mode: "insertion", affectedFirst: false },
-    });
-    expect(nodes).toHaveLength(0);
-    expect(coupleEdges).toHaveLength(0);
-    expect(sibshipEdges).toHaveLength(0);
+describe("buildScene: edge cases", () => {
+  it("empty pedigree returns no people or lines (alignPedigree throws on empty input, buildScene guards it)", () => {
+    const { people, couples, sibships } = buildScene(build([], [], {}));
+    expect([people, couples, sibships]).toEqual([[], [], []]);
   });
 
-  it("single individual: one node, no edges", () => {
-    const { people: nodes, couples: coupleEdges, sibships: sibshipEdges } = buildScene({
-      individuals: [{ id: "x1", sex: "male", affected: false, sibOrder: 0 }],
-      partnerships: [],
-      parentOf: {},
-      siblingOrder: { mode: "insertion", affectedFirst: false },
-    });
-    expect(nodes).toHaveLength(1);
-    expect(nodes[0]!.individual.id).toBe("x1");
-    expect(coupleEdges).toHaveLength(0);
-    expect(sibshipEdges).toHaveLength(0);
+  it("single individual: one person, no lines", () => {
+    const { people, couples, sibships } = buildScene(build([M("x1")], [], {}));
+    expect(people.map(n => n.individual.id)).toEqual(["x1"]);
+    expect([couples, sibships]).toEqual([[], []]);
   });
-
 });
 
 // ── Someone drawn more than once ──────────────────────────────────────────────
@@ -537,46 +349,33 @@ describe("buildScene: compact option", () => {
   const ROW_SCALE  = 0.7;
   const SLOT_SCALE = 0.85;
 
-  it("default (no options) keeps the normal spacing", () => {
-    const { people: nodes } = buildScene(simpleFamily);
-    const n20 = nodes.find((n) => n.id === "2-0")!;
-    const n21 = nodes.find((n) => n.id === "2-1")!;
-    expect(n21.position.x - n20.position.x).toBeCloseTo(SLOT_WIDTH);
-    expect(n20.position.y).toBeCloseTo(2 * ROW_HEIGHT);
+  const at = (p: Pedigree, compact: boolean, id: string) =>
+    buildScene(p, compact ? { compact: true } : {}).people.find(n => n.individual.id === id)!.position;
+
+  it("default (no options) keeps the normal spacing: siblings one slot apart, rows one row apart", () => {
+    expect(at(simpleFamily, false, "i7").x - at(simpleFamily, false, "i6").x).toBeCloseTo(SLOT_WIDTH);
+    expect(at(simpleFamily, false, "i6").y - at(simpleFamily, false, "i3").y).toBeCloseTo(ROW_HEIGHT);
   });
 
-  it("compact=true places rows at 70% of ROW_HEIGHT", () => {
-    const { people: nodes } = buildScene(simpleFamily, { compact: true });
-    for (const level of [0, 1, 2]) {
-      const node = nodes.find((n) => n.id === `${level}-0`)!;
-      expect(node.position.y).toBeCloseTo(level * ROW_HEIGHT * ROW_SCALE);
-    }
-  });
-
-  it("compact=true places slots at 85% of SLOT_WIDTH", () => {
-    const { people: nodes } = buildScene(simpleFamily, { compact: true });
-    // gen-2 children sit at pos 0, 1, 2 (one slot apart).
-    const n20 = nodes.find((n) => n.id === "2-0")!;
-    const n21 = nodes.find((n) => n.id === "2-1")!;
-    const n22 = nodes.find((n) => n.id === "2-2")!;
-    expect(n21.position.x - n20.position.x).toBeCloseTo(SLOT_WIDTH * SLOT_SCALE);
-    expect(n22.position.x - n21.position.x).toBeCloseTo(SLOT_WIDTH * SLOT_SCALE);
-    // Every position is the normal position scaled by the same factors.
-    const normal = buildScene(simpleFamily).people;
-    for (const node of nodes) {
-      const ref = normal.find((n) => n.id === node.id)!;
-      expect(node.position.x).toBeCloseTo(ref.position.x * SLOT_SCALE);
-      expect(node.position.y).toBeCloseTo(ref.position.y * ROW_SCALE);
+  it("compact=true scales every position: slots to 85%, rows to 70%", () => {
+    expect(at(simpleFamily, true, "i7").x - at(simpleFamily, true, "i6").x).toBeCloseTo(SLOT_WIDTH * SLOT_SCALE);
+    expect(at(simpleFamily, true, "i6").y - at(simpleFamily, true, "i3").y).toBeCloseTo(ROW_HEIGHT * ROW_SCALE);
+    for (const { id } of simpleFamily.individuals) {
+      expect(at(simpleFamily, true, id).x).toBeCloseTo(at(simpleFamily, false, id).x * SLOT_SCALE);
+      expect(at(simpleFamily, true, id).y).toBeCloseTo(at(simpleFamily, false, id).y * ROW_SCALE);
     }
   });
 
   it("compact=true derives sibship geometry from the compact positions", () => {
-    const { sibships: sibshipEdges } = buildScene(simpleFamily, { compact: true });
-    const gen1 = sibshipEdges.find((e) => e.id === "sibship-1-1")!;
-    const data = gen1.data;
-    expect(data.coupleY).toBeCloseTo(0);
-    expect(data.childY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE);
-    expect(data.sibBarY).toBeCloseTo(ROW_HEIGHT * ROW_SCALE * SIB_BAR_FACTOR);
+    const s = sceneOf(simpleFamily);
+    const compact = buildScene(simpleFamily, { compact: true });
+    const idOf = (nodeId: string) => compact.people.find(n => n.id === nodeId)!.individual.id;
+    const atC = (id: string) => compact.people.find(n => n.individual.id === id)!.position;
+    const gen1 = compact.sibships.find(e => idOf(e.data.childIds[0]!) === "i3")!.data;
+    expect(gen1.coupleY).toBeCloseTo(atC("i1").y);
+    expect(gen1.childY).toBeCloseTo(atC("i3").y);
+    expect(gen1.sibBarY).toBeCloseTo((gen1.coupleY + gen1.childY) / 2);
+    expect(gen1.childY).toBeCloseTo(s.at("i3").y * ROW_SCALE);
   });
 
   it("compact=true scales pinned positions by the same factors", () => {

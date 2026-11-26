@@ -24,8 +24,11 @@ and `build` from `src/fixtures/features.ts` where it can, not a builder of its
 own. Assert what is drawn or stored, not how: look a person up by id, not by
 layout slot; compare `keyRows` or `parseExportSvg` output, not markup strings
 or path data; and when a number is checked, make it a relation (above, inside,
-centred) unless the number is the specification. A test that needs today's
-date fixes it (`vi.useFakeTimers`, as `svgSnapshots.test.ts` does).
+centred) unless the number is the specification. "One undo step" and "not
+an edit" are `expectOneUndoStep` and `expectNoEdit`
+(`src/store/__tests__/undoSteps.ts`), not the length of `past`. A test that
+needs today's date fixes it (`vi.useFakeTimers`, as `svgSnapshots.test.ts`
+does).
 
 Check a change in the real page before calling it done: `node
 frontend/scripts/browser/console.mjs --fixture example:2` reports JS errors as

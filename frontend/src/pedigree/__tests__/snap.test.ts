@@ -88,13 +88,20 @@ describe("buildScene with snap on", () => {
     const plain = buildScene(ex).people.find(n => n.individual.id === "i2a")!;
     expect(onGrid(plain.position.x, 5)).toBe(false); // 129.6 without snap
     const snapped = buildScene(withSnap(ex, 5)).people.find(n => n.individual.id === "i2a")!;
-    expect(snapped.position.x).toBe(130);
+    expect(onGrid(snapped.position.x, 5)).toBe(true);
+    expect(Math.abs(snapped.position.x - plain.position.x)).toBeLessThanOrEqual(2.5); // the nearest grid point
   });
 
   it("puts compact rows on the grid, so a horizontal drag stays on its row", () => {
     const flow = buildScene(withSnap(EXAMPLES[2]!.data, 5), { compact: true });
     const ys = [...new Set(flow.people.map(n => n.position.y))].sort((a, b) => a - b);
-    expect(ys).toEqual([0, 85, 170, 250].slice(0, ys.length));
+    // Each row on the grid, within half a grid step of where compact puts it unsnapped.
+    const plainYs = [...new Set(buildScene(EXAMPLES[2]!.data, { compact: true }).people.map(n => n.position.y))].sort((a, b) => a - b);
+    expect(ys).toHaveLength(plainYs.length);
+    ys.forEach((y, i) => {
+      expect(onGrid(y, 5)).toBe(true);
+      expect(Math.abs(y - plainYs[i]!)).toBeLessThanOrEqual(2.5);
+    });
   });
 
   it("shows a pin snapped in normal coordinates on the grid in compact", () => {
