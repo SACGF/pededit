@@ -7,6 +7,11 @@ import { ancestorsOf, couplesOf, descendantsOf, parentCoupleOf, partnerIn } from
  * store applies them. Framework-free so the rules are unit testable.
  */
 
+/** The tooltips of the three ways to remove people (more menu, one person or several). */
+export const DELETE_TITLE = "Delete (children stay, as founders)";
+export const REMOVE_WITH_DESCENDANTS_TITLE = "Shift+Delete. Also removes everyone below and partners who married in";
+export const REMOVE_WITH_ANCESTORS_TITLE = "Alt+Delete. Also removes everyone above; descendants become founders";
+
 /**
  * `people` plus the partners of those people who married in (no parents in
  * the pedigree) and have no partnership with anyone outside the set, repeated

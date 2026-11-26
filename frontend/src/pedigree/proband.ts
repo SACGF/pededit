@@ -8,7 +8,7 @@
  * legends, so they agree.
  */
 
-import type { Individual } from "@pedigree-editor/layout-engine";
+import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 
 export type ArrowKind = "proband" | "consultand";
 
@@ -52,3 +52,14 @@ export const ARROW_LEGEND_LABEL: Record<ArrowKind, string> = {
   consultand: "Consultand (seeking counselling)",
 };
 
+
+/**
+ * The tooltip of the proband controls (Person tab, more menu): there is one
+ * proband per pedigree, so marking another moves the arrow, and this says
+ * from whom.
+ */
+export function probandTitle(pedigree: Pedigree, individual: Individual): string {
+  const other = pedigree.individuals.find(i => i.proband && i.id !== individual.id);
+  if (!other) return "The affected person through whom the family came to attention: an arrow with a P. One per pedigree.";
+  return `One per pedigree: marking this person moves the proband arrow from ${other.name?.trim() || "another person"}.`;
+}

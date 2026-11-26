@@ -240,3 +240,11 @@ export function applyCarrier(ind: Individual, carrier: boolean, pedigree: Pick<P
   if (ind.carrier) { ind.carrier = false; changed = true; }
   return changed;
 }
+
+/**
+ * How many people have a tag, affected with a condition or a carrier of it:
+ * "People with this" in the Conditions and tags dialog.
+ */
+export function peopleWithTag(pedigree: Pedigree, tagId: string): number {
+  return pedigree.individuals.filter(i => i.tags?.includes(tagId) || i.carrierTags?.includes(tagId)).length;
+}

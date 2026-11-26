@@ -1,15 +1,14 @@
 import { useLayoutEffect, useRef } from "react";
 import { NodeToolbar, Position, useStore } from "@xyflow/react";
 import { Lock, Unlock } from "lucide-react";
-import { usePedigreeStore } from "../../store/usePedigreeStore";
+import { usePedigreeFields, usePedigreeStore } from "../../store/usePedigreeStore";
 import { MoreMenu } from "./MoreMenu";
+import { lockActionTitle, personAddActions, runPersonAdd } from "../personActions";
 
 interface HoverPillProps {
   nodeId: string;          // React Flow node ID (for NodeToolbar)
   individualId: string;    // pedigree Individual.id
   isVisible: boolean;
-  hasParents: boolean;     // disable +parents if already has both parents filled
-  noChildren: boolean;     // a pregnancy or pregnancy loss, which cannot have children
   name?: string;           // full name, shown under the pill (the pill covers the name label)
   nameOnly?: boolean;      // a cut name label is hovered: show the full name without the buttons
   onPillEnter: () => void; // called when mouse enters pill (cancel hide timer)
@@ -17,12 +16,9 @@ interface HoverPillProps {
   onMenuClose?: () => void; // more menu closed (it gives no mouseleave, see MoreMenu)
 }
 
-export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChildren, name, nameOnly, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
+export function HoverPill({ nodeId, individualId, isVisible, name, nameOnly, onPillEnter, onPillLeave, onMenuClose }: HoverPillProps) {
   // Every node has a pill, shown or not, so it reads only this person's
   // answers from the store: a whole-store read redrew every pill on a hover (#197).
-  const addParent = usePedigreeStore(s => s.addParent);
-  const addChild = usePedigreeStore(s => s.addChild);
-  const addSibling = usePedigreeStore(s => s.addSibling);
   const unlockIndividual = usePedigreeStore(s => s.unlockIndividual);
   const lockIndividual = usePedigreeStore(s => s.lockIndividual);
   const nodesMoveable = usePedigreeStore(s => s.pedigree.canvasSettings?.nodesMoveable ?? false);
@@ -47,57 +43,14 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChild
         onMouseMove={onPillEnter}
         onMouseLeave={onPillLeave}
       >
-        {/* +parents */}
-        <PillButton
-          title="Add parents"
-          disabled={hasParents}
-          onClick={() => addParent(individualId, "male")}
-        >
-          ↑
-        </PillButton>
-
-        {/* +son */}
-        <PillButton
-          title="Add son"
-          disabled={noChildren}
-          onClick={() => addChild(individualId, "male")}
-        >
-          □↓
-        </PillButton>
-
-        {/* +daughter */}
-        <PillButton
-          title="Add daughter"
-          disabled={noChildren}
-          onClick={() => addChild(individualId, "female")}
-        >
-          ○↓
-        </PillButton>
-
-        {/* +child of unknown sex */}
-        <PillButton
-          title="Add child (unknown sex)"
-          disabled={noChildren}
-          onClick={() => addChild(individualId, "unknown")}
-        >
-          ◇↓
-        </PillButton>
-
-        {/* +sib */}
-        <PillButton
-          title="Add sibling"
-          disabled={!hasParents}
-          onClick={() => addSibling(individualId)}
-        >
-          ←│→
-        </PillButton>
+        <AddButtons individualId={individualId} />
 
         {/* Lock / unlock — only shown when global "nodes moveable" is off */}
         {!nodesMoveable && (
           <>
             <div className="w-px h-3 bg-gray-300 mx-0.5" />
             <PillButton
-              title={isUnlocked ? "Lock position" : "Unlock to drag"}
+              title={lockActionTitle(isUnlocked)}
               onClick={() => isUnlocked ? lockIndividual(individualId) : unlockIndividual(individualId)}
             >
               {isUnlocked
@@ -125,6 +78,24 @@ export function HoverPill({ nodeId, individualId, isVisible, hasParents, noChild
       )}
       </KeepOnCanvas>
     </NodeToolbar>
+  );
+}
+
+/**
+ * The add buttons, from `personAddActions` as on the Person tab. NodeToolbar
+ * mounts its children only while the pill shows, so reading the whole
+ * pedigree here costs the other nodes nothing.
+ */
+function AddButtons({ individualId }: { individualId: string }) {
+  const { pedigree, ...edits } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling");
+  const individual = pedigree.individuals.find(i => i.id === individualId);
+  if (!individual) return null;
+  return (
+    <>
+      {personAddActions(pedigree, individual).map(a => (
+        <PillButton key={a.key} title={a.title} disabled={a.disabled} onClick={() => runPersonAdd(a.key, individualId, edits)}>{a.glyph}</PillButton>
+      ))}
+    </>
   );
 }
 

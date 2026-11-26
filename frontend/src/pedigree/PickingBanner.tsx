@@ -6,14 +6,10 @@ import { setParentsProblem } from "./parents";
 import { linkPartnerProblem } from "./partners";
 import { addDonorProblem, addSurrogateProblem } from "./assisted";
 import { isSameSexCouple } from "./sameSex";
+import { personLabel } from "./personLabel";
 
 function nameOf(pedigree: Pedigree, id: string): string {
-  const ind = pedigree.individuals.find(i => i.id === id);
-  if (!ind) return id;
-  const name = ind.name?.trim();
-  if (name) return name;
-  const sex = ind.sex === "male" ? "male" : ind.sex === "female" ? "female" : "unknown sex";
-  return `unnamed (${sex})`;
+  return personLabel(pedigree, id, "unnamed");
 }
 
 function matchRank(ind: Pedigree["individuals"][number], q: string): number {

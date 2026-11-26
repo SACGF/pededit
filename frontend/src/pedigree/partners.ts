@@ -3,17 +3,13 @@ import { drawnBesideChoices, drawnBesideConflict, drawnLeftPartner } from "@pedi
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { buildScene, type Scene } from "./scene";
-import { couplesOf, partnerIn } from "./graph";
+import { couplesOf, partnerIn, raisedChildrenOf } from "./graph";
+import { personLabel } from "./personLabel";
 
 /**
  * Linking two existing individuals as partners: the rules,
  * framework-free so the store and the picking UI share them.
  */
-
-function label(pedigree: Pedigree, id: string): string {
-  const ind = pedigree.individuals.find(i => i.id === id);
-  return ind?.name?.trim() || "this person";
-}
 
 /**
  * Why `aId` and `bId` cannot become partners, or null when they can.
@@ -28,7 +24,7 @@ export function linkPartnerProblem(pedigree: Pedigree, aId: string, bId: string)
   const b = pedigree.individuals.find(i => i.id === bId);
   if (!a || !b) return "Unknown individual.";
   for (const ind of [a, b]) {
-    if (ind.lifeStatus) return `${label(pedigree, ind.id)} is a pregnancy or pregnancy loss and cannot have a partner.`;
+    if (ind.lifeStatus) return `${personLabel(pedigree, ind.id, "this person", { start: true })} is a pregnancy or pregnancy loss and cannot have a partner.`;
   }
   const already = pedigree.partnerships.some(p =>
     (p.individual1 === aId && p.individual2 === bId) || (p.individual1 === bId && p.individual2 === aId));
@@ -129,22 +125,67 @@ export function drawBesideOptions(pedigree: Pedigree, partnershipId: string): st
   return choices.length === 2 ? choices : [];
 }
 
+export interface PersonCouple {
+  partnershipId: string;
+  partnerId: string;
+  /** The partner on their own (a list, an option): their name, else "Partner 2 (male)". */
+  label: string;
+  /** The partner inside a sentence: their name, else "partner 2 (male)". */
+  phrase: string;
+  /**
+   * A gamete donation pair (`donorConception`): the two are genetic parents
+   * of a child but not a relationship, and have no couple line, so nothing
+   * about a relationship (ended, consanguineous, childless, swap sides)
+   * applies to them.
+   */
+  donorPair: boolean;
+  /** No child raised (`raisedChildrenOf`): the childless mark applies and Remove partnership is allowed. */
+  childless: boolean;
+}
+
+/**
+ * Every couple `id` is in, relationships first and then donor pairs, each
+ * in pedigree order. An unnamed partner is numbered in this order, so the
+ * more menu, the Person tab and "Add children..." call them the same.
+ * Lists about relationships leave out the donor pairs (`donorPair`).
+ */
+export function personCouples(pedigree: Pedigree, id: string): PersonCouple[] {
+  const all = couplesOf(pedigree, id, { donorPairs: true });
+  return [...all.filter(p => !p.donorConception), ...all.filter(p => p.donorConception)].map((p, i) => {
+    const partnerId = partnerIn(p, id);
+    return {
+      partnershipId: p.id,
+      partnerId,
+      label: personLabel(pedigree, partnerId, { partner: i + 1 }, { start: true }),
+      phrase: personLabel(pedigree, partnerId, { partner: i + 1 }),
+      donorPair: !!p.donorConception,
+      childless: raisedChildrenOf(pedigree, p.id).length === 0,
+    };
+  });
+}
+
 /**
  * How to name one partner of a couple in a menu or a notice: their name, or
- * for someone unnamed "the man" / "the woman" where that tells the two
- * apart, else the side they are drawn on.
+ * for someone unnamed "partner 1 (male)". Seen from one of the two
+ * (`fromId`, the person whose menu it is) that person is "this person" and
+ * the other is numbered as in `personCouples`; seen from the couple line,
+ * partner 1 is the one drawn on the left.
  */
-export function couplePartnerLabel(pedigree: Pedigree, partnershipId: string, id: string): string {
+export function couplePartnerLabel(
+  pedigree: Pedigree, partnershipId: string, id: string,
+  { fromId, start = false }: { fromId?: string; start?: boolean } = {},
+): string {
   const p = pedigree.partnerships.find(q => q.id === partnershipId);
-  const person = pedigree.individuals.find(i => i.id === id);
-  const name = person?.name?.trim();
-  if (name || !p || !person) return name || "this person";
-  const other = pedigree.individuals.find(i => i.id === partnerIn(p, id));
-  if (person.sex !== other?.sex && person.sex !== "unknown") return person.sex === "male" ? "the man" : "the woman";
+  const name = pedigree.individuals.find(i => i.id === id)?.name?.trim();
+  if (name) return name;
+  if (!p || fromId === id) return personLabel(pedigree, id, "this person", { start });
+  if (fromId) {
+    const c = personCouples(pedigree, fromId).find(x => x.partnershipId === partnershipId);
+    if (c) return start ? c.label : c.phrase;
+  }
   const base = laidOutWith(pedigree, partnershipId);
-  const left = drawnLeftPartner(base, cachedLayout(base), partnershipId);
-  if (!left) return id === p.individual1 ? "the first partner" : "the second partner";
-  return left === id ? "the partner on the left" : "the partner on the right";
+  const left = drawnLeftPartner(base, cachedLayout(base), partnershipId) ?? p.individual1;
+  return personLabel(pedigree, id, { partner: id === left ? 1 : 2 }, { start });
 }
 
 function drawnTwice(scene: Scene): Set<string> {

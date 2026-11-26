@@ -141,7 +141,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               <div>
                 <div className="text-sm">Name consanguineous relationships</div>
                 <div className="text-xs text-gray-400">
-                  Write the relationship ("first cousins") above every double line it can be worked out for, with the kinship when they are more closely related than that ("siblings (3/8)" when their parents are siblings too). Text set on a couple in the edit panel is always shown.
+                  Write the relationship ("first cousins") above every double line it can be worked out for, with the kinship when they are more closely related than that ("siblings (3/8)" when their parents are siblings too). Text set on a couple on the Person tab is always shown.
                 </div>
               </div>
             </label>
@@ -301,7 +301,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               <div>
                 <div className="text-sm">Affected first</div>
                 <div className="text-xs text-gray-400">
-                  Affected individuals appear leftmost within each sibling group
+                  Affected people appear leftmost within each sibling group
                 </div>
               </div>
             </label>

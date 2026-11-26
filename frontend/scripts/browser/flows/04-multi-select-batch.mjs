@@ -64,5 +64,13 @@ export default {
     t.equal(await t.undoDepth(), steps + 1, "as one undo step");
     await t.press("Control+z");
     t.equal(await t.people(), people, "and one undo brings them back");
+
+    // Deleting someone else from the right-click menu leaves the selection alone.
+    await t.press("Escape");
+    await t.click(node("g3a"));
+    await t.rightClick(node("g3b"));
+    await t.click('[data-context-menu] button:text-is("Delete")');
+    t.ok(!(await t.pedigree()).individuals.some(i => i.id === "g3b"), "Delete in the menu of an unselected person removes them");
+    t.equal(await selected(), ["g3a"], "and whoever was selected stays selected");
   },
 };

@@ -1,5 +1,5 @@
 import { selectedPair, usePedigreeFields } from "../store/usePedigreeStore";
-import { batchLockState } from "../pedigree/selection";
+import { BATCH_LOCK_TITLE, BATCH_UNLOCK_TITLE, batchLockState } from "../pedigree/selection";
 import { kinshipOf, kinshipXOf, formatCoefficient, degreeOfRelationship } from "../pedigree/relatedness";
 import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigree/relationship";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -26,12 +26,12 @@ export function SelectionPanel() {
       {pair && <PairRelatedness pedigree={pedigree} a={pair[0]} b={pair[1]} />}
       <div className="flex flex-col items-start gap-1">
         {toUnlock.length > 0 && (
-          <PanelButton onClick={() => unlockIndividuals(toUnlock)} title="Let these people be dragged">
+          <PanelButton onClick={() => unlockIndividuals(toUnlock)} title={BATCH_UNLOCK_TITLE}>
             Unlock {toUnlock.length}
           </PanelButton>
         )}
         {toLock.length > 0 && (
-          <PanelButton onClick={() => lockIndividuals(toLock)} title="Lock and drop their pinned positions">
+          <PanelButton onClick={() => lockIndividuals(toLock)} title={BATCH_LOCK_TITLE}>
             Lock {toLock.length} (return to auto layout)
           </PanelButton>
         )}

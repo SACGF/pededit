@@ -26,14 +26,14 @@ export default {
     t.equal(await copiesDrawn("F2"), 1, "and F2 is drawn once");
 
     await t.rightClick(line);
-    t.equal(await t.count('[data-context-menu] [role="menuitemcheckbox"][aria-checked="true"]:has-text("The man")'), 1, "the menu ticks the partner the couple is drawn beside");
+    t.equal(await t.count('[data-context-menu] [role="menuitemcheckbox"][aria-checked="true"]:has-text("(male)")'), 1, "the menu ticks the partner the couple is drawn beside");
     await t.click("[data-context-menu] >> text=Automatic");
     t.ok((await couple()).drawnBeside === undefined && (await couple()).leftPartner === undefined, "Automatic hands the couple back to the layout");
     t.equal(await twicePerRow(), [2, 2, 0], "which draws four people twice, two of them in the second row");
     t.equal(await copiesDrawn("F2"), 2, "F2 is on the canvas twice");
     t.match(await t.text('[role="status"]'), /4 people are drawn twice now; 3 were before/, "and a notice says so");
 
-    await t.menu(line, "The man");
+    await t.menu(line, "/Partner \\d \\(male\\)/");
     t.equal((await couple()).drawnBeside, "C", "choosing C draws the couple beside him again");
     t.equal(await twicePerRow(), [3, 0, 0], "three people drawn twice, in the top row only");
     t.equal(await copiesDrawn("F2"), 1, "F2 is drawn once again");
@@ -50,14 +50,14 @@ export default {
     await t.reload();
     t.equal(await twicePerRow(), [3, 0, 0], "and the reloaded pedigree is drawn the same way");
 
-    // The same choice without the couple line: on a partner's own menu,
-    // named by the other partner when they have more than one couple, and
+    // The same choice without the couple line: on a partner's own menu, in
+    // the group of each couple, headed by the other partner, and
     // on the menu of the two partners selected together.
     // Whoever is drawn twice has two symbols; either copy will do.
     const node = id => `[data-individual-id="${id}"] >> nth=0`;
     await t.rightClick(node("B"));
-    t.match(await t.text("[data-context-menu]"), /Draw the couple with [^\n]* beside/i, "a partner's own menu offers it for each of their couples");
-    t.equal(await t.count('[data-context-menu] [data-draw-beside="C+B"] [aria-checked="true"]:has-text("The man")'), 1, "with the same tick as the couple line's menu");
+    t.match(await t.text("[data-context-menu]"), /With [^\n]+\n[\s\S]*Draw this couple beside/i, "a partner's own menu offers it in the group of each of their couples");
+    t.equal(await t.count('[data-context-menu] [data-draw-beside="C+B"] [aria-checked="true"]:has-text("(male)")'), 1, "with the same tick as the couple line's menu");
     t.equal(await t.count("[data-context-menu] [data-draw-beside]"), 2, "B is in two couples that have the choice");
     await t.click('[data-context-menu] [data-draw-beside="C+B"] >> text=Automatic');
     t.equal(await twicePerRow(), [2, 2, 0], "and choosing there redraws the couple");

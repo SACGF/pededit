@@ -299,7 +299,7 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
                   Draws one founding couple and their descendants
                   {uPartners ? ", each with their partners." : " by blood only."}
                   {omittedCount > 0 &&
-                    ` ${omittedCount} of ${uFigure!.total} individuals ${omittedCount === 1 ? "is" : "are"} outside that line` +
+                    ` ${omittedCount} of ${uFigure!.total} people ${omittedCount === 1 ? "is" : "are"} outside that line` +
                     `${uFigure!.notDrawn > 0 ? " or not drawn on the chart" : ""} and will be left out.`}
                 </p>
               </>

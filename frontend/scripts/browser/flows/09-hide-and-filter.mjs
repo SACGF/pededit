@@ -42,15 +42,26 @@ export default {
     await turnOn("Affected only");
     t.equal(await drawn(), total, "turning it off draws everyone");
 
+    // A married-in partner with parents of his own: the filter leaves them out.
+    await t.pill("c8h", "Add parents");
+    const withHisParents = await t.people();
+    t.equal(withHisParents, total + 2, "Add parents gives the cousin's husband two parents");
     await turnOn("Blood relatives only");
     t.ok((await t.drawn()).includes("c8h"), "Blood relatives only still draws partners, so nobody here is left out who married in");
-    t.equal(await t.people(), total, "nobody is deleted by a filter");
+    t.ok((await t.drawn()).length < withHisParents, "and leaves out his parents");
+    t.equal(await t.people(), withHisParents, "nobody is deleted by a filter");
+    // The pill asks the stored pedigree, as the Person tab does: he has parents, drawn or not.
+    await t.hover('[data-individual-id="c8h"]');
+    const pillButton = title => t.eval(title => document.querySelector(`[data-testid="hover-pill"] button[title="${title}"]`)?.disabled, title);
+    t.equal(await pillButton("Add parents"), true, "his hover pill does not offer Add parents under the filter");
+    t.equal(await pillButton("Add sibling"), false, "and offers Add sibling");
+    await t.mouseAway();
     await turnOn("Mother's");
     t.equal((await t.pedigree()).filters, { bloodRelativesOnly: true, side: "maternal" }, "two filters can be on at once");
     t.ok(!(await t.drawn()).includes("pa2"), "Mother's side leaves out the father's brother");
 
     await t.reload();
     t.equal((await t.stored(id)).data.filters, { bloodRelativesOnly: true, side: "maternal" }, "the filters are saved with the pedigree");
-    t.equal((await t.stored(id)).data.individuals.length, total, "with everyone still in it");
+    t.equal((await t.stored(id)).data.individuals.length, withHisParents, "with everyone still in it");
   },
 };

@@ -1,15 +1,19 @@
-import { hasPartnerOrChild, usePedigreeFields } from "../store/usePedigreeStore";
+import { usePedigreeFields } from "../store/usePedigreeStore";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Legend, SectionHeader } from "./Legend";
 import { ConditionsAndTags } from "./ConditionsAndTags";
 import { SelectionPanel } from "./SelectionPanel";
 import { PersonActions } from "./PersonActions";
-import { LIFE_STATUS_OPTIONS } from "../pedigree/lifeStatus";
+import { LIFE_STATUS_LOCKED_TITLE, LIFE_STATUS_OPTIONS, lifeStatusLocked } from "../pedigree/lifeStatus";
+import { ENDED_LABEL, ENDED_TITLE } from "../pedigree/ended";
+import { probandTitle } from "../pedigree/proband";
+import { personCouples } from "../pedigree/partners";
+import { capitalised, personLabel } from "../pedigree/personLabel";
 import { CHILDLESS_OPTIONS } from "../pedigree/childless";
 import { ADOPTION_OPTIONS } from "../pedigree/adoption";
 import { GENDER_IDENTITY_OPTIONS, assignedAtBirthText, drawsGender } from "../pedigree/gender";
-import { ZYGOSITY_OPTIONS, twinSetOf, twinSetProblem } from "../pedigree/twins";
+import { ZYGOSITY_OPTIONS, adjacentSibling, twinSetOf, twinSetProblem } from "../pedigree/twins";
 import { formatCoefficient, degreeOfRelationship, relatednessOf } from "../pedigree/relatedness";
 import { referenceRelatedness } from "../pedigree/referenceRelatedness";
 import { namedCoupleRelationship } from "../pedigree/consanguinityLabel";
@@ -33,7 +37,7 @@ import {
 import { batchSexProblem, carrierStatusOf } from "../pedigree/batch";
 import { notationOf } from "../pedigree/notation";
 import { symbolPaint, PLAIN_CARRIER_TAG } from "../pedigree/tags";
-import { childrenOf, couplesOf, parentCoupleOf, partnerIn, raisedChildrenOf } from "../pedigree/graph";
+import { childrenOf, parentCoupleOf } from "../pedigree/graph";
 
 /** Small screens: how much of the screen the side panel's sheet takes. */
 export type PanelSize = "closed" | "half" | "full";
@@ -203,7 +207,7 @@ function SheetHandle({ size, onSizeChange }: { size: PanelSize; onSizeChange: (s
 function IndividualForm({ individual, onManageTags }: { individual: Individual; onManageTags?: () => void }) {
   const { pedigree, updateIndividual, setDeceased, setDateOfDeath, setCarrier, setPresymptomatic, setFamilyHistoryUnknown, setLifeStatus, setAdopted, setOnset, setAffected, setProband, setConsultand, setConditionStatus, setIndividualTag } = usePedigreeFields("pedigree", "updateIndividual", "setDeceased", "setDateOfDeath", "setCarrier", "setPresymptomatic", "setFamilyHistoryUnknown", "setLifeStatus", "setAdopted", "setOnset", "setAffected", "setProband", "setConsultand", "setConditionStatus", "setIndividualTag");
   // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
-  const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individual.id);
+  const isLifeStatusLocked = lifeStatusLocked(pedigree, individual);
   // With any condition defined, conditions are recorded only in "Conditions and tags" and
   // Status keeps the plain flags, affected or carrier with no condition recorded.
   const withConditions = conditionMode(pedigree) !== "plain";
@@ -408,7 +412,7 @@ function IndividualForm({ individual, onManageTags }: { individual: Individual; 
             value={individual.lifeStatus ?? ""}
             aria-label="Pregnancy / loss"
             disabled={isLifeStatusLocked}
-            title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
+            title={isLifeStatusLocked ? LIFE_STATUS_LOCKED_TITLE : undefined}
             onChange={e => setLifeStatus(individual.id, (e.target.value || undefined) as LifeStatus | undefined)}
             className={`${SELECT} disabled:opacity-50`}
           >
@@ -673,15 +677,6 @@ function siblingLabel(pedigree: Pedigree, id: string): string {
   return `${sex} ${sibs.indexOf(id) + 1}`;
 }
 
-/** The sibling drawn next to this person: the next one in the sibship, or the previous one for the last. */
-export function adjacentSibling(pedigree: Pedigree, individualId: string): string | undefined {
-  const couple = parentCoupleOf(pedigree, individualId);
-  const sibs = couple ? childrenOf(pedigree, couple.id) : [];
-  const i = sibs.indexOf(individualId);
-  if (i < 0 || sibs.length < 2) return undefined;
-  return sibs[i + 1] ?? sibs[i - 1];
-}
-
 /**
  * Twins: zygosity for the selected person's twin set and which
  * siblings are in it. Choosing a zygosity when the person is not a twin yet
@@ -752,19 +747,6 @@ function TwinsForm({ individual }: { individual: Individual }) {
   );
 }
 
-/** Label for the other member of a partnership, as the more menu names them. */
-export function partnerLabel(pedigree: Pedigree, individualId: string, partnershipId: string): string {
-  const own = couplesOf(pedigree, individualId, { donorPairs: true });
-  const i = own.findIndex(p => p.id === partnershipId);
-  const p = own[i];
-  if (!p) return "partner";
-  const otherId = partnerIn(p, individualId);
-  const other = pedigree.individuals.find(ind => ind.id === otherId);
-  const name = other?.name?.trim();
-  const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
-  return name || `partner ${i + 1} (${sexLabel})`;
-}
-
 /** An X-linked coefficient, which is NaN when it turns on someone's unknown sex. */
 function formatCoefficientX(x: number): string {
   return Number.isNaN(x) ? "unknown (a sex is not recorded)" : formatCoefficient(x);
@@ -787,6 +769,7 @@ function formatCoefficientX(x: number): string {
 function RelatednessSection({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipConsanguineous } = usePedigreeFields("pedigree", "setPartnershipConsanguineous");
   const { inbreeding, inbreedingX, couples } = relatednessOf(pedigree, individual.id);
+  const partners = personCouples(pedigree, individual.id);
   const references = referenceRelatedness(pedigree, individual.id);
   if (!(inbreeding > 0) && couples.length === 0 && references.length === 0) return null;
 
@@ -810,7 +793,7 @@ function RelatednessSection({ individual }: { individual: Individual }) {
           </div>
         )}
         {couples.map(c => {
-          const partner = partnerLabel(pedigree, individual.id, c.partnershipId);
+          const partner = partners.find(x => x.partnershipId === c.partnershipId)?.phrase ?? "";
           const related = c.kinship > 0;
           const flagged = !!pedigree.partnerships.find(p => p.id === c.partnershipId)?.consanguineous;
           return (
@@ -842,7 +825,7 @@ function RelatednessSection({ individual }: { individual: Individual }) {
                     X-linked kinship <span className="font-medium">{formatCoefficientX(c.kinshipX)}</span>
                   </div>
                   <div className="text-[10px] text-gray-500">
-                    {capitalise(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = {formatCoefficient(c.kinship)}
+                    {capitalised(degreeOfRelationship(c.kinship) ?? "")}. Their children have F = {formatCoefficient(c.kinship)}
                     {Number.isNaN(c.kinshipX) ? "." : `, their daughters X-linked F = ${formatCoefficient(c.kinshipX)}.`}
                   </div>
                 </div>
@@ -901,10 +884,6 @@ function ConsanguinityLabelField({ partnershipId }: { partnershipId: string }) {
   );
 }
 
-function capitalise(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
 /**
  * Partners: one block per couple this person is in, with the ended
  * mark (two short strokes across the couple line for a separation or
@@ -913,28 +892,28 @@ function capitalise(text: string): string {
  */
 function PartnersForm({ individual }: { individual: Individual }) {
   const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason");
-  const own = couplesOf(pedigree, individual.id, { donorPairs: false });
+  const own = personCouples(pedigree, individual.id).filter(c => !c.donorPair);
   if (own.length === 0) return null;
   return (
     <div className="border-t pt-3 space-y-2" data-testid="partners-form">
       <SectionHeader>Partners</SectionHeader>
-      {own.map(p => {
-        const partner = partnerLabel(pedigree, individual.id, p.id);
-        const childless = raisedChildrenOf(pedigree, p.id).length === 0;
+      {own.map(c => {
+        const p = pedigree.partnerships.find(q => q.id === c.partnershipId)!;
+        const partner = c.phrase;
         return (
           <div key={p.id} className="space-y-1 text-xs text-gray-600" data-partner-row={p.id}>
-            <div className="text-gray-800 break-words">{partner}</div>
-            <label className="flex items-center gap-2 cursor-pointer" title="Separated or divorced: two short strokes across the couple line">
+            <div className="text-gray-800 break-words">{c.label}</div>
+            <label className="flex items-center gap-2 cursor-pointer" title={ENDED_TITLE}>
               <input
                 type="checkbox"
                 checked={!!p.ended}
-                aria-label={`Ended with ${partner}`}
+                aria-label={`${ENDED_LABEL} with ${partner}`}
                 onChange={e => setPartnershipEnded(p.id, e.target.checked)}
                 className="accent-black"
               />
-              <span>Relationship ended</span>
+              <span>{ENDED_LABEL}</span>
             </label>
-            {childless && (
+            {c.childless && (
               <Field inline label="No children">
                 <select
                   value={p.childless ?? ""}
@@ -976,7 +955,7 @@ function AssistedForm({ individual, problemsOn }: { individual: Individual; prob
   const label = (id: string) => {
     const ind = pedigree.individuals.find(i => i.id === id);
     const letter = ind && symbolLetter(ind);
-    return (ind?.name?.trim() || (letter ? `${letter === "D" ? "Donor" : "Surrogate"} (${ind!.sex})` : `Unnamed ${ind?.sex ?? ""}`)).trim();
+    return ind?.name?.trim() || (letter ? `${letter === "D" ? "Donor" : "Surrogate"} (${ind!.sex})` : personLabel(pedigree, id, "unnamed", { start: true }));
   };
   const hasParents = geneticParents(pedigree, individual.id).length > 0;
   const donorConceived = !!parentCoupleOf(pedigree, individual.id)?.donorConception;
@@ -1065,13 +1044,6 @@ interface ProblemProps {
   problemFor?: string;
   problemField?: ProblemField;
   problems?: Problem[];
-}
-
-/** Proband checkbox tooltip: one per pedigree, so say whose arrow moves. */
-function probandTitle(pedigree: Pedigree, individual: Individual): string {
-  const other = pedigree.individuals.find(i => i.proband && i.id !== individual.id);
-  if (!other) return "The affected person through whom the family came to attention: an arrow with a P. One per pedigree.";
-  return `One per pedigree: ticking this moves the proband arrow from ${other.name?.trim() || "another person"}.`;
 }
 
 /**

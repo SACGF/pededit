@@ -92,7 +92,7 @@ describe("draw this couple beside (#205)", () => {
     expect(store().setCoupleDrawnBeside("C+B", null)).toMatch(/already chooses/);
     store().setCoupleDrawnBeside("C+B", "C");
     const once = store().pedigree;
-    expect(store().setCoupleDrawnBeside("C+B", "C")).toMatch(/already drawn beside the man/);
+    expect(store().setCoupleDrawnBeside("C+B", "C")).toMatch(/already drawn beside partner [12] \(male\)/);
     expect(store().pedigree).toBe(once);
     expect(store().notice).toMatchObject({ kind: "info" });
     expect(untouched).not.toBe(once);
@@ -112,7 +112,7 @@ describe("draw this couple beside (#205)", () => {
         : q.id === "C+B" ? { ...q, leftPartner: "C" } : q),
     };
     store().initialize(sided);
-    expect(store().setCoupleDrawnBeside("C+B", "B")).toMatch(/cannot be drawn beside the woman together with the choices made for other couples/);
+    expect(store().setCoupleDrawnBeside("C+B", "B")).toMatch(/cannot be drawn beside partner [12] \(female\) together with the choices made for other couples/);
     expect(store().pedigree).toBe(sided);
     expect(lintScene(sided, buildScene(sided))).toEqual([]);
   });
@@ -134,9 +134,11 @@ describe("draw this couple beside (#205)", () => {
     }
   });
 
-  it("names an unnamed partner by sex and a named one by name", () => {
-    expect(couplePartnerLabel(ring(), "C+B", "C")).toBe("the man");
-    expect(couplePartnerLabel(ring(), "C+B", "B")).toBe("the woman");
+  it("names an unnamed partner by the side drawn on and sex, seen from the couple or from one of them, and a named one by name", () => {
+    expect(couplePartnerLabel(ring(), "C+B", "C")).toBe("partner 1 (male)");
+    expect(couplePartnerLabel(ring(), "C+B", "B", { start: true })).toBe("Partner 2 (female)");
+    expect(couplePartnerLabel(ring(), "C+B", "B", { fromId: "B", start: true })).toBe("This person");
+    expect(couplePartnerLabel(ring(), "C+B", "C", { fromId: "B" })).toMatch(/^partner \d \(male\)$/);
     const named: Pedigree = { ...ring(), individuals: ring().individuals.map(i => (i.id === "C" ? { ...i, name: "Cy" } : i)) };
     expect(couplePartnerLabel(named, "C+B", "C")).toBe("Cy");
   });

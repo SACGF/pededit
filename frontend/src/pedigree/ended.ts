@@ -12,6 +12,8 @@ import { childrenOf } from "./graph";
 
 /** Legend and export key row. */
 export const ENDED_LABEL = "Relationship ended";
+/** The tooltip of every control that sets it. */
+export const ENDED_TITLE = "Separated or divorced: two short strokes across the couple line";
 
 /** Half the horizontal run (px) of one stroke. */
 export const ENDED_STROKE_DX = 3;

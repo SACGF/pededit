@@ -1,22 +1,25 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Pedigree, Sex, Tag } from "@pedigree-editor/layout-engine";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { usePedigreeStore, hasPartnerOrChild, MAX_ADD_CHILDREN, usePedigreeFields } from "../../store/usePedigreeStore";
-import { LIFE_STATUS_OPTIONS } from "../lifeStatus";
+import { usePedigreeStore, MAX_ADD_CHILDREN, usePedigreeFields } from "../../store/usePedigreeStore";
+import { LIFE_STATUS_LOCKED_TITLE, LIFE_STATUS_OPTIONS, NO_CHILDREN_TITLE, NO_PARTNER_TITLE, lifeStatusLocked } from "../lifeStatus";
+import { ENDED_LABEL, ENDED_TITLE } from "../ended";
+import { probandTitle } from "../proband";
+import { DELETE_TITLE, REMOVE_WITH_ANCESTORS_TITLE, REMOVE_WITH_DESCENDANTS_TITLE } from "../removal";
+import { TagSwatchSvg } from "../chart/keySwatches";
 import { CHILDLESS_OPTIONS } from "../childless";
 import { ADOPTION_OPTIONS } from "../adoption";
 import { addDonorProblem, addSurrogateProblem } from "../assisted";
-import { ZYGOSITY_OPTIONS, twinSetOf, twinSetProblem } from "../twins";
-import { adjacentSibling } from "../../components/EditPanel";
-import { batchLockState, batchCollapseState } from "../selection";
+import { ZYGOSITY_OPTIONS, adjacentSibling, twinSetOf, twinSetProblem } from "../twins";
+import { BATCH_LOCK_TITLE, BATCH_UNLOCK_TITLE, batchLockState, batchCollapseState } from "../selection";
 import { coupleConsanguinity } from "../consanguinity";
 import { namedCoupleRelationship } from "../consanguinityLabel";
-import { hasDescendants } from "../collapse";
+import { drawnPedigree, hasDescendants } from "../collapse";
 import { batchStatus, batchSexProblem, carrierStatusOf } from "../batch";
 import { CONDITIONS_AND_TAGS, CONDITION_NOT_RECORDED, affectedControlOn, isConditionTag, conditionMode, conditionStateOf, conditionTags, soleCondition } from "../conditions";
 import { donorPairFor, sameSexCouple } from "../sameSex";
-import { coupleOfPair, couplePartnerLabel, drawBesideOptions } from "../partners";
-import { couplesOf, hasParents, parentCoupleOf, partnerIn, raisedChildrenOf } from "../graph";
+import { coupleOfPair, couplePartnerLabel, drawBesideOptions, personCouples } from "../partners";
+import { hasParents, parentCoupleOf, raisedChildrenOf } from "../graph";
 
 function clampCount(n: number): number {
   if (!Number.isFinite(n)) return 1;
@@ -100,14 +103,9 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     moveSibLeft,
     moveSibRight,
     deleteIndividual,
-    setSelectedId,
     unpinIndividual,
     setIndividualTag,
     setConditionStatus,
-    setPartnershipChildless,
-    setPartnershipConsanguineous,
-    setPartnershipEnded,
-    swapPartnerSides,
     setAdopted,
     addDonor,
     addSurrogate,
@@ -117,14 +115,12 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
     removeWithAncestors,
     setDescendantsHidden,
     startPickingParents,
-    startPickingChild,
     startPickingPartner,
     startPickingDonor,
     startPickingSurrogate,
     detachFromParents,
-    removePartnership,
   } = usePedigreeFields(
-    "pedigree", "addPartner", "addChildren", "setAffected", "setDeceased", "setCarrier", "setPresymptomatic", "setProband", "setConsultand", "setFamilyHistoryUnknown", "setSex", "setLifeStatus", "moveSibLeft", "moveSibRight", "deleteIndividual", "setSelectedId", "unpinIndividual", "setIndividualTag", "setConditionStatus", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "setAdopted", "addDonor", "addSurrogate", "setTwins", "removeTwin", "removeWithDescendants", "removeWithAncestors", "setDescendantsHidden", "startPickingParents", "startPickingChild", "startPickingPartner", "startPickingDonor", "startPickingSurrogate", "detachFromParents", "removePartnership",
+    "pedigree", "addPartner", "addChildren", "setAffected", "setDeceased", "setCarrier", "setPresymptomatic", "setProband", "setConsultand", "setFamilyHistoryUnknown", "setSex", "setLifeStatus", "moveSibLeft", "moveSibRight", "deleteIndividual", "unpinIndividual", "setIndividualTag", "setConditionStatus", "setAdopted", "addDonor", "addSurrogate", "setTwins", "removeTwin", "removeWithDescendants", "removeWithAncestors", "setDescendantsHidden", "startPickingParents", "startPickingPartner", "startPickingDonor", "startPickingSurrogate", "detachFromParents",
   );
   const selectedIds = usePedigreeStore(s => s.selectedIds);
 
@@ -149,19 +145,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
 
   const isPinned = !!pedigree.pinnedPositions?.[individualId];
   const hasParentsAlready = hasParents(pedigree, individualId);
-  const ownPartnerships = partnerChoices(pedigree, individualId);
-  // Gamete donation pairs have no couple line, so no line to mark.
-  const couples = ownPartnerships.filter(c => !pedigree.partnerships.find(p => p.id === c.partnershipId)?.donorConception);
+  // A gamete donation pair is not a relationship and has no couple line, so none of the couple items apply.
+  const couples = personCouples(pedigree, individualId).filter(c => !c.donorPair);
   // Twins: the current set, or the sibling drawn next to this person to pair with.
   const twin = twinSetOf(pedigree, individualId);
   const twinPartnership = parentCoupleOf(pedigree, individualId);
   const twinMembers = twin?.set.members ?? [individualId, adjacentSibling(pedigree, individualId) ?? ""].filter(Boolean);
-  // Partnerships of this person with no children: the childless mark applies to these.
-  const childlessCouples = partnerChoices(pedigree, individualId)
-    .filter(c => raisedChildrenOf(pedigree, c.partnershipId).length === 0)
-    .map(c => ({ ...c, status: pedigree.partnerships.find(p => p.id === c.partnershipId)?.childless }));
-  // A pregnancy or pregnancy loss cannot have a partner or children, and vice versa.
-  const isLifeStatusLocked = !individual.lifeStatus && hasPartnerOrChild(pedigree, individualId);
+  const isLifeStatusLocked = lifeStatusLocked(pedigree, individual);
 
   // Partners may share a sex; a child's two genetic parents may not.
   const sexProblem = (sex: Sex) => individual.sex === sex ? null : batchSexProblem(pedigree, [individualId], sex);
@@ -178,7 +168,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           <MenuItem
             onClick={() => action(() => addPartner(individualId))}
             disabled={!!individual.lifeStatus}
-            title={individual.lifeStatus ? "A pregnancy or pregnancy loss cannot have a partner" : undefined}
+            title={individual.lifeStatus ? NO_PARTNER_TITLE : undefined}
           >
             Add partner
           </MenuItem>
@@ -187,7 +177,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               onClick={() => action(() => startPickingPartner(individualId))}
               disabled={!!individual.lifeStatus}
               title={individual.lifeStatus
-                ? "A pregnancy or pregnancy loss cannot have a partner"
+                ? NO_PARTNER_TITLE
                 : "Click someone already on the tree to make them this person's partner, for example a relative"}
             >
               Add existing partner...
@@ -197,7 +187,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
             onClick={() => setShowAddChildren(v => !v)}
             active={showAddChildren}
             disabled={!!individual.lifeStatus}
-            title={individual.lifeStatus ? "A pregnancy or pregnancy loss cannot have children" : undefined}
+            title={individual.lifeStatus ? NO_CHILDREN_TITLE : undefined}
           >
             Add children...
           </MenuItem>
@@ -219,16 +209,6 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               title="Take this person out of their parents' sibship: they become a founder, and the parents stay"
             >
               Detach from parents
-            </MenuItem>
-          )}
-          {ownPartnerships.length > 0 && !individual.lifeStatus && (
-            <MenuItem
-              onClick={() => action(() => startPickingChild(ownPartnerships[0]!.partnershipId, individualId))}
-              title={ownPartnerships.length > 1
-                ? `Click an existing person on the canvas to make them a child of this couple (with ${ownPartnerships[0]!.label}; use Set parents on the child for another partner)`
-                : "Click an existing person on the canvas to make them a child of this couple"}
-            >
-              Add existing child...
             </MenuItem>
           )}
         </MenuSection>
@@ -270,7 +250,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
           >
             Presymptomatic carrier
           </MenuItem>
-          <MenuItem onClick={() => action(() => setProband(individualId))}>
+          <MenuItem onClick={() => action(() => setProband(individualId))} title={probandTitle(pedigree, individual)}>
             {individual.proband ? "Unmark proband" : "Mark as proband"}
           </MenuItem>
           <MenuItem
@@ -297,13 +277,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                   key={`${tag.id}-a`} checked={state === "affected"}
                   onClick={() => action(() => setConditionStatus(individualId, tag.id, state === "affected" ? "none" : "affected"))}
                 >
-                  <ConditionItemLabel tag={tag} text={`Affected with ${tag.label}`} on={state === "affected"} />
+                  <ConditionItemLabel tag={tag} pedigree={pedigree} text={`Affected with ${tag.label}`} />
                 </MenuItem>,
                 <MenuItem
                   key={`${tag.id}-c`} checked={state === "carrier"}
                   onClick={() => action(() => setConditionStatus(individualId, tag.id, state === "carrier" ? "none" : "carrier"))}
                 >
-                  <ConditionItemLabel tag={tag} text={`Carrier of ${tag.label}`} on={state === "carrier"} />
+                  <ConditionItemLabel tag={tag} pedigree={pedigree} carrier text={`Carrier of ${tag.label}`} />
                 </MenuItem>,
               ];
             })}
@@ -321,10 +301,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                   active={on}
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    <span
-                      className="inline-block w-2 h-2 border border-black/20"
-                      style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
-                    />
+                    <MenuSwatch tag={tag} pedigree={pedigree} />
                     {tag.label}
                     {on && <span className="text-gray-400">✓</span>}
                   </span>
@@ -363,7 +340,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                   onClick={() => action(() => setTwins(twinPartnership.id, twinMembers, o.value))}
                   active={twin?.set.zygosity === o.value}
                   disabled={!!why}
-                  title={why ?? (twin ? undefined : "Pairs with the sibling drawn next to this person; pick others in the edit panel")}
+                  title={why ?? (twin ? undefined : "Pairs with the sibling drawn next to this person; pick others on the Person tab")}
                 >
                   {o.label}
                 </MenuItem>
@@ -451,93 +428,16 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               onClick={() => action(() => setLifeStatus(individualId, o.value))}
               active={individual.lifeStatus === o.value}
               disabled={isLifeStatusLocked}
-              title={isLifeStatusLocked ? "Not available: this person has a partner or children" : undefined}
+              title={isLifeStatusLocked ? LIFE_STATUS_LOCKED_TITLE : undefined}
             >
               {o.label}
             </MenuItem>
           ))}
         </MenuSection>
 
-        {couples.length > 0 && (
-          <MenuSection label="Consanguinity">
-            {couples.map(c => (
-              <ConsanguineousItem
-                key={c.partnershipId}
-                partnershipId={c.partnershipId}
-                label={couples.length > 1 ? `Consanguineous with ${c.label}` : "Consanguineous"}
-                onToggle={on => action(() => setPartnershipConsanguineous(c.partnershipId, on))}
-              />
-            ))}
-          </MenuSection>
-        )}
-
-        {couples.length > 0 && (
-          <MenuSection label="Relationship">
-            {couples.map(c => {
-              const ended = !!pedigree.partnerships.find(p => p.id === c.partnershipId)?.ended;
-              return (
-                <MenuItem
-                  key={c.partnershipId}
-                  onClick={() => action(() => setPartnershipEnded(c.partnershipId, !ended))}
-                  active={ended}
-                  checked={ended}
-                  title={ENDED_TITLE}
-                >
-                  {couples.length > 1 ? `Ended with ${c.label}` : "Ended"}
-                </MenuItem>
-              );
-            })}
-            {couples.map(c => (
-              <MenuItem
-                key={`swap:${c.partnershipId}`}
-                onClick={() => action(() => swapPartnerSides(c.partnershipId))}
-                title={SWAP_SIDES_TITLE}
-              >
-                {couples.length > 1 ? `Swap sides with ${c.label}` : "Swap sides"}
-              </MenuItem>
-            ))}
-          </MenuSection>
-        )}
-
         {couples.map(c => (
-          <DrawBesideSection
-            key={c.partnershipId}
-            partnershipId={c.partnershipId}
-            label={couples.length > 1 ? `Draw the couple with ${c.label} beside` : "Draw this couple beside"}
-            action={action}
-          />
+          <CoupleMenuItems key={c.partnershipId} partnershipId={c.partnershipId} fromId={individualId} onDone={onDone} />
         ))}
-
-        {childlessCouples.length > 0 && (
-          <MenuSection label="Couple without children">
-            {childlessCouples.map(c => (
-              <div key={c.partnershipId}>
-                {childlessCouples.length > 1 && (
-                  <div className="px-2 text-[10px] text-gray-500 truncate">With {c.label}</div>
-                )}
-                <MenuItem onClick={() => action(() => setPartnershipChildless(c.partnershipId, undefined))} active={!c.status}>
-                  No mark
-                </MenuItem>
-                {CHILDLESS_OPTIONS.map(o => (
-                  <MenuItem
-                    key={o.value}
-                    onClick={() => action(() => setPartnershipChildless(c.partnershipId, o.value))}
-                    active={c.status === o.value}
-                  >
-                    {o.label}
-                  </MenuItem>
-                ))}
-                <MenuItem
-                  onClick={() => action(() => removePartnership(c.partnershipId))}
-                  destructive
-                  title={REMOVE_PARTNERSHIP_TITLE}
-                >
-                  Remove partnership
-                </MenuItem>
-              </div>
-            ))}
-          </MenuSection>
-        )}
 
         {(individual.descendantsHidden || hasDescendants(pedigree, individualId)) && (
           <div className="border-t mt-1 pt-1">
@@ -554,23 +454,23 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
 
         <div className="border-t mt-1 pt-1">
           <MenuItem
-            onClick={() => action(() => { deleteIndividual(individualId); setSelectedId(null); })}
+            onClick={() => action(() => deleteIndividual(individualId))}
             destructive
-            title="Delete (children stay, as founders)"
+            title={DELETE_TITLE}
           >
             Delete
           </MenuItem>
           <MenuItem
             onClick={() => action(() => removeWithDescendants([individualId]))}
             destructive
-            title="Shift+Delete. Also removes everyone below and partners who married in"
+            title={REMOVE_WITH_DESCENDANTS_TITLE}
           >
             Remove with descendants
           </MenuItem>
           <MenuItem
             onClick={() => action(() => removeWithAncestors([individualId]))}
             destructive
-            title="Alt+Delete. Also removes everyone above; descendants become founders"
+            title={REMOVE_WITH_ANCESTORS_TITLE}
           >
             Remove with ancestors
           </MenuItem>
@@ -627,8 +527,6 @@ function ConsanguinityLabelItem({ partnershipId, onDone }: { partnershipId: stri
   );
 }
 
-const ENDED_TITLE = "Separated or divorced: two short strokes across the couple line";
-
 /**
  * The consanguinity override for one couple, as a toggle. A couple the
  * pedigree already shows to be related is ticked and disabled, as in the
@@ -659,15 +557,20 @@ function ConsanguineousItem({ partnershipId, label, onToggle }: {
 }
 
 /**
- * The right-click menu of a couple line: what the more menu offers
- * for one partnership, without the person items.
+ * Everything offered for one couple: the right-click menu of a couple line,
+ * the menu of both partners selected together, and one group per couple in
+ * a partner's own menu (`fromId`, that partner), which names the other
+ * partner as `personCouples` does. A new couple item goes here only.
  */
-export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: string; onDone: () => void }) {
+export function CoupleMenuItems({ partnershipId, fromId, onDone }: { partnershipId: string; fromId?: string; onDone: () => void }) {
   const { pedigree, setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeFields("pedigree", "setPartnershipChildless", "setPartnershipConsanguineous", "setPartnershipEnded", "swapPartnerSides", "startPickingChild", "removePartnership");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
+  const heading = fromId
+    ? `With ${couplePartnerLabel(pedigree, partnershipId, fromId === partnership.individual1 ? partnership.individual2 : partnership.individual1, { fromId })}`
+    : n1 && n2 ? `${n1} and ${n2}` : "Couple";
   const childless = raisedChildrenOf(pedigree, partnershipId).length === 0;
   const sameSex = !!sameSexCouple(pedigree, partnershipId);
   function action(fn: () => void) {
@@ -677,7 +580,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
 
   return (
     <>
-      <MenuSection label={n1 && n2 ? `${n1} and ${n2}` : "Couple"}>
+      <MenuSection label={heading}>
         <ConsanguineousItem
           partnershipId={partnershipId}
           label="Consanguineous"
@@ -690,13 +593,13 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           checked={!!partnership.ended}
           title={ENDED_TITLE}
         >
-          Relationship ended
+          {ENDED_LABEL}
         </MenuItem>
         <MenuItem onClick={() => action(() => swapPartnerSides(partnershipId))} title={SWAP_SIDES_TITLE}>
           Swap sides
         </MenuItem>
         {sameSex ? (
-          <SameSexChildItems partnershipId={partnershipId} action={action} />
+          <SameSexChildItems partnershipId={partnershipId} fromId={fromId} action={action} />
         ) : (
           <MenuItem
             onClick={() => action(() => startPickingChild(partnershipId))}
@@ -714,7 +617,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
           Remove partnership
         </MenuItem>
       </MenuSection>
-      <DrawBesideSection partnershipId={partnershipId} label="Draw this couple beside" action={action} />
+      <DrawBesideSection partnershipId={partnershipId} fromId={fromId} action={action} />
       {childless && (
         <MenuSection label="Couple without children">
           <MenuItem onClick={() => action(() => setPartnershipChildless(partnershipId, undefined))} active={!partnership.childless}>
@@ -741,7 +644,7 @@ export function CoupleMenuItems({ partnershipId, onDone }: { partnershipId: stri
  * for a couple with no choice to make; a stored choice the structure no
  * longer allows can still be handed back to the layout.
  */
-function DrawBesideSection({ partnershipId, label, action }: { partnershipId: string; label: string; action: (fn: () => void) => void }) {
+function DrawBesideSection({ partnershipId, fromId, action }: { partnershipId: string; fromId?: string; action: (fn: () => void) => void }) {
   const { pedigree, setCoupleDrawnBeside } = usePedigreeFields("pedigree", "setCoupleDrawnBeside");
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
@@ -750,7 +653,7 @@ function DrawBesideSection({ partnershipId, label, action }: { partnershipId: st
   if (choices.length === 0) return null;
   return (
     <div data-draw-beside={partnershipId}>
-      <MenuSection label={label}>
+      <MenuSection label="Draw this couple beside">
         {choices.map(id => (
           <MenuItem
             key={id}
@@ -759,7 +662,7 @@ function DrawBesideSection({ partnershipId, label, action }: { partnershipId: st
             checked={partnership.drawnBeside === id}
             title={DRAW_BESIDE_TITLE}
           >
-            {capitalised(couplePartnerLabel(pedigree, partnershipId, id))}
+            {couplePartnerLabel(pedigree, partnershipId, id, { fromId, start: true })}
           </MenuItem>
         ))}
         <MenuItem
@@ -781,13 +684,13 @@ function DrawBesideSection({ partnershipId, label, action }: { partnershipId: st
  * the genetic parent and the child gets a donor of the other sex (see
  * `applySameSexChildren`). Opposite-sex couples never see this.
  */
-function SameSexChildItems({ partnershipId, action }: { partnershipId: string; action: (fn: () => void) => void }) {
+function SameSexChildItems({ partnershipId, fromId, action }: { partnershipId: string; fromId?: string; action: (fn: () => void) => void }) {
   const { pedigree, addChildren, startPickingChild } = usePedigreeFields("pedigree", "addChildren", "startPickingChild");
   const [open, setOpen] = useState(false);
   const [parent, setParent] = useState<string | undefined>();
   const p = pedigree.partnerships.find(x => x.id === partnershipId)!;
   const ids = [p.individual1, p.individual2];
-  const nameOf = (id: string, k: number) => pedigree.individuals.find(i => i.id === id)?.name?.trim() || `Partner ${k + 1}`;
+  const nameOf = (id: string, start: boolean) => couplePartnerLabel(pedigree, partnershipId, id, { fromId, start });
   const sex = pedigree.individuals.find(i => i.id === p.individual1)?.sex;
   const donorKind = sex === "female" ? "sperm donor" : "egg donor";
   const other = parent && ids.find(id => id !== parent);
@@ -807,15 +710,15 @@ function SameSexChildItems({ partnershipId, action }: { partnershipId: string; a
         <div className="pl-2" data-same-sex-child>
           <div className="px-2 pt-1 text-[10px] text-gray-400">Genetic parent</div>
           <div className="flex">
-            {ids.map((id, k) => (
+            {ids.map(id => (
               <MenuItem key={id} onClick={() => setParent(id)} active={parent === id} checked={parent === id}>
-                {nameOf(id, k)}
+                {nameOf(id, true)}
               </MenuItem>
             ))}
           </div>
           {parent && other && (
             <div className="px-2 py-1 text-[10px] text-gray-500 leading-tight">
-              With {donorText}; {nameOf(other, ids.indexOf(other))} is a parent who is not genetic.
+              With {donorText}; {nameOf(other, false)} is a parent who is not genetic.
             </div>
           )}
           <MenuItem disabled={!parent} title={need} onClick={() => action(() => addChildren(parent!, 1, "male", partnershipId))}>
@@ -842,20 +745,7 @@ function SameSexChildItems({ partnershipId, action }: { partnershipId: string; a
 
 const SWAP_SIDES_TITLE = "Draw the partners the other way round. Partner order is free under NSGC 2022; nobody is pinned";
 const DRAW_BESIDE_TITLE = "Draw the couple where this partner is placed. In a family with a loop the other partner is then the one drawn twice. Nobody is pinned";
-const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 const REMOVE_PARTNERSHIP_TITLE ="Remove the couple line, keeping both people (for a partner linked by mistake)";
-
-/** Partners of individualId, one per partnership, in partnership order. */
-function partnerChoices(pedigree: ReturnType<typeof usePedigreeStore.getState>["pedigree"], individualId: string) {
-  return couplesOf(pedigree, individualId, { donorPairs: true })
-    .map((p, i) => {
-      const otherId = partnerIn(p, individualId);
-      const other = pedigree.individuals.find(ind => ind.id === otherId);
-      const name = other?.name?.trim();
-      const sexLabel = other?.sex === "male" ? "male" : other?.sex === "female" ? "female" : "unknown sex";
-      return { partnershipId: p.id, label: name || `Partner ${i + 1} (${sexLabel})` };
-    });
-}
 
 /**
  * Count stepper, partner choice (when there are several) and the three add
@@ -869,7 +759,7 @@ function AddChildrenPanel({ individualId, onAdd }: {
   const pedigree = usePedigreeStore(s => s.pedigree);
   const [count, setCount] = useState(2);
   const [draft, setDraft] = useState("2");
-  const partners = partnerChoices(pedigree, individualId);
+  const partners = personCouples(pedigree, individualId);
   const [partnershipId, setPartnershipId] = useState<string | undefined>(partners[0]?.partnershipId);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -983,12 +873,12 @@ function SelectionMenuSection({ individualId, action }: { individualId: string; 
         </MenuItem>
       )}
       {toUnlock.length > 0 && (
-        <MenuItem onClick={() => action(() => unlockIndividuals(toUnlock))} title="Let the selected people be dragged">
+        <MenuItem onClick={() => action(() => unlockIndividuals(toUnlock))} title={BATCH_UNLOCK_TITLE}>
           Unlock {toUnlock.length}
         </MenuItem>
       )}
       {toLock.length > 0 && (
-        <MenuItem onClick={() => action(() => lockIndividuals(toLock))} title="Lock the selected people and drop their pinned positions">
+        <MenuItem onClick={() => action(() => lockIndividuals(toLock))} title={BATCH_LOCK_TITLE}>
           Lock {toLock.length} (return to auto layout)
         </MenuItem>
       )}
@@ -1069,10 +959,7 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
                 title={all ? `Remove ${tag.label} from all ${n}` : `Add ${tag.label} to all ${n}`}
               >
                 <span className="inline-flex items-center gap-1.5">
-                  <span
-                    className="inline-block w-2 h-2 border border-black/20"
-                    style={{ background: tag.color, borderRadius: tag.style === "dot" ? "50%" : 0 }}
-                  />
+                  <MenuSwatch tag={tag} pedigree={pedigree} />
                   {tag.label}
                   {all ? <span className="text-gray-400">✓</span> : count > 0 ? <span className="text-gray-400">{count}/{n}</span> : null}
                 </span>
@@ -1102,20 +989,20 @@ function BatchMenuItems({ ids, action }: { ids: string[]; action: (fn: () => voi
       </MenuSection>
 
       <div className="border-t mt-1 pt-1">
-        <MenuItem onClick={() => action(() => deleteIndividuals(st.ids))} destructive title="Delete. Children stay, as founders">
+        <MenuItem onClick={() => action(() => deleteIndividuals(st.ids))} destructive title={DELETE_TITLE}>
           Delete {n}
         </MenuItem>
         <MenuItem
           onClick={() => action(() => removeWithDescendants(st.ids))}
           destructive
-          title="Shift+Delete. Also removes everyone below and partners who married in"
+          title={REMOVE_WITH_DESCENDANTS_TITLE}
         >
           Remove {n} with descendants
         </MenuItem>
         <MenuItem
           onClick={() => action(() => removeWithAncestors(st.ids))}
           destructive
-          title="Alt+Delete. Also removes everyone above; descendants become founders"
+          title={REMOVE_WITH_ANCESTORS_TITLE}
         >
           Remove {n} with ancestors
         </MenuItem>
@@ -1143,12 +1030,27 @@ function menuTagsLabel(pedigree: Pedigree): string {
   return menuTags(pedigree).some(isConditionTag) ? CONDITIONS_AND_TAGS : "Tags";
 }
 
-function ConditionItemLabel({ tag, text, on }: { tag: Tag; text: string; on: boolean }) {
+/**
+ * A tag's swatch beside its menu item: the key's swatch (`TagSwatchSvg`),
+ * so it is painted as the chart paints the tag, black and white patterns
+ * included, shrunk to the height of a line of menu text. Read from the drawn
+ * pedigree, as the Person tab's swatches are, since a condition's section
+ * depends on which conditions are in use there.
+ */
+function MenuSwatch({ tag, pedigree, carrier }: { tag: Tag; pedigree: Pedigree; carrier?: boolean }) {
+  return (
+    <span className="inline-flex shrink-0 -my-1 [&>svg]:h-4 [&>svg]:w-auto" data-menu-swatch={tag.id} aria-hidden>
+      <TagSwatchSvg tag={tag} pedigree={drawnPedigree(pedigree)} carrier={carrier} />
+    </span>
+  );
+}
+
+/** A condition's item: its swatch and text. The item's `checked` draws the tick. */
+function ConditionItemLabel({ tag, pedigree, carrier, text }: { tag: Tag; pedigree: Pedigree; carrier?: boolean; text: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className="inline-block w-2 h-2 border border-black/20" style={{ background: tag.color }} />
+      <MenuSwatch tag={tag} pedigree={pedigree} carrier={carrier} />
       {text}
-      {on && <span className="text-gray-400">✓</span>}
     </span>
   );
 }

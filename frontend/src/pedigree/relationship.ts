@@ -1,6 +1,7 @@
 import type { Pedigree, Sex } from "@pedigree-editor/layout-engine";
 import { briefCoefficient } from "./relatedness";
 import { childrenOf, parentCoupleOf } from "./graph";
+import { personLabel } from "./personLabel";
 
 /**
  * The name of the relationship between two people: "first cousin once
@@ -249,9 +250,8 @@ function coupleTerm(pedigree: Pedigree, named: RelationshipName): string {
  */
 export function pairLabels(pedigree: Pedigree, a: string, b: string): Record<string, string> {
   const unnamed = (id: string) => {
-    const ind = pedigree.individuals.find(i => i.id === id);
-    if (ind?.name?.trim()) return ind.name.trim();
-    return `the unnamed ${ind?.sex === "male" ? "male" : ind?.sex === "female" ? "female" : "person"}`;
+    const label = personLabel(pedigree, id, "unnamed");
+    return pedigree.individuals.find(i => i.id === id)?.name?.trim() ? label : `the ${label}`;
   };
   const labels = { [a]: unnamed(a), [b]: unnamed(b) };
   if (labels[a] === labels[b]) {

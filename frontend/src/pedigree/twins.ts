@@ -9,6 +9,19 @@ import { childrenOf, parentCoupleOf } from "./graph";
  * canvas, the exporters and the legend.
  */
 
+/**
+ * The sibling drawn next to this person: the next one in the sibship, or the
+ * previous one for the last. Choosing a zygosity for someone not yet a twin
+ * pairs them with this sibling (the Person tab and the more menu).
+ */
+export function adjacentSibling(pedigree: Pedigree, individualId: string): string | undefined {
+  const couple = parentCoupleOf(pedigree, individualId);
+  const sibs = couple ? childrenOf(pedigree, couple.id) : [];
+  const i = sibs.indexOf(individualId);
+  if (i < 0 || sibs.length < 2) return undefined;
+  return sibs[i + 1] ?? sibs[i - 1];
+}
+
 export const ZYGOSITY_OPTIONS: { value: Zygosity; label: string }[] = [
   { value: "monozygotic", label: "Monozygotic (identical)" },
   { value: "dizygotic",   label: "Dizygotic (fraternal)" },

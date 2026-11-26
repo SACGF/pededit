@@ -4,6 +4,7 @@ import { NODE_SIZE } from "./constants";
 import type { Segment } from "./sibshipPath";
 import { symbolTopInset } from "./lifeStatus";
 import { childrenOf, couplesOf, descendantsOf, parentCoupleOf, partnerIn } from "./graph";
+import { personLabel } from "./personLabel";
 
 /**
  * Assisted reproduction (NSGC 2008 Fig. 3). Framework-free, shared by the
@@ -238,9 +239,6 @@ export function assistedEdgeSegment(
 
 export type Gamete = "sperm" | "egg";
 
-function nameOf(pedigree: Pedigree, id: string): string {
-  return pedigree.individuals.find(i => i.id === id)?.name?.trim() || "this person";
-}
 
 /**
  * The genetic parent a donor of this gamete replaces: for sperm the male
@@ -266,15 +264,15 @@ export function addDonorProblem(pedigree: Pedigree, childId: string, gamete: Gam
   const x = replacedParent(pedigree, p, gamete);
   if (!x) return `Neither parent could have given the ${gamete}.`;
   const xi = pedigree.individuals.find(i => i.id === x);
-  if (xi?.reproductiveRole === "donor") return `${nameOf(pedigree, x)} is already a donor.`;
+  if (xi?.reproductiveRole === "donor") return `${personLabel(pedigree, x, "this person", { start: true })} is already a donor.`;
   if (donorId === undefined) return null;
   const donor = pedigree.individuals.find(i => i.id === donorId);
   if (!donor) return "Unknown individual.";
   if (donorId === childId) return "Someone cannot be their own donor.";
-  if (donorId === p.individual1 || donorId === p.individual2) return `${nameOf(pedigree, donorId)} is already a genetic parent of ${nameOf(pedigree, childId)}.`;
-  if (donor.lifeStatus) return `${nameOf(pedigree, donorId)} is a pregnancy or pregnancy loss and cannot be a donor.`;
+  if (donorId === p.individual1 || donorId === p.individual2) return `${personLabel(pedigree, donorId, "this person", { start: true })} is already a genetic parent of ${personLabel(pedigree, childId, "this person")}.`;
+  if (donor.lifeStatus) return `${personLabel(pedigree, donorId, "this person", { start: true })} is a pregnancy or pregnancy loss and cannot be a donor.`;
   if (donor.sex === (gamete === "sperm" ? "female" : "male")) return `${gamete === "egg" ? "An egg" : "A sperm"} donor cannot be ${donor.sex}.`;
-  if (descendantsOf(pedigree, [childId]).has(donorId)) return `${nameOf(pedigree, donorId)} is a descendant of ${nameOf(pedigree, childId)}, so cannot be their donor.`;
+  if (descendantsOf(pedigree, [childId]).has(donorId)) return `${personLabel(pedigree, donorId, "this person", { start: true })} is a descendant of ${personLabel(pedigree, childId, "this person")}, so cannot be their donor.`;
   return null;
 }
 
@@ -351,17 +349,17 @@ export function addSurrogateProblem(pedigree: Pedigree, childId: string, surroga
   const child = pedigree.individuals.find(i => i.id === childId);
   if (!child) return "Unknown individual.";
   const carrier = child.carriedBy && pedigree.individuals.find(i => i.id === child.carriedBy);
-  if (carrier && carrier.reproductiveRole === "surrogate") return `${nameOf(pedigree, carrier.id)} is already recorded as the surrogate.`;
+  if (carrier && carrier.reproductiveRole === "surrogate") return `${personLabel(pedigree, carrier.id, "this person", { start: true })} is already recorded as the surrogate.`;
   if (surrogateId === undefined) return null;
   const s = pedigree.individuals.find(i => i.id === surrogateId);
   if (!s) return "Unknown individual.";
   if (surrogateId === childId) return "Someone cannot carry themselves.";
-  if (s.sex === "male") return `${nameOf(pedigree, surrogateId)} is male and cannot carry a pregnancy.`;
-  if (s.lifeStatus) return `${nameOf(pedigree, surrogateId)} is a pregnancy or pregnancy loss.`;
+  if (s.sex === "male") return `${personLabel(pedigree, surrogateId, "this person", { start: true })} is male and cannot carry a pregnancy.`;
+  if (s.lifeStatus) return `${personLabel(pedigree, surrogateId, "this person", { start: true })} is a pregnancy or pregnancy loss.`;
   // An egg donor who also carried the child (NSGC Fig. 3, the sister as donor and carrier) is allowed:
   // she is drawn as the donor only, and the previous carrier becomes a social parent.
-  if (geneticParents(pedigree, childId).includes(surrogateId) && s.reproductiveRole !== "donor") return `${nameOf(pedigree, surrogateId)} is the genetic mother of ${nameOf(pedigree, childId)}, not a surrogate.`;
-  if (descendantsOf(pedigree, [childId]).has(surrogateId)) return `${nameOf(pedigree, surrogateId)} is a descendant of ${nameOf(pedigree, childId)}.`;
+  if (geneticParents(pedigree, childId).includes(surrogateId) && s.reproductiveRole !== "donor") return `${personLabel(pedigree, surrogateId, "this person", { start: true })} is the genetic mother of ${personLabel(pedigree, childId, "this person")}, not a surrogate.`;
+  if (descendantsOf(pedigree, [childId]).has(surrogateId)) return `${personLabel(pedigree, surrogateId, "this person", { start: true })} is a descendant of ${personLabel(pedigree, childId, "this person")}.`;
   return null;
 }
 

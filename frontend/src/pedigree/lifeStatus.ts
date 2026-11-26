@@ -1,4 +1,5 @@
-import type { LifeStatus } from "@pedigree-editor/layout-engine";
+import type { Individual, LifeStatus, Pedigree } from "@pedigree-editor/layout-engine";
+import { couplesOf } from "./graph";
 
 /**
  * Pregnancy and pregnancy-loss symbols (NSGC 2008, Bennett et al.):
@@ -117,3 +118,20 @@ export function pregnancyBaselineY(size: number, oy = 0, carrier = false): numbe
     ? oy + size * 0.56
     : oy + size / 2 + pregnancyFontSize(size) * 0.35;
 }
+
+// ── The editing rule: a pregnancy or loss has no partner or children ───────
+
+/**
+ * Whether the pregnancy and loss choices are closed to this person: someone
+ * with a partner or children cannot become a pregnancy or a loss, as one
+ * cannot have either (the store refuses both ways). The Person tab and the
+ * more menu grey them out with `LIFE_STATUS_LOCKED_TITLE`.
+ */
+export function lifeStatusLocked(pedigree: Pedigree, individual: Individual): boolean {
+  return !individual.lifeStatus && couplesOf(pedigree, individual.id, { donorPairs: true }).length > 0;
+}
+
+export const LIFE_STATUS_LOCKED_TITLE = "Not available: this person has a partner or children";
+/** Why a pregnancy or loss is offered no partner, and no child. */
+export const NO_PARTNER_TITLE = "A pregnancy or pregnancy loss cannot have a partner";
+export const NO_CHILDREN_TITLE = "A pregnancy or pregnancy loss cannot have children";

@@ -1,15 +1,11 @@
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { descendantsOf } from "./graph";
+import { personLabel } from "./personLabel";
 
 /**
  * Linking a child to existing parents: the rules, framework-free so
  * the store and the picking UI share them.
  */
-
-function label(pedigree: Pedigree, id: string): string {
-  const ind = pedigree.individuals.find(i => i.id === id);
-  return ind?.name?.trim() || "this person";
-}
 
 /**
  * Why `parentIds` (one or two existing individuals) cannot be the parents of
@@ -28,11 +24,11 @@ export function setParentsProblem(pedigree: Pedigree, childId: string, parentIds
     const p = pedigree.individuals.find(i => i.id === id);
     if (!p) return "Unknown individual.";
     if (id === childId) return "Someone cannot be their own parent.";
-    if (p.lifeStatus) return `${label(pedigree, id)} is a pregnancy or pregnancy loss and cannot have children.`;
+    if (p.lifeStatus) return `${personLabel(pedigree, id, "this person", { start: true })} is a pregnancy or pregnancy loss and cannot have children.`;
   }
   const below = descendantsOf(pedigree, [childId]);
   for (const id of unique) {
-    if (below.has(id)) return `${label(pedigree, id)} is a descendant of ${label(pedigree, childId)}, so cannot be their parent.`;
+    if (below.has(id)) return `${personLabel(pedigree, id, "this person", { start: true })} is a descendant of ${personLabel(pedigree, childId, "this person")}, so cannot be their parent.`;
   }
   if (unique.length === 2) {
     const [a, b] = unique.map(id => pedigree.individuals.find(i => i.id === id)!);

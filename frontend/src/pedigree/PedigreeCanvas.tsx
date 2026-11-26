@@ -543,7 +543,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
             }}
           >
             <span className="text-sm text-gray-300">
-              Use the toolbar above to add individuals
+              Use the toolbar above to add people
             </span>
           </div>
         )}

@@ -130,7 +130,7 @@ export interface IndividualRelatedness {
   inbreeding: number;
   /** X-linked F. NaN for a male, who has one X, and for unknown sex. */
   inbreedingX: number;
-  /** One entry per partnership of the individual, in pedigree order. */
+  /** One entry per couple of the individual, in pedigree order; a donor pair is not a couple and has no line to make double. */
   couples: CoupleRelatedness[];
 }
 
@@ -144,7 +144,7 @@ export function relatednessOf(
   return {
     inbreeding: coefficients.inbreeding(individualId),
     inbreedingX: xCoefficients.inbreeding(individualId),
-    couples: couplesOf(pedigree, individualId, { donorPairs: true })
+    couples: couplesOf(pedigree, individualId, { donorPairs: false })
       .map(p => {
         const partnerId = partnerIn(p, individualId);
         return {

@@ -128,12 +128,11 @@ reporting is off, and the dev server never reports.
   more menu link existing people (#36), which is how consanguinity loops
   and "the two families turn out to be related" are drawn. Their undo:
   "Detach from parents" (`detachFromParents`) makes a child a founder again,
-  and "Remove partnership" (`removePartnership`, couple line menu and a
-  childless couple's section of the person menu, #104) drops a couple line
-  while keeping both people; it refuses a couple with children, who would
-  silently lose a parent.
-  "Swap sides" (#106, `swapPartnerSides`, couple line menu and the person
-  menu's Relationship section) sets `Partnership.leftPartner` from the side
+  and "Remove partnership" (`removePartnership`, in the couple's items, #104)
+  drops a couple line while keeping both people; it refuses a couple with
+  children, who would silently lose a parent, and the menus show it
+  disabled with that reason.
+  "Swap sides" (#106, `swapPartnerSides`, in the couple's items) sets `Partnership.leftPartner` from the side
   the canvas currently draws, so it is a toggle and never pins anyone. When
   one partner has exactly two partners drawn either side of them, the other
   couple's side is set too, so the two trade places. `swapSidesPlan` lays the
@@ -151,8 +150,11 @@ reporting is off, and the dev server never reports.
   and nothing says it can be right-clicked: the couple line's menu
   (`CoupleMenuItems`), the menu of both partners selected together, which
   shows the same items above the batch ones (`coupleOfPair`), and one
-  partner's own menu, which lists them per couple ("Swap sides with X").
-  A new couple item goes in `CoupleMenuItems` and in the person menu.
+  partner's own menu, which shows them once per couple under "With <the
+  other partner>" (`CoupleMenuItems` with `fromId`). All three render
+  `CoupleMenuItems`, so a new couple item goes there only. A donor pair
+  is not a couple: no menu or form about relationships lists it
+  (`personCouples(...).donorPair`).
   `drawBesidePlan` stores a side with the choice (the one swapped to if any,
   else whichever of the two draws fewer people twice), stores nothing when
   the drawing would not change, and refuses a choice the layout cannot draw

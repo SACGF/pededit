@@ -2,6 +2,10 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { hasDescendants } from "./collapse";
 import { descendantsOf } from "./graph";
 
+/** The tooltips of the batch lock and unlock (more menu, Person tab). */
+export const BATCH_UNLOCK_TITLE = "Let the selected people be dragged";
+export const BATCH_LOCK_TITLE = "Lock the selected people and drop their pinned positions";
+
 /**
  * Batch lock and unlock for a multiple selection, shared by the more
  * menu and the edit panel. `toUnlock` are the selected people still locked;

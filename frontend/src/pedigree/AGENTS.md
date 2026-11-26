@@ -104,15 +104,21 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
 - `nodes/PedigreeSymbolNode.tsx` — wraps `PersonSymbol` with the hover
   pill, more menu, selection outline, pin indicator and problem marker.
 - `nodes/HoverPill.tsx`: add parents / son / daughter / child of unknown
-  sex / sibling buttons, and lock / unlock.
+  sex / sibling buttons, and lock / unlock. The add buttons are
+  `personAddActions` (`personActions.ts`), which the Person tab's row
+  (`components/PersonActions.tsx`) renders too. They ask the stored
+  pedigree, never the drawn one or the glyph: under a view filter a
+  married-in partner's parents are not drawn but exist. The pill's buttons
+  are in a child that NodeToolbar mounts only while the pill shows, so it
+  can read the whole pedigree without costing the other nodes (#197).
   By touch (#169) there is no hover: a tap on the symbol opens the pill and
   it stays while the person is selected, closing when the selection clears.
   A finger selects and opens the pill on the click, not on `pointerdown` as
   the mouse does: a touch that starts on a person is as often a pan or a
   pinch, and the browser sends a click only for a tap. Below `lg` a tap
   shows no pill (#214): it opens the Person tab's sheet, which starts with
-  the same buttons (`components/PersonActions.tsx`), so a button added to
-  the pill is added there too. A large touch screen keeps the pill. Do not lean on the mouse events a browser makes up after
+  the same buttons (`components/PersonActions.tsx`); a new one goes in
+  `personAddActions`. A large touch screen keeps the pill. Do not lean on the mouse events a browser makes up after
   a tap: they differ between browsers (and chromium's emulation moves its
   mouse away again, which closed the pill at once). Its buttons are larger
   under `pointer-coarse:`. The pill is centred on the person and is wider
@@ -132,7 +138,14 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   element under the cursor vanishes and the pill gets no mouseleave, so the
   menu calls `onClose` and the pill schedules its own hide.
   The items are `MoreMenuItems`, so the right-click menu shows the same list:
-  add new items there, not in `MoreMenu`.
+  add new items there, not in `MoreMenu`. A person's couples are one
+  `CoupleMenuItems` group each (`personCouples`, donor pairs left out),
+  the same items as the couple line's menu. Tag swatches are the key's
+  `TagSwatchSvg`, so they follow black and white patterns. A tooltip or
+  rule the Person tab shares lives with its module: `ENDED_TITLE`
+  (`ended.ts`), `lifeStatusLocked` and its titles (`lifeStatus.ts`),
+  `probandTitle` (`proband.ts`), `adjacentSibling` (`twins.ts`), the
+  delete titles (`removal.ts`), the batch lock titles (`selection.ts`).
   With several people selected and the menu opened on one of them (#35),
   `MoreMenuItems` shows only the "N selected" section and `BatchMenuItems`
   (status, carrier status, tags, sex, delete, each acting on all of them);
@@ -521,7 +534,19 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   known sex). Relatives are deliberately not refused, parent and child
   included: inbred pedigrees are the reason the feature exists. The store's
   `linkPartner` makes a childless partnership, father role first, and
-  stores nothing about their being related (see `consanguinity.ts`). A
+  stores nothing about their being related (see `consanguinity.ts`).
+  `personCouples(pedigree, id)` is every couple of one person, as the more
+  menu, the Person tab and "Add children..." list them: relationships
+  first, then donor pairs (`donorPair`), each with `childless` and the
+  partner's `label` / `phrase` ("Partner 2 (male)" alone, "partner 2
+  (male)" in a sentence), numbered in that order. `couplePartnerLabel`
+  names a partner of one couple the same way seen from the other partner,
+  and from the couple line numbers them by the side drawn on (1 is left).
+- `personLabel.ts`: `personLabel(pedigree, id, style)`, the one way to name
+  a person who may be unnamed: "this person" (the subject of a refusal),
+  "unnamed" ("unnamed female", in a list or a pair) or `{ partner: n }`.
+  The problems list and the PED warning add the pedigree number
+  (`personSubject` in `components/problemList.ts`). A
   cross-generation link draws
   the older partner twice with the dashed arc, as kinship2 does; that is the
   layout, not a bug in the link.
@@ -538,7 +563,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   are cached per object, a test that mutates a pedigree after reading it
   must build a fresh one. The section appears for anyone who is
   inbred or has a partner, since each couple carries the double-line
-  checkbox.
+  checkbox; a donor pair has no line, so it is not listed.
   Drawn on the figure only with `canvasSettings.showCoefficients` ("Show
   kinship and inbreeding coefficients" in Settings, off by default, #86):
   `inbreedingLabel` is the "F = 1/16" detail line under anyone whose

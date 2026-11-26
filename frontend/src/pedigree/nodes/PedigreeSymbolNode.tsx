@@ -57,7 +57,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // person even though every edit makes a new list.
   const problemSeverity = usePedigreeStore(s => worstSeverity(problemsOf(s.pedigree).byIndividual.get(id) ?? []));
   const problemTitle = usePedigreeStore(s => (problemsOf(s.pedigree).byIndividual.get(id) ?? []).map(p => p.message).join("\n"));
-  const hasParents = glyph.hasParents;
   // React Flow's flag, which PedigreeCanvas mirrors from the store's
   // selection and which also shows a rubber band as it is drawn.
   const isSelected = !!selected;
@@ -220,8 +219,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         nodeId={nodeId}
         individualId={individual.id}
         isVisible={(isPillVisible || (isTouchPill && isSelected)) && !isPicking}
-        hasParents={hasParents}
-        noChildren={!!individual.lifeStatus}
         name={individual.name}
         nameOnly={isNameHovered && nameCut}
         onPillEnter={cancelHide}

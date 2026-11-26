@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CONDITIONS_AND_TAGS } from "@/pedigree/conditions";
+import { CONDITIONS_AND_TAGS, peopleWithTag } from "@/pedigree/conditions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -138,8 +138,6 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     }
   }
 
-  const usageCount = (tagId: string) =>
-    pedigree.individuals.filter(i => i.tags?.includes(tagId)).length;
 
   const inLibrary = (tag: Tag) =>
     presets.some(p => p.label === tag.label && p.color === tag.color && p.style === tag.style
@@ -216,7 +214,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                         aria-label="Meaning"
                         value={tag.kind ?? "condition"}
                         onChange={e => updateTag(tag.id, { kind: e.target.value === "trait" ? "trait" : undefined })}
-                        title="Condition: the person is affected with it (NSGC shading). Trait: a coloured section only, not affected status (#118)."
+                        title="Condition: the person is affected with it (NSGC shading). Trait: a coloured section only, not affected status."
                         className="h-6 w-24 shrink-0 text-xs border rounded px-1 bg-white"
                       >
                         <option value="condition">Condition</option>
@@ -239,7 +237,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                     </span>
 
                     <span className="w-5 shrink-0 text-[10px] text-gray-400 text-right" title="People with this">
-                      {usageCount(tag.id)}
+                      {peopleWithTag(pedigree, tag.id)}
                     </span>
 
                     <IconButton title="Move up" disabled={i === 0} onClick={() => moveTag(tag.id, -1)}>
