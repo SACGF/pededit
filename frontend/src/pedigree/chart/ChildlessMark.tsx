@@ -1,6 +1,7 @@
 import type { ChildlessStatus } from "@pedigree-editor/layout-engine";
 import { childlessMarkSegments, childlessReasonBaselineY, CHILDLESS_REASON_FONT_SIZE } from "../childless";
 import { segmentsPathD } from "../sibshipPath";
+import { LINE_WIDTH } from "../constants";
 
 /**
  * Childless couple mark under a couple line, hung from (cx, topY): the line's
@@ -12,7 +13,7 @@ export function ChildlessMark({ cx, topY, status, reason }: {
 }) {
   return (
     <g data-childless={status}>
-      <path d={segmentsPathD(childlessMarkSegments(cx, topY, status))} stroke="black" strokeWidth={2} fill="none" />
+      <path d={segmentsPathD(childlessMarkSegments(cx, topY, status))} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />
       {reason && (
         <text
           x={cx} y={childlessReasonBaselineY(topY)}

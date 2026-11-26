@@ -14,7 +14,9 @@ import { CONSANGUINITY_LABEL_FONT_SIZE } from "../../../pedigree/consanguinityLa
 import { PersonMarks } from "../../../pedigree/chart/PersonSymbol";
 import { TextUnderSymbol, ProbandMarkerDef } from "../../../pedigree/chart/symbols";
 import { ChartTitle } from "../../../pedigree/chart/ChartTitle";
-import { NODE_SIZE, HALF, PROBAND_TAIL, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
+import { NODE_SIZE } from "../../../pedigree/constants";
+import { LABEL_LINE_HEIGHT } from "../../../pedigree/labels";
+import { HALF, PROBAND_TAIL, r, escapeXml } from "./constants";
 import { walk } from "./tree";
 import { build, nodeAt, toLayout, glyphOf, outlineRotation, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
 import { trackPath, renderConnectors } from "./connectors";

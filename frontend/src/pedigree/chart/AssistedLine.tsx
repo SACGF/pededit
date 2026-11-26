@@ -1,6 +1,7 @@
 import { ADOPTION_DASH } from "../adoption";
 import { assistedEdgeSegment } from "../assisted";
 import type { AssistedLineData, SceneLine } from "../scene";
+import { LINE_WIDTH } from "../constants";
 
 type NodeAt = Parameters<typeof assistedEdgeSegment>[1];
 
@@ -15,7 +16,7 @@ export function AssistedLine({ line, nodeAt }: { line: Pick<SceneLine<AssistedLi
   const [x1, y1, x2, y2] = seg;
   return (
     <line
-      x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2}
+      x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={LINE_WIDTH}
       strokeDasharray={line.data.kind === "social" ? ADOPTION_DASH : undefined}
     />
   );

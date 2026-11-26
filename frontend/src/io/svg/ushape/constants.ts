@@ -4,13 +4,11 @@
  */
 import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "../../../pedigree/proband";
 import { ENDED_STROKE_DY } from "../../../pedigree/ended";
+import { CONSANGUINEOUS_GAP, NODE_SIZE } from "../../../pedigree/constants";
+import { LABEL_LINE_HEIGHT } from "../../../pedigree/labels";
 
-export const NODE_SIZE = 40;
 export const HALF = NODE_SIZE / 2;
-export const STROKE = 2;
 export const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
-export const LABEL_LINE_HEIGHT = 13;
-export const CONSANG_GAP = 4;
 
 export const MIN_SLOT = 58;            // min centre-to-centre spacing between siblings
 export const MAX_SLOT = 130;           // long names stop widening the layout here
@@ -26,7 +24,7 @@ export const MAX_FLAT = 260;           // longest half flat bottom that generati
 // Consanguinity label: written along the double line between the
 // two symbols, on the inward side ("above" the line, as the symbols see it).
 export const CLABEL_PAD = 7;           // between the label and either symbol (clears a deceased slash and adoption brackets)
-export const CLABEL_BASELINE = CONSANG_GAP / 2 + 4;            // bottom line's baseline, inward of the track
+export const CLABEL_BASELINE = CONSANGUINEOUS_GAP / 2 + 4;            // bottom line's baseline, inward of the track
 export const CLABEL_ENDED_BASELINE = ENDED_STROKE_DY + 4;      // above the strokes of an ended relationship
 export const CLABEL_CAP = 9;           // from the baseline to above the cap height, with a pixel to spare
 export const CLABEL_REACH = 3;         // past the text's ends that the label keeps clear of the line

@@ -5,7 +5,7 @@ import {
 } from "@pedigree-editor/layout-engine";
 import {
   COUPLE_HOP, COUPLE_HOP_STEP, COUPLE_HOP_CLEARANCE, COUPLE_HOP_NEST_STEP,
-  COUPLE_PORT_STEP, COUPLE_PORT_MAX, COUPLE_PORT_DOUBLE_EXTRA, NODE_SIZE,
+  COUPLE_PORT_STEP, COUPLE_PORT_MAX, COUPLE_PORT_DOUBLE_EXTRA, CONSANGUINEOUS_GAP, NODE_SIZE,
 } from "./constants";
 
 /** The editor's sizes for the engine's hop line geometry (layout-engine/src/hopLine.ts). */
@@ -200,7 +200,7 @@ export function duplicateArcPoints(
  * the outer (upper) one, then the inner. For a hopping line the two are
  * concentric, so they stay parallel round the corners.
  */
-export function consanguineousPathsD(left: CoupleEnd, right: CoupleEnd, hopHeight = 0, gap = 4): [string, string] {
+export function consanguineousPathsD(left: CoupleEnd, right: CoupleEnd, hopHeight = 0, gap = CONSANGUINEOUS_GAP): [string, string] {
   const h = gap / 2;
   return [couplePathD(left, right, hopHeight, h), couplePathD(left, right, hopHeight, -h)];
 }

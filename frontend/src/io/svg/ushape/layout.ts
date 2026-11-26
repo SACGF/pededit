@@ -9,7 +9,9 @@ import { personGlyph, type PersonGlyph } from "../../../pedigree/personGlyph";
 import { labelMaxWidth, LABEL_CHAR_WIDTH } from "../../../pedigree/labels";
 import { labelNumbers } from "../../../pedigree/scene";
 import { usesLossTriangle } from "../../../pedigree/lifeStatus";
-import { NODE_SIZE, HALF, LABEL_LINE_HEIGHT, CONSANG_GAP, MIN_SLOT, MAX_SLOT, FAMILY_GAP, BAR_CLEARANCE, TARGET_ASPECT, MIN_ASPECT, MAX_PLACE_ATTEMPTS, FAN_MAX_WIDTH, MAX_FLAT, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH } from "./constants";
+import { CONSANGUINEOUS_GAP, NODE_SIZE } from "../../../pedigree/constants";
+import { LABEL_LINE_HEIGHT } from "../../../pedigree/labels";
+import { HALF, MIN_SLOT, MAX_SLOT, FAMILY_GAP, BAR_CLEARANCE, TARGET_ASPECT, MIN_ASPECT, MAX_PLACE_ATTEMPTS, FAN_MAX_WIDTH, MAX_FLAT, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH } from "./constants";
 import { coupleGap, labelRadius, kidsOf, walk, buildTree, type UShapeOptions, type Union, type TNode } from "./tree";
 import { hasParents } from "../../../pedigree/graph";
 
@@ -487,7 +489,7 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
   walk(root, n => {
     for (const w of n.unions) {
       if (!w.labelWidth) continue;
-      minR0 = Math.max(minR0, labelRadius(w) + CONSANG_GAP / 2 - n.depth * ringGap);
+      minR0 = Math.max(minR0, labelRadius(w) + CONSANGUINEOUS_GAP / 2 - n.depth * ringGap);
     }
   });
 
@@ -632,7 +634,7 @@ export function coupleLabels(b: Built, layout: Pick<UShapeLayout, "nodes" | "dup
         const lo = Math.abs(mid) - half, hi = Math.abs(mid) + half;
         const onCurve = hi > g.flat && lo < g.flat + g.vb;
         const reach = half + CLABEL_REACH;
-        const sag = onCurve ? (reach * reach) / (2 * (g.r0 + track - CONSANG_GAP / 2)) : 0;
+        const sag = onCurve ? (reach * reach) / (2 * (g.r0 + track - CONSANGUINEOUS_GAP / 2)) : 0;
         const bottom = (w.ended ? CLABEL_ENDED_BASELINE : CLABEL_BASELINE) + sag;
         const p = trackPoint(mid, track, g);
         return {

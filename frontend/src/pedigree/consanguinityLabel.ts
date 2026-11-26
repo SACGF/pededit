@@ -1,5 +1,5 @@
 import type { Partnership, Pedigree } from "@pedigree-editor/layout-engine";
-import { NODE_SIZE, ROW_HEIGHT } from "./constants";
+import { CONSANGUINEOUS_GAP, DECEASED_OVERHANG, NODE_SIZE, ROW_HEIGHT } from "./constants";
 import { LABEL_FONT_SIZE, textWidth, wrapLabel } from "./labels";
 import { highestDuplicateArc, highestHop } from "./couplePath";
 import { kinshipLabel, kinshipOf } from "./relatedness";
@@ -28,10 +28,6 @@ export const CONSANGUINITY_LABEL_FONT_SIZE = 9;
 export const CONSANGUINITY_LABEL_LINE_HEIGHT = 11;
 /** Cap height (px) of the label font, for the top of the text. */
 const CAP = 7;
-/** How far a deceased slash reaches above the symbol box (as in symbols.tsx). */
-const SLASH_OVERHANG = 4;
-/** Gap between the double line's two lines (as in ConsanguineousEdge). */
-const DOUBLE_GAP = 4;
 const SCALE = CONSANGUINITY_LABEL_FONT_SIZE / LABEL_FONT_SIZE;
 
 /** Estimated width (px) of one line of the label. */
@@ -126,7 +122,7 @@ export function wrapConsanguinityLabel(text: string, maxWidth: number, rowHeight
  * above the line where it hops higher than that.
  */
 export function consanguinityLabelBaseline(cy: number, hop: number): number {
-  return Math.min(cy - NODE_SIZE / 2 - SLASH_OVERHANG - 3, cy - hop - DOUBLE_GAP / 2 - 5);
+  return Math.min(cy - NODE_SIZE / 2 - DECEASED_OVERHANG - 3, cy - hop - CONSANGUINEOUS_GAP / 2 - 5);
 }
 
 /** Baselines of each line, top line first, moved down by `dy` (`ConsanguinityLabelOffset`). */
@@ -221,7 +217,7 @@ function searchLabelPlace(o: Parameters<typeof placeConsanguinityLabel>[0], bloc
 
   // Low, between the symbols, on a straight line.
   if (hop === 0 && !o.ended && rx - lx - NODE_SIZE - 12 >= 2 * half) {
-    const dy = cy - DOUBLE_GAP / 2 - 5 - consanguinityLabelBaseline(cy, hop);
+    const dy = cy - CONSANGUINEOUS_GAP / 2 - 5 - consanguinityLabelBaseline(cy, hop);
     if (hits(box(0, dy)).length === 0) return { dx: 0, dy };
   }
   return null;

@@ -43,9 +43,11 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   while the R oracle tests still pass. A pin is
   stored per individual, so it moves only the copy laid out nearest to it.
   `svgExporter` takes its positions from `buildScene` so it matches.
-- `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40. The layout
-  engine's `pedigreeToGeometry` and the SVG exporters use the same numbers;
-  change them together.
+- `constants.ts` — SLOT_WIDTH 80, ROW_HEIGHT 120, NODE_SIZE 40, and the
+  sizes more than one drawing shares (`LINE_WIDTH`, `CONSANGUINEOUS_GAP`,
+  `DECEASED_OVERHANG`): the SVG exporters, the U-shape included, import
+  them rather than repeat them. The layout engine's `pedigreeToGeometry`
+  has its own copies of the first three; change them together.
 - `PedigreeCanvas.tsx` — the React Flow instance, minimap,
   drag handling (drag end pins every dragged node, one undo step), pane
   click clears selection. New individuals are added from the Toolbar and

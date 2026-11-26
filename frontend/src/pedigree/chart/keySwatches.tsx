@@ -9,6 +9,7 @@ import { ADOPTION_DASH } from "../adoption";
 import { endedMarkSegments } from "../ended";
 import { segmentsPathD } from "../sibshipPath";
 import type { KeyRow } from "../keyRows";
+import { LINE_WIDTH } from "../constants";
 
 /**
  * The swatches of the chart's key, one `<svg>` each with its own size and
@@ -33,15 +34,15 @@ function SymbolSvg({ sex, affected = false, carrier = false }: { sex: Sex; affec
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
       {sex === "male" && (
-        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={2} fill={fill} />
+        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={LINE_WIDTH} fill={fill} />
       )}
       {sex === "female" && (
-        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill={fill} />
+        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={LINE_WIDTH} fill={fill} />
       )}
       {sex === "unknown" && (
         <polygon
           points={`${cx},1 ${SZ - 1},${cy} ${cx},${SZ - 1} 1,${cy}`}
-          stroke="black" strokeWidth={2} fill={fill}
+          stroke="black" strokeWidth={LINE_WIDTH} fill={fill}
         />
       )}
       {carrier && !affected && (
@@ -56,18 +57,18 @@ function DeceasedSvg({ sex }: { sex: Sex }) {
   return (
     <svg width="36" height="36" viewBox="-6 -6 36 36">
       {sex === "male" && (
-        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={2} fill="white" />
+        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={LINE_WIDTH} fill="white" />
       )}
       {sex === "female" && (
-        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="white" />
+        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={LINE_WIDTH} fill="white" />
       )}
       {sex === "unknown" && (
         <polygon
           points={`${cx},1 ${SZ - 1},${cy} ${cx},${SZ - 1} 1,${cy}`}
-          stroke="black" strokeWidth={2} fill="white"
+          stroke="black" strokeWidth={LINE_WIDTH} fill="white"
         />
       )}
-      <line x1={-4} y1={-4} x2={SZ + 4} y2={SZ + 4} stroke="black" strokeWidth={2} />
+      <line x1={-4} y1={-4} x2={SZ + 4} y2={SZ + 4} stroke="black" strokeWidth={LINE_WIDTH} />
     </svg>
   );
 }
@@ -132,15 +133,15 @@ function ProbandSvg({ sex, kind }: { sex: Sex; kind: ArrowKind }) {
         </marker>
       </defs>
       {sex === "male" && (
-        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={2} fill="white" />
+        <rect x={1} y={1} width={SZ - 2} height={SZ - 2} stroke="black" strokeWidth={LINE_WIDTH} fill="white" />
       )}
       {sex === "female" && (
-        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="white" />
+        <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={LINE_WIDTH} fill="white" />
       )}
       {sex === "unknown" && (
         <polygon
           points={`${cx},1 ${SZ - 1},${cy} ${cx},${SZ - 1} 1,${cy}`}
-          stroke="black" strokeWidth={2} fill="white"
+          stroke="black" strokeWidth={LINE_WIDTH} fill="white"
         />
       )}
       <ProbandArrow size={SZ} kind={kind} markerId="legend-arrowhead" />
@@ -217,7 +218,7 @@ function RoleSvg({ sex, role }: { sex: Sex; role: ReproductiveRole }) {
 function AssistedLineSvg({ dashed }: { dashed: boolean }) {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
-      <line x1={14} y1={2} x2={34} y2={18} stroke="black" strokeWidth={2} strokeDasharray={dashed ? ADOPTION_DASH : undefined} />
+      <line x1={14} y1={2} x2={34} y2={18} stroke="black" strokeWidth={LINE_WIDTH} strokeDasharray={dashed ? ADOPTION_DASH : undefined} />
     </svg>
   );
 }
@@ -227,7 +228,7 @@ function CollapsedBranchSvg() {
   const c = SZ / 2;
   return (
     <svg width="28" height="28" viewBox="-2 -2 28 28">
-      <polygon points={`${c},1 ${SZ - 1},${c} ${c},${SZ - 1} 1,${c}`} stroke="black" strokeWidth={2} fill="white" />
+      <polygon points={`${c},1 ${SZ - 1},${c} ${c},${SZ - 1} 1,${c}`} stroke="black" strokeWidth={LINE_WIDTH} fill="white" />
       <text x={c} y={c + 4} textAnchor="middle" fontFamily="sans-serif" fontSize={11} fontStyle="italic">n</text>
     </svg>
   );
@@ -247,7 +248,7 @@ function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }
 function CoupleSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
-      <line x1={0} y1={10} x2={48} y2={10} stroke="black" strokeWidth={2} />
+      <line x1={0} y1={10} x2={48} y2={10} stroke="black" strokeWidth={LINE_WIDTH} />
     </svg>
   );
 }
@@ -256,10 +257,10 @@ function CoupleSvg() {
 function ChildlessSvg({ status }: { status: ChildlessStatus }) {
   return (
     <svg width="48" height="28" viewBox="0 0 48 28">
-      <line x1={0} y1={4} x2={48} y2={4} stroke="black" strokeWidth={2} />
-      <line x1={24} y1={4} x2={24} y2={22} stroke="black" strokeWidth={2} />
-      <line x1={17} y1={22} x2={31} y2={22} stroke="black" strokeWidth={2} />
-      {status === "infertility" && <line x1={17} y1={18} x2={31} y2={18} stroke="black" strokeWidth={2} />}
+      <line x1={0} y1={4} x2={48} y2={4} stroke="black" strokeWidth={LINE_WIDTH} />
+      <line x1={24} y1={4} x2={24} y2={22} stroke="black" strokeWidth={LINE_WIDTH} />
+      <line x1={17} y1={22} x2={31} y2={22} stroke="black" strokeWidth={LINE_WIDTH} />
+      {status === "infertility" && <line x1={17} y1={18} x2={31} y2={18} stroke="black" strokeWidth={LINE_WIDTH} />}
     </svg>
   );
 }
@@ -268,10 +269,10 @@ function ChildlessSvg({ status }: { status: ChildlessStatus }) {
 function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
   return (
     <svg width="48" height="28" viewBox="0 0 48 28">
-      <line x1={8} y1={3} x2={40} y2={3} stroke="black" strokeWidth={2} />
-      <line x1={24} y1={3} x2={12} y2={27} stroke="black" strokeWidth={2} />
-      <line x1={24} y1={3} x2={36} y2={27} stroke="black" strokeWidth={2} />
-      {zygosity === "monozygotic" && <line x1={18} y1={15} x2={30} y2={15} stroke="black" strokeWidth={2} />}
+      <line x1={8} y1={3} x2={40} y2={3} stroke="black" strokeWidth={LINE_WIDTH} />
+      <line x1={24} y1={3} x2={12} y2={27} stroke="black" strokeWidth={LINE_WIDTH} />
+      <line x1={24} y1={3} x2={36} y2={27} stroke="black" strokeWidth={LINE_WIDTH} />
+      {zygosity === "monozygotic" && <line x1={18} y1={15} x2={30} y2={15} stroke="black" strokeWidth={LINE_WIDTH} />}
       {zygosity === "unknown" && <text x={24} y={19} textAnchor="middle" fontFamily="sans-serif" fontSize={11} fontWeight="bold">?</text>}
     </svg>
   );
@@ -282,7 +283,7 @@ function TwinsSvg({ zygosity }: { zygosity: Zygosity }) {
 function DuplicateArcSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
-      <path d="M 4 17 Q 24 -5 44 17" stroke="black" strokeWidth={2} strokeDasharray="6 4" fill="none" />
+      <path d="M 4 17 Q 24 -5 44 17" stroke="black" strokeWidth={LINE_WIDTH} strokeDasharray="6 4" fill="none" />
     </svg>
   );
 }
@@ -290,8 +291,8 @@ function DuplicateArcSvg() {
 function EndedSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
-      <line x1={0} y1={10} x2={48} y2={10} stroke="black" strokeWidth={2} />
-      <path d={segmentsPathD(endedMarkSegments(24, 10))} stroke="black" strokeWidth={2} fill="none" />
+      <line x1={0} y1={10} x2={48} y2={10} stroke="black" strokeWidth={LINE_WIDTH} />
+      <path d={segmentsPathD(endedMarkSegments(24, 10))} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />
     </svg>
   );
 }
@@ -299,8 +300,8 @@ function EndedSvg() {
 function ConsanguineousSvg() {
   return (
     <svg width="48" height="20" viewBox="0 0 48 20">
-      <line x1={0} y1={7}  x2={48} y2={7}  stroke="black" strokeWidth={2} />
-      <line x1={0} y1={13} x2={48} y2={13} stroke="black" strokeWidth={2} />
+      <line x1={0} y1={7}  x2={48} y2={7}  stroke="black" strokeWidth={LINE_WIDTH} />
+      <line x1={0} y1={13} x2={48} y2={13} stroke="black" strokeWidth={LINE_WIDTH} />
     </svg>
   );
 }

@@ -10,7 +10,7 @@
  */
 import { descentX, type ChildlessStatus } from "@pedigree-editor/layout-engine";
 import type { CoupleLineData, ScenePerson, SibshipData } from "./scene";
-import { NODE_SIZE } from "./constants";
+import { CONSANGUINEOUS_GAP, NODE_SIZE } from "./constants";
 import { couplePathD, consanguineousPathsD, hopRisers } from "./couplePath";
 import { childlessMarkSegments, childlessReasonBaselineY } from "./childless";
 import { endedBreakX, endedMarkSegments } from "./ended";
@@ -18,9 +18,6 @@ import { symbolTopInset } from "./lifeStatus";
 import { sibshipPaths, twinForkMarks, type Segment, type SibshipChild } from "./sibshipPath";
 
 export interface LinePosition { x: number; y: number }
-
-/** Gap (px) between the two lines of a consanguineous couple. */
-export const CONSANGUINEOUS_GAP = 4;
 
 export interface CoupleLineGeometry {
   /** The line: one path, or the outer and inner path of a double line. */

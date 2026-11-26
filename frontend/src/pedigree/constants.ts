@@ -7,6 +7,12 @@ export const ROW_HEIGHT = 120;
 /** Width and height (px) of the symbol bounding box. */
 export const NODE_SIZE = 40;
 
+/** Stroke width (px) of the chart's lines and symbol outlines. */
+export const LINE_WIDTH = 2;
+
+/** Gap (px) between the two lines of a consanguineous (double) couple line. */
+export const CONSANGUINEOUS_GAP = 4;
+
 /**
  * Height (px) a couple line rises to pass over an intermediate partner when
  * someone has three or more partners. Must clear NODE_SIZE / 2.

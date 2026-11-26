@@ -21,7 +21,7 @@ import {
   DOCUMENTED_FONT_SIZE, DOCUMENTED_MARK,
 } from "../evaluation";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
-import { DECEASED_OVERHANG } from "../constants";
+import { DECEASED_OVERHANG, LINE_WIDTH } from "../constants";
 import { COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../labelBlock";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth } from "../labels";
 import { branchCountBaseline, branchCountFontSize } from "../collapse";
@@ -164,12 +164,12 @@ function MaleSymbol({ size, fill, sectors, core, clipId, clip }: { size: number;
       {clip && <clipPath id={clipId}><rect {...outline} /></clipPath>}
       <rect
         {...outline}
-        stroke="black" strokeWidth={2}
+        stroke="black" strokeWidth={LINE_WIDTH}
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       <AffectedCore size={size} show={core} outline={<rect {...outline} />} />
-      {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={2} fill="none" />}
+      {sectors.length > 0 && <rect {...outline} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />}
     </g>
   );
 }
@@ -183,12 +183,12 @@ function FemaleSymbol({ size, fill, sectors, core, clipId, clip }: { size: numbe
       {clip && <clipPath id={clipId}><circle cx={cx} cy={cy} r={r} /></clipPath>}
       <circle
         cx={cx} cy={cy} r={r}
-        stroke="black" strokeWidth={2}
+        stroke="black" strokeWidth={LINE_WIDTH}
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       <AffectedCore size={size} show={core} outline={<circle cx={cx} cy={cy} r={r} />} />
-      {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={2} fill="none" />}
+      {sectors.length > 0 && <circle cx={cx} cy={cy} r={r} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />}
     </g>
   );
 }
@@ -208,12 +208,12 @@ function UnknownSymbol({ size, fill, sectors, core, clipId, clip }: { size: numb
       {clip && <clipPath id={clipId}><polygon points={points} /></clipPath>}
       <polygon
         points={points}
-        stroke="black" strokeWidth={2}
+        stroke="black" strokeWidth={LINE_WIDTH}
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       <AffectedCore size={size} show={core} outline={<polygon points={points} />} />
-      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
+      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />}
     </g>
   );
 }
@@ -231,12 +231,12 @@ function LossTriangle({ size, fill, slash, sectors, core, clipId, clip }: {
       {clip && <clipPath id={clipId}><polygon points={points} /></clipPath>}
       <polygon
         points={points}
-        stroke="black" strokeWidth={2}
+        stroke="black" strokeWidth={LINE_WIDTH}
         fill={fill.type === "solid" ? "black" : "white"}
       />
       <Sectors sectors={sectors} size={size} clipId={clipId} />
       <AffectedCore size={size} show={core} outline={<polygon points={points} />} />
-      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={2} fill="none" />}
+      {sectors.length > 0 && <polygon points={points} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />}
       {slash && <SlashOverFill {...s} fill={fill} clipId={clipId} />}
     </g>
   );
@@ -254,14 +254,14 @@ function SlashOverFill({ x1, y1, x2, y2, fill, clipId, outlineTurn, size }: {
   const c = (size ?? 0) / 2;
   return (
     <g>
-      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2} />
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={LINE_WIDTH} />
       {fill.type === "solid" && (outlineTurn
         // A clip is read in the space of the element that uses it, so the
         // white slash is turned back inside a group turned like the outline.
         ? <g {...turn(outlineTurn, c, c)} clipPath={`url(#${clipId})`}>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={2} {...turn(-outlineTurn, c, c)} />
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={LINE_WIDTH} {...turn(-outlineTurn, c, c)} />
           </g>
-        : <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={2} clipPath={`url(#${clipId})`} />
+        : <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={LINE_WIDTH} clipPath={`url(#${clipId})`} />
       )}
     </g>
   );
@@ -338,7 +338,7 @@ export function AdoptionBrackets({ size, adopted }: { size: number; adopted: str
   return (
     <g data-adopted={adopted}>
       {adoptionBracketSegments(size).map(([x1, y1, x2, y2], i) => (
-        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2} />
+        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={LINE_WIDTH} />
       ))}
     </g>
   );
@@ -444,7 +444,7 @@ function deceasedSlashEnds(size: number) {
 }
 
 export function DeceasedSlash({ size }: { size: number }) {
-  return <line {...deceasedSlashEnds(size)} stroke="black" strokeWidth={2} />;
+  return <line {...deceasedSlashEnds(size)} stroke="black" strokeWidth={LINE_WIDTH} />;
 }
 
 /** The arrowhead of the proband and consultand arrows, defined once per drawing as `id`. */
@@ -471,7 +471,7 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
       <line
         x1={tail.x} y1={tail.y}
         x2={tip.x}  y2={tip.y}
-        stroke="black" strokeWidth={2}
+        stroke="black" strokeWidth={LINE_WIDTH}
         markerEnd={`url(#${markerId})`}
       />
       {kind === "proband" && (

@@ -33,7 +33,7 @@ import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
 import type { Scene, ScenePerson } from "./scene";
-import { NODE_SIZE } from "./constants";
+import { DECEASED_OVERHANG, NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
 import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth } from "./consanguinityLabel";
 import { duplicateArcPoints } from "./couplePath";
@@ -336,9 +336,6 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
   return out;
 }
 
-/** Slash overhang (px) a deceased symbol's slash reaches above the symbol. */
-const SLASH_REACH = 4;
-
 /**
  * The canvas title, placed as `ChartTitleNode` places it, against
  * everything drawn near the top of the chart. The title is raised to clear
@@ -357,7 +354,7 @@ function lintTitle(title: string, scene: Scene): LintFinding[] {
 
   for (const n of scene.people) {
     const { x, y } = n.position;
-    if (overlaps([x - half, y - half - SLASH_REACH, x + half, y + half])) return found(`the symbol of ${n.individual.id}`, [n.individual.id]);
+    if (overlaps([x - half, y - half - DECEASED_OVERHANG, x + half, y + half])) return found(`the symbol of ${n.individual.id}`, [n.individual.id]);
   }
   const pos = new Map(scene.people.map(n => [n.id, n.position]));
   for (const e of scene.duplicates) {

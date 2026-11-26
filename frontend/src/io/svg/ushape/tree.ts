@@ -8,7 +8,8 @@ import { isAffected, placementParentOf, type Pedigree, type Individual } from "@
 import { consanguinityTest } from "../../../pedigree/consanguinity";
 import { twinMembership } from "../../../pedigree/twins";
 import { consanguinityLabelText, consanguinityLabelWidth } from "../../../pedigree/consanguinityLabel";
-import { NODE_SIZE, HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS } from "./constants";
+import { NODE_SIZE } from "../../../pedigree/constants";
+import { HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS } from "./constants";
 import { groupBy } from "./connectors";
 import { couplesOf, partnerIn } from "../../../pedigree/graph";
 

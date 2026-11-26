@@ -11,7 +11,8 @@ import { ADOPTION_DASH } from "../../../pedigree/adoption";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../../pedigree/ended";
 import { twinMembership, TWIN_QUESTION_FONT_SIZE } from "../../../pedigree/twins";
 import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHILDLESS_REASON_FONT_SIZE } from "../../../pedigree/childless";
-import { HALF, STROKE, CONSANG_GAP, BAR_CLEARANCE, DUP_LINK_INSET, r, escapeXml } from "./constants";
+import { CONSANGUINEOUS_GAP, LINE_WIDTH } from "../../../pedigree/constants";
+import { HALF, BAR_CLEARANCE, DUP_LINK_INSET, r, escapeXml } from "./constants";
 import { walk, type TNode } from "./tree";
 import { trackPoint, memberU, descentU, glyphOf, outlineRotation, type Geom, type UShapeLayout, type Built } from "./layout";
 
@@ -39,7 +40,7 @@ function childDropEndOffset(ind: Individual | undefined, pedigree: Pedigree, u: 
   return -edgeReach(ind, pedigree, u, offset, g) + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
 }
 
-export const LINE_ATTRS = `fill="none" stroke="black" stroke-width="${STROKE}" stroke-linecap="round"`;
+export const LINE_ATTRS = `fill="none" stroke="black" stroke-width="${LINE_WIDTH}" stroke-linecap="round"`;
 
 /** A path that follows one track from u1 to u2: true arcs on the curve, lines elsewhere. */
 export function trackPath(u1: number, u2: number, offset: number, g: Geom, attrs = LINE_ATTRS): string {
@@ -152,7 +153,7 @@ export function renderConnectors(b: Built, layout: UShapeLayout, pedigree: Pedig
       if (w.kind !== "solo" && !donor) {
         const uA = memberU(n, w.a, g);
         const uB = w.kind === "join" ? w.joinNode!.u : memberU(n, w.b!, g);
-        if (w.consang) out.push(trackPath(uA, uB, track - CONSANG_GAP / 2, g), trackPath(uA, uB, track + CONSANG_GAP / 2, g));
+        if (w.consang) out.push(trackPath(uA, uB, track - CONSANGUINEOUS_GAP / 2, g), trackPath(uA, uB, track + CONSANGUINEOUS_GAP / 2, g));
         else out.push(trackPath(uA, uB, track, g));
         // Ended relationship: two strokes across the line, aside from
         // the descent line or childless mark in its middle.

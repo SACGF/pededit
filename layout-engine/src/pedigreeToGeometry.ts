@@ -4,9 +4,12 @@
  * Converts a Pedigree to a flat, pixel-coordinate geometry description that
  * can be used for testing, export, and future API responses.
  *
- * Rendering constants default to the values used by the React frontend
- * (SLOT_WIDTH=80, ROW_HEIGHT=120, NODE_SIZE=40, SIB_BAR_FACTOR=0.4).
- * Pass custom values for different output sizes.
+ * Rendering constants default to the editor's sizes (SLOT_WIDTH=80,
+ * ROW_HEIGHT=120, NODE_SIZE=40) and hop line constants, except the sibship
+ * bar: 0.4 of a row above the children here, where the editor draws it
+ * halfway between the couple line and the children (`sibBarHeight` in
+ * frontend/src/pedigree/sibshipPath.ts). Pass custom values for different
+ * output sizes.
  */
 
 import { alignPedigree } from "./alignPedigree.js";
@@ -16,7 +19,7 @@ import { couplePortHeights, descentX, hopHeight, hopTurn, symbolSideDx } from ".
 import type { HopLineConstants } from "./hopLine.js";
 import type { Pedigree, Individual, LayoutResult } from "./types.js";
 
-// ── Rendering constants (match frontend/src/pedigree/constants.ts) ────────────
+// ── Rendering constants (see the header for how they compare with the editor) ─
 
 export interface RenderingConstants extends HopLineConstants {
   /** Horizontal distance between slot centres, in pixels. Default: 80. */

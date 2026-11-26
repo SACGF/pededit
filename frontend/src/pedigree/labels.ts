@@ -19,6 +19,7 @@ import { notationOf } from "./notation";
 import type { NotationEdition } from "@pedigree-editor/layout-engine";
 import { assignedAtBirthText } from "./gender";
 import { inbreedingLabel } from "./relatedness";
+import { DECEASED_OVERHANG } from "./constants";
 
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
@@ -329,6 +330,6 @@ export function chartTitlePlace(
     minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y);
   }
   // The baseline sits about a third of the font size below the box centre.
-  const baseline = Math.min(minY - half, aboveTop) - TITLE_GAP - 4;
+  const baseline = Math.min(minY - half, aboveTop) - TITLE_GAP - DECEASED_OVERHANG;
   return { x: (minX + maxX) / 2, y: baseline - TITLE_FONT_SIZE / 3, width: Math.ceil(titleWidth(title)) + 8, height: TITLE_LINE_HEIGHT };
 }

@@ -3,6 +3,7 @@ import { segmentsPathD } from "../sibshipPath";
 import type { CoupleLineData } from "../scene";
 import { ChildlessMark } from "./ChildlessMark";
 import { ConsanguinityLabel } from "./ConsanguinityLabel";
+import { LINE_WIDTH } from "../constants";
 
 /**
  * A couple line between the partners centred at `left` and `right`: single
@@ -14,11 +15,11 @@ export function CoupleLine({ data, double, left, right }: { data: CoupleLineData
   const line = coupleLineGeometry(data, double, left, right);
   return (
     <>
-      {line.paths.map((d, i) => <path key={i} d={d} stroke="black" strokeWidth={2} fill="none" />)}
+      {line.paths.map((d, i) => <path key={i} d={d} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />)}
       {line.childless && (
         <ChildlessMark cx={line.childless.cx} topY={line.childless.topY} status={line.childless.status} reason={line.childless.reason} />
       )}
-      {line.ended && <path data-ended d={segmentsPathD(line.ended)} stroke="black" strokeWidth={2} fill="none" />}
+      {line.ended && <path data-ended d={segmentsPathD(line.ended)} stroke="black" strokeWidth={LINE_WIDTH} fill="none" />}
     </>
   );
 }
