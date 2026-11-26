@@ -72,13 +72,13 @@ const status = build(
 // ── Pattern fills and more than four sections ────────────────────────────────
 
 const fillTags: Tag[] = [
-  { id: "f1", label: "Solid", color: "#d62728", style: "quadrant", fill: "solid" },
-  { id: "f2", label: "Horizontal", color: "#1f77b4", style: "quadrant", fill: "horizontal" },
-  { id: "f3", label: "Vertical", color: "#2ca02c", style: "quadrant", fill: "vertical" },
-  { id: "f4", label: "Diagonal", color: "#9467bd", style: "quadrant", fill: "diagonal" },
-  { id: "f5", label: "Cross-hatched", color: "#ff7f0e", style: "quadrant", fill: "crosshatch" },
+  { id: "f1", label: "Solid", color: "#d62728", style: "quadrant", fill: "solid", carrierFill: "dots" },
+  { id: "f2", label: "Horizontal", color: "#1f77b4", style: "quadrant", fill: "horizontal", carrierFill: "solid" },
+  { id: "f3", label: "Vertical", color: "#2ca02c", style: "quadrant", fill: "vertical", carrierFill: "vertical" },
+  { id: "f4", label: "Diagonal", color: "#9467bd", style: "quadrant", fill: "diagonal", carrierFill: "horizontal" },
+  { id: "f5", label: "Cross-hatched", color: "#ff7f0e", style: "quadrant", fill: "crosshatch", carrierFill: "diagonal" },
   { id: "f6", label: "Dotted", color: "#8c564b", style: "quadrant", fill: "dots", kind: "trait" },
-  { id: "f7", label: "Shaded", color: "#e377c2", style: "quadrant", fill: "shade" },
+  { id: "f7", label: "Shaded", color: "#e377c2", style: "quadrant", fill: "shade", carrierFill: "shade" },
 ];
 
 const fills = build(
@@ -275,7 +275,7 @@ const reproduction = build(
 // ── Hidden descendants and view filters ──────────────────────────────────────
 
 const familyTags: Tag[] = [
-  { id: "hcm", label: "Hypertrophic cardiomyopathy", color: "#d62728", style: "quadrant", abbrev: "HCM" },
+  { id: "hcm", label: "Hypertrophic cardiomyopathy", color: "#d62728", style: "quadrant", abbrev: "HCM", carrierFill: "crosshatch" },
   { id: "dm", label: "Type 2 diabetes", color: "#1f77b4", style: "quadrant", abbrev: "T2D" },
 ];
 
@@ -362,7 +362,7 @@ const BASE: FeatureFixture[] = [
   },
   {
     slug: "fills", label: "Pattern fills",
-    covers: "every pattern fill, carrier fills, and a fifth to seventh section drawn as slices",
+    covers: "every pattern fill, carrier fills (automatic and chosen, one the same as its own fill), and a fifth to seventh section drawn as slices",
     data: fills,
   },
   {

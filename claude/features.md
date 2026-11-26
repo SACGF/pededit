@@ -29,7 +29,7 @@ checked by `npm run check` (`scripts/check-doc-paths.mjs`).
 | Family history not known ("?") | #100 | `frontend/src/pedigree/familyHistory.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Evaluations, documented "*", presymptomatic carrier line | #101, #114 | `frontend/src/pedigree/evaluation.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Conditions, tags, colouring, pattern fills, legend and key, My library | #3, #67 | `frontend/src/pedigree/tags.ts`, `frontend/src/pedigree/tagFills.ts` | `claude/phase_7_2_plan.md`, `frontend/src/pedigree/AGENTS.md` |
-| Carriers per condition, traits, sections | #115, #118, #136 | `frontend/src/pedigree/conditions.ts` | `frontend/src/pedigree/AGENTS.md` |
+| Carriers per condition, carrier fills, traits, sections | #115, #118, #129, #136 | `frontend/src/pedigree/conditions.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Relatedness: kinship, inbreeding, named relationships, coefficients on the chart | #32, #85, #86, #87, #90, #134 | `layout-engine/src/kinship.ts`, `frontend/src/pedigree/relationship.ts` | `layout-engine/AGENTS.md`, `frontend/src/pedigree/AGENTS.md` |
 | Consanguinity text above the double line, ended relationships | #97, #98, #109 | `frontend/src/pedigree/consanguinityLabel.ts` | `frontend/src/pedigree/AGENTS.md` |
 | Chart title, approximate age, long names | #20, #68 | `frontend/src/pedigree/labels.ts` | `frontend/src/pedigree/AGENTS.md` |

@@ -128,35 +128,40 @@
         "label": "Solid",
         "color": "#d62728",
         "style": "quadrant",
-        "fill": "solid"
+        "fill": "solid",
+        "carrierFill": "dots"
       },
       {
         "id": "f2",
         "label": "Horizontal",
         "color": "#1f77b4",
         "style": "quadrant",
-        "fill": "horizontal"
+        "fill": "horizontal",
+        "carrierFill": "solid"
       },
       {
         "id": "f3",
         "label": "Vertical",
         "color": "#2ca02c",
         "style": "quadrant",
-        "fill": "vertical"
+        "fill": "vertical",
+        "carrierFill": "vertical"
       },
       {
         "id": "f4",
         "label": "Diagonal",
         "color": "#9467bd",
         "style": "quadrant",
-        "fill": "diagonal"
+        "fill": "diagonal",
+        "carrierFill": "horizontal"
       },
       {
         "id": "f5",
         "label": "Cross-hatched",
         "color": "#ff7f0e",
         "style": "quadrant",
-        "fill": "crosshatch"
+        "fill": "crosshatch",
+        "carrierFill": "diagonal"
       },
       {
         "id": "f6",
@@ -171,7 +176,8 @@
         "label": "Shaded",
         "color": "#e377c2",
         "style": "quadrant",
-        "fill": "shade"
+        "fill": "shade",
+        "carrierFill": "shade"
       }
     ]
   }

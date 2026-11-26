@@ -192,6 +192,15 @@ export interface Tag {
   /** Fill of a quadrant tag's sector. Absent means "solid". Ignored for dot and text tags. */
   fill?: TagFill;
   /**
+   * Fill of a condition's section for its carriers (`carrierTags`), in the
+   * condition's colour. Absent: chosen automatically (hatched when the
+   * condition is solid or shaded, else its own pattern in a lighter tint).
+   * A chosen fill that would draw a carrier the same as someone affected
+   * (this or another section, or the plain black fill) is drawn in the
+   * lighter tint. Ignored for traits, dot and text tags.
+   */
+  carrierFill?: TagFill;
+  /**
    * What a quadrant tag means (#118). Absent or "condition": a condition,
    * affected with it (`Individual.tags`) or a carrier (`carrierTags`).
    * "trait": only a coloured section, saying nothing about affected status

@@ -285,7 +285,8 @@
         "label": "Hypertrophic cardiomyopathy",
         "color": "#d62728",
         "style": "quadrant",
-        "abbrev": "HCM"
+        "abbrev": "HCM",
+        "carrierFill": "crosshatch"
       },
       {
         "id": "dm",

@@ -407,8 +407,13 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   with one fix per condition (`Problem.moreFixes`), built with
   `resolvePlainAffected` as one `updateIndividual` so a click is one undo
   step. Drawing is decided once in
-  `symbolPaint` (tags.ts): sectors (carrier ones flagged, with
-  `carrierPaintFrom` from tagFills.ts, plus the 2022 dotted half for a plain
+  `symbolPaint` (tags.ts): sectors (carrier ones flagged, painted by
+  `conditionCarrierPaint`: the condition's `carrierFill` when one is
+  chosen in the tags dialog, else `carrierPaintFrom` from tagFills.ts; a
+  chosen fill that `carrierFillClash` finds equal to an affected section,
+  the plain black fill or the plain carrier's dots, as drawn now, so in
+  black and white any section with that pattern, is drawn in the lighter
+  carrier tint, and the dialog says so under the row), plus the 2022 dotted half for a plain
   carrier as the `PLAIN_CARRIER_TAG` sector, left off when the person's
   affected conditions cover the right half, which the Person tab then
   reports as not drawn), black base, black centre,

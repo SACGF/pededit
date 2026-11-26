@@ -57,7 +57,8 @@ FULL_PEDIGREE = {
                        "tagFills": "monochrome"},
     "unlockedIndividuals": ["f"],
     "tags": [
-        {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant", "fill": "diagonal"},
+        {"id": "t1", "label": "Tremor", "color": "#000000", "style": "quadrant", "fill": "diagonal",
+         "carrierFill": "dots"},
         {"id": "t3", "label": "Cohort", "color": "#2ca02c", "style": "quadrant", "kind": "trait"},
         {"id": "t2", "label": "Sequenced", "color": "#1f77b4", "style": "dot", "abbrev": "WGS"},
     ],
@@ -153,6 +154,7 @@ class PedigreeRoundTripTests(APITestCase):
             {"individuals": [], "partnerships": []},
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "stripe"}]},
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "quadrant", "fill": "plaid"}]},
+            {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "quadrant", "carrierFill": "plaid"}]},
             {**base, "tags": [{"id": "t", "label": "x", "color": "#000", "style": "quadrant", "kind": "maybe"}]},
             {**base, "canvasSettings": {"nodesMoveable": False, "snapToGrid": False, "snapGridSize": 20,
                                         "tagFills": "sepia"}},
@@ -436,17 +438,29 @@ class TagPresetTests(APITestCase):
         [saved] = self.client.get("/api/tag-presets/").json()
         self.assertEqual((saved["fill"], saved["kind"]), ("diagonal", "trait"))
 
+    def test_carrier_fill_round_trip(self):
+        self.client.force_authenticate(self.alice)
+        resp = self.client.post(
+            "/api/tag-presets/",
+            {"label": "CF", "color": "#d62728", "style": "quadrant", "carrierFill": "dots"},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 201, resp.data)
+        [saved] = self.client.get("/api/tag-presets/").json()
+        self.assertEqual(saved["carrierFill"], "dots")
+        self.assertEqual(TagPreset.objects.get(owner=self.alice).carrier_fill, "dots")
+
     def test_fill_and_kind_blank_when_absent(self):
         self.client.force_authenticate(self.alice)
         resp = self.client.post(
             "/api/tag-presets/", {"label": "CF", "color": "#000", "style": "quadrant"}, format="json"
         )
         self.assertEqual(resp.status_code, 201, resp.data)
-        self.assertEqual((resp.data["fill"], resp.data["kind"]), ("", ""))
+        self.assertEqual((resp.data["fill"], resp.data["carrierFill"], resp.data["kind"]), ("", "", ""))
 
     def test_rejects_unknown_fill_or_kind(self):
         self.client.force_authenticate(self.alice)
-        for extra in ({"fill": "stripes"}, {"kind": "carrier"}):
+        for extra in ({"fill": "stripes"}, {"carrierFill": "stripes"}, {"kind": "carrier"}):
             resp = self.client.post(
                 "/api/tag-presets/",
                 {"label": "x", "color": "#000", "style": "quadrant", **extra},

@@ -219,7 +219,7 @@
     {
       "file": "drawn/fills.json",
       "group": "drawn",
-      "purpose": "Pattern fills: every pattern fill, carrier fills, and a fifth to seventh section drawn as slices",
+      "purpose": "Pattern fills: every pattern fill, carrier fills (automatic and chosen, one the same as its own fill), and a fifth to seventh section drawn as slices",
       "import": [],
       "valid": true,
       "server": "accepted",

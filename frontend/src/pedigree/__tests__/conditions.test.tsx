@@ -6,9 +6,10 @@ import {
   plainAffected, plainCarrier, resolvePlainAffected, CONDITIONS_AND_TAGS,
 } from "../conditions";
 import { keyTagRows, statusKeyRows } from "../keyRows";
-import { symbolPaint, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, PLAIN_CARRIER_TAG } from "../tags";
+import { symbolPaint, sectionLayout, sectionName, sectorAngles, sectorPath, conditionSection, conditionPaint, conditionCarrierPaint, carrierFillClash, quadrantTags, PLAIN_CARRIER_TAG } from "../tags";
 import { exportKeyMarkup } from "../exportKey";
-import { carrierPaintFrom, tagPaint } from "../tagFills";
+import { carrierPaintFrom, tagPaint, tint, CARRIER_TINT, PLAIN_CARRIER_PAINT, TAG_FILL_OPTIONS } from "../tagFills";
+import { TagSwatchSvg } from "../chart/keySwatches";
 import { notationOf, withCurrentNotation } from "../notation";
 import { SymbolShape, standaloneGlyph } from "../chart/symbols";
 import { Legend } from "../../components/Legend";
@@ -391,6 +392,94 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
     expect(keyRow(family([CF], "nsgc2022"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
     expect(keyRow(family([CF, TS], "nsgc2022"))).toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
     expect(keyRow(family([CF, TS]))).not.toMatch(/M (\S+) \S+ L \1 \S+ A 16 16 0 0 1 \1 \S+ Z/);
+  });
+});
+
+describe("a condition's chosen carrier fill (#129)", () => {
+  const carrierSector = (p: Pedigree, id = "b") => symbolPaint(byId(p, id), p).sectors.find(s => s.carrier && s.tag.id === "cf")!;
+
+  it("colour: carriers are drawn in the chosen fill in the condition's colour; absent is the automatic choice", () => {
+    const p = family([{ ...CF, carrierFill: "dots" }, TS], "nsgc2022");
+    expect(carrierSector(p)).toMatchObject({ fill: "dots", color: "#d62728", start: 180, end: 360 });
+    expect(carrierSector(family([CF, TS], "nsgc2022"))).toMatchObject({ fill: "diagonal", color: "#d62728" });
+    // The affected section keeps its own fill.
+    expect(symbolPaint(byId(p, "a"), p).sectors[0]).toMatchObject({ fill: "solid", color: "#d62728" });
+    expect(carrierFillClash(p.tags![0]!, p)).toBeNull();
+  });
+
+  it("a carrier fill that would look like someone affected is drawn in the lighter tint", () => {
+    // Its own fill.
+    const own = family([{ ...CF, fill: "vertical", carrierFill: "vertical" }, TS], "nsgc2022");
+    expect(carrierSector(own)).toMatchObject({ fill: "vertical", color: tint("#d62728", CARRIER_TINT) });
+    expect(carrierFillClash(own.tags![0]!, own)).toMatchObject({ kind: "section", tag: { id: "cf" } });
+    // Black and white: TS is given horizontal lines, so CF carriers in horizontal lines are mid grey.
+    const mono = family([{ ...CF, carrierFill: "horizontal" }, TS], "nsgc2022", "monochrome");
+    expect(tagPaint(TS, mono)).toEqual({ color: "#000000", fill: "horizontal" });
+    expect(carrierSector(mono)).toMatchObject({ fill: "horizontal", color: "#8c8c8c" });
+    expect(carrierFillClash(mono.tags![0]!, mono)).toMatchObject({ kind: "section", tag: { id: "ts" } });
+    // A pattern no one has stays black.
+    const free = family([{ ...CF, carrierFill: "vertical" }, TS], "nsgc2022", "monochrome");
+    expect(carrierSector(free)).toMatchObject({ fill: "vertical", color: "#000000" });
+    // Black dots are the plain carrier's half; solid black the plain affected fill.
+    const dots = family([{ ...CF, carrierFill: "dots" }, TS], "nsgc2022", "monochrome");
+    expect(carrierFillClash(dots.tags![0]!, dots)).toEqual({ kind: "carrier" });
+    expect(carrierSector(dots).color).toBe("#8c8c8c");
+    const solid = family([{ ...CF, color: "#000000", fill: "dots", carrierFill: "solid" }, TS], "nsgc2022");
+    expect(carrierFillClash(solid.tags![0]!, solid)).toEqual({ kind: "affected" });
+  });
+
+  it("every chosen fill, in colour and black and white, keeps carriers and affected people of every condition apart", () => {
+    for (const fill of TAG_FILL_OPTIONS.map(o => o.value)) {
+      for (const carrierFill of TAG_FILL_OPTIONS.map(o => o.value)) {
+        for (const notation of ["nsgc2008", "nsgc2022"] as const) {
+          for (const mono of [undefined, "monochrome" as const]) {
+            for (const tags of [[{ ...CF, fill, carrierFill }], [{ ...CF, fill, carrierFill }, { ...TS, carrierFill }]]) {
+              const p = family(tags, notation, mono);
+              const affected = [...quadrantTags(p).map(t => conditionPaint(t, p)), { color: "#000000", fill: "solid" }, PLAIN_CARRIER_PAINT];
+              for (const t of tags) {
+                const carrier = conditionCarrierPaint(t, p);
+                expect(carrier.fill).toBe(carrierFill);
+                for (const a of affected) expect(carrier, `${fill} ${carrierFill} ${notation} ${mono}`).not.toEqual(a);
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it("a trait has no carriers, and an unknown carrier fill from a newer file is the automatic choice", () => {
+    const trait: Tag = { ...CF, kind: "trait", carrierFill: "dots" };
+    const p = family([trait, TS], "nsgc2022");
+    expect(carrierFillClash(trait, p)).toBeNull();
+    expect(conditionCarrierPaint(trait, p)).toEqual(carrierPaintFrom(conditionPaint(trait, p)));
+    const odd = { ...CF, carrierFill: "plaid" } as unknown as Tag;
+    const q = family([odd, TS], "nsgc2022");
+    expect(conditionCarrierPaint(odd, q)).toEqual({ color: "#d62728", fill: "diagonal" });
+  });
+
+  it("the legend and export key draw the \"<condition> carrier\" swatch with it", () => {
+    const p = family([{ ...CF, carrierFill: "crosshatch" }, TS], "nsgc2022");
+    const app = renderToStaticMarkup(<TagSwatchSvg tag={p.tags![0]!} pedigree={p} carrier />);
+    expect(app).toContain(`data-tag-fill="crosshatch"`);
+    expect(app).toContain(`stroke="#d62728"`);
+    const row = exportKeyMarkup(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis carrier<"))!;
+    expect(row).toContain(`data-tag-fill="crosshatch"`);
+    expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(`data-tag-fill="crosshatch"`);
+    // The affected row keeps the condition's own fill.
+    expect(exportKeyMarkup(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))).not.toContain("crosshatch");
+    // And the figure export draws the carriers with it.
+    expect(exportSvg(p)).toContain(`data-tag-fill="crosshatch"`);
+  });
+
+  it("JSON keeps it; the importer refuses a fill name it does not know", () => {
+    const p = family([{ ...CF, carrierFill: "dots" }, TS], "nsgc2022");
+    expect(importJson(exportJson(p)).pedigree!.tags![0]!.carrierFill).toBe("dots");
+    const bad = JSON.parse(exportJson(p));
+    bad.pedigree.tags[0].carrierFill = "plaid";
+    const result = importJson(JSON.stringify(bad));
+    expect(result.hasErrors).toBe(true);
+    expect(JSON.stringify(result)).toContain("carrierFill");
   });
 });
 

@@ -46,8 +46,10 @@ class TagPreset(models.Model):
     color = models.CharField(max_length=32)
     style = models.CharField(max_length=16)
     abbrev = models.CharField(max_length=64, blank=True, default="")
-    # Tag.fill and Tag.kind; blank means absent (a solid fill, a condition).
+    # Tag.fill, Tag.carrierFill and Tag.kind; blank means absent (a solid
+    # fill, the automatic carrier fill, a condition).
     fill = models.CharField(max_length=16, blank=True, default="")
+    carrier_fill = models.CharField(max_length=16, blank=True, default="")
     kind = models.CharField(max_length=16, blank=True, default="")
     created = models.DateTimeField(auto_now_add=True)
 

@@ -106,6 +106,7 @@ class TagSerializer(serializers.Serializer):
     style = serializers.ChoiceField(choices=["quadrant", "dot", "text"])
     abbrev = _opt_text()
     fill = _opt(serializers.ChoiceField, choices=TAG_FILL_CHOICES)
+    carrierFill = _opt(serializers.ChoiceField, choices=TAG_FILL_CHOICES)
     kind = _opt(serializers.ChoiceField, choices=TAG_KIND_CHOICES)
 
 
@@ -399,13 +400,16 @@ class PedigreeListSerializer(serializers.ModelSerializer):
 
 
 class TagPresetSerializer(serializers.ModelSerializer):
-    # Blank is the stored form of an absent Tag.fill or Tag.kind.
+    # Blank is the stored form of an absent Tag.fill, Tag.carrierFill or Tag.kind.
     fill = serializers.ChoiceField(choices=TAG_FILL_CHOICES, required=False, allow_blank=True)
+    carrierFill = serializers.ChoiceField(
+        source="carrier_fill", choices=TAG_FILL_CHOICES, required=False, allow_blank=True
+    )
     kind = serializers.ChoiceField(choices=TAG_KIND_CHOICES, required=False, allow_blank=True)
 
     class Meta:
         model = TagPreset
-        fields = ["id", "label", "color", "style", "abbrev", "fill", "kind", "created"]
+        fields = ["id", "label", "color", "style", "abbrev", "fill", "carrierFill", "kind", "created"]
         read_only_fields = ["id", "created"]
 
     def validate_style(self, value):

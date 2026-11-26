@@ -168,6 +168,8 @@ export interface TagPresetPayload {
   abbrev: string;
   /** Tag.fill; "" when the tag has none (solid). */
   fill: TagFill | "";
+  /** Tag.carrierFill; "" when the tag has none (chosen automatically). */
+  carrierFill: TagFill | "";
   /** Tag.kind; "" when the tag has none (a condition). */
   kind: TagKind | "";
   created: string;

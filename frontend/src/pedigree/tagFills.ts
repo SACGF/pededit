@@ -39,6 +39,11 @@ export const TAG_FILL_OPTIONS: readonly TagFillOption[] = [
 
 const FILL_VALUES = new Set<string>(TAG_FILL_OPTIONS.map(o => o.value));
 
+/** True for a fill name this version draws (a newer file may carry others). */
+export function isTagFill(value: unknown): value is TagFill {
+  return typeof value === "string" && FILL_VALUES.has(value);
+}
+
 /**
  * Patterns handed out in monochrome mode to quadrant tags whose own fill is
  * solid, in quadrant order, skipping any a tag already has. Vertical lines go
@@ -118,6 +123,7 @@ export function tagPaint(tag: Tag, pedigree: Pedigree): TagPaint {
  * that pattern for its carriers, in a lighter tint of its colour (mid grey
  * for black), so in black and white each condition is still told by its
  * pattern and the carrier by the lighter lines. Both are defined in the key.
+ * A condition's own `carrierFill` replaces this choice (`conditionCarrierPaint`).
  */
 export const CARRIER_TINT = 0.45;
 

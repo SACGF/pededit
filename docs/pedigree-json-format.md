@@ -46,6 +46,7 @@ Any other property on the pedigree object is preserved as-is through import and 
 | `style` | `"quadrant"`, `"dot"` or `"text"` | yes | `quadrant` fills a sector of the symbol (NSGC multi-condition shading, sector taken from the tag's position among quadrant tags). `dot` draws a small coloured dot below the symbol. `text` draws short coloured text below the symbol. |
 | `abbrev` | string | no | Short canvas text for `text` tags. Defaults to `label`. |
 | `fill` | `"solid"`, `"horizontal"`, `"vertical"`, `"diagonal"`, `"crosshatch"`, `"dots"` or `"shade"` | no | How a `quadrant` tag fills its sector: solid in its colour, or a pattern in its colour on white (horizontal or vertical lines, diagonal hatching, cross-hatching, dots), or `shade`, a light tint of the colour (light grey for black). Absent means `"solid"`. Ignored for `dot` and `text` tags. |
+| `carrierFill` | the same values as `fill` | no | How a condition's carriers (`carrierTags`) fill its section, in its colour. Absent means chosen automatically: hatched when the condition is solid or shaded, otherwise its own pattern in a lighter tint. A chosen fill that would look the same as an affected section (this condition's, another's, or the plain black fill of affected with no condition recorded, after `tagFills`) is drawn in the lighter tint. Ignored for traits, `dot` and `text` tags. |
 
 ### `SiblingOrderSettings`
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CONDITIONS_AND_TAGS, peopleWithTag } from "@/pedigree/conditions";
+import { CONDITIONS_AND_TAGS, isConditionTag, peopleWithTag } from "@/pedigree/conditions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -10,7 +10,7 @@ import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { tagPresetApi, type TagPresetPayload } from "../api/client";
 import {
-  TAG_PALETTE, TAG_STYLE_LABELS, sectionName,
+  TAG_PALETTE, TAG_STYLE_LABELS, sectionName, carrierFillClash,
   pedigreeTags, quadrantTags, nextTagColor, unusedTagSuggestions,
 } from "../pedigree/tags";
 
@@ -113,6 +113,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     addTag({
       label: p.label, color: p.color, style: p.style, abbrev: p.abbrev || undefined,
       fill: p.fill && p.fill !== "solid" ? p.fill : undefined,
+      carrierFill: p.carrierFill || undefined,
       kind: p.kind === "trait" ? "trait" : undefined,
     });
   }
@@ -121,7 +122,7 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
     try {
       const { data } = await tagPresetApi.create({
         label: tag.label, color: tag.color, style: tag.style, abbrev: tag.abbrev ?? "",
-        fill: tag.fill ?? "", kind: tag.kind ?? "",
+        fill: tag.fill ?? "", carrierFill: tag.carrierFill ?? "", kind: tag.kind ?? "",
       });
       setPresets(prev => [...prev, data].sort((a, b) => a.label.localeCompare(b.label)));
     } catch {
@@ -141,11 +142,12 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
 
   const inLibrary = (tag: Tag) =>
     presets.some(p => p.label === tag.label && p.color === tag.color && p.style === tag.style
-      && (p.fill || "solid") === (tag.fill ?? "solid") && (p.kind || "condition") === (tag.kind ?? "condition"));
+      && (p.fill || "solid") === (tag.fill ?? "solid") && (p.carrierFill || "") === (tag.carrierFill ?? "")
+      && (p.kind || "condition") === (tag.kind ?? "condition"));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl" aria-describedby={undefined}>
+      <DialogContent className="max-w-3xl" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="text-sm font-medium">{CONDITIONS_AND_TAGS}</DialogTitle>
         </DialogHeader>
@@ -153,7 +155,8 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
         <div className="space-y-4">
           <p className="text-xs text-gray-500">
             A condition fills a section of the symbol for the people affected with it, and the
-            hatched section for its carriers. The order below sets which section (the whole symbol,
+            same section in its carrier fill for its carriers (automatic: hatched, or its own pattern
+            in a lighter tint). The order below sets which section (the whole symbol,
             a half or a quarter, by how many are in use). Its fill can be solid or a pattern (hatched,
             lines, dotted) drawn in its colour. A section set to trait is coloured only and says
             nothing about affected status, such as a cohort or a sample. Dot and text tags mark a
@@ -172,8 +175,11 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
             <div className="border divide-y">
               {tags.map((tag, i) => {
                 const position = tag.style !== "quadrant" ? null : sectionName(tag, pedigree);
+                const condition = tag.style === "quadrant" && isConditionTag(tag);
+                const clash = condition ? carrierFillClash(tag, pedigree) : null;
                 return (
-                  <div key={tag.id} className="flex items-center gap-1.5 px-2 py-1.5 min-w-0">
+                  <div key={tag.id} className="px-2 py-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     <ColorPicker tag={tag} onChange={color => updateTag(tag.id, { color })} />
 
                     <input
@@ -205,6 +211,23 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                         className="h-6 w-28 shrink-0 text-xs border rounded px-1 bg-white"
                       >
                         {TAG_FILL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    )}
+
+                    {condition && (
+                      <select
+                        name="tag-carrier-fill"
+                        aria-label="Carrier fill"
+                        value={tag.carrierFill ?? ""}
+                        onChange={e => {
+                          const carrierFill = e.target.value as TagFill | "";
+                          updateTag(tag.id, { carrierFill: carrierFill || undefined });
+                        }}
+                        title="Carrier fill: how its carriers fill its section, in its colour"
+                        className="h-6 w-36 shrink-0 text-xs border rounded px-1 bg-white"
+                      >
+                        <option value="">Carrier: automatic</option>
+                        {TAG_FILL_OPTIONS.map(o => <option key={o.value} value={o.value}>Carrier: {o.label.toLowerCase()}</option>)}
                       </select>
                     )}
 
@@ -258,6 +281,15 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
                     <IconButton title="Delete" destructive onClick={() => deleteTag(tag.id)}>
                       <Trash2 size={12} />
                     </IconButton>
+                  </div>
+                  {clash && (
+                    <p className="mt-0.5 text-[10px] text-gray-500" data-carrier-fill-clash>
+                      Carriers in this fill would look like {clash.kind === "affected" ? "someone affected with no condition recorded"
+                        : clash.kind === "carrier" ? "a carrier with no condition recorded"
+                        : clash.tag.id === tag.id ? "someone affected with it" : `someone with "${clash.tag.label}"`}, so
+                      they are drawn in a lighter tint of it.
+                    </p>
+                  )}
                   </div>
                 );
               })}

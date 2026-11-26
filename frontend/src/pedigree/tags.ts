@@ -2,7 +2,7 @@ import type { Individual, Pedigree, Tag, TagStyle } from "@pedigree-editor/layou
 import { drawnPedigree } from "./collapse";
 import { drawsPresymptomatic } from "./evaluation";
 import { notationOf } from "./notation";
-import { tagPaint, carrierPaintFrom, tagFillMode, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
+import { tagPaint, carrierPaintFrom, tagFillMode, tint, isTagFill, CARRIER_TINT, MONOCHROME_COLOR, PLAIN_CARRIER_PAINT } from "./tagFills";
 import type { TagPaint } from "./tagFills";
 import { affectedControlOn, carrierConditions, isConditionTag, plainAffected, plainCarrier } from "./conditions";
 import type { TagFill } from "@pedigree-editor/layout-engine";
@@ -285,9 +285,41 @@ export function conditionPaint(tag: Tag, pedigree: Pedigree): TagPaint {
   return { color: MONOCHROME_COLOR, fill: "solid" };
 }
 
-/** The paint of a condition's carrier section (`carrierPaintFrom` of `conditionPaint`). */
+const samePaint = (a: TagPaint, b: TagPaint) => a.fill === b.fill && a.color.toLowerCase() === b.color.toLowerCase();
+
+/**
+ * What a carrier of `tag` drawn with its chosen `carrierFill` in the
+ * condition's colour would look the same as: a section of someone affected
+ * (this condition, or another condition or trait, as drawn now, so in black
+ * and white any section with that pattern), the solid black of affected
+ * with no condition recorded, or the plain carrier's dots. Null when it
+ * differs from all of them, or no carrier fill is chosen.
+ */
+export type CarrierFillClash = { kind: "section"; tag: Tag } | { kind: "affected" } | { kind: "carrier" };
+
+export function carrierFillClash(tag: Tag, pedigree: Pedigree): CarrierFillClash | null {
+  if (!isConditionTag(tag) || !isTagFill(tag.carrierFill)) return null;
+  const chosen: TagPaint = { color: conditionPaint(tag, pedigree).color, fill: tag.carrierFill };
+  for (const other of quadrantTags(pedigree)) {
+    if (samePaint(chosen, conditionPaint(other, pedigree))) return { kind: "section", tag: other };
+  }
+  if (samePaint(chosen, { color: MONOCHROME_COLOR, fill: "solid" })) return { kind: "affected" };
+  if (samePaint(chosen, PLAIN_CARRIER_PAINT)) return { kind: "carrier" };
+  return null;
+}
+
+/**
+ * The paint of a condition's carrier section: its chosen `carrierFill` in
+ * its colour, or in the lighter carrier tint when that would look like
+ * something else (`carrierFillClash`), so a carrier is never drawn as an
+ * affected person. With no carrier fill chosen, `carrierPaintFrom` of
+ * `conditionPaint`.
+ */
 export function conditionCarrierPaint(tag: Tag, pedigree: Pedigree): TagPaint {
-  return carrierPaintFrom(conditionPaint(tag, pedigree));
+  const affected = conditionPaint(tag, pedigree);
+  if (!isConditionTag(tag) || !isTagFill(tag.carrierFill)) return carrierPaintFrom(affected);
+  const color = carrierFillClash(tag, pedigree) ? tint(affected.color, CARRIER_TINT) : affected.color;
+  return { color, fill: tag.carrierFill };
 }
 
 /**
