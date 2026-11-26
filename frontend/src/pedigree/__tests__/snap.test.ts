@@ -1,3 +1,4 @@
+import { parseExportSvg } from "../../io/svg/exportLint";
 import { describe, it, expect } from "vitest";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { buildScene } from "../scene";
@@ -147,7 +148,7 @@ describe("sibship drops", () => {
     const n7 = flow.people.find(n => n.individual.id === "i7")!;
     const p: Pedigree = { ...simpleFamily, pinnedPositions: { i7: { x: n7.position.x, y: 280 } } };
     const svg = exportSvg(p, { padding: 0 });
-    const tops = [...svg.matchAll(/<line x1="([-\d.]+)" y1="([-\d.]+)" x2="\1" y2="([-\d.]+)"/g)].map(m => Number(m[3]));
+    const tops = parseExportSvg(svg).sibs.filter(([x1, , x2]) => x1 === x2).map(([, , , y2]) => y2);
     // The export translates everything; the drop to i7 ends 40px lower than its siblings'.
     const maxTop = Math.max(...tops);
     const siblingsTop = tops.filter(t => t < maxTop).reduce((a, b) => Math.max(a, b), -Infinity);

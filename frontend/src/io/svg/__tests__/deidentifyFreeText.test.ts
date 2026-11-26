@@ -87,7 +87,7 @@ describe.each(["nsgc2022", "nsgc2008"] as const)("deidentify evaluations (#111),
     expect(s).toContain("BRCA1");
     expect(s).toContain("c.5266dupC");
     expect(s).toContain("echo");
-    expect(s).toContain('class="documented-evaluation"');
+    expect(s).toContain('data-documented-evaluation="true"');
     expect(keyText(s)).toContain(legend);
   });
 
@@ -98,7 +98,7 @@ describe.each(["nsgc2022", "nsgc2008"] as const)("deidentify evaluations (#111),
     expect(s).toMatch(notation === "nsgc2008" ? />E1\+</ : />\+</);
     // 2008 keeps the numbering and the bare "E2"; 2022 draws nothing for an evaluation left empty.
     if (notation === "nsgc2008") expect(s).toMatch(/>E2</);
-    expect(s).toContain('class="documented-evaluation"');
+    expect(s).toContain('data-documented-evaluation="true"');
     expect(keyText(s)).toContain(legend);
     expect(keyText(s)).toContain("Documented evaluation");
   });

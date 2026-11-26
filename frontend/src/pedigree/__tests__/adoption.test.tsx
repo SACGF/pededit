@@ -39,8 +39,8 @@ describe("adoption brackets (#12)", () => {
   it("SymbolShape draws the brackets for adopted in and out, not otherwise", () => {
     const html = (adopted?: "in" | "out") =>
       renderToStaticMarkup(<SymbolShape glyph={standaloneGlyph({ id: "x", sex: "male", affected: false, sibOrder: 0, adopted })} size={40} />);
-    expect(html("in")).toContain('data-adopted="true"');
-    expect(html("out")).toContain('data-adopted="true"');
+    expect(html("in")).toContain('data-adopted="in"');
+    expect(html("out")).toContain('data-adopted="out"');
     expect(html()).not.toContain("data-adopted");
     expect(html("in").match(/<line/g)!.length).toBe(6);
   });

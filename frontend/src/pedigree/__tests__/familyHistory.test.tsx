@@ -25,7 +25,7 @@ function family(): Pedigree {
   };
 }
 
-const MARK = /<text class="family-history-unknown"[^>]*>\?<\/text>/g;
+const MARK = /<text data-family-history-unknown="true"[^>]*>\?<\/text>/g;
 
 describe("family history not known (#100)", () => {
   it("puts the ? above the symbol, centred, or left of a line of descent", () => {

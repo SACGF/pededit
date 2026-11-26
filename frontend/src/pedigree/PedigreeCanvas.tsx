@@ -25,6 +25,7 @@ import { useDismissableLayerSurface } from "@radix-ui/react-dismissable-layer";
 import { usePedigreeStore, DEFAULT_SNAP_GRID_SIZE, usePedigreeFields } from "../store/usePedigreeStore";
 import { buildScene } from "./scene";
 import { sceneToFlow } from "./sceneToFlow";
+import { ProbandMarkerDef } from "./chart/symbols";
 import { PedigreeSymbolNode } from "./nodes/PedigreeSymbolNode";
 import { CollapsedBranchNode } from "./nodes/CollapsedBranchNode";
 import { CoupleEdge, ConsanguineousEdge } from "./edges/CoupleEdge";
@@ -491,10 +492,7 @@ export function PedigreeCanvas({ showMinimap = false, compact = false, onPersonT
     >
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
-          <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
-                  refX="6" refY="3" orient="auto">
-            <path d="M 0 0 L 6 3 L 0 6 Z" fill="black" />
-          </marker>
+          <ProbandMarkerDef />
         </defs>
       </svg>
 

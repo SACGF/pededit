@@ -1,98 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="254" height="686"
      viewBox="0 0 254 686">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
-          refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="254" height="686" fill="white"/>
-<text class="chart-title" x="127" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Tutankhamun&apos;s family</text>
+<g class="chart-title"><text x="127" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Tutankhamun&#x27;s family</text></g>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 54 0 L 82 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 20 84 L 48 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 20 166 L 48 166" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 20 170 L 48 170" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 54 252 L 82 252" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 54 0 L 82 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 84 L 48 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 166 L 48 166" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 170 L 48 170" stroke="black" stroke-width="2" fill="none"></path><path d="M 54 252 L 82 252" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="sibship-lines">
-<line x1="68" y1="0" x2="68" y2="42" stroke="black" stroke-width="2"/>
-<line x1="68" y1="42" x2="68" y2="42" stroke="black" stroke-width="2"/>
-<line x1="68" y1="42" x2="68" y2="64" stroke="black" stroke-width="2"/>
-<line x1="34" y1="84" x2="34" y2="134" stroke="black" stroke-width="2"/>
-<line x1="0" y1="134" x2="68" y2="134" stroke="black" stroke-width="2"/>
-<line x1="0" y1="134" x2="0" y2="148" stroke="black" stroke-width="2"/>
-<line x1="68" y1="134" x2="68" y2="148" stroke="black" stroke-width="2"/>
-<line x1="34" y1="168" x2="34" y2="210" stroke="black" stroke-width="2"/>
-<line x1="34" y1="210" x2="34" y2="210" stroke="black" stroke-width="2"/>
-<line x1="34" y1="210" x2="34" y2="232" stroke="black" stroke-width="2"/>
-<line x1="68" y1="252" x2="68" y2="302" stroke="black" stroke-width="2"/>
-<line x1="34" y1="302" x2="102" y2="302" stroke="black" stroke-width="2"/>
-<line x1="34" y1="302" x2="34" y2="316" stroke="black" stroke-width="2"/>
-<line x1="102" y1="302" x2="102" y2="316" stroke="black" stroke-width="2"/>
+<path d="M 68 0 L 68 42 M 68 42 L 68 42 M 68 42 L 68 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 84 L 34 134 M 0 134 L 68 134 M 0 134 L 0 148 M 68 134 L 68 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 168 L 34 210 M 34 210 L 34 210 M 34 210 L 34 232" stroke="black" stroke-width="2" fill="none"></path><path d="M 68 252 L 68 302 M 34 302 L 102 302 M 34 302 L 34 316 M 102 302 L 102 316" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
 </g>
 <g class="symbols">
-<g transform="translate(34 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(102 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(0 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(68 84)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(0 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(68 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(34 252)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
-</g>
-<g transform="translate(102 252)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(34 336)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(102 336)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
+<g transform="translate(34 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(102 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(0 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(68 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(0 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(68 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(34 252)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g><g transform="translate(102 252)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(34 336)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(102 336)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g>
 </g>
 <g class="labels">
-<text x="34" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Yuya</text>
-<text x="102" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Thuya</text>
-<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amenhotep III</title>Amenhotep</text>
-<text x="0" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III</text>
-<text x="68" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tiye (KV35EL)</title>Tiye</text>
-<text x="68" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">(KV35EL)</text>
-<text x="0" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV55</text>
-<text x="68" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV35YL</text>
-<text x="34" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tutankhamun</title>Tutankhamu</text>
-<text x="34" y="297" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">n</text>
-<text x="102" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV21A</text>
-<text x="34" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 1</text>
-<text x="102" y="368" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 2</text>
+<g transform="translate(14 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Yuya</text></g></g></g><g transform="translate(82 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Thuya</text></g></g></g><g transform="translate(-20 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Amenhotep III</title>Amenhotep</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">III</text></g></g></g><g transform="translate(48 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tiye (KV35EL)</title>Tiye</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">(KV35EL)</text></g></g></g><g transform="translate(-20 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV55</text></g></g></g><g transform="translate(48 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV35YL</text></g></g></g><g transform="translate(14 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black"><title>Tutankhamun</title>Tutankhamu</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">n</text></g></g></g><g transform="translate(82 232)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">KV21A</text></g></g></g><g transform="translate(14 316)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 1</text></g></g></g><g transform="translate(82 316)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Fetus 2</text></g></g></g>
 </g>
 <g class="consanguinity-labels">
 </g>

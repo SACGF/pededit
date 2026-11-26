@@ -1,110 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="528" height="449"
      viewBox="0 0 528 449">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
-          refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="528" height="449" fill="white"/>
-<text class="chart-title" x="264" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">A loop: people drawn twice</text>
+<g class="chart-title"><text x="264" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">A loop: people drawn twice</text></g>
 <g transform="translate(60 116)">
 <g class="couple-lines">
-<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 156 0 L 184 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 224 0 L 252 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 360 0 L 388 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 54 84 L 150 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 258 84 L 354 84" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 20 0 L 48 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 156 0 L 184 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 224 0 L 252 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 360 0 L 388 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 54 84 L 150 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 258 84 L 354 84" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="sibship-lines">
-<line x1="34" y1="0" x2="34" y2="42" stroke="black" stroke-width="2"/>
-<line x1="34" y1="42" x2="34" y2="42" stroke="black" stroke-width="2"/>
-<line x1="34" y1="42" x2="34" y2="64" stroke="black" stroke-width="2"/>
-<line x1="170" y1="0" x2="170" y2="42" stroke="black" stroke-width="2"/>
-<line x1="170" y1="42" x2="170" y2="42" stroke="black" stroke-width="2"/>
-<line x1="170" y1="42" x2="170" y2="64" stroke="black" stroke-width="2"/>
-<line x1="238" y1="0" x2="238" y2="42" stroke="black" stroke-width="2"/>
-<line x1="238" y1="42" x2="238" y2="42" stroke="black" stroke-width="2"/>
-<line x1="238" y1="42" x2="238" y2="64" stroke="black" stroke-width="2"/>
-<line x1="374" y1="0" x2="374" y2="42" stroke="black" stroke-width="2"/>
-<line x1="374" y1="42" x2="374" y2="42" stroke="black" stroke-width="2"/>
-<line x1="374" y1="42" x2="374" y2="64" stroke="black" stroke-width="2"/>
-<line x1="102" y1="84" x2="102" y2="126" stroke="black" stroke-width="2"/>
-<line x1="102" y1="126" x2="102" y2="126" stroke="black" stroke-width="2"/>
-<line x1="102" y1="126" x2="102" y2="148" stroke="black" stroke-width="2"/>
-<line x1="306" y1="84" x2="306" y2="126" stroke="black" stroke-width="2"/>
-<line x1="306" y1="126" x2="306" y2="126" stroke="black" stroke-width="2"/>
-<line x1="306" y1="126" x2="306" y2="148" stroke="black" stroke-width="2"/>
+<path d="M 34 0 L 34 42 M 34 42 L 34 42 M 34 42 L 34 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 170 0 L 170 42 M 170 42 L 170 42 M 170 42 L 170 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 238 0 L 238 42 M 238 42 L 238 42 M 238 42 L 238 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 374 0 L 374 42 M 374 42 L 374 42 M 374 42 L 374 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 102 84 L 102 126 M 102 126 L 102 126 M 102 126 L 102 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 306 84 L 306 126 M 306 126 L 306 126 M 306 126 L 306 148" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
-<path d="M 0 -20 Q 136 -50.8 272 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 68 -20 Q 204 -50.8 340 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
-<path d="M 136 -20 Q 272 -50.8 408 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+<path d="M 0 -20 Q 136 -50.8 272 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path><path d="M 68 -20 Q 204 -50.8 340 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path><path d="M 136 -20 Q 272 -50.8 408 -20" stroke="black" stroke-width="1.5" stroke-dasharray="6 4" fill="none"></path>
 </g>
 <g class="symbols">
-<g transform="translate(0 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
-</g>
-<g transform="translate(68 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
-</g>
-<g transform="translate(136 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">1</text>
-</g>
-<g transform="translate(204 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(272 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
-</g>
-<g transform="translate(340 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
-</g>
-<g transform="translate(408 0)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<text x="22" y="-18" font-family="sans-serif" font-size="10" fill="black">2</text>
-</g>
-<g transform="translate(34 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(170 84)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(238 84)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(374 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(102 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/>
-</g>
-<g transform="translate(306 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/>
-</g>
+<g transform="translate(0 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(68 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(136 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><text data-copy-number="1" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">1</text></g></g><g transform="translate(204 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(272 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(340 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(408 0)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><text data-copy-number="2" x="42" y="2" font-family="sans-serif" font-size="10" fill="black" style="pointer-events:none;user-select:none">2</text></g></g><g transform="translate(34 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(170 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(238 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(374 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(102 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g><g transform="translate(306 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="black"></circle></g></g></g></g>
 </g>
 <g class="labels">
-<text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maple</text>
-<text x="68" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text>
-<text x="136" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text>
-<text x="204" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Nettle</text>
-<text x="272" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maple</text>
-<text x="340" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text>
-<text x="408" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text>
-<text x="34" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Privet</text>
-<text x="170" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Quince</text>
-<text x="238" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sorrel</text>
-<text x="374" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rowan</text>
-<text x="102" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Thistle</text>
-<text x="306" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Yarrow</text>
+<g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maple</text></g></g></g><g transform="translate(48 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text></g></g></g><g transform="translate(116 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text></g></g></g><g transform="translate(184 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Nettle</text></g></g></g><g transform="translate(252 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Maple</text></g></g></g><g transform="translate(320 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Larch</text></g></g></g><g transform="translate(388 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Olive</text></g></g></g><g transform="translate(14 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Privet</text></g></g></g><g transform="translate(150 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Quince</text></g></g></g><g transform="translate(218 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sorrel</text></g></g></g><g transform="translate(354 64)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Rowan</text></g></g></g><g transform="translate(82 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Thistle</text></g></g></g><g transform="translate(286 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Yarrow</text></g></g></g>
 </g>
 <g class="consanguinity-labels">
 </g>

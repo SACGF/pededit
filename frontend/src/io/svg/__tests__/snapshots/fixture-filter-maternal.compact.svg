@@ -1,90 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="560" height="609"
      viewBox="0 0 560 609">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
-          refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="560" height="609" fill="white"/>
-<text class="chart-title" x="280" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Filter: blood relatives, mother&apos;s side</text>
+<g class="chart-title"><text x="280" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Filter: blood relatives, mother&#x27;s side</text></g>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 230.59 0 L 258.59 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 132.98 84 L 160.98 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 328.2 84 L 356.2 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 292 168 L 320 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 230.59 0 L 258.59 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 132.98 84 L 160.98 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 328.2 84 L 356.2 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 292 168 L 320 168" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="sibship-lines">
-<line x1="244.59" y1="0" x2="244.59" y2="42" stroke="black" stroke-width="2"/>
-<line x1="180.98" y1="42" x2="308.2" y2="42" stroke="black" stroke-width="2"/>
-<line x1="180.98" y1="42" x2="180.98" y2="64" stroke="black" stroke-width="2"/>
-<line x1="308.2" y1="42" x2="308.2" y2="64" stroke="black" stroke-width="2"/>
-<line x1="146.98" y1="84" x2="146.98" y2="126" stroke="black" stroke-width="2"/>
-<line x1="0" y1="126" x2="204" y2="126" stroke="black" stroke-width="2"/>
-<line x1="0" y1="126" x2="0" y2="148" stroke="black" stroke-width="2"/>
-<line x1="68" y1="126" x2="68" y2="148" stroke="black" stroke-width="2"/>
-<line x1="136" y1="126" x2="136" y2="148" stroke="black" stroke-width="2"/>
-<line x1="204" y1="126" x2="204" y2="148" stroke="black" stroke-width="2"/>
-<line x1="342.2" y1="84" x2="342.2" y2="126" stroke="black" stroke-width="2"/>
-<line x1="340" y1="126" x2="408" y2="126" stroke="black" stroke-width="2"/>
-<line x1="340" y1="126" x2="340" y2="148" stroke="black" stroke-width="2"/>
-<line x1="408" y1="126" x2="408" y2="148" stroke="black" stroke-width="2"/>
-<line x1="306" y1="168" x2="306" y2="210" stroke="black" stroke-width="2"/>
-<line x1="306" y1="210" x2="306" y2="210" stroke="black" stroke-width="2"/>
-<line x1="306" y1="210" x2="306" y2="232" stroke="black" stroke-width="2"/>
+<path d="M 244.59 0 L 244.59 42 M 180.98 42 L 308.2 42 M 180.98 42 L 180.98 64 M 308.2 42 L 308.2 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 146.98 84 L 146.98 126 M 0 126 L 204 126 M 0 126 L 0 148 M 68 126 L 68 148 M 136 126 L 136 148 M 204 126 L 204 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 342.2 84 L 342.2 126 M 340 126 L 408 126 M 340 126 L 340 148 M 408 126 L 408 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 306 168 L 306 210 M 306 210 L 306 210 M 306 210 L 306 232" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
 </g>
 <g class="symbols">
-<g transform="translate(210.59 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(278.59 0)">
-<clipPath id="symbol-clip-0-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-0-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-</g>
-<g transform="translate(112.98 84)">
-<clipPath id="symbol-clip-1-0"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#d62728" clip-path="url(#symbol-clip-1-0)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
-</g>
-<g transform="translate(180.98 84)">
-<clipPath id="symbol-clip-1-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><clipPath id="symbol-clip-1-1-s0"><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z"/></clipPath><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="white" clip-path="url(#symbol-clip-1-1)"/><g clip-path="url(#symbol-clip-1-1)"><path d="M-57.172 20L-17.172 -20M-51.515 20L-11.515 -20M-45.858 20L-5.858 -20M-40.201 20L-0.201 -20M-34.544 20L5.456 -20M-28.887 20L11.113 -20M-23.23 20L16.77 -20M-17.574 20L22.426 -20M-11.917 20L28.083 -20M-6.26 20L33.74 -20M-0.603 20L39.397 -20M5.054 20L45.054 -20M10.711 20L50.711 -20M16.368 20L56.368 -20" fill="none" stroke="#d62728" stroke-width="1" clip-path="url(#symbol-clip-1-1-s0)"/></g><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-</g>
-<g transform="translate(308.2 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(376.2 84)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(0 168)">
-<clipPath id="symbol-clip-2-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#d62728" clip-path="url(#symbol-clip-2-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text>
-</g>
-<g transform="translate(68 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(136 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(204 168)">
-<clipPath id="symbol-clip-2-3"><rect x="-19" y="-19" width="38" height="38"/></clipPath><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-2-3)"/><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="none"/>
-</g>
-<g transform="translate(272 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(340 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(408 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/>
-</g>
-<g transform="translate(306 252)">
-<polygon points="0,-19 19,0 0,19 -19,0" stroke="black" stroke-width="2" fill="white"/>
-</g>
+<g transform="translate(210.59 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(278.59 0)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-0-1"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-0-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="#1f77b4"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g></g></g><g transform="translate(112.98 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-0"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-1-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z" fill="#d62728"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g></g></g><g transform="translate(180.98 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-1"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-1)"><g data-carrier-sector="hcm"><g data-tag-fill="diagonal"><clipPath id="symbol-clip-1-1-s0"><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z"></path></clipPath><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z" fill="white"></path><path d="M-37.172 40L2.828 0M-31.515 40L8.485 0M-25.858 40L14.142 0M-20.201 40L19.799 0M-14.544 40L25.456 0M-8.887 40L31.113 0M-3.23 40L36.77 0M2.426 40L42.426 0M8.083 40L48.083 0M13.74 40L53.74 0M19.397 40L59.397 0M25.054 40L65.054 0M30.711 40L70.711 0M36.368 40L76.368 0" fill="none" stroke="#d62728" stroke-width="1" clip-path="url(#symbol-clip-1-1-s0)"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g></g></g><g transform="translate(308.2 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(376.2 84)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 168)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-0"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-2-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g><g transform="translate(68 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(136 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(204 168)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-2-3"><rect x="1" y="1" width="38" height="38"></rect></clipPath><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect><g clip-path="url(#symbol-clip-2-3)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="#1f77b4"></path></g></g></g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="none"></rect></g></g></g></g><g transform="translate(272 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(340 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(408 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g><g transform="translate(306 252)"><g transform="translate(-20 -20)"><g><g><polygon points="20,1 39,20 20,39 1,20" stroke="black" stroke-width="2" fill="white"></polygon></g></g></g></g>
 </g>
 <g class="labels">
-<text x="0" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Proband</text>
+<g transform="translate(190.59 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(258.59 -20)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(92.98 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(160.98 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(288.2 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(356.2 64)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(-20 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Proband</text></g></g></g><g transform="translate(48 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(116 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(184 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(252 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(320 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(388 148)"><g transform="translate(20 20)" style="user-select:none"></g></g><g transform="translate(286 232)"><g transform="translate(20 20)" style="user-select:none"></g></g>
 </g>
 <g class="consanguinity-labels">
 </g>

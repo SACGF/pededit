@@ -29,7 +29,9 @@ function pedigree(): Pedigree {
   };
 }
 
-const markLines = (svg: string) => (svg.match(/<line class="mark"/g) ?? []).length;
+/** The strokes of ended marks: lines marked "mark" (U-shape), or the runs of a `data-ended` path. */
+const markLines = (svg: string) => (svg.match(/<line class="mark"/g) ?? []).length
+  + [...svg.matchAll(/<path data-ended="true" d="([^"]+)"/g)].reduce((n, m) => n + (m[1]!.match(/M/g) ?? []).length, 0);
 
 describe("ended relationship geometry (#98)", () => {
   it("sits in the middle when nothing hangs there, else halfway to the left end", () => {

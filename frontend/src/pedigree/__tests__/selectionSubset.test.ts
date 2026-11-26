@@ -120,7 +120,7 @@ describe("selectionSubset (#215)", () => {
     expect(sorted(s.added)).toEqual(["c1", "c2"]);
     const drawn = selectionPedigree(p, s);
     expect(collapseInfo(drawn).placeholders.get(group)?.children).toEqual(["y", "z"]);
-    expect(exportSvg(drawn, {})).toContain('class="branch-count"');
+    expect(exportSvg(drawn, {})).toContain('data-branch-count=');
     // Without the group symbol selected, the figure has none and the key no row for it.
     const without = figure(p, ["c1", "c2", "x"]);
     expect(without.individuals.some(i => isBranchPlaceholderId(i.id))).toBe(false);

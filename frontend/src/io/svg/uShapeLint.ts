@@ -146,7 +146,9 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     if (tag === "g" || tag === "clipPath" || tag === "defs" || tag === "marker") {
       if (selfClosing) continue;
       const parent = top();
-      const kind = tag !== "g" || a.class === "pedigree-key" ? "skip"
+      // A clipped group (a symbol's sections) stays inside the outline, which is checked itself.
+      const kind = tag !== "g" || a.class === "pedigree-key" || a["clip-path"] ? "skip"
+        : a.class === "chart-title" ? "title"
         : a.class === "consanguinity-labels" ? "labels"
         : parent.kind === "labels" ? "label" : parent.kind === "label" ? "label" : parent.kind;
       stack.push({ m: mul(parent.m, parseTransform(a.transform)), kind });
@@ -159,9 +161,9 @@ export function lintUShapeSvg(svg: string): ExportLintFinding[] {
     const at = (pts: P[]) => pts.map(p => apply(m, p));
     if (tag === "text") {
       const size = num(a, "font-size") || 10;
-      const text = (textContent ?? "").replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "").replace(/&[a-z]+;/g, "x");
-      // The chart title, outside every group, upright: checked against everything below.
-      if (a.class === "chart-title") {
+      const text = (textContent ?? "").replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "").replace(/&#?[a-z0-9]+;/gi, "x");
+      // The chart title, in a group of its own, upright: checked against everything below.
+      if (top().kind === "title") {
         const w = titleWidth(text), [x, y] = apply(m, [num(a, "x"), num(a, "y")]);
         const fs = num(a, "font-size") || TITLE_FONT_SIZE;
         titles.push({ text, box: [x - w / 2, y - 0.8 * fs, x + w / 2, y + 0.3 * fs] });

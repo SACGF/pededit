@@ -25,7 +25,7 @@ function family(): Pedigree {
   };
 }
 
-const PROBAND_P = /<text class="proband-letter"[^>]*>P<\/text>/g;
+const PROBAND_P = /<text data-proband-letter="true"[^>]*>P<\/text>/g;
 
 describe("proband and consultand arrows (#99)", () => {
   it("the proband wins over the consultand", () => {

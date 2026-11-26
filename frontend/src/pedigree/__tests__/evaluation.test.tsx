@@ -38,8 +38,8 @@ function family2008(): Pedigree {
 }
 
 const WIDTH = labelMaxWidth(80);
-const STAR = /<text class="documented-evaluation"[^>]*>\*<\/text>/g;
-const LINE = /<line class="presymptomatic"[^>]*stroke="black"/g;
+const STAR = /<text data-documented-evaluation="true"[^>]*>\*<\/text>/g;
+const LINE = /<g data-presymptomatic="true">/g;
 
 describe("evaluation results, NSGC 2022 (#114)", () => {
   it("writes the detail then the result, with no E and no numbering", () => {

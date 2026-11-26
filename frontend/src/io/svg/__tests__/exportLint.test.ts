@@ -79,7 +79,7 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
   it("reports a missing couple line", () => {
     const [a] = section(svg, "couple-lines");
     const first = svg.indexOf("<path", a);
-    const end = svg.indexOf("/>", first) + 2;
+    const end = svg.indexOf("</path>", first) + "</path>".length;
     expect(codes(svg.slice(0, first) + svg.slice(end))).toContain("partnership-not-drawn");
   });
 
@@ -108,17 +108,19 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
 
   it("reports a sibship drop that ends in empty space", () => {
     const c = flow.people.find(n => n.individual.id === "c")!.position;
-    const re = new RegExp(`(<line x1="${c.x}" y1="[^"]+" x2="${c.x}" y2=")([^"]+)(")`);
+    // Its drop, in the sibship's path: "M x bar L x top".
+    const re = new RegExp(`(M ${c.x} [-\\d.e]+ L ${c.x} )([-\\d.e]+)`);
     expect(svg).toMatch(re);
-    const found = codes(svg.replace(re, (_, a, y, b) => `${a}${Number(y) - 15}${b}`));
+    const found = codes(svg.replace(re, (_, a, y) => `${a}${Number(y) - 15}`));
     expect(found).toContain("missing-node");
     expect(found).toContain("child-without-parents");
   });
 
   it("reports overlapping labels", () => {
     // A second label on the first one's baseline, right next to it.
-    const m = /<g class="labels">\n<text x="([^"]+)" y="([^"]+)"/.exec(svg)!;
-    const extra = `<text x="${Number(m[1]) + 10}" y="${m[2]}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Someone else</text>`;
+    const parsed = parseExportSvg(svg);
+    const t = parsed.texts[0]!;
+    const extra = `<text x="${t.x - parsed.origin[0] + 10}" y="${t.y - parsed.origin[1]}" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Someone else</text>`;
     expect(codes(svg.replace(`<g class="labels">\n`, `<g class="labels">\n${extra}\n`))).toEqual(["labels-overlap"]);
   });
 

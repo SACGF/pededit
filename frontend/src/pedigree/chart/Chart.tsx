@@ -2,7 +2,7 @@ import { NODE_SIZE } from "../constants";
 import type { Scene, ScenePerson } from "../scene";
 import type { SibshipEnd } from "../lineGeometry";
 import { PersonSymbol } from "./PersonSymbol";
-import { CoupleLine } from "./CoupleLine";
+import { CoupleLine, CoupleText } from "./CoupleLine";
 import { SibshipLines } from "./SibshipLines";
 import { AssistedLine } from "./AssistedLine";
 import { DuplicateArc } from "./DuplicateArc";
@@ -34,7 +34,12 @@ export function Chart({ scene, figure = false, idPrefix = "", markerId }: {
       })}
       {scene.couples.map(e => {
         const l = at(e.source), r = at(e.target);
-        return l && r ? <g key={e.id}><CoupleLine data={e.data} double={e.double} left={l} right={r} /></g> : null;
+        return l && r ? (
+          <g key={e.id}>
+            <CoupleLine data={e.data} double={e.double} left={l} right={r} />
+            {e.double && <CoupleText data={e.data} left={l} right={r} />}
+          </g>
+        ) : null;
       })}
       {scene.sibships.map(e => <g key={e.id}><SibshipLines data={e.data} nodeAt={end} /></g>)}
       {scene.assisted.map(e => <AssistedLine key={e.id} line={e} nodeAt={end} />)}

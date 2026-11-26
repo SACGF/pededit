@@ -319,9 +319,9 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
     expect(sectionLayout(q)).toBe("halves");
     expect(angles(q, "gm")).toEqual([["cf", 180, 360], ["ts", 0, 180]]);
     // Exports, the export key and the app legend agree.
-    const centred = sectorPath(0, 0, 40, 0, 360);
-    expect(exportSvg(p)).toContain(centred);
-    expect(exportUShapeSvg(p)).toContain(centred);
+    const boxed = sectorPath(20, 20, 40, 0, 360);
+    expect(exportSvg(p)).toContain(boxed);
+    expect(exportUShapeSvg(p)).toContain(boxed);
     expect(renderToStaticMarkup(<Legend pedigree={p} />)).toContain(sectorPath(14, 14, 16, 0, 360));
     expect(renderExportKeySvg(p, 0, 0).markup.find(m => m.includes(">Cystic fibrosis<"))).toMatch(/A 16 16 0 1 1 \S+ \S+ A 16 16 0 1 1/);
     // NSGC 2008 keeps a quarter per defined condition.
@@ -346,8 +346,8 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
     const hidden = { ...p };
     expect(sectionLayout(hidden)).toBe("whole");
     expect(angles(hidden, "a")).toEqual([["cf", 0, 360]]);
-    const centred = sectorPath(0, 0, 40, 0, 360);
-    expect(exportSvg(hidden)).toContain(centred);
+    const boxed = sectorPath(20, 20, 40, 0, 360);
+    expect(exportSvg(hidden)).toContain(boxed);
     expect(exportSvg(hidden)).not.toContain("Tay-Sachs");
     expect(renderToStaticMarkup(<Legend pedigree={hidden} />)).toContain(sectorPath(14, 14, 16, 0, 360));
   });
@@ -376,9 +376,10 @@ describe("sections follow the number of conditions in use (NSGC 2022)", () => {
         const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
         expect(canvas).toContain(sectorPath(20, 20, 40, start, end));
         const centred = sectorPath(0, 0, 40, start, end);
+        const boxed = sectorPath(20, 20, 40, start, end);
         expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
-        expect(exportSvg(p)).toContain(centred);
-        expect(exportUShapeSvg(p)).toContain(centred);
+        expect(exportSvg(p)).toContain(boxed);
+        expect(exportUShapeSvg(p)).toContain(boxed);
       }
     }
     // Legend swatches: 16px, at 6 6 in the app legend and at the key's origin in exports.
@@ -442,9 +443,10 @@ describe("one condition in black and white is solid black (NSGC 2022)", () => {
     const canvas = renderToStaticMarkup(<svg><SymbolShape glyph={{ ...standaloneGlyph(a), paint: symbolPaint(a, p) }} size={40} clipId="k" /></svg>);
     expect(canvas).toContain(`<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`);
     const centred = `<path d="${sectorPath(0, 0, 40, 0, 360)}" fill="#000000"`;
+    const boxed = `<path d="${sectorPath(20, 20, 40, 0, 360)}" fill="#000000"`;
     expect(renderSectorListSvg(symbolPaint(a, p).sectors, 40, "x")).toContain(centred);
-    expect(exportSvg(p)).toContain(centred);
-    expect(exportUShapeSvg(p)).toContain(centred);
+    expect(exportSvg(p)).toContain(boxed);
+    expect(exportUShapeSvg(p)).toContain(boxed);
     // Keys: the condition's own row, a solid black whole swatch named for it; then its carriers, hatched.
     const key = renderExportKeySvg(p, 0, 0).markup;
     const row = key.find(m => m.includes(">Cystic fibrosis<"))!;

@@ -246,10 +246,10 @@ describe("U-shape SVG", () => {
     const ind = q.individuals.find(i => i.id === rotated.id)!;
     ind.lifeStatus = "pregnancy";
     const svg = exportUShapeSvg(q);
-    const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g>`))!;
+    const group = svg.match(new RegExp(`<g data-id="${ind.id}"[^>]*rotate\\((-?90)\\)">(.*?)</g></g>\n`))!;
     expect(group).not.toBeNull();
-    expect(group[2]).toContain(`<g transform="rotate(${-Number(group[1])})"><text`);
-    expect(group[2]).toMatch(/>P<\/text>$/);
+    // Turned back about the symbol's centre, in its box.
+    expect(group[2]).toMatch(new RegExp(`<g transform="rotate\\(${-Number(group[1])} 20 20\\)"><text[^>]*>P</text>`));
   });
 
   it("draws the childless mark for a couple with no children (#15)", () => {
@@ -571,17 +571,17 @@ describe("U-shape figure shape", () => {
 });
 
 describe("the U-shape draws no symbol of its own (#149)", () => {
-  it("ushape/ has no symbol outline in it, and render.ts calls the shared symbol renderer", async () => {
+  it("ushape/ has no symbol outline in it, and render.tsx draws people with the shared components", async () => {
     const { readFileSync, readdirSync } = await import("node:fs");
     const { join } = await import("node:path");
     const dir = join(__dirname, "../ushape");
-    const files = readdirSync(dir).filter(f => f.endsWith(".ts"));
-    expect(files.sort()).toEqual(["connectors.ts", "constants.ts", "layout.ts", "render.ts", "tree.ts"]);
+    const files = readdirSync(dir).filter(f => /\.tsx?$/.test(f));
+    expect(files.sort()).toEqual(["connectors.ts", "constants.ts", "layout.ts", "render.tsx", "tree.ts"]);
     for (const f of files) {
       const source = readFileSync(join(dir, f), "utf8");
       expect(source, f).not.toMatch(/<circle|<polygon|clipPath|renderSectorListSvg|renderAffectedCoreSvg|symbolPaint/);
     }
-    expect(readFileSync(join(dir, "render.ts"), "utf8")).toContain("renderPersonShapeSvg(");
+    expect(readFileSync(join(dir, "render.tsx"), "utf8")).toContain("<PersonMarks ");
     // The layout half holds no SVG at all.
     for (const f of ["tree.ts", "layout.ts"]) expect(readFileSync(join(dir, f), "utf8"), f).not.toMatch(/<[a-z]+ [a-z-]+="/);
   });

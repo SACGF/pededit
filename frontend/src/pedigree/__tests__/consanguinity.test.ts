@@ -131,7 +131,8 @@ describe("the drawn line follows the test (#85)", () => {
   // A double line is two paths where a single line is one, so an export of
   // the same family with one more double line has one more path. The legend
   // gains its "Consanguineous couple" row with the first double line.
-  const paths = (svg: string) => (svg.match(/<path /g) ?? []).length;
+  // Paths among the couple lines (two for a double line); the whole file for the U-shape, which has no such group.
+  const paths = (svg: string) => ((/<g class="couple-lines">([^]*?)<\/g>\n/.exec(svg)?.[1] ?? svg).match(/<path /g) ?? []).length;
   const inLegend = (svg: string) => svg.includes("Consanguineous couple");
   const adopted = withIndividual(cousins(), "gc2", { adopted: "in" });
   const adoptedFlagged = withPartnership(adopted, "cc", { consanguineous: true });

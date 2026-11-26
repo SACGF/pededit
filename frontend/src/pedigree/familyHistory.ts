@@ -20,9 +20,3 @@ export function familyHistoryMarkAt(size: number, hasParents: boolean, x = 0, y 
   return { x: x + size / 2 - (hasParents ? 9 : 0), y: y - 4 };
 }
 
-/** The "?" as SVG markup, for the exporters. `uprightDeg` keeps it upright in a rotated symbol. */
-export function renderFamilyHistorySvg(size: number, hasParents: boolean, x: number, y: number, uprightDeg?: number): string {
-  const p = familyHistoryMarkAt(size, hasParents, x, y);
-  const turn = uprightDeg ? ` transform="rotate(${uprightDeg} ${p.x} ${p.y - FAMILY_HISTORY_FONT_SIZE / 3})"` : "";
-  return `<text class="family-history-unknown" x="${p.x}" y="${p.y}"${turn} text-anchor="middle" font-family="sans-serif" font-size="${FAMILY_HISTORY_FONT_SIZE}" font-weight="bold" fill="black">?</text>`;
-}

@@ -100,13 +100,6 @@ export function documentedMarkAt(size: number, adopted: boolean, x = 0, y = 0): 
   return { x: x + size + 1 + (adopted ? ADOPTION_BRACKET_GAP + 1 : 0), y: y + size + 3 };
 }
 
-/** The "*" as SVG markup, for the exporters. `uprightDeg` keeps it upright in a rotated symbol. */
-export function renderDocumentedMarkSvg(size: number, adopted: boolean, x: number, y: number, uprightDeg?: number): string {
-  const p = documentedMarkAt(size, adopted, x, y);
-  const turn = uprightDeg ? ` transform="rotate(${uprightDeg} ${p.x + 3.5} ${p.y - DOCUMENTED_FONT_SIZE / 2})"` : "";
-  return `<text class="documented-evaluation" x="${p.x}" y="${p.y}"${turn} font-family="sans-serif" font-size="${DOCUMENTED_FONT_SIZE}" fill="black">${DOCUMENTED_MARK}</text>`;
-}
-
 // ── Presymptomatic carrier line ─────────────────────────────────────────────
 
 /**
@@ -135,17 +128,6 @@ export function presymptomaticLine(status: LifeStatus | undefined, size: number,
 /** Width of the white rim round the line when tag colours are behind it, as for the carrier dot. */
 export const PRESYMPTOMATIC_RIM = 1.5;
 export const PRESYMPTOMATIC_STROKE = 2;
-
-/**
- * The line as SVG markup for a symbol box with top-left (ox, oy); `rim` over
- * tag colours. The caller draws it only when `SymbolPaint.line` says so.
- */
-export function renderPresymptomaticLineSvg(lifeStatus: Individual["lifeStatus"], size: number, ox: number, oy: number, rim = false): string {
-  const l = presymptomaticLine(lifeStatus, size, ox, oy);
-  const attrs = `class="presymptomatic" x1="${l.x1}" y1="${l.y1}" x2="${l.x2}" y2="${l.y2}"`;
-  return (rim ? `<line ${attrs} stroke="white" stroke-width="${PRESYMPTOMATIC_STROKE + 2 * PRESYMPTOMATIC_RIM}"/>` : "")
-    + `<line ${attrs} stroke="black" stroke-width="${PRESYMPTOMATIC_STROKE}"/>`;
-}
 
 // ── Key wording ─────────────────────────────────────────────────────────────
 

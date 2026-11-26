@@ -150,7 +150,7 @@ describe("the label in exports and over the title (#97)", () => {
     expect(lintExport(p, { title: "Title" })).toEqual([]);
     expect(lintExport(p, { compact: true })).toEqual([]);
     // The title baseline sits well above the founders' label.
-    const titleY = Number(/class="chart-title"[^>]* y="([\d.]+)"/.exec(svg)![1]);
+    const titleY = Number(/class="chart-title"><text[^>]* y="([\d.]+)"/.exec(svg)![1]);
     const translateY = Number(/<g transform="translate\([\d.e+-]+ ([\d.e+-]+)\)">/.exec(svg)![1]);
     const top = highestConsanguinityLabel(buildScene(p)) + translateY;
     expect(titleY).toBeLessThan(top - 10);

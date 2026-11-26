@@ -3,8 +3,9 @@
  * lines, twin forks, assisted reproduction lines and the dashed links between
  * copies, drawn along the tracks. This geometry is the U-shape's own.
  */
-import { type Pedigree } from "@pedigree-editor/layout-engine";
-import { childDropEndOffset } from "../symbolSvg";
+import { type Individual, type Pedigree } from "@pedigree-editor/layout-engine";
+import { NODE_SIZE } from "../../../pedigree/constants";
+import { symbolTopInset } from "../../../pedigree/lifeStatus";
 import { assistedLinks } from "../../../pedigree/assisted";
 import { ADOPTION_DASH } from "../../../pedigree/adoption";
 import { endedBreakX, endedMarkSegments, middleTaken } from "../../../pedigree/ended";
@@ -13,6 +14,14 @@ import { activeChildless, CHILDLESS_DROP, CHILDLESS_BAR, CHILDLESS_BAR_GAP, CHIL
 import { HALF, STROKE, CONSANG_GAP, BAR_CLEARANCE, DUP_LINK_INSET, r, escapeXml } from "./constants";
 import { walk, type TNode } from "./tree";
 import { trackPoint, memberU, descentU, type Geom, type UShapeLayout, type Built } from "./layout";
+
+/**
+ * Where a line of descent meets the child: the top of the symbol box, lowered
+ * to the apex for a loss triangle. Relative to the symbol centre.
+ */
+function childDropEndOffset(ind: Individual | undefined): number {
+  return -NODE_SIZE / 2 + symbolTopInset(ind?.lifeStatus, NODE_SIZE);
+}
 
 export const LINE_ATTRS = `fill="none" stroke="black" stroke-width="${STROKE}" stroke-linecap="round"`;
 

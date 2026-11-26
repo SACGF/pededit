@@ -150,7 +150,7 @@ describe("chart title (#20)", () => {
       siblingOrder: { mode: "insertion", affectedFirst: false },
     };
   }
-  const TITLE_Y = /(class="chart-title"[^>]* y=")([\d.]+)"/;
+  const TITLE_Y = /(class="chart-title"><text[^>]* y=")([\d.]+)"/;
   const TRANSLATE_Y = /<g transform="translate\([\d.e+-]+ ([\d.e+-]+)\)">/;
 
   it("is raised above the dashed arc of someone drawn twice in the top row (#172)", () => {

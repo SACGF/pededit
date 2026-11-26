@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { EXAMPLES } from "../../../data/examples";
 import { exportSvg } from "../svgExporter";
+import { parseExportSvg } from "../exportLint";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
 import { consanguineousFamily } from "../../../fixtures/consanguineous";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
@@ -77,8 +78,8 @@ describe("exportSvg — symbol fills", () => {
       individuals: [{ id: "i1", sex: "male", affected: false, carrier: true, sibOrder: 0 }],
     });
     const svg = exportSvg(p);
-    // Carrier dot: <circle cx="0" cy="0" r="...">
-    expect(svg).toMatch(/<circle cx="0" cy="0" r="\d/);
+    // Carrier dot: centred in the symbol's box.
+    expect(svg).toMatch(/<circle cx="20" cy="20" r="\d/);
   });
 });
 
@@ -163,8 +164,8 @@ describe("exportSvg — overlays", () => {
 // ── Pregnancy / loss symbols (NSGC 2008) ─────────────────────────────────────
 
 describe("exportSvg, pregnancy and pregnancy loss", () => {
-  const half = NODE_SIZE / 2;
-  const TRIANGLE = `points="${lossTrianglePoints(NODE_SIZE, -half, -half)}"`;
+  // Symbols are drawn in their box, from (0, 0) to (40, 40).
+  const TRIANGLE = `points="${lossTrianglePoints(NODE_SIZE)}"`;
   // The symbol only: the export key, which now lists pregnancies and losses
   // too, is a separate <g class="pedigree-key"> at the end.
   const one = (ind: Partial<Pedigree["individuals"][number]>) => exportSvg(makePedigree({
@@ -181,7 +182,7 @@ describe("exportSvg, pregnancy and pregnancy loss", () => {
   it("miscarriage → small triangle instead of the sex symbol", () => {
     const svg = one({ sex: "female", lifeStatus: "miscarriage" });
     expect(svg).toContain(TRIANGLE);
-    expect(svg).not.toContain("<circle cx=\"0\" cy=\"0\" r=\"19\"");
+    expect(svg).not.toContain("<circle cx=\"20\" cy=\"20\" r=\"19\"");
     expect(svg).not.toContain("<text");
   });
 
@@ -227,15 +228,13 @@ describe("exportSvg, pregnancy and pregnancy loss", () => {
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, lifeStatus: "stillbirth", name: "Baby", tags: ["d"] }],
       tags: [{ id: "d", label: "Sequenced", color: "#2ca02c", style: "dot" }],
     }));
-    const caption = svg.match(/<text x="([\d.-]+)" y="([\d.-]+)"[^>]*>SB<\/text>/)!;
-    const captionY = Number(caption[2]);
+    // The caption and the dot are drawn in the symbol's box; the name in a
+    // group translated to the symbol's centre, so 20 lower in that box.
+    const captionY = Number(svg.match(/<text x="[\d.-]+" y="([\d.-]+)"[^>]*>SB<\/text>/)![1]);
     const dotY = Number(svg.match(/<circle cx="[^"]*" cy="([\d.-]+)" r="3.5" fill="#2ca02c"/)![1]);
-    const nameY = Number(svg.match(/<text[^>]*y="([\d.]+)"[^>]*>Baby<\/text>/)![1]);
-    // The dot is drawn in the symbol's local frame (centre at 0,0); the
-    // caption and name are absolute. Compare via the symbol centre.
-    const centreY = Number(svg.match(new RegExp(`<g transform="translate\\(${caption[1]} ([\\d.-]+)\\)">`))![1]);
-    expect(centreY + dotY - 3.5).toBeGreaterThan(captionY);
-    expect(nameY - 10).toBeGreaterThan(centreY + dotY + 3.5);
+    const nameY = Number(svg.match(/<text[^>]*y="([\d.]+)"[^>]*>Baby<\/text>/)![1]) + NODE_SIZE / 2;
+    expect(dotY - 3.5).toBeGreaterThan(captionY);
+    expect(nameY - 10).toBeGreaterThan(dotY + 3.5);
   });
 });
 
@@ -405,8 +404,7 @@ describe("exportSvg — title option", () => {
 describe("exportSvg: compact option", () => {
   /** Centre of every rendered symbol, in slot order, from its translate(x y). */
   function symbolCentres(svg: string): { x: number; y: number }[] {
-    return [...svg.matchAll(/<g transform="translate\(([-\d.]+) ([-\d.]+)\)">\n<(?:rect|circle|polygon)/g)]
-      .map((m) => ({ x: parseFloat(m[1]), y: parseFloat(m[2]) }));
+    return parseExportSvg(svg).symbols.map(([x, y]) => ({ x, y }));
   }
   function rowYs(svg: string): number[] {
     return [...new Set(symbolCentres(svg).map((c) => c.y))].sort((a, b) => a - b);
@@ -495,8 +493,7 @@ describe("exportSvg: someone drawn twice", () => {
 
   it("draws both copies joined by one dashed arc, as on the canvas", () => {
     const svg = exportSvg(dfc);
-    const shapes = svg.match(/<g transform="translate\([^)]+\)">\n<(?:rect|circle|polygon)/g) ?? [];
-    expect(shapes).toHaveLength(11);
+    expect(parseExportSvg(svg).symbols).toHaveLength(11);
     const arcs = svg.match(/<g class="duplicate-arcs">([\s\S]*?)<\/g>/)![1]!;
     expect(arcs.match(/stroke-dasharray/g)).toHaveLength(1);
     // The key explains the arc (#124).
@@ -507,7 +504,7 @@ describe("exportSvg: someone drawn twice", () => {
 describe("exportSvg — duplicate copies", () => {
   it("numbers every copy of someone drawn twice, as the canvas does", () => {
     const uncleNiece = EXAMPLES.find(e => e.label === "Uncle-niece")!.data;
-    const marks = [...exportSvg(uncleNiece).matchAll(/font-size="10" fill="black">(\d+)<\/text>/g)].map(m => m[1]);
+    const marks = [...exportSvg(uncleNiece).matchAll(/data-copy-number="(\d+)"/g)].map(m => m[1]);
     expect(marks.sort()).toEqual(["1", "2"]);
   });
 });
@@ -516,7 +513,7 @@ describe("the export draws from the canvas's layout data (#143)", () => {
   it("svgExporter.ts imports only types from the layout engine and never lays out itself", async () => {
     const { readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
-    const source = readFileSync(join(__dirname, "../svgExporter.ts"), "utf8");
+    const source = readFileSync(join(__dirname, "../svgExporter.tsx"), "utf8");
     const engine = [...source.matchAll(/^import ([^;]*?) from "@pedigree-editor\/layout-engine";/gms)].map(m => m[1]!.trim());
     expect(engine.length).toBeGreaterThan(0);
     expect(engine.filter(i => !i.startsWith("type "))).toEqual([]);

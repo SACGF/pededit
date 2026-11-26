@@ -46,26 +46,6 @@ export function arrowGeometry(size: number, x = 0, y = 0) {
 /** Rough width (px) of the bold "P" at PROBAND_LETTER_SIZE. */
 const LETTER_WIDTH = 7;
 
-/**
- * The arrow as SVG markup, for the exporters. `markerId` names the
- * arrowhead marker in the file's <defs>. `uprightDeg` turns the "P" back by
- * that many degrees about its own anchor, for a symbol drawn rotated (the
- * U-shape export), so the letter stays upright.
- */
-export function renderArrowSvg(
-  kind: ArrowKind, size: number, x: number, y: number,
-  opts: { stroke: number; markerId: string; uprightDeg?: number },
-): string {
-  const { tip, tail, letter, letterBox: b } = arrowGeometry(size, x, y);
-  let out = `<line x1="${tail.x}" y1="${tail.y}" x2="${tip.x}" y2="${tip.y}" stroke="black" stroke-width="${opts.stroke}" marker-end="url(#${opts.markerId})"/>`;
-  if (kind === "proband") {
-    const turn = opts.uprightDeg ? ` transform="rotate(${opts.uprightDeg} ${letter.x} ${letter.y - PROBAND_LETTER_SIZE / 2})"` : "";
-    out += `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="white"${turn}/>`;
-    out += `<text class="proband-letter" x="${letter.x}" y="${letter.y}"${turn} text-anchor="end" font-family="sans-serif" font-size="${PROBAND_LETTER_SIZE}" font-weight="bold" fill="black">${PROBAND_LETTER}</text>`;
-  }
-  return out;
-}
-
 /** Legend wording, shared by the in-app legend and the export key. */
 export const ARROW_LEGEND_LABEL: Record<ArrowKind, string> = {
   proband: "Proband (index case)",

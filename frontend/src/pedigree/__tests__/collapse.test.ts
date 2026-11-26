@@ -151,7 +151,7 @@ describe("drawing with hidden descendants (#94)", () => {
     expect(lintExport(plain({}))).toEqual([]);
     for (const p of [plain({ son: true }), plain({ dau: true }), plain({ gm: true })]) {
       const svg = exportSvg(p);
-      expect(svg.match(/class="branch-count"/g)).toHaveLength(1);
+      expect(svg.match(/data-branch-count=/g)).toHaveLength(1);
       expect(svg).toContain("descendants not shown");
       expect(lintExport(p)).toEqual([]);
       expect(lintExport(p, { deidentify: true })).toEqual([]);
@@ -159,7 +159,7 @@ describe("drawing with hidden descendants (#94)", () => {
     // The U-shape draws one family, the proband's.
     const u = plain({ son: true });
     u.individuals.find(i => i.id === "dau")!.proband = true;
-    expect(exportUShapeSvg(u).match(/class="branch-count"/g)).toHaveLength(1);
+    expect(exportUShapeSvg(u).match(/data-branch-count=/g)).toHaveLength(1);
     expect(exportUShapeSvg(u)).not.toContain('data-id="gc1"');
     // wife is the only affected person and is hidden with gm's branch: no Affected key row.
     expect(renderExportKeySvg(drawnPedigree(pedigree({ gm: true })), 0, 0).markup.join("")).not.toContain(">Affected<");
@@ -176,7 +176,7 @@ describe("drawing with hidden descendants (#94)", () => {
     expect(collapseInfo(d).placeholders.get(diamond.id)!.hidden.size).toBe(6);
     const svg = exportSvg(pedigree({ gm: true }), { deidentify: true });
     // The number of siblings grouped (son and dau), not of everyone hidden.
-    expect(svg).toMatch(/class="branch-count"[^>]*>2</);
+    expect(svg).toMatch(/data-branch-count="2"/);
     expect(svg).not.toContain(" affected<");
   });
 });
@@ -289,9 +289,9 @@ describe("collapsed branch diamond (#1)", () => {
     delete p.partnerships[0]!.twins;
     delete p.pinnedPositions;
     const svg = exportSvg(p);
-    // In the symbols group, centred on the symbol's own origin (its centre).
+    // In the symbols group, centred in the symbol's box.
     const symbols = svg.slice(svg.indexOf('<g class="symbols">'), svg.indexOf('<g class="labels">'));
-    expect(symbols).toMatch(/<text class="branch-count" x="0" y="[\d.]+"[^>]*>2<\/text>/);
+    expect(symbols).toMatch(/<text data-branch-count="2" x="20" y="[\d.]+"[^>]*>2<\/text>/);
     expect(parseExportSvg(svg).symbols).toHaveLength(drawnPedigree(p).individuals.length);
     expect(svg).not.toContain(">1 affected<");
   });
@@ -397,7 +397,7 @@ describe("affected children of a collapsed couple (#1, NSGC Fig. 1)", () => {
   it("exports the number of grouped siblings, the affected child, and lints clean", () => {
     const p = sibship();
     const svg = exportSvg(p);
-    expect(svg).toMatch(/class="branch-count"[^>]*>3</);
+    expect(svg).toMatch(/data-branch-count="3"/);
     // p1, p2, the group symbol, c and d.
     expect(parseExportSvg(svg).symbols).toHaveLength(5);
     expect(lintExport(p)).toEqual([]);

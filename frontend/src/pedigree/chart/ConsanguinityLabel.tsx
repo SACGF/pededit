@@ -13,14 +13,16 @@ export function ConsanguinityLabel({ cx, cy, hop, lines, offset }: { cx: number;
   const b = offset?.backed ? consanguinityLabelBacking(x, baselines, lines) : null;
   return (
     <>
-      {b && <rect x={b.x} y={b.y} width={b.width} height={b.height} fill="white" style={{ pointerEvents: "none" }} />}
-      <text
-        data-consanguinity-label
-        textAnchor="middle" fontFamily="sans-serif" fontSize={CONSANGUINITY_LABEL_FONT_SIZE} fill="black"
-        style={{ pointerEvents: "none", userSelect: "none" }}
-      >
-        {lines.map((line, i) => <tspan key={i} x={x} y={baselines[i]}>{line}</tspan>)}
-      </text>
+      {b && <rect x={b.x} y={b.y} width={b.width} height={b.height} fill="white" pointerEvents="none" />}
+      {lines.map((line, i) => (
+        <text
+          key={i} data-consanguinity-label x={x} y={baselines[i]}
+          textAnchor="middle" fontFamily="sans-serif" fontSize={CONSANGUINITY_LABEL_FONT_SIZE} fill="black"
+          pointerEvents="none" style={{ userSelect: "none" }}
+        >
+          {line}
+        </text>
+      ))}
     </>
   );
 }

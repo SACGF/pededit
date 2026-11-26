@@ -409,12 +409,6 @@ export function branchTooltip(branch: CollapsedBranch): string {
   return `${head}${all}. ${how}`;
 }
 
-/** SVG text of the count centred on (cx, cy), the centre of a group symbol of `symbolSize`. */
-export function renderBranchCountSvg(count: number, symbolSize: number, cx = 0, cy = 0): string {
-  const fs = branchCountFontSize(count, symbolSize);
-  return `<text class="branch-count" x="${cx}" y="${cy + branchCountBaseline(count, symbolSize)}" text-anchor="middle" font-family="sans-serif" font-size="${fs}" fill="black">${count}</text>`;
-}
-
 /**
  * Baseline of the number inside a group symbol, below the symbol's centre,
  * so the digits sit in the middle. A baseline offset rather than

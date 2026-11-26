@@ -1,12 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="470" height="370"
      viewBox="0 0 470 370">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="470" height="370" fill="white"/>
-<text class="chart-title" x="235" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Remarriage · half-siblings</text>
+<g class="chart-title"><text x="235" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Remarriage · half-siblings</text></g>
 <g transform="translate(206 -64.1)">
 <path d="M -80 200 L 0 200" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-40" y1="200" x2="-40" y2="234" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
@@ -19,14 +15,14 @@
 <line x1="40" y1="234" x2="40" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="98" y1="234" x2="98" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="156" y1="234" x2="156" y2="246" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<g data-id="rm_mom1" transform="translate(-80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="rm_dad" transform="translate(0 200) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/></g>
-<g data-id="rm_mom2" transform="translate(80 200) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="rm_c2c" transform="translate(156 266) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="rm_c2b" transform="translate(98 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="black"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
-<g data-id="rm_c2a" transform="translate(40 266) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="rm_c1b" transform="translate(-40 266) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="rm_c1a" transform="translate(-98 266) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/></g>
+<g data-id="rm_mom1" transform="translate(-80 200) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
+<g data-id="rm_dad" transform="translate(0 200) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g>
+<g data-id="rm_mom2" transform="translate(80 200) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
+<g data-id="rm_c2c" transform="translate(156 266) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
+<g data-id="rm_c2b" transform="translate(98 266) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="black"></circle></g></g><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g>
+<g data-id="rm_c2a" transform="translate(40 266) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
+<g data-id="rm_c1b" transform="translate(-40 266) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
+<g data-id="rm_c1a" transform="translate(-98 266) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g></g></g>
 <g class="consanguinity-labels">
 </g>
 </g>

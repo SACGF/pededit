@@ -21,6 +21,7 @@ import {
   DOCUMENTED_FONT_SIZE, DOCUMENTED_MARK,
 } from "../evaluation";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
+import { DECEASED_OVERHANG } from "../constants";
 import { COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../labelBlock";
 import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth } from "../labels";
 import { branchCountBaseline, branchCountFontSize } from "../collapse";
@@ -71,7 +72,16 @@ interface ShapeProps {
   size: number;
   /** Unique id for this symbol's clipPath. Needed when the paint has sectors. */
   clipId?: string;
+  /**
+   * Degrees to turn the letters ("D", "S", the "P" of a pregnancy) back by,
+   * for a symbol drawn turned (the U-shape): on their side they read as other
+   * letters. Slashes turn with the symbol.
+   */
+  upright?: number;
 }
+
+/** A turn of `deg` degrees about (x, y), or nothing for none. */
+const turn = (deg: number | undefined, x: number, y: number) => (deg ? { transform: `rotate(${deg} ${x} ${y})` } : {});
 
 /**
  * Tag sectors, clipped to the symbol outline. The radius is the full symbol
@@ -138,14 +148,14 @@ function AffectedCore({ size, show, outline }: { size: number; show: boolean; ou
 
 // ── Male (square) ──────────────────────────────────────────────────────────────
 
-function MaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
+function MaleSymbol({ size, fill, sectors, core, clipId, clip }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string; clip: boolean }) {
   // Inset by half the stroke, as the circle and diamond are, so the outer
   // edge is the box and a square stands as tall as a circle.
   const padding = 1;
   const outline = { x: padding, y: padding, width: size - 2 * padding, height: size - 2 * padding };
   return (
     <g>
-      <clipPath id={clipId}><rect {...outline} /></clipPath>
+      {clip && <clipPath id={clipId}><rect {...outline} /></clipPath>}
       <rect
         {...outline}
         stroke="black" strokeWidth={2}
@@ -160,11 +170,11 @@ function MaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill:
 
 // ── Female (circle) ────────────────────────────────────────────────────────────
 
-function FemaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
+function FemaleSymbol({ size, fill, sectors, core, clipId, clip }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string; clip: boolean }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 1;
   return (
     <g>
-      <clipPath id={clipId}><circle cx={cx} cy={cy} r={r} /></clipPath>
+      {clip && <clipPath id={clipId}><circle cx={cx} cy={cy} r={r} /></clipPath>}
       <circle
         cx={cx} cy={cy} r={r}
         stroke="black" strokeWidth={2}
@@ -179,7 +189,7 @@ function FemaleSymbol({ size, fill, sectors, core, clipId }: { size: number; fil
 
 // ── Unknown sex (diamond) ──────────────────────────────────────────────────────
 
-function UnknownSymbol({ size, fill, sectors, core, clipId }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string }) {
+function UnknownSymbol({ size, fill, sectors, core, clipId, clip }: { size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string; clip: boolean }) {
   const cx = size / 2, cy = size / 2;
   const points = [
     `${cx},1`,
@@ -189,7 +199,7 @@ function UnknownSymbol({ size, fill, sectors, core, clipId }: { size: number; fi
   ].join(" ");
   return (
     <g>
-      <clipPath id={clipId}><polygon points={points} /></clipPath>
+      {clip && <clipPath id={clipId}><polygon points={points} /></clipPath>}
       <polygon
         points={points}
         stroke="black" strokeWidth={2}
@@ -205,14 +215,14 @@ function UnknownSymbol({ size, fill, sectors, core, clipId }: { size: number; fi
 // ── Pregnancy and pregnancy loss (NSGC 2008) ───────────────────────────────────
 
 /** Small triangle for miscarriage, termination (with slash) and ectopic pregnancy. */
-function LossTriangle({ size, fill, slash, sectors, core, clipId }: {
-  size: number; fill: FillDescriptor; slash: boolean; sectors: Sector[]; core: boolean; clipId: string;
+function LossTriangle({ size, fill, slash, sectors, core, clipId, clip }: {
+  size: number; fill: FillDescriptor; slash: boolean; sectors: Sector[]; core: boolean; clipId: string; clip: boolean;
 }) {
   const s = lossSlashEnds(size);
   const points = lossTrianglePoints(size);
   return (
     <g>
-      <clipPath id={clipId}><polygon points={points} /></clipPath>
+      {clip && <clipPath id={clipId}><polygon points={points} /></clipPath>}
       <polygon
         points={points}
         stroke="black" strokeWidth={2}
@@ -299,20 +309,20 @@ function LifeStatusCaption({ size, text }: { size: number; text: string }) {
   );
 }
 
-function SexSymbol({ shape, size, fill, sectors, core, clipId }: {
-  shape: Individual["sex"]; size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string;
+function SexSymbol({ shape, size, fill, sectors, core, clipId, clip }: {
+  shape: Individual["sex"]; size: number; fill: FillDescriptor; sectors: Sector[]; core: boolean; clipId: string; clip: boolean;
 }) {
   switch (shape) {
-    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
-    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
-    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} />;
+    case "male":    return <MaleSymbol    size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} clip={clip} />;
+    case "female":  return <FemaleSymbol  size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} clip={clip} />;
+    case "unknown": return <UnknownSymbol size={size} fill={fill} sectors={sectors} core={core} clipId={clipId} clip={clip} />;
   }
 }
 
 /** Square brackets round the symbol of an adopted individual (NSGC). */
-export function AdoptionBrackets({ size }: { size: number }) {
+export function AdoptionBrackets({ size, adopted }: { size: number; adopted: string }) {
   return (
-    <g data-adopted="true">
+    <g data-adopted={adopted}>
       {adoptionBracketSegments(size).map(([x1, y1, x2, y2], i) => (
         <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" strokeWidth={2} />
       ))}
@@ -322,23 +332,26 @@ export function AdoptionBrackets({ size }: { size: number }) {
 
 // ── SymbolShape (dispatcher) ───────────────────────────────────────────────────
 
-export function SymbolShape({ glyph, size, clipId: id = "symbol-clip" }: ShapeProps) {
+export function SymbolShape({ glyph, size, clipId: id = "symbol-clip", upright }: ShapeProps) {
   const { paint, shape } = glyph;
   const fill = symbolFill(paint);
   const { sectors, core } = paint;
   const status = glyph.lifeStatus;
-  const brackets = glyph.adopted ? <AdoptionBrackets size={size} /> : null;
+  // The outline as a clip path, only where something is clipped to it: the
+  // sections, and a slash redrawn in white over a black fill.
+  const clip = sectors.length > 0 || (fill.type === "solid" && (status === "termination" || status === "stillbirth"));
+  const brackets = glyph.adopted ? <AdoptionBrackets size={size} adopted={glyph.adopted} /> : null;
   if (status) {
     const caption = glyph.caption;
     return (
       <g>
         {brackets}
         {usesLossTriangle(status)
-          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} />
-          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />}
+          ? <LossTriangle size={size} fill={fill} slash={status === "termination"} sectors={sectors} core={core} clipId={id} clip={clip} />
+          : <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />}
         {fill.type === "carrier-dot" && <CarrierDot size={size} status={status} rim={sectors.length > 0} />}
         {paint.line && <PresymptomaticLine size={size} status={status} rim={sectors.length > 0} />}
-        {status === "pregnancy"  && <PregnancyMark size={size} fill={fill} />}
+        {status === "pregnancy"  && <g {...turn(upright, size / 2, size / 2)}><PregnancyMark size={size} fill={fill} /></g>}
         {status === "stillbirth" && (
           <SlashOverFill {...deceasedSlashEnds(size)} fill={fill} clipId={id} />
         )}
@@ -349,10 +362,10 @@ export function SymbolShape({ glyph, size, clipId: id = "symbol-clip" }: ShapePr
   return (
     <g>
       {brackets}
-      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} />
+      <SexSymbol shape={shape} size={size} fill={fill} sectors={sectors} core={core} clipId={id} clip={clip} />
       {fill.type === "carrier-dot" && <CarrierDot size={size} status={undefined} rim={sectors.length > 0} />}
       {paint.line && <PresymptomaticLine size={size} status={undefined} rim={sectors.length > 0} />}
-      {glyph.letter && <RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} />}
+      {glyph.letter && <g {...turn(upright, size / 2, size / 2)}><RoleLetter letter={glyph.letter} size={size} halo={sectors.length > 0} base={paint.base} /></g>}
     </g>
   );
 }
@@ -408,12 +421,21 @@ export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationI
 // ── Overlays ───────────────────────────────────────────────────────────────────
 
 function deceasedSlashEnds(size: number) {
-  const overhang = 4;
-  return { x1: -overhang, y1: -overhang, x2: size + overhang, y2: size + overhang };
+  const o = DECEASED_OVERHANG;
+  return { x1: -o, y1: -o, x2: size + o, y2: size + o };
 }
 
 export function DeceasedSlash({ size }: { size: number }) {
   return <line {...deceasedSlashEnds(size)} stroke="black" strokeWidth={2} />;
+}
+
+/** The arrowhead of the proband and consultand arrows, defined once per drawing as `id`. */
+export function ProbandMarkerDef({ id = "proband-arrowhead" }: { id?: string }) {
+  return (
+    <marker id={id} markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+      <path d="M 0 0 L 6 3 L 0 6 Z" fill="black" />
+    </marker>
+  );
 }
 
 /**
@@ -422,8 +444,10 @@ export function DeceasedSlash({ size }: { size: number }) {
  * only. Geometry in `proband.ts`, shared with the exporters. The default
  * marker id is registered globally in PedigreeCanvas to avoid duplicate defs.
  */
-export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrowhead" }: { size: number; kind?: ArrowKind; markerId?: string }) {
+export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrowhead", upright }: { size: number; kind?: ArrowKind; markerId?: string; upright?: number }) {
   const { tip, tail, letter, letterBox } = arrowGeometry(size);
+  // A turned symbol (the U-shape) keeps its "P" upright, about the letter's own anchor.
+  const letterTurn = turn(upright, letter.x, letter.y - PROBAND_LETTER_SIZE / 2);
   return (
     <g data-arrow={kind}>
       <line
@@ -433,11 +457,11 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
         markerEnd={`url(#${markerId})`}
       />
       {kind === "proband" && (
-        <rect x={letterBox.x} y={letterBox.y} width={letterBox.w} height={letterBox.h} fill="white" />
+        <rect x={letterBox.x} y={letterBox.y} width={letterBox.w} height={letterBox.h} fill="white" {...letterTurn} />
       )}
       {kind === "proband" && (
         <text
-          x={letter.x} y={letter.y}
+          data-proband-letter x={letter.x} y={letter.y} {...letterTurn}
           textAnchor="end" fontFamily="sans-serif" fontSize={PROBAND_LETTER_SIZE} fontWeight="bold" fill="black"
           style={{ userSelect: "none" }}
         >
@@ -449,12 +473,12 @@ export function ProbandArrow({ size, kind = "proband", markerId = "proband-arrow
 }
 
 /** "?" above the symbol: family history not known. Placement in `familyHistory.ts`. */
-export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParents: boolean }) {
+export function FamilyHistoryMark({ size, hasParents, upright }: { size: number; hasParents: boolean; upright?: number }) {
   const p = familyHistoryMarkAt(size, hasParents);
   return (
     <text
       data-family-history-unknown
-      x={p.x} y={p.y}
+      x={p.x} y={p.y} {...turn(upright, p.x, p.y - FAMILY_HISTORY_FONT_SIZE / 3)}
       textAnchor="middle" fontFamily="sans-serif" fontSize={FAMILY_HISTORY_FONT_SIZE} fontWeight="bold" fill="black"
       style={{ userSelect: "none" }}
     >
@@ -464,12 +488,12 @@ export function FamilyHistoryMark({ size, hasParents }: { size: number; hasParen
 }
 
 /** "*" at the lower right: a documented evaluation. Placement in `evaluation.ts`. */
-export function DocumentedMark({ size, adopted }: { size: number; adopted: boolean }) {
+export function DocumentedMark({ size, adopted, upright }: { size: number; adopted: boolean; upright?: number }) {
   const p = documentedMarkAt(size, adopted);
   return (
     <text
       data-documented-evaluation
-      x={p.x} y={p.y}
+      x={p.x} y={p.y} {...turn(upright, p.x + 3.5, p.y - DOCUMENTED_FONT_SIZE / 2)}
       fontFamily="sans-serif" fontSize={DOCUMENTED_FONT_SIZE} fill="black"
       style={{ userSelect: "none" }}
     >
@@ -485,18 +509,22 @@ export function DocumentedMark({ size, adopted }: { size: number; adopted: boole
  * lines (text alone is hit only where its letters are painted), and reports
  * it to `onNameHover`; otherwise the text lets the mouse through.
  */
-export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNameHover }: {
+export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNameHover, fullName }: {
   glyph: Pick<PersonGlyph, "caption" | "annotations" | "detailLines" | "detailsBacked" | "labelsBacked">;
   nameLines: string[];
   size: number;
   nameCut?: boolean;
   onNameHover?: (over: boolean) => void;
+  /** In a file: the name in full, kept as a `<title>` on the first line when the lines cut it. */
+  fullName?: string;
 }) {
   const at = textUnder(glyph, nameLines);
   const c = size / 2;
   const backing = (b: TextBacking) => <rect x={b.x} y={b.y} width={b.width} height={b.height} fill="white" />;
-  const line = (text: string, y: number, key: number) => (
-    <text key={key} x={0} y={y} textAnchor="middle" fontFamily="sans-serif" fontSize={LABEL_FONT_SIZE} fill="black">{text}</text>
+  const line = (text: string, y: number, key: number, title?: string) => (
+    <text key={key} x={0} y={y} textAnchor="middle" fontFamily="sans-serif" fontSize={LABEL_FONT_SIZE} fill="black">
+      {title && <title>{title}</title>}{text}
+    </text>
   );
   const nameWidth = linesWidth(nameLines) + 4;
   return (
@@ -516,7 +544,7 @@ export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNam
               width={nameWidth} height={nameLines.length * LABEL_LINE_HEIGHT} fill="transparent"
             />
           )}
-          {nameLines.map((text, k) => line(text, at.nameY[k]!, k))}
+          {nameLines.map((text, k) => line(text, at.nameY[k]!, k, k === 0 && fullName && text !== fullName ? fullName : undefined))}
         </g>
       )}
       {glyph.detailLines.length > 0 && (
@@ -545,10 +573,11 @@ export function CopyNumber({ size, index }: { size: number; index: number }) {
 }
 
 /** The number inside a collapsed-branch group symbol. Placement in `collapse.ts`. */
-export function BranchCount({ size, count }: { size: number; count: number }) {
+export function BranchCount({ size, count, upright }: { size: number; count: number; upright?: number }) {
   return (
     <text
-      x={size / 2} y={size / 2 + branchCountBaseline(count, size)}
+      data-branch-count={count}
+      x={size / 2} y={size / 2 + branchCountBaseline(count, size)} {...turn(upright, size / 2, size / 2)}
       textAnchor="middle" fontFamily="sans-serif" fontSize={branchCountFontSize(count, size)} fill="black"
       style={{ userSelect: "none" }}
     >

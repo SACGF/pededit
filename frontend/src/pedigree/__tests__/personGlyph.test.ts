@@ -63,7 +63,7 @@ describe("personGlyph", () => {
 describe("the renderers draw from the glyph (#144)", () => {
   const source = (rel: string) => readFileSync(join(__dirname, rel), "utf8");
   const imported = (text: string) => [...text.matchAll(/^import ([^;]*?) from "[^"]+";/gms)].map(m => m[1]!).join("\n");
-  for (const file of ["../nodes/PedigreeSymbolNode.tsx", "../../io/svg/svgExporter.ts", "../../io/svg/uShapeExporter.ts"]) {
+  for (const file of ["../nodes/PedigreeSymbolNode.tsx", "../../io/svg/svgExporter.tsx", "../../io/svg/uShapeExporter.ts"]) {
     it(`${file.split("/").pop()} does not decide what to draw itself`, () => {
       expect(imported(source(file))).not.toMatch(/\b(symbolPaint|annotationRow|arrowKind|symbolSex|hasDocumentedEvaluation|detailLines|wrapLabel)\b/);
     });

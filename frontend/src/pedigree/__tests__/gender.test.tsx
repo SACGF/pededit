@@ -116,7 +116,7 @@ describe("gender identity on the symbol (#26)", () => {
     expect(sex).not.toContain("AFAB");
     expect(sex).not.toContain("assigned");
     // Two circles (mother, Sam) in sex mode; one (mother) in gender mode.
-    const circles = (s: string) => (s.match(/<circle cx="0" cy="0"[^>]*fill="(white|black)"/g) ?? []).length;
+    const circles = (s: string) => (s.match(/<circle cx="20" cy="20"[^>]*fill="(white|black)"/g) ?? []).length;
     expect(circles(sex)).toBe(2);
     expect(circles(svg)).toBe(1);
   });

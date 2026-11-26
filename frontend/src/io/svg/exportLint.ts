@@ -108,7 +108,10 @@ interface Parsed {
 }
 
 const unescapeXml = (s: string) =>
-  s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+  s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&#x([\da-f]+);/gi, (_, h: string) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d: string) => String.fromCodePoint(Number(d)))
+    .replace(/&amp;/g, "&");
 
 /** Points of an "M x y L x y ..." path; null for anything with curves. */
 function polyline(d: string): Pt[] | null {
@@ -119,14 +122,28 @@ function polyline(d: string): Pt[] | null {
   return pts.length >= 2 ? pts : null;
 }
 
+/** The straight segments of a path of "M x y L x y" runs, such as `segmentsPathD` writes. */
+function pathSegments(d: string): Seg[] {
+  const out: Seg[] = [];
+  let at: Pt | null = null;
+  for (const m of d.matchAll(/([ML])\s*(-?[\d.]+(?:e[-+]?\d+)?)[\s,]+(-?[\d.]+(?:e[-+]?\d+)?)/gi)) {
+    const p: Pt = [Number(m[2]), Number(m[3])];
+    if (m[1]!.toUpperCase() === "L" && at) out.push([at[0], at[1], p[0], p[1]]);
+    at = p;
+  }
+  return out;
+}
+
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
   const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], questionMarks: [], duplicateArcs: [], copyNumbers: [], coupleBackings: [], titles: [], structured: false, origin: [0, 0] };
-  type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean };
+  type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean; mark?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
   const group = () => [...stack].reverse().find(f => f.group)?.group;
   const inSymbol = () => stack.some(f => f.symbol);
+  // Childless, ended and twin marks join nobody (`data-childless`, `data-ended`, `data-twin-mark`).
+  const inMark = () => stack.some(f => f.mark);
   const skipped = () => stack.some(f => f.name === "defs" || f.name === "clipPath" || f.name === "marker" || f.group === "pedigree-key");
   const TAG = /<(\/?)([a-zA-Z]+)((?:\s+[\w:-]+="[^"]*")*)\s*(\/?)>/g;
   let textStart = -1, textAt: Pt | null = null, textInto = out.texts;
@@ -147,11 +164,12 @@ export function parseExportSvg(svg: string): Parsed {
     const t = /translate\(\s*(-?[\d.e+-]+)[\s,]+(-?[\d.e+-]+)\s*\)/.exec(attrs.transform ?? "");
     const [ox, oy] = offset();
     const g = group();
+    const mark = "data-childless" in attrs || "data-ended" in attrs || "data-twin-mark" in attrs;
     if (name === "g") {
-      const frame: Frame = { name, dx: t ? Number(t[1]) : 0, dy: t ? Number(t[2]) : 0 };
+      const frame: Frame = { name, dx: t ? Number(t[1]) : 0, dy: t ? Number(t[2]) : 0, mark };
       if (attrs.class) {
         frame.group = attrs.class;
-        if (attrs.class !== "pedigree-key" && !out.structured) { out.structured = true; out.origin = [ox, oy]; }
+        if (attrs.class !== "pedigree-key" && attrs.class !== "chart-title" && !out.structured) { out.structured = true; out.origin = [ox, oy]; }
       }
       if (g === "symbols" && !inSymbol() && t) {
         frame.symbol = true;
@@ -163,17 +181,17 @@ export function parseExportSvg(svg: string): Parsed {
     if (!selfClosing && name !== "line" && name !== "path" && name !== "rect" && name !== "circle" && name !== "polygon") {
       stack.push({ name, dx: 0, dy: 0 });
     }
-    if (name === "text" && attrs.class === "family-history-unknown" && !skipped()) {
+    if (name === "text" && "data-family-history-unknown" in attrs && !skipped()) {
       out.questionMarks.push([Number(attrs.x) + ox, Number(attrs.y) + oy]);
     }
-    // The copy number of someone drawn twice: plain digits at the symbol's top right.
-    if (name === "text" && inSymbol() && !skipped() && !attrs["text-anchor"] && !attrs.class) {
+    // The copy number of someone drawn twice: digits at the symbol's top right.
+    if (name === "text" && inSymbol() && !skipped() && "data-copy-number" in attrs) {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
       textInto = out.copyNumbers;
     }
-    // The chart title is outside every group, on purpose: it is not a label.
-    if (name === "text" && attrs.class === "chart-title" && !skipped()) {
+    // The chart title is in a group of its own, on purpose: it is not a label.
+    if (name === "text" && g === "chart-title") {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
       textInto = out.titles;
@@ -186,11 +204,12 @@ export function parseExportSvg(svg: string): Parsed {
       const pts = pathPoints(attrs.d ?? "");
       if (pts.length > 1) out.duplicateArcs.push(pts.map(([x, y]) => [x + ox, y + oy] as Pt));
     }
-    if (skipped() || inSymbol()) continue;
-    if (attrs.class === "mark") continue;
+    if (skipped() || inSymbol() || inMark() || mark) continue;
     if (name === "path" && g === "couple-lines" && !attrs["stroke-dasharray"]) {
       const pts = polyline(attrs.d ?? "");
       if (pts) out.couples.push(pts.map(([x, y]) => [x + ox, y + oy] as Pt));
+    } else if (name === "path" && g === "sibship-lines") {
+      for (const [x1, y1, x2, y2] of pathSegments(attrs.d ?? "")) out.sibs.push([x1 + ox, y1 + oy, x2 + ox, y2 + oy]);
     } else if (name === "line" && (g === "sibship-lines" || g === "assisted-lines")) {
       const n = (k: string) => Number(attrs[k]);
       (g === "sibship-lines" ? out.sibs : out.assisted).push([n("x1") + ox, n("y1") + oy, n("x2") + ox, n("y2") + oy]);

@@ -1,97 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="357" height="615"
      viewBox="0 0 357 615">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6"
-          refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="357" height="615" fill="white"/>
-<text class="chart-title" x="178.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Breast and ovarian cancer</text>
+<g class="chart-title"><text x="178.5" y="56" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Breast and ovarian cancer</text></g>
 <g transform="translate(92 100)">
 <g class="couple-lines">
-<path d="M 99.33 0 L 127.33 0" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 88 84 L 116 84" stroke="black" stroke-width="2" fill="none"/>
-<path d="M 20 168 L 48 168" stroke="black" stroke-width="2" fill="none"/>
+<path d="M 99.33 0 L 127.33 0" stroke="black" stroke-width="2" fill="none"></path><path d="M 88 84 L 116 84" stroke="black" stroke-width="2" fill="none"></path><path d="M 20 168 L 48 168" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="sibship-lines">
-<line x1="113.33" y1="0" x2="113.33" y2="50" stroke="black" stroke-width="2"/>
-<line x1="0" y1="50" x2="204" y2="50" stroke="black" stroke-width="2"/>
-<line x1="0" y1="50" x2="0" y2="64" stroke="black" stroke-width="2"/>
-<line x1="136" y1="50" x2="136" y2="64" stroke="black" stroke-width="2"/>
-<line x1="204" y1="50" x2="204" y2="64" stroke="black" stroke-width="2"/>
-<line x1="102" y1="84" x2="102" y2="126" stroke="black" stroke-width="2"/>
-<line x1="68" y1="126" x2="136" y2="126" stroke="black" stroke-width="2"/>
-<line x1="68" y1="126" x2="68" y2="148" stroke="black" stroke-width="2"/>
-<line x1="136" y1="126" x2="136" y2="148" stroke="black" stroke-width="2"/>
-<line x1="34" y1="168" x2="34" y2="218" stroke="black" stroke-width="2"/>
-<line x1="0" y1="218" x2="68" y2="218" stroke="black" stroke-width="2"/>
-<line x1="0" y1="218" x2="0" y2="232" stroke="black" stroke-width="2"/>
-<line x1="68" y1="218" x2="68" y2="232" stroke="black" stroke-width="2"/>
+<path d="M 113.33 0 L 113.33 50 M 0 50 L 204 50 M 0 50 L 0 64 M 136 50 L 136 64 M 204 50 L 204 64" stroke="black" stroke-width="2" fill="none"></path><path d="M 102 84 L 102 126 M 68 126 L 136 126 M 68 126 L 68 148 M 136 126 L 136 148" stroke="black" stroke-width="2" fill="none"></path><path d="M 34 168 L 34 218 M 0 218 L 68 218 M 0 218 L 0 232 M 68 218 L 68 232" stroke="black" stroke-width="2" fill="none"></path>
 </g>
 <g class="assisted-lines">
 </g>
 <g class="duplicate-arcs">
 </g>
 <g class="symbols">
-<g transform="translate(79.33 0)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(147.33 0)">
-<clipPath id="symbol-clip-0-1"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#d62728" clip-path="url(#symbol-clip-0-1)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(0 84)">
-<clipPath id="symbol-clip-1-0"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-1-0)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-</g>
-<g transform="translate(68 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(136 84)">
-<clipPath id="symbol-clip-1-2"><circle cx="0" cy="0" r="19"/></clipPath><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/><path d="M 0 0 L 0 40 A 40 40 0 0 1 0 -40 Z" fill="#1f77b4" clip-path="url(#symbol-clip-1-2)"/><path d="M 0 0 L 0 -40 A 40 40 0 0 1 0 40 Z" fill="#d62728" clip-path="url(#symbol-clip-1-2)"/><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="none"/>
-<line x1="-24" y1="-24" x2="24" y2="24" stroke="black" stroke-width="2"/>
-</g>
-<g transform="translate(204 84)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(0 168)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(68 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-<line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/>
-</g>
-<g transform="translate(136 168)">
-<circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(0 252)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
-<g transform="translate(68 252)">
-<rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/>
-</g>
+<g transform="translate(79.33 0)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(147.33 0)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-0-1"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-0-1)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(0 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-0"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-0)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z" fill="#1f77b4"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g></g></g><g transform="translate(68 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(136 84)"><g transform="translate(-20 -20)"><g><g><clipPath id="symbol-clip-1-2"><circle cx="20" cy="20" r="19"></circle></clipPath><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle><g clip-path="url(#symbol-clip-1-2)"><g><g data-tag-fill="solid"><path d="M 20 20 L 20 60 A 40 40 0 0 1 20 -20 Z" fill="#1f77b4"></path></g></g><g><g data-tag-fill="solid"><path d="M 20 20 L 20 -20 A 40 40 0 0 1 20 60 Z" fill="#d62728"></path></g></g></g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="none"></circle></g></g><line x1="-4" y1="-4" x2="44" y2="44" stroke="black" stroke-width="2"></line></g></g><g transform="translate(204 84)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(0 168)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g><g data-arrow="consultand"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line></g></g></g><g transform="translate(136 168)"><g transform="translate(-20 -20)"><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g><g transform="translate(0 252)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g><g transform="translate(68 252)"><g transform="translate(-20 -20)"><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
 </g>
 <g class="labels">
-<text x="79.33" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 80y</text>
-<rect x="127.93" y="22" width="38.8" height="26" fill="white"/>
-<text x="147.33" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 52y</text>
-<text x="147.33" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 50y</text>
-<rect x="-19.4" y="106" width="38.8" height="26" fill="white"/>
-<text x="0" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">70y</text>
-<text x="0" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 47y</text>
-<text x="68" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">72y</text>
-<rect x="116.6" y="106" width="38.8" height="39" fill="white"/>
-<text x="136" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 61y</text>
-<text x="136" y="129" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 41y</text>
-<text x="136" y="142" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 58y</text>
-<text x="204" y="116" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">68y</text>
-<text x="0" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">40y</text>
-<text x="68" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sarah</text>
-<text x="68" y="213" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">38y</text>
-<text x="136" y="200" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">35y</text>
-<text x="0" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">10y</text>
-<text x="68" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">8y</text>
+<g transform="translate(59.33 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 80y</text></g></g></g><g transform="translate(127.33 -20)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><rect x="-19.4" y="22" width="38.8" height="26" fill="white"></rect><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 52y</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 50y</text></g></g></g><g transform="translate(-20 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><rect x="-19.4" y="22" width="38.8" height="26" fill="white"></rect><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">70y</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 47y</text></g></g></g><g transform="translate(48 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">72y</text></g></g></g><g transform="translate(116 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><rect x="-19.4" y="22" width="38.8" height="39" fill="white"></rect><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">d. 61y</text><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">BC 41y</text><text x="0" y="58" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">OC 58y</text></g></g></g><g transform="translate(184 64)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">68y</text></g></g></g><g transform="translate(-20 148)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">40y</text></g></g></g><g transform="translate(48 148)"><g transform="translate(20 20)" style="user-select:none"><g data-name-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">Sarah</text></g><g data-detail-label="true" pointer-events="none"><text x="0" y="45" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">38y</text></g></g></g><g transform="translate(116 148)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">35y</text></g></g></g><g transform="translate(-20 232)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">10y</text></g></g></g><g transform="translate(48 232)"><g transform="translate(20 20)" style="user-select:none"><g data-detail-label="true" pointer-events="none"><text x="0" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" fill="black">8y</text></g></g></g>
 </g>
 <g class="consanguinity-labels">
 </g>

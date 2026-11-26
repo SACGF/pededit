@@ -1,22 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="296" height="370"
      viewBox="0 0 296 370">
-<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>
+<defs><marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="black"></path></marker></defs>
 <rect width="296" height="370" fill="white"/>
-<text class="chart-title" x="148" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black">Simple family</text>
+<g class="chart-title"><text x="148" y="34" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="black" style="user-select:none">Simple family</text></g>
 <g transform="translate(148 15.9)">
 <path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="0" y1="120" x2="0" y2="154" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <path d="M -37 154 L 37 154" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="-37" y1="154" x2="-37" y2="166" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
 <line x1="37" y1="154" x2="37" y2="166" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-<g data-id="p1" transform="translate(-40 120) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="p2" transform="translate(40 120) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="c2" transform="translate(37 186) rotate(0)"><circle cx="0" cy="0" r="19" stroke="black" stroke-width="2" fill="white"/></g>
-<g data-id="c1" transform="translate(-37 186) rotate(0)"><rect x="-19" y="-19" width="38" height="38" stroke="black" stroke-width="2" fill="black"/><line x1="-38" y1="38" x2="-20" y2="20" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"/><rect x="-50" y="38" width="8.5" height="10" fill="white"/><text class="proband-letter" x="-42" y="47" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black">P</text></g>
+<g data-id="p1" transform="translate(-40 120) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="white"></rect></g></g></g></g>
+<g data-id="p2" transform="translate(40 120) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
+<g data-id="c2" transform="translate(37 186) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><circle cx="20" cy="20" r="19" stroke="black" stroke-width="2" fill="white"></circle></g></g></g></g>
+<g data-id="c1" transform="translate(-37 186) rotate(0)"><g transform="translate(-20 -20)"><g transform="translate(20 20)" style="user-select:none"></g><g><g><rect x="1" y="1" width="38" height="38" stroke="black" stroke-width="2" fill="black"></rect></g></g><g data-arrow="proband"><line x1="-18" y1="58" x2="0" y2="40" stroke="black" stroke-width="2" marker-end="url(#proband-arrowhead)"></line><rect x="-30" y="58" width="8.5" height="10" fill="white"></rect><text data-proband-letter="true" x="-22" y="67" text-anchor="end" font-family="sans-serif" font-size="10" font-weight="bold" fill="black" style="user-select:none">P</text></g></g></g>
 <g class="consanguinity-labels">
 </g>
 </g>

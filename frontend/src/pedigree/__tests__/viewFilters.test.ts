@@ -182,7 +182,7 @@ describe("drawing and exporting with affected only (#4)", () => {
   it("the SVG draws the group counts and not the hidden people; CSV keeps everyone", () => {
     const p = loop();
     const svg = exportSvg(p);
-    expect(svg.match(/class="branch-count"/g)).toHaveLength(4);
+    expect(svg.match(/data-branch-count=/g)).toHaveLength(4);
     expect(svg).not.toContain('data-id="y"');
     expect(svg).toContain("descendants not shown");
     expect(exportCsv(p).trim().split("\n")).toHaveLength(18);

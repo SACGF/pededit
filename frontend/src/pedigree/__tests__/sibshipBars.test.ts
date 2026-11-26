@@ -1,3 +1,4 @@
+import { parseExportSvg } from "../../io/svg/exportLint";
 import { describe, expect, it } from "vitest";
 import { importPed } from "../../io/ped/index.js";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -166,9 +167,9 @@ describe("overlapping sibship bars on the canvas and in the export (#80)", () =>
     const flow = buildScene(ped);
     const svg = exportSvg(ped);
     const exported = [...new Set(
-      [...svg.matchAll(/<line x1="([\d.-]+)" y1="([\d.-]+)" x2="([\d.-]+)" y2="([\d.-]+)"/g)]
-        .filter(m => m[2] === m[4] && m[1] !== m[3])
-        .map(m => Number(m[2])),
+      parseExportSvg(svg).sibs
+        .filter(([x1, y1, x2, y2]) => y1 === y2 && x1 !== x2)
+        .map(([, y]) => y),
     )].sort((p, q) => p - q);
     // Three horizontal lines the same distances apart as the canvas bars
     // (the export shifts everything by its own margin).

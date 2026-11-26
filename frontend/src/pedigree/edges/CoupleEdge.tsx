@@ -2,7 +2,7 @@ import { useNodes } from "@xyflow/react";
 import type { Edge, EdgeProps } from "@xyflow/react";
 import type { CoupleEdgeData } from "../sceneToFlow";
 import { coupleLineGeometry } from "../lineGeometry";
-import { CoupleLine } from "../chart/CoupleLine";
+import { CoupleLine, CoupleText } from "../chart/CoupleLine";
 
 export type CoupleEdgeType = Edge<CoupleEdgeData, "coupleEdge">;
 export type ConsanguineousEdgeType = Edge<CoupleEdgeData, "consanguineousEdge">;
@@ -21,6 +21,7 @@ function CoupleLineEdge({ source, target, data, double }: { source: string; targ
     <g data-partnership-id={data.partnershipId}>
       <path d={coupleLineGeometry(data, double, left, right).course} stroke="transparent" strokeWidth={12} fill="none" style={{ pointerEvents: "stroke" }} />
       <CoupleLine data={data} double={double} left={left} right={right} />
+      {double && <CoupleText data={data} left={left} right={right} />}
     </g>
   );
 }

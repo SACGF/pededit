@@ -2,19 +2,19 @@
  * U-shape export, step 4: the figure. Symbols and the text beside them, the
  * consanguinity labels, title and key, assembled into the SVG.
  */
+import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { type Pedigree } from "@pedigree-editor/layout-engine";
 import { deidentify } from "../deidentify";
-import { drawnPedigree, renderBranchCountSvg } from "../../../pedigree/collapse";
-import { type PersonGlyph } from "../../../pedigree/personGlyph";
-import { ANNOTATION_ROW_HEIGHT } from "../../../pedigree/tags";
+import { drawnPedigree } from "../../../pedigree/collapse";
 import { renderExportKeySvg } from "../../../pedigree/exportKey";
 import type { SvgExportOptions } from "../types";
-import { renderPersonShapeSvg, renderDeceasedSlashSvg, renderProbandArrowSvg } from "../symbolSvg";
-import { titleWidth, LABEL_CHAR_WIDTH, TITLE_FONT_SIZE } from "../../../pedigree/labels";
-import { renderFamilyHistorySvg } from "../../../pedigree/familyHistory";
-import { renderDocumentedMarkSvg } from "../../../pedigree/evaluation";
+import { titleWidth } from "../../../pedigree/labels";
 import { CONSANGUINITY_LABEL_FONT_SIZE } from "../../../pedigree/consanguinityLabel";
-import { NODE_SIZE, HALF, PROBAND_TAIL, LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
+import { PersonMarks } from "../../../pedigree/chart/PersonSymbol";
+import { TextUnderSymbol, ProbandMarkerDef } from "../../../pedigree/chart/symbols";
+import { ChartTitle } from "../../../pedigree/chart/ChartTitle";
+import { NODE_SIZE, HALF, PROBAND_TAIL, LABEL_LINE_HEIGHT, r, escapeXml } from "./constants";
 import { walk } from "./tree";
 import { build, nodeAt, toLayout, glyphOf, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
 import { trackPath, renderConnectors } from "./connectors";
@@ -31,45 +31,24 @@ export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
     `</g>`);
 }
 
-/**
- * Labels sit on the outward side of the symbol, rotated with it. For anyone
- * with children the descent line runs through that spot, so the text gets a
- * white backing to stay readable.
- */
-export function renderLabel(glyph: PersonGlyph, hasDescent: boolean): string {
-  // Top to bottom: "SB" / "ECT" caption, gap for the tag annotation row (drawn
-  // by the symbol renderer, over the white backing), name, then the detail lines in
-  // NSGC order (age, onset, pedigree number).
-  const caption = glyph.caption;
-  // The pedigree number is the one the standard figure shows, so the
-  // two exports agree, even though it need not read left to right here.
-  const below = [...glyph.figureNameLines, ...glyph.detailLines];
-  const lines = caption ? [caption, ...below] : below;
-  if (lines.length === 0) return "";
-  const out: string[] = [];
-  const top = HALF + 3;
-  const annotationGap = glyph.annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0;
-  const lineY = (i: number) =>
-    top + LABEL_FONT_SIZE + i * LABEL_LINE_HEIGHT + (caption && i === 0 ? 0 : annotationGap);
-  if (hasDescent) {
-    const w = Math.max(...lines.map(l => l.length)) * LABEL_CHAR_WIDTH + 4;
-    const h = lines.length * LABEL_LINE_HEIGHT + (below.length > 0 ? annotationGap : 0);
-    const y = caption ? top : top + annotationGap;
-    out.push(`<rect x="${r(-w / 2)}" y="${y}" width="${r(w)}" height="${h}" fill="white"/>`);
-  }
-  lines.forEach((text, i) => {
-    out.push(`<text x="0" y="${lineY(i)}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(text)}</text>`);
-  });
-  return out.join("");
+/** SVG markup for some SVG elements, rendered inside an `<svg>` root as React needs. */
+function markup(children: ReactNode): string {
+  return renderToStaticMarkup(<svg>{children}</svg>).slice("<svg>".length, -"</svg>".length);
 }
 
+/**
+ * Each person as the standard figure and the canvas draw them
+ * (`PersonMarks` and `TextUnderSymbol`, #139), turned along the track:
+ * slashes and text turn with the symbol (that is the design), letters and
+ * numbers are turned back upright. For anyone with a sibship hanging from the
+ * symbol itself (by partners who are not drawn), the line runs down through
+ * the text, so it gets a white backing.
+ */
 export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
   const out: string[] = [];
   let seq = 0;
   walk(b.root, n => {
-    // A sibship by partners who are not drawn descends from the symbol itself,
-    // straight through the label.
     const solo = n.unions.some(w => w.kind === "solo" && w.kids.length > 0);
     n.members.forEach((m, i) => {
       const ind = byId.get(m.id);
@@ -78,17 +57,18 @@ export function renderSymbols(pedigree: Pedigree, b: Built): string[] {
       const clipId = `symbol-clip-${seq++}`;
       // What is drawn for the person, as the standard figure and the canvas have it.
       const glyph = glyphOf(ind, pedigree);
+      const backed = solo && m.id === n.blood;
       out.push(
         `<g ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}" transform="translate(${r(pos.x)} ${r(pos.y)}) rotate(${r(pos.rotation)})">` +
-        renderLabel(glyph, solo && m.id === n.blood) +
-        // The symbol is the standard figure's (io/svg/symbolSvg.ts), turned with the track.
-        renderPersonShapeSvg(glyph, clipId, { rotation: pos.rotation, captionShift: glyph.caption ? LABEL_LINE_HEIGHT : 0 }) +
-        (glyph.deceased ? renderDeceasedSlashSvg() : "") +
-        (glyph.arrow ? renderProbandArrowSvg(glyph.arrow, pos.rotation) : "") +
-        (glyph.familyHistoryUnknown ? renderFamilyHistorySvg(NODE_SIZE, glyph.hasParents, -HALF, -HALF, -pos.rotation) : "") +
-        (glyph.documented ? renderDocumentedMarkSvg(NODE_SIZE, !!glyph.adopted, -HALF, -HALF, -pos.rotation) : "") +
-        // The count in a collapsed-branch diamond, kept upright.
-        (glyph.groupCount !== undefined ? `<g transform="rotate(${r(-pos.rotation)})">${renderBranchCountSvg(glyph.groupCount, NODE_SIZE)}</g>` : "") +
+        markup(
+          <g transform={`translate(${-HALF} ${-HALF})`}>
+            <TextUnderSymbol
+              glyph={backed ? { ...glyph, labelsBacked: true } : glyph} nameLines={glyph.figureNameLines} size={NODE_SIZE}
+              fullName={glyph.name}
+            />
+            <PersonMarks glyph={glyph} clipId={clipId} upright={Math.round(-pos.rotation * 10) / 10} />
+          </g>,
+        ) +
         `</g>`,
       );
     });
@@ -152,19 +132,10 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
   const out: string[] = [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
     `     viewBox="0 0 ${width} ${height}">`,
-    `<defs>
-  <marker id="proband-arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
-    <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
-  </marker>
-</defs>`,
+    `<defs>${markup(<ProbandMarkerDef />)}</defs>`,
     `<rect width="${width}" height="${height}" fill="white"/>`,
   ];
-  if (options.title) {
-    out.push(
-      `<text class="chart-title" x="${width / 2}" y="${padding / 2 + 14}" text-anchor="middle" font-family="sans-serif" ` +
-      `font-size="${TITLE_FONT_SIZE}" font-weight="bold" fill="black">${escapeXml(options.title)}</text>`,
-    );
-  }
+  if (options.title) out.push(`<g class="chart-title">${markup(<ChartTitle title={options.title} x={width / 2} y={padding / 2 + 14} />)}</g>`);
   out.push(`<g transform="translate(${r(margin - minX + shiftX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
   out.push(...renderConnectors(b, layout, working));
