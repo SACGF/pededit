@@ -308,7 +308,7 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
 
   const partners = buildPartnerSetFromPedigree(pedigree);
   const sibshipEdges = buildSibshipEdges(pedigree, result, partners, slotPos, spacing.rowHeight);
-  clearLabelsOfBars(pedigree, nodes, sibshipEdges, spacing);
+  clearLabelsOfBars(nodes, sibshipEdges);
 
   const assistedEdges = buildAssistedEdges(pedigree, nodes, sibshipEdges);
   for (const id of labelsOverLines(nodes, sibshipEdges, assistedEdges)) {
@@ -316,10 +316,10 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
     if (n) n.data.glyph.labelsBacked = true;
   }
 
-  const text = textBlocks(pedigree, nodes, spacing), bars = sibshipBlocks(sibshipEdges, nodes);
+  const text = textBlocks(nodes), bars = sibshipBlocks(sibshipEdges, nodes);
   let coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...bars]);
   // The arcs keep off the couple lines, and the couple labels off the arcs.
-  const duplicateEdges = buildDuplicateEdges(pedigree, nodes, spacing, sibshipEdges, coupleEdges);
+  const duplicateEdges = buildDuplicateEdges(nodes, spacing, sibshipEdges, coupleEdges);
   if (duplicateEdges.length) {
     coupleEdges = buildCoupleEdges(pedigree, result, partners, slotPos, spacing.rowHeight, [...text, ...duplicateArcBlocks(duplicateEdges, slotPos), ...bars]);
   }
@@ -338,11 +338,9 @@ export function layoutToFlow(full: Pedigree, options: LayoutToFlowOptions = {}):
  * to pass under the text, or, where it cannot be, the text gets a white
  * backing (`barsUnderLabels`). Changes the edges and nodes in place.
  */
-function clearLabelsOfBars(pedigree: Pedigree, nodes: Node<RFNodeData>[], sibshipEdges: Edge<SibshipEdgeData>[], spacing: LayoutSpacing): void {
-  const labelMax = labelMaxWidth(spacing.slotWidth);
-  const numbers = labelNumbers(pedigree);
+function clearLabelsOfBars(nodes: Node<RFNodeData>[], sibshipEdges: Edge<SibshipEdgeData>[]): void {
   const labelled = nodes.flatMap(node => {
-    const box = textBlockUnder(node.data.individual, pedigree, node.position.x, node.position.y, labelMax, numbers);
+    const box = textBlockUnder(node.data.glyph, node.position.x, node.position.y);
     return box ? [{ node, box }] : [];
   });
   const drawn = sibshipEdges.filter(e => e.data && e.data.childXs.length > 0 && !e.data.converge);
@@ -580,7 +578,7 @@ function buildNodes(
  * run at their own height.
  */
 function buildDuplicateEdges(
-  pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: LayoutSpacing,
+  nodes: Node<RFNodeData>[], spacing: LayoutSpacing,
   sibshipEdges: Edge<SibshipEdgeData>[], coupleEdges: Edge<CoupleEdgeData>[],
 ): Edge<DuplicateEdgeData>[] {
   const byPerson = new Map<string, Node<RFNodeData>[]>();
@@ -594,11 +592,9 @@ function buildDuplicateEdges(
 
   const half = NODE_SIZE / 2;
   const bulge = DUPLICATE_ARC_BULGE * (spacing.rowHeight / 2 - half);
-  const labelMax = labelMaxWidth(spacing.slotWidth);
-  const numbers = labelNumbers(pedigree);
   const obstacles: ArcObstacle[] = nodes.map(n => ({
     id: n.data.individual.id, x: n.position.x, y: n.position.y,
-    text: textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, labelMax, numbers),
+    text: textBlockUnder(n.data.glyph, n.position.x, n.position.y),
   }));
   const at = new Map(nodes.map(n => [n.id, n.position]));
   const lines: ArcLine[] = [
@@ -643,11 +639,9 @@ function buildDuplicateEdges(
  * The text under every drawn symbol, as the export writes it, and the copy
  * number beside the top of a symbol drawn twice, for placing couple labels.
  */
-function textBlocks(pedigree: Pedigree, nodes: Node<RFNodeData>[], spacing: LayoutSpacing): TextBlock[] {
-  const labelMax = labelMaxWidth(spacing.slotWidth);
-  const numbers = labelNumbers(pedigree);
+function textBlocks(nodes: Node<RFNodeData>[]): TextBlock[] {
   return nodes.flatMap(n => [
-    ...[textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, labelMax, numbers) ?? []].flat(),
+    ...[textBlockUnder(n.data.glyph, n.position.x, n.position.y) ?? []].flat(),
     ...(n.data.glyph.copy !== undefined ? [copyNumberBlock(n.position.x, n.position.y, n.data.glyph.copy)] : []),
   ]);
 }

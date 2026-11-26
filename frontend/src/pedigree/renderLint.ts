@@ -32,7 +32,6 @@ import { placementParentOf } from "@pedigree-editor/layout-engine";
 import { cachedLayout } from "./layoutCache";
 import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
-import { labelNumbers } from "./layoutToFlow";
 import type { FlowData } from "./layoutToFlow";
 import { NODE_SIZE } from "./constants";
 import { chartTitlePlace, linesWidth, titleWidth } from "./labels";
@@ -314,7 +313,6 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
   // 6. Dashed arcs between two copies of someone: through nobody else's
   // symbol and nobody else's text. Lines are crossed, as any arc must.
   const half = NODE_SIZE / 2;
-  const numbers = labelNumbers(pedigree);
   for (const e of flow.duplicateEdges) {
     const s = nodeById.get(e.source), t = nodeById.get(e.target);
     if (!s || !t) continue;
@@ -323,7 +321,7 @@ export function lintFlow(full: Pedigree, flow: FlowData, options: { title?: stri
       duplicateArcPoints(s.position.x, s.position.y, t.position.x, t.position.y, e.data?.bulge ?? 28, half, 48, e.data?.legDx),
       flow.nodes.filter(n => n.data.individual.id !== who).map(n => ({
         id: n.data.individual.id, x: n.position.x, y: n.position.y,
-        text: textBlockUnder(n.data.individual, pedigree, n.position.x, n.position.y, flow.labelMax, numbers),
+        text: textBlockUnder(n.data.glyph, n.position.x, n.position.y),
       })),
       half,
     );

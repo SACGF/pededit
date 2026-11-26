@@ -21,7 +21,8 @@ import {
   DOCUMENTED_FONT_SIZE, DOCUMENTED_MARK,
 } from "../evaluation";
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
-import { COPY_NUMBER_FONT_SIZE, copyNumberAt } from "../labelBlock";
+import { COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../labelBlock";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth } from "../labels";
 import { branchCountBaseline, branchCountFontSize } from "../collapse";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
@@ -474,6 +475,57 @@ export function DocumentedMark({ size, adopted }: { size: number; adopted: boole
     >
       {DOCUMENTED_MARK}
     </text>
+  );
+}
+
+/**
+ * The name and detail lines under a symbol of size `size` drawn from its
+ * top left corner, placed by `textUnder` as the export places them. A cut
+ * name (`nameCut`, #68) takes the mouse, through a hit box the size of its
+ * lines (text alone is hit only where its letters are painted), and reports
+ * it to `onNameHover`; otherwise the text lets the mouse through.
+ */
+export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNameHover }: {
+  glyph: Pick<PersonGlyph, "caption" | "annotations" | "detailLines" | "detailsBacked" | "labelsBacked">;
+  nameLines: string[];
+  size: number;
+  nameCut?: boolean;
+  onNameHover?: (over: boolean) => void;
+}) {
+  const at = textUnder(glyph, nameLines);
+  const c = size / 2;
+  const backing = (b: TextBacking) => <rect x={b.x} y={b.y} width={b.width} height={b.height} fill="white" />;
+  const line = (text: string, y: number, key: number) => (
+    <text key={key} x={0} y={y} textAnchor="middle" fontFamily="sans-serif" fontSize={LABEL_FONT_SIZE} fill="black">{text}</text>
+  );
+  const nameWidth = linesWidth(nameLines) + 4;
+  return (
+    <g transform={`translate(${c} ${c})`} style={{ userSelect: "none" }}>
+      {nameLines.length > 0 && (
+        <g
+          data-name-label
+          data-name-cut={nameCut ? "true" : undefined}
+          pointerEvents={nameCut ? "auto" : "none"}
+          onMouseEnter={nameCut ? () => onNameHover?.(true) : undefined}
+          onMouseLeave={nameCut ? () => onNameHover?.(false) : undefined}
+        >
+          {at.nameBacking && backing(at.nameBacking)}
+          {nameCut && (
+            <rect
+              x={-nameWidth / 2} y={at.nameY[0]! - LABEL_FONT_SIZE}
+              width={nameWidth} height={nameLines.length * LABEL_LINE_HEIGHT} fill="transparent"
+            />
+          )}
+          {nameLines.map((text, k) => line(text, at.nameY[k]!, k))}
+        </g>
+      )}
+      {glyph.detailLines.length > 0 && (
+        <g data-detail-label pointerEvents="none">
+          {at.detailBacking && backing(at.detailBacking)}
+          {glyph.detailLines.map((text, k) => line(text, at.detailY[k]!, k))}
+        </g>
+      )}
+    </g>
   );
 }
 

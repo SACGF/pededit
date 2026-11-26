@@ -43,13 +43,18 @@ export const CAPTION_FONT_SIZE = 9;
 
 /**
  * Vertical space the caption takes below the symbol. Anything drawn under the
- * symbol (tag annotation row, name, DOB) moves down by this much.
+ * symbol (tag annotation row, name, DOB) moves down by this much and a gap
+ * (`CAPTION_SHIFT` in labelBlock.ts).
  */
 export const CAPTION_ROW_HEIGHT = CAPTION_FONT_SIZE + 2;
 
-/** Baseline of the caption, measured from the top of the symbol box. */
+/**
+ * Baseline of the caption, measured from the top of the symbol box: where
+ * the first line of text under a symbol goes (`TEXT_OFFSET_Y` in
+ * labelBlock.ts), leaving a gap between the symbol and a capital letter.
+ */
 export function captionBaselineY(size: number): number {
-  return size + CAPTION_FONT_SIZE + 1;
+  return size + 12;
 }
 
 /** Inset of the loss triangle from the symbol box, so it reads as "small". */

@@ -3,7 +3,7 @@ import { NODE_SIZE } from "../../pedigree/constants";
 import { duplicateArcD } from "../../pedigree/couplePath";
 import { coupleLineGeometry, sibshipLineGeometry } from "../../pedigree/lineGeometry";
 import { TWIN_QUESTION_FONT_SIZE } from "../../pedigree/twins";
-import { linesWidth, titleWidth, LABEL_FONT_SIZE, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
+import { titleWidth, LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, TITLE_FONT_SIZE, TITLE_GAP } from "../../pedigree/labels";
 import { assistedEdgeSegment } from "../../pedigree/assisted";
 import { CHILDLESS_REASON_FONT_SIZE } from "../../pedigree/childless";
 import { layoutToFlow } from "../../pedigree/layoutToFlow";
@@ -11,7 +11,7 @@ import type { PersonGlyph } from "../../pedigree/personGlyph";
 import {
   CONSANGUINITY_LABEL_FONT_SIZE, consanguinityLabelBacking, consanguinityLabelBaselines, consanguinityLabelPlacements, highestAboveSymbols,
 } from "../../pedigree/consanguinityLabel";
-import { EXPORT_LABEL_LINE_HEIGHT, EXPORT_LABEL_OFFSET_Y, EXPORT_ANNOTATION_SHIFT, EXPORT_CAPTION_SHIFT, COPY_NUMBER_FONT_SIZE, copyNumberAt } from "../../pedigree/labelBlock";
+import { TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT, COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../../pedigree/labelBlock";
 import type { FlowData } from "../../pedigree/layoutToFlow";
 import { deidentify } from "./deidentify";
 import { drawnPedigree, renderBranchCountSvg } from "../../pedigree/collapse";
@@ -25,13 +25,6 @@ import {
 import type { SvgExportOptions } from "./types";
 
 const PROBAND_TAIL = ARROW_TAIL + PROBAND_LETTER_SIZE; // arrow plus its "P" (proband.ts)
-// Where the text under a symbol goes (pedigree/labelBlock.ts, shared with
-// the couple label placement). The first baseline leaves a gap between
-// the symbol edge and the cap height of a 10px label.
-const LABEL_LINE_HEIGHT = EXPORT_LABEL_LINE_HEIGHT;
-const LABEL_OFFSET_Y = EXPORT_LABEL_OFFSET_Y;
-const ANNOTATION_SHIFT = EXPORT_ANNOTATION_SHIFT;
-const CAPTION_SHIFT = EXPORT_CAPTION_SHIFT;
 
 // ── Slot positions ────────────────────────────────────────────────────────────
 
@@ -98,7 +91,7 @@ function computeBounds(
   // does each age of onset and the pedigree number, so allow for
   // the most lines anyone takes.
   const textLines = Math.max(1, ...glyphs.map(g => g.figureNameLines.length + g.detailLines.length));
-  const labelHeight = LABEL_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
+  const labelHeight = TEXT_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
     + (hasAnnotations ? ANNOTATION_SHIFT : 0) + (hasCaption ? CAPTION_SHIFT : 0);
 
   // Consanguinity labels and the dashed arcs between two copies of
@@ -255,6 +248,10 @@ function escapeXml(s: string): string {
 
 function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
   const elems: string[] = [];
+  const rect = (cx: number, cy: number, b: TextBacking) =>
+    `<rect x="${cx + b.x}" y="${cy + b.y}" width="${b.width}" height="${b.height}" fill="white"/>`;
+  const text = (x: number, y: number, body: string) =>
+    `<text x="${x}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${body}</text>`;
 
   // Text goes under every copy of someone drawn more than once, as on the
   // canvas: a copy with no name can only be told by following its dashed arc.
@@ -262,39 +259,24 @@ function renderLabels(slotPos: SlotPos, flow: FlowData): string[] {
     const pos = slotPos.get(node.id);
     if (!pos) continue;
     const glyph = node.data.glyph;
-
     const { x: cx, y: cy } = pos;
     // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation
-    // row, name, then the detail lines in NSGC order (age, onset, number).
-    if (glyph.caption) elems.push(renderLifeStatusCaption(glyph.caption, cx, cy + LABEL_OFFSET_Y));
-    const labelBaseY = cy + LABEL_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0)
-      + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0);
-
-    // The name wraps to the slot width; the full text is kept as a <title>.
-    const text = glyph.name;
+    // row, name, then the detail lines in NSGC order (age, onset, number),
+    // placed as on the canvas (`textUnder`).
     const lines = glyph.figureNameLines;
-    // A line of descent runs down through this person's labels: white backing, as on the canvas.
-    if (glyph.labelsBacked && lines.length > 0) {
-      const w = linesWidth(lines) + 4;
-      elems.push(`<rect x="${cx - w / 2}" y="${labelBaseY - LABEL_FONT_SIZE}" width="${w}" height="${lines.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
-    }
+    const at = textUnder(glyph, lines);
+    if (glyph.caption && at.captionY !== undefined) elems.push(renderLifeStatusCaption(glyph.caption, cx, cy + at.captionY));
+    // A line of descent runs down through this person's labels: white backing.
+    if (at.nameBacking) elems.push(rect(cx, cy, at.nameBacking));
+    // The name wraps to the slot width; the full text is kept as a <title>.
     lines.forEach((line, k) => {
-      const title = k === 0 && line !== text ? `<title>${escapeXml(text!)}</title>` : "";
-      elems.push(`<text x="${cx}" y="${labelBaseY + k * LABEL_LINE_HEIGHT}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${title}${escapeXml(line)}</text>`);
+      const title = k === 0 && line !== glyph.name ? `<title>${escapeXml(glyph.name!)}</title>` : "";
+      elems.push(text(cx, cy + at.nameY[k]!, `${title}${escapeXml(line)}`));
     });
-    // Age or DOB, ages of onset, pedigree number. Past the
-    // age line the block can reach the sibship bar of the person's
-    // children, so it gets a white backing then, as on the canvas.
-    const details = glyph.detailLines;
-    if (details.length > 0 && (glyph.labelsBacked || glyph.detailsBacked)) {
-      const w = linesWidth(details) + 4;
-      const top = labelBaseY + lines.length * LABEL_LINE_HEIGHT - LABEL_FONT_SIZE;
-      elems.push(`<rect x="${cx - w / 2}" y="${top}" width="${w}" height="${details.length * LABEL_LINE_HEIGHT}" fill="white"/>`);
-    }
-    details.forEach((line, k) => {
-      const y = labelBaseY + (lines.length + k) * LABEL_LINE_HEIGHT;
-      elems.push(`<text x="${cx}" y="${y}" text-anchor="middle" font-family="sans-serif" font-size="${LABEL_FONT_SIZE}" fill="black">${escapeXml(line)}</text>`);
-    });
+    // Past the age line the details can reach the sibship bar of the
+    // person's children, so they get a white backing then.
+    if (at.detailBacking) elems.push(rect(cx, cy, at.detailBacking));
+    glyph.detailLines.forEach((line, k) => elems.push(text(cx, cy + at.detailY[k]!, escapeXml(line))));
   }
   return elems;
 }

@@ -2,8 +2,7 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, BranchCount } from "./symbols";
-import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT } from "../labels";
+import { SymbolShape, BranchCount, TextUnderSymbol } from "./symbols";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
 import { branchTooltip } from "../collapse";
 
@@ -40,27 +39,8 @@ export function CollapsedBranchNode({ data }: NodeProps<CollapsedBranchNodeType>
       <svg width={NODE_SIZE} height={NODE_SIZE} viewBox={`0 0 ${NODE_SIZE} ${NODE_SIZE}`} overflow="visible">
         <SymbolShape glyph={data.glyph} size={NODE_SIZE} clipId={`symbol-clip-${nodeId}`} />
         <BranchCount size={NODE_SIZE} count={n} />
+        <TextUnderSymbol glyph={data.glyph} nameLines={data.glyph.nameLines} size={NODE_SIZE} />
       </svg>
-
-      {data.glyph.detailLines.length > 0 && (
-        <div
-          data-detail-label
-          style={{
-            position: "absolute",
-            top: NODE_SIZE + 2,
-            left: "50%",
-            transform: "translateX(-50%)",
-            whiteSpace: "nowrap",
-            textAlign: "center",
-            fontSize: LABEL_FONT_SIZE,
-            lineHeight: `${LABEL_LINE_HEIGHT}px`,
-            color: "#000",
-            pointerEvents: "none",
-          }}
-        >
-          {data.glyph.detailLines.map((line, i) => <div key={i}>{line}</div>)}
-        </div>
-      )}
 
       <Handle type="target" position={Position.Top} id="sibship-in" style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Right} id="couple-out" style={{ opacity: 0 }} />

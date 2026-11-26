@@ -234,7 +234,7 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
       const d = e.data!, xs = [d.coupleX, ...d.childXs];
       if (d.barOffset > 0) lowered++;
       for (const n of flow.nodes) {
-        const box = textBlockUnder(n.data.individual, part, n.position.x, n.position.y, labelMax);
+        const box = textBlockUnder(n.data.glyph, n.position.x, n.position.y);
         if (!box || box.top >= d.sibBarY || box.x + box.halfWidth <= Math.min(...xs) || box.x - box.halfWidth >= Math.max(...xs)) continue;
         expect(box.bottom, `${n.data.individual.name} over ${e.id}`).toBeLessThanOrEqual(d.sibBarY + 1);
       }

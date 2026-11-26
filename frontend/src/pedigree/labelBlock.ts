@@ -1,39 +1,83 @@
-import type { Individual, Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "./constants";
-import { detailLines, linesWidth, nameLabelText, textWidth, wrapLabel } from "./labels";
-import { ANNOTATION_ROW_HEIGHT, hasAnnotationRow } from "./tags";
-import { CAPTION_ROW_HEIGHT, lifeStatusCaption } from "./lifeStatus";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth, textWidth } from "./labels";
+import { ANNOTATION_ROW_HEIGHT } from "./tags";
+import { CAPTION_ROW_HEIGHT, captionBaselineY } from "./lifeStatus";
 import type { TextBlock } from "./consanguinityLabel";
+import type { PersonGlyph } from "./personGlyph";
 
 /**
- * Where the standard SVG export (`svgExporter.ts`) writes the text under a
- * symbol. Kept here so the couple label placement can stay off it.
- * The export's text runs lower and in taller lines than the canvas's, so a
- * label clear of the export's text is clear of the canvas's too.
+ * Where the text under a symbol goes: one geometry for the canvas
+ * (`TextUnderSymbol` in `nodes/symbols.tsx`), the standard SVG export
+ * (`svgExporter.ts`), the lints and the placement of couple labels and
+ * sibship bars. All of it is measured from the symbol's centre.
  */
-export const EXPORT_LABEL_LINE_HEIGHT = 13;
-/** Baseline of the first line under the symbol, below its centre. */
-export const EXPORT_LABEL_OFFSET_Y = NODE_SIZE / 2 + 12;
+
+/** Baseline of the first line under the symbol ("SB" / "ECT" caption or name), below its centre. */
+export const TEXT_OFFSET_Y = captionBaselineY(NODE_SIZE) - NODE_SIZE / 2;
 /** Extra drop for the name when a tag annotation row sits between it and the symbol. */
-export const EXPORT_ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
-/** Extra drop for everything under a symbol with an "SB" / "ECT" caption. */
-export const EXPORT_CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
+export const ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
+/** Extra drop for everything under a symbol with an "SB" / "ECT" caption, the annotation row included. */
+export const CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
+
+/** A box from the symbol's centre: a white backing behind lines of text. */
+export interface TextBacking { x: number; y: number; width: number; height: number }
+
+/** Where each line of text under one symbol is written, from the symbol's centre. */
+export interface TextUnder {
+  /** Baseline of the "SB" / "ECT" caption, when there is one. */
+  captionY?: number;
+  /** How far the annotation row moves down for the caption (the `offsetY` of its renderers). */
+  annotationShift: number;
+  /** Baseline of each name line. */
+  nameY: number[];
+  /** Baseline of each detail line, under the name. */
+  detailY: number[];
+  /** White box behind the name, when a line runs down through it (`labelsBacked`). */
+  nameBacking?: TextBacking;
+  /** White box behind the detail lines (`detailsBacked` or `labelsBacked`). */
+  detailBacking?: TextBacking;
+}
 
 /**
- * The box the text under a symbol centred at (x, y) takes in the export:
- * caption, tag annotation row, name and detail lines. Null when there is no
- * text under it.
+ * Where the text under a symbol goes. `nameLines` are the name as drawn:
+ * the glyph's `nameLines` on the canvas, `figureNameLines` in a file.
  */
-export function textBlockUnder(ind: Individual, pedigree: Pedigree, x: number, y: number, labelMax: number, numbers?: Map<string, string>): TextBlock | null {
-  const lines = [...wrapLabel(nameLabelText(ind), labelMax), ...detailLines(ind, labelMax, pedigree, numbers)];
+export function textUnder(
+  glyph: Pick<PersonGlyph, "caption" | "annotations" | "detailLines" | "detailsBacked" | "labelsBacked">,
+  nameLines: string[],
+): TextUnder {
+  const first = TEXT_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0) + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0);
+  const details = glyph.detailLines;
+  const backing = (lines: string[], baseline: number): TextBacking => {
+    const width = linesWidth(lines) + 4;
+    return { x: -width / 2, y: baseline - LABEL_FONT_SIZE, width, height: lines.length * LABEL_LINE_HEIGHT };
+  };
+  const detailTop = first + nameLines.length * LABEL_LINE_HEIGHT;
+  return {
+    ...(glyph.caption ? { captionY: TEXT_OFFSET_Y } : {}),
+    annotationShift: glyph.caption ? CAPTION_SHIFT : 0,
+    nameY: nameLines.map((_, k) => first + k * LABEL_LINE_HEIGHT),
+    detailY: details.map((_, k) => detailTop + k * LABEL_LINE_HEIGHT),
+    ...(glyph.labelsBacked && nameLines.length > 0 ? { nameBacking: backing(nameLines, first) } : {}),
+    ...(details.length > 0 && (glyph.labelsBacked || glyph.detailsBacked) ? { detailBacking: backing(details, detailTop) } : {}),
+  };
+}
+
+/**
+ * The box the text under a symbol centred at (x, y) takes in a figure:
+ * caption, tag annotation row, name and detail lines. Null when there is no
+ * name or detail line. The canvas's text takes the same box or less (its
+ * names may be cut to one line).
+ */
+export function textBlockUnder(glyph: PersonGlyph, x: number, y: number): TextBlock | null {
+  const lines = [...glyph.figureNameLines, ...glyph.detailLines];
   if (lines.length === 0) return null;
-  const firstBaseline = y + EXPORT_LABEL_OFFSET_Y
-    + (lifeStatusCaption(ind.lifeStatus) ? EXPORT_CAPTION_SHIFT : 0)
-    + (hasAnnotationRow(ind, pedigree) ? EXPORT_ANNOTATION_SHIFT : 0);
+  const at = textUnder(glyph, glyph.figureNameLines);
+  const last = Math.max(...at.nameY, ...at.detailY);
   return {
     x,
     top: y + NODE_SIZE / 2,
-    bottom: firstBaseline + (lines.length - 1) * EXPORT_LABEL_LINE_HEIGHT + 3,
+    bottom: y + last + 3,
     halfWidth: linesWidth(lines) / 2,
   };
 }

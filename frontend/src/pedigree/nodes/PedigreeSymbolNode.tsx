@@ -3,13 +3,12 @@ import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../layoutToFlow";
 import { NODE_SIZE } from "../constants";
-import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, CopyNumber, AnnotationRow } from "./symbols";
+import { SymbolShape, DeceasedSlash, ProbandArrow, FamilyHistoryMark, DocumentedMark, CopyNumber, AnnotationRow, TextUnderSymbol } from "./symbols";
 import { HoverPill } from "./HoverPill";
 import { isSmallScreen } from "../../hooks/useSmallScreen";
-import { CAPTION_ROW_HEIGHT } from "../lifeStatus";
-import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, isLabelCut } from "../labels";
+import { isLabelCut } from "../labels";
+import { textUnder } from "../labelBlock";
 import { usePedigreeStore } from "../../store/usePedigreeStore";
-import { ANNOTATION_ROW_HEIGHT } from "../tags";
 import { isPhantomId } from "../../io/ped/converter";
 import { worstSeverity } from "../validation";
 import { problemsOf } from "../../components/problemList";
@@ -31,7 +30,6 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   // pin dot, the problem marker, the dev id, the hover pill).
   const { individual, glyph, isPinned } = data;
   const { nameLines, annotations, arrow } = glyph;
-  const details = glyph.detailLines;
   const nodeId = useNodeId()!;
   const [isPillVisible, setIsPillVisible] = useState(false);
   const [isNameHovered, setIsNameHovered] = useState(false);
@@ -76,9 +74,10 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   useEffect(() => { if (!isSelected) setIsTouchPill(false); }, [isSelected]);
   const nameCut = isLabelCut(nameLines, glyph.name);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
-  // name, then the detail lines in NSGC order (age, onset, pedigree number).
-  const captionOffset = glyph.caption ? CAPTION_ROW_HEIGHT : 0;
-  const labelTop = NODE_SIZE + 2 + captionOffset + (annotations.length > 0 ? ANNOTATION_ROW_HEIGHT : 0);
+  // name, then the detail lines in NSGC order (age, onset, pedigree number),
+  // placed as the export places them.
+  const textAt = textUnder(glyph, nameLines);
+  const lastBaseline = Math.max(NODE_SIZE / 2 - 2, ...textAt.nameY, ...textAt.detailY);
 
   function scheduleHide() {
     hideTimeout.current = setTimeout(() => {
@@ -160,59 +159,12 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         {arrow && <ProbandArrow size={NODE_SIZE} kind={arrow} />}
         {glyph.familyHistoryUnknown && <FamilyHistoryMark size={NODE_SIZE} hasParents={hasParents} />}
         {glyph.documented && <DocumentedMark size={NODE_SIZE} adopted={!!glyph.adopted} />}
-        <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={captionOffset} />
+        <AnnotationRow items={annotations} size={NODE_SIZE} offsetY={textAt.annotationShift} />
         {glyph.copy !== undefined && <CopyNumber size={NODE_SIZE} index={glyph.copy} />}
+        {/* A cut name takes the mouse: hovering it shows the full name,
+            clicking it selects. */}
+        <TextUnderSymbol glyph={glyph} nameLines={nameLines} size={NODE_SIZE} nameCut={nameCut} onNameHover={setIsNameHovered} />
       </svg>
-
-      {/* Name label below symbol, fitted to the slot width. A cut label
-          takes the mouse: hovering it shows the full name, clicking it selects. */}
-      {nameLines.length > 0 && (
-        <div
-          data-name-label
-          data-name-cut={nameCut ? "true" : undefined}
-          onMouseEnter={() => setIsNameHovered(true)}
-          onMouseLeave={() => setIsNameHovered(false)}
-          style={{
-            position: "absolute",
-            top: labelTop,
-            left: "50%",
-            transform: "translateX(-50%)",
-            whiteSpace: "nowrap",
-            textAlign: "center",
-            fontSize: LABEL_FONT_SIZE,
-            lineHeight: `${LABEL_LINE_HEIGHT}px`,
-            color: "#000",
-            pointerEvents: nameCut ? "auto" : "none",
-            ...(glyph.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
-          }}
-        >
-          {nameLines.map((line, i) => <div key={i}>{line}</div>)}
-        </div>
-      )}
-
-      {/* Under the name in NSGC order: age or DOB, ages of onset,
-          evaluations, pedigree number. Past the age line the block can reach the
-          sibship bar of the person's children, so it gets a white backing. */}
-      {details.length > 0 && (
-        <div
-          data-detail-label
-          style={{
-            position: "absolute",
-            top: labelTop + nameLines.length * LABEL_LINE_HEIGHT,
-            left: "50%",
-            transform: "translateX(-50%)",
-            whiteSpace: "nowrap",
-            textAlign: "center",
-            fontSize: LABEL_FONT_SIZE,
-            lineHeight: `${LABEL_LINE_HEIGHT}px`,
-            color: "#000",
-            pointerEvents: "none",
-            ...(glyph.detailsBacked || glyph.labelsBacked ? { background: "#fff", padding: "0 2px" } : {}),
-          }}
-        >
-          {details.map((line, i) => <div key={i}>{line}</div>)}
-        </div>
-      )}
 
       {/* Dev-mode ID label, so a screenshot of the canvas names each node for bug
           reports. Generated ids are UUIDs, which are wider than a slot and
@@ -223,7 +175,7 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
         <div
           style={{
             position: "absolute",
-            top: labelTop + (nameLines.length + details.length) * LABEL_LINE_HEIGHT,
+            top: NODE_SIZE / 2 + lastBaseline + 4,
             left: "50%",
             transform: "translateX(-50%)",
             whiteSpace: "nowrap",

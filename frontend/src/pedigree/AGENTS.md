@@ -190,7 +190,7 @@ draws NSGC symbols.
   and the order is chosen so drops cross other bars as little as possible.
   A bar is also lowered to pass under text that hangs past the halfway line
   (a tag row and a two-line name, a long detail block; `barsUnderLabels`,
-  measured on the export's text, which runs lower than the canvas's). Where
+  measured on the text as a figure writes it, names always wrapped). Where
   that cannot clear it (compact rows, or it would land on another bar) the
   bar stays and the text gets the white backing (`labelsBacked`), unless the
   text reaches the symbols below, which a backing would cover. An only child
@@ -601,8 +601,8 @@ draws NSGC symbols.
   the title placed by `chartTitlePlace` in `labels.ts`, which
   `chartTitleNode` also uses). Placement (#109, `placeConsanguinityLabel`): `layoutToFlow`
   hands it every obstacle near a label as a box (`TextBlock`): the text
-  under each symbol as the export writes it (`labelBlock.ts`, lower and
-  taller than the canvas's, so clear there means clear on the canvas too),
+  under each symbol as a figure writes it (`textBlockUnder` in
+  `labelBlock.ts`; the canvas's is the same or shorter, a name cut to one line),
   copy numbers, sibship bars and drops, and the dashed arcs between copies.
   It tries the usual place, then slid along the line, then raised up to
   12px, then low between wide-apart symbols; then the same with the arcs
@@ -830,12 +830,21 @@ renderer:
 
 A two-line name plus the age line clears the sibship bar of the person's own
 children; anything past the age line can reach it, so then the detail block
-gets a white backing (`detailsBacked`: canvas div background, a `<rect>` in
-the export's labels group, which `exportLint` ignores) and the bar shows a
+gets a white backing (`detailsBacked`: a white `<rect>`, which `exportLint`
+ignores in the export's labels group) and the bar shows a
 gap under the text rather than running through it. Which lines there are comes from the
-person's glyph (#144); where they sit is still worked out by each renderer
-(`PedigreeSymbolNode`, `svgExporter`, `uShapeExporter`), so change all three
-together (#145 is to give the canvas the export's text geometry).
+person's glyph (#144); where they sit is `textUnder` in `labelBlock.ts`
+(#145): first baseline 12px below the symbol, 13px lines, the caption and
+annotation row shifts and the white backings. The canvas draws it as SVG
+text in the node (`TextUnderSymbol`, `font-family="sans-serif"` as in the
+export, so the 5.8px a character that `labels.ts` wraps by means the same
+in both) and `svgExporter` writes the same numbers; the lints and the
+placement of bars and couple labels read `textBlockUnder`. A cut name's
+group (`data-name-label`, `data-name-cut`) takes the mouse through a
+transparent box the size of its lines; the `text-under-symbols` flow checks
+the hover and the click. The U-shape keeps its own placement
+(`ushape/render.ts`, beside the symbol and turned with it, with the same
+font and line height), since its spacing along the tracks is built round it.
 
 - Chart title (#20): `chartTitle(pedigree, name)` in `labels.ts` is the one
   rule. `Pedigree.chartTitle` wins when set, `""` meaning no title; absent

@@ -3,6 +3,7 @@ import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, ta
 import { CONDITIONS_AND_TAGS } from "../pedigree/conditions";
 import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "../pedigree/nodes/symbols";
 import { PLAIN_CARRIER_PAINT } from "../pedigree/tagFills";
+import { lifeStatusCaption } from "../pedigree/lifeStatus";
 import { type ArrowKind } from "../pedigree/proband";
 import { ADOPTION_DASH } from "../pedigree/adoption";
 import type { Zygosity } from "@pedigree-editor/layout-engine";
@@ -236,8 +237,9 @@ function CollapsedBranchSvg() {
 /** Pregnancy / loss symbols reuse the canvas renderer so the legend matches exactly. */
 function LifeStatusSvg({ sex, lifeStatus }: { sex: Sex; lifeStatus: LifeStatus }) {
   // Extra room below for the "SB" / "ECT" caption and the stillbirth slash overhang.
+  const h = lifeStatusCaption(lifeStatus) ? 42 : 40;
   return (
-    <svg width="36" height="40" viewBox="-6 -6 36 40">
+    <svg width="36" height={h} viewBox={`-6 -6 36 ${h}`}>
       <SymbolShape glyph={standaloneGlyph({ id: "", sex, affected: false, sibOrder: 0, lifeStatus })} size={SZ} clipId={`legend-life-${lifeStatus}`} />
     </svg>
   );

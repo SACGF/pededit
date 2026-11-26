@@ -23,7 +23,8 @@ import { inbreedingLabel } from "./relatedness";
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
 export const LABEL_CHAR_WIDTH = 5.8;
-export const LABEL_LINE_HEIGHT = 12;
+/** Height (px) of a line of text under a symbol, on the canvas and in figures. */
+export const LABEL_LINE_HEIGHT = 13;
 export const MAX_LABEL_LINES = 2;
 export const ELLIPSIS = "…";
 
