@@ -39,7 +39,7 @@ function cousins(): Pedigree {
 }
 
 const withSetting = (p: Pedigree): Pedigree =>
-  ({ ...p, canvasSettings: { nodesMoveable: false, snapToGrid: false, snapGridSize: 20, relationshipLabels: true } });
+  ({ ...p, canvasSettings: { ...p.canvasSettings, nodesMoveable: false, snapToGrid: false, snapGridSize: 20, relationshipLabels: true } });
 
 const labelsByPartnership = (p: Pedigree) =>
   Object.fromEntries(buildScene(p).couples.map(e => [e.data.partnershipId, e.data.consanguinityLabel]));

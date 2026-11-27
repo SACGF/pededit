@@ -13,7 +13,7 @@
         "dob": "1931-04-02",
         "dod": "2009-11-17",
         "deceased": true,
-        "notes": "Notes are never drawn."
+        "notes": "Notes are hidden here."
       },
       {
         "id": "gm",
@@ -200,7 +200,8 @@
       "notation": "nsgc2022",
       "showNumbers": true,
       "nameLabels": "wrap",
-      "symbolsShow": "gender"
+      "symbolsShow": "gender",
+      "showNotes": false
     },
     "tags": [
       {

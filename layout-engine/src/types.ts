@@ -333,16 +333,16 @@ export interface CanvasSettings {
   showCoefficients?: boolean;
   /**
    * Draw each person's notes under their symbol, after the other text and
-   * before the pedigree number, on the canvas and in figure exports. Notes
-   * are free text and often private, so absent means false; a de-identified
-   * export never draws them.
+   * before the pedigree number, on the canvas and in figure exports.
+   * Absent means true: notes someone wrote are expected on the chart.
+   * False hides them; a de-identified export never draws them.
    */
   showNotes?: boolean;
   /**
    * How much of each person's notes `showNotes` draws: "twoLines" cuts them
    * at two lines with an ellipsis, "full" draws every line and moves the
    * rows below down where the text would reach them. Absent means
-   * "twoLines".
+   * "full".
    */
   notesLength?: NotesLength;
   /**

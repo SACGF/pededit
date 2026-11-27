@@ -14,7 +14,7 @@ import { exportSvg } from "../../io/svg/svgExporter";
 const withSnap = (p: Pedigree, grid: number, extra: Partial<Pedigree> = {}): Pedigree => ({
   ...p,
   ...extra,
-  canvasSettings: { nodesMoveable: true, snapToGrid: true, snapGridSize: grid },
+  canvasSettings: { ...p.canvasSettings, nodesMoveable: true, snapToGrid: true, snapGridSize: grid },
 });
 
 const onGrid = (v: number, g: number) => Math.abs(v / g - Math.round(v / g)) < 1e-9;

@@ -125,11 +125,10 @@ export function linesWidth(lines: string[]): number {
  *      whose parents are related, when the pedigree draws coefficients
  *      (#86). NSGC has no place for it; it goes with what was worked
  *      out about the person, above the number that only locates them;
- *   6. `notes`: the person's notes, when the pedigree draws them
- *      (`canvasSettings.showNotes`, off by default as notes are free text
- *      and often private). NSGC's list has no comment line, so they go
- *      after everything recorded or worked out about the person and above
- *      the number, up to `NOTE_LINES` lines or in full
+ *   6. `notes`: the person's notes, unless the pedigree hides them
+ *      (`canvasSettings.showNotes` false). NSGC's list has no comment
+ *      line, so they go after everything recorded or worked out about the
+ *      person and above the number, in full or up to `NOTE_LINES` lines
  *      (`canvasSettings.notesLength`, `noteLines`);
  *   7. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
@@ -259,19 +258,20 @@ export function evaluationLines(ind: Individual, maxWidth: number, notation: Not
 
 /** True when the pedigree draws people's notes under their symbols (`canvasSettings.showNotes`). */
 export function showsNotes(pedigree: Pick<Pedigree, "canvasSettings">): boolean {
-  return pedigree.canvasSettings?.showNotes === true;
+  return pedigree.canvasSettings?.showNotes !== false;
 }
 
-/** Lines a person's notes may take under the symbol, unless the pedigree draws them in full. */
+/** Lines a person's notes may take under the symbol when the pedigree cuts them (`notesLength` "twoLines"). */
 export const NOTE_LINES = 2;
 
 /**
- * Lines a person's notes may take under the symbol in this pedigree:
- * `NOTE_LINES`, or no limit with `canvasSettings.notesLength` "full" (the
- * rows below then move down to make room, see `rowYs` in scene.ts).
+ * Lines a person's notes may take under the symbol in this pedigree: no
+ * limit unless `canvasSettings.notesLength` is "twoLines", then
+ * `NOTE_LINES`. With no limit the rows below move down to make room (see
+ * `rowYs` in scene.ts).
  */
 export function noteLineLimit(pedigree: Pick<Pedigree, "canvasSettings">): number {
-  return pedigree.canvasSettings?.notesLength === "full" ? Infinity : NOTE_LINES;
+  return pedigree.canvasSettings?.notesLength === "twoLines" ? NOTE_LINES : Infinity;
 }
 
 /**

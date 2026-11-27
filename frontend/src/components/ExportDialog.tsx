@@ -91,7 +91,7 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
     });
   }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact]);
 
-  // Notes are drawn only with the pedigree setting, so say so when there are some.
+  // Notes can be hidden by the pedigree setting, so say so when there are some.
   const hasNotes = useMemo(() => open && pedigree.individuals.some(i => !!i.notes?.trim()), [open, pedigree]);
 
   // Which free-text choices this pedigree has anything for.

@@ -189,18 +189,18 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   `canvasSettings.nameLabels` "truncate" (Settings, "Truncate long names")
   gives one line on the canvas only; exports always wrap, because a file
   cannot be hovered.
-- Notes on the chart: `Individual.notes` is drawn only with
-  `canvasSettings.showNotes` ("Show notes on the chart", off by default,
-  since notes are free text and often private). `noteLines` keeps the
-  note's own line breaks, wraps each to the slot width and stops at
-  `NOTE_LINES` (2) with an ellipsis (a two-line name, an age, three note
-  lines and a number reach the symbol of anyone drawn directly below,
-  which no lint catches); they are the `notes` detail section,
-  just above the pedigree number, so the canvas and every figure export
-  draw them. De-identification drops the notes and turns the setting off.
-  `canvasSettings.notesLength` "full" (Settings, "Notes: Full text", shown
-  only with the notes on) lifts the limit (`noteLineLimit`); then, and only
-  then, rows are not a fixed `rowHeight` apart: `rowYs` in `scene.ts`
+- Notes on the chart: `Individual.notes` is drawn unless
+  `canvasSettings.showNotes` is false ("Show notes on the chart", on by
+  default: notes someone wrote are expected on the chart). They are the
+  `notes` detail section, just above the pedigree number, so the canvas
+  and every figure export draw them. De-identification drops the notes and
+  turns the setting off. `noteLines` keeps the note's own line breaks and
+  wraps each to the slot width. `canvasSettings.notesLength` "twoLines"
+  (Settings, "Notes: Up to two lines", shown only with the notes on) stops
+  them at `NOTE_LINES` (2) with an ellipsis (a two-line name, an age, three
+  note lines and a number reach the symbol of anyone drawn directly below,
+  which no lint catches) and keeps rows a fixed `rowHeight` apart. In
+  full, the default (`noteLineLimit`), rows are not a fixed `rowHeight` apart: `rowYs` in `scene.ts`
   moves each row down until the text of anyone above clears the symbols
   under it by `ROW_TEXT_CLEARANCE` (room for the sibship bar to pass under
   the text). The canvas and the standard export both draw the scene, so

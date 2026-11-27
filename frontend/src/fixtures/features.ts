@@ -110,7 +110,7 @@ const textTags: Tag[] = [
 
 const text = build(
   [
-    M("gf", { name: "Bartholomew Featherstonehaugh-Wetherby", dob: "1931-04-02", dod: "2009-11-17", deceased: true, notes: "Notes are never drawn." }),
+    M("gf", { name: "Bartholomew Featherstonehaugh-Wetherby", dob: "1931-04-02", dod: "2009-11-17", deceased: true, notes: "Notes are hidden here." }),
     F("gm", { name: "Ottoline", dob: "1934", age: "92y" }),
     F("m", { name: "Persephone Quillfeather", dob: "1958-06", genderIdentity: "woman", tags: ["ms"], tagOnset: { ms: "childhood" }, hpoTerms: ["HP:0001250"] }),
     M("f", { name: "Rupert", age: "d. 60s", deceased: true, affected: true, onset: "40s" }),
@@ -145,7 +145,7 @@ const text = build(
       recordedBy: "A. Counsellor",
       recordedOn: "2026-11-16",
     },
-    canvasSettings: { ...SETTINGS_2022, showNumbers: true, nameLabels: "wrap", symbolsShow: "gender" },
+    canvasSettings: { ...SETTINGS_2022, showNumbers: true, nameLabels: "wrap", symbolsShow: "gender", showNotes: false },
   },
 );
 

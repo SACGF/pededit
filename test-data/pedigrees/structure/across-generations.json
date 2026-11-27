@@ -97,7 +97,8 @@
       "nodesMoveable": false,
       "snapToGrid": false,
       "snapGridSize": 5,
-      "notation": "nsgc2022"
+      "notation": "nsgc2022",
+      "showNotes": false
     }
   }
 }

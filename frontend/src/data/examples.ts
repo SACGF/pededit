@@ -520,9 +520,14 @@ const EXAMPLE_LIST: ExamplePedigree[] = [
 /**
  * The examples, each written with `canvasSettings.notation` "nsgc2022": a
  * pedigree without the setting is drawn in NSGC 2008 (pedigrees saved before
- * it existed), and an example opened now is new.
+ * it existed), and an example opened now is new. They are also written with
+ * `showNotes` false: their notes are sources and commentary for the side
+ * panel, and drawn under the symbols they would crowd the figures.
  */
-export const EXAMPLES: ExamplePedigree[] = EXAMPLE_LIST.map(e => ({ ...e, data: withCurrentNotation(e.data) }));
+export const EXAMPLES: ExamplePedigree[] = EXAMPLE_LIST.map(e => {
+  const data = withCurrentNotation(e.data);
+  return { ...e, data: { ...data, canvasSettings: { ...data.canvasSettings!, showNotes: false } } };
+});
 
 /** The example a /example/<slug> link names, whatever the case of the letters typed. */
 export function exampleBySlug(slug: string | undefined): ExamplePedigree | undefined {
