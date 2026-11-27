@@ -1,0 +1,74 @@
+{
+  "id": "FAM-0107",
+  "proband": {
+    "id": "PP-Maya",
+    "subject": {
+      "id": "Maya",
+      "dateOfBirth": "1985-04-12T00:00:00Z",
+      "timeAtLastEncounter": { "age": { "iso8601duration": "P38Y" } },
+      "sex": "FEMALE",
+      "taxonomy": { "id": "NCBITaxon:9606", "label": "Homo sapiens" }
+    },
+    "phenotypicFeatures": [
+      { "type": { "id": "HP:0003002", "label": "Breast carcinoma" }, "onset": { "age": { "iso8601duration": "P35Y" } } }
+    ],
+    "diseases": [
+      { "term": { "id": "MONDO:0016419", "label": "hereditary breast carcinoma" }, "onset": { "age": { "iso8601duration": "P35Y" } } }
+    ],
+    "interpretations": [
+      { "id": "int-1", "progressStatus": "SOLVED", "diagnosis": { "disease": { "id": "MONDO:0016419", "label": "hereditary breast carcinoma" } } }
+    ],
+    "metaData": { "created": "2026-11-20T00:00:00Z", "createdBy": "test-data", "phenopacketSchemaVersion": "2.0" }
+  },
+  "relatives": [
+    {
+      "id": "PP-Lena",
+      "subject": {
+        "id": "Lena",
+        "vitalStatus": { "status": "DECEASED", "timeOfDeath": { "age": { "iso8601duration": "P52Y" } } },
+        "sex": "FEMALE"
+      },
+      "diseases": [
+        { "term": { "id": "MONDO:0016419", "label": "hereditary breast carcinoma" }, "onset": { "ageRange": { "start": { "iso8601duration": "P40Y" }, "end": { "iso8601duration": "P49Y" } } } },
+        { "term": { "id": "MONDO:0008170", "label": "ovarian cancer" }, "onset": { "age": { "iso8601duration": "P50Y" } } }
+      ],
+      "metaData": { "created": "2026-11-20T00:00:00Z", "createdBy": "test-data", "phenopacketSchemaVersion": "2.0" }
+    },
+    {
+      "id": "PP-Omar",
+      "subject": { "id": "Omar", "sex": "MALE", "gender": { "id": "SNOMEDCT:446151000124109", "label": "Identifies as male gender" } },
+      "diseases": [{ "term": { "id": "MONDO:0016419", "label": "hereditary breast carcinoma" }, "excluded": true }],
+      "metaData": { "created": "2026-11-20T00:00:00Z", "createdBy": "test-data", "phenopacketSchemaVersion": "2.0" }
+    },
+    {
+      "id": "PP-Sam",
+      "subject": { "id": "Sam", "vitalStatus": { "status": "ALIVE" }, "sex": "MALE", "gender": { "id": "LOCAL:nb", "label": "non-binary gender" } },
+      "metaData": { "created": "2026-11-20T00:00:00Z", "createdBy": "test-data", "phenopacketSchemaVersion": "2.0" }
+    },
+    {
+      "id": "PP-Ruth",
+      "subject": { "id": "Ruth", "vitalStatus": { "status": "DECEASED", "timeOfDeath": { "timestamp": "1999-06-01T00:00:00Z" } }, "sex": "FEMALE" },
+      "metaData": { "created": "2026-11-20T00:00:00Z", "createdBy": "test-data", "phenopacketSchemaVersion": "2.0" }
+    }
+  ],
+  "consanguinousParents": true,
+  "pedigree": {
+    "persons": [
+      { "familyId": "FAM-0107", "individualId": "Ivo", "paternalId": "0", "maternalId": "0", "sex": "MALE", "affectedStatus": "UNAFFECTED" },
+      { "familyId": "FAM-0107", "individualId": "Ruth", "paternalId": "0", "maternalId": "0", "sex": "FEMALE", "affectedStatus": "UNAFFECTED" },
+      { "familyId": "FAM-0107", "individualId": "Omar", "paternalId": "0", "maternalId": "0", "sex": "MALE", "affectedStatus": "UNAFFECTED" },
+      { "familyId": "FAM-0107", "individualId": "Lena", "paternalId": "Ivo", "maternalId": "Ruth", "sex": "FEMALE", "affectedStatus": "AFFECTED" },
+      { "familyId": "FAM-0107", "individualId": "Maya", "paternalId": "Omar", "maternalId": "Lena", "sex": "FEMALE", "affectedStatus": "AFFECTED" },
+      { "familyId": "FAM-0107", "individualId": "Sam", "paternalId": "Omar", "maternalId": "Lena", "sex": "MALE", "affectedStatus": "UNAFFECTED" }
+    ]
+  },
+  "metaData": {
+    "created": "2026-11-20T00:00:00Z",
+    "createdBy": "test-data",
+    "resources": [
+      { "id": "hp", "name": "human phenotype ontology", "url": "http://purl.obolibrary.org/obo/hp.owl", "version": "2024-04-26", "namespacePrefix": "HP", "iriPrefix": "http://purl.obolibrary.org/obo/HP_" },
+      { "id": "mondo", "name": "Mondo Disease Ontology", "url": "http://purl.obolibrary.org/obo/mondo.obo", "version": "2024-06-04", "namespacePrefix": "MONDO", "iriPrefix": "http://purl.obolibrary.org/obo/MONDO_" }
+    ],
+    "phenopacketSchemaVersion": "2.0"
+  }
+}

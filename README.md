@@ -106,7 +106,7 @@ To check a frontend change in a headless browser (JS errors mapped to source lin
 
 ## File formats
 
-Pedigrees can be downloaded as a lossless JSON document and imported again. The format, including every field of the data model and a worked example, is documented in [docs/pedigree-json-format.md](docs/pedigree-json-format.md), with a JSON Schema in [docs/pedigree-json-schema.json](docs/pedigree-json-schema.json). PED files and GA4GH Phenopackets pedigrees can also be imported and exported (both lossy), and CSV, SVG, PNG and PDF exported.
+Pedigrees can be downloaded as a lossless JSON document and imported again. The format, including every field of the data model and a worked example, is documented in [docs/pedigree-json-format.md](docs/pedigree-json-format.md), with a JSON Schema in [docs/pedigree-json-schema.json](docs/pedigree-json-schema.json). PED files and GA4GH Phenopackets families can also be imported and exported (both lossy: the export says what it leaves out), and CSV, SVG, PNG and PDF exported.
 
 ## Production deployment
 

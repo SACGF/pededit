@@ -3,7 +3,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportPed } from "../io/ped/index.js";
-import { pedExportLosses } from "../io/ped/exporter.js";
+import { exportLosses, lossLines } from "../io/losses.js";
 import { PedTextBox } from "./PedTextBox";
 
 /**
@@ -12,7 +12,7 @@ import { PedTextBox } from "./PedTextBox";
  */
 export function PedTextViewDialog({ pedigree, open, onClose }: { pedigree: Pedigree; open: boolean; onClose: () => void }) {
   const text = useMemo(() => open ? exportPed(pedigree, { familyId: "1" }) : "", [pedigree, open]);
-  const losses = useMemo(() => open ? pedExportLosses(pedigree) : [], [pedigree, open]);
+  const losses = useMemo(() => open ? lossLines(exportLosses(pedigree, "plink")) : [], [pedigree, open]);
   const [copied, setCopied] = useState<"yes" | "failed" | null>(null);
 
   async function copy() {

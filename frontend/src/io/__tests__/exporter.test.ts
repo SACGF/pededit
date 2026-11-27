@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { exportPed, pedLostLifeStatus, pedLostConsanguinity } from "../ped/exporter.js";
+import { exportPed } from "../ped/exporter.js";
+import { exportLosses } from "../losses.js";
 import { importPed } from "../ped/index.js";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 
@@ -317,7 +318,10 @@ describe("exportPed: r dialect", () => {
   });
 });
 
-describe("pedLostLifeStatus", () => {
+describe("PED export losses", () => {
+  const lostFields = (p: Pedigree, field: string) =>
+    exportLosses(p, "plink").filter(l => l.field === field).map(l => (l.on === "pedigree" ? "" : l.id));
+
   it("lists pregnancies and losses, which PED writes as ordinary children", () => {
     const ped: Pedigree = {
       individuals: [
@@ -329,15 +333,15 @@ describe("pedLostLifeStatus", () => {
       parentOf: {},
       siblingOrder: { mode: "insertion", affectedFirst: false },
     };
-    expect(pedLostLifeStatus(ped).map(i => i.id)).toEqual(["b", "c"]);
+    expect(lostFields(ped, "lifeStatus")).toEqual(["b", "c"]);
   });
-});
 
-describe("pedLostConsanguinity (#97)", () => {
   const person = (id: string, sex: "male" | "female") => ({ id, sex, affected: false, sibOrder: 0 });
+  // What is lost of the couples (the people here have no names, which PED replaces with their IDs).
+  const coupleLosses = (p: Pedigree) => exportLosses(p, "plink").filter(l => l.on === "partnership");
   // gf = gm, their children s1 and s2 marry in, and the grandchildren c1 and c2 are a couple: first cousins.
   const cousins = (overrides: { g?: object; pc?: object; out?: object } = {}): Pedigree => makePedigree({
-    individuals: ["gf", "s1", "h2", "c1", "o1"].map(id => person(id, "male"))
+    individuals: ["gf", "s1", "h2", "c1", "o1", "k1", "k2"].map(id => person(id, "male"))
       .concat(["gm", "w1", "s2", "c2", "o2"].map(id => person(id, "female"))),
     partnerships: [
       { id: "g", individual1: "gf", individual2: "gm", ...overrides.g },
@@ -346,24 +350,33 @@ describe("pedLostConsanguinity (#97)", () => {
       { id: "pc", individual1: "c1", individual2: "c2", ...overrides.pc },
       { id: "out", individual1: "o1", individual2: "o2", ...overrides.out },
     ],
-    parentOf: { g: ["s1", "s2"], p1: ["c1"], p2: ["c2"] },
+    parentOf: { g: ["s1", "s2"], p1: ["c1"], p2: ["c2"], pc: ["k2"], out: ["k1"] },
   });
 
-  it("says nothing when the double line follows from the parents", () => {
-    expect(pedLostConsanguinity(cousins())).toEqual([]);
-    expect(pedLostConsanguinity(cousins({ pc: { consanguineous: true } }))).toEqual([]);
+  it("says nothing of consanguinity when the double line follows from the parents (#97)", () => {
+    expect(coupleLosses(cousins())).toEqual([]);
+    expect(coupleLosses(cousins({ pc: { consanguineous: true } }))).toEqual([]);
   });
 
   it("lists the text above the double line and the override for a couple not shown to be related", () => {
-    const lost = pedLostConsanguinity(cousins({ pc: { consanguinityLabel: "first cousins" }, out: { consanguineous: true }, g: { consanguineous: true, consanguinityLabel: "second cousins" } }));
-    expect(lost.map(l => [l.partnership.id, l.what])).toEqual([
-      ["g", 'consanguineous ("second cousins")'],
+    const lost = coupleLosses(cousins({ pc: { consanguinityLabel: "first cousins" }, out: { consanguineous: true }, g: { consanguineous: true, consanguinityLabel: "second cousins" } }));
+    expect(lost.map(l => [l.id, l.what])).toEqual([
+      ["g", "marked consanguineous"],
+      ["g", '"second cousins" above the double line'],
       ["pc", '"first cousins" above the double line'],
       ["out", "marked consanguineous"],
     ]);
   });
 
   it("ignores text on a couple whose line is not drawn double", () => {
-    expect(pedLostConsanguinity(cousins({ out: { consanguinityLabel: "third cousins" } }))).toEqual([]);
+    expect(coupleLosses(cousins({ out: { consanguinityLabel: "third cousins" } }))).toEqual([]);
+  });
+
+  it("names a couple with no children, which no row of the file names", () => {
+    const p = makePedigree({
+      individuals: [person("a", "male"), person("b", "female")],
+      partnerships: [{ id: "ab", individual1: "a", individual2: "b", childless: "infertility" }],
+    });
+    expect(coupleLosses(p).map(l => [l.field, l.what])).toEqual([["id", "a couple with no children"], ["childless", "infertility"]]);
   });
 });

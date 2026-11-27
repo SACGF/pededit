@@ -311,15 +311,6 @@ export function assistedCandidates(pedigree: Pedigree, childId: string): Individ
   return pedigree.individuals.filter(i => i.id !== childId && !genetic.has(i.id) && !own.has(i.id) && !i.lifeStatus);
 }
 
-/** What Export PED drops for this individual, for its warning. */
-export function assistedLossText(ind: Individual, nameOf: (id: string) => string): string {
-  const parts: string[] = [];
-  if (ind.reproductiveRole) parts.push(ind.reproductiveRole === "donor" ? "donor (D)" : "surrogate (S)");
-  if (ind.carriedBy) parts.push(`carried by ${nameOf(ind.carriedBy)}`);
-  if (ind.socialParents?.length) parts.push(`social parent ${ind.socialParents.map(nameOf).join(", ")}`);
-  return parts.join("; ");
-}
-
 /**
  * Why `id` cannot be given this reproductive role, or null. A surrogate
  * carried a pregnancy, so cannot be male (biological sex); as with the Sex

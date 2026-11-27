@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
-import { pedExportLosses } from "../io/ped/exporter.js";
+import { exportLosses, lossLines } from "../io/losses.js";
 import { exportPhenopackets } from "../io/phenopackets/index.js";
 import { downloadText } from "../utils/download";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -68,12 +68,12 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const small = useSmallScreen();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
-  // A PED dialect, or the Phenopackets pedigree, which holds what PED holds.
+  // A PED dialect, or a Phenopackets family.
   type PedDialect = NonNullable<ExportOptions["dialect"]> | "phenopackets";
-  // PED has no column for pregnancy / loss status, so warn before writing
-  // those individuals as ordinary children. Holds the chosen dialect too.
+  // Neither format holds everything, so warn before writing a file that
+  // drops something (`exportLosses`). Holds the chosen dialect too.
   const [pedWarning, setPedWarning] = useState<{ lines: string[]; dialect: PedDialect } | null>(null);
-  const pedWarningFormat = pedWarning?.dialect === "phenopackets" ? "A Phenopackets pedigree" : "PED";
+  const pedWarningFormat = pedWarning?.dialect === "phenopackets" ? "A Phenopackets file" : "PED";
 
   const { toggle: toggleUShapeView } = useUShapeToggle();
   // In the U-shape view the add buttons and Reset layout do nothing useful.
@@ -86,7 +86,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
 
   function handleExportPedClick(dialect: PedDialect) {
     setPedMenuOpen(false);
-    const lines = pedExportLosses(pedigree);
+    const lines = lossLines(exportLosses(pedigree, dialect));
     if (lines.length === 0) handleExportPed(dialect);
     else setPedWarning({ dialect, lines });
   }
@@ -122,16 +122,14 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         <Menu size={14} />
       </Button>
       <Dialog open={pedWarning !== null} onOpenChange={open => { if (!open) setPedWarning(null); }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{pedWarningFormat} cannot carry everything in this pedigree</DialogTitle>
             <DialogDescription>
-              {pedWarningFormat} has no field for pregnancy, pregnancy loss, twins, adoption, a childless couple mark, an ended relationship, donors and surrogates, or consanguinity it cannot work out from the parents, so{" "}
-              {pedWarning?.lines.length === 1 ? "this will be lost" : `these ${pedWarning?.lines.length} will be lost`}{" "}
-              (pregnancies and losses become ordinary children). Download JSON keeps them.
+              {pedWarningFormat} has no place for what is listed here, so it will be lost or changed when the file is read back. Download JSON keeps everything.
             </DialogDescription>
           </DialogHeader>
-          <ul className="text-xs text-gray-700 max-h-40 overflow-y-auto list-disc pl-5">
+          <ul className="text-xs text-gray-700 max-h-60 overflow-y-auto list-disc pl-5" data-testid="export-losses">
             {(pedWarning?.lines ?? []).map((line, k) => <li key={k}>{line}</li>)}
           </ul>
           <DialogFooter className="gap-2">
@@ -245,7 +243,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
             <PedFormatItem label="SVG, PNG or PDF" detail="the chart as a figure" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
             <PedFormatItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
             <PedFormatItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
-            <PedFormatItem label="Phenopackets pedigree (JSON)" detail="GA4GH v2 Pedigree, persons" onClick={() => { setExportMenuOpen(false); handleExportPedClick("phenopackets"); }} />
+            <PedFormatItem label="Phenopackets family (JSON)" detail="GA4GH v2 Family, a phenopacket per person" onClick={() => { setExportMenuOpen(false); handleExportPedClick("phenopackets"); }} />
             <PedFormatItem label="CSV" detail="one row per person" onClick={() => { setExportMenuOpen(false); handleExportCsv(); }} />
             <PedFormatItem label="JSON" detail="lossless, re-importable" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
           </PopoverContent>
@@ -258,7 +256,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
             <Button
               variant="ghost" size="sm"
               className="h-7 px-2 gap-1 text-xs"
-              title="Export as PED file or Phenopackets pedigree (sex, affected status and parents only; pregnancy / loss status is not carried)"
+              title="Export as PED file or Phenopackets family (neither carries everything: the export says what it leaves out)"
               disabled={!hasPedigree}
             >
               <Download size={12} />
@@ -277,8 +275,8 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
               onClick={() => handleExportPedClick("r")}
             />
             <PedFormatItem
-              label="Phenopackets pedigree (JSON)"
-              detail="GA4GH v2 Pedigree, persons"
+              label="Phenopackets family (JSON)"
+              detail="GA4GH v2 Family, a phenopacket per person"
               onClick={() => handleExportPedClick("phenopackets")}
             />
             {/* Desktop only, like the rest of text mode (#218). */}

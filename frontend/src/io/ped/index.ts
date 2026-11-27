@@ -28,7 +28,7 @@ export function importPed(text: string): ImportResult {
 
 /**
  * Validate and convert rows already read from a file: PED, or a PED-shaped
- * format such as a Phenopackets pedigree. `earlier` are the reader's own issues.
+ * format such as a Phenopackets family. `earlier` are the reader's own issues.
  */
 export function importPedRows(rows: PedRow[], earlier: ImportResult["issues"] = []): ImportResult {
   const validateIssues = validatePedRows(rows);

@@ -52,13 +52,38 @@ Rules that keep a bad file from importing as nonsense (#31):
   parent (`isPhantomId`). They are never shown, not even as the dev-mode ID
   label.
 
-PED cannot carry pregnancy / loss status, twins, adoption, childless couple
-marks, ended relationships or assisted reproduction details (#45: the D/S
-letter, `carriedBy`, `socialParents`; a donor is written as the genetic
-parent, which is right), or consanguinity it cannot work out from the
-parents. `pedExportLosses` in `exporter.ts` lists what a file would drop, one
-line per person or couple (from the `pedLost*` functions there); the toolbar
-shows the lines before writing, for PED and for a Phenopackets pedigree.
+PED carries sex, parents and affected status only (a donor is written as
+the genetic parent, which is right, #45), and a couple with no children has
+no row at all.
+
+## losses.ts: what a PED or Phenopackets export drops
+
+`exportLosses(pedigree, format)` lists everything a PED (`"plink"`, `"r"`)
+or Phenopackets file would drop or change, field by field, and `lossLines`
+groups it into one line per person, couple or the pedigree ("II-2, Mary:
+notes; age of onset "40s"). The toolbar shows the lines before writing
+either format, and "View as text" shows PED's. Every field of `Individual`,
+`Partnership` and `Pedigree` has a rule per format (`"kept"`, `"internal"`
+or a function giving the words), typed as `Record<keyof T, ...>`, so a new
+field fails the type check until its rule is written. `__tests__/losses.test.ts`
+holds the rules to the formats: it exports a pedigree with every field set
+(and fails if one is not), imports the file, and requires every field that
+does not come back unchanged to be named for that person, couple or
+pedigree, and nothing that does come back to be named. Its own
+`Record<keyof T, ...>` says how each field is compared ("affected" as
+affected at all and affected with a condition not recorded, a reference to
+someone through the file's IDs). A field added to the data model needs a
+rule there too, and a fixture value.
+
+Fields the formats never carry, so they are always named: notes,
+evaluations, carrier status (plain and per condition), presymptomatic,
+consultand, family history unknown, the onset of the plain affected status,
+pregnancy and loss status, adoption, assisted reproduction, hidden
+descendants; twins, ended, childless marks and reasons, donor conception,
+the layout choices `leftPartner` and `drawnBeside`, and couples with no
+children; and the pedigree's settings, positions, filters, chart title and
+clinical details. Not compared: ids (the file has its own), `sibOrder`
+(read back from the file's order) and `placeholder`.
 
 PED text (#218): `readPedText` in `ped/text.ts` reads text typed or pasted
 into the text box (`components/PedTextBox.tsx`) with `importPed`, for a live
@@ -69,29 +94,64 @@ Copy, under "View as text" in the Export PED menu; neither is offered below
 1024px. Opening the text in the editor makes a new pedigree: an existing one
 is never edited from text yet.
 
-## phenopackets/ — GA4GH Phenopackets v2 pedigree
+## phenopackets/ — GA4GH Phenopackets v2 family
 
-A Phenopackets `Pedigree` message is PED with named fields (`persons`, each
-with `familyId`, `individualId`, `paternalId`, `maternalId`, `sex`,
-`affectedStatus`), so it reuses the PED code both ways:
+Export writes a whole `Family` message; import reads a `Family` or a bare
+`Pedigree` message. The pedigree's Person is PED with named fields
+(`familyId`, `individualId`, `paternalId`, `maternalId`, `sex`,
+`affectedStatus`), so the PED code is reused both ways, and each person's
+`Phenopacket` adds what PED cannot hold.
 - Import turns persons into `PedRow`s and calls `importPedRows` in
   `ped/index.ts`, so the PED validator's checks and the converter (names
   from the IDs, invented partner of a single parent, current notation)
-  apply unchanged. A bare Pedigree or a whole `Family` (its `pedigree` only;
-  the other keys are reported as not read) is accepted. The import dialog
-  picks it by content (`isPhenopacketsJson`): a PedEdit file has `pedigree`
-  too, but with `individuals`. A parent `"0"` (the specification's founder),
-  `""` or a field left out is missing, as protobuf JSON drops default
-  values; so is a left-out `sex` (UNKNOWN_SEX) or `affectedStatus` (MISSING).
-  Proto names (`individual_id`) and enum numbers are read too. The enum
-  numbers are not PED's codes: FEMALE is 1, MALE is 2. OTHER_SEX is drawn
-  as unknown sex with a warning.
-- Export (`exportPhenopackets`) writes a Pedigree message with every field,
-  enums as strings, with `exportIds` (R dialect, spaces kept) from
-  `ped/exporter.ts` and the father role from `parentRoles`, so the IDs and
-  who is the father are PED's. It holds what PED holds, so the toolbar shows
-  the same `pedExportLosses` warning first. Test files:
-  `test-data/phenopackets/`.
+  apply unchanged; then `readFamily` adds the phenopackets, matching
+  `subject.id` to a person (a phenopacket about no one is a warning).
+  The import dialog picks the format by content (`isPhenopacketsJson`): a
+  PedEdit file has `pedigree` too, but with `individuals`. A parent `"0"`
+  (the specification's founder), `""` or a field left out is missing, as
+  protobuf JSON drops default values; so is a left-out `sex` (UNKNOWN_SEX)
+  or `affectedStatus` (MISSING). Proto names (`individual_id`) and enum
+  numbers are read too (`read.ts`). The enum numbers are not PED's codes:
+  FEMALE is 1, MALE is 2. OTHER_SEX is drawn as unknown sex with a warning.
+  Fields not read are listed in one info issue ("Not read from the family:
+  phenopacket.interpretations, subject.taxonomy").
+- Export (`exportPhenopackets`) writes `id`, `proband`, `relatives`,
+  `consanguinousParents`, `pedigree` and `metaData`, enums as strings, with
+  `exportIds` (R dialect, spaces kept) and the father role from
+  `parentRoles`, so the IDs and who is the father are PED's. `proband` is
+  required, so with no proband marked the first person is written there
+  (and comes back marked; the warning says so). Each person's phenopacket
+  has `subject` (`dateOfBirth`, `timeAtLastEncounter`, `vitalStatus`
+  DECEASED with `timeOfDeath`, `sex`, `gender`), `phenotypicFeatures` (the
+  HPO terms, labelled with their code, since PedEdit has no labels) and a
+  disease for every condition of the pedigree: affected with it (with its
+  onset), or `excluded: true`. `metaData` (created, createdBy "PedEdit",
+  phenopacketSchemaVersion "2.0", a resource per ontology prefix used) is
+  written on the Family and on each phenopacket, where v2 requires it.
+- Ages and dates (`time.ts`): an age, onset or partial date of death is
+  written only in a form that reads back as the same text ("45y" P45Y,
+  "6mo", "3 wk" (a gestational age for a pregnancy or loss), "10d", "40s"
+  an age range, "childhood" and other HPO onset words, a year or month of
+  death an interval); anything else is named in the warning. "d. 72y" on
+  someone deceased with no date of death is their `timeOfDeath`. Ages from
+  other tools are read in any of these forms, and other durations too.
+- Terms (`terms.ts`): a condition has no code in PedEdit, so it is written
+  as `PEDEDIT:<tag id>` with its label; a disease from another tool becomes
+  a condition whose tag id is the term id ("MONDO:0016419"), written back
+  as that term. Colours come from the palette, as for a new condition.
+  Gender identity is the SNOMED CT "Identifies as male / female / nonbinary
+  gender" finding; another tool's gender term is matched by id, else by
+  words in its label.
+- Someone affected with a condition comes back affected through it, not the
+  plain flag (the persons say AFFECTED). `consanguinousParents` marks the
+  proband's parents consanguineous on import when the drawing does not show
+  them related. The `ind1`, `ind2` that `exportIds` writes for someone with
+  no name come back with no name, in a file whose `metaData.createdBy` is
+  "PedEdit" (a person really named "ind3" is named in the warning).
+- What it cannot carry: see `losses.ts` above. Carrier status and
+  evaluations have no clean field (a `GenomicInterpretation` wants a gene or
+  variant), nor do notes, tag colours and fills, or anything about couples.
+  Test files: `test-data/phenopackets/`.
 
 ## json/ — native lossless format
 

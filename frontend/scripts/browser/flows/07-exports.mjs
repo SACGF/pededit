@@ -75,28 +75,55 @@ export default {
     t.equal(json.format, "pededit-pedigree", "JSON: the envelope");
     t.equal(json.pedigree, await t.pedigree(), "JSON: the whole pedigree, unchanged");
 
-    // PED cannot carry the stillbirth or the adoption, so it warns first.
+    // PED cannot carry the stillbirth, the adoption, the dates or the notes, so it warns first and names them.
     await t.click('button[title^="Export as PED file"]');
     if (await t.visible('[data-radix-popper-content-wrapper]')) await t.click('[data-radix-popper-content-wrapper] button >> nth=0');
-    t.match(await t.text('[role="dialog"]'), /cannot|not carr|lost|drop/i, "PED: a warning says what the format cannot carry");
+    t.match(await t.text('[role="dialog"]'), /PED cannot carry/, "PED: a warning says what the format cannot carry");
+    const pedLosses = await t.text('[data-testid="export-losses"]');
+    for (const what of [/stillbirth/, /adopted in/, /deceased/, /date of birth/, /notes/, /an evaluation|evaluations/, /proband/, /chart title/])
+      t.match(pedLosses, what, `PED: the warning names ${what.source}`);
     const ped = readFileSync(await t.download('[role="dialog"] button:has-text("Export PED anyway")'), "utf8");
     const lines = ped.trim().split("\n").filter(l => !l.startsWith("#"));
     t.equal(lines.length, await t.people(), "PED: one line a person");
     t.ok(lines.every(l => l.split(/\s+/).length === 6), "PED: six columns");
 
-    // The Phenopackets pedigree holds what PED holds, so it warns the same way.
+    // A Phenopackets Family carries more than PED (#23): its warning names only what it drops.
+    const before = await t.pedigree();
     await t.click('button[title^="Export as PED file"]');
-    await t.click('[data-radix-popper-content-wrapper] button:has-text("Phenopackets pedigree")');
-    t.match(await t.text('[role="dialog"]'), /Phenopackets pedigree cannot carry/, "Phenopackets: a warning says what the format cannot carry");
+    await t.click('[data-radix-popper-content-wrapper] button:has-text("Phenopackets family")');
+    t.match(await t.text('[role="dialog"]'), /Phenopackets file cannot carry/, "Phenopackets: a warning says what the format cannot carry");
+    const ppLosses = await t.text('[data-testid="export-losses"]');
+    for (const what of [/notes/, /an evaluation|evaluations/, /stillbirth/, /tags \(Genotype\)/, /date of birth "1934"/, /chart title/])
+      t.match(ppLosses, what, `Phenopackets: the warning names ${what.source}`);
+    t.notMatch(ppLosses, /deceased|proband|gender identity|HPO/, "Phenopackets: the warning does not name what the file keeps");
     const ppFile = await t.download('[role="dialog"] button:has-text("Export anyway")');
     t.match(ppFile, /\.phenopackets\.json$/, "Phenopackets: the file is .phenopackets.json");
     const pp = JSON.parse(readFileSync(ppFile, "utf8"));
-    const people = (await t.pedigree()).individuals;
-    t.equal(Object.keys(pp), ["persons"], "Phenopackets: a Pedigree message");
-    t.equal(pp.persons.length, people.length, "Phenopackets: one person each");
-    t.equal(pp.persons.map(p => p.sex), people.map(i => ({ male: "MALE", female: "FEMALE" })[i.sex] ?? "UNKNOWN_SEX"), "Phenopackets: biological sex");
-    t.ok(pp.persons.every(p => p.familyId && p.individualId && p.paternalId && p.maternalId && /^(UN)?AFFECTED$/.test(p.affectedStatus)), "Phenopackets: every field written");
-    t.ok(pp.persons.some(p => p.paternalId !== "0"), "Phenopackets: parents written");
+    const people = before.individuals;
+    t.equal(Object.keys(pp), ["id", "proband", "relatives", "consanguinousParents", "pedigree", "metaData"], "Phenopackets: a Family message");
+    t.equal(pp.pedigree.persons.length, people.length, "Phenopackets: one person each in the pedigree");
+    t.equal(1 + pp.relatives.length, people.length, "Phenopackets: a phenopacket each");
+    t.equal(pp.pedigree.persons.map(p => p.sex), people.map(i => ({ male: "MALE", female: "FEMALE" })[i.sex] ?? "UNKNOWN_SEX"), "Phenopackets: biological sex");
+    t.ok(pp.pedigree.persons.some(p => p.paternalId !== "0"), "Phenopackets: parents written");
+    t.equal(pp.proband.subject.id, "Wilhelmina", "Phenopackets: the proband is the Family's proband");
+    t.equal(pp.metaData.createdBy, "PedEdit", "Phenopackets: metaData says who made it");
+
+    // Read back, the file keeps the conditions, the deceased with their age, and the proband.
+    await t.open("/");
+    await t.click('button:has-text("Import from PED or JSON file")');
+    await t.upload('[role="dialog"] input[type="file"]', ppFile);
+    await t.click('[role="dialog"] button:has-text("Import")');
+    await t.waitFor('button[title="Add male"]');
+    const back = await t.pedigree();
+    const named = name => back.individuals.find(i => i.name === name) ?? {};
+    const cond = before.tags.find(tag => tag.style === "quadrant");
+    t.equal(back.tags?.map(tag => tag.label), [cond.label], "Phenopackets round trip: the condition comes back");
+    t.equal([named("Wilhelmina").proband, named("Wilhelmina").tags, named("Wilhelmina").tagOnset], [true, [cond.id], { [cond.id]: "27y" }], "Phenopackets round trip: the proband, with her condition and its onset");
+    t.equal([named("Rupert").deceased, named("Rupert").age], [true, "d. 60s"], "Phenopackets round trip: deceased with the age at death");
+    t.equal([named("Bartholomew Featherstonehaugh-Wetherby").dod, named("Bartholomew Featherstonehaugh-Wetherby").dob], ["2009-11-17", "1931-04-02"], "Phenopackets round trip: dates of birth and death");
+    t.equal(named("Ottoline").age, "92y", "Phenopackets round trip: the age");
+    t.equal(named("Umber").genderIdentity, "nonbinary", "Phenopackets round trip: gender identity");
+    t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "Phenopackets round trip: the drawing passes the render lint");
 
     // #225: a couple's childless reason is free text, dropped unless asked for.
     await t.openFixture("fixture:couples");

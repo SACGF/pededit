@@ -49,7 +49,7 @@ export function ImportPedDialog({ open, onClose, onImport }: ImportPedDialogProp
     reader.onload = (ev) => {
       const text = ev.target?.result as string;
       // Decided by content: a PED file never starts with "{", and a .json
-      // file is either PedEdit's own or a Phenopackets pedigree or family.
+      // file is either PedEdit's own or a Phenopackets family or pedigree.
       const isJson = /\.json$/i.test(file.name) || text.trimStart().startsWith("{");
       let imported: DialogResult;
       if (isJson && isPhenopacketsJson(text)) {

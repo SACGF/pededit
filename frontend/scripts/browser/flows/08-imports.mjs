@@ -24,9 +24,8 @@ export default {
     t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "PED: the drawing passes the render lint");
     t.ok(p.individuals.every(i => !!i.name), "PED: the file's ids become the names");
 
-    // A Phenopackets Family: only its pedigree is read, recognised by content.
+    // A Phenopackets Family, recognised by content: its pedigree and the proband's phenopacket.
     await importFile(t.file("test-data/phenopackets/family.json"));
-    t.match(await t.text('[role="dialog"]'), /Only the family's pedigree is read/, "Phenopackets: says the rest of the Family is not read");
     await t.click('[role="dialog"] button:has-text("Import")');
     await t.waitFor('button[title="Add male"]');
     t.currentId();
@@ -37,7 +36,19 @@ export default {
     t.equal(named.find(i => i.name === "Ines")?.sex, "female", "Phenopackets: FEMALE is female");
     t.equal(named.find(i => i.name === "Kit")?.sex, "unknown", "Phenopackets: UNKNOWN_SEX is unknown");
     t.ok(named.find(i => i.name === "Greta")?.affected, "Phenopackets: AFFECTED is affected");
+    t.equal([named.find(i => i.name === "Ines")?.proband, named.find(i => i.name === "Ines")?.hpoTerms], [true, ["HP:0001250"]], "Phenopackets: the Family's proband, with her phenotypic feature");
     t.equal((await t.drawn()).length, p.individuals.length, "Phenopackets: everyone is drawn");
+    t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "Phenopackets: the drawing passes the render lint");
+
+    // Another tool's Family: diseases become conditions, with vital status and ages; what is not read is said.
+    await importFile(t.file("test-data/phenopackets/family_full.json"));
+    t.match(await t.text('[role="dialog"]'), /Not read from the family: .*interpretations/, "Phenopackets: says what of the Family is not read");
+    await t.click('[role="dialog"] button:has-text("Import")');
+    await t.waitFor('button[title="Add male"]');
+    p = await t.pedigree();
+    const lena = p.individuals.find(i => i.name === "Lena");
+    t.equal(p.tags?.map(tag => tag.label), ["hereditary breast carcinoma", "ovarian cancer"], "Phenopackets: diseases become conditions");
+    t.equal([lena?.deceased, lena?.age, lena?.tags?.length], [true, "d. 52y", 2], "Phenopackets: deceased, the age at death and both conditions");
     t.equal(await t.eval(() => window.__pededit.check().map(f => f.code)), [], "Phenopackets: the drawing passes the render lint");
 
     // The lossless format: what comes in is exactly what the file holds.
