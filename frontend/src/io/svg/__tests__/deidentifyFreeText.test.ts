@@ -29,6 +29,7 @@ function family(notation: NotationEdition = "nsgc2022"): Pedigree {
       },
       {
         id: "c2", sex: "female", affected: true, sibOrder: 0, onset: "45y",
+      notes: "Seen by Dr Okafor in March 2019; declined surveillance and moved interstate with her children",
         tags: ["bc", "geno"], tagOnset: { bc: "50y" },
       },
     ],
@@ -55,9 +56,9 @@ const svg = (p: Pedigree, keep: Partial<DeidentifyKeep> = {}) => exportSvg(p, { 
 const keyText = (s: string) => s.match(/<g class="pedigree-key"[\s\S]*$/)?.[0] ?? "";
 
 describe("deidentify free text (#111): defaults", () => {
-  it("are the maintainer's: drop detail, onset and the childless reason, keep marks, couple text and text tags", () => {
+  it("are the maintainer's: drop detail, onset, the childless reason and notes, keep marks, couple text and text tags", () => {
     expect(DEIDENTIFY_KEEP_DEFAULTS).toEqual({
-      evaluationDetail: false, evaluationMarks: true, onset: false, consanguinityLabels: true, textTags: true, childlessReason: false,
+      evaluationDetail: false, evaluationMarks: true, onset: false, consanguinityLabels: true, textTags: true, childlessReason: false, notes: false,
     });
   });
 
@@ -166,8 +167,31 @@ describe("deidentify onset, couple text and text tags (#111)", () => {
     expect(exportSvg(family())).toContain("azoospermia");
   });
 
+  it("notes (#242): dropped by default with the setting, kept when asked and drawn as on the canvas", () => {
+    const out = deidentify(family());
+    expect(ind(out, "c2").notes).toBeUndefined();
+    expect(out.canvasSettings?.showNotes).toBe(false);
+    expect(svg(family())).not.toContain("Okafor");
+    const kept = deidentify(family(), { deidentifyKeep: { notes: true } });
+    expect(ind(kept, "c2").notes).toMatch(/Okafor/);
+    expect(kept.canvasSettings?.showNotes).not.toBe(false);
+    const full = svg(family(), { notes: true });
+    expect(full).toContain("Okafor");
+    expect(full).toContain("children");
+    // Cut at two lines, as the canvas cuts them.
+    const short = family();
+    short.canvasSettings = { ...short.canvasSettings!, notesLength: "twoLines" };
+    const cut = svg(short, { notes: true });
+    expect(cut).toContain("Okafor");
+    expect(cut).not.toContain("children");
+    // Hidden in Settings: not drawn, even when kept.
+    const hidden = family();
+    hidden.canvasSettings = { ...hidden.canvasSettings!, showNotes: false };
+    expect(svg(hidden, { notes: true })).not.toContain("Okafor");
+  });
+
   it("the U-shape export follows the same choices", () => {
-    const keepAll = { evaluationDetail: true, onset: true, childlessReason: true };
+    const keepAll = { evaluationDetail: true, onset: true, childlessReason: true, notes: true };
     const u = (k: Partial<DeidentifyKeep>) => exportUShapeSvg(family(), { deidentify: true, deidentifyKeep: k });
     const all = u(keepAll);
     expect(all).toContain("BRCA1");
@@ -175,15 +199,16 @@ describe("deidentify onset, couple text and text tags (#111)", () => {
     expect(all).toContain("first cousins");
     expect(all).toContain("exp/+");
     expect(all).toContain("azoospermia");
+    expect(all).toContain("Okafor");
     const none = u({ consanguinityLabels: false, textTags: false });
-    for (const t of ["BRCA1", "45y", "first cousins", "exp/+", "azoospermia"]) expect(none).not.toContain(t);
+    for (const t of ["BRCA1", "45y", "first cousins", "exp/+", "azoospermia", "Okafor"]) expect(none).not.toContain(t);
   });
 });
 
 describe("deidentify free text (#111): export lint and dialog offers", () => {
   const combos: Partial<DeidentifyKeep>[] = [
     {},
-    { evaluationDetail: true, onset: true, childlessReason: true },
+    { evaluationDetail: true, onset: true, childlessReason: true, notes: true },
     { evaluationMarks: false, consanguinityLabels: false, textTags: false },
   ];
   it.each(combos)("lint is clean with %o", keep => {
@@ -193,11 +218,11 @@ describe("deidentify free text (#111): export lint and dialog offers", () => {
   });
 
   it("offers only what the pedigree has", () => {
-    expect(deidentifiableText(family())).toEqual({ evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true });
+    expect(deidentifiableText(family())).toEqual({ evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true, notes: true });
     const bare = family();
-    bare.individuals = bare.individuals.map(i => ({ ...i, evaluations: undefined, onset: undefined, tagOnset: undefined, tags: undefined }));
+    bare.individuals = bare.individuals.map(i => ({ ...i, evaluations: undefined, onset: undefined, tagOnset: undefined, tags: undefined, notes: undefined }));
     bare.partnerships = bare.partnerships.map(p => ({ ...p, consanguinityLabel: undefined, childlessReason: undefined }));
-    expect(deidentifiableText(bare)).toEqual({ evaluationDetail: false, onset: false, consanguinityLabels: false, textTags: false, childlessReason: false });
+    expect(deidentifiableText(bare)).toEqual({ evaluationDetail: false, onset: false, consanguinityLabels: false, textTags: false, childlessReason: false, notes: false });
   });
 });
 
@@ -216,16 +241,19 @@ describe("deidentify is an allowlist (#225)", () => {
     expect(ind(out, "c1").evaluations![0]!.detail).toBe("BRCA1 c.5266dupC");
   });
 
-  it("drops names, dates, age, notes, the title and clinical details whatever is kept", () => {
+  it("drops names, dates, age, the title and clinical details whatever is kept", () => {
     const p = family();
     Object.assign(ind(p, "c1"), { name: "John Smith", dob: "1980-02-03", dod: "2020-01-01", deceased: true, age: "about 40", notes: "lives in Adelaide" });
     p.chartTitle = "The Smith family";
     p.clinicalDetails = { referralReason: "sister's cancer", historian: "Jane Smith" };
-    const all = { evaluationDetail: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true };
+    const all: DeidentifyKeep = { evaluationDetail: true, evaluationMarks: true, onset: true, consanguinityLabels: true, textTags: true, childlessReason: true, notes: true };
     const out = deidentify(p, { deidentifyKeep: all });
-    expect(JSON.stringify(out)).not.toMatch(/Smith|1980|2020|about 40|Adelaide|sister/);
+    expect(JSON.stringify(out)).not.toMatch(/Smith|1980|2020|about 40|sister/);
+    // Notes are the one kept: the user chose them, with a warning.
+    expect(ind(out, "c1").notes).toBe("lives in Adelaide");
     for (const s of [exportSvg(p, { deidentify: true, deidentifyKeep: all }), exportUShapeSvg(p, { deidentify: true, deidentifyKeep: all })]) {
-      expect(s).not.toMatch(/Smith|1980|2020|about 40|Adelaide|sister/);
+      expect(s).not.toMatch(/Smith|1980|2020|about 40|sister/);
+      expect(s).toContain("Adelaide");
     }
   });
 });

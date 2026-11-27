@@ -51,7 +51,7 @@ const INDIVIDUAL_FIELDS: Record<keyof Individual, FieldRule> = {
   dod: "drop",
   // Free text, so it can name or date someone; age ranges come from the DOB.
   age: "drop",
-  notes: "drop",
+  notes: "notes",
   // HPO codes, not free text.
   hpoTerms: "keep",
   lifeStatus: "keep",
@@ -148,8 +148,8 @@ function deidentifiedPerson(ind: Individual, keep: DeidentifyKeep, textTagIds: S
  * The drawn pedigree (hidden descendants left out) with names replaced by
  * pedigree numbers, the DOB bucketed or dropped, and every field the lists
  * above drop left out. The optional free text (evaluation detail, onset,
- * consanguinity text, text tags, the childless reason) goes as
- * `options.deidentifyKeep` says, by default the detail, onset and reason.
+ * consanguinity text, text tags, the childless reason, notes) goes as
+ * `options.deidentifyKeep` says, by default the detail, onset, reason and notes.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
@@ -167,11 +167,12 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     chartTitle: "",
     // The names are the numbers now: drawing them again would repeat them.
     // Without consanguinity text the relationship is not named either.
-    // Notes are dropped above; the setting goes too, so nothing can draw them.
+    // Notes not kept are dropped above; the setting goes too, so nothing
+    // can draw them. Kept, they are drawn as the canvas draws them.
     ...(pedigree.canvasSettings ? { canvasSettings: {
       ...pedigree.canvasSettings,
       showNumbers: false,
-      showNotes: false,
+      ...(keep.notes ? {} : { showNotes: false }),
       ...(keep.consanguinityLabels ? {} : { relationshipLabels: false }),
     } } : {}),
     partnerships: pedigree.partnerships.map(p => ({
@@ -201,5 +202,6 @@ export function deidentifiableText(full: Pedigree): Record<Exclude<keyof Deident
     consanguinityLabels: pedigree.partnerships.some(p => !!consanguinityWording(pedigree, p)),
     textTags: inds.some(i => i.tags?.some(id => textTagIds.has(id))),
     childlessReason: pedigree.partnerships.some(p => p.childless && !!p.childlessReason?.trim()),
+    notes: inds.some(i => !!i.notes?.trim()),
   };
 }

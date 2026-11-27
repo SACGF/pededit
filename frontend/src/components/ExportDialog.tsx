@@ -52,6 +52,9 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
       setCompact(defaultCompact);
       setError(null);
       setOnlySelected(false);
+      // Notes are the free text most likely to name someone: including
+      // them is chosen afresh for each export, not carried over.
+      setKept("notes", false);
     }
   }
 
@@ -196,7 +199,7 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
             </div>
           )}
 
-          {hasNotes && !showsNotes(pedigree) && !deident && (
+          {hasNotes && !showsNotes(pedigree) && (
             <p className="text-xs text-muted-foreground" data-testid="export-notes-hint">
               Notes are not drawn; turn on Show notes on the chart in Settings.
             </p>
@@ -233,8 +236,15 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
             {freeText?.consanguinityLabels && keepBox("consanguinityLabels", "Include the relationship text above double lines")}
             {freeText?.textTags && keepBox("textTags", "Include text tags (genotypes …)")}
             {freeText?.childlessReason && keepBox("childlessReason", "Include the reason under no-children marks")}
-            {deident && hasNotes && showsNotes(pedigree) && (
-              <p className="text-[10px] text-gray-500 ml-5">Notes are left out.</p>
+            {freeText?.notes && showsNotes(pedigree) && (
+              <>
+                {keepBox("notes", "Include notes")}
+                {keep.notes && (
+                  <p className="text-[10px] text-gray-500 ml-10" data-testid="export-notes-warning">
+                    Notes are free text: check them for names and dates before sharing.
+                  </p>
+                )}
+              </>
             )}
             {deident && clinicalDetailLines(pedigree).length > 0 && (
               <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>

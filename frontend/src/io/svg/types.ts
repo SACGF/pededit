@@ -15,8 +15,7 @@ export interface SvgExportOptions {
   /**
    * When deidentify=true: which free text the de-identified copy keeps.
    * Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
-   * free-text age, notes, the chart title and the clinical key fields always
-   * go.
+   * free-text age, the chart title and the clinical key fields always go.
    */
   deidentifyKeep?: Partial<DeidentifyKeep>;
 
@@ -81,12 +80,17 @@ export interface DeidentifyKeep {
   textTags: boolean;
   /** The reason under a childless or infertility mark (`Partnership.childlessReason`). */
   childlessReason: boolean;
+  /**
+   * People's notes, drawn as the canvas draws them (`showNotes`,
+   * `notesLength`). The free text most likely to hold a name or a date.
+   */
+  notes: boolean;
 }
 
 /**
  * The maintainer's defaults on #111: drop evaluation detail and onset, keep
  * the rest. The childless reason is clinical free text like them, so it is
- * dropped too (#225).
+ * dropped too (#225). Notes are dropped unless chosen (#242).
  */
 export const DEIDENTIFY_KEEP_DEFAULTS: DeidentifyKeep = {
   evaluationDetail: false,
@@ -95,4 +99,5 @@ export const DEIDENTIFY_KEEP_DEFAULTS: DeidentifyKeep = {
   consanguinityLabels: true,
   textTags: true,
   childlessReason: false,
+  notes: false,
 };

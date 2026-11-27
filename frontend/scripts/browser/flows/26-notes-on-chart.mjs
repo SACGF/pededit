@@ -1,5 +1,6 @@
 // Notes under the symbol (#219): drawn unless "Show notes on the chart" is
-// off, in the canvas and the SVG export alike, never in a de-identified one,
+// off, in the canvas and the SVG export alike, in a de-identified one only
+// with "Include notes" ticked (#242),
 // in full with the next generation moved down to make room, or cut at two
 // lines with Notes "Up to two lines"; the settings are saved. The text
 // fixture turns the notes off, so the flow starts from the hidden state.
@@ -7,7 +8,7 @@ import { readFileSync } from "node:fs";
 
 export default {
   name: "notes-on-chart",
-  about: "With Show notes on the chart off the export dialog says notes are not drawn; turned on, a person's notes are under their symbol on the canvas and in the SVG, not in a de-identified SVG; a long note is drawn in full clear of the children's symbols, and cut at two lines with Notes Up to two lines; the settings are there after a reload",
+  about: "With Show notes on the chart off the export dialog says notes are not drawn; turned on, a person's notes are under their symbol on the canvas and in the SVG, not in a de-identified SVG unless Include notes is ticked, with a warning; a long note is drawn in full clear of the children's symbols, and cut at two lines with Notes Up to two lines; the settings are there after a reload",
   async run(t) {
     const id = await t.openFixture("fixture:text");
     const note = "Notes are hidden here.";
@@ -24,6 +25,10 @@ export default {
     t.notMatch(await detail(), /Notes/, "turned off: the note is not drawn on the canvas");
     await t.click('button[title="Export as SVG or PNG"]');
     t.match(await t.text('[data-testid="export-notes-hint"]'), /Notes are not drawn; turn on Show notes on the chart in Settings/, "the export dialog says how to draw them");
+    await t.click('[role="dialog"] label:has-text("De-identify")');
+    t.equal(await t.count('[data-testid="export-notes-hint"]'), 1, "and still does with De-identify ticked");
+    t.equal(await t.count('[data-testid="deidentify-keep-notes"]'), 0, "with no Include notes box while notes are not drawn");
+    await t.click('[role="dialog"] label:has-text("De-identify")');
     await t.click('[role="dialog"] button:has-text("Cancel")');
     t.notMatch(await exportSvg(), /Notes are/, "nor in the SVG");
 
@@ -43,8 +48,20 @@ export default {
       return lintExportSvg(p, window.__pededit.layout(p, { compact: false }), text).map(f => f.code);
     }, svg);
     t.equal(findings, [], "the SVG passes the export lint");
-    t.notMatch(await exportSvg(["De-identify"]), /Notes are/, "a de-identified SVG has no notes");
+    t.notMatch(await exportSvg(["De-identify"]), /Notes are/, "a de-identified SVG has no notes by default");
+    // The dialog keeps De-identify ticked; Include notes draws them, with a warning.
+    const name = (await t.individual("gf")).name;
     await t.click('button[title="Export as SVG or PNG"]');
+    t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-notes"]').checked), false, "Include notes is offered, unticked");
+    t.equal(await t.count('[data-testid="export-notes-warning"]'), 0, "with no warning");
+    await t.click('[data-testid="deidentify-keep-notes"]');
+    t.match(await t.text('[data-testid="export-notes-warning"]'), /Notes are free text: check them for names and dates before sharing/, "ticked, it warns");
+    const keptSvg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
+    if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
+    t.match(keptSvg, /Notes are[\s\S]*hidden here\./, "the de-identified SVG has the notes");
+    t.notMatch(keptSvg, new RegExp(name), "and still no names");
+    await t.click('button[title="Export as SVG or PNG"]');
+    t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-notes"]').checked), false, "reopened, Include notes is unticked again");
     await t.click('[role="dialog"] label:has-text("De-identify")');
     await t.click('[role="dialog"] button:has-text("Cancel")');
 

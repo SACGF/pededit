@@ -267,7 +267,7 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   field of the type a rule (keep, drop, rewritten, or a `DeidentifyKeep`
   choice), typed as `Record<keyof T, ...>`, so a new field fails the type
   check until someone decides, and the copy is built from the rules, so a
-  field the types do not name is dropped. It strips names, DOB, free-text age and notes,
+  field the types do not name is dropped. It strips names, DOB and free-text age,
   blanks `chartTitle` and drops `clinicalDetails`
   entirely (reason and ancestry are free text that can name people); the export dialog also
   passes no title. Age ranges come from the DOB only: free text such as
@@ -278,8 +278,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   numbered pedigree does not draw "II-3 II-3".
   Optional free text (#111) follows `options.deidentifyKeep`
   (`DeidentifyKeep` in `types.ts`, defaults `DEIDENTIFY_KEEP_DEFAULTS`, the
-  maintainer's call on #111): evaluation detail, age of onset and a couple's
-  childless reason (#225) are dropped,
+  maintainer's call on #111): evaluation detail, age of onset, a couple's
+  childless reason (#225) and notes (#242) are dropped,
   the result marks with the documented "*", the consanguinity text (own and
   named, by turning `relationshipLabels` off on the copy) and text tags are
   kept. Dropping the marks drops the evaluations entirely. The coefficients
@@ -291,7 +291,13 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   code of its own (it lists tags in use, evaluation rows from what is left).
   The export dialog shows one checkbox per kind the drawn pedigree has
   (`deidentifiableText`); the choices are dialog state for the page session,
-  like the de-identify box itself, and are never saved.
+  like the de-identify box itself, and are never saved. "Include notes" is
+  the exception: it is unticked again each time the dialog opens, since
+  notes are the free text most likely to name someone, and ticking it shows
+  a warning to check them. Kept notes are drawn as on the canvas (the copy
+  keeps `showNotes` and `notesLength`); not kept, the copy turns
+  `showNotes` off. The box is offered only while the notes are drawn on the
+  canvas, and the "turn on Show notes on the chart" hint shows otherwise.
 - The chart title (#20) is `options.title`, resolved by the caller with
   `chartTitle()` from `pedigree/labels.ts`. Its width is estimated
   (`titleWidth`); a title wider than the drawing widens the figure and the

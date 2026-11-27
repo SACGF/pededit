@@ -194,7 +194,8 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   default: notes someone wrote are expected on the chart). They are the
   `notes` detail section, just above the pedigree number, so the canvas
   and every figure export draw them. De-identification drops the notes and
-  turns the setting off. `noteLines` keeps the note's own line breaks and
+  turns the setting off unless the export's "Include notes" is ticked
+  (`DeidentifyKeep.notes`). `noteLines` keeps the note's own line breaks and
   wraps each to the slot width. `canvasSettings.notesLength` "twoLines"
   (Settings, "Notes: Up to two lines", shown only with the notes on) stops
   them at `NOTE_LINES` (2) with an ellipsis (a two-line name, an age, three

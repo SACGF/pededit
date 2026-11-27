@@ -114,9 +114,10 @@ describe("deidentify — data stripping", () => {
     expect(out.individuals[0].dob).toBeUndefined();
   });
 
-  it("notes removed", () => {
+  it("notes removed by default, kept when chosen", () => {
     const out = deidentify(singleMale);
     expect(out.individuals[0].notes).toBeUndefined();
+    expect(deidentify(singleMale, { deidentifyKeep: { notes: true } }).individuals[0].notes).toBe("some notes");
   });
 
   it("affected flag preserved", () => {

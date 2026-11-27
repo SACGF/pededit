@@ -137,7 +137,7 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               className="mt-2"
               name="showNotes"
               label="Show notes on the chart"
-              description="Write each person's notes under their symbol, above the pedigree number, on the canvas and in exports. Notes often hold private detail, so check them before sharing a figure, or turn this off. De-identified exports never include them."
+              description="Write each person's notes under their symbol, above the pedigree number, on the canvas and in exports. Notes often hold private detail, so check them before sharing a figure, or turn this off. De-identified exports leave them out unless you choose to include them."
               checked={showsNotes(pedigree)}
               onChange={on => updateCanvasSettings({ showNotes: on })}
             />
