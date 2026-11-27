@@ -28,12 +28,12 @@ export function useEditorSession({ id, slug, example }: { id?: string; slug?: st
   // Draw the example named by the URL; nothing is saved until it is edited.
   useEffect(() => {
     if (example) openExample(example);
-  }, [example]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [example, openExample]);
 
   // The first edit saved the example's copy: the URL becomes its link.
   useEffect(() => {
     if (slug !== undefined && activePedigreeId) navigate(`/p/${activePedigreeId}`, { replace: true });
-  }, [slug, activePedigreeId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [slug, activePedigreeId, navigate]);
 
   // Load the pedigree identified by the URL param
   useEffect(() => {
@@ -48,11 +48,11 @@ export function useEditorSession({ id, slug, example }: { id?: string; slug?: st
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 404) forgetRecentPedigree(id);
     });
-  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, openPedigree]);
 
   // Leaving the editor (back to the landing page) empties it, so the next
   // pedigree opened does not flash the last one first.
-  useEffect(() => () => closePedigree(), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => closePedigree(), [closePedigree]);
 
   // Save at once when the tab is hidden or closed, rather than losing the
   // last 2 s of edits. The browser's own "Leave site?" prompt shows
@@ -100,12 +100,12 @@ export function useEditorSession({ id, slug, example }: { id?: string; slug?: st
     }
     const timer = setTimeout(() => { saveActivePedigree().catch(() => {}); }, 2000);
     return () => clearTimeout(timer);
-  }, [pedigree, activePedigreeId, copyRetries]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pedigree, isDirty, activePedigreeId, openExampleInfo, copyRetries, saveActivePedigree, setNotice]);
 
   // Load pedigree list for authenticated users
   useEffect(() => {
     if (isAuthenticated) loadPedigrees();
-  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, loadPedigrees]);
 
   // Page title
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;

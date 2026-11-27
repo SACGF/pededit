@@ -30,7 +30,7 @@ export default function LandingPage() {
     loadPedigrees()
       .catch(() => setOwnedFailed(true))
       .finally(() => setOwnedLoaded(true));
-  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, loadPedigrees]);
   const listsReady = !isAuthenticated || ownedLoaded;
   const owned = isAuthenticated && !ownedFailed ? pedigrees : [];
   // Why the last create or import failed: the rate limit's wait, or a plain failure.
@@ -43,7 +43,7 @@ export default function LandingPage() {
     if (isAuthenticated && !user) {
       fetchMe().catch(() => { /* interceptor handles auth failures */ });
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user, fetchMe]);
 
   const handleCreateBlank = async () => {
     setLoading("blank");

@@ -37,6 +37,8 @@ jobs:
         run: npm -w layout-engine pack --dry-run
       - name: Type check (layout engine and frontend, tests included)
         run: npm run typecheck
+      - name: Hooks lint (rules of hooks, effect dependencies)
+        run: npm run lint
       - name: Frontend tests
         run: npm run test:frontend
       # What deploy.sh runs. It also prerenders the static pages, which

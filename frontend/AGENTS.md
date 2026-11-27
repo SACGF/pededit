@@ -507,6 +507,12 @@ reporting is off, and the dev server never reports.
 - **A test counts as a use.** `npx knip --production` leaves the tests out, so it also lists what only tests call. Read that list now and then: a wrapper only tests call is deleted and its tests pointed at what the app calls; deliberate test support stays (`resetProblemStep`, `readPngDpi`, `layoutCost.ts`, `uShapeLint.ts`, the fixtures).
 - **What it does not report:** an export used only in its own file, a field of an object that nothing reads, and anything that is not TypeScript or JavaScript.
 
+## Lint
+
+`npm run lint` (part of `npm run check` and CI) runs ESLint with two rules only: `react-hooks/rules-of-hooks` and `react-hooks/exhaustive-deps` (`frontend/eslint.config.js`). Style is not linted and types are tsc's job. Fix a missing dependency rather than disable the rule: Zustand store actions never change, so listing them never reruns an effect, and `navigate` changes only when the URL does. A disable needs a comment saying why, and a disable that no longer suppresses anything is an error.
+
+The plugin's `recommended` set also has the React Compiler's rules (`set-state-in-effect`, `refs`, `static-components`). They are not on: most of what they flag is refs read or written during render, which is fine without the compiler. Running them now and then (`flat.recommended` in a scratch config) is a quick way to find effects that should be event handlers or values worked out during render (#239).
+
 ## Conventions
 
 - Tests sit in `__tests__/` next to the code they cover.

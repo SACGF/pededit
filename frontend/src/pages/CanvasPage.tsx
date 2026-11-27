@@ -71,7 +71,7 @@ export default function CanvasPage() {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(null), notice.kind === "error" ? 8000 : 5000);
     return () => clearTimeout(timer);
-  }, [notice]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [notice, setNotice]);
 
   const { notFound } = useEditorSession({ id, slug, example });
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
