@@ -12,7 +12,7 @@ import { chartTitle, showsNotes } from "../pedigree/labels";
 import { KEY_POSITIONS, keyPositionOf } from "../io/svg/keyPlacement";
 import type { KeyPosition } from "../io/svg/types";
 import type { KeyPositionSetting } from "../utils/keyPositionSetting";
-import { clinicalDetailLines } from "../pedigree/clinicalDetails";
+import { clinicalDetailLines, type ClinicalDetailField } from "../pedigree/clinicalDetails";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { uShapeExportLayout } from "../pedigree/uShapeView";
 import { selectionLabel, selectionPedigree, selectionSubset } from "../pedigree/selectionSubset";
@@ -38,6 +38,10 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
   // here, they last while the page is open and are not saved.
   const [keep, setKeep]             = useState<DeidentifyKeep>(DEIDENTIFY_KEEP_DEFAULTS);
   const setKept = (key: keyof DeidentifyKeep, value: boolean) => setKeep(k => ({ ...k, [key]: value }));
+  // Clinical details a de-identified export keeps: none at first, each added back by hand.
+  const [keepClinical, setKeepClinical] = useState<readonly ClinicalDetailField[]>([]);
+  const setClinicalKept = (field: ClinicalDetailField, value: boolean) =>
+    setKeepClinical(k => (value ? [...k.filter(f => f !== field), field] : k.filter(f => f !== field)));
   const [pngDpi, setPngDpi]         = useState<number>(DEFAULT_PNG_DPI);
   const [error, setError]           = useState<string | null>(null);
   const [uShape, setUShape]         = useState(false);
@@ -101,13 +105,14 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
       deidentify: deident,
       ageBuckets: deident && ageBuckets,
       deidentifyKeep: keep,
+      deidentifyKeepClinical: keepClinical,
       // The chart title, as on the canvas. A de-identified export has none.
       title: deident ? undefined : chartTitle(pedigree, title) || undefined,
       uShapePartners: uPartners,
       compact,
       ...(keyCorner ? { keyPosition: keyCorner } : {}),
     });
-  }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact, keyCorner]);
+  }, [open, useU, pedigree, deident, ageBuckets, keep, keepClinical, title, uPartners, compact, keyCorner]);
   // The corner the key is in: the one picked, or the best one, read from the figure.
   const shownCorner = svgString ? keyPositionOf(svgString) : undefined;
 
@@ -163,7 +168,8 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
           <DialogTitle>Export pedigree</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        {/* min-w-0: a long clinical detail is cut, not widening the dialog's grid column. */}
+        <div className="space-y-4 min-w-0">
           {/* Format */}
           <div className="space-y-1.5">
             <div className="text-xs font-medium text-gray-700">Format</div>
@@ -258,9 +264,18 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
                 )}
               </>
             )}
-            {deident && clinicalDetailLines(pedigree).length > 0 && (
-              <p className="text-[10px] text-gray-500 ml-5">The clinical details (referral, ancestry, historian, recorder, date) are left out.</p>
-            )}
+            {deident && clinicalDetailLines(pedigree).map(({ field, label, value }) => (
+              <label key={field} className="flex items-center gap-2 text-xs cursor-pointer ml-5 min-w-0">
+                <input
+                  type="checkbox"
+                  data-testid={`deidentify-keep-clinical-${field}`}
+                  checked={keepClinical.includes(field)}
+                  onChange={e => setClinicalKept(field, e.target.checked)}
+                />
+                {/* The value too, so whoever exports sees what they would share. */}
+                <span className="truncate min-w-0">Include {label}: <span className="text-gray-500">{value}</span></span>
+              </label>
+            ))}
           </div>
 
           {/* Part of the chart: the people selected on the canvas */}

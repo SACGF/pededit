@@ -256,6 +256,19 @@ describe("deidentify is an allowlist (#225)", () => {
       expect(s).toContain("Adelaide");
     }
   });
+
+  it("keeps only the clinical details chosen, one field at a time", () => {
+    const p = family();
+    p.clinicalDetails = { referralReason: "Family history of breast cancer", maternalAncestry: "Ashkenazi Jewish", historian: "Jane Smith", recordedOn: "2026-11-12" };
+    expect(deidentify(p).clinicalDetails).toBeUndefined();
+    const out = deidentify(p, { deidentifyKeepClinical: ["referralReason", "maternalAncestry", "paternalAncestry"] });
+    // An empty field asked for stays absent.
+    expect(out.clinicalDetails).toEqual({ referralReason: "Family history of breast cancer", maternalAncestry: "Ashkenazi Jewish" });
+    for (const s of [exportSvg(p, { deidentify: true, deidentifyKeepClinical: ["referralReason"] }), exportUShapeSvg(p, { deidentify: true, deidentifyKeepClinical: ["referralReason"] })]) {
+      expect(s).toContain("Family history of breast cancer");
+      expect(s).not.toMatch(/Ashkenazi|Jane Smith|2026-11-12/);
+    }
+  });
 });
 
 describe("exports carry no person ids (#225)", () => {

@@ -51,6 +51,19 @@ export default {
     for (const name of names) t.ok(!anon.includes(name.split(" ")[0]), `de-identified: no "${name.split(" ")[0]}"`);
     t.match(anon, />II-2</, "de-identified: pedigree numbers in place of names");
     t.notMatch(anon, /1985|1931|Cornish|Counsellor/, "de-identified: no dates of birth and no clinical details");
+    // Each clinical detail can be added back on its own.
+    await t.click('button[title="Export as SVG or PNG"]');
+    t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-clinical-maternalAncestry"]').checked), false, "de-identified: Include maternal ancestry is offered, unticked");
+    await t.click('[data-testid="deidentify-keep-clinical-maternalAncestry"]');
+    const ancestry = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
+    if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
+    t.match(ancestry, /Cornish/, "de-identified: the maternal ancestry ticked is in the key");
+    t.notMatch(ancestry, /Counsellor|Not known|multiple sclerosis|2026-11-16/, "de-identified: the other clinical details are not");
+    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click('[data-testid="deidentify-keep-clinical-maternalAncestry"]');
+    const dropped = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
+    if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
+    t.notMatch(dropped, /Cornish/, "de-identified: unticked, the maternal ancestry goes again");
 
     // #225: a PED import makes the file's IDs the ids, so no export writes them.
     const ids = (await t.pedigree()).individuals.map(i => i.id);

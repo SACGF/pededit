@@ -1,3 +1,5 @@
+import type { ClinicalDetailField } from "../../pedigree/clinicalDetails";
+
 export interface SvgExportOptions {
   /**
    * Replace names/DOB/age/notes with NSGC generation-individual notation
@@ -15,9 +17,15 @@ export interface SvgExportOptions {
   /**
    * When deidentify=true: which free text the de-identified copy keeps.
    * Missing keys take `DEIDENTIFY_KEEP_DEFAULTS`. Names, dates, the
-   * free-text age, the chart title and the clinical key fields always go.
+   * free-text age and the chart title always go.
    */
   deidentifyKeep?: Partial<DeidentifyKeep>;
+
+  /**
+   * When deidentify=true: the clinical details (referral reason, ancestry,
+   * historian, recorder, date) the de-identified key keeps. Default: none.
+   */
+  deidentifyKeepClinical?: readonly ClinicalDetailField[];
 
   /** Padding (px) added on all four sides. Default: 40. */
   padding?: number;

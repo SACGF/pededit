@@ -1,4 +1,5 @@
-import type { Evaluation, Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
+import type { ClinicalDetails, Evaluation, Individual, Partnership, Pedigree } from "@pedigree-editor/layout-engine";
+import type { ClinicalDetailField } from "../../pedigree/clinicalDetails";
 import { pedigreeNumbers } from "../../pedigree/scene";
 import { DEIDENTIFY_KEEP_DEFAULTS } from "./types";
 import type { DeidentifyKeep, SvgExportOptions } from "./types";
@@ -102,7 +103,8 @@ const PEDIGREE_FIELDS: Record<keyof Pedigree, FieldRule> = {
   chartTitle: "rewritten",
   // The recorder and historian, the visit date, and free-text reason and
   // ancestry that can name people too: the whole block goes.
-  clinicalDetails: "drop",
+  // Each field goes unless `deidentifyKeepClinical` names it.
+  clinicalDetails: "rewritten",
   filters: "keep",
 };
 
@@ -150,6 +152,7 @@ function deidentifiedPerson(ind: Individual, keep: DeidentifyKeep, textTagIds: S
  * above drop left out. The optional free text (evaluation detail, onset,
  * consanguinity text, text tags, the childless reason, notes) goes as
  * `options.deidentifyKeep` says, by default the detail, onset, reason and notes.
+ * The clinical details go, but for the fields `options.deidentifyKeepClinical` names.
  */
 export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedigree {
   const pedigree = drawnPedigree(full);
@@ -165,6 +168,7 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
     parentOf: pedigree.parentOf,
     siblingOrder: pedigree.siblingOrder,
     chartTitle: "",
+    ...keptClinicalDetails(pedigree, options.deidentifyKeepClinical),
     // The names are the numbers now: drawing them again would repeat them.
     // Without consanguinity text the relationship is not named either.
     // Notes not kept are dropped above; the setting goes too, so nothing
@@ -185,6 +189,16 @@ export function deidentify(full: Pedigree, options: SvgExportOptions = {}): Pedi
       dob: options.ageBuckets && ind.dob ? (ind.deceased && ind.dod && parsePartialDate(ind.dod.trim()) ? `d. ${ageBucket(ind.dob, new Date(ind.dod))}` : ageBucket(ind.dob)) : undefined,
     })),
   }, pedigree);
+}
+
+/** The clinical details `fields` names, as a `clinicalDetails` entry, or nothing when none is kept. */
+function keptClinicalDetails(pedigree: Pedigree, fields: readonly ClinicalDetailField[] = []): Pick<Pedigree, "clinicalDetails"> {
+  const kept: ClinicalDetails = {};
+  for (const field of fields) {
+    const value = pedigree.clinicalDetails?.[field];
+    if (value?.trim()) kept[field] = value;
+  }
+  return Object.keys(kept).length > 0 ? { clinicalDetails: kept } : {};
 }
 
 /**
