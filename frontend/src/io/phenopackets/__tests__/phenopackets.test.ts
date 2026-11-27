@@ -222,6 +222,9 @@ describe("Phenopackets export", () => {
     });
     expect(out.relatives[0].diseases).toEqual([{ term: { id: "PEDEDIT:bc", label: "Breast cancer" }, excluded: true }]);
     expect(out.metaData.resources.map((r: { namespacePrefix: string }) => r.namespacePrefix)).toEqual(["SNOMEDCT", "HP", "PEDEDIT"]);
+    // PedEdit's own terms have no page; the prefix can never resolve.
+    const local = out.metaData.resources.find((r: { namespacePrefix: string }) => r.namespacePrefix === "PEDEDIT");
+    expect(new URL(local.iriPrefix).hostname).toMatch(/\.invalid$/);
   });
 
   it("writes biological sex, not gender identity", () => {

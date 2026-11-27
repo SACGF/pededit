@@ -74,9 +74,15 @@ export interface Resource {
   iriPrefix: string;
 }
 
-/** Resources for the prefixes PedEdit writes or commonly reads. The version of the outside ontologies is not known. */
+/**
+ * Resources for the prefixes PedEdit writes or commonly reads. The version of
+ * the outside ontologies is not known. PedEdit's own condition terms have no
+ * page: the file already holds each label, and a page could only add a way to
+ * find other pedigrees' conditions. Their IRI prefix is under `.invalid`
+ * (RFC 2606), which never resolves, so it reads as a name, not a link.
+ */
 const RESOURCES: Record<string, Omit<Resource, "namespacePrefix">> = {
-  [LOCAL_PREFIX]: { id: "pededit", name: "PedEdit conditions, local to this file", url: "https://pededit.com", version: "1", iriPrefix: "https://pededit.com/condition/" },
+  [LOCAL_PREFIX]: { id: "pededit", name: "PedEdit conditions, local to this file", url: "https://pededit.com", version: "1", iriPrefix: "https://pededit.invalid/condition/" },
   HP: { id: "hp", name: "human phenotype ontology", url: "http://purl.obolibrary.org/obo/hp.owl", version: "unknown", iriPrefix: "http://purl.obolibrary.org/obo/HP_" },
   SNOMEDCT: { id: "snomedct", name: "SNOMED CT", url: "http://snomed.info/sct", version: "unknown", iriPrefix: "http://snomed.info/id/" },
   MONDO: { id: "mondo", name: "Mondo Disease Ontology", url: "http://purl.obolibrary.org/obo/mondo.obo", version: "unknown", iriPrefix: "http://purl.obolibrary.org/obo/MONDO_" },
