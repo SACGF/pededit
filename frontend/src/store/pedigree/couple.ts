@@ -35,6 +35,12 @@ export function coupleSlice(tools: EditTools): CoupleSlice {
       mutate(draft => removeFromTwinSets(draft, id));
     },
 
+    removeTwins: (ids) => {
+      const twins = ids.filter(id => twinSetOf(get().pedigree, id));
+      if (twins.length === 0) return;
+      mutate(draft => { for (const id of twins) removeFromTwinSets(draft, id); });
+    },
+
     setPartnershipChildless: (partnershipId, status) => {
       if (status !== undefined && childrenOf(get().pedigree, partnershipId).length > 0) {
         console.warn("Cannot mark a couple with children as childless");

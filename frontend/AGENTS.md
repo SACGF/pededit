@@ -155,7 +155,10 @@ reporting is off, and the dev server never reports.
   shows the same items above the batch ones (`coupleOfPair`), and one
   partner's own menu, which shows them once per couple under "With <the
   other partner>" (`CoupleMenuItems` with `fromId`). All three render
-  `CoupleMenuItems`, so a new couple item goes there only. A donor pair
+  `CoupleMenuItems`, so a new couple item goes there only. The Person
+  tab's couple blocks (`CoupleBlock`) have a "More" button opening the same
+  items, and the panel for several selected a "More" button opening the
+  batch menu, so the U-shape view reaches them too (#243). A donor pair
   is not a couple: no menu or form about relationships lists it
   (`personCouples(...).donorPair`).
   `drawBesidePlan` stores a side with the choice (the one swapped to if any,
@@ -183,7 +186,12 @@ reporting is off, and the dev server never reports.
   Export PED warns first. Assisted reproduction (#45, `pedigree/assisted.ts`):
   "Add sperm donor" / "Add egg donor" / "Add surrogate" in the more menu;
   the donor becomes the child's genetic parent (so kinship is right) and
-  the parent replaced stays linked as carrier or social parent. "Existing
+  the parent replaced stays linked as carrier or social parent. "Remove
+  donor" and "Remove surrogate" undo them (`applyRemoveDonor`,
+  `applyRemoveSurrogate`, #243): the replaced parent is the genetic parent
+  again and the link adding the donor made goes; a donor or surrogate added
+  with nothing recorded since goes too. Deleting a donor does the same for
+  every child of theirs who stays, with a notice. "Existing
   sperm donor..." / "Existing egg donor..." / "Existing surrogate..." (#104,
   `picking.kind` "donor" / "surrogate") make someone already on the tree the
   donor or carrier, e.g. the wife's sister (NSGC Fig. 3); a second child of

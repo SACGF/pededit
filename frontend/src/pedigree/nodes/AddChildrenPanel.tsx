@@ -16,15 +16,18 @@ function clampCount(n: number): number {
  * and clamped on blur or Enter, so typing "4" after clearing the box gives
  * 4, not 1 then 10.
  */
-export function AddChildrenPanel({ individualId, onAdd }: {
+export function AddChildrenPanel({ individualId, partnershipId: fixed, onAdd }: {
   individualId: string;
+  /** A couple's menu: the children are this couple's, with no choice of partner. */
+  partnershipId?: string;
   onAdd: (sex: Sex, count: number, partnershipId: string | undefined) => void;
 }) {
   const pedigree = usePedigreeStore(s => s.pedigree);
   const [count, setCount] = useState(2);
   const [draft, setDraft] = useState("2");
   const partners = personCouples(pedigree, individualId);
-  const [partnershipId, setPartnershipId] = useState<string | undefined>(partners[0]?.partnershipId);
+  const [chosen, setPartnershipId] = useState<string | undefined>(partners[0]?.partnershipId);
+  const partnershipId = fixed ?? chosen;
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { ref.current?.scrollIntoView?.({ block: "nearest" }); }, []);
@@ -76,7 +79,7 @@ export function AddChildrenPanel({ individualId, onAdd }: {
           +
         </button>
       </div>
-      {partners.length > 1 && (
+      {!fixed && partners.length > 1 && (
         <label className="flex items-center gap-1 px-2 py-1">
           <span className="text-[10px] text-gray-400">With</span>
           <select

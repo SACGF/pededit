@@ -8,6 +8,8 @@ import { donorPairFor, sameSexCouple } from "../sameSex";
 import { couplePartnerLabel, drawBesideOptions } from "../partners";
 import { raisedChildrenOf } from "../graph";
 import { MenuItem, MenuSection, menuAction, type MenuAction } from "./menuParts";
+import { AddChildrenPanel } from "./AddChildrenPanel";
+import { NO_CHILDREN_TITLE } from "../lifeStatus";
 
 /**
  * Everything offered for one couple: the right-click menu of a couple line,
@@ -17,9 +19,13 @@ import { MenuItem, MenuSection, menuAction, type MenuAction } from "./menuParts"
  */
 export function CoupleMenuItems({ partnershipId, fromId, onDone }: { partnershipId: string; fromId?: string; onDone: () => void }) {
   const pedigree = usePedigreeStore(s => s.pedigree);
-  const { setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership } = usePedigreeStore.getState();
+  const { setPartnershipChildless, setPartnershipConsanguineous, setPartnershipEnded, swapPartnerSides, startPickingChild, removePartnership, addChildren } = usePedigreeStore.getState();
+  const [addingChildren, setAddingChildren] = useState(false);
   const partnership = pedigree.partnerships.find(p => p.id === partnershipId);
   if (!partnership) return null;
+  // A pregnancy or loss in the couple cannot have children.
+  const noChildren = [partnership.individual1, partnership.individual2]
+    .some(id => pedigree.individuals.find(i => i.id === id)?.lifeStatus) ? NO_CHILDREN_TITLE : null;
   const nameOf = (id: string) => pedigree.individuals.find(i => i.id === id)?.name?.trim();
   const n1 = nameOf(partnership.individual1), n2 = nameOf(partnership.individual2);
   const heading = fromId
@@ -52,12 +58,29 @@ export function CoupleMenuItems({ partnershipId, fromId, onDone }: { partnership
         {sameSex ? (
           <SameSexChildItems partnershipId={partnershipId} fromId={fromId} action={action} />
         ) : (
-          <MenuItem
-            onClick={() => action(() => startPickingChild(partnershipId))}
-            title="Click an existing person on the canvas to make them a child of this couple"
-          >
-            Add existing child...
-          </MenuItem>
+          <>
+            <MenuItem
+              onClick={() => setAddingChildren(v => !v)}
+              active={addingChildren}
+              disabled={!!noChildren}
+              title={noChildren ?? "Add sons, daughters or children of unknown sex to this couple"}
+            >
+              Add children...
+            </MenuItem>
+            {addingChildren && !noChildren && (
+              <AddChildrenPanel
+                individualId={partnership.individual1}
+                partnershipId={partnershipId}
+                onAdd={(sex, count) => action(() => addChildren(partnership.individual1, count, sex, partnershipId))}
+              />
+            )}
+            <MenuItem
+              onClick={() => action(() => startPickingChild(partnershipId))}
+              title="Click an existing person on the canvas to make them a child of this couple"
+            >
+              Add existing child...
+            </MenuItem>
+          </>
         )}
         <MenuItem
           onClick={() => action(() => removePartnership(partnershipId))}

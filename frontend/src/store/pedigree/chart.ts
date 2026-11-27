@@ -191,6 +191,8 @@ export function chartSlice(tools: EditTools): ChartSlice {
 
     unpinIndividual: (individualId) => mutate(draft => { dropPins(draft, [individualId]); }),
 
+    unpinIndividuals: (individualIds) => mutate(draft => { dropPins(draft, individualIds); }),
+
     resetLayout: () => {
       mutate(draft => {
         delete draft.pinnedPositions;

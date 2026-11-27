@@ -10,6 +10,9 @@ import { referenceRelatedness } from "@/pedigree/referenceRelatedness";
 import { namedCoupleRelationship } from "@/pedigree/consanguinityLabel";
 import { capitalised } from "@/utils/text";
 import { CheckboxRow, Field, Hint, OptionSelect } from "./fields";
+import { CoupleMoreMenu } from "@/pedigree/nodes/MoreMenu";
+import { coupleConsanguinity } from "@/pedigree/consanguinity";
+import { raisedChildrenOf } from "@/pedigree/graph";
 
 // The Person tab's sections about a person's couples: Relatedness, with
 // each couple's double-line checkbox, and Partners.
@@ -153,48 +156,78 @@ function ConsanguinityLabelField({ partnershipId }: { partnershipId: string }) {
  * A gamete donation pair is not a couple and is left out.
  */
 export function PartnersForm({ individual }: { individual: Individual }) {
-  const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason } = usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason");
+  const { pedigree } = usePedigreeFields("pedigree");
   const own = personCouples(pedigree, individual.id).filter(c => !c.donorPair);
   if (own.length === 0) return null;
   return (
     <div className="border-t pt-3 space-y-2" data-testid="partners-form">
       <SectionHeader>Partners</SectionHeader>
-      {own.map(c => {
-        const p = pedigree.partnerships.find(q => q.id === c.partnershipId)!;
-        const partner = c.phrase;
-        return (
-          <div key={p.id} className="space-y-1 text-xs text-gray-600" data-partner-row={p.id}>
-            <div className="text-gray-800 break-words">{c.label}</div>
-            <CheckboxRow
-              label={ENDED_LABEL}
-              ariaLabel={`${ENDED_LABEL} with ${partner}`}
-              title={ENDED_TITLE}
-              checked={!!p.ended}
-              onChange={on => setPartnershipEnded(p.id, on)}
+      {own.map(c => <CoupleBlock key={c.partnershipId} partnershipId={c.partnershipId} label={c.label} partner={c.phrase} fromId={individual.id} />)}
+    </div>
+  );
+}
+
+/**
+ * One couple's fields: the ended mark and, while the couple has no
+ * children, the childless mark and its reason, with a "More" button that
+ * opens the couple's own menu (#243: swap sides, draw beside, remove
+ * partnership, add children). The childless reason is free text, so it
+ * stays a field here rather than a menu item. `consanguineous` adds the
+ * double-line checkbox, for the selection panel, where the Relatedness
+ * section that has it is not shown.
+ */
+export function CoupleBlock({ partnershipId, label, partner, fromId, consanguineous }: {
+  partnershipId: string; label: string; partner: string; fromId?: string; consanguineous?: boolean;
+}) {
+  const { pedigree, setPartnershipEnded, setPartnershipChildless, setPartnershipChildlessReason, setPartnershipConsanguineous } =
+    usePedigreeFields("pedigree", "setPartnershipEnded", "setPartnershipChildless", "setPartnershipChildlessReason", "setPartnershipConsanguineous");
+  const p = pedigree.partnerships.find(q => q.id === partnershipId);
+  if (!p) return null;
+  const childless = raisedChildrenOf(pedigree, partnershipId).length === 0;
+  const related = consanguineous ? coupleConsanguinity(pedigree, partnershipId) : null;
+  return (
+    <div className="space-y-1 text-xs text-gray-600" data-partner-row={p.id}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-gray-800 break-words min-w-0">{label}</div>
+        <CoupleMoreMenu partnershipId={partnershipId} fromId={fromId} />
+      </div>
+      <CheckboxRow
+        label={ENDED_LABEL}
+        ariaLabel={`${ENDED_LABEL} with ${partner}`}
+        title={ENDED_TITLE}
+        checked={!!p.ended}
+        onChange={on => setPartnershipEnded(p.id, on)}
+      />
+      {related && (
+        <CheckboxRow
+          label="Consanguineous"
+          ariaLabel={`Consanguineous with ${partner}`}
+          title={related.related ? "The pedigree shows they are related, so the couple line is double." : "Draws the couple line double."}
+          checked={related.related || related.flagged}
+          disabled={related.related}
+          onChange={on => setPartnershipConsanguineous(p.id, on)}
+        />
+      )}
+      {childless && (
+        <Field inline label="No children">
+          <OptionSelect<ChildlessStatus>
+            label={`Childless mark with ${partner}`}
+            none="No mark"
+            value={p.childless}
+            options={CHILDLESS_OPTIONS}
+            onChange={v => setPartnershipChildless(p.id, v)}
+          />
+          {p.childless && (
+            <Input
+              value={p.childlessReason ?? ""}
+              aria-label="Reason shown under the mark"
+              onChange={e => setPartnershipChildlessReason(p.id, e.target.value)}
+              className="h-7 text-xs"
+              placeholder="Reason, e.g. vasectomy"
             />
-            {c.childless && (
-              <Field inline label="No children">
-                <OptionSelect<ChildlessStatus>
-                  label={`Childless mark with ${partner}`}
-                  none="No mark"
-                  value={p.childless}
-                  options={CHILDLESS_OPTIONS}
-                  onChange={v => setPartnershipChildless(p.id, v)}
-                />
-                {p.childless && (
-                  <Input
-                    value={p.childlessReason ?? ""}
-                    aria-label="Reason shown under the mark"
-                    onChange={e => setPartnershipChildlessReason(p.id, e.target.value)}
-                    className="h-7 text-xs"
-                    placeholder="Reason, e.g. vasectomy"
-                  />
-                )}
-              </Field>
-            )}
-          </div>
-        );
-      })}
+          )}
+        </Field>
+      )}
     </div>
   );
 }

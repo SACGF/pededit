@@ -105,9 +105,17 @@ describe("the hover pill and the Person tab's row", () => {
     expect(of("her")).toMatchObject({ parents: false, sibling: true });
   });
 
-  it("offer no child to a pregnancy", () => {
+  it("offer no child or partner to a pregnancy", () => {
     const p = build([F("preg", { lifeStatus: "pregnancy" })], [], {});
-    expect(personAddActions(p, p.individuals[0]!).filter(a => a.disabled).map(a => a.key)).toEqual(["son", "daughter", "child", "sibling"]);
+    expect(personAddActions(p, p.individuals[0]!).filter(a => a.disabled).map(a => a.key)).toEqual(["son", "daughter", "child", "sibling", "partner"]);
+  });
+
+  it("say why each disabled button is disabled, and offer a partner on wide screens only (#243)", () => {
+    const p = build([F("solo")], [], {});
+    const actions = personAddActions(p, p.individuals[0]!);
+    for (const a of actions.filter(x => x.disabled)) expect(a.reason, a.key).toBeTruthy();
+    expect(actions.find(a => a.key === "sibling")!.reason).toMatch(/Add parents first/);
+    expect(actions.find(a => a.key === "partner")).toMatchObject({ disabled: false, wideOnly: true, title: "Add partner" });
   });
 });
 

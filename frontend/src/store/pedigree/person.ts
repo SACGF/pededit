@@ -153,6 +153,21 @@ export function personSlice(tools: EditTools): PersonSlice {
         : `Marked ${n} ${status === "carrier" ? "carrier" : "presymptomatic carrier"}.`);
     },
 
+    setConsultandMany: (ids, consultand) => {
+      mutateEach(ids, ind => !!ind.consultand !== consultand, ind => { setOptional(ind, "consultand", consultand); },
+        n => consultand ? `Marked ${n} as ${n === 1 ? "consultand" : "consultands"}.` : `Unmarked ${n} as ${n === 1 ? "consultand" : "consultands"}.`);
+    },
+
+    setFamilyHistoryUnknownMany: (ids, unknown) => {
+      mutateEach(ids, ind => !!ind.familyHistoryUnknown !== unknown, ind => { setOptional(ind, "familyHistoryUnknown", unknown); },
+        n => unknown ? `Marked family history not known for ${n}.` : `Cleared family history not known for ${n}.`);
+    },
+
+    setAdoptedMany: (ids, status) => {
+      mutateEach(ids, ind => ind.adopted !== status, ind => { setOptional(ind, "adopted", status); },
+        n => status ? `Marked ${n} adopted ${status}.` : `Cleared adoption for ${n}.`);
+    },
+
     setSexMany: (ids, sex) => {
       const { pedigree } = get();
       const problem = batchSexProblem(pedigree, ids, sex);

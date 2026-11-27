@@ -57,7 +57,10 @@ export interface CoreSlice {
  * becomes the child's sperm or egg donor or the surrogate who carried them.
  */
 export type Picking =
-  | { kind: "parents"; childId: string; picked: string[] }
+  /** Parents for `childId`, or for every one of `childIds` at once (the batch "Set parents...", one undo step). */
+  | { kind: "parents"; childId: string; childIds?: string[]; picked: string[] }
+  /** An existing person to be a child of `individualId` (with a placeholder partner when they have none). */
+  | { kind: "childOf"; individualId: string }
   | { kind: "child"; partnershipId: string; geneticParentId?: string }
   | { kind: "partner"; individualId: string }
   | { kind: "relatedness"; individualId: string }
@@ -107,6 +110,10 @@ export interface ViewSlice {
   /** Active on-canvas picking, or null. Not undoable. */
   picking: Picking | null;
   startPickingParents: (childId: string) => void;
+  /** "Set parents..." for several people: the parents picked are given to all of them, as one undo step. */
+  startPickingParentsOf: (childIds: string[]) => void;
+  /** "Add existing child..." for one person: the person clicked becomes their child. */
+  startPickingChildOf: (individualId: string) => void;
   startPickingChild: (partnershipId: string, geneticParentId?: string) => void;
   startPickingPartner: (individualId: string) => void;
   startPickingRelatedness: (individualId: string) => void;
@@ -137,6 +144,8 @@ export interface ViewSlice {
    * as primary. Returns how many are selected.
    */
   selectDescendants: (id: string) => number;
+  /** Select the person and everyone "Remove with ancestors" would take (`removeWithAncestorsSet`). Returns how many. */
+  selectAncestors: (id: string) => number;
   setProblemHighlightId: (id: string | null) => void;
 }
 
@@ -146,7 +155,7 @@ export interface StructureSlice {
   addParent: (individualId: string, sex: Sex) => void;
   addChild: (individualId: string, sex: Sex) => void;
   addChildren: (individualId: string, count: number, sex: Sex, partnershipId?: string) => void;
-  addSibling: (individualId: string) => void;
+  addSibling: (individualId: string, sex?: Sex) => void;
   addPartner: (individualId: string) => void;
   /**
    * Make two existing individuals partners, which is how a marriage
@@ -191,6 +200,10 @@ export interface StructureSlice {
    */
   setSameSexChild: (childId: string, partnershipId: string, geneticParentId: string) => string | null;
   detachFromParents: (childId: string) => void;
+  /** Detach every one of `childIds` from their parents, as one undo step. */
+  detachFromParentsMany: (childIds: string[]) => void;
+  /** Give every one of `childIds` the same parents, as one undo step. A problem with any of them refuses all. */
+  setParentsMany: (childIds: string[], parentIds: string[]) => string | null;
   /**
    * Remove a partnership without removing either person, for a
    * partner linked by mistake. Refused, with the reason, while it has
@@ -208,6 +221,10 @@ export interface StructureSlice {
    */
   addDonor: (childId: string, gamete: Gamete, existingId?: string) => string | null;
   addSurrogate: (childId: string, existingId?: string) => string | null;
+  /** The inverse of addDonor: the replaced parent is the genetic parent again (`applyRemoveDonor`). */
+  removeDonor: (childId: string) => string | null;
+  /** The inverse of addSurrogate (`applyRemoveSurrogate`). */
+  removeSurrogate: (childId: string) => string | null;
 }
 
 /** Implemented in `person.ts`. */
@@ -271,6 +288,9 @@ export interface PersonSlice {
   setIndividualTagMany: (ids: string[], tagId: string, on: boolean) => void;
   /** `setConditionStatus` for several people, one undo step. */
   setConditionStatusMany: (ids: string[], tagId: string, state: ConditionState) => void;
+  setConsultandMany: (ids: string[], consultand: boolean) => void;
+  setFamilyHistoryUnknownMany: (ids: string[], unknown: boolean) => void;
+  setAdoptedMany: (ids: string[], status: Adoption | undefined) => void;
 }
 
 /** Implemented in `couple.ts`. */
@@ -284,6 +304,8 @@ export interface CoupleSlice {
   setTwins: (partnershipId: string, members: string[], zygosity: Zygosity) => string | null;
   /** Take an individual out of their twin set; a set left with one member is dropped. */
   removeTwin: (id: string) => void;
+  /** Take every one of `ids` out of their twin sets, as one undo step. */
+  removeTwins: (ids: string[]) => void;
   /**
    * Childless couple mark. Refused (no-op) when the partnership has
    * children. Clearing with undefined also drops the reason.
@@ -352,6 +374,7 @@ export interface ChartSlice {
   /** Pin several individuals as one undo step (a group drag). Positions in normal spacing. */
   pinIndividuals: (positions: Record<string, { x: number; y: number }>) => void;
   unpinIndividual: (individualId: string) => void;
+  unpinIndividuals: (individualIds: string[]) => void;
   resetLayout: () => void;
   unlockIndividual: (individualId: string) => void;
   /** Unlock several individuals as one undo step. No-op when all are unlocked already. */

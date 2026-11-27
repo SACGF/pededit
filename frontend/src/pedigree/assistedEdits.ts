@@ -4,7 +4,9 @@
  * `apply` functions to an Immer draft.
  */
 import type { Individual, Partnership, Pedigree, ReproductiveRole } from "@pedigree-editor/layout-engine";
-import { childrenOf, couplesOf, descendantsOf, parentCoupleOf, partnerIn } from "./graph";
+import { childrenOf, couplesOf, descendantsOf, hasParents, parentCoupleOf, partnerIn } from "./graph";
+import { removeIndividuals } from "./removal";
+import { isUntouchedAddedRole } from "./placeholders";
 import { personLabel } from "./personLabel";
 import { geneticParents } from "./assisted";
 
@@ -109,6 +111,140 @@ export function applyAddDonor(draft: Pedigree, childId: string, gamete: Gamete, 
     }
   }
   return donorId;
+}
+
+/**
+ * The donor pair a child was conceived from: the pair, the donor in it and
+ * the other genetic parent. Null when the child's parents are not a donor
+ * pair with a donor in it.
+ */
+export function donorOf(pedigree: Pedigree, childId: string): { pair: Partnership; donorId: string; otherId: string } | null {
+  const p = parentCoupleOf(pedigree, childId);
+  if (!p?.donorConception) return null;
+  const role = (id: string) => pedigree.individuals.find(i => i.id === id)?.reproductiveRole;
+  const donorId = role(p.individual1) === "donor" ? p.individual1 : role(p.individual2) === "donor" ? p.individual2 : null;
+  return donorId ? { pair: p, donorId, otherId: partnerIn(p, donorId) } : null;
+}
+
+/**
+ * The parent a donor replaced, as `applyAddDonor` recorded them: the woman
+ * who carried the child or a social parent, preferring one who is a partner
+ * of the other genetic parent.
+ */
+function replacedByDonor(pedigree: Pedigree, childId: string, otherId: string): string | undefined {
+  const child = pedigree.individuals.find(i => i.id === childId);
+  const linked = [child?.carriedBy, ...(child?.socialParents ?? [])].filter((x): x is string => !!x);
+  const role = (id: string) => pedigree.individuals.find(i => i.id === id)?.reproductiveRole;
+  const candidates = linked.filter(id => role(id) !== "surrogate" && role(id) !== "donor");
+  const partners = new Set(couplesOf(pedigree, otherId, { donorPairs: false }).map(c => partnerIn(c, otherId)));
+  return candidates.find(id => partners.has(id)) ?? (candidates.length === 1 ? candidates[0] : undefined);
+}
+
+/** Why the donor cannot be removed for this child, or null when they can ("Remove donor", #243). */
+export function removeDonorProblem(pedigree: Pedigree, childId: string): string | null {
+  const d = donorOf(pedigree, childId);
+  if (!d) return "No donor is recorded for this person.";
+  if (!replacedByDonor(pedigree, childId, d.otherId)) {
+    return "The parent the donor replaced is not recorded (no carrier or social parent to return to): use Replace parents instead.";
+  }
+  return null;
+}
+
+/**
+ * Remove the donor of one child, in place: the inverse of `applyAddDonor`.
+ * The parent the donor replaced is the genetic parent again, with the other
+ * genetic parent (their couple, or a new one with `partnershipId`), and the
+ * carrier or social parent link adding the donor made goes. A donor pair
+ * left with no children goes, and so does a donor left in no couple who has
+ * nothing recorded since being added; otherwise the person stays and is no
+ * longer marked as a donor once they have no donor pair.
+ */
+export function applyRemoveDonor(draft: Pedigree, childId: string, partnershipId: string): void {
+  if (removeDonorProblem(draft, childId)) return;
+  const { pair, donorId, otherId } = donorOf(draft, childId)!;
+  const replaced = replacedByDonor(draft, childId, otherId)!;
+  const child = draft.individuals.find(i => i.id === childId)!;
+
+  draft.parentOf[pair.id] = childrenOf(draft, pair.id).filter(c => c !== childId);
+  if (pair.twins) {
+    pair.twins = pair.twins.map(t => ({ ...t, members: t.members.filter(m => m !== childId) })).filter(t => t.members.length >= 2);
+    if (pair.twins.length === 0) delete pair.twins;
+  }
+  let couple = draft.partnerships.find(x => !x.donorConception
+    && ((x.individual1 === otherId && x.individual2 === replaced) || (x.individual1 === replaced && x.individual2 === otherId)));
+  if (!couple) {
+    const sexOf = (id: string) => draft.individuals.find(i => i.id === id)?.sex;
+    const [i1, i2] = sexOf(otherId) === "female" || (sexOf(otherId) === "unknown" && sexOf(replaced) === "male") ? [replaced, otherId] : [otherId, replaced];
+    couple = { id: partnershipId, individual1: i1, individual2: i2 };
+    draft.partnerships.push(couple);
+    draft.parentOf[couple.id] = [];
+  }
+  const siblings = childrenOf(draft, couple.id);
+  child.sibOrder = siblings.length === 0 ? 0 : Math.max(...siblings.map(id => draft.individuals.find(i => i.id === id)?.sibOrder ?? 0)) + 1;
+  draft.parentOf[couple.id] = [...siblings, childId];
+  delete couple.childless;
+  delete couple.childlessReason;
+
+  if (child.carriedBy === replaced) delete child.carriedBy;
+  if (child.socialParents) {
+    child.socialParents = child.socialParents.filter(x => x !== replaced);
+    if (child.socialParents.length === 0) delete child.socialParents;
+  }
+
+  if (childrenOf(draft, pair.id).length === 0) {
+    draft.partnerships = draft.partnerships.filter(x => x.id !== pair.id);
+    delete draft.parentOf[pair.id];
+  }
+  const donor = draft.individuals.find(i => i.id === donorId)!;
+  if (couplesOf(draft, donorId, { donorPairs: true }).some(c => c.donorConception)) return;
+  const linked = draft.individuals.some(i => i.carriedBy === donorId || i.socialParents?.includes(donorId));
+  if (isUntouchedAddedRole(donor) && !hasParents(draft, donorId) && couplesOf(draft, donorId, { donorPairs: true }).length === 0 && !linked) {
+    removeIndividuals(draft, new Set([donorId]));
+  } else {
+    delete donor.reproductiveRole;
+  }
+}
+
+/** Why the surrogate cannot be removed for this child, or null when they can ("Remove surrogate", #243). */
+export function removeSurrogateProblem(pedigree: Pedigree, childId: string): string | null {
+  const child = pedigree.individuals.find(i => i.id === childId);
+  const carrier = child?.carriedBy && pedigree.individuals.find(i => i.id === child.carriedBy);
+  if (!carrier || carrier.reproductiveRole !== "surrogate") return "No surrogate is recorded for this person.";
+  return null;
+}
+
+/**
+ * Remove the surrogate of one child, in place: the inverse of
+ * `applyAddSurrogate`. A woman who carried the child before (the mother of
+ * a child from a donor egg, moved to the social parents) carries it again.
+ * A surrogate who carries nobody else stops being marked as one, and goes
+ * if she has nothing recorded since being added and no other link.
+ */
+export function applyRemoveSurrogate(draft: Pedigree, childId: string): void {
+  if (removeSurrogateProblem(draft, childId)) return;
+  const child = draft.individuals.find(i => i.id === childId)!;
+  const surrogateId = child.carriedBy!;
+  delete child.carriedBy;
+  // The woman applyAddSurrogate moved from carrying to raising: a social
+  // parent who partners a genetic parent, the mother of a donor-egg child.
+  const d = donorOf(draft, childId);
+  if (d && d.pair.individual2 === d.donorId) {
+    const partners = new Set(couplesOf(draft, d.otherId, { donorPairs: false }).map(c => partnerIn(c, d.otherId)));
+    const before = child.socialParents?.find(id => partners.has(id) && draft.individuals.find(i => i.id === id)?.sex === "female");
+    if (before) {
+      child.carriedBy = before;
+      child.socialParents = child.socialParents!.filter(x => x !== before);
+      if (child.socialParents.length === 0) delete child.socialParents;
+    }
+  }
+  if (draft.individuals.some(i => i.carriedBy === surrogateId)) return;
+  const surrogate = draft.individuals.find(i => i.id === surrogateId)!;
+  const linked = draft.individuals.some(i => i.socialParents?.includes(surrogateId));
+  if (isUntouchedAddedRole(surrogate) && !hasParents(draft, surrogateId) && couplesOf(draft, surrogateId, { donorPairs: true }).length === 0 && !linked) {
+    removeIndividuals(draft, new Set([surrogateId]));
+  } else if (surrogate.reproductiveRole === "surrogate") {
+    delete surrogate.reproductiveRole;
+  }
 }
 
 /**

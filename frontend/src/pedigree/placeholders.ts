@@ -39,6 +39,16 @@ export function isUntouchedPlaceholder(ind: Individual): boolean {
 }
 
 /**
+ * A donor or surrogate added by "Add sperm donor", "Add egg donor" or "Add
+ * surrogate" with nothing recorded about them since: removing the donor or
+ * surrogate (#243) takes such a person away, as a placeholder goes.
+ */
+export function isUntouchedAddedRole(ind: Individual): boolean {
+  if (!ind.reproductiveRole) return false;
+  return Object.entries(ind).every(([k, v]) => BOOKKEEPING.has(k) || k === "reproductiveRole" || isEmptyValue(v));
+}
+
+/**
  * Partnership fields every couple has. A couple carrying any other field
  * (set by the user, or unknown to this version) is kept.
  */

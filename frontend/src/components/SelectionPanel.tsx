@@ -4,16 +4,24 @@ import { kinshipOf, kinshipXOf, formatCoefficient, degreeOfRelationship } from "
 import { ALSO_RELATED_OTHERWISE, nameRelationship, pairLabels } from "../pedigree/relationship";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { capitalised } from "../utils/text";
+import { coupleOfPair, personCouples } from "../pedigree/partners";
+import { MoreMenu } from "../pedigree/nodes/MoreMenu";
+import { CoupleBlock } from "./panel/CoupleSections";
 
 /**
- * The edit panel with several people selected: how many, and the
- * batch lock / unlock, in place of one person's fields.
+ * The edit panel with several people selected: how many, the batch lock /
+ * unlock, a "More" button opening the same menu as right-clicking one of
+ * them (so the U-shape view, which has no menus on the chart, reaches every
+ * batch edit, #243), and for both partners of a couple that couple's fields.
  */
 export function SelectionPanel() {
   const { pedigree, selectedId, selectedIds, setSelectedId, unlockIndividuals, lockIndividuals } = usePedigreeFields("pedigree", "selectedId", "selectedIds", "setSelectedId", "unlockIndividuals", "lockIndividuals");
   const { toUnlock, toLock } = batchLockState(pedigree, selectedIds);
   const moveable = pedigree.canvasSettings?.nodesMoveable ?? false;
   const pair = selectedPair({ selectedId, selectedIds });
+  // Both partners of a couple: the couple's own fields too (#243).
+  const pairCouple = coupleOfPair(pedigree, selectedIds);
+  const couple = pairCouple && personCouples(pedigree, selectedIds[0]!).find(c => c.partnershipId === pairCouple.id);
 
   return (
     <div className="space-y-3" data-selection-panel>
@@ -25,6 +33,9 @@ export function SelectionPanel() {
         someone; Shift+drag on the canvas selects an area.
       </p>
       {pair && <PairRelatedness pedigree={pedigree} a={pair[0]} b={pair[1]} />}
+      {couple && (
+        <CoupleBlock partnershipId={couple.partnershipId} label={couple.label} partner={couple.phrase} fromId={selectedIds[0]} consanguineous />
+      )}
       <div className="flex flex-col items-start gap-1">
         {toUnlock.length > 0 && (
           <PanelButton onClick={() => unlockIndividuals(toUnlock)} title={BATCH_UNLOCK_TITLE}>
@@ -38,6 +49,14 @@ export function SelectionPanel() {
         )}
         {moveable && toLock.length === 0 && (
           <p className="text-xs text-gray-400">Every node is moveable (Settings).</p>
+        )}
+        {selectedId && (
+          <MoreMenu
+            individualId={selectedId}
+            triggerClassName="text-xs border rounded px-2 py-1 hover:bg-gray-100"
+          >
+            More for the {selectedIds.length}...
+          </MoreMenu>
         )}
         <PanelButton onClick={() => setSelectedId(null)} title="Escape">
           Clear selection

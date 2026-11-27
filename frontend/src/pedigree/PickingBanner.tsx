@@ -32,8 +32,9 @@ export function PickingBanner() {
   const isParents = picking.kind === "parents";
   const picked = isParents ? picking.picked : [];
   const isPartner = picking.kind === "partner";
-  const excluded = new Set(isParents ? [picking.childId, ...picked]
-    : picking.kind === "partner" || picking.kind === "relatedness" ? [picking.individualId]
+  const children = isParents ? picking.childIds ?? [picking.childId] : [];
+  const excluded = new Set(isParents ? [...children, ...picked]
+    : picking.kind === "partner" || picking.kind === "relatedness" || picking.kind === "childOf" ? [picking.individualId]
     : picking.kind === "donor" || picking.kind === "surrogate" ? [picking.childId] : []);
   const q = query.trim().toLowerCase();
   const matches = q
@@ -42,7 +43,7 @@ export function PickingBanner() {
       // Best match first: a name equal to the query, then one starting with it, then the rest
       // (ids are UUIDs, so a short query such as "9" matches many of them).
       .sort((a, b) => matchRank(a, q) - matchRank(b, q))
-      .filter(i => !isParents || !setParentsProblem(pedigree, picking.childId, [...picked, i.id]))
+      .filter(i => !isParents || children.every(c => !setParentsProblem(pedigree, c, [...picked, i.id])))
       .filter(i => !isPartner || !linkPartnerProblem(pedigree, picking.individualId, i.id))
       .filter(i => picking.kind !== "donor" || !addDonorProblem(pedigree, picking.childId, picking.gamete, i.id))
       .filter(i => picking.kind !== "surrogate" || !addSurrogateProblem(pedigree, picking.childId, i.id))
@@ -51,7 +52,9 @@ export function PickingBanner() {
 
   const partnership = picking.kind === "child" ? pedigree.partnerships.find(p => p.id === picking.partnershipId) : undefined;
   const heading = isParents
-    ? `Click one or two people to be the parents of ${nameOf(pedigree, picking.childId)}`
+    ? `Click one or two people to be the parents of ${children.length > 1 ? `the ${children.length} selected` : nameOf(pedigree, picking.childId)}`
+    : picking.kind === "childOf"
+      ? `Click a person already on the tree to be a child of ${nameOf(pedigree, picking.individualId)}`
     : isPartner
       ? `Click a person already on the tree to be the partner of ${nameOf(pedigree, picking.individualId)}`
     : picking.kind === "donor"

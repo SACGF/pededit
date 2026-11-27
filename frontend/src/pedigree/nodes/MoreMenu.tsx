@@ -6,7 +6,9 @@ import { LIFE_STATUS_LOCKED_TITLE, LIFE_STATUS_OPTIONS, NO_CHILDREN_TITLE, NO_PA
 import { probandTitle } from "../proband";
 import { DELETE_TITLE, REMOVE_WITH_ANCESTORS_TITLE, REMOVE_WITH_DESCENDANTS_TITLE } from "../removal";
 import { ADOPTION_OPTIONS } from "../adoption";
-import { addDonorProblem, addSurrogateProblem } from "../assistedEdits";
+import { addDonorProblem, addSurrogateProblem, donorOf, removeSurrogateProblem } from "../assistedEdits";
+import { moveSiblingProblem } from "../actionInventory";
+import { ADD_PARENTS_HAS_PARENTS, ADD_SIBLING_NEEDS_PARENTS } from "../personActions";
 import { ZYGOSITY_OPTIONS, adjacentSibling, twinSetOf, twinSetProblem } from "../twins";
 import { hasDescendants } from "../collapse";
 import { batchSexProblem, carrierStatusOf } from "../batch";
@@ -18,6 +20,7 @@ import { ConditionItemLabel, MenuItem, MenuSection, MenuSwatch, menuAction, menu
 import { CoupleMenuItems } from "./CoupleMenuItems";
 import { AddChildrenPanel } from "./AddChildrenPanel";
 import { BatchMenuItems, SelectionMenuSection } from "./BatchMenuItems";
+import { GroupMenuItems } from "./GroupMenuItems";
 
 interface MoreMenuProps {
   individualId: string;
@@ -74,6 +77,32 @@ export function MoreMenu({ individualId, onClose, triggerClassName, children }: 
 }
 
 /**
+ * A couple's menu behind a "More" button: the Person tab's couple blocks
+ * (#243), so the couple's items are reached there as from the couple line.
+ */
+export function CoupleMoreMenu({ partnershipId, fromId }: { partnershipId: string; fromId?: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          title="More for this couple"
+          aria-label="More for this couple"
+          data-couple-more={partnershipId}
+          className="shrink-0 px-1.5 border rounded text-[10px] leading-4 text-gray-600 hover:bg-gray-100"
+        >
+          More
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className={MENU_CONTENT_CLASS} side="bottom" align="end" collisionPadding={8}>
+        <CoupleMenuItems partnershipId={partnershipId} fromId={fromId} onDone={() => setOpen(false)} />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+/**
  * Everything the more menu offers for one person. The hover pill's "···"
  * and the right-click menu both show this list, so an item added here
  * appears in both. `onDone` closes whichever popover holds it.
@@ -83,7 +112,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
   const { pedigree, selectedIds } = usePedigreeFields("pedigree", "selectedIds");
   // Actions never change, so they are read once rather than subscribed to.
   const {
-    addPartner, addChildren, setAffected, setDeceased, setCarrier, setPresymptomatic, setProband, setConsultand,
+    addPartner, addChildren, addParent, addSibling, removeDonor, removeSurrogate, startPickingChildOf, setAffected, setDeceased, setCarrier, setPresymptomatic, setProband, setConsultand,
     setFamilyHistoryUnknown, setSex, setLifeStatus, moveSibLeft, moveSibRight, deleteIndividual, unpinIndividual,
     setIndividualTag, setConditionStatus, setAdopted, addDonor, addSurrogate, setTwins, removeTwin,
     removeWithDescendants, removeWithAncestors, setDescendantsHidden, startPickingParents, startPickingPartner,
@@ -105,6 +134,7 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
       <>
         <SelectionMenuSection individualId={individualId} action={action} />
         {couple && <CoupleMenuItems partnershipId={couple.id} onDone={onDone} />}
+        <GroupMenuItems ids={selectedIds} action={action} />
         <BatchMenuItems ids={selectedIds} action={action} />
       </>
     );
@@ -146,6 +176,13 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
             </MenuItem>
           )}
           <MenuItem
+            onClick={() => action(() => addParent(individualId, "male"))}
+            disabled={hasParentsAlready}
+            title={hasParentsAlready ? ADD_PARENTS_HAS_PARENTS : "Add a father and a mother above this person"}
+          >
+            Add parents
+          </MenuItem>
+          <MenuItem
             onClick={() => setShowAddChildren(v => !v)}
             active={showAddChildren}
             disabled={!!individual.lifeStatus}
@@ -159,6 +196,30 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               onAdd={(sex, count, partnershipId) => action(() => addChildren(individualId, count, sex, partnershipId))}
             />
           )}
+          {pedigree.individuals.length > 1 && (
+            <MenuItem
+              onClick={() => action(() => startPickingChildOf(individualId))}
+              disabled={!!individual.lifeStatus}
+              title={individual.lifeStatus
+                ? NO_CHILDREN_TITLE
+                : "Click someone already on the tree to make them this person's child. With no partner, an unknown partner is added, as Set parents does"}
+            >
+              Add existing child...
+            </MenuItem>
+          )}
+          <div className="px-2 pt-1 text-[10px] text-gray-400">Add sibling</div>
+          <div className="flex" data-add-sibling>
+            {([["male", "Brother"], ["female", "Sister"], ["unknown", "Unknown"]] as const).map(([sex, text]) => (
+              <MenuItem
+                key={sex}
+                onClick={() => action(() => addSibling(individualId, sex))}
+                disabled={!hasParentsAlready}
+                title={hasParentsAlready ? `Add a ${sex === "unknown" ? "sibling of unknown sex" : text.toLowerCase()}` : ADD_SIBLING_NEEDS_PARENTS}
+              >
+                {text}
+              </MenuItem>
+            ))}
+          </div>
           <MenuItem
             onClick={() => action(() => startPickingParents(individualId))}
             title={hasParentsAlready ? "Click existing people on the canvas to replace the current parents" : "Click one or two existing people on the canvas to be the parents"}
@@ -177,10 +238,18 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
 
         <MenuSection label="Sibling order">
           <div className="flex">
-            <MenuItem onClick={() => action(() => moveSibLeft(individualId))}>
+            <MenuItem
+              onClick={() => action(() => moveSibLeft(individualId))}
+              disabled={!!moveSiblingProblem(pedigree, individualId, -1)}
+              title={moveSiblingProblem(pedigree, individualId, -1) ?? undefined}
+            >
               Move left
             </MenuItem>
-            <MenuItem onClick={() => action(() => moveSibRight(individualId))}>
+            <MenuItem
+              onClick={() => action(() => moveSibRight(individualId))}
+              disabled={!!moveSiblingProblem(pedigree, individualId, 1)}
+              title={moveSiblingProblem(pedigree, individualId, 1) ?? undefined}
+            >
               Move right
             </MenuItem>
           </div>
@@ -352,6 +421,14 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
               </div>
             );
           })}
+          {donorOf(pedigree, individualId) && (
+            <MenuItem
+              onClick={() => action(() => { const why = removeDonor(individualId); if (why) usePedigreeStore.getState().setNotice({ kind: "error", text: why }); })}
+              title="The parent the donor replaced is the genetic parent again; a donor added here with nothing recorded goes"
+            >
+              Remove donor
+            </MenuItem>
+          )}
           {(() => {
             const why = addSurrogateProblem(pedigree, individualId);
             return (
@@ -370,6 +447,14 @@ export function MoreMenuItems({ individualId, onDone }: { individualId: string; 
                     title={why ?? "Click a woman already on the tree who carried this pregnancy, for example a relative"}
                   >
                     Existing surrogate...
+                  </MenuItem>
+                )}
+                {!removeSurrogateProblem(pedigree, individualId) && (
+                  <MenuItem
+                    onClick={() => action(() => removeSurrogate(individualId))}
+                    title="Nobody is recorded as the surrogate; a mother who carried the child before carries it again"
+                  >
+                    Remove surrogate
                   </MenuItem>
                 )}
               </>

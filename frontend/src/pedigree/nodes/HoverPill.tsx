@@ -3,6 +3,7 @@ import { NodeToolbar, Position, useStore } from "@xyflow/react";
 import { Lock, Unlock } from "lucide-react";
 import { usePedigreeFields, usePedigreeStore } from "../../store/usePedigreeStore";
 import { MoreMenu } from "./MoreMenu";
+import { useSmallScreen } from "../../hooks/useSmallScreen";
 import { lockActionTitle, personAddActions, runPersonAdd } from "../personActions";
 
 interface HoverPillProps {
@@ -87,12 +88,13 @@ export function HoverPill({ nodeId, individualId, isVisible, name, nameOnly, onP
  * pedigree here costs the other nodes nothing.
  */
 function AddButtons({ individualId }: { individualId: string }) {
-  const { pedigree, ...edits } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling");
+  const { pedigree, ...edits } = usePedigreeFields("pedigree", "addParent", "addChild", "addSibling", "addPartner");
+  const small = useSmallScreen();
   const individual = pedigree.individuals.find(i => i.id === individualId);
   if (!individual) return null;
   return (
     <>
-      {personAddActions(pedigree, individual).map(a => (
+      {personAddActions(pedigree, individual).filter(a => !(small && a.wideOnly)).map(a => (
         <PillButton key={a.key} title={a.title} disabled={a.disabled} onClick={() => runPersonAdd(a.key, individualId, edits)}>{a.glyph}</PillButton>
       ))}
     </>

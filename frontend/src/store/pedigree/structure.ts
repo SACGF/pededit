@@ -4,7 +4,7 @@ import { setParentsProblem } from "../../pedigree/parents";
 import { dropLeftoverPlaceholders, partnersIn } from "../../pedigree/placeholders";
 import { linkPartnerProblem } from "../../pedigree/partners";
 import { kinshipOf } from "../../pedigree/relatedness";
-import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate } from "../../pedigree/assistedEdits";
+import { addDonorProblem, applyAddDonor, addSurrogateProblem, applyAddSurrogate, applyRemoveDonor, applyRemoveSurrogate, donorOf, removeDonorProblem, removeSurrogateProblem } from "../../pedigree/assistedEdits";
 import { applySameSexChildren, isSameSexCouple, sameSexChildProblem } from "../../pedigree/sameSex";
 import { newId, fatherFirst, nextSibOrderInFamily, nextRootSibOrder, makeIndividual, makePlaceholder, oppositeSex, addCouple, addPlaceholderFor, ensureChildPartnershipId, leaveParents, tidyCoupleLeft, clearChildless } from "./draft";
 import type { EditTools, StructureSlice } from "./state";
@@ -57,6 +57,29 @@ export function structureSlice(tools: EditTools): StructureSlice {
     });
   }
 
+  /**
+   * Children conceived with a donor among `gone` who themselves stay: their
+   * donor is removed first, so the parent the donor replaced is the genetic
+   * parent again (#243). No user deleting a donor means "make this child a
+   * founder". Call inside the edit; returns how many children it restored.
+   */
+  function restoreDonorChildren(draft: Pedigree, gone: Set<string>): number {
+    const children = draft.individuals.filter(i => !gone.has(i.id) && (() => {
+      const d = donorOf(draft, i.id);
+      return !!d && gone.has(d.donorId) && !removeDonorProblem(draft, i.id);
+    })()).map(i => i.id);
+    for (const id of children) applyRemoveDonor(draft, id, newId());
+    return children.length;
+  }
+
+  function noticeDonorsRemoved(n: number) {
+    if (n > 0) get().setNotice({
+      kind: "info",
+      text: `Removed the donor: the parent they replaced is the genetic parent again of ${n === 1 ? "their child" : `${n} children`}.`,
+      undoable: true,
+    });
+  }
+
   /** Shared body of removeWithDescendants / removeWithAncestors. */
   function removeBranch(
     individualIds: string[],
@@ -76,12 +99,17 @@ export function structureSlice(tools: EditTools): StructureSlice {
     const candidates = partnersIn(pedigree, pedigree.partnerships
       .filter(p => gone.has(p.individual1) || gone.has(p.individual2) || childrenOf(pedigree, p.id).some(c => gone.has(c)))
       .map(p => p.id)).filter(id => !gone.has(id));
-    let removed = gone.size;
+    let removed = gone.size, restored = 0;
     mutate(draft => {
+      restored = restoreDonorChildren(draft, gone);
       removeIndividuals(draft, gone);
       removed += dropLeftoverPlaceholders(draft, candidates);
     });
-    get().setNotice({ kind: "info", text: `Removed ${removed} ${removed === 1 ? "individual" : "individuals"}.`, undoable: true });
+    get().setNotice({
+      kind: "info",
+      text: `Removed ${removed} ${removed === 1 ? "individual" : "individuals"}.${restored ? ` The parent a removed donor replaced is the genetic parent again of ${restored === 1 ? "their child" : `${restored} children`}.` : ""}`,
+      undoable: true,
+    });
     return removed;
   }
 
@@ -193,12 +221,12 @@ export function structureSlice(tools: EditTools): StructureSlice {
      * Finds the partnership that is individualId's parent, then adds a new
      * unknown-sex child to that same partnership. No-op if individual has no parents.
      */
-    addSibling: (individualId) => {
+    addSibling: (individualId, sex = "unknown") => {
       mutate(draft => {
         const parentPId = parentCoupleOf(draft, individualId)?.id;
         if (!parentPId) return; // no parents — can't add sibling
 
-        const sibling = makeIndividual("unknown", nextSibOrderInFamily(draft, parentPId));
+        const sibling = makeIndividual(sex, nextSibOrderInFamily(draft, parentPId));
         // A donor-conceived child's sibling by the same donor is raised by
         // the same social parents (the other partner of a same-sex couple).
         const source = draft.individuals.find(i => i.id === individualId);
@@ -259,11 +287,14 @@ export function structureSlice(tools: EditTools): StructureSlice {
         ...Object.keys(ped0.parentOf).filter(pid => ped0.parentOf[pid]!.includes(individualId)),
         ...couplesOf(ped0, individualId, { donorPairs: true }).map(p => p.id),
       ]);
+      let restored = 0;
       mutate(draft => {
+        restored = restoreDonorChildren(draft, new Set([individualId]));
         removeIndividuals(draft, new Set([individualId]));
         // A placeholder left with no children, or alone, goes too.
         dropLeftoverPlaceholders(draft, candidates);
       });
+      noticeDonorsRemoved(restored);
     },
 
     deleteIndividuals: (individualIds) => removeBranch(individualIds, (_p, ids) => new Set(ids), null),
@@ -335,6 +366,55 @@ export function structureSlice(tools: EditTools): StructureSlice {
       get().setNotice({ kind: "info", text: `${nameOr(childId, "This person")} no longer has parents drawn.`, undoable: true });
     },
 
+    detachFromParentsMany: (childIds) => {
+      const ped = get().pedigree;
+      const withParents = childIds.filter(id => parentCoupleOf(ped, id));
+      if (withParents.length === 0) return;
+      mutate(draft => {
+        for (const id of withParents) {
+          const before = parentCoupleOf(draft, id);
+          if (!before) continue;
+          leaveParents(draft, before, id);
+          tidyCoupleLeft(draft, before);
+          const child = draft.individuals.find(i => i.id === id);
+          if (child) child.sibOrder = nextRootSibOrder(draft);
+        }
+      });
+      get().setNotice({ kind: "info", text: `${withParents.length} ${withParents.length === 1 ? "person no longer has" : "people no longer have"} parents drawn.`, undoable: true });
+    },
+
+    setParentsMany: (childIds, parentIds) => {
+      const unique = [...new Set(parentIds)];
+      const ped = get().pedigree;
+      const problem = childIds.map(id => setParentsProblem(ped, id, unique)).find(Boolean);
+      if (problem) { console.warn(`Cannot set parents: ${problem}`); return problem; }
+      mutate(draft => {
+        const [a, b] = unique as [string, string | undefined];
+        // One couple for all of them: existing, or new (with one placeholder for a single parent).
+        const partnership = (b && draft.partnerships.find(p =>
+          !p.donorConception && ((p.individual1 === a && p.individual2 === b) || (p.individual1 === b && p.individual2 === a))))
+          || addCouple(draft, ...fatherFirst(draft, a, b ?? addPlaceholderFor(draft, a).id));
+        for (const childId of childIds) {
+          const before = parentCoupleOf(draft, childId);
+          if (before?.id === partnership.id) continue;
+          if (before) leaveParents(draft, before, childId);
+          const child = draft.individuals.find(i => i.id === childId)!;
+          child.sibOrder = nextSibOrderInFamily(draft, partnership.id);
+          draft.parentOf[partnership.id] = [...childrenOf(draft, partnership.id), childId];
+          if (before) tidyCoupleLeft(draft, before);
+        }
+        clearChildless(draft, partnership.id);
+      });
+      const after = parentCoupleOf(get().pedigree, childIds[0]!)!;
+      const name = (id: string) => nameOr(id, "an individual");
+      get().setNotice({
+        kind: "info",
+        text: `${childIds.length} people are now children of ${name(after.individual1)} and ${name(after.individual2)}.`,
+        undoable: true,
+      });
+      return null;
+    },
+
     removePartnership: (partnershipId) => {
       const { pedigree } = get();
       const p = pedigree.partnerships.find(x => x.id === partnershipId);
@@ -372,6 +452,20 @@ export function structureSlice(tools: EditTools): StructureSlice {
       const problem = addSurrogateProblem(get().pedigree, childId, existingId);
       if (problem) { console.warn(`Cannot add a surrogate: ${problem}`); return problem; }
       mutate(draft => { applyAddSurrogate(draft, childId, existingId ?? newId()); });
+      return null;
+    },
+
+    removeDonor: (childId) => {
+      const problem = removeDonorProblem(get().pedigree, childId);
+      if (problem) { console.warn(`Cannot remove the donor: ${problem}`); return problem; }
+      mutate(draft => { applyRemoveDonor(draft, childId, newId()); });
+      return null;
+    },
+
+    removeSurrogate: (childId) => {
+      const problem = removeSurrogateProblem(get().pedigree, childId);
+      if (problem) { console.warn(`Cannot remove the surrogate: ${problem}`); return problem; }
+      mutate(draft => { applyRemoveSurrogate(draft, childId); });
       return null;
     },
   };

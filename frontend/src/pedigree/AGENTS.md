@@ -103,12 +103,25 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   canvas node reads the pedigree from the store only for the problem
   marker. `nameLines` is what the canvas draws (one line when names are
   truncated), `figureNameLines` what a file writes (always wrapped).
+- `actionInventory.ts` (#243) — every editor action as data: the targets a
+  selection is (`selectionTargets`: person, couple, pair, siblings,
+  people), each action against a target kind with its surfaces and its
+  inverse, and three tables (relation by verb, per-person flag by reach,
+  scope by verb) whose every cell is an action or a written reason, plus
+  `STORE_ACTIONS`, typed over every edit action of the store. The menus,
+  pill and Person tab stay hand-written; `__tests__/actionInventory.test.ts`
+  fails on a cell that is neither, an add with no inverse, or a store action
+  nothing reaches. A new action goes in the inventory and in the surface
+  that shows it. Disabled items say why (`moveSiblingProblem`,
+  `PersonAddAction.reason`).
 - `chart/symbols.tsx` — the SVG for square / circle / diamond, affected fill,
   deceased slash, proband arrow, carrier dot, condition and trait sections and annotation row.
 - `nodes/PedigreeSymbolNode.tsx` — wraps `PersonSymbol` with the hover
   pill, more menu, selection outline, pin indicator and problem marker.
 - `nodes/HoverPill.tsx`: add parents / son / daughter / child of unknown
-  sex / sibling buttons, and lock / unlock. The add buttons are
+  sex / sibling buttons, a partner button on wide screens only
+  (`wideOnly`: on a phone the pill is already wider than the screen), and
+  lock / unlock. The add buttons are
   `personAddActions` (`personActions.ts`), which the Person tab's row
   (`components/PersonActions.tsx`) renders too. They ask the stored
   pedigree, never the drawn one or the glyph: under a view filter a

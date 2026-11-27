@@ -1,4 +1,4 @@
-import { removeWithDescendantsSet } from "../../pedigree/removal";
+import { removeWithDescendantsSet, removeWithAncestorsSet } from "../../pedigree/removal";
 import { setParentsProblem } from "../../pedigree/parents";
 import { collapseInfo } from "../../pedigree/collapse";
 import { isSameSexCouple } from "../../pedigree/sameSex";
@@ -69,6 +69,14 @@ export function viewSlice(tools: EditTools): ViewSlice {
 
     startPickingParents: (childId) => startPicking({ kind: "parents", childId, picked: [] }, selectOnly(childId)),
 
+    startPickingParentsOf: (childIds) => {
+      if (childIds.length === 0) return;
+      if (childIds.length === 1) { get().startPickingParents(childIds[0]!); return; }
+      startPicking({ kind: "parents", childId: childIds[0]!, childIds, picked: [] });
+    },
+
+    startPickingChildOf: (individualId) => startPicking({ kind: "childOf", individualId }, selectOnly(individualId)),
+
     startPickingChild: (partnershipId, geneticParentId) => startPicking({ kind: "child", partnershipId, geneticParentId }),
 
     startPickingPartner: (individualId) => startPicking({ kind: "partner", individualId }, selectOnly(individualId)),
@@ -94,6 +102,16 @@ export function viewSlice(tools: EditTools): ViewSlice {
         else set({ picking: null });
         return true;
       }
+      if (picking.kind === "childOf") {
+        if (id === picking.individualId) {
+          get().setNotice({ kind: "error", text: "Someone cannot be their own child." });
+          return true;
+        }
+        const problem = get().setParents(id, [picking.individualId]);
+        if (problem) get().setNotice({ kind: "error", text: problem });
+        else set({ picking: null, ...selectOnly(picking.individualId) });
+        return true;
+      }
       if (picking.kind === "relatedness") {
         if (id === picking.individualId) return true;
         set({ picking: null, ...selectionOf([picking.individualId, id], id) });
@@ -111,7 +129,8 @@ export function viewSlice(tools: EditTools): ViewSlice {
         else set({ picking: null, ...selectOnly(picking.individualId) });
         return true;
       }
-      if (id === picking.childId) {
+      const children = picking.childIds ?? [picking.childId];
+      if (children.includes(id)) {
         get().setNotice({ kind: "error", text: "Someone cannot be their own parent." });
         return true;
       }
@@ -119,7 +138,7 @@ export function viewSlice(tools: EditTools): ViewSlice {
         ? picking.picked.filter(x => x !== id)
         : [...picking.picked, id];
       if (picked.length > picking.picked.length) {
-        const problem = setParentsProblem(pedigree, picking.childId, picked);
+        const problem = children.map(c => setParentsProblem(pedigree, c, picked)).find(Boolean);
         if (problem) { get().setNotice({ kind: "error", text: problem }); return true; }
       }
       set({ picking: { ...picking, picked } });
@@ -130,6 +149,12 @@ export function viewSlice(tools: EditTools): ViewSlice {
     applyPicking: () => {
       const { picking } = get();
       if (!picking || picking.kind !== "parents" || picking.picked.length === 0) return;
+      if (picking.childIds) {
+        const problem = get().setParentsMany(picking.childIds, picking.picked);
+        if (problem) get().setNotice({ kind: "error", text: problem });
+        else set({ picking: null, ...selectionOf(picking.childIds, picking.childId) });
+        return;
+      }
       const problem = get().setParents(picking.childId, picking.picked);
       if (problem) get().setNotice({ kind: "error", text: problem });
       else set({ picking: null, ...selectOnly(picking.childId) });
@@ -155,6 +180,16 @@ export function viewSlice(tools: EditTools): ViewSlice {
       // without being seen.
       const hidden = collapseInfo(pedigree).hidden;
       const ids = [...removeWithDescendantsSet(pedigree, [id])].filter(x => !hidden.has(x));
+      set(selectionOf(ids, id));
+      return ids.length;
+    },
+
+    selectAncestors: (id) => {
+      const { pedigree } = get();
+      if (!pedigree.individuals.some(i => i.id === id)) return 0;
+      // As selectDescendants: only people who are drawn.
+      const hidden = collapseInfo(pedigree).hidden;
+      const ids = [...removeWithAncestorsSet(pedigree, [id])].filter(x => !hidden.has(x));
       set(selectionOf(ids, id));
       return ids.length;
     },
