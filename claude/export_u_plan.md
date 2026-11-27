@@ -19,7 +19,10 @@ expansions in STARD7 in familial adult myoclonic epilepsy linked to
 chromosome 2", Nature Communications 10:4920,
 https://doi.org/10.1038/s41467-019-12671-y, Supplementary Figure 2a
 (Family 1). The image attached to #2 is the same family in another colouring.
-The U-shape follows it:
+The U-shape follows it. **The FAME figure is the spec, and this is a final
+decision by the maintainer:** symbols turn rigidly with the curve, so a
+tilted diamond that reads as a square is intended. Do not raise it again or
+ask whether to go back to upright symbols.
 
 - The founder sits at the bottom centre on the innermost track and each
   generation is one track further out. On the arms the family is an ordinary
