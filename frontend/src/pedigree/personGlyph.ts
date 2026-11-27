@@ -19,7 +19,7 @@ import { arrowKind, type ArrowKind } from "./proband";
 import { hasDocumentedEvaluation } from "./evaluation";
 import { lifeStatusCaption } from "./lifeStatus";
 import { symbolLetter } from "./assisted";
-import { wrapLabel, nameLabelText, detailSections, detailLines, detailsBacked, MAX_LABEL_LINES } from "./labels";
+import { wrapLabel, nameLabelText, detailSections, detailLines, detailRuns, detailsBacked, nameCharWidth, MAX_LABEL_LINES, type NameWeight, type TextRun } from "./labels";
 import { branchOf } from "./collapse";
 
 export interface PersonGlyph {
@@ -45,7 +45,7 @@ export interface PersonGlyph {
   documented: boolean;
   /** "SB" or "ECT" under the symbol, above everything else there. */
   caption?: string;
-  /** Dot and text tags in a row under the symbol. */
+  /** Dot tags in a row under the symbol. Text tags are detail lines. */
   annotations: AnnotationItem[];
   /** The name in full, for a tooltip or `<title>` when the lines are cut. */
   name?: string;
@@ -53,8 +53,12 @@ export interface PersonGlyph {
   nameLines: string[];
   /** The name as a figure writes it: always wrapped, since a file cannot be hovered. */
   figureNameLines: string[];
-  /** Under the name, in NSGC order: age or year of birth, onset, sex at birth, evaluations, pedigree number. */
+  /** Bold for a name, regular when the name is a pedigree number. Name lines are wrapped at this weight's width. */
+  nameWeight: NameWeight;
+  /** Under the name, in NSGC order: age or year of birth, onset, sex at birth, evaluations, text tags, notes, pedigree number. */
   detailLines: string[];
+  /** The detail lines drawn in colour (text tags), by index into `detailLines`, as coloured pieces. */
+  detailRuns: Record<number, TextRun[]>;
   /** The detail lines reach the sibship bar below, so they get a white backing. */
   detailsBacked: boolean;
   /** A line runs down through the text, so all of it gets a white backing. Set by `buildScene`. */
@@ -76,6 +80,8 @@ export interface PersonGlyphOptions {
   hasParents: boolean;
   /** Which copy this is, for someone drawn more than once. */
   copy?: number;
+  /** "regular" when names are pedigree numbers (a de-identified figure). Default: bold. */
+  nameWeight?: NameWeight;
 }
 
 export function personGlyph(individual: Individual, pedigree: Pedigree, options: PersonGlyphOptions): PersonGlyph {
@@ -86,6 +92,8 @@ export function personGlyph(individual: Individual, pedigree: Pedigree, options:
   const caption = lifeStatusCaption(individual.lifeStatus);
   const letter = symbolLetter(individual);
   const details = detailSections(individual, labelMax, pedigree, numbers);
+  const nameWeight = options.nameWeight ?? "bold";
+  const charWidth = nameCharWidth(nameWeight);
   return {
     shape: symbolSex(individual, pedigree),
     ...(individual.lifeStatus ? { lifeStatus: individual.lifeStatus } : {}),
@@ -100,9 +108,11 @@ export function personGlyph(individual: Individual, pedigree: Pedigree, options:
     ...(caption ? { caption } : {}),
     annotations: annotationRow(individual, pedigree),
     ...(name ? { name } : {}),
-    nameLines: wrapLabel(name, labelMax, options.nameLineLimit ?? MAX_LABEL_LINES),
-    figureNameLines: wrapLabel(name, labelMax),
+    nameLines: wrapLabel(name, labelMax, options.nameLineLimit ?? MAX_LABEL_LINES, charWidth),
+    figureNameLines: wrapLabel(name, labelMax, MAX_LABEL_LINES, charWidth),
+    nameWeight,
     detailLines: detailLines(details),
+    detailRuns: detailRuns(details),
     detailsBacked: detailsBacked(details),
     ...(options.copy !== undefined ? { copy: options.copy } : {}),
     ...(branch ? { groupCount: branch.children.length } : {}),

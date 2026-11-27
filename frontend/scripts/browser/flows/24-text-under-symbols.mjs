@@ -1,6 +1,7 @@
 // The text under a symbol is SVG text on the canvas, as in the export
 // (#145): a cut name still shows the full name on hover and selects on a
-// click (#68), and a name that is not cut lets the mouse through.
+// click (#68), and a name that is not cut lets the mouse through. The name
+// is bold, text tags are detail lines under it (#246).
 export default {
   name: "text-under-symbols",
   about: "Names and details under the symbols are SVG text placed as the export places them; hovering a cut name shows it in full without the pill's buttons, clicking it selects, an uncut name lets the mouse through",
@@ -10,7 +11,19 @@ export default {
 
     // Bartholomew Featherstonehaugh-Wetherby is cut to fit his slot.
     const drawn = await t.eval(sel => [...document.querySelectorAll(`${sel} text`)].map(e => e.textContent), name("gf"));
-    t.equal(drawn, ["Bartholomew", "Featherston…"], "the cut name is drawn as two SVG text lines");
+    t.equal(drawn, ["Bartholomew", "Feathersto…"], "the cut name is drawn as two SVG text lines, cut at the bold width");
+    // #246: the name is bold and nothing else under the symbol is; Tamsin's
+    // "+/-" text tag is a detail line under her name, not a row above it.
+    const weights = await t.eval(() => ({
+      name: [...document.querySelectorAll('[data-individual-id="u2"] [data-name-label] text')].map(e => getComputedStyle(e).fontWeight),
+      details: [...document.querySelectorAll('[data-individual-id="u2"] [data-detail-label] text')].map(e => [e.textContent, getComputedStyle(e).fontWeight]),
+      nameY: Number(document.querySelector('[data-individual-id="u2"] [data-name-label] text').getAttribute("y")),
+      tagY: Number([...document.querySelectorAll('[data-individual-id="u2"] [data-detail-label] text')].find(e => e.textContent === "+/-")?.getAttribute("y")),
+    }));
+    t.equal(weights.name, ["700"], "the name is bold");
+    t.ok(weights.details.some(([text]) => text === "+/-"), "the text tag is among the detail lines");
+    t.ok(weights.details.every(([, w]) => w === "400"), "in regular weight, like the other detail lines");
+    t.ok(weights.tagY > weights.nameY, "under the name");
     t.equal(await t.eval(() => document.querySelector('[data-individual-id="gf"] [data-detail-label] text')?.textContent), "d. 78y",
       "the detail lines are SVG text too");
     // The canvas writes each line where the export does: the same baselines, from the symbol's centre.

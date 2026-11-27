@@ -1,10 +1,10 @@
-<svg height="750" viewBox="0 0 1473 750" width="1473" xmlns="http://www.w3.org/2000/svg">
+<svg height="756" viewBox="0 0 1473 756" width="1473" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="750" width="1473"/>
+  <rect fill="white" height="756" width="1473"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="736.5" y="56">Queen Victoria · haemophilia B</text>
   </g>
@@ -653,376 +653,378 @@
       <g transform="translate(499.86 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Prince Albert</title>Prince</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Albert</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Prince Albert</title>Prince</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Albert</text>
           </g>
         </g>
       </g>
       <g transform="translate(579.86 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Queen Victoria</title>Queen</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Victoria</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Queen Victoria</title>Queen</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Victoria</text>
           </g>
         </g>
       </g>
       <g transform="translate(-20 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Frederick III</title>Frederick</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">III</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Frederick III</title>Frederick</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">III</text>
           </g>
         </g>
       </g>
       <g transform="translate(60 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Victoria, Princess Royal</title>Victoria,</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Princess…</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Victoria, Princess Royal</title>Victoria,</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Princess…</text>
           </g>
         </g>
       </g>
       <g transform="translate(217.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Edward VII</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Edward VII</text>
           </g>
         </g>
       </g>
       <g transform="translate(297.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Louis IV of Hesse</title>Louis IV of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hesse</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Louis IV of Hesse</title>Louis IV of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Hesse</text>
           </g>
         </g>
       </g>
       <g transform="translate(377.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alice</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Alice</text>
           </g>
         </g>
       </g>
       <g transform="translate(457.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alfred</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Alfred</text>
           </g>
         </g>
       </g>
       <g transform="translate(537.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Helena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Helena</text>
           </g>
         </g>
       </g>
       <g transform="translate(617.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Louise</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Louise</text>
           </g>
         </g>
       </g>
       <g transform="translate(697.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Arthur</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Arthur</text>
           </g>
         </g>
       </g>
       <g transform="translate(777.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Leopold</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Leopold</text>
           </g>
         </g>
       </g>
       <g transform="translate(857.36 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Helen of Waldeck</title>Helen of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Waldeck</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Helen of Waldeck</title>Helen of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Waldeck</text>
           </g>
         </g>
       </g>
       <g transform="translate(1037.23 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Henry of Battenberg</title>Henry of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Battenberg</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Henry of Battenberg</title>Henry of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Battenberg</text>
           </g>
         </g>
       </g>
       <g transform="translate(1117.23 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Beatrice</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Beatrice</text>
           </g>
         </g>
       </g>
       <g transform="translate(-20 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Henry of Prussia</title>Henry of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Prussia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Henry of Prussia</title>Henry of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prussia</text>
           </g>
         </g>
       </g>
       <g transform="translate(60 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Irene of Hesse</title>Irene of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hesse</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Irene of Hesse</title>Irene of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Hesse</text>
           </g>
         </g>
       </g>
       <g transform="translate(140 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Victoria of Hesse</title>Victoria of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hesse</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Victoria of Hesse</title>Victoria of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Hesse</text>
           </g>
         </g>
       </g>
       <g transform="translate(220 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Elisabeth of Hesse</title>Elisabeth of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hesse</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Elisabeth of Hesse</title>Elisabeth</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">of Hesse</text>
           </g>
         </g>
       </g>
       <g transform="translate(300 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Ernest Louis</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Ernest Louis</title>Ernest</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Louis</text>
           </g>
         </g>
       </g>
       <g transform="translate(380 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Friedrich</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Friedrich</text>
           </g>
         </g>
       </g>
       <g transform="translate(460 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Nicholas II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Nicholas II</text>
           </g>
         </g>
       </g>
       <g transform="translate(540 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alix (Empress Alexandra)</title>Alix</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">(Empress…</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alix (Empress Alexandra)</title>Alix</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">(Empress…</text>
           </g>
         </g>
       </g>
       <g transform="translate(620 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Marie of Hesse</title>Marie of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hesse</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Marie of Hesse</title>Marie of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Hesse</text>
           </g>
         </g>
       </g>
       <g transform="translate(700 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alexander of Teck</title>Alexander of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Teck</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alexander of Teck</title>Alexander</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">of Teck</text>
           </g>
         </g>
       </g>
       <g transform="translate(780 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alice of Albany</title>Alice of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Albany</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alice of Albany</title>Alice of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Albany</text>
           </g>
         </g>
       </g>
       <g transform="translate(860 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Charles Edward</title>Charles</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Edward</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Charles Edward</title>Charles</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Edward</text>
           </g>
         </g>
       </g>
       <g transform="translate(940 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alexander of Battenberg</title>Alexander of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Battenberg</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alexander of Battenberg</title>Alexander</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">of…</text>
           </g>
         </g>
       </g>
       <g transform="translate(1020 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alfonso XIII</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alfonso XIII</title>Alfonso</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">XIII</text>
           </g>
         </g>
       </g>
       <g transform="translate(1100 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Victoria Eugenie</title>Victoria</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Eugenie</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Victoria Eugenie</title>Victoria</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Eugenie</text>
           </g>
         </g>
       </g>
       <g transform="translate(1180 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Leopold of Battenberg</title>Leopold of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Battenberg</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Leopold of Battenberg</title>Leopold of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Battenberg</text>
           </g>
         </g>
       </g>
       <g transform="translate(1260 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Maurice of Battenberg</title>Maurice of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Battenberg</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Maurice of Battenberg</title>Maurice of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Battenberg</text>
           </g>
         </g>
       </g>
       <g transform="translate(-60 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Waldemar of Prussia</title>Waldemar of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Prussia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Waldemar of Prussia</title>Waldemar of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prussia</text>
           </g>
         </g>
       </g>
       <g transform="translate(20 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Sigismund of Prussia</title>Sigismund of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Prussia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Sigismund of Prussia</title>Sigismund</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">of Prussia</text>
           </g>
         </g>
       </g>
       <g transform="translate(100 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Heinrich of Prussia</title>Heinrich of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Prussia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Heinrich of Prussia</title>Heinrich of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prussia</text>
           </g>
         </g>
       </g>
       <g transform="translate(220.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Olga</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Olga</text>
           </g>
         </g>
       </g>
       <g transform="translate(300.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Tatiana</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tatiana</text>
           </g>
         </g>
       </g>
       <g transform="translate(380.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Maria</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Maria</text>
           </g>
         </g>
       </g>
       <g transform="translate(460.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Anastasia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Anastasia</text>
           </g>
         </g>
       </g>
       <g transform="translate(540.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alexei</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Alexei</text>
           </g>
         </g>
       </g>
       <g transform="translate(620.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">May of Teck</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">May of Teck</text>
           </g>
         </g>
       </g>
       <g transform="translate(700.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Rupert of Teck</title>Rupert of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Teck</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Rupert of Teck</title>Rupert of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Teck</text>
           </g>
         </g>
       </g>
       <g transform="translate(780.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Maurice of Teck</title>Maurice of</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Teck</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Maurice of Teck</title>Maurice of</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Teck</text>
           </g>
         </g>
       </g>
       <g transform="translate(860.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alfonso, Prince of Asturias</title>Alfonso,</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Prince of…</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alfonso, Prince of Asturias</title>Alfonso,</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prince of…</text>
           </g>
         </g>
       </g>
       <g transform="translate(940.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jaime</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jaime</text>
           </g>
         </g>
       </g>
       <g transform="translate(1020.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Beatriz</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Beatriz</text>
           </g>
         </g>
       </g>
       <g transform="translate(1100.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Maria Cristina</title>Maria</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Cristina</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Maria Cristina</title>Maria</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Cristina</text>
           </g>
         </g>
       </g>
       <g transform="translate(1180.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Juan</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Juan</text>
           </g>
         </g>
       </g>
       <g transform="translate(1260.8 340)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Gonzalo</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gonzalo</text>
           </g>
         </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 590)">
+  <g class="pedigree-key" transform="translate(0 596)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

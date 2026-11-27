@@ -1,10 +1,10 @@
-<svg height="654" viewBox="0 0 552 654" width="552" xmlns="http://www.w3.org/2000/svg">
+<svg height="660" viewBox="0 0 552 660" width="552" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="654" width="552"/>
+  <rect fill="white" height="660" width="552"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="276" y="56">Twins, a pregnancy and a loss</text>
   </g>
@@ -172,7 +172,7 @@
       <g transform="translate(216.67 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Priya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Priya</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">34y</text>
@@ -182,7 +182,7 @@
       <g transform="translate(296.67 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Tom</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tom</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">36y</text>
@@ -233,7 +233,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 470)">
+  <g class="pedigree-key" transform="translate(0 476)">
     <g transform="translate(56 12) scale(0.667) translate(-23 -23)">
       <svg height="46" viewBox="-30 -2 56 56" width="46">
         <defs>

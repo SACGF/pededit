@@ -217,7 +217,10 @@ describe("U-shape layout", () => {
     for (const label of ["House Lannister (TV show)", "Multi-branch family"]) {
       const l = layoutUShape(EXAMPLES.find(e => e.label === label)!.data)!;
       const [a, b] = l.founders.map(id => l.nodes.get(id)!);
-      expect(Math.abs(a.u + b.u) / 2, label).toBeLessThan(2);
+      // Within a quarter slot: when the bar is a little short of levelling
+      // the arms the founders slide by what is missing (Lannister's wider
+      // slot for bold names, #246, takes about 14px of a 119px slot).
+      expect(Math.abs(a.u + b.u) / 2, label).toBeLessThan(l.slot / 4);
       const us = [...l.nodes.values()].map(n => n.u);
       expect(Math.abs(Math.min(...us) + Math.max(...us)), label).toBeLessThan(l.slot);
     }

@@ -1,10 +1,10 @@
-<svg height="629" viewBox="0 0 560 629" width="560" xmlns="http://www.w3.org/2000/svg">
+<svg height="635" viewBox="0 0 560 635" width="560" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="629" width="560"/>
+  <rect fill="white" height="635" width="560"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="280" y="56">Filter: blood relatives, mother&#x27;s side</text>
   </g>
@@ -217,13 +217,13 @@
       <g transform="translate(-20 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Proband</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Proband</text>
           </g>
         </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 469)">
+  <g class="pedigree-key" transform="translate(0 475)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

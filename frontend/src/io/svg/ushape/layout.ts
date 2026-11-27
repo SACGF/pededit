@@ -6,7 +6,7 @@
  */
 import { type Pedigree, type Individual } from "@pedigree-editor/layout-engine";
 import { personGlyph, type PersonGlyph } from "../../../pedigree/personGlyph";
-import { labelMaxWidth, LABEL_CHAR_WIDTH } from "../../../pedigree/labels";
+import { labelMaxWidth, nameCharWidth, LABEL_CHAR_WIDTH, type NameWeight } from "../../../pedigree/labels";
 import { labelNumbers } from "../../../pedigree/scene";
 import { CONSANGUINEOUS_GAP, NODE_SIZE } from "../../../pedigree/constants";
 import { LABEL_LINE_HEIGHT } from "../../../pedigree/labels";
@@ -452,26 +452,27 @@ export function extentOf(root: TNode, g: Geom): Extent {
   return e;
 }
 
-export interface Built { root: TNode; geom: Geom; maxDepth: number; labelLines: number; }
+export interface Built { root: TNode; geom: Geom; maxDepth: number; labelLines: number; nameWeight: NameWeight; }
 
 export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | null {
   const root = buildTree(pedigree, opts.partners ?? true);
   if (!root) return null;
 
   const byId = new Map(pedigree.individuals.map(i => [i.id, i]));
-  let maxDepth = 0, labelLines = 0, labelChars = 0;
+  const nameWeight = opts.nameWeight ?? "bold";
+  let maxDepth = 0, labelLines = 0, labelWidth = 0;
   walk(root, n => {
     maxDepth = Math.max(maxDepth, n.depth);
     for (const { id } of n.members) {
       const ind = byId.get(id);
       if (!ind) continue;
       // Names wrap at the widest slot, so a long name adds a line rather than width.
-      const glyph = glyphOf(ind, pedigree);
+      const glyph = glyphOf(ind, pedigree, nameWeight);
       const nameLines = glyph.figureNameLines;
       const details = glyph.detailLines;
       labelLines = Math.max(labelLines, nameLines.length + details.length
         + (glyph.annotations.length > 0 ? 1 : 0) + (glyph.caption ? 1 : 0));
-      labelChars = Math.max(labelChars, ...nameLines.map(l => l.length), ...details.map(l => l.length));
+      labelWidth = Math.max(labelWidth, ...nameLines.map(l => l.length * nameCharWidth(nameWeight)), ...details.map(l => l.length * LABEL_CHAR_WIDTH));
     }
   });
 
@@ -479,7 +480,7 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
   // tracks move apart when labels have more lines, and nodes move apart along
   // the track when labels are long.
   const ringGap = NODE_SIZE + 8 + labelLines * LABEL_LINE_HEIGHT + BAR_CLEARANCE + 6;
-  const slot = Math.min(MAX_SLOT, Math.max(MIN_SLOT, labelChars * LABEL_CHAR_WIDTH + 12));
+  const slot = Math.min(MAX_SLOT, Math.max(MIN_SLOT, labelWidth + 12));
   let minR0 = Math.max(1.4 * ringGap, Math.max(...root.members.map(m => m.dx)) - Math.min(...root.members.map(m => m.dx)) + NODE_SIZE);
   // A straight label on a curve is lifted clear of the line at its ends
   // (coupleLabels); the curve must be gentle enough for that lift.
@@ -536,7 +537,7 @@ export function build(pedigree: Pedigree, opts: UShapeOptions = {}): Built | nul
     }
   }
 
-  return { root, geom: geom!, maxDepth, labelLines };
+  return { root, geom: geom!, maxDepth, labelLines, nameWeight };
 }
 
 export function nodeAt(n: TNode, i: number, g: Geom): UShapeNode {
@@ -672,16 +673,17 @@ export function layoutUShape(pedigree: Pedigree, opts: UShapeOptions = {}): USha
  * a copy (its copies are joined by dashed links, not numbers).
  */
 export const glyphCache = new WeakMap<Pedigree, { numbers: Map<string, string> | undefined; glyphs: Map<string, PersonGlyph> }>();
-export function glyphOf(ind: Individual, pedigree: Pedigree): PersonGlyph {
+export function glyphOf(ind: Individual, pedigree: Pedigree, nameWeight: NameWeight = "bold"): PersonGlyph {
   let cache = glyphCache.get(pedigree);
   if (!cache) {
     cache = { numbers: labelNumbers(pedigree), glyphs: new Map() };
     glyphCache.set(pedigree, cache);
   }
-  let glyph = cache.glyphs.get(ind.id);
+  const key = `${nameWeight} ${ind.id}`;
+  let glyph = cache.glyphs.get(key);
   if (!glyph) {
-    glyph = personGlyph(ind, pedigree, { labelMax: labelMaxWidth(MAX_SLOT), numbers: cache.numbers, hasParents: hasParents(pedigree, ind.id) });
-    cache.glyphs.set(ind.id, glyph);
+    glyph = personGlyph(ind, pedigree, { labelMax: labelMaxWidth(MAX_SLOT), numbers: cache.numbers, hasParents: hasParents(pedigree, ind.id), nameWeight });
+    cache.glyphs.set(key, glyph);
   }
   return glyph;
 }

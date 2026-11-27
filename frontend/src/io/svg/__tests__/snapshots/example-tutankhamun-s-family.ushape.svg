@@ -1,37 +1,37 @@
-<svg height="676" viewBox="0 0 461 676" width="461" xmlns="http://www.w3.org/2000/svg">
+<svg height="676" viewBox="0 0 466 676" width="466" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="676" width="461"/>
+  <rect fill="white" height="676" width="466"/>
   <g class="chart-title">
-    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="230.5" y="34">Tutankhamun&#x27;s family</text>
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="233" y="34">Tutankhamun&#x27;s family</text>
   </g>
-  <g transform="translate(312.9 15.9)">
+  <g transform="translate(318.1 15.9)">
     <path d="M -40 120 L 40 120" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="0" x2="0" y1="120" y2="167"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="0" x2="0" y1="167" y2="179"/>
     <path d="M -80 199 L 0 199" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
     <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-40" x2="-40" y1="199" y2="246"/>
-    <path d="M -192.8 227.8 A 246 246 0 0 0 -100 246 L 11.7 246" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-192.8" x2="-197.3" y1="227.8" y2="238.9"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="11.7" x2="11.7" y1="246" y2="258"/>
-    <path d="M -204.1 255.6 A 276 276 0 0 0 -100 276 L 11.7 276" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <path d="M -205.6 259.3 A 280 280 0 0 0 -100 280 L 11.7 280" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-67.4" x2="-67.4" y1="278" y2="325"/>
-    <path d="M -164.8 318.5 A 325 325 0 0 0 -100 325 L -67.4 325" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-164.8" x2="-167.2" y1="318.5" y2="330.2"/>
-    <path d="M -171.2 349.8 A 357 357 0 0 0 -100 357 L -91.7 357" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123.5" x2="-126.6" y1="356.2" y2="403.1"/>
-    <path d="M -178.2 396.4 A 404 404 0 0 0 -100 404 L -97.6 404" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-178.2" x2="-180.5" y1="396.4" y2="408.1"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-97.6" x2="-97.6" y1="404" y2="416"/>
+    <path d="M -197.5 225.8 A 246 246 0 0 0 -100 246 L 14.9 246" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-197.5" x2="-202.3" y1="225.8" y2="236.9"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="14.9" x2="14.9" y1="246" y2="258"/>
+    <path d="M -209.4 253.4 A 276 276 0 0 0 -100 276 L 14.9 276" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <path d="M -211 257.1 A 280 280 0 0 0 -100 280 L 14.9 280" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-67" x2="-67" y1="278" y2="325"/>
+    <path d="M -167.7 317.9 A 325 325 0 0 0 -100 325 L -67 325" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-167.7" x2="-170.2" y1="317.9" y2="329.6"/>
+    <path d="M -174.4 349.2 A 357 357 0 0 0 -100 357 L -94.9 357" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-129.9" x2="-133.9" y1="355.7" y2="402.6"/>
+    <path d="M -184.3 395.1 A 404 404 0 0 0 -100 404 L -97.7 404" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-184.3" x2="-186.8" y1="395.1" y2="406.8"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-97.7" x2="-97.7" y1="404" y2="416"/>
     <g transform="translate(-40 120) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Yuya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Yuya</text>
           </g>
         </g>
         <g>
@@ -46,7 +46,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Thuya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Thuya</text>
           </g>
         </g>
         <g>
@@ -61,7 +61,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Amenhotep III</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Amenhotep III</text>
           </g>
         </g>
         <g>
@@ -76,7 +76,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Tiye (KV35EL)</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tiye (KV35EL)</text>
           </g>
         </g>
         <g>
@@ -87,11 +87,11 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
       </g>
     </g>
-    <g transform="translate(11.7 278) rotate(0)">
+    <g transform="translate(14.9 278) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV35YL</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV35YL</text>
           </g>
         </g>
         <g>
@@ -102,11 +102,11 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
       </g>
     </g>
-    <g transform="translate(-204.9 257.5) rotate(22.2)">
+    <g transform="translate(-210.2 255.2) rotate(23.4)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV55</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV55</text>
           </g>
         </g>
         <g>
@@ -117,11 +117,11 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
       </g>
     </g>
-    <g transform="translate(-171.2 349.8) rotate(11.5)">
+    <g transform="translate(-174.4 349.2) rotate(12)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Tutankhamun</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Tutankhamun</text>
           </g>
         </g>
         <g>
@@ -132,16 +132,16 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
         <g data-arrow="proband">
           <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
-          <rect fill="white" height="10" transform="rotate(-11.5 -22 62)" width="8.5" x="-30" y="58"/>
-          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" transform="rotate(-11.5 -22 62)" x="-22" y="67">P</text>
+          <rect fill="white" height="10" transform="rotate(-12 -22 62)" width="8.5" x="-30" y="58"/>
+          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" transform="rotate(-12 -22 62)" x="-22" y="67">P</text>
         </g>
       </g>
     </g>
-    <g transform="translate(-91.7 357) rotate(0)">
+    <g transform="translate(-94.9 357) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV21A</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV21A</text>
           </g>
         </g>
         <g>
@@ -152,11 +152,11 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
       </g>
     </g>
-    <g transform="translate(-97.6 436) rotate(0)">
+    <g transform="translate(-97.7 436) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Fetus 2</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Fetus 2</text>
           </g>
         </g>
         <g>
@@ -167,11 +167,11 @@
         <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
       </g>
     </g>
-    <g transform="translate(-184.4 427.7) rotate(11.2)">
+    <g transform="translate(-191 426.4) rotate(12)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Fetus 1</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Fetus 1</text>
           </g>
         </g>
         <g>

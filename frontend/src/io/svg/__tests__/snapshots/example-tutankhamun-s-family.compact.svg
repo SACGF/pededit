@@ -1,10 +1,10 @@
-<svg height="702" viewBox="0 0 254 702" width="254" xmlns="http://www.w3.org/2000/svg">
+<svg height="708" viewBox="0 0 254 708" width="254" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="702" width="254"/>
+  <rect fill="white" height="708" width="254"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="127" y="56">Tutankhamun&#x27;s family</text>
   </g>
@@ -20,7 +20,7 @@
       <path d="M 68 0 L 68 42 M 68 42 L 68 42 M 68 42 L 68 64" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 34 84 L 34 134 M 0 134 L 68 134 M 0 134 L 0 148 M 68 134 L 68 148" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 34 168 L 34 210 M 34 210 L 34 210 M 34 210 L 34 232" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 68 252 L 68 302 M 34 302 L 102 302 M 34 302 L 34 316 M 102 302 L 102 316" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 68 252 L 68 308 M 34 308 L 102 308 M 34 308 L 34 316 M 102 308 L 102 316" fill="none" stroke="black" stroke-width="2"/>
     </g>
     <g class="symbols">
       <g transform="translate(34 0)">
@@ -133,79 +133,79 @@
       <g transform="translate(14 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Yuya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Yuya</text>
           </g>
         </g>
       </g>
       <g transform="translate(82 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Thuya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Thuya</text>
           </g>
         </g>
       </g>
       <g transform="translate(-20 64)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Amenhotep III</title>Amenhotep</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">III</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Amenhotep III</title>Amenhotep</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">III</text>
           </g>
         </g>
       </g>
       <g transform="translate(48 64)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Tiye (KV35EL)</title>Tiye</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">(KV35EL)</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Tiye (KV35EL)</title>Tiye</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">(KV35EL)</text>
           </g>
         </g>
       </g>
       <g transform="translate(-20 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV55</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV55</text>
           </g>
         </g>
       </g>
       <g transform="translate(48 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV35YL</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV35YL</text>
           </g>
         </g>
       </g>
       <g transform="translate(14 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Tutankhamun</title>Tutankhamu</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">n</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38"><title>Tutankhamun</title>Tutankham</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="51">un</text>
           </g>
         </g>
       </g>
       <g transform="translate(82 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">KV21A</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">KV21A</text>
           </g>
         </g>
       </g>
       <g transform="translate(14 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Fetus 1</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Fetus 1</text>
           </g>
         </g>
       </g>
       <g transform="translate(82 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Fetus 2</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Fetus 2</text>
           </g>
         </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 566)">
+  <g class="pedigree-key" transform="translate(0 572)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

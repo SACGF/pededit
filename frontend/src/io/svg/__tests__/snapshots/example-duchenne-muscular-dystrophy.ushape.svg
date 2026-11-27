@@ -81,7 +81,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Emma</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Emma</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">31y</text>
@@ -141,7 +141,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jack</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jack</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">6y</text>
@@ -174,7 +174,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Michael</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Michael</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">d. 19y</text>

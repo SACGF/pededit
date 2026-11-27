@@ -1,10 +1,10 @@
-<svg height="1019" viewBox="0 0 712 1019" width="712" xmlns="http://www.w3.org/2000/svg">
+<svg height="1018" viewBox="0 0 712 1018" width="712" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="1019" width="712"/>
+  <rect fill="white" height="1018" width="712"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="356" y="56">Text under the symbol</text>
   </g>
@@ -84,9 +84,6 @@
               <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
             </g>
           </g>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">+/-</text>
-          </g>
         </g>
       </g>
       <g transform="translate(400 120)">
@@ -153,9 +150,6 @@
             <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="67">P</text>
           </g>
           <text data-documented-evaluation="true" fill="black" font-family="sans-serif" font-size="14" style="user-select:none" x="41" y="43">*</text>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">+/-</text>
-          </g>
         </g>
       </g>
       <g transform="translate(160 240)">
@@ -189,8 +183,8 @@
       <g transform="translate(300 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Bartholomew Featherstonehaugh-Wetherby</title>Bartholomew</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Featherston…</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Bartholomew Featherstonehaugh-Wetherby</title>Bartholomew</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Feathersto…</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="26" width="38.8" x="-19.4" y="48"/>
@@ -202,7 +196,7 @@
       <g transform="translate(380 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Ottoline</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Ottoline</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="26" width="21.4" x="-10.7" y="35"/>
@@ -214,7 +208,7 @@
       <g transform="translate(60 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rupert</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rupert</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="39" width="56.2" x="-28.1" y="35"/>
@@ -227,8 +221,8 @@
       <g transform="translate(140 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Persephone Quillfeather</title>Persephone</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Quillfeather</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Persephone Quillfeather</title>Persephone</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Quillfeath…</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="39" width="73.6" x="-36.8" y="48"/>
@@ -241,7 +235,7 @@
       <g transform="translate(220 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Sorrel</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Sorrel</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="39" width="44.6" x="-22.3" y="35"/>
@@ -254,20 +248,21 @@
       <g transform="translate(300 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Tamsin</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tamsin</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="39" width="44.6" x="-22.3" y="55"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">b. 1963</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="78">AFAB</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="91">II-4</text>
+            <rect fill="white" height="52" width="44.6" x="-22.3" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">b. 1963</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58">AFAB</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="71"><tspan fill="#000000">+/-</tspan></text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="84">II-4</text>
           </g>
         </g>
       </g>
       <g transform="translate(380 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Umber</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Umber</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="39" width="27.2" x="-13.6" y="35"/>
@@ -280,7 +275,7 @@
       <g transform="translate(460 100)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Vesper</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Vesper</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="26" width="27.2" x="-13.6" y="35"/>
@@ -302,7 +297,7 @@
       <g transform="translate(-20 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="46">Yolanda</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="46">Yolanda</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="26" width="33" x="-16.5" y="49"/>
@@ -314,25 +309,26 @@
       <g transform="translate(60 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Wilhelmina</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Wilhelmina</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="104" width="73.6" x="-36.8" y="55"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">b. 1985</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="78">MS 27y</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="91">HLA-DRB1*15:</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="104">01 +</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="117">NOTCH3</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="130">c.1672C&gt;T… -</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="143">u</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="156">III-2</text>
+            <rect fill="white" height="117" width="73.6" x="-36.8" y="41"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="51">b. 1985</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="64">MS 27y</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="77">HLA-DRB1*15:</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="90">01 +</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="103">NOTCH3</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="116">c.1672C&gt;T… -</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="129">u</text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="142"><tspan fill="#000000">+/-</tspan></text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="155">III-2</text>
           </g>
         </g>
       </g>
       <g transform="translate(140 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Xavier</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Xavier</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="52" width="67.8" x="-33.9" y="35"/>
@@ -346,7 +342,7 @@
       <g transform="translate(220 220)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Zebedee</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Zebedee</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <rect fill="white" height="26" width="44.6" x="-22.3" y="35"/>
@@ -357,7 +353,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 595)">
+  <g class="pedigree-key" transform="translate(0 594)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
@@ -471,7 +467,7 @@
     <text fill="black" font-family="sans-serif" font-size="10" x="80" y="256">Multiple sclerosis</text>
     <g transform="translate(56 276) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">+/-</text>
+        <text fill="#000000" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">+/-</text>
       </svg>
     </g>
     <text fill="black" font-family="sans-serif" font-size="10" x="80" y="280">Genotype</text>

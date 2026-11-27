@@ -67,7 +67,9 @@ Use initials or first names rather than full names on clinical pedigrees.
 | Rule | PedEdit |
 |---|---|
 | Age / year of birth first | Follows (#20, #103): the free-text age, else the age at death ("d. 72y") when both full dates are known, else the year of birth and year of death ("b. 1935", "d. 2007", two lines). The full dates stay in the data, the Person tab and CSV. "Deceased" alone means date unknown. |
-| Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). The name goes above the age line. |
+| Pedigree number last, below the other text | Follows (#8): its own line, last (`detailSections` in `pedigree/labels.ts`). |
+| Nothing on how to style the name | Common practice (#246): the name directly under the symbol, above the age line, in **bold**, the only bold text there, so it reads first. A de-identified figure's names are pedigree numbers, in regular weight as in published figures. |
+| Genotype written as a result under the symbol (2022) | Follows (#246): text tags ("+/-") are a detail line of their own after the evaluations, in regular weight and the tag's colour (it matches the key). Dot tags stay in a row just under the symbol. |
 | Nothing about an inbreeding coefficient | Adds, off by default (#86): with "Show kinship and inbreeding coefficients" the line "F = 1/16" under anyone whose parents are related, after the evaluations and before the pedigree number, with a key row saying what F is. |
 | No line for free comments | Adds (#219): the person's notes, after the inbreeding coefficient and before the pedigree number, in full (the next generation moves down to make room) or, with "Notes: Up to two lines", cut at two lines. On by default, because notes someone wrote are expected on the chart; "Show notes on the chart" in Settings turns them off, and de-identified export leaves them out unless "Include notes" is ticked (#242). |
 | Age at onset is pedigree information for risk assessment (2008, p. 431) | #93 records it. The standard gives no exact wording; "dx" is common practice. |

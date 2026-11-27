@@ -1,10 +1,10 @@
-<svg height="1814" viewBox="0 0 1241 1814" width="1241" xmlns="http://www.w3.org/2000/svg">
+<svg height="1813" viewBox="0 0 1241 1813" width="1241" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="1814" width="1241"/>
+  <rect fill="white" height="1813" width="1241"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="620.5" y="56">House Targaryen</text>
   </g>
@@ -55,29 +55,29 @@
     <g class="sibship-lines">
       <path d="M 386.54 0 L 386.54 50 M 318.54 50 L 454.54 50 M 318.54 50 L 318.54 64 M 386.54 50 L 386.54 64 M 454.54 50 L 454.54 64" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 352.54 84 L 352.54 126 M 318.54 126 L 352.54 126 M 318.54 126 L 318.54 148" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 420.54 84 L 420.54 126 M 420.54 126 L 454.54 126 M 454.54 126 L 454.54 148" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 352.54 168 L 352.54 210 M 51.41 210 L 598.62 210 M 51.41 210 L 51.41 232 M 119.41 210 L 119.41 232 M 352.54 210 L 352.54 232 M 462.62 210 L 462.62 232 M 530.62 210 L 530.62 232 M 598.62 210 L 598.62 232" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 420.54 84 L 420.54 134 M 420.54 134 L 454.54 134 M 454.54 134 L 454.54 148" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 352.54 168 L 352.54 218 M 51.41 218 L 598.62 218 M 51.41 218 L 51.41 232 M 119.41 218 L 119.41 232 M 352.54 218 L 352.54 232 M 462.62 218 L 462.62 232 M 530.62 218 L 530.62 232 M 598.62 218 L 598.62 232" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 85.41 252 L 85.41 294 M 0 294 L 85.41 294 M 0 294 L 0 316 M 68 294 L 68 316" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 496.62 252 L 496.62 294 M 136 294 L 1088 294 M 136 294 L 136 316 M 204 294 L 204 316 M 272 294 L 272 316 M 340 294 L 340 316 M 476 294 L 476 316 M 544 294 L 544 316 M 680 294 L 680 316 M 748 294 L 748 316 M 816 294 L 816 316 M 884 294 L 884 316 M 952 294 L 952 316 M 1020 294 L 1020 316 M 1088 294 L 1088 316" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 306 336 L 306 378 M 169.03 378 L 373.03 378 M 169.03 378 L 169.03 400 M 237.03 378 L 237.03 400 M 373.03 378 L 373.03 400" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 306 336 L 306 386 M 169.03 386 L 373.03 386 M 169.03 386 L 169.03 400 M 237.03 386 L 237.03 400 M 373.03 386 L 373.03 400" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 442 336 L 442 378 M 442 378 L 442 378 M 442 378 L 442 400" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 578 336 L 578 386 M 578 386 L 605.7 386 M 605.7 386 L 605.7 400" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 339.03 420 L 339.03 470 M 105.23 470 L 339.03 470 M 105.23 470 L 105.23 484 M 173.23 470 L 173.23 484 M 241.23 470 L 241.23 484 M 309.23 470 L 309.23 484" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 407.52 420 L 407.52 470 M 407.52 470 L 445.23 470 M 445.23 470 L 445.23 484" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 571.7 420 L 571.7 470 M 513.23 470 L 708.5 470 M 513.23 470 L 513.23 484 M 708.5 470 L 708.5 484" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 139.23 504 L 139.23 546 M 28.91 546 L 164.91 546 M 28.91 546 L 28.91 568 M 96.91 546 L 96.91 568 M 164.91 546 L 164.91 568" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 411.23 504 L 411.23 546 M 232.91 546 L 411.23 546 M 232.91 546 L 232.91 568 M 368.91 546 L 368.91 568" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 139.23 504 L 139.23 554 M 28.91 554 L 164.91 554 M 28.91 554 L 28.91 568 M 96.91 554 L 96.91 568 M 164.91 554 L 164.91 568" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 411.23 504 L 411.23 554 M 232.91 554 L 411.23 554 M 232.91 554 L 232.91 568 M 368.91 554 L 368.91 568" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 479.23 504 L 479.23 554 M 479.23 554 L 640.91 554 M 504.91 554 L 504.91 568 M 572.91 554 L 572.91 568 M 640.91 554 L 640.91 568" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 674.5 504 L 674.5 546 M 674.5 546 L 776.91 546 M 708.91 546 L 708.91 568 M 776.91 546 L 776.91 568" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 266.91 588 L 266.91 630 M 54.27 630 L 326.27 630 M 54.27 630 L 54.27 652 M 122.27 630 L 122.27 652 M 190.27 630 L 190.27 652 M 258.27 630 L 258.27 652 M 326.27 630 L 326.27 652" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 402.91 588 L 402.91 630 M 394.27 630 L 530.27 630 M 394.27 630 L 394.27 652 M 462.27 630 L 462.27 652 M 530.27 630 L 530.27 652" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 266.91 588 L 266.91 638 M 54.27 638 L 326.27 638 M 54.27 638 L 54.27 652 M 122.27 638 L 122.27 652 M 190.27 638 L 190.27 652 M 258.27 638 L 258.27 652 M 326.27 638 L 326.27 652" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 402.91 588 L 402.91 638 M 394.27 638 L 530.27 638 M 394.27 638 L 394.27 652 M 462.27 638 L 462.27 652 M 530.27 638 L 530.27 652" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 360.27 672 L 360.27 714 M 332.1 714 L 360.27 714 M 332.1 714 L 332.1 736" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 428.27 672 L 428.27 714 M 400.1 714 L 536.1 714 M 400.1 714 L 400.1 736 M 536.1 714 L 536.1 736" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 434.1 756 L 434.1 798 M 332.1 798 L 536.1 798 M 332.1 798 L 332.1 820 M 400.1 798 L 400.1 820 M 468.1 798 L 468.1 820 M 536.1 798 L 536.1 820" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 570.1 840 L 570.1 882 M 388.77 882 L 796.77 882 M 388.77 882 L 388.77 904 M 456.77 882 L 456.77 904 M 524.77 882 L 524.77 904 M 592.77 882 L 592.77 904 M 660.77 882 L 660.77 904 M 796.77 882 L 796.77 904" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 694.77 924 L 694.77 966 M 558.77 966 L 830.77 966 M 558.77 966 L 558.77 988 M 626.77 966 L 626.77 988 M 694.77 966 L 694.77 988 M 762.77 966 L 762.77 988 M 830.77 966 L 830.77 988" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 428.27 672 L 428.27 722 M 400.1 722 L 536.1 722 M 400.1 722 L 400.1 736 M 536.1 722 L 536.1 736" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 434.1 756 L 434.1 806 M 332.1 806 L 536.1 806 M 332.1 806 L 332.1 820 M 400.1 806 L 400.1 820 M 468.1 806 L 468.1 820 M 536.1 806 L 536.1 820" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 570.1 840 L 570.1 890 M 388.77 890 L 796.77 890 M 388.77 890 L 388.77 904 M 456.77 890 L 456.77 904 M 524.77 890 L 524.77 904 M 592.77 890 L 592.77 904 M 660.77 890 L 660.77 904 M 796.77 890 L 796.77 904" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 694.77 924 L 694.77 974 M 558.77 974 L 830.77 974 M 558.77 974 L 558.77 988 M 626.77 974 L 626.77 988 M 694.77 974 L 694.77 988 M 762.77 974 L 762.77 988 M 830.77 974 L 830.77 988" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 660.77 1008 L 660.77 1050 M 626.77 1050 L 694.77 1050 M 626.77 1050 L 626.77 1072 M 694.77 1050 L 694.77 1072" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 660.77 1092 L 660.77 1134 M 547.44 1134 L 751.44 1134 M 547.44 1134 L 547.44 1156 M 683.44 1134 L 683.44 1156 M 751.44 1134 L 751.44 1156" fill="none" stroke="black" stroke-width="2"/>
+      <path d="M 660.77 1092 L 660.77 1142 M 547.44 1142 L 751.44 1142 M 547.44 1142 L 547.44 1156 M 683.44 1142 L 683.44 1156 M 751.44 1142 L 751.44 1156" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 513.44 1176 L 513.44 1226 M 459.52 1226 L 527.52 1226 M 459.52 1226 L 459.52 1240 M 527.52 1226 L 527.52 1240" fill="none" stroke="black" stroke-width="2"/>
       <path d="M 581.44 1176 L 581.44 1218 M 581.44 1218 L 595.52 1218 M 595.52 1218 L 595.52 1240" fill="none" stroke="black" stroke-width="2"/>
     </g>
@@ -146,9 +146,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(454.54 84)">
@@ -170,9 +167,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
-          </g>
         </g>
       </g>
       <g transform="translate(318.54 168)">
@@ -194,9 +188,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(386.54 168)">
@@ -228,9 +219,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(51.41 252)">
@@ -304,9 +292,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(530.62 252)">
@@ -410,9 +395,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
-          </g>
         </g>
       </g>
       <g transform="translate(340 336)">
@@ -612,9 +594,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(442 420)">
@@ -677,9 +656,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(173.23 504)">
@@ -727,9 +703,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
-          </g>
         </g>
       </g>
       <g transform="translate(309.23 504)">
@@ -794,9 +767,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(513.23 504)">
@@ -861,9 +831,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Vhagar</text>
-          </g>
         </g>
       </g>
       <g transform="translate(28.91 588)">
@@ -915,9 +882,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(300.91 588)">
@@ -938,9 +902,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(436.91 588)">
@@ -1066,9 +1027,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(122.27 672)">
@@ -1079,9 +1037,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(190.27 672)">
@@ -1122,9 +1077,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(462.27 672)">
@@ -1165,9 +1117,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(468.1 756)">
@@ -1208,9 +1157,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(468.1 840)">
@@ -1231,9 +1177,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(604.1 840)">
@@ -1316,9 +1259,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(728.77 924)">
@@ -1359,9 +1299,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(694.77 1008)">
@@ -1413,9 +1350,6 @@
             </g>
           </g>
           <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-          <g>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Throne</text>
-          </g>
         </g>
       </g>
       <g transform="translate(694.77 1092)">
@@ -1491,10 +1425,6 @@
               <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
             </g>
           </g>
-          <g>
-            <text fill="#ff7f0e" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="15.4" y="50.5">Fireproof</text>
-            <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="45.4" y="50.5">?</text>
-          </g>
         </g>
       </g>
       <g transform="translate(459.52 1260)">
@@ -1545,744 +1475,819 @@
       <g transform="translate(332.54 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerion</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aerion</text>
           </g>
         </g>
       </g>
       <g transform="translate(400.54 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Valaena Velaryon</title>Valaena</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Valaena Velaryon</title>Valaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(298.54 64)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaenys</text>
           </g>
         </g>
       </g>
       <g transform="translate(366.54 64)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(434.54 64)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="44.6" x="-22.3" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Visenya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Visenya</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#7f7f7f">Vhagar</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(298.54 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="44.6" x="-22.3" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aenys I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aenys I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(366.54 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="50.4" x="-25.2" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alyssa Velaryon</title>Alyssa</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alyssa Velaryon</title>Alyssa</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(434.54 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="50.4" x="-25.2" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Maegor I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Maegor I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(31.41 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon</text>
           </g>
         </g>
       </g>
       <g transform="translate(99.41 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaena</text>
           </g>
         </g>
       </g>
       <g transform="translate(332.54 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Viserys</text>
           </g>
         </g>
       </g>
       <g transform="translate(442.62 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>Jaehaerys I</title>Jaehaerys</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">I</text>
+            <rect fill="white" height="26" width="60.7" x="-30.35" y="22"/>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jaehaerys I</title>Jaehaerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(510.62 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alysanne</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Alysanne</text>
           </g>
         </g>
       </g>
       <g transform="translate(578.62 232)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Vaella</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Vaella</text>
           </g>
         </g>
       </g>
       <g transform="translate(-20 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerea</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aerea</text>
           </g>
         </g>
       </g>
       <g transform="translate(48 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaella</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaella</text>
           </g>
         </g>
       </g>
       <g transform="translate(116 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon</text>
           </g>
         </g>
       </g>
       <g transform="translate(184 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daenerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daenerys</text>
           </g>
         </g>
       </g>
       <g transform="translate(252 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="38.8" x="-19.4" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Baelon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baelon</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#7f7f7f">Vhagar</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(320 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Alyssa</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Alyssa</text>
           </g>
         </g>
       </g>
       <g transform="translate(388 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Rodrik Arryn</title>Rodrik</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Arryn</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Rodrik Arryn</title>Rodrik</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Arryn</text>
           </g>
         </g>
       </g>
       <g transform="translate(456 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daella</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daella</text>
           </g>
         </g>
       </g>
       <g transform="translate(524 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(592 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Jocelyn Baratheon</title>Jocelyn</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Baratheon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jocelyn Baratheon</title>Jocelyn</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Baratheon</text>
           </g>
         </g>
       </g>
       <g transform="translate(660 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Maegelle</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Maegelle</text>
           </g>
         </g>
       </g>
       <g transform="translate(728 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Vaegon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Vaegon</text>
           </g>
         </g>
       </g>
       <g transform="translate(796 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Saera</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Saera</text>
           </g>
         </g>
       </g>
       <g transform="translate(864 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserra</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Viserra</text>
           </g>
         </g>
       </g>
       <g transform="translate(932 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Gaemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gaemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(1000 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Valerion</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Valerion</text>
           </g>
         </g>
       </g>
       <g transform="translate(1068 316)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Gael</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gael</text>
           </g>
         </g>
       </g>
       <g transform="translate(149.03 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(217.03 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon</text>
           </g>
         </g>
       </g>
       <g transform="translate(285.03 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Alicent Hightower</title>Alicent</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Hightower</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Alicent Hightower</title>Alicent</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Hightower</text>
           </g>
         </g>
       </g>
       <g transform="translate(353.03 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Viserys I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Viserys I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(422 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Aemma Arryn</title>Aemma</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Arryn</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Aemma Arryn</title>Aemma</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Arryn</text>
           </g>
         </g>
       </g>
       <g transform="translate(517.7 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Corlys Velaryon</title>Corlys</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Corlys Velaryon</title>Corlys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(585.7 400)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaenys</text>
           </g>
         </g>
       </g>
       <g transform="translate(85.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="50.4" x="-25.2" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(153.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Helaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Helaena</text>
           </g>
         </g>
       </g>
       <g transform="translate(221.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="38.8" x="-19.4" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aemond</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aemond</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#7f7f7f">Vhagar</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(289.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daeron</text>
           </g>
         </g>
       </g>
       <g transform="translate(357.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(425.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Rhaenyra</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaenyra</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(493.23 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Laenor Velaryon</title>Laenor</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Laenor Velaryon</title>Laenor</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(620.5 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(688.5 484)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>Laena Velaryon</title>Laena</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">Velaryon</text>
+            <rect fill="white" height="26" width="54.4" x="-27.2" y="22"/>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Laena Velaryon</title>Laena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#7f7f7f">Vhagar</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(8.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jaehaerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jaehaerys</text>
           </g>
         </g>
       </g>
       <g transform="translate(76.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jaehaera</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jaehaera</text>
           </g>
         </g>
       </g>
       <g transform="translate(144.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Maelor</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Maelor</text>
           </g>
         </g>
       </g>
       <g transform="translate(212.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="56.2" x="-28.1" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon III</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon III</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(280.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="50.4" x="-25.2" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Daenaera Velaryon</title>Daenaera</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Daenaera Velaryon</title>Daenaera</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(348.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="62" x="-31" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Viserys II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Viserys II</title>Viserys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(416.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="38.8" x="-19.4" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Larra Rogare</title>Larra</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Rogare</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Larra Rogare</title>Larra</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Rogare</text>
           </g>
         </g>
       </g>
       <g transform="translate(484.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="50.4" x="-25.2" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Jacaerys Velaryon</title>Jacaerys</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jacaerys Velaryon</title>Jacaerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(552.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Lucerys Velaryon</title>Lucerys</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Lucerys Velaryon</title>Lucerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(620.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Joffrey Velaryon</title>Joffrey</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Velaryon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Joffrey Velaryon</title>Joffrey</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Velaryon</text>
           </g>
         </g>
       </g>
       <g transform="translate(688.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baela</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baela</text>
           </g>
         </g>
       </g>
       <g transform="translate(756.91 568)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaena</text>
           </g>
         </g>
       </g>
       <g transform="translate(34.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daeron I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daeron I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(102.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Baelor I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baelor I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(170.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaena</text>
           </g>
         </g>
       </g>
       <g transform="translate(238.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Elaena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Elaena</text>
           </g>
         </g>
       </g>
       <g transform="translate(306.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daena</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daena</text>
           </g>
         </g>
       </g>
       <g transform="translate(374.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="50.4" x="-25.2" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon IV</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon IV</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(442.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Naerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Naerys</text>
           </g>
         </g>
       </g>
       <g transform="translate(510.27 652)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(312.1 736)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="56.2" x="-28.1" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Daemon Blackfyre</title>Daemon</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Blackfyre</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Daemon Blackfyre</title>Daemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Blackfyre</text>
           </g>
         </g>
       </g>
       <g transform="translate(380.1 736)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="56.2" x="-28.1" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daeron II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daeron II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(448.1 736)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="44.6" x="-22.3" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Myriah Martell</title>Myriah</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Martell</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Myriah Martell</title>Myriah</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Martell</text>
           </g>
         </g>
       </g>
       <g transform="translate(516.1 736)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daenerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daenerys</text>
           </g>
         </g>
       </g>
       <g transform="translate(312.1 820)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baelor</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baelor</text>
           </g>
         </g>
       </g>
       <g transform="translate(380.1 820)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="44.6" x="-22.3" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aerys I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aerys I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(448.1 820)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaegel</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaegel</text>
           </g>
         </g>
       </g>
       <g transform="translate(516.1 820)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="50.4" x="-25.2" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Maekar I</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Maekar I</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(584.1 820)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="38.8" x="-19.4" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Dyanna Dayne</title>Dyanna</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Dayne</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Dyanna Dayne</title>Dyanna</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Dayne</text>
           </g>
         </g>
       </g>
       <g transform="translate(368.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daeron</text>
           </g>
         </g>
       </g>
       <g transform="translate(436.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aerion</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aerion</text>
           </g>
         </g>
       </g>
       <g transform="translate(504.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aemon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aemon</text>
           </g>
         </g>
       </g>
       <g transform="translate(572.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daella</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daella</text>
           </g>
         </g>
       </g>
       <g transform="translate(640.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="44.6" x="-22.3" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aegon V</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon V</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(708.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="26" width="56.2" x="-28.1" y="22"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Betha Blackwood</title>Betha</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Blackwood</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Betha Blackwood</title>Betha</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Blackwood</text>
           </g>
         </g>
       </g>
       <g transform="translate(776.77 904)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhae</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhae</text>
           </g>
         </g>
       </g>
       <g transform="translate(538.77 988)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Duncan</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Duncan</text>
           </g>
         </g>
       </g>
       <g transform="translate(606.77 988)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52"><title>Jaehaerys II</title>Jaehaerys</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65">II</text>
+            <rect fill="white" height="26" width="60.7" x="-30.35" y="22"/>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jaehaerys II</title>Jaehaerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(674.77 988)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Shaera</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Shaera</text>
           </g>
         </g>
       </g>
       <g transform="translate(742.77 988)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Daeron</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daeron</text>
           </g>
         </g>
       </g>
       <g transform="translate(810.77 988)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaelle</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaelle</text>
           </g>
         </g>
       </g>
       <g transform="translate(606.77 1072)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="50.4" x="-25.2" y="42"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Aerys II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aerys II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(674.77 1072)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaella</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaella</text>
           </g>
         </g>
       </g>
       <g transform="translate(459.44 1156)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Elia Martell</title>Elia</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Martell</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Elia Martell</title>Elia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Martell</text>
           </g>
         </g>
       </g>
       <g transform="translate(527.44 1156)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaegar</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaegar</text>
           </g>
         </g>
       </g>
       <g transform="translate(595.44 1156)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32"><title>Lyanna Stark</title>Lyanna</text>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">Stark</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Lyanna Stark</title>Lyanna</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Stark</text>
           </g>
         </g>
       </g>
       <g transform="translate(663.44 1156)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Viserys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Viserys</text>
           </g>
         </g>
       </g>
       <g transform="translate(731.44 1156)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Daenerys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Daenerys</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="26" width="56.2" x="-28.1" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#ff7f0e">Fireproof</tspan></text>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">?</tspan></text>
           </g>
         </g>
       </g>
       <g transform="translate(439.52 1240)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rhaenys</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rhaenys</text>
           </g>
         </g>
       </g>
       <g transform="translate(507.52 1240)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Aegon</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Aegon</text>
           </g>
         </g>
       </g>
       <g transform="translate(575.52 1240)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Jon Snow</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Jon Snow</text>
           </g>
         </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 1510)">
-    <g transform="translate(67 12) scale(0.667) translate(-18 -18)">
+  <g class="pedigree-key" transform="translate(0 1509)">
+    <g transform="translate(66.1 12) scale(0.667) translate(-18 -18)">
       <svg height="36" viewBox="-6 -6 36 36" width="36">
         <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
         <line stroke="black" stroke-width="2" x1="-4" x2="28" y1="-4" y2="28"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="16">Deceased</text>
-    <g transform="translate(67 36) scale(0.667) translate(-23 -23)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="16">Deceased</text>
+    <g transform="translate(66.1 36) scale(0.667) translate(-23 -23)">
       <svg height="46" viewBox="-30 -2 56 56" width="46">
         <defs>
           <marker id="legend-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
@@ -2295,21 +2300,21 @@
         </g>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="40">Consultand (seeking counselling)</text>
-    <g transform="translate(67 60) scale(0.667) translate(-24 -10)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="40">Consultand (seeking counselling)</text>
+    <g transform="translate(66.1 60) scale(0.667) translate(-24 -10)">
       <svg height="20" viewBox="0 0 48 20" width="48">
         <line stroke="black" stroke-width="2" x1="0" x2="48" y1="7" y2="7"/>
         <line stroke="black" stroke-width="2" x1="0" x2="48" y1="13" y2="13"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="64">Consanguineous couple</text>
-    <g transform="translate(67 84) scale(0.667) translate(-24 -10)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="64">Consanguineous couple</text>
+    <g transform="translate(66.1 84) scale(0.667) translate(-24 -10)">
       <svg height="20" viewBox="0 0 48 20" width="48">
         <path d="M 4 17 Q 24 -5 44 17" fill="none" stroke="black" stroke-dasharray="6 4" stroke-width="2"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="88">Same person drawn more than once</text>
-    <g transform="translate(67 108) scale(1) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="88">Same person drawn more than once</text>
+    <g transform="translate(66.1 108) scale(1) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <clipPath id="legend-clip-madness">
           <rect height="16" width="16" x="6" y="6"/>
@@ -2323,8 +2328,8 @@
         <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="112">Madness</text>
-    <g transform="translate(67 132) scale(1) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="112">Madness</text>
+    <g transform="translate(66.1 132) scale(1) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <clipPath id="legend-clip-dragonrider">
           <rect height="16" width="16" x="6" y="6"/>
@@ -2338,8 +2343,8 @@
         <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="136">Dragonrider</text>
-    <g transform="translate(67 156) scale(1) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="136">Dragonrider</text>
+    <g transform="translate(66.1 156) scale(1) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <clipPath id="legend-clip-dreams">
           <rect height="16" width="16" x="6" y="6"/>
@@ -2353,30 +2358,30 @@
         <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="160">Prophetic dreams</text>
-    <g transform="translate(67 180) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="160">Prophetic dreams</text>
+    <g transform="translate(66.1 180) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Throne</text>
+        <text fill="#000000" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">Throne</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="184">Sat the Iron Throne</text>
-    <g transform="translate(67 204) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="184">Sat the Iron Throne</text>
+    <g transform="translate(66.1 204) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#7f7f7f" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Vhagar</text>
+        <text fill="#7f7f7f" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">Vhagar</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="208">Rode Vhagar</text>
-    <g transform="translate(67 228) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="208">Rode Vhagar</text>
+    <g transform="translate(66.1 228) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#ff7f0e" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Fireproof</text>
+        <text fill="#ff7f0e" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">Fireproof</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="232">Fireproof</text>
-    <g transform="translate(67 252) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="232">Fireproof</text>
+    <g transform="translate(66.1 252) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">?</text>
+        <text fill="#000000" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">?</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="102" y="256">Madness disputed</text>
+    <text fill="black" font-family="sans-serif" font-size="10" x="100.2" y="256">Madness disputed</text>
   </g>
 </svg>

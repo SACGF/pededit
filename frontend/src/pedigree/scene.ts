@@ -14,12 +14,12 @@ import { middleTaken } from "./ended";
 import { consanguinityLabelLimits, consanguinityLabelRoom, consanguinityLabelText, placeConsanguinityLabel, wrapConsanguinityLabel } from "./consanguinityLabel";
 import { highestConsanguinityLabel, type ConsanguinityLabelOffset } from "./consanguinityLabel";
 import type { TextBlock, LinePoint } from "./geometryTypes";
-import { copyNumberBlock, textBlockUnder, TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT } from "./labelBlock";
+import { copyNumberBlock, textBlockUnder, TEXT_OFFSET_Y, ANNOTATION_SHIFT, CAPTION_SHIFT, ARROW_TEXT_SHIFT } from "./labelBlock";
 import { drawnPedigree, branchOf } from "./collapse";
 import type { CollapsedBranch } from "./collapse";
 import { twinMembership } from "./twins";
 import { barsUnderLabels, sibBarHeight, sibshipBarOffsets } from "./sibshipPath";
-import { labelMaxWidth, nameLabelMode, canvasLabelLines, noteLineLimit, showsNotes, LABEL_LINE_HEIGHT } from "./labels";
+import { labelMaxWidth, nameLabelMode, canvasLabelLines, noteLineLimit, showsNotes, LABEL_LINE_HEIGHT, type NameWeight } from "./labels";
 import { ARROW_TAIL, PROBAND_LETTER_SIZE } from "./proband";
 import { personGlyph, type PersonGlyph } from "./personGlyph";
 import { numberFromLayout, showsNumbers } from "./numbering";
@@ -243,6 +243,8 @@ export interface SceneOptions {
   compact?: boolean;
   /** Layout improvements beyond kinship2 (#76). Default true; false gives the plain port, for comparisons. */
   improveLayout?: boolean;
+  /** "regular" when the names are pedigree numbers (a de-identified figure). Default: bold. */
+  nameWeight?: NameWeight;
 }
 
 // ── Duplicate copies ──────────────────────────────────────────────────────────
@@ -337,7 +339,7 @@ export function buildScene(full: Pedigree, options: SceneOptions = {}): Scene {
   const spacing = layoutSpacing(options.compact);
 
   const hidden = findLinelessCopies(result);
-  const nodes = buildNodes(pedigree, result, hidden, spacing);
+  const nodes = buildNodes(pedigree, result, hidden, spacing, options.nameWeight);
 
   // Map from slot id ("level-slot") → final pixel position (reflects pin overrides).
   const slotPos = new Map<string, { x: number; y: number }>();
@@ -405,7 +407,8 @@ function sceneBounds(people: ScenePerson[], aboveTop: number, showsFullNotes: bo
   const counted = showsFullNotes ? people.filter(p => p.position.y === maxY).map(p => p.glyph) : glyphs;
   const textLines = Math.max(1, ...counted.map(g => g.figureNameLines.length + g.detailLines.length));
   const labelHeight = TEXT_OFFSET_Y + textLines * LABEL_LINE_HEIGHT
-    + (glyphs.some(g => g.annotations.length > 0) ? ANNOTATION_SHIFT : 0) + (glyphs.some(g => g.caption) ? CAPTION_SHIFT : 0);
+    + (glyphs.some(g => g.annotations.length > 0) ? ANNOTATION_SHIFT : 0) + (glyphs.some(g => g.caption) ? CAPTION_SHIFT : 0)
+    + (glyphs.some(g => g.arrow) ? ARROW_TEXT_SHIFT : 0);
   const above = Math.max(0, Math.ceil(minY - NODE_SIZE / 2 - aboveTop));
   return {
     left: minX - NODE_SIZE / 2 - proband,
@@ -559,6 +562,7 @@ function buildNodes(
   result: LayoutResult,
   hidden: Set<string>,
   spacing: LayoutSpacing,
+  nameWeight?: NameWeight,
 ): ScenePerson[] {
   const { slotWidth, rowHeight } = spacing;
 
@@ -583,7 +587,7 @@ function buildNodes(
     const individual = pedigree.individuals[nid - 1]!;
     for (const id of ids) {
       glyphs.set(id, personGlyph(individual, pedigree, {
-        labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines,
+        labelMax: labelMaxWidth(slotWidth), numbers, nameLineLimit: labelLines, nameWeight,
         hasParents: hasParents(pedigree, individual.id), copy: ids.length > 1 ? ids.indexOf(id) + 1 : undefined,
       }));
     }
@@ -797,6 +801,9 @@ function sibshipBlocks(edges: SceneLine<SibshipData>[], nodes: ScenePerson[]): T
     });
     return [
       { x: (lo + hi) / 2, halfWidth: (hi - lo) / 2 + 1, top: d.sibBarY - 2, bottom: d.sibBarY + 2 },
+      // The line of descent from the couple line down to the bar, which a
+      // couple label in the row below may be raised into.
+      ...(d.hopDrop ? [] : [{ x: d.coupleX, halfWidth: 1, top: d.coupleY, bottom: d.sibBarY }]),
       ...d.childXs.flatMap((x, i) => {
         const bottom = (d.childYs[i] ?? d.childY) - NODE_SIZE / 2;
         const members = forkX.get(twinSetOf.get(d.childIds[i]!) ?? "");

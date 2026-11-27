@@ -12,7 +12,8 @@
 
 import type { Individual, NameLabelMode, Pedigree } from "@pedigree-editor/layout-engine";
 import { onsetsOf } from "./onset";
-import { tagCanvasText } from "./tags";
+import { tagCanvasText, tagsOf } from "./tags";
+import { tagPaint } from "./tagFills";
 import { branchOf } from "./collapse";
 import { evaluationsOf, evaluationParts, evaluationText } from "./evaluation";
 import { notationOf } from "./notation";
@@ -25,6 +26,24 @@ import { ageAtDeath, parsePartialDate } from "./dateRanges";
 export const LABEL_FONT_SIZE = 10;
 /** Rough sans-serif advance (px) per character at LABEL_FONT_SIZE. */
 export const LABEL_CHAR_WIDTH = 5.8;
+/**
+ * The same in bold, for the name: the first thing under the symbol, in
+ * bold, unless the name is a pedigree number (`NameWeight`). Measured in
+ * chromium, bold sans-serif is about 8% wider than regular.
+ */
+export const NAME_CHAR_WIDTH = 6.3;
+
+/**
+ * How a name is written under the symbol: "bold" for a person's name,
+ * "regular" when it is a pedigree number (a de-identified figure), as
+ * numbers are in published figures.
+ */
+export type NameWeight = "bold" | "regular";
+
+/** Advance per character of a name in `weight`. */
+export function nameCharWidth(weight: NameWeight = "bold"): number {
+  return weight === "bold" ? NAME_CHAR_WIDTH : LABEL_CHAR_WIDTH;
+}
 /** Height (px) of a line of text under a symbol, on the canvas and in figures. */
 export const LABEL_LINE_HEIGHT = 13;
 export const MAX_LABEL_LINES = 2;
@@ -46,9 +65,9 @@ export function isLabelCut(lines: string[], text: string | undefined): boolean {
   return squash(lines.join("")) !== squash(text ?? "");
 }
 
-/** Estimated rendered width (px) of a line of label text. */
-export function textWidth(text: string): number {
-  return text.length * LABEL_CHAR_WIDTH;
+/** Estimated rendered width (px) of a line of label text (`charWidth` per character, regular text by default). */
+export function textWidth(text: string, charWidth = LABEL_CHAR_WIDTH): number {
+  return text.length * charWidth;
 }
 
 /** Widest a label may be under a symbol in a slot `slotWidth` px wide: a small gap each side. */
@@ -60,12 +79,13 @@ export function labelMaxWidth(slotWidth: number): number {
  * Break `text` into at most `maxLines` lines no wider than `maxWidth` px:
  * greedy word wrap, a word wider than a line is split by characters, and
  * whatever does not fit is dropped from the last line with an ellipsis.
- * Empty text gives no lines.
+ * Empty text gives no lines. `charWidth` is the advance per character
+ * (`NAME_CHAR_WIDTH` for a bold name).
  */
-export function wrapLabel(text: string | undefined, maxWidth: number, maxLines = MAX_LABEL_LINES): string[] {
+export function wrapLabel(text: string | undefined, maxWidth: number, maxLines = MAX_LABEL_LINES, charWidth = LABEL_CHAR_WIDTH): string[] {
   const clean = (text ?? "").trim().replace(/\s+/g, " ");
   if (!clean) return [];
-  const maxChars = Math.max(1, Math.floor(maxWidth / LABEL_CHAR_WIDTH));
+  const maxChars = Math.max(1, Math.floor(maxWidth / charWidth));
   const words = clean.split(" ");
   const lines: string[] = [];
   let current = "";
@@ -103,9 +123,9 @@ export function nameLabelText(ind: Individual): string | undefined {
   return ind.name;
 }
 
-/** Width (px) of the widest of several label lines. */
-export function linesWidth(lines: string[]): number {
-  return lines.reduce((w, l) => Math.max(w, textWidth(l)), 0);
+/** Width (px) of the widest of several label lines (`charWidth` per character, regular text by default). */
+export function linesWidth(lines: string[], charWidth = LABEL_CHAR_WIDTH): number {
+  return lines.reduce((w, l) => Math.max(w, textWidth(l, charWidth)), 0);
 }
 
 /**
@@ -121,24 +141,35 @@ export function linesWidth(lines: string[]): number {
  *      a symbol drawn by gender identity (NSGC 2022);
  *   4. `evaluation`: each evaluation, "BRCA1 ... +", up to two
  *      lines each;
- *   5. `inbreeding`: the inbreeding coefficient ("F = 1/16") of someone
+ *   5. `tags`: the person's text tags ("+/-"), on one line wrapped to the
+ *      width, each in its colour (`runs`). NSGC 2022 writes a genotype as
+ *      a result under the symbol, so they follow the evaluations;
+ *   6. `inbreeding`: the inbreeding coefficient ("F = 1/16") of someone
  *      whose parents are related, when the pedigree draws coefficients
  *      (#86). NSGC has no place for it; it goes with what was worked
  *      out about the person, above the number that only locates them;
- *   6. `notes`: the person's notes, unless the pedigree hides them
+ *   7. `notes`: the person's notes, unless the pedigree hides them
  *      (`canvasSettings.showNotes` false). NSGC's list has no comment
  *      line, so they go after everything recorded or worked out about the
  *      person and above the number, in full or up to `NOTE_LINES` lines
  *      (`canvasSettings.notesLength`, `noteLines`);
- *   7. `number`: the pedigree number ("II-3") when `numbers` has one,
+ *   8. `number`: the pedigree number ("II-3") when `numbers` has one,
  *      which callers pass only when the pedigree shows numbers.
  *
  * A collapsed-branch group symbol has none. Shared by the canvas, both
  * SVG exporters and the lints through the glyph's `detailLines`.
  */
 export interface DetailSection {
-  key: "age" | "onset" | "gender" | "evaluation" | "inbreeding" | "notes" | "number";
+  key: "age" | "onset" | "gender" | "evaluation" | "tags" | "inbreeding" | "notes" | "number";
   lines: string[];
+  /** Lines drawn in more than one colour, one entry per line: the text tags. */
+  runs?: TextRun[][];
+}
+
+/** A piece of a line under the symbol drawn in its own colour. */
+export interface TextRun {
+  text: string;
+  color: string;
 }
 
 export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedigree, numbers?: Map<string, string>): DetailSection[] {
@@ -149,6 +180,7 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
     { key: "onset", lines: onsetLines(ind, pedigree, maxWidth) },
     { key: "gender", lines: wrapLabel(assignedAtBirthText(ind, pedigree), maxWidth, 1) },
     { key: "evaluation", lines: evaluationLines(ind, maxWidth, notationOf(pedigree)) },
+    tagSection(ind, pedigree, maxWidth),
     { key: "inbreeding", lines: wrapLabel(inbreedingLabel(pedigree, ind.id), maxWidth, 1) },
     { key: "notes", lines: showsNotes(pedigree) ? noteLines(ind.notes, maxWidth, noteLineLimit(pedigree)) : [] },
     number,
@@ -158,6 +190,45 @@ export function detailSections(ind: Individual, maxWidth: number, pedigree: Pedi
 /** Every line under the name, top to bottom. */
 export function detailLines(sections: DetailSection[]): string[] {
   return sections.flatMap(s => s.lines);
+}
+
+/**
+ * The coloured pieces of each line of `detailLines`, by line index, for the
+ * lines drawn in colour (the text tags). Empty when every line is plain black.
+ */
+export function detailRuns(sections: DetailSection[]): Record<number, TextRun[]> {
+  const out: Record<number, TextRun[]> = {};
+  let k = 0;
+  for (const s of sections) {
+    s.runs?.forEach((runs, i) => { out[k + i] = runs; });
+    k += s.lines.length;
+  }
+  return out;
+}
+
+/**
+ * The text tags under the name: one line with every tag, a space between
+ * them, wrapped to `maxWidth` at the tags (a tag wider than a line is cut).
+ * Each tag keeps its colour, after the monochrome setting, since the colour
+ * matches the key.
+ */
+export function tagSection(ind: Individual, pedigree: Pedigree, maxWidth: number): DetailSection {
+  const tags = tagsOf(ind, pedigree).filter(t => t.style === "text");
+  const runs: TextRun[][] = [];
+  let line: TextRun[] = [];
+  const lineText = (rs: TextRun[]) => rs.map(r => r.text).join(" ");
+  for (const tag of tags) {
+    const text = wrapLabel(tagCanvasText(tag), maxWidth, 1)[0];
+    if (!text) continue;
+    const run = { text, color: tagPaint(tag, pedigree).color };
+    if (line.length > 0 && textWidth(lineText([...line, run])) > maxWidth) {
+      runs.push(line);
+      line = [];
+    }
+    line.push(run);
+  }
+  if (line.length > 0) runs.push(line);
+  return runs.length > 0 ? { key: "tags", lines: runs.map(lineText), runs } : { key: "tags", lines: [] };
 }
 
 /**

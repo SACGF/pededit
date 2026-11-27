@@ -86,14 +86,18 @@ describe("sectorPath", () => {
 });
 
 describe("annotationRow", () => {
-  it("lays dot and text tags out as a centred row in tag order", () => {
-    const p = makePedigree([genotype, tremor, sequenced], { a: ["s1", "g1", "t1"] });
+  it("lays dot tags out as a centred row in tag order; text tags are detail lines (#246)", () => {
+    const dna: Tag = { id: "d1", label: "DNA banked", color: "#1f77b4", style: "dot" };
+    const p = makePedigree([genotype, tremor, sequenced, dna], { a: ["s1", "g1", "t1", "d1"] });
     const row = annotationRow(p.individuals[0]!, p);
-    expect(row.map(i => i.tag.id)).toEqual(["g1", "s1"]);
+    expect(row.map(i => i.tag.id)).toEqual(["s1", "d1"]);
     const left = row[0]!.x - row[0]!.width / 2;
     const right = row[1]!.x + row[1]!.width / 2;
     expect(left).toBeCloseTo(-right, 5);
     expect(annotationRow(p.individuals[1]!, p)).toEqual([]);
+    // Text tags alone take no row.
+    const textOnly = makePedigree([genotype], { a: ["g1"] });
+    expect(annotationRow(textOnly.individuals[0]!, textOnly)).toEqual([]);
   });
 
   it("starts a proband's row at the symbol's left edge, clear of the arrow", () => {

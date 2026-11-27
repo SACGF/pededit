@@ -11,6 +11,7 @@ import { consanguinityLabelText, consanguinityLabelWidth } from "../../../pedigr
 import { NODE_SIZE } from "../../../pedigree/constants";
 import { HALF, COUPLE_GAP, DUP_LINK_INSET, CLABEL_PAD, CLABEL_BASELINE, CLABEL_ENDED_BASELINE, CLABEL_CAP, CLABEL_REACH, MIN_LABEL_RADIUS, groupBy } from "./constants";
 import { couplesOf, partnerIn } from "../../../pedigree/graph";
+import type { NameWeight } from "../../../pedigree/labels";
 
 /** How far a label may be lifted off a curve before it reaches the dashed links just inside the symbols. */
 export function maxLabelSag(w: Union): number {
@@ -22,6 +23,8 @@ export type Partnership = Pedigree["partnerships"][number];
 export interface UShapeOptions {
   /** Draw married-in partners beside their blood partner. Default true. */
   partners?: boolean;
+  /** "regular" when the names are pedigree numbers (de-identified). Default: bold. */
+  nameWeight?: NameWeight;
 }
 
 // ── Tree ──────────────────────────────────────────────────────────────────────

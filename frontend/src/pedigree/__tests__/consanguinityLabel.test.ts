@@ -243,7 +243,7 @@ describe("keeping the label off the text above (#109)", () => {
     expect(count(false)).toBe(p.partnerships.filter(x => consanguinityLabelText(p, x) && buildScene(p).couples.some(e => e.data.partnershipId === x.id && e.double)).length);
     // Nearly every couple here is more closely related than their name says, so
     // the labels carry a kinship and compact rows have room for fewer of them.
-    expect(count(true)).toBe(8);
+    expect(count(true)).toBe(7);
   });
 });
 

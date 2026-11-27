@@ -1,50 +1,50 @@
-<svg height="892" viewBox="0 0 807 892" width="807" xmlns="http://www.w3.org/2000/svg">
+<svg height="957" viewBox="0 0 843 957" width="843" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="892" width="807"/>
+  <rect fill="white" height="957" width="843"/>
   <g class="chart-title">
-    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="403.5" y="34">House Atreides</text>
+    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="421.5" y="34">House Atreides</text>
   </g>
-  <g transform="translate(524.9 -64.1)">
+  <g transform="translate(548.4 -64.1)">
     <path d="M -80 200 L 0 200" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-40" x2="-40" y1="200" y2="260"/>
-    <path d="M -143.3 260 L -40 260" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-143.3" x2="-143.3" y1="260" y2="272"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-40" x2="-40" y1="200" y2="273"/>
+    <path d="M -147.5 273 L -40 273" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-147.5" x2="-147.5" y1="273" y2="285"/>
     <path d="M 0 200 L 80 200" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="40" x2="40" y1="200" y2="260"/>
-    <path d="M 40 260 L 78.6 260" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="78.6" x2="78.6" y1="260" y2="272"/>
-    <path d="M 78.6 292 L 158.6 292" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="118.6" x2="118.6" y1="292" y2="352"/>
-    <path d="M 63.3 352 L 173.9 352" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="63.3" x2="63.3" y1="352" y2="364"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="173.9" x2="173.9" y1="352" y2="364"/>
-    <path d="M -143.3 292 L -63.3 292" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-103.3" x2="-103.3" y1="292" y2="352"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-103.3" x2="-103.3" y1="352" y2="364"/>
-    <path d="M -183.3 384 A 384 384 0 0 0 -178.6 384 L -103.3 384" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-142.2" x2="-142.2" y1="384" y2="444"/>
-    <path d="M -256.8 437.1 A 444 444 0 0 0 -178.6 444 L -72.3 444" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-256.8" x2="-258.9" y1="437.1" y2="448.9"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-72.3" x2="-72.3" y1="444" y2="456"/>
-    <path d="M -262.4 468.6 A 476 476 0 0 0 -182.9 476" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-222.8" x2="-228.4" y1="473.9" y2="533.7"/>
-    <path d="M -403.2 486.7 A 536 536 0 0 0 -178.6 536 L -123 536" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-403.2" x2="-408.2" y1="486.7" y2="497.6"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-304.8" x2="-307.6" y1="520.9" y2="532.6"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-123" x2="-123" y1="536" y2="548"/>
-    <path d="M -203 567.5 A 568 568 0 0 0 -178.6 568 L -123 568" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-155.1" x2="-155.1" y1="568" y2="628"/>
-    <path d="M -163 628 L -155.1 628" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
-    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-163" x2="-163" y1="628" y2="640"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="40" x2="40" y1="200" y2="273"/>
+    <path d="M 40 273 L 87.1 273" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="87.1" x2="87.1" y1="273" y2="285"/>
+    <path d="M 87.1 305 L 167.1 305" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="127.1" x2="127.1" y1="305" y2="378"/>
+    <path d="M 67.6 378 L 186.6 378" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="67.6" x2="67.6" y1="378" y2="390"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="186.6" x2="186.6" y1="378" y2="390"/>
+    <path d="M -147.5 305 L -67.6 305" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-107.5" x2="-107.5" y1="305" y2="378"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-107.5" x2="-107.5" y1="378" y2="390"/>
+    <path d="M -187.5 410 A 410 410 0 0 0 -187.1 410 L -107.5 410" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-147.4" x2="-147.4" y1="410" y2="483"/>
+    <path d="M -267.2 476.3 A 483 483 0 0 0 -187.1 483 L -73.8 483" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-267.2" x2="-269.2" y1="476.3" y2="488.1"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-73.8" x2="-73.8" y1="483" y2="495"/>
+    <path d="M -272.5 507.9 A 515 515 0 0 0 -192.9 515" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-232.8" x2="-239.3" y1="513" y2="585.7"/>
+    <path d="M -427.4 536.7 A 588 588 0 0 0 -187.1 588 L -129.9 588" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-427.4" x2="-432.3" y1="536.7" y2="547.6"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-320.5" x2="-323.3" y1="572.7" y2="584.3"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-129.9" x2="-129.9" y1="588" y2="600"/>
+    <path d="M -209.9 619.6 A 620 620 0 0 0 -187.1 620 L -129.9 620" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-162.2" x2="-162.2" y1="620" y2="693"/>
+    <path d="M -169.9 693 L -162.2 693" fill="none" stroke="black" stroke-linecap="round" stroke-width="2"/>
+    <line fill="none" stroke="black" stroke-linecap="round" stroke-width="2" x1="-169.9" x2="-169.9" y1="693" y2="705"/>
     <g transform="translate(-80 200) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baron&#x27;s mother</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baron&#x27;s mother</text>
           </g>
         </g>
         <g>
@@ -58,7 +58,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Dmitri Harkonnen</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Dmitri Harkonnen</text>
           </g>
         </g>
         <g>
@@ -72,7 +72,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Abulurd&#x27;s mother</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Abulurd&#x27;s mother</text>
           </g>
         </g>
         <g>
@@ -82,11 +82,11 @@
         </g>
       </g>
     </g>
-    <g transform="translate(78.6 292) rotate(0)">
+    <g transform="translate(87.1 305) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Abulurd</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Abulurd</text>
           </g>
         </g>
         <g>
@@ -96,11 +96,11 @@
         </g>
       </g>
     </g>
-    <g transform="translate(158.6 292) rotate(0)">
+    <g transform="translate(167.1 305) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Emmi Rabban</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Emmi Rabban</text>
           </g>
         </g>
         <g>
@@ -110,11 +110,11 @@
         </g>
       </g>
     </g>
-    <g transform="translate(173.9 384) rotate(0)">
+    <g transform="translate(186.6 410) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Feyd-Rautha</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Feyd-Rautha</text>
           </g>
         </g>
         <g>
@@ -124,11 +124,11 @@
         </g>
       </g>
     </g>
-    <g transform="translate(63.3 384) rotate(0)">
+    <g transform="translate(67.6 410) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Rabban</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Rabban</text>
           </g>
         </g>
         <g>
@@ -138,11 +138,11 @@
         </g>
       </g>
     </g>
-    <g transform="translate(-143.3 292) rotate(0)">
+    <g transform="translate(-147.5 305) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Baron Harkonnen</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Baron Harkonnen</text>
           </g>
         </g>
         <g>
@@ -152,11 +152,15 @@
         </g>
       </g>
     </g>
-    <g transform="translate(-63.3 292) rotate(0)">
+    <g transform="translate(-67.6 305) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Mohiam</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="52">Mohiam</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="15.6" x="-7.8" y="55"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65"><tspan fill="#000000">BG</tspan></text>
           </g>
         </g>
         <g>
@@ -165,16 +169,15 @@
           </g>
         </g>
         <g>
-          <circle cx="12.8" cy="47" fill="#1f77b4" r="3.5"/>
-          <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="25.5" y="50.5">BG</text>
+          <circle cx="20" cy="47" fill="#1f77b4" r="3.5"/>
         </g>
       </g>
     </g>
-    <g transform="translate(-183.3 384) rotate(0.7)">
+    <g transform="translate(-187.5 410) rotate(0.1)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Duke Leto</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Duke Leto</text>
           </g>
         </g>
         <g>
@@ -184,11 +187,15 @@
         </g>
       </g>
     </g>
-    <g transform="translate(-103.3 384) rotate(0)">
+    <g transform="translate(-107.5 410) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Jessica</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="52">Jessica</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="56.2" x="-28.1" y="55"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65"><tspan fill="#000000">BG</tspan><tspan fill="#8c564b"> Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -197,17 +204,19 @@
           </g>
         </g>
         <g>
-          <circle cx="-4.8" cy="47" fill="#1f77b4" r="3.5"/>
-          <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="7.9" y="50.5">BG</text>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="32.7" y="50.5">Fremen</text>
+          <circle cx="20" cy="47" fill="#1f77b4" r="3.5"/>
         </g>
       </g>
     </g>
-    <g transform="translate(-72.3 476) rotate(0)">
+    <g transform="translate(-73.8 515) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Alia</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Alia</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -226,16 +235,17 @@
             <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
           </g>
         </g>
-        <g>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Fremen</text>
-        </g>
       </g>
     </g>
-    <g transform="translate(-262.4 468.6) rotate(10.1)">
+    <g transform="translate(-272.5 507.9) rotate(9.5)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Paul</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="52">Paul</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="55"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="65"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -245,20 +255,23 @@
         </g>
         <g data-arrow="proband">
           <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
-          <rect fill="white" height="10" transform="rotate(-10.1 -22 62)" width="8.5" x="-30" y="58"/>
-          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" transform="rotate(-10.1 -22 62)" x="-22" y="67">P</text>
+          <rect fill="white" height="10" transform="rotate(-9.5 -22 62)" width="8.5" x="-30" y="58"/>
+          <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" transform="rotate(-9.5 -22 62)" x="-22" y="67">P</text>
         </g>
         <g>
-          <circle cx="5.5" cy="47" fill="#1f77b4" r="3.5"/>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="28.6" y="50.5">Fremen</text>
+          <circle cx="20" cy="47" fill="#1f77b4" r="3.5"/>
         </g>
       </g>
     </g>
-    <g transform="translate(-182.9 476) rotate(0.5)">
+    <g transform="translate(-192.9 515) rotate(0.6)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Chani</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Chani</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -266,16 +279,13 @@
             <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
           </g>
         </g>
-        <g>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Fremen</text>
-        </g>
       </g>
     </g>
-    <g transform="translate(-203 567.5) rotate(2.5)">
+    <g transform="translate(-209.9 619.6) rotate(2.1)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Farad&#x27;n</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Farad&#x27;n</text>
           </g>
         </g>
         <g>
@@ -285,11 +295,15 @@
         </g>
       </g>
     </g>
-    <g transform="translate(-123 568) rotate(0)">
+    <g transform="translate(-129.9 620) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Ghanima</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Ghanima</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -308,16 +322,13 @@
             <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
           </g>
         </g>
-        <g>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Fremen</text>
-        </g>
       </g>
     </g>
-    <g transform="translate(-163 660) rotate(0)">
+    <g transform="translate(-169.9 725) rotate(0)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Their descendants</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Their descendants</text>
           </g>
         </g>
         <g>
@@ -327,11 +338,15 @@
         </g>
       </g>
     </g>
-    <g transform="translate(-312.3 552) rotate(13.6)">
+    <g transform="translate(-327.8 603.8) rotate(13.1)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Leto II</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Leto II</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -354,16 +369,17 @@
             <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
-        <g>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Fremen</text>
-        </g>
       </g>
     </g>
-    <g transform="translate(-416.6 515.7) rotate(24.8)">
+    <g transform="translate(-440.5 565.9) rotate(24.1)">
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="52">Leto</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Leto</text>
+          </g>
+          <g data-detail-label="true" pointer-events="none">
+            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#8c564b">Fremen</tspan></text>
           </g>
         </g>
         <g>
@@ -371,20 +387,17 @@
             <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
           </g>
         </g>
-        <g>
-          <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="50.5">Fremen</text>
-        </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 684)">
-    <g transform="translate(58 12) scale(0.667) translate(-14 -14)">
+  <g class="pedigree-key" transform="translate(0 749)">
+    <g transform="translate(57.4 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="16">Affected</text>
-    <g transform="translate(58 36) scale(0.667) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="16">Affected</text>
+    <g transform="translate(57.4 36) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <g>
           <g>
@@ -408,8 +421,8 @@
         </g>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="40">Affected, condition not recorded (black centre)</text>
-    <g transform="translate(58 60) scale(0.667) translate(-23 -23)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="40">Affected, condition not recorded (black centre)</text>
+    <g transform="translate(57.4 60) scale(0.667) translate(-23 -23)">
       <svg height="46" viewBox="-30 -2 56 56" width="46">
         <defs>
           <marker id="legend-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
@@ -424,8 +437,8 @@
         </g>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="64">Proband (index case)</text>
-    <g transform="translate(58 84) scale(1) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="64">Proband (index case)</text>
+    <g transform="translate(57.4 84) scale(1) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <clipPath id="legend-clip-preborn">
           <rect height="16" width="16" x="6" y="6"/>
@@ -439,24 +452,24 @@
         <rect fill="none" height="16" stroke="black" stroke-width="1.5" width="16" x="6" y="6"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="88">Pre-born (ancestral memory before birth)</text>
-    <g transform="translate(58 108) scale(1) translate(-14 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="88">Pre-born (ancestral memory before birth)</text>
+    <g transform="translate(57.4 108) scale(1) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <circle cx="14" cy="14" fill="#1f77b4" r="3.5"/>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="112">Survived the spice agony</text>
-    <g transform="translate(58 132) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="112">Survived the spice agony</text>
+    <g transform="translate(57.4 132) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#000000" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">BG</text>
+        <text fill="#000000" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">BG</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="136">Bene Gesserit</text>
-    <g transform="translate(58 156) scale(1) translate(-20 -14)">
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="136">Bene Gesserit</text>
+    <g transform="translate(57.4 156) scale(1) translate(-20 -14)">
       <svg height="28" viewBox="0 0 40 28" width="40">
-        <text fill="#8c564b" font-family="sans-serif" font-size="9" font-weight="bold" text-anchor="middle" x="20" y="17.5">Fremen</text>
+        <text fill="#8c564b" font-family="sans-serif" font-size="10" text-anchor="middle" x="20" y="18">Fremen</text>
       </svg>
     </g>
-    <text fill="black" font-family="sans-serif" font-size="10" x="84" y="160">Fremen, by birth or adoption</text>
+    <text fill="black" font-family="sans-serif" font-size="10" x="82.8" y="160">Fremen, by birth or adoption</text>
   </g>
 </svg>

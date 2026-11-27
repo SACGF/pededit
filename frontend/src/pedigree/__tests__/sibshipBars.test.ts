@@ -227,6 +227,9 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
   const flow = buildScene(part);
 
   it("passes every sibship bar under the names of the people above it", () => {
+    // Laena Velaryon with a year of birth: a two-line name, her "Vhagar" tag
+    // and the year reach the bar to her children, which is lowered.
+    const flow = buildScene({ ...part, individuals: part.individuals.map(i => i.id === "Laena_Velaryon" ? { ...i, dob: "93" } : i) });
     let lowered = 0;
     for (const e of flow.sibships) {
       const d = e.data, xs = [d.coupleX, ...d.childXs];
@@ -237,7 +240,6 @@ describe("House Targaryen, the Dance of the Dragons rows as a figure", () => {
         expect(box.bottom, `${n.individual.name} over ${e.id}`).toBeLessThanOrEqual(d.sibBarY + 1);
       }
     }
-    // Laena Velaryon: a tag row and a two-line name.
     expect(lowered).toBeGreaterThan(0);
   });
 

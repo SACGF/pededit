@@ -56,7 +56,7 @@ export function renderSymbols(pedigree: Pedigree, b: Built, personIds = false): 
       const pos = nodeAt(n, i, b.geom);
       const clipId = `symbol-clip-${seq++}`;
       // What is drawn for the person, as the standard figure and the canvas have it.
-      const glyph = glyphOf(ind, pedigree);
+      const glyph = glyphOf(ind, pedigree, b.nameWeight);
       const backed = solo && m.id === n.blood;
       const id = personIds ? ` ${m.dup ? "data-dup-of" : "data-id"}="${escapeXml(m.id)}"` : "";
       out.push(
@@ -99,7 +99,8 @@ export function exportUShapeSvg(pedigree: Pedigree, options: SvgExportOptions = 
  */
 export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {}): { svg: string; layout: UShapeLayout | null } {
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  const b = build(working, { partners: options.uShapePartners });
+  // De-identified, the names are pedigree numbers, written in regular weight.
+  const b = build(working, { partners: options.uShapePartners, nameWeight: options.deidentify ? "regular" : "bold" });
   if (!b) {
     return { layout: null, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
   <rect width="200" height="100" fill="white"/>

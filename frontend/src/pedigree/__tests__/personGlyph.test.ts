@@ -36,7 +36,9 @@ describe("personGlyph", () => {
     expect(glyph(status, "gf")).toMatchObject({ deceased: true, paint: { base: "black" } });
     expect(glyph(status, "w1", { hasParents: false })).toMatchObject({ familyHistoryUnknown: true, hasParents: false });
     expect(glyph(status, "s3").paint.line).toBe(true);
-    expect(glyph(status, "s5").annotations.map(a => a.tag.id)).toEqual(["dna", "apoe"]);
+    // Dot tags in the row under the symbol; text tags among the detail lines (#246).
+    expect(glyph(status, "s5").annotations.map(a => a.tag.id)).toEqual(["dna"]);
+    expect(Object.values(glyph(status, "s5").detailRuns).flat().length).toBe(1);
   });
 
   it("draws the gender identity's shape and writes the sex at birth under it", () => {

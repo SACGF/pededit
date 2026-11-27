@@ -1,5 +1,5 @@
 import { NODE_SIZE } from "./constants";
-import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth, textWidth } from "./labels";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth, nameCharWidth, textWidth } from "./labels";
 import { ANNOTATION_ROW_HEIGHT } from "./tags";
 import { CAPTION_ROW_HEIGHT, captionBaselineY } from "./lifeStatus";
 import type { TextBlock } from "./geometryTypes";
@@ -14,10 +14,16 @@ import type { PersonGlyph } from "./personGlyph";
 
 /** Baseline of the first line under the symbol ("SB" / "ECT" caption or name), below its centre. */
 export const TEXT_OFFSET_Y = captionBaselineY(NODE_SIZE) - NODE_SIZE / 2;
-/** Extra drop for the name when a tag annotation row sits between it and the symbol. */
+/** Extra drop for the name when a row of dot tags sits between it and the symbol. */
 export const ANNOTATION_SHIFT = ANNOTATION_ROW_HEIGHT + 8;
 /** Extra drop for everything under a symbol with an "SB" / "ECT" caption, the annotation row included. */
 export const CAPTION_SHIFT = CAPTION_ROW_HEIGHT + 3;
+/**
+ * Extra drop for the text under a proband or consultand when its first line
+ * is wider than the symbol: the arrowhead ends at the symbol's lower left
+ * corner and reaches about 9px below it, where that line's left end would be.
+ */
+export const ARROW_TEXT_SHIFT = 6;
 
 /** A box from the symbol's centre: a white backing behind lines of text. */
 export interface TextBacking { x: number; y: number; width: number; height: number }
@@ -43,13 +49,17 @@ export interface TextUnder {
  * the glyph's `nameLines` on the canvas, `figureNameLines` in a file.
  */
 export function textUnder(
-  glyph: Pick<PersonGlyph, "caption" | "annotations" | "detailLines" | "detailsBacked" | "labelsBacked">,
+  glyph: Pick<PersonGlyph, "arrow" | "caption" | "annotations" | "nameWeight" | "detailLines" | "detailsBacked" | "labelsBacked">,
   nameLines: string[],
 ): TextUnder {
-  const first = TEXT_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0) + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0);
   const details = glyph.detailLines;
-  const backing = (lines: string[], baseline: number): TextBacking => {
-    const width = linesWidth(lines) + 4;
+  const shifted = !!glyph.caption || glyph.annotations.length > 0;
+  const firstWidth = nameLines.length > 0 ? textWidth(nameLines[0]!, nameCharWidth(glyph.nameWeight)) : textWidth(details[0] ?? "");
+  const underArrow = !!glyph.arrow && !shifted && firstWidth / 2 > NODE_SIZE / 2 - 2;
+  const first = TEXT_OFFSET_Y + (glyph.caption ? CAPTION_SHIFT : 0) + (glyph.annotations.length > 0 ? ANNOTATION_SHIFT : 0)
+    + (underArrow ? ARROW_TEXT_SHIFT : 0);
+  const backing = (lines: string[], baseline: number, charWidth?: number): TextBacking => {
+    const width = linesWidth(lines, charWidth) + 4;
     return { x: -width / 2, y: baseline - LABEL_FONT_SIZE, width, height: lines.length * LABEL_LINE_HEIGHT };
   };
   const detailTop = first + nameLines.length * LABEL_LINE_HEIGHT;
@@ -58,27 +68,26 @@ export function textUnder(
     annotationShift: glyph.caption ? CAPTION_SHIFT : 0,
     nameY: nameLines.map((_, k) => first + k * LABEL_LINE_HEIGHT),
     detailY: details.map((_, k) => detailTop + k * LABEL_LINE_HEIGHT),
-    ...(glyph.labelsBacked && nameLines.length > 0 ? { nameBacking: backing(nameLines, first) } : {}),
+    ...(glyph.labelsBacked && nameLines.length > 0 ? { nameBacking: backing(nameLines, first, nameCharWidth(glyph.nameWeight)) } : {}),
     ...(details.length > 0 && (glyph.labelsBacked || glyph.detailsBacked) ? { detailBacking: backing(details, detailTop) } : {}),
   };
 }
 
 /**
  * The box the text under a symbol centred at (x, y) takes in a figure:
- * caption, tag annotation row, name and detail lines. Null when there is no
+ * caption, dot tag row, name and detail lines. Null when there is no
  * name or detail line. The canvas's text takes the same box or less (its
  * names may be cut to one line).
  */
 export function textBlockUnder(glyph: PersonGlyph, x: number, y: number): TextBlock | null {
-  const lines = [...glyph.figureNameLines, ...glyph.detailLines];
-  if (lines.length === 0) return null;
+  if (glyph.figureNameLines.length + glyph.detailLines.length === 0) return null;
   const at = textUnder(glyph, glyph.figureNameLines);
   const last = Math.max(...at.nameY, ...at.detailY);
   return {
     x,
     top: y + NODE_SIZE / 2,
     bottom: y + last + 3,
-    halfWidth: linesWidth(lines) / 2,
+    halfWidth: Math.max(linesWidth(glyph.figureNameLines, nameCharWidth(glyph.nameWeight)), linesWidth(glyph.detailLines)) / 2,
   };
 }
 

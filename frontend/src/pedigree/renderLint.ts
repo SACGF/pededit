@@ -47,7 +47,7 @@ import { drawnPedigree } from "./collapse";
 import { assistedLinks } from "./assisted";
 import type { Scene, ScenePerson } from "./scene";
 import { DECEASED_OVERHANG, NODE_SIZE } from "./constants";
-import { chartTitlePlace, linesWidth, textWidth, titleWidth } from "./labels";
+import { chartTitlePlace, linesWidth, nameCharWidth, textWidth, titleWidth } from "./labels";
 import { consanguinityLabelBaseline, consanguinityLabelPlacements, consanguinityLabelTop, consanguinityLabelWidth } from "./consanguinityLabel";
 import { duplicateArcPoints } from "./duplicateArc";
 import { textBlockUnder } from "./labelBlock";
@@ -303,7 +303,7 @@ export function lintScene(full: Pedigree, scene: Scene, options: { title?: strin
   // 5. Labels on one row running into each other. Names are wrapped to
   // the slot width, so this catches dragged nodes and long dates.
   const labelW = (n: ScenePerson) =>
-    Math.max(linesWidth(n.glyph.nameLines), linesWidth(n.glyph.figureNameLines), linesWidth(n.glyph.detailLines));
+    Math.max(linesWidth([...n.glyph.nameLines, ...n.glyph.figureNameLines], nameCharWidth(n.glyph.nameWeight)), linesWidth(n.glyph.detailLines));
   for (let i = 0; i < scene.people.length; i++) {
     for (let j = i + 1; j < scene.people.length; j++) {
       const A = scene.people[i]!, B = scene.people[j]!;

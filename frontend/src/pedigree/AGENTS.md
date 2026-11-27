@@ -257,7 +257,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   parents. Offsets only lower a bar (labels hang above the halfway line),
   and the order is chosen so drops cross other bars as little as possible.
   A bar is also lowered to pass under text that hangs past the halfway line
-  (a tag row and a two-line name, a long detail block; `barsUnderLabels`,
+  (a dot tag row and a two-line name, a long detail block; `barsUnderLabels`,
   measured on the text as a figure writes it, names always wrapped). Where
   that cannot clear it (compact rows, or it would land on another bar) the
   bar stays and the text gets the white backing (`labelsBacked`), unless the
@@ -903,8 +903,9 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   the "Relationship" / couple-line items of the more and right-click menus
   (`setPartnershipEnded`). PED cannot carry it; Export PED warns.
 
-Below a symbol, top to bottom: "SB" / "ECT" caption, tag annotation row, name
-(one or two lines), then the detail lines in NSGC order (2008 Fig. 1: age,
+Below a symbol, top to bottom: "SB" / "ECT" caption, the row of dot tags,
+name (one or two lines, **bold**), then the detail lines, in regular
+weight, in NSGC order (2008 Fig. 1: age,
 then evaluation, then pedigree number; `claude/nsgc_nomenclature.md`).
 `detailSections` in `labels.ts` is the one place that orders them; add new
 text under the symbol there as its own entry of the list, not by appending to a
@@ -925,10 +926,25 @@ renderer:
    sets one with the other, and unticking deceased deletes `dod`). The
    free-text age still wins over all of it;
 2. one line per age of onset (#93, `onsetLines`);
-3. (gender identity #26 and evaluation #101 belong here, before the number);
-4. the inbreeding coefficient, "F = 1/16" (#86, `inbreedingLabel`), only
+3. the sex assigned at birth (#26) and the evaluations (#101);
+4. the text tags (#246, `tagSection`): every text tag on one line, wrapped
+   to the width at the tags, each `<tspan>` in its own colour (the glyph's
+   `detailRuns`), since the colour matches the key. NSGC 2022 writes a
+   genotype as a result under the symbol, so they follow the evaluations;
+5. the inbreeding coefficient, "F = 1/16" (#86, `inbreedingLabel`), only
    when the pedigree draws coefficients and the person's parents are related;
-5. the pedigree number (#8), last, on its own line.
+6. the notes, unless hidden (#219);
+7. the pedigree number (#8), last, on its own line.
+
+The name is bold so it is the first and plainest thing under the symbol;
+nothing else there is bold. Bold is wider, so a name wraps and is cut at
+`NAME_CHAR_WIDTH` (6.3px a character against 5.8), and everything that
+measures a name (`textUnder`'s backing, `textBlockUnder`, the render, export
+and U-shape lints, the U-shape slot) asks `nameCharWidth(glyph.nameWeight)`.
+A de-identified figure's names are pedigree numbers, written in regular
+weight as published figures do: the exporters pass `nameWeight: "regular"`
+(`SceneOptions`, `UShapeOptions`). Only dot tags sit in the row under the
+symbol (`annotationRow`); someone with text tags alone has no row.
 
 A two-line name plus the age line clears the sibship bar of the person's own
 children; anything past the age line can reach it, so then the detail block
@@ -938,8 +954,8 @@ person's glyph (#144); where they sit is `textUnder` in `labelBlock.ts`
 (#145): first baseline 12px below the symbol, 13px lines, the caption and
 annotation row shifts and the white backings. The canvas draws it as SVG
 text in the node (`TextUnderSymbol`, `font-family="sans-serif"` as in the
-export, so the 5.8px a character that `labels.ts` wraps by means the same
-in both) and `svgExporter` writes the same numbers; the lints and the
+export, so the 5.8px (6.3px bold) a character that `labels.ts` wraps by
+means the same in both) and `svgExporter` writes the same numbers; the lints and the
 placement of bars and couple labels read `textBlockUnder`. A cut name's
 group (`data-name-label`, `data-name-cut`) takes the mouse through a
 transparent box the size of its lines; the `text-under-symbols` flow checks

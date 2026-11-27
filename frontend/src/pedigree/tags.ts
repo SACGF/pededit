@@ -471,13 +471,11 @@ export function sectorPath(cx: number, cy: number, r: number, start: number, end
 
 // ── Annotation row (dots and text under the symbol) ───────────────────────────
 
-/** Vertical space the annotation row takes below the symbol, pushing the name down. */
+/** Vertical space the dot row takes below the symbol, pushing the name down. */
 export const ANNOTATION_ROW_HEIGHT = 12;
 /** Centre line of the row, measured from the symbol's bottom edge. */
 export const ANNOTATION_Y = 7;
 export const ANNOTATION_DOT_RADIUS = 3.5;
-export const ANNOTATION_FONT_SIZE = 9;
-const ANNOTATION_CHAR_WIDTH = 5.2; // rough sans-serif advance at ANNOTATION_FONT_SIZE
 const ANNOTATION_GAP = 4;
 
 export interface AnnotationItem {
@@ -490,17 +488,17 @@ export interface AnnotationItem {
 }
 
 /**
- * Dot and text tags of an individual laid out as a centred row. The proband
+ * Dot tags of an individual laid out as a centred row. Text tags are written
+ * with the detail lines under the name (`tagSection` in `labels.ts`), so the
+ * name is the first text under the symbol. The proband
  * arrow comes in from below-left to the symbol's bottom-left corner, so for a
  * proband the row starts no further left than the symbol's left edge.
  * `size` is the symbol size (NODE_SIZE on the canvas and in the exporters).
  */
 export function annotationRow(individual: Individual, pedigree: Pedigree, size = 40): AnnotationItem[] {
-  const tags = tagsOf(individual, pedigree).filter(t => t.style !== "quadrant");
+  const tags = tagsOf(individual, pedigree).filter(t => t.style === "dot");
   if (tags.length === 0) return [];
-  const widths = tags.map(t =>
-    t.style === "dot" ? ANNOTATION_DOT_RADIUS * 2 : tagCanvasText(t).length * ANNOTATION_CHAR_WIDTH,
-  );
+  const widths = tags.map(() => ANNOTATION_DOT_RADIUS * 2);
   const total = widths.reduce((a, b) => a + b, 0) + ANNOTATION_GAP * (tags.length - 1);
   let x = individual.proband ? Math.max(-total / 2, -size / 2 + 2) : -total / 2;
   return tags.map((tag, i) => {
@@ -516,11 +514,12 @@ export function annotationRow(individual: Individual, pedigree: Pedigree, size =
 export const LEGEND_SWATCH = 16;
 export const LEGEND_FONT_SIZE = 10;
 
-/** Rough width of a text tag drawn at ANNOTATION_FONT_SIZE bold. */
+/** Font size of a text tag's swatch in the key: the size it has under the symbol (`LABEL_FONT_SIZE`). */
+export const TAG_TEXT_FONT_SIZE = 10;
+/** Rough width of a text tag's swatch, regular weight as under the symbol (`LABEL_CHAR_WIDTH`). */
 export function tagTextWidth(tag: Tag): number {
-  return tagCanvasText(tag).length * ANNOTATION_BOLD_CHAR_WIDTH;
+  return tagCanvasText(tag).length * 5.8;
 }
-const ANNOTATION_BOLD_CHAR_WIDTH = 6;
 export const LEGEND_LABEL_GAP = 8;
 export const LEGEND_CHAR_WIDTH = 6;
 

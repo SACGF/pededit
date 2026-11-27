@@ -1,8 +1,8 @@
 import { cloneElement } from "react";
 import type { Individual } from "@pedigree-editor/layout-engine";
 import {
-  sectorPath, tagCanvasText, AFFECTED_CORE_SCALE, AFFECTED_CORE_RIM,
-  ANNOTATION_Y, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE,
+  sectorPath, AFFECTED_CORE_SCALE, AFFECTED_CORE_RIM,
+  ANNOTATION_Y, ANNOTATION_DOT_RADIUS,
 } from "../tags";
 import type { Sector, AnnotationItem, SymbolPaint } from "../tags";
 import type { PersonGlyph } from "../personGlyph";
@@ -23,7 +23,7 @@ import {
 import { arrowGeometry, PROBAND_LETTER, PROBAND_LETTER_SIZE, type ArrowKind } from "../proband";
 import { DECEASED_OVERHANG, LINE_WIDTH } from "../constants";
 import { COPY_NUMBER_FONT_SIZE, copyNumberAt, textUnder, type TextBacking } from "../labelBlock";
-import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth } from "../labels";
+import { LABEL_FONT_SIZE, LABEL_LINE_HEIGHT, linesWidth, nameCharWidth, type TextRun } from "../labels";
 import { branchCountBaseline, branchCountFontSize } from "../collapse";
 
 // ── Fill descriptor ────────────────────────────────────────────────────────────
@@ -380,8 +380,8 @@ function RoleLetter({ letter, size, halo = false, base = "white" }: { letter: st
 }
 
 /**
- * Dot and text tags in a centred row just below the symbol. `offsetY` moves
- * the row down, e.g. past an "SB" / "ECT" caption.
+ * Dot tags in a centred row just below the symbol. `offsetY` moves the row
+ * down, e.g. past an "SB" / "ECT" caption.
  */
 export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationItem[]; size: number; offsetY?: number }) {
   if (items.length === 0) return null;
@@ -389,21 +389,7 @@ export function AnnotationRow({ items, size, offsetY = 0 }: { items: AnnotationI
   const cy = size + ANNOTATION_Y + offsetY;
   return (
     <g>
-      {items.map(({ tag, x, color }) =>
-        tag.style === "dot" ? (
-          <circle key={tag.id} cx={cx + x} cy={cy} r={ANNOTATION_DOT_RADIUS} fill={color} />
-        ) : (
-          <text
-            key={tag.id}
-            x={cx + x} y={cy + ANNOTATION_FONT_SIZE / 2 - 1}
-            textAnchor="middle"
-            fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold"
-            fill={color}
-          >
-            {tagCanvasText(tag)}
-          </text>
-        ),
-      )}
+      {items.map(({ tag, x, color }) => <circle key={tag.id} cx={cx + x} cy={cy} r={ANNOTATION_DOT_RADIUS} fill={color} />)}
     </g>
   );
 }
@@ -503,7 +489,7 @@ export function DocumentedMark({ size, adopted }: { size: number; adopted: boole
  * it to `onNameHover`; otherwise the text lets the mouse through.
  */
 export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNameHover, fullName }: {
-  glyph: Pick<PersonGlyph, "caption" | "annotations" | "detailLines" | "detailsBacked" | "labelsBacked">;
+  glyph: Pick<PersonGlyph, "arrow" | "caption" | "annotations" | "nameWeight" | "detailLines" | "detailRuns" | "detailsBacked" | "labelsBacked">;
   nameLines: string[];
   size: number;
   nameCut?: boolean;
@@ -514,12 +500,13 @@ export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNam
   const at = textUnder(glyph, nameLines);
   const c = size / 2;
   const backing = (b: TextBacking) => <rect x={b.x} y={b.y} width={b.width} height={b.height} fill="white" />;
-  const line = (text: string, y: number, key: number, title?: string) => (
-    <text key={key} x={0} y={y} textAnchor="middle" fontFamily="sans-serif" fontSize={LABEL_FONT_SIZE} fill="black">
-      {title && <title>{title}</title>}{text}
+  const line = (text: string, y: number, key: number, { title, bold, runs }: { title?: string; bold?: boolean; runs?: TextRun[] } = {}) => (
+    <text key={key} x={0} y={y} textAnchor="middle" fontFamily="sans-serif" fontSize={LABEL_FONT_SIZE} fill="black" {...(bold ? { fontWeight: "bold" } : {})}>
+      {title && <title>{title}</title>}
+      {runs ? runs.map((r, i) => <tspan key={i} fill={r.color}>{i > 0 ? ` ${r.text}` : r.text}</tspan>) : text}
     </text>
   );
-  const nameWidth = linesWidth(nameLines) + 4;
+  const nameWidth = linesWidth(nameLines, nameCharWidth(glyph.nameWeight)) + 4;
   return (
     <g transform={`translate(${c} ${c})`} style={{ userSelect: "none" }}>
       {nameLines.length > 0 && (
@@ -537,13 +524,16 @@ export function TextUnderSymbol({ glyph, nameLines, size, nameCut = false, onNam
               width={nameWidth} height={nameLines.length * LABEL_LINE_HEIGHT} fill="transparent"
             />
           )}
-          {nameLines.map((text, k) => line(text, at.nameY[k]!, k, k === 0 && fullName && text !== fullName ? fullName : undefined))}
+          {nameLines.map((text, k) => line(text, at.nameY[k]!, k, {
+            title: k === 0 && fullName && text !== fullName ? fullName : undefined,
+            bold: glyph.nameWeight === "bold",
+          }))}
         </g>
       )}
       {glyph.detailLines.length > 0 && (
         <g data-detail-label pointerEvents="none">
           {at.detailBacking && backing(at.detailBacking)}
-          {glyph.detailLines.map((text, k) => line(text, at.detailY[k]!, k))}
+          {glyph.detailLines.map((text, k) => line(text, at.detailY[k]!, k, { runs: glyph.detailRuns[k] }))}
         </g>
       )}
     </g>

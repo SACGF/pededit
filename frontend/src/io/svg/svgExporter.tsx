@@ -63,7 +63,8 @@ export function exportSvg(pedigree: Pedigree, options: SvgExportOptions = {}): s
   // What the canvas draws: hidden descendants left out.
   // The one layout: everything below is drawn from what the canvas draws (#143).
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  const scene = buildScene(working, { compact: options.compact });
+  // De-identified, the names are pedigree numbers, written in regular weight.
+  const scene = buildScene(working, { compact: options.compact, nameWeight: options.deidentify ? "regular" : undefined });
   const padding = options.padding ?? 40;
   const legend = options.key === false ? { width: 0, height: 0, markup: [] } : exportKeyMarkup(working, padding, 0, { duplicates: scene.duplicates.length > 0 });
   const { offsetX, offsetY, width, height } = computeBounds(scene, options, legend);

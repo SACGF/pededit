@@ -22,7 +22,7 @@
  * check of the layout's arithmetic, as the other lints are.
  */
 import type { Pedigree } from "@pedigree-editor/layout-engine";
-import { textWidth, titleWidth, TITLE_FONT_SIZE } from "../../pedigree/labels";
+import { LABEL_CHAR_WIDTH, NAME_CHAR_WIDTH, textWidth, titleWidth, TITLE_FONT_SIZE } from "../../pedigree/labels";
 import { exportUShapeSvg } from "./uShapeExporter";
 import type { SvgExportOptions } from "./types";
 
@@ -166,6 +166,8 @@ export function lintUShapeSvg(svg: string): UShapeLintFinding[] {
     const at = (pts: P[]) => pts.map(p => apply(m, p));
     if (tag === "text") {
       const size = num(a, "font-size") || 10;
+      // Bold (a name) is wider than the regular estimate.
+      const boldScale = a["font-weight"] === "bold" ? NAME_CHAR_WIDTH / LABEL_CHAR_WIDTH : 1;
       const text = (textContent ?? "").replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "").replace(/&#?[a-z0-9]+;/gi, "x");
       // The chart title, in a group of its own, upright: checked against everything below.
       if (top().kind === "title") {
@@ -177,7 +179,7 @@ export function lintUShapeSvg(svg: string): UShapeLintFinding[] {
       // The standard export writes each line straight into the group.
       if (top().kind === "labels") { labels.push({ m, lines: [{ text, y: num(a, "y"), size }], backed: false, x: num(a, "x") }); continue; }
       if (inLabel) { labels[labels.length - 1]!.lines.push({ text, y: num(a, "y"), size }); continue; }
-      const w = textWidth(text) * size / 10;
+      const w = textWidth(text) * size / 10 * boldScale;
       const x = num(a, "x"), y = num(a, "y");
       const left = a["text-anchor"] === "end" ? x - w : a["text-anchor"] === "middle" ? x - w / 2 : x;
       const box: P[] = [[left, y - 0.8 * size], [left + w, y - 0.8 * size], [left + w, y + 0.3 * size], [left, y + 0.3 * size], [left, y - 0.8 * size]];

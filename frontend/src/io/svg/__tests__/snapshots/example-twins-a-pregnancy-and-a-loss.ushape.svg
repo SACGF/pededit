@@ -109,7 +109,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Tom</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tom</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">36y</text>
@@ -127,7 +127,7 @@
       <g transform="translate(-20 -20)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Priya</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Priya</text>
           </g>
           <g data-detail-label="true" pointer-events="none">
             <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45">34y</text>

@@ -1,10 +1,10 @@
-<svg height="425" viewBox="0 0 473 425" width="473" xmlns="http://www.w3.org/2000/svg">
+<svg height="431" viewBox="0 0 473 431" width="473" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="425" width="473"/>
+  <rect fill="white" height="431" width="473"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="236.5" y="56">Remarriage · half-siblings</text>
   </g>
@@ -97,7 +97,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 337)">
+  <g class="pedigree-key" transform="translate(0 343)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

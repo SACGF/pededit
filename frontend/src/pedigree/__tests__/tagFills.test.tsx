@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Pedigree, Tag, TagFill } from "@pedigree-editor/layout-engine";
 import { tagPaint, tagFillMode, fillLayers, MONOCHROME_PATTERN_ORDER, MONOCHROME_COLOR } from "../tagFills";
 import { symbolPaint, annotationRow } from "../tags";
+import { tagSection } from "../labels";
 import { SymbolShape, standaloneGlyph, AnnotationRow } from "../chart/symbols";
 import { TagSwatchSvg } from "../chart/keySwatches";
 import { exportSvg } from "../../io/svg/svgExporter";
@@ -144,10 +145,11 @@ describe("renderers draw the pattern (#67)", () => {
     const dot: Tag = { id: "d", label: "Sequenced", color: "#2ca02c", style: "dot" };
     const text: Tag = { id: "t", label: "Gene", color: "#ff7f0e", style: "text", abbrev: "+/-" };
     const p = ped([dot, text], true);
-    expect(annotationRow(p.individuals[0]!, p).map(i => i.color)).toEqual([MONOCHROME_COLOR, MONOCHROME_COLOR]);
+    expect(annotationRow(p.individuals[0]!, p).map(i => i.color)).toEqual([MONOCHROME_COLOR]);
+    expect(tagSection(p.individuals[0]!, p, 74).runs!.flat().map(r => r.color)).toEqual([MONOCHROME_COLOR]);
     const svg = renderToStaticMarkup(<svg><AnnotationRow items={annotationRow(p.individuals[0]!, p)} size={40} /></svg>);
     expect(svg).not.toContain("#2ca02c");
-    expect(svg).not.toContain("#ff7f0e");
+    for (const s of [exportSvg(p), exportUShapeSvg(p)]) expect(s).not.toContain("#ff7f0e");
   });
 
   it("monochrome SVG and U-shape exports use no tag colour, and pattern every quadrant tag", () => {

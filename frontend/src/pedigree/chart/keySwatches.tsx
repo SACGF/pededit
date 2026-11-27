@@ -1,6 +1,6 @@
 import type { Pedigree, Tag, LifeStatus, Sex } from "@pedigree-editor/layout-engine";
 import type { Zygosity, ChildlessStatus, Adoption, ReproductiveRole } from "@pedigree-editor/layout-engine";
-import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, ANNOTATION_FONT_SIZE } from "../tags";
+import { conditionSection, conditionPaint, conditionCarrierPaint, sectorPath, tagCanvasText, PLAIN_CARRIER_TAG, PLAIN_CARRIER_ANGLES, ANNOTATION_DOT_RADIUS, TAG_TEXT_FONT_SIZE } from "../tags";
 import { SymbolShape, standaloneGlyph, ProbandArrow, FamilyHistoryMark, DocumentedMark, RegionFill } from "./symbols";
 import { PLAIN_CARRIER_PAINT } from "../tagFills";
 import { lifeStatusCaption } from "../lifeStatus";
@@ -177,7 +177,7 @@ export function TagSwatchSvg({ tag, pedigree, carrier = false }: { tag: Tag; ped
   }
   return (
     <svg width="40" height="28" viewBox="0 0 40 28">
-      <text x={20} y={14 + ANNOTATION_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={ANNOTATION_FONT_SIZE} fontWeight="bold" fill={paint.color}>
+      <text x={20} y={14 + TAG_TEXT_FONT_SIZE / 2 - 1} textAnchor="middle" fontFamily="sans-serif" fontSize={TAG_TEXT_FONT_SIZE} fill={paint.color}>
         {tagCanvasText(tag)}
       </text>
     </svg>

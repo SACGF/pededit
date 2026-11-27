@@ -33,7 +33,7 @@ import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { NODE_SIZE } from "../../pedigree/constants";
 import { buildScene } from "../../pedigree/scene";
 import type { Scene } from "../../pedigree/scene";
-import { textWidth, titleWidth } from "../../pedigree/labels";
+import { NAME_CHAR_WIDTH, textWidth, titleWidth } from "../../pedigree/labels";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { pathPoints } from "../../pedigree/couplePath";
 import { sceneDrawing, segmentsOf } from "../../pedigree/sceneDrawing";
@@ -65,7 +65,8 @@ interface Parsed {
   sibs: Seg[];
   /** Lines of assisted reproduction, group `assisted-lines`. */
   assisted: Seg[];
-  texts: { x: number; y: number; text: string }[];
+  /** Lines under symbols; `bold` for a name in bold, which is wider. */
+  texts: { x: number; y: number; text: string; bold?: boolean }[];
   /** Lines of the consanguinity labels, group `consanguinity-labels`. */
   coupleTexts: { x: number; y: number; text: string }[];
   /** The dashed arcs between two copies of someone, as polylines (group `duplicate-arcs`). */
@@ -121,13 +122,13 @@ export function parseExportSvg(svg: string): Parsed {
   const inMark = () => stack.some(f => f.mark);
   const skipped = () => stack.some(f => f.name === "defs" || f.name === "clipPath" || f.name === "marker" || f.group === "pedigree-key");
   const TAG = /<(\/?)([a-zA-Z]+)((?:\s+[\w:-]+="[^"]*")*)\s*(\/?)>/g;
-  let textStart = -1, textAt: Pt | null = null, textInto = out.texts;
+  let textStart = -1, textAt: Pt | null = null, textInto = out.texts, textBold = false;
   for (let m: RegExpExecArray | null; (m = TAG.exec(svg)); ) {
     const [, closing, name, attrText, selfClosing] = m;
     if (closing) {
       if (name === "text" && textAt && textStart >= 0) {
         const inner = svg.slice(textStart, m.index).replace(/<title>[^]*?<\/title>/g, "").replace(/<[^>]*>/g, "");
-        textInto.push({ x: textAt[0], y: textAt[1], text: unescapeXml(inner) });
+        textInto.push({ x: textAt[0], y: textAt[1], text: unescapeXml(inner), ...(textBold ? { bold: true } : {}) });
         textAt = null;
       }
       // Pop to the matching element (the exporter's markup is well formed).
@@ -163,6 +164,7 @@ export function parseExportSvg(svg: string): Parsed {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
       textInto = out.titles;
+      textBold = false;
     }
     if (name === "path" && g === "duplicate-arcs" && !skipped()) {
       const pts = pathPoints(attrs.d ?? "");
@@ -181,6 +183,7 @@ export function parseExportSvg(svg: string): Parsed {
       textStart = m.index + m[0].length;
       textAt = [Number(attrs.x) + ox, Number(attrs.y) + oy];
       textInto = g === "labels" ? out.texts : out.coupleTexts;
+      textBold = attrs["font-weight"] === "bold";
     }
   }
   return out;
@@ -268,7 +271,7 @@ export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): Ex
   const coupleBoxes = parsed.coupleTexts.map(t => ({ t, box: textBox(t, consanguinityLabelWidth(t.text), 7) }));
   const drawn: Box[] = [
     ...parsed.symbols.map(symbolBox),
-    ...parsed.texts.map(t => textBox(t, textWidth(t.text), 8)),
+    ...parsed.texts.map(t => textBox(t, textWidth(t.text, t.bold ? NAME_CHAR_WIDTH : undefined), 8)),
     ...coupleBoxes.map(b => b.box),
     ...[...parsed.sibs, ...parsed.assisted, ...parsed.couples.flatMap(segmentsOf), ...arcSegs].map(segBox),
   ];
@@ -305,7 +308,7 @@ export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): Ex
  */
 export function lintExport(pedigree: Pedigree, options: SvgExportOptions = {}, { drawing = true } = {}): (ExportLintFinding | LintFinding)[] {
   const working = options.deidentify ? deidentify(pedigree, options) : drawnPedigree(pedigree);
-  const scene = buildScene(working, { compact: options.compact });
+  const scene = buildScene(working, { compact: options.compact, nameWeight: options.deidentify ? "regular" : undefined });
   return [
     ...(drawing ? lintScene(working, scene) : []),
     ...lintExportSvg(working, scene, exportSvg(pedigree, { ...options, uShape: false })),

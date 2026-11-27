@@ -1,10 +1,10 @@
-<svg height="569" viewBox="0 0 493 569" width="493" xmlns="http://www.w3.org/2000/svg">
+<svg height="575" viewBox="0 0 493 575" width="493" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="569" width="493"/>
+  <rect fill="white" height="575" width="493"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="246.5" y="56">Filter: affected only, one condition</text>
   </g>
@@ -248,13 +248,13 @@
       <g transform="translate(184 148)">
         <g style="user-select:none" transform="translate(20 20)">
           <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="32">Proband</text>
+            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Proband</text>
           </g>
         </g>
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 385)">
+  <g class="pedigree-key" transform="translate(0 391)">
     <g transform="translate(56 12) scale(0.667) translate(-18 -18)">
       <svg height="36" viewBox="-6 -6 36 36" width="36">
         <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
