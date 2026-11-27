@@ -35,11 +35,18 @@ export interface SvgExportOptions {
   compact?: boolean;
 
   /**
-   * Draw the key under the chart. Default: true. The guide pages' figures
+   * Draw the key, in a corner (`keyPosition`). Default: true. The guide pages' figures
    * (`src/guides/`) leave it out, as their text says what each symbol is,
    * and so does the editor's U-shape view, whose legend is on the Pedigree tab.
    */
   key?: boolean;
+
+  /**
+   * The corner the key goes in (#241). Left out, the corner that makes the
+   * figure grow least (`KEY_POSITIONS` in `keyPlacement.ts`). Either way the
+   * key goes into the chart's free space when there is room.
+   */
+  keyPosition?: KeyPosition;
 
   /** Render as U-shape (horseshoe) layout instead of standard top-down. */
   uShape?: boolean;
@@ -101,3 +108,6 @@ export const DEIDENTIFY_KEEP_DEFAULTS: DeidentifyKeep = {
   childlessReason: false,
   notes: false,
 };
+
+/** A corner of an exported figure, for the key (#241). */
+export type KeyPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";

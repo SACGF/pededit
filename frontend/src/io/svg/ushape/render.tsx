@@ -19,6 +19,7 @@ import { HALF, PROBAND_TAIL, r, escapeXml } from "./constants";
 import { walk } from "./tree";
 import { build, nodeAt, toLayout, glyphOf, type UShapeLayout, type UShapeCoupleLabel, type Built } from "./layout";
 import { trackPath, renderConnectors } from "./connectors";
+import { withKey } from "../keyPlacement";
 
 export function renderCoupleLabels(labels: UShapeCoupleLabel[]): string[] {
   return labels.map(l =>
@@ -123,20 +124,16 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
     minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
   }
   const legend = options.key === false ? { width: 0, height: 0, markup: [] } : exportKeyMarkup(working, padding, 0, { duplicates: layout.duplicates.length > 0 });
-  const legendExtra = legend.height > 0 ? legend.height + padding / 2 : 0;
   const titleW = options.title ? titleWidth(options.title) + 2 * padding : 0;
   const drawingW = Math.max(maxX - minX + 2 * margin, legend.width + 2 * padding);
   const width = Math.ceil(Math.max(drawingW, titleW));
   // A title wider than the drawing widens the figure; the drawing is centred under it.
   const shiftX = (width - drawingW) / 2;
-  const height = Math.ceil(maxY - minY + 2 * margin + titleH + legendExtra);
+  // The key goes in a corner afterwards (`withKey`), growing the figure
+  // only by what its free space lacks.
+  const height = Math.ceil(maxY - minY + 2 * margin + titleH);
 
-  const out: string[] = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"`,
-    `     viewBox="0 0 ${width} ${height}">`,
-    `<defs>${svgMarkup(<ProbandMarkerDef />)}</defs>`,
-    `<rect width="${width}" height="${height}" fill="white"/>`,
-  ];
+  const out: string[] = [];
   if (options.title) out.push(`<g class="chart-title">${svgMarkup(<ChartTitle title={options.title} x={width / 2} y={padding / 2 + 14} />)}</g>`);
   out.push(`<g transform="translate(${r(margin - minX + shiftX)} ${r(margin - minY + titleH)})">`);
   if (options.debugSpine) out.push(...renderDebugTracks(b, layout));
@@ -144,9 +141,5 @@ export function renderUShape(pedigree: Pedigree, options: SvgExportOptions = {})
   out.push(...renderSymbols(working, b, options.personIds));
   out.push(`<g class="consanguinity-labels">`, ...renderCoupleLabels(layout.coupleLabels), `</g>`);
   out.push(`</g>`);
-  if (legend.height > 0) {
-    out.push(`<g class="pedigree-key" transform="translate(0 ${height - padding - legend.height})">`, ...legend.markup, `</g>`);
-  }
-  out.push(`</svg>`);
-  return { svg: out.join("\n"), layout };
+  return { svg: withKey(out, { width, height }, `<defs>${svgMarkup(<ProbandMarkerDef />)}</defs>`, legend, padding, options.keyPosition).svg, layout };
 }

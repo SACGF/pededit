@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 
 export default {
   name: "exports",
-  about: "Every export downloads a non-empty file of the right type; the SVG passes the export lint; de-identified has no names, ids or childless reason",
+  about: "Every export downloads a non-empty file of the right type; the SVG passes the export lint; de-identified has no names, ids or childless reason; the key goes in the corner the dialog shows, a click or Settings picks another",
   async run(t) {
     await t.openFixture("fixture:text");
     const dialogDownload = async options => {
@@ -103,5 +103,37 @@ export default {
     t.match(readFileSync(await dialogDownload(["SVG"]), "utf8"), /azoospermia/, "childless reason: drawn in the plain export");
     t.notMatch(readFileSync(await dialogDownload(["SVG", "De-identify"]), "utf8"), /azoospermia/, "childless reason: dropped when de-identified");
     t.match(readFileSync(await dialogDownload(["Include the reason under"]), "utf8"), /azoospermia/, "childless reason: kept when ticked");
+
+    // #241: the key's corner. The dialog shows the corner the figure uses,
+    // a click picks another for this export, and Settings sets the default.
+    await t.openFixture("fixture:text");
+    const pressed = () => t.eval(() => document.querySelector('[data-testid="key-corner-picker"] [aria-checked="true"]')?.getAttribute("data-key-corner"));
+    const keyAt = svgText => /data-key-position="([a-z-]+)"/.exec(svgText)?.[1];
+    const keyProblems = svgText => t.eval(async text => (await import("/src/io/svg/keyPlacement.ts")).keyPlacementProblems(text), svgText);
+    await t.click('button[title="Export as SVG or PNG"]');
+    const best = await pressed();
+    t.ok(!!best, `the dialog shows the key's corner (${best})`);
+    const bestSvg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
+    if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
+    t.equal(keyAt(bestSvg), best, "the file has the key in that corner");
+    t.equal(await keyProblems(bestSvg), [], "clear of everything drawn");
+    const other = ["bottom-left", "bottom-right", "top-left", "top-right"].find(c => c !== best);
+    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(`[data-key-corner="${other}"]`);
+    t.equal(await pressed(), other, "a click picks another corner");
+    const otherSvg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
+    if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
+    t.equal(keyAt(otherSvg), other, "the file has the key there");
+    t.equal(await keyProblems(otherSvg), [], "still clear of everything drawn");
+    await t.click('button[title="Export as SVG or PNG"]');
+    t.equal(await pressed(), best, "reopened, the dialog follows the setting again (Auto)");
+    await t.click('[role="dialog"] button:has-text("Cancel")');
+    await t.click('button[title="Pedigree settings"]');
+    await t.select('select[name="keyPosition"]', "Top right");
+    await t.press("Escape");
+    await t.reload();
+    await t.click('button[title="Export as SVG or PNG"]');
+    t.equal(await pressed(), "top-right", "with Top right in Settings, kept after a reload, the dialog opens on it");
+    await t.click('[role="dialog"] button:has-text("Cancel")');
   },
 };

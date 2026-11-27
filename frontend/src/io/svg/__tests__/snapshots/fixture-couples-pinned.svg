@@ -1,10 +1,10 @@
-<svg height="865" viewBox="0 0 1200 865" width="1200" xmlns="http://www.w3.org/2000/svg">
+<svg height="660" viewBox="0 0 1200 660" width="1200" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="865" width="1200"/>
+  <rect fill="white" height="660" width="1200"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="600" y="56">Couples and lines, pinned and snapped</text>
   </g>
@@ -289,7 +289,7 @@
       <text data-consanguinity-label="true" fill="black" font-family="sans-serif" font-size="9" pointer-events="none" style="user-select:none" text-anchor="middle" x="120" y="213">first cousins</text>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 585)">
+  <g class="pedigree-key" data-box="856 380 304 240" data-key-position="bottom-right" transform="translate(816 380)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <circle cx="12" cy="12" fill="black" r="11" stroke="black" stroke-width="2"/>

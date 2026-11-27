@@ -1,10 +1,10 @@
-<svg height="904" viewBox="0 0 752 904" width="752" xmlns="http://www.w3.org/2000/svg">
+<svg height="823" viewBox="0 0 752 823" width="752" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="904" width="752"/>
+  <rect fill="white" height="823" width="752"/>
   <g transform="translate(92 60)">
     <g class="couple-lines">
       <path d="M 366.67 0 L 406.67 0" fill="none" stroke="black" stroke-width="2"/>
@@ -421,7 +421,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 456)">
+  <g class="pedigree-key" data-box="40 375 346 408" data-key-position="bottom-left" transform="translate(0 375)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

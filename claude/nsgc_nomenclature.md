@@ -193,6 +193,7 @@ history, the reason for referral and the ancestry of both sides.
 | Rule | PedEdit |
 |---|---|
 | Key defines every fill and symbol | Auto legend (#3). |
+| Silent on where the key goes | Common practice (#241): a corner of the figure, in the chart's free space there, chosen in Settings ("Key position in exports") or the export dialog; Auto picks the corner that keeps the figure smallest. |
 | Reason for referral, recorder, date, historian, ancestry | Follows (#102): pedigree-level fields, listed in the legend and the export key, dropped by de-identified export. The proband is marked on the chart, not in these fields. |
 
 **Fills other than solid shading (#67).** NSGC asks only that every fill be

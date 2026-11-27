@@ -9,6 +9,9 @@ import {
 import type { DeidentifyKeep } from "../io/svg/index";
 import type { Pedigree } from "@pedigree-editor/layout-engine";
 import { chartTitle, showsNotes } from "../pedigree/labels";
+import { KEY_POSITIONS, keyPositionOf } from "../io/svg/keyPlacement";
+import type { KeyPosition } from "../io/svg/types";
+import type { KeyPositionSetting } from "../utils/keyPositionSetting";
 import { clinicalDetailLines } from "../pedigree/clinicalDetails";
 import { usePedigreeStore } from "../store/usePedigreeStore";
 import { uShapeExportLayout } from "../pedigree/uShapeView";
@@ -23,9 +26,11 @@ interface ExportDialogProps {
   title: string;
   /** Initial state of the compact toggle, normally the canvas setting. */
   defaultCompact?: boolean;
+  /** "Key position in exports" from Settings: the corner picked when the dialog opens, or "auto". */
+  defaultKeyPosition?: KeyPositionSetting;
 }
 
-export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defaultCompact = false }: ExportDialogProps) {
+export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defaultCompact = false, defaultKeyPosition = "auto" }: ExportDialogProps) {
   const [format, setFormat]         = useState<"svg" | "png" | "pdf">("svg");
   const [deident, setDeident]       = useState(false);
   const [ageBuckets, setAgeBuckets] = useState(false);
@@ -41,6 +46,9 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
   const [uPartners, setUPartners]   = useState(true);
   const [compact, setCompact]       = useState(defaultCompact);
   const [onlySelected, setOnlySelected] = useState(false);
+  // The key's corner for this export: null follows the best corner, which
+  // changes with what is drawn; a click picks one until the dialog closes.
+  const [keyCorner, setKeyCorner] = useState<KeyPosition | null>(defaultKeyPosition === "auto" ? null : defaultKeyPosition);
 
   // Each time the dialog opens: follow the canvas setting, and draw
   // everyone, whatever was ticked last time. Set during render, so the
@@ -52,6 +60,7 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
       setCompact(defaultCompact);
       setError(null);
       setOnlySelected(false);
+      setKeyCorner(defaultKeyPosition === "auto" ? null : defaultKeyPosition);
       // Notes are the free text most likely to name someone: including
       // them is chosen afresh for each export, not carried over.
       setKept("notes", false);
@@ -96,8 +105,11 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
       title: deident ? undefined : chartTitle(pedigree, title) || undefined,
       uShapePartners: uPartners,
       compact,
+      ...(keyCorner ? { keyPosition: keyCorner } : {}),
     });
-  }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact]);
+  }, [open, useU, pedigree, deident, ageBuckets, keep, title, uPartners, compact, keyCorner]);
+  // The corner the key is in: the one picked, or the best one, read from the figure.
+  const shownCorner = svgString ? keyPositionOf(svgString) : undefined;
 
   // Notes can be hidden by the pedigree setting, so say so when there are some.
   const hasNotes = useMemo(() => open && pedigree.individuals.some(i => !!i.notes?.trim()), [open, pedigree]);
@@ -324,6 +336,19 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
               </>
             )}
           </div>
+
+          {/* The key's corner (#241), when the figure has a key */}
+          {shownCorner && (
+            <div className="flex items-center gap-3">
+              <KeyCornerPicker value={shownCorner} onChange={setKeyCorner} />
+              <div className="text-xs">
+                <div className="font-medium">Key position</div>
+                <p className="text-muted-foreground" data-testid="key-corner-hint">
+                  {keyCorner ? "Picked for this export." : "The corner with most room."} The key uses the chart's empty space there.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {error && <p className="text-xs text-red-700" role="alert">Export failed: {error}</p>}
@@ -336,5 +361,30 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const CORNER_LABELS: Record<KeyPosition, string> = {
+  "top-left": "Top left", "top-right": "Top right", "bottom-left": "Bottom left", "bottom-right": "Bottom right",
+};
+
+/** A small square standing for the figure, with a button in each corner; the key's corner is pressed. */
+function KeyCornerPicker({ value, onChange }: { value: KeyPosition; onChange: (v: KeyPosition) => void }) {
+  return (
+    <div role="radiogroup" aria-label="Key position" className="relative w-14 h-10 border border-gray-400 shrink-0" data-testid="key-corner-picker">
+      {KEY_POSITIONS.map(p => (
+        <button
+          key={p}
+          type="button"
+          role="radio"
+          aria-checked={value === p}
+          aria-label={CORNER_LABELS[p]}
+          title={CORNER_LABELS[p]}
+          data-key-corner={p}
+          onClick={() => onChange(p)}
+          className={`absolute w-4 h-3 border ${value === p ? "bg-black border-black" : "bg-white border-gray-400 hover:border-black"} ${p.startsWith("top") ? "top-0.5" : "bottom-0.5"} ${p.endsWith("left") ? "left-0.5" : "right-0.5"}`}
+        />
+      ))}
+    </div>
   );
 }

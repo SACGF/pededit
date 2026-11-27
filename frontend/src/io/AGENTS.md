@@ -150,6 +150,24 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   Tests find symbols by `<g transform="translate(..)">` followed by a shape,
   so the key group needs that class to stay out of their way. Shares geometry with the canvas via `pedigree/tags.ts` and the layout
   constants.
+- The key's corner (#241, `keyPlacement.ts`): both exporters draw the
+  figure without the key, then `withKey` reads back the box of everything
+  drawn (`drawnBoxes`, parsing the SVG with its transforms through
+  `svgGeometry.ts`, so the U-shape's turned text is boxed where it lands)
+  and puts the key in a corner, its left or right edge on the padding.
+  Over the key's width (plus half the padding either side) the drawn thing
+  nearest that edge decides: the key goes against the edge when the gap
+  holds it plus half the padding, otherwise the figure grows at that edge
+  by the shortfall (a top corner moves everything else down). Only a clear
+  run to the edge counts, never a pocket enclosed by lines. With no
+  `keyPosition` the corner that grows the figure least is used, bottom left
+  first on a tie, so it is never taller than the old band under the chart.
+  The key's group says its corner (`data-key-position`, which the export
+  dialog reads to show it) and its box (`data-box`, for
+  `keyPlacementProblems`, run by `lintExport` and `lintUShape` as
+  `key-collides`). The standing choice is Settings, "Key position in
+  exports" (`utils/keyPositionSetting.ts`, localStorage, per browser, Auto
+  by default); the dialog's corner picker overrides it for one export.
 - One renderer (#139): `svgExporter.tsx` and the U-shape draw people,
   lines and text with the canvas's components (`pedigree/chart/`),
   rendered to markup with `renderToStaticMarkup` inside an `<svg>` root
@@ -225,7 +243,8 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
   that it holds every symbol, line, dashed arc and line of text the scene
   draws, at its place (`missing-from-file`, `symbol-not-in-scene`, a smoke
   test against `sceneDrawing`), and how the export composed the figure
-  (`title-collides` for the title in its own band, `key-collides`,
+  (`title-collides` for the title in its own band, `key-collides` for the
+  key against everything drawn,
   `outside-figure`). `lint.mjs` and `__pededit.checkExport()` leave out the
   render lint for a plain export, whose scene `check()` has already linted.
   It parses the SVG, so `pedigree/chart/Chart.tsx` must keep writing its

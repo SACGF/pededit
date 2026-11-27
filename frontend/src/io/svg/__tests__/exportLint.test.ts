@@ -113,11 +113,11 @@ describe("lintExportSvg finds what the exporter got wrong", () => {
     expect(messages(svg.replace(">Kid</text>", ">Kit</text>"))).toEqual(['missing-from-file: the line "Kid" under Kid (c) is not in the file']);
   });
 
-  it("reports the key drawn up into the drawing", () => {
+  it("reports the key drawn into the drawing", () => {
     const keyed: Pedigree = { ...trio, individuals: trio.individuals.map(i => (i.id === "c" ? { ...i, affected: true } : i)) };
     const file = exportSvg(keyed);
-    const top = parseExportSvg(file).symbols[0]![1];
-    const raised = file.replace(/<g class="pedigree-key" transform="translate\(0 [-\d.e]+\)">/, `<g class="pedigree-key" transform="translate(0 ${top})">`);
+    const [x, top] = parseExportSvg(file).symbols[0]!;
+    const raised = file.replace(/data-box="[-\d.]+ [-\d.]+ /, `data-box="${x - 10} ${top} `);
     expect(raised).not.toBe(file);
     expect(lintExportSvg(keyed, buildScene(keyed), file)).toEqual([]);
     expect(lintExportSvg(keyed, buildScene(keyed), raised).map(f => f.code)).toEqual(["key-collides"]);

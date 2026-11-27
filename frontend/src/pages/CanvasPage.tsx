@@ -11,6 +11,7 @@ import { EditPanel, type PanelSize } from "../components/EditPanel";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { ImportPedDialog } from "../components/ImportPedDialog";
 import { ExportDialog } from "../components/ExportDialog";
+import { readKeyPositionSetting, writeKeyPositionSetting } from "../utils/keyPositionSetting";
 import { TagsDialog } from "../components/TagsDialog";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useEditorSession } from "../hooks/useEditorSession";
@@ -46,6 +47,7 @@ export default function CanvasPage() {
   const [compact, setCompact] = useState(() => {
     try { return localStorage.getItem("compactLayout") === "true"; } catch { return false; }
   });
+  const [keyPosition, setKeyPosition] = useState(readKeyPositionSetting);
   const [importOpen, setImportOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
@@ -173,6 +175,8 @@ export default function CanvasPage() {
           setCompact(v);
           try { localStorage.setItem("compactLayout", String(v)); } catch { /* storage unavailable */ }
         }}
+        keyPosition={keyPosition}
+        onKeyPosition={v => { setKeyPosition(v); writeKeyPositionSetting(v); }}
       />
 
       <ImportPedDialog
@@ -199,6 +203,7 @@ export default function CanvasPage() {
           pedigree={pedigree}
           title={activeTitle ?? "pedigree"}
           defaultCompact={compact}
+          defaultKeyPosition={keyPosition}
         />
       )}
 

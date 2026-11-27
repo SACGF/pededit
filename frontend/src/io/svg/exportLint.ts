@@ -13,7 +13,8 @@
  *   title-collides         the chart title, which the export places in its own
  *                          band, is drawn through a symbol, a dashed arc between two
  *                          copies or a consanguinity label
- *   key-collides           the key reaches up into the drawing
+ *   key-collides           the key, in its corner, overlaps something drawn or
+ *                          reaches outside the figure (`keyPlacementProblems`)
  *   outside-figure         something drawn lies outside the figure's width and height
  *
  * `lintExport` runs both: the render lint on the scene the export draws
@@ -34,6 +35,7 @@ import { NODE_SIZE } from "../../pedigree/constants";
 import { buildScene } from "../../pedigree/scene";
 import type { Scene } from "../../pedigree/scene";
 import { NAME_CHAR_WIDTH, textWidth, titleWidth } from "../../pedigree/labels";
+import { keyPlacementProblems } from "./keyPlacement";
 import { consanguinityLabelWidth } from "../../pedigree/consanguinityLabel";
 import { pathPoints } from "../../pedigree/couplePath";
 import { sceneDrawing, segmentsOf } from "../../pedigree/sceneDrawing";
@@ -73,8 +75,6 @@ interface Parsed {
   duplicateArcs: Pt[][];
   /** The chart title (`class="chart-title"`): its centre on the baseline, and the text. */
   titles: { x: number; y: number; text: string }[];
-  /** The top of the key (`class="pedigree-key"`), or null when there is none. */
-  keyTop: number | null;
   /** The figure's width and height, from the root element. */
   size: Pt;
   /** False when the SVG has none of the drawing's groups. */
@@ -112,7 +112,7 @@ function pathSegments(d: string): Seg[] {
 
 /** Pull the drawn geometry out of an exportSvg string, in absolute SVG coordinates. */
 export function parseExportSvg(svg: string): Parsed {
-  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], duplicateArcs: [], titles: [], keyTop: null, size: [0, 0], structured: false, origin: [0, 0] };
+  const out: Parsed = { symbols: [], couples: [], sibs: [], assisted: [], texts: [], coupleTexts: [], duplicateArcs: [], titles: [], size: [0, 0], structured: false, origin: [0, 0] };
   type Frame = { name: string; dx: number; dy: number; group?: string; symbol?: boolean; mark?: boolean };
   const stack: Frame[] = [];
   const offset = () => stack.reduce<Pt>((a, f) => [a[0] + f.dx, a[1] + f.dy], [0, 0]);
@@ -146,8 +146,8 @@ export function parseExportSvg(svg: string): Parsed {
       const frame: Frame = { name, dx: t ? Number(t[1]) : 0, dy: t ? Number(t[2]) : 0, mark };
       if (attrs.class) {
         frame.group = attrs.class;
-        if (attrs.class === "pedigree-key") out.keyTop = oy + frame.dy;
-        else if (attrs.class !== "chart-title" && !out.structured) { out.structured = true; out.origin = [ox, oy]; }
+        // The key is checked by keyPlacementProblems.
+        if (attrs.class !== "pedigree-key" && attrs.class !== "chart-title" && !out.structured) { out.structured = true; out.origin = [ox, oy]; }
       }
       if (g === "symbols" && !inSymbol() && t) {
         frame.symbol = true;
@@ -289,11 +289,8 @@ export function lintExportSvg(pedigree: Pedigree, scene: Scene, svg: string): Ex
     }
   }
 
-  // The key, below the drawing.
-  if (parsed.keyTop !== null) {
-    const bottom = Math.max(...drawn.map(b => b[3]));
-    if (parsed.keyTop < bottom) out.push({ code: "key-collides", message: `the key starts at y ${Math.round(parsed.keyTop)}, above the bottom of the drawing at ${Math.round(bottom)}`, individuals: [] });
-  }
+  // The key, in its corner, clear of everything drawn (#241).
+  for (const message of keyPlacementProblems(svg)) out.push({ code: "key-collides", message, individuals: [] });
   // Everything inside the figure.
   const [w, h] = parsed.size;
   const outside = drawn.find(b => b[0] < 0 || b[1] < 0 || b[2] > w || b[3] > h);

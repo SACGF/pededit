@@ -1,10 +1,10 @@
-<svg height="878" viewBox="0 0 971 878" width="971" xmlns="http://www.w3.org/2000/svg">
+<svg height="808" viewBox="0 0 971 808" width="971" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="878" width="971"/>
+  <rect fill="white" height="808" width="971"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="485.5" y="34">Couples and lines, relationships named</text>
   </g>
@@ -311,7 +311,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 550)">
+  <g class="pedigree-key" data-box="40 480 304 288" data-key-position="bottom-left" transform="translate(0 480)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <circle cx="12" cy="12" fill="black" r="11" stroke="black" stroke-width="2"/>

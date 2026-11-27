@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { EXAMPLES } from "../../../data/examples";
+import { keyPlacementProblems } from "../keyPlacement";
 import { exportSvg } from "../svgExporter";
 import { lintExport, parseExportSvg } from "../exportLint";
 import { simpleFamily } from "../../../fixtures/simpleFamily";
@@ -90,7 +91,7 @@ describe("exportSvg — tags", () => {
     expect(svg).not.toContain("<clipPath"); // no quadrant tag on anyone
   });
 
-  it("tags grow the canvas to fit the legend", () => {
+  it("tags add a key, which the figure is wide enough for and which overlaps nothing", () => {
     const base = makePedigree({
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0 }],
     });
@@ -98,8 +99,11 @@ describe("exportSvg — tags", () => {
       individuals: [{ id: "i1", sex: "male", affected: false, sibOrder: 0, tags: ["t1"] }],
       tags,
     });
-    const h = (svg: string) => Number(svg.match(/height="(\d+)"/)![1]);
-    expect(h(exportSvg(tagged))).toBeGreaterThan(h(exportSvg(base)));
+    expect(exportSvg(base)).not.toContain("pedigree-key");
+    const svg = exportSvg(tagged);
+    const [x, , w] = /data-box="([^"]*)"/.exec(svg)![1]!.split(" ").map(Number);
+    expect(x! + w!).toBeLessThanOrEqual(Number(/width="(\d+)"/.exec(svg)![1]));
+    expect(keyPlacementProblems(svg)).toEqual([]);
   });
 
   it("de-identified export keeps tags", () => {

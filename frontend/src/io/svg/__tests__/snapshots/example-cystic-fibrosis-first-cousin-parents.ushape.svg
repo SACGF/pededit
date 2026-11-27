@@ -1,10 +1,10 @@
-<svg height="684" viewBox="0 0 505 684" width="505" xmlns="http://www.w3.org/2000/svg">
+<svg height="572" viewBox="0 0 505 572" width="505" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="684" width="505"/>
+  <rect fill="white" height="572" width="505"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="252.5" y="34">Cystic fibrosis, first cousin parents</text>
   </g>
@@ -230,7 +230,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 500)">
+  <g class="pedigree-key" data-box="287 388 178 144" data-key-position="bottom-right" transform="translate(247 388)">
     <g transform="translate(56 12) scale(0.667) translate(-18 -18)">
       <svg height="36" viewBox="-6 -6 36 36" width="36">
         <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

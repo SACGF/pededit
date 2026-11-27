@@ -1,10 +1,10 @@
-<svg height="885" viewBox="0 0 662 885" width="662" xmlns="http://www.w3.org/2000/svg">
+<svg height="791" viewBox="0 0 662 791" width="662" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="885" width="662"/>
+  <rect fill="white" height="791" width="662"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="331" y="56">Status and conditions</text>
   </g>
@@ -465,7 +465,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 437)">
+  <g class="pedigree-key" data-box="300 343 322 408" data-key-position="bottom-right" transform="translate(260 343)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

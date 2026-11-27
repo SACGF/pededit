@@ -1,10 +1,10 @@
-<svg height="705" viewBox="0 0 520 705" width="520" xmlns="http://www.w3.org/2000/svg">
+<svg height="660" viewBox="0 0 520 660" width="520" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="705" width="520"/>
+  <rect fill="white" height="660" width="520"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="260" y="56">Pattern fills, black and white</text>
   </g>
@@ -306,7 +306,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 305)">
+  <g class="pedigree-key" data-box="40 260 322 360" data-key-position="bottom-left" transform="translate(0 260)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <g>

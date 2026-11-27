@@ -1,806 +1,808 @@
-<svg height="1033" viewBox="0 0 1273 1033" width="1273" xmlns="http://www.w3.org/2000/svg">
+<svg height="758" viewBox="0 0 1273 758" width="1273" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="1033" width="1273"/>
-  <g class="chart-title">
-    <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="636.5" y="56">House Lannister (TV show)</text>
+  <rect fill="white" height="758" width="1273"/>
+  <g transform="translate(0 9)">
+    <g class="chart-title">
+      <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="636.5" y="56">House Lannister (TV show)</text>
+    </g>
+    <g transform="translate(92 100)">
+      <g class="couple-lines">
+        <path d="M 580.59 0 L 620.59 0" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 604.6 120 L 644.6 120" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 908.57 120 L 948.57 120" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 182.64 240 L 222.64 240" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 399.48 240 L 439.48 240" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 559.48 240 L 599.48 240" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 719.48 240 L 759.48 240" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 879.48 238 L 919.48 238" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 879.48 242 L 919.48 242" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 900.8 358 L 940.8 358" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 900.8 362 L 940.8 362" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 980.8 360 L 1020.8 360" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 1060.8 360 L 1100.8 360" fill="none" stroke="black" stroke-width="2"/>
+      </g>
+      <g class="sibship-lines">
+        <path d="M 600.59 0 L 600.59 60 M 464.6 60 L 888.57 60 M 464.6 60 L 424.6 100 M 464.6 60 L 504.6 100 M 584.6 60 L 584.6 100 M 888.57 60 L 888.57 100" fill="none" stroke="black" stroke-width="2"/>
+        <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="464.6" y="83.85">?</text>
+        <path d="M 624.6 120 L 624.6 180 M 162.64 180 L 859.48 180 M 162.64 180 L 162.64 220 M 459.48 180 L 459.48 220 M 539.48 180 L 539.48 220 M 699.48 180 L 699.48 220 M 859.48 180 L 859.48 220" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 928.57 120 L 928.57 180 M 928.57 180 L 1019.48 180 M 939.48 180 L 939.48 220 M 1019.48 180 L 1019.48 220" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 202.64 240 L 202.64 300 M 0 300 L 240 300 M 0 300 L 0 340 M 120 300 L 80 340 M 120 300 L 160 340 M 240 300 L 240 340" fill="none" stroke="black" stroke-width="2"/>
+        <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="120" y="323.85">?</text>
+        <path d="M 419.48 240 L 419.48 300 M 320 300 L 560 300 M 320 300 L 320 340 M 400 300 L 400 340 M 480 300 L 480 340 M 560 300 L 560 340" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 579.48 240 L 579.48 300 M 579.48 300 L 640 300 M 640 300 L 640 340" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 739.48 240 L 739.48 300 M 720.8 300 L 739.48 300 M 720.8 300 L 720.8 340" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 899.48 240 L 899.48 300 M 800.8 300 L 920.8 300 M 800.8 300 L 800.8 340 M 920.8 300 L 880.8 340 M 920.8 300 L 960.8 340" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 920.8 360 L 920.8 420 M 840.8 420 L 1000.8 420 M 840.8 420 L 840.8 460 M 920.8 420 L 920.8 460 M 1000.8 420 L 1000.8 460" fill="none" stroke="black" stroke-width="2"/>
+        <path d="M 1080.8 360 L 1080.8 420 M 1080.8 420 L 1080.8 420 M 1080.8 420 L 1080.8 460" fill="none" stroke="black" stroke-width="2"/>
+      </g>
+      <g class="symbols">
+        <g transform="translate(560.59 0)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(640.59 0)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(424.6 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(504.6 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(584.6 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(664.6 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(888.57 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(968.57 120)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(162.64 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(242.64 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(379.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(459.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(539.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(619.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(699.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(779.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(859.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(939.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(1019.48 240)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(0 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(80 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(160 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(240 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(320 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(400 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(480 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(560 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(640 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(720.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(800.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-3-10">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-3-10)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <g data-arrow="proband">
+              <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
+              <rect fill="white" height="10" width="8.5" x="-30" y="58"/>
+              <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="67">P</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(880.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-3-11">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-3-11)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(960.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-3-12">
+                  <circle cx="20" cy="20" r="19"/>
+                </clipPath>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+                <g clip-path="url(#symbol-clip-3-12)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
+                    </g>
+                  </g>
+                </g>
+                <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(1040.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-3-13">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-3-13)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#1f3a93"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(1120.8 360)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(840.8 480)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-4-0">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-4-0)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(920.8 480)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-4-1">
+                  <circle cx="20" cy="20" r="19"/>
+                </clipPath>
+                <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
+                <g clip-path="url(#symbol-clip-4-1)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
+                    </g>
+                  </g>
+                </g>
+                <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(1000.8 480)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-4-2">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-4-2)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+            <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
+          </g>
+        </g>
+        <g transform="translate(1080.8 480)">
+          <g transform="translate(-20 -20)">
+            <g>
+              <g>
+                <clipPath id="symbol-clip-4-3">
+                  <rect height="38" width="38" x="1" y="1"/>
+                </clipPath>
+                <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+                <g clip-path="url(#symbol-clip-4-3)">
+                  <g>
+                    <g data-tag-fill="solid">
+                      <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#1f3a93"/>
+                    </g>
+                  </g>
+                </g>
+                <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g class="labels">
+        <g transform="translate(540.59 -20)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gerold</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(620.59 -20)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Rohanne Webber</title>Rohanne</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Webber</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(404.6 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tywald</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(484.6 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tion</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(564.6 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tytos</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(644.6 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jeyne Marbrand</title>Jeyne</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Marbrand</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(868.57 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jason</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(948.57 100)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Marla Prester</title>Marla</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prester</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(142.64 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Kevan</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(222.64 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Dorna Swyft</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(359.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Emmon Frey</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(439.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Genna</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(519.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tygett</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(599.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Darlessa Marbrand</title>Darlessa</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Marbrand</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(679.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gerion</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(759.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Briony</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(839.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tywin</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="27.2" x="-13.6" y="35"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Hand</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(919.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joanna</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(999.48 220)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Stafford</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(-20 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Lancel</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(60 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Willem</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(140 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Martyn</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(220 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Janei</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(300 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Cleos Frey</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(380 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Lyonel Frey</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(460 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tion Frey</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(540 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Red Walder</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(620 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tyrek</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(700.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joy Hill</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(780.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Tyrion</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="27.2" x="-13.6" y="41"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="51"><tspan fill="#000000">Hand</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(860.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jaime</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="15.6" x="-7.8" y="35"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">KG</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(940.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Cersei</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(1020.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Robert Baratheon</title>Robert</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Baratheon</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">Throne</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(1100.8 340)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Gendry&#x27;s mother</title>Gendry&#x27;s</text>
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">mother</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(820.8 460)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joffrey</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(900.8 460)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Myrcella</text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(980.8 460)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tommen</text>
+            </g>
+            <g data-detail-label="true" pointer-events="none">
+              <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
+              <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
+            </g>
+          </g>
+        </g>
+        <g transform="translate(1060.8 460)">
+          <g style="user-select:none" transform="translate(20 20)">
+            <g data-name-label="true" pointer-events="none">
+              <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gendry</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
   </g>
-  <g transform="translate(92 100)">
-    <g class="couple-lines">
-      <path d="M 580.59 0 L 620.59 0" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 604.6 120 L 644.6 120" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 908.57 120 L 948.57 120" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 182.64 240 L 222.64 240" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 399.48 240 L 439.48 240" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 559.48 240 L 599.48 240" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 719.48 240 L 759.48 240" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 879.48 238 L 919.48 238" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 879.48 242 L 919.48 242" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 900.8 358 L 940.8 358" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 900.8 362 L 940.8 362" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 980.8 360 L 1020.8 360" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 1060.8 360 L 1100.8 360" fill="none" stroke="black" stroke-width="2"/>
-    </g>
-    <g class="sibship-lines">
-      <path d="M 600.59 0 L 600.59 60 M 464.6 60 L 888.57 60 M 464.6 60 L 424.6 100 M 464.6 60 L 504.6 100 M 584.6 60 L 584.6 100 M 888.57 60 L 888.57 100" fill="none" stroke="black" stroke-width="2"/>
-      <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="464.6" y="83.85">?</text>
-      <path d="M 624.6 120 L 624.6 180 M 162.64 180 L 859.48 180 M 162.64 180 L 162.64 220 M 459.48 180 L 459.48 220 M 539.48 180 L 539.48 220 M 699.48 180 L 699.48 220 M 859.48 180 L 859.48 220" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 928.57 120 L 928.57 180 M 928.57 180 L 1019.48 180 M 939.48 180 L 939.48 220 M 1019.48 180 L 1019.48 220" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 202.64 240 L 202.64 300 M 0 300 L 240 300 M 0 300 L 0 340 M 120 300 L 80 340 M 120 300 L 160 340 M 240 300 L 240 340" fill="none" stroke="black" stroke-width="2"/>
-      <text data-twin-mark="true" fill="black" font-family="sans-serif" font-size="11" font-weight="bold" pointer-events="none" style="user-select:none" text-anchor="middle" x="120" y="323.85">?</text>
-      <path d="M 419.48 240 L 419.48 300 M 320 300 L 560 300 M 320 300 L 320 340 M 400 300 L 400 340 M 480 300 L 480 340 M 560 300 L 560 340" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 579.48 240 L 579.48 300 M 579.48 300 L 640 300 M 640 300 L 640 340" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 739.48 240 L 739.48 300 M 720.8 300 L 739.48 300 M 720.8 300 L 720.8 340" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 899.48 240 L 899.48 300 M 800.8 300 L 920.8 300 M 800.8 300 L 800.8 340 M 920.8 300 L 880.8 340 M 920.8 300 L 960.8 340" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 920.8 360 L 920.8 420 M 840.8 420 L 1000.8 420 M 840.8 420 L 840.8 460 M 920.8 420 L 920.8 460 M 1000.8 420 L 1000.8 460" fill="none" stroke="black" stroke-width="2"/>
-      <path d="M 1080.8 360 L 1080.8 420 M 1080.8 420 L 1080.8 420 M 1080.8 420 L 1080.8 460" fill="none" stroke="black" stroke-width="2"/>
-    </g>
-    <g class="symbols">
-      <g transform="translate(560.59 0)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(640.59 0)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(424.6 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(504.6 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(584.6 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(664.6 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(888.57 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(968.57 120)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(162.64 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(242.64 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(379.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(459.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(539.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(619.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(699.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(779.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(859.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(939.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(1019.48 240)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(0 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(80 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(160 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(240 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(320 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(400 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(480 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(560 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(640 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(720.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(800.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-3-10">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-3-10)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L -20 20 A 40 40 0 0 1 20 -20 Z" fill="#000000"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <g data-arrow="proband">
-            <line marker-end="url(#proband-arrowhead)" stroke="black" stroke-width="2" x1="-18" x2="0" y1="58" y2="40"/>
-            <rect fill="white" height="10" width="8.5" x="-30" y="58"/>
-            <text data-proband-letter="true" fill="black" font-family="sans-serif" font-size="10" font-weight="bold" style="user-select:none" text-anchor="end" x="-22" y="67">P</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(880.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-3-11">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-3-11)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(960.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-3-12">
-                <circle cx="20" cy="20" r="19"/>
-              </clipPath>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-              <g clip-path="url(#symbol-clip-3-12)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
-                  </g>
-                </g>
-              </g>
-              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(1040.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-3-13">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-3-13)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#1f3a93"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(1120.8 360)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(840.8 480)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-4-0">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-4-0)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(920.8 480)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-4-1">
-                <circle cx="20" cy="20" r="19"/>
-              </clipPath>
-              <circle cx="20" cy="20" fill="white" r="19" stroke="black" stroke-width="2"/>
-              <g clip-path="url(#symbol-clip-4-1)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
-                  </g>
-                </g>
-              </g>
-              <circle cx="20" cy="20" fill="none" r="19" stroke="black" stroke-width="2"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(1000.8 480)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-4-2">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-4-2)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 20 -20 A 40 40 0 0 1 60 20 Z" fill="#e0b000"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-          <line stroke="black" stroke-width="2" x1="-4" x2="44" y1="-4" y2="44"/>
-        </g>
-      </g>
-      <g transform="translate(1080.8 480)">
-        <g transform="translate(-20 -20)">
-          <g>
-            <g>
-              <clipPath id="symbol-clip-4-3">
-                <rect height="38" width="38" x="1" y="1"/>
-              </clipPath>
-              <rect fill="white" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-              <g clip-path="url(#symbol-clip-4-3)">
-                <g>
-                  <g data-tag-fill="solid">
-                    <path d="M 20 20 L 60 20 A 40 40 0 0 1 20 60 Z" fill="#1f3a93"/>
-                  </g>
-                </g>
-              </g>
-              <rect fill="none" height="38" stroke="black" stroke-width="2" width="38" x="1" y="1"/>
-            </g>
-          </g>
-        </g>
-      </g>
-    </g>
-    <g class="labels">
-      <g transform="translate(540.59 -20)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gerold</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(620.59 -20)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Rohanne Webber</title>Rohanne</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Webber</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(404.6 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tywald</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(484.6 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tion</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(564.6 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tytos</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(644.6 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Jeyne Marbrand</title>Jeyne</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Marbrand</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(868.57 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jason</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(948.57 100)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Marla Prester</title>Marla</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Prester</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(142.64 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Kevan</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(222.64 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Dorna Swyft</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(359.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Emmon Frey</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(439.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Genna</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(519.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tygett</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(599.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Darlessa Marbrand</title>Darlessa</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Marbrand</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(679.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gerion</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(759.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Briony</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(839.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tywin</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="27.2" x="-13.6" y="35"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Hand</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(919.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joanna</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(999.48 220)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Stafford</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(-20 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Lancel</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(60 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Willem</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(140 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Martyn</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(220 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Janei</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(300 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Cleos Frey</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(380 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Lyonel Frey</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(460 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tion Frey</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(540 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Red Walder</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(620 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tyrek</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(700.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joy Hill</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(780.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="38">Tyrion</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="27.2" x="-13.6" y="41"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="51"><tspan fill="#000000">Hand</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(860.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Jaime</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="15.6" x="-7.8" y="35"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">KG</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(940.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Cersei</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(1020.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Robert Baratheon</title>Robert</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">Baratheon</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="38.8" x="-19.4" y="48"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="58"><tspan fill="#000000">Throne</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(1100.8 340)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32"><title>Gendry&#x27;s mother</title>Gendry&#x27;s</text>
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="45">mother</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(820.8 460)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Joffrey</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(900.8 460)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Myrcella</text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(980.8 460)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Tommen</text>
-          </g>
-          <g data-detail-label="true" pointer-events="none">
-            <rect fill="white" height="13" width="38.8" x="-19.4" y="35"/>
-            <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="0" y="45"><tspan fill="#000000">Throne</tspan></text>
-          </g>
-        </g>
-      </g>
-      <g transform="translate(1060.8 460)">
-        <g style="user-select:none" transform="translate(20 20)">
-          <g data-name-label="true" pointer-events="none">
-            <text fill="black" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle" x="0" y="32">Gendry</text>
-          </g>
-        </g>
-      </g>
-    </g>
-  </g>
-  <g class="pedigree-key" transform="translate(0 729)">
+  <g class="pedigree-key" data-box="40 40 180.8 264" data-key-position="top-left" transform="translate(0 40)">
     <g transform="translate(57.4 12) scale(0.667) translate(-18 -18)">
       <svg height="36" viewBox="-6 -6 36 36" width="36">
         <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

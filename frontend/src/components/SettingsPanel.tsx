@@ -9,10 +9,19 @@ import { nameLabelMode, showsNotes } from "../pedigree/labels";
 import { symbolsShowMode } from "../pedigree/gender";
 import { NOTATION_OPTIONS, notationOf } from "../pedigree/notation";
 import { SettingSelect, SettingToggle } from "./SettingControls";
+import type { KeyPositionSetting } from "../utils/keyPositionSetting";
 
 const NOTES_LENGTH_OPTIONS: { value: NotesLength; label: string }[] = [
   { value: "full", label: "Full text" },
   { value: "twoLines", label: "Up to two lines" },
+];
+
+const KEY_POSITION_OPTIONS: { value: KeyPositionSetting; label: string }[] = [
+  { value: "auto", label: "Auto (the corner with most room)" },
+  { value: "top-left", label: "Top left" },
+  { value: "top-right", label: "Top right" },
+  { value: "bottom-left", label: "Bottom left" },
+  { value: "bottom-right", label: "Bottom right" },
 ];
 
 const SYMBOLS_SHOW_OPTIONS: { value: SymbolsShowMode; label: string }[] = [
@@ -27,9 +36,11 @@ interface SettingsPanelProps {
   onToggleMinimap: (v: boolean) => void;
   compact: boolean;
   onToggleCompact: (v: boolean) => void;
+  keyPosition: KeyPositionSetting;
+  onKeyPosition: (v: KeyPositionSetting) => void;
 }
 
-export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, compact, onToggleCompact }: SettingsPanelProps) {
+export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, compact, onToggleCompact, keyPosition, onKeyPosition }: SettingsPanelProps) {
   const { pedigree, updateSiblingOrderSettings, updateCanvasSettings, uShapeView } = usePedigreeFields("pedigree", "updateSiblingOrderSettings", "updateCanvasSettings", "uShapeView");
   const { mode, affectedFirst } = pedigree.siblingOrder;
   const canvasSettings = pedigree.canvasSettings ?? { nodesMoveable: false, snapToGrid: false, snapGridSize: DEFAULT_SNAP_GRID_SIZE };
@@ -100,6 +111,14 @@ export function SettingsPanel({ open, onClose, showMinimap, onToggleMinimap, com
               description="Tighter spacing between generations so larger pedigrees fit on screen. Pinned positions are scaled to match."
               checked={compact}
               onChange={onToggleCompact}
+            />
+            <SettingSelect<KeyPositionSetting>
+              name="keyPosition"
+              label="Key position in exports"
+              value={keyPosition}
+              options={KEY_POSITION_OPTIONS}
+              onChange={onKeyPosition}
+              description="The corner of an exported SVG, PNG or PDF the key goes in. It uses the chart's empty space there, and the figure grows only by what is missing. Auto picks the corner that keeps the figure smallest. Kept in this browser."
             />
             <SettingToggle
               className="mt-2"

@@ -1,10 +1,10 @@
-<svg height="435" viewBox="0 0 1400 435" width="1400" xmlns="http://www.w3.org/2000/svg">
+<svg height="392" viewBox="0 0 1400 392" width="1400" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="435" width="1400"/>
+  <rect fill="white" height="392" width="1400"/>
   <g transform="translate(60 81)">
     <g class="couple-lines">
       <path d="M 20 0 L 50 0 L 50 -38 L 194 -38 L 194 -12 L 225.27 -12" fill="none" stroke="black" stroke-width="2"/>
@@ -432,7 +432,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 299)">
+  <g class="pedigree-key" data-box="40 256 172 96" data-key-position="bottom-left" transform="translate(0 256)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="0 0 28 28" width="28">
         <text fill="black" font-family="sans-serif" font-size="10" text-anchor="middle" x="14" y="17">AMAB</text>

@@ -1,10 +1,10 @@
-<svg height="1813" viewBox="0 0 1241 1813" width="1241" xmlns="http://www.w3.org/2000/svg">
+<svg height="1529" viewBox="0 0 1241 1529" width="1241" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="1813" width="1241"/>
+  <rect fill="white" height="1529" width="1241"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="620.5" y="56">House Targaryen</text>
   </g>
@@ -2279,7 +2279,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" transform="translate(0 1509)">
+  <g class="pedigree-key" data-box="40 1225 252.2 264" data-key-position="bottom-left" transform="translate(0 1225)">
     <g transform="translate(66.1 12) scale(0.667) translate(-18 -18)">
       <svg height="36" viewBox="-6 -6 36 36" width="36">
         <rect fill="white" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>
