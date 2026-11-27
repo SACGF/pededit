@@ -23,7 +23,9 @@ export function useEditorSession({ id, slug, example }: { id?: string; slug?: st
   const { isDirty, pedigree, setNotice } = usePedigreeFields("isDirty", "pedigree", "setNotice");
   // Failed creates of an example's copy so far, which spaces out the retries.
   const [copyRetries, setCopyRetries] = useState(0);
-  const [notFound, setNotFound] = useState(false);
+  // The id the server had no pedigree for; a different URL is not "not found".
+  const [notFoundId, setNotFoundId] = useState<string | null>(null);
+  const notFound = id !== undefined && notFoundId === id;
 
   // Draw the example named by the URL; nothing is saved until it is edited.
   useEffect(() => {
@@ -40,9 +42,8 @@ export function useEditorSession({ id, slug, example }: { id?: string; slug?: st
     if (!id) return;
     // Already in the editor: the example copy just created.
     if (useAppStore.getState().activePedigreeId === id) return;
-    setNotFound(false);
-    openPedigree(id).catch((err: unknown) => {
-      setNotFound(true);
+    openPedigree(id).then(() => setNotFoundId(null), (err: unknown) => {
+      setNotFoundId(id);
       // Gone from the server: drop it from "Recent on this device". A network
       // error keeps the entry, since the pedigree may still exist.
       const status = (err as { response?: { status?: number } })?.response?.status;

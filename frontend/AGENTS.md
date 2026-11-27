@@ -509,9 +509,11 @@ reporting is off, and the dev server never reports.
 
 ## Lint
 
-`npm run lint` (part of `npm run check` and CI) runs ESLint with two rules only: `react-hooks/rules-of-hooks` and `react-hooks/exhaustive-deps` (`frontend/eslint.config.js`). Style is not linted and types are tsc's job. Fix a missing dependency rather than disable the rule: Zustand store actions never change, so listing them never reruns an effect, and `navigate` changes only when the URL does. A disable needs a comment saying why, and a disable that no longer suppresses anything is an error.
+`npm run lint` (part of `npm run check` and CI) runs ESLint with the hooks rules only (`frontend/eslint.config.js`): `rules-of-hooks`, `exhaustive-deps` and the React Compiler's rules from the plugin's recommended set (`purity`, `immutability`, `set-state-in-effect`, `set-state-in-render`, `static-components` and the rest), all as errors. Style is not linted and types are tsc's job. Fix a missing dependency rather than disable the rule: Zustand store actions never change, so listing them never reruns an effect, and `navigate` changes only when the URL does. A disable needs a comment saying why, and a disable that no longer suppresses anything is an error.
 
-The plugin's `recommended` set also has the React Compiler's rules (`set-state-in-effect`, `refs`, `static-components`). They are not on: most of what they flag is refs read or written during render, which is fine without the compiler. Running them now and then (`flat.recommended` in a scratch config) is a quick way to find effects that should be event handlers or values worked out during render (#239).
+What these rules want instead of an effect that sets state: a value worked out during render (`GitHubCallbackPage`'s missing code, `useEditorSession`'s `notFound` from the id that failed), state reset during render when a prop changes, by keeping the last value seen in state (`GridSizeInput`, `DeleteAccountDialog` on opening), or the change made in the event that causes it (#239). A lookup table of pages maps to elements, not components (`GuidePage`).
+
+`refs` is the one recommended rule left off: most of what it flags is refs read or written during render, which is fine without the compiler (#245).
 
 ## Conventions
 

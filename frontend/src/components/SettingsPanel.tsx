@@ -306,7 +306,13 @@ function GridSizeInput({ value, onCommit }: { value: number; onCommit: (v: numbe
   // and the unmount that follows it from committing twice.
   const latest = useRef({ text, value, onCommit, sent: value });
   latest.current = { ...latest.current, text, value, onCommit };
-  useEffect(() => { setText(String(value)); latest.current.sent = value; }, [value]);
+  // A new value from outside (undo, another tab) replaces the text.
+  const [shown, setShown] = useState(value);
+  if (value !== shown) {
+    setShown(value);
+    setText(String(value));
+    latest.current.sent = value;
+  }
 
   function commit(raw: string) {
     const cur = latest.current;

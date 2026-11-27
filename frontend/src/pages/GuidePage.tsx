@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ReactNode } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { GuideLayout } from "../guides/GuideLayout";
 import { GUIDES, guideBySlug, guidePath } from "../guides/guides";
@@ -7,22 +7,22 @@ import { HowToDrawGuide } from "../guides/HowToDrawGuide";
 import { ConsanguinityGuide } from "../guides/ConsanguinityGuide";
 import { PracticeFamiliesGuide } from "../guides/PracticeFamiliesGuide";
 
-const BODIES: Record<string, ComponentType> = {
-  "pedigree-symbols": SymbolsGuide,
-  "how-to-draw-a-pedigree": HowToDrawGuide,
-  "consanguinity": ConsanguinityGuide,
-  "practice-families": PracticeFamiliesGuide,
+const BODIES: Record<string, ReactNode> = {
+  "pedigree-symbols": <SymbolsGuide />,
+  "how-to-draw-a-pedigree": <HowToDrawGuide />,
+  "consanguinity": <ConsanguinityGuide />,
+  "practice-families": <PracticeFamiliesGuide />,
 };
 
 /** /guides/<slug>: one of the static guides (#202). */
 export default function GuidePage() {
   const { slug } = useParams();
   const guide = guideBySlug(slug);
-  const Body = guide && BODIES[guide.slug];
-  if (!guide || !Body) return <Navigate to="/guides" replace />;
+  const body = guide && BODIES[guide.slug];
+  if (!guide || !body) return <Navigate to="/guides" replace />;
   return (
     <GuideLayout title={guide.title} intro={guide.description} current={guide.slug}>
-      <Body />
+      {body}
     </GuideLayout>
   );
 }

@@ -17,10 +17,15 @@ export function DeleteAccountDialog({ open, onClose }: { open: boolean; onClose:
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Opening clears what the last opening read or failed with.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) { setCounts(null); setError(null); }
+  }
+
   useEffect(() => {
     if (!open) return;
-    setCounts(null);
-    setError(null);
     let live = true;
     Promise.all([pedigreeApi.list(), tagPresetApi.list()])
       .then(([p, t]) => { if (live) setCounts({ pedigrees: p.data.length, library: t.data.length }); })

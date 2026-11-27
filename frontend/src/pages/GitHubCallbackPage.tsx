@@ -7,23 +7,19 @@ export default function GitHubCallbackPage() {
   const [searchParams] = useSearchParams();
   const githubLogin = useAppStore((s) => s.githubLogin);
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
+  const [signInError, setError] = useState<string | null>(null);
   const attempted = useRef(false);
+  const code = searchParams.get("code");
+  const error = code ? signInError : "Missing authorization code from GitHub.";
 
   useEffect(() => {
-    if (attempted.current) return;
+    if (attempted.current || !code) return;
     attempted.current = true;
-
-    const code = searchParams.get("code");
-    if (!code) {
-      setError("Missing authorization code from GitHub.");
-      return;
-    }
 
     githubLogin(code)
       .then(() => navigate("/", { replace: true }))
       .catch(err => setError(requestErrorMessage(err, "GitHub sign-in failed. Please try again.")));
-  }, [searchParams, githubLogin, navigate]);
+  }, [code, githubLogin, navigate]);
 
   if (error) {
     return (
