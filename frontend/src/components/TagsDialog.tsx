@@ -95,9 +95,12 @@ export function TagsDialog({ open, onOpenChange }: TagsDialogProps) {
 
   useEffect(() => {
     if (!open || !isAuthenticated) return;
+    // A list that arrives after the dialog closed, or after a newer one, is dropped.
+    let live = true;
     tagPresetApi.list()
-      .then(({ data }) => { setPresets(data); setPresetsError(null); })
-      .catch(() => setPresetsError("Could not load your library."));
+      .then(({ data }) => { if (live) { setPresets(data); setPresetsError(null); } })
+      .catch(() => { if (live) setPresetsError("Could not load your library."); });
+    return () => { live = false; };
   }, [open, isAuthenticated]);
 
   function handleAdd() {

@@ -2,7 +2,8 @@ import { removeWithDescendantsSet } from "../../pedigree/removal";
 import { setParentsProblem } from "../../pedigree/parents";
 import { collapseInfo } from "../../pedigree/collapse";
 import { isSameSexCouple } from "../../pedigree/sameSex";
-import type { EditTools, ViewSlice } from "./state";
+import { U_SHAPE_REFUSALS } from "../../pedigree/uShapeView";
+import type { EditTools, Notice, PedigreeState, Picking, ViewSlice } from "./state";
 
 /**
  * What is selected, hovered, being picked or shown as a notice: how the
@@ -38,6 +39,14 @@ export function selectedPair(state: { selectedId: string | null; selectedIds: st
 
 export function viewSlice(tools: EditTools): ViewSlice {
   const { set, get } = tools;
+  const nextNotice = (s: PedigreeState, notice: Omit<Notice, "id">) => ({ ...notice, id: (s.notice?.id ?? 0) + 1 });
+  // Picking is a click on the standard chart, so starting it (from the
+  // Person tab's More options) leaves the U-shape view and says why.
+  const startPicking = (picking: Picking, select?: ReturnType<typeof selectOnly>) =>
+    set(s => ({
+      picking, ...select,
+      ...(s.uShapeView && { uShapeView: false, notice: nextNotice(s, { kind: "info", text: U_SHAPE_REFUSALS.picking }) }),
+    }));
 
   return {
     selectedId: null,
@@ -50,7 +59,7 @@ export function viewSlice(tools: EditTools): ViewSlice {
 
     notice: null,
 
-    setNotice: (notice) => set(s => ({ notice: notice ? { ...notice, id: (s.notice?.id ?? 0) + 1 } : null })),
+    setNotice: (notice) => set(s => ({ notice: notice ? nextNotice(s, notice) : null })),
 
     uShapeView: false,
 
@@ -58,17 +67,17 @@ export function viewSlice(tools: EditTools): ViewSlice {
 
     picking: null,
 
-    startPickingParents: (childId) => set({ picking: { kind: "parents", childId, picked: [] }, ...selectOnly(childId) }),
+    startPickingParents: (childId) => startPicking({ kind: "parents", childId, picked: [] }, selectOnly(childId)),
 
-    startPickingChild: (partnershipId, geneticParentId) => set({ picking: { kind: "child", partnershipId, geneticParentId } }),
+    startPickingChild: (partnershipId, geneticParentId) => startPicking({ kind: "child", partnershipId, geneticParentId }),
 
-    startPickingPartner: (individualId) => set({ picking: { kind: "partner", individualId }, ...selectOnly(individualId) }),
+    startPickingPartner: (individualId) => startPicking({ kind: "partner", individualId }, selectOnly(individualId)),
 
-    startPickingRelatedness: (individualId) => set({ picking: { kind: "relatedness", individualId }, ...selectOnly(individualId) }),
+    startPickingRelatedness: (individualId) => startPicking({ kind: "relatedness", individualId }, selectOnly(individualId)),
 
-    startPickingDonor: (childId, gamete) => set({ picking: { kind: "donor", childId, gamete }, ...selectOnly(childId) }),
+    startPickingDonor: (childId, gamete) => startPicking({ kind: "donor", childId, gamete }, selectOnly(childId)),
 
-    startPickingSurrogate: (childId) => set({ picking: { kind: "surrogate", childId }, ...selectOnly(childId) }),
+    startPickingSurrogate: (childId) => startPicking({ kind: "surrogate", childId }, selectOnly(childId)),
 
     cancelPicking: () => set({ picking: null }),
 

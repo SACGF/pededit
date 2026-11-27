@@ -27,9 +27,11 @@ export default function LandingPage() {
   const [ownedFailed, setOwnedFailed] = useState(false);
   useEffect(() => {
     if (!isAuthenticated) return;
+    let live = true;
     loadPedigrees()
-      .catch(() => setOwnedFailed(true))
-      .finally(() => setOwnedLoaded(true));
+      .catch(() => { if (live) setOwnedFailed(true); })
+      .finally(() => { if (live) setOwnedLoaded(true); });
+    return () => { live = false; };
   }, [isAuthenticated, loadPedigrees]);
   const listsReady = !isAuthenticated || ownedLoaded;
   const owned = isAuthenticated && !ownedFailed ? pedigrees : [];

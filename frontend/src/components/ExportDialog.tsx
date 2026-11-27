@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,13 +42,18 @@ export function ExportDialog({ open, onOpenChange, pedigree: whole, title, defau
   const [compact, setCompact]       = useState(defaultCompact);
   const [onlySelected, setOnlySelected] = useState(false);
 
-  // Follow the canvas setting each time the dialog opens.
-  useEffect(() => {
-    if (open) setCompact(defaultCompact);
-    if (open) setError(null);
-    // An ordinary export draws everyone, whatever was ticked last time.
-    if (open) setOnlySelected(false);
-  }, [open, defaultCompact]);
+  // Each time the dialog opens: follow the canvas setting, and draw
+  // everyone, whatever was ticked last time. Set during render, so the
+  // first frame already shows them.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setCompact(defaultCompact);
+      setError(null);
+      setOnlySelected(false);
+    }
+  }
 
   // The people selected on the canvas: with two or more, the figure can be of them alone.
   const selectedIds = usePedigreeStore(s => s.selectedIds);

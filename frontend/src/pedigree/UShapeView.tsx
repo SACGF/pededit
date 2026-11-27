@@ -57,10 +57,10 @@ interface Gesture {
  */
 export function UShapeView({ onPersonTap, onPaneTap }: { onPersonTap?: () => void; onPaneTap?: () => void }) {
   const {
-    pedigree, selectedIds, selectedId, problemHighlightId, picking, revealRequest, layoutResetCount,
+    pedigree, selectedIds, selectedId, problemHighlightId, revealRequest, layoutResetCount,
     setSelectedId, toggleSelected, setUShapeView, setNotice, setDescendantsHidden,
   } = usePedigreeFields(
-    "pedigree", "selectedIds", "selectedId", "problemHighlightId", "picking", "revealRequest", "layoutResetCount",
+    "pedigree", "selectedIds", "selectedId", "problemHighlightId", "revealRequest", "layoutResetCount",
     "setSelectedId", "toggleSelected", "setUShapeView", "setNotice", "setDescendantsHidden",
   );
   const name = useAppStore(s => s.activeTitle);
@@ -75,14 +75,6 @@ export function UShapeView({ onPersonTap, onPaneTap }: { onPersonTap?: () => voi
   const viewRef = useRef(view);
   viewRef.current = view;
   const gesture = useRef<Gesture | null>(null);
-
-  // Picking people (Set parents..., Add existing partner...) is a click on
-  // the chart: the More options menu on the Person tab can start it here.
-  useEffect(() => {
-    if (!picking) return;
-    setUShapeView(false);
-    setNotice({ kind: "info", text: U_SHAPE_REFUSALS.picking });
-  }, [picking, setUShapeView, setNotice]);
 
   const figureSize = useCallback(() => {
     const svg = contentRef.current?.querySelector("svg");

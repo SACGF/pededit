@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Handle, Position, useNodeId } from "@xyflow/react";
 import type { NodeProps, Node } from "@xyflow/react";
 import type { RFNodeData } from "../sceneToFlow";
@@ -69,7 +69,14 @@ export function PedigreeSymbolNode({ data, selected }: NodeProps<PedigreeSymbolN
   const [isTouchPill, setIsTouchPill] = useState(false);
   // Whether the press now on the symbol is a finger.
   const touchDown = useRef(false);
-  useEffect(() => { if (!isSelected) setIsTouchPill(false); }, [isSelected]);
+  // Closed when the person stops being selected. Only on that change: the
+  // tap that opens it selects through the store, and React Flow's flag
+  // follows a render later.
+  const [wasSelected, setWasSelected] = useState(isSelected);
+  if (wasSelected !== isSelected) {
+    setWasSelected(isSelected);
+    if (!isSelected) setIsTouchPill(false);
+  }
   const nameCut = isLabelCut(nameLines, glyph.name);
   // Under the symbol, top to bottom: "SB" / "ECT" caption, tag annotation row,
   // name, then the detail lines in NSGC order (age, onset, pedigree number),

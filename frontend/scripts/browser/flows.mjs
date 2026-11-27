@@ -252,7 +252,7 @@ await main(async () => {
   try {
     for (const flow of chosen) {
       const started = Date.now();
-      const context = await newContext(browser, { asAgent: flow.asAgent ?? false, viewport: flow.viewport ?? { width: 1440, height: 900 } });
+      const context = await newContext(browser, { asAgent: flow.asAgent ?? false, viewport: flow.viewport ?? { width: 1440, height: 900 }, device: flow.device });
       const t = makeT({ context, base, flags, outDir, name: flow.name });
       let failure = null;
       try {

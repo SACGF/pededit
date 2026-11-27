@@ -74,13 +74,12 @@ export function ProblemIcon({ severity, size = 12 }: { severity: Problem["severi
  */
 export function ProblemsMenu() {
   const pedigree = usePedigreeStore(s => s.pedigree);
-  const setHighlight = usePedigreeStore(s => s.setProblemHighlightId);
   const [open, setOpen] = useState(false);
   // After picking an item, focus goes to the field, not back to this button.
   const picked = useRef(false);
   const { all, errors } = problemsOf(pedigree);
-  // The canvas outline follows the hovered item; none once the list closes or empties.
-  useEffect(() => { if (!open || all.length === 0) setHighlight(null); }, [open, all.length, setHighlight]);
+  // Emptied while open: closed, so the next problem does not open it.
+  if (open && all.length === 0) setOpen(false);
   if (all.length === 0) return null;
   const label = `${all.length} ${all.length === 1 ? "problem" : "problems"}`;
 
@@ -113,6 +112,9 @@ export function ProblemsMenu() {
  */
 function ProblemList({ pedigree, all, onPick }: { pedigree: Pedigree; all: Problem[]; onPick: (p: Problem) => void }) {
   const setHighlight = usePedigreeStore(s => s.setProblemHighlightId);
+  // The canvas outline lasts as long as the list: closing it, or the last
+  // problem being fixed, takes it away.
+  useEffect(() => () => setHighlight(null), [setHighlight]);
   const numbers = pedigreeNumbers(pedigree);
   return (
     <ul data-testid="problems-list" onMouseLeave={() => setHighlight(null)}>

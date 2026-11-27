@@ -24,10 +24,12 @@ export default function ChangelogPage() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    let live = true;
     fetch("/changelog.json", { cache: "no-cache" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((j: { releases: ChangelogRelease[] }) => setReleases(j.releases))
-      .catch(() => setFailed(true));
+      .then((j: { releases: ChangelogRelease[] }) => { if (live) setReleases(j.releases); })
+      .catch(() => { if (live) setFailed(true); });
+    return () => { live = false; };
   }, []);
 
   return (

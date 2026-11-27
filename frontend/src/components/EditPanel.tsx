@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FocusEvent, type ReactNode } from "react";
+import { useRef, useState, type FocusEvent, type ReactNode } from "react";
 import { ChevronDown, Network, User } from "lucide-react";
 import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useSmallScreen } from "../hooks/useSmallScreen";
@@ -50,9 +50,14 @@ export function EditPanel({ onManageTags, size = "half", onSizeChange }: EditPan
   const open = !small || size !== "closed";
   const anyone = selectedIds.length > 0;
   const [tab, setTab] = useState<PanelTab>(anyone ? "person" : "pedigree");
-  useEffect(() => {
-    setTab(selectedIds.length > 0 ? "person" : "pedigree");
-  }, [selectedIds]);
+  // Each new selection (every click, band or pick makes a new list) shows
+  // the Person tab, or the Pedigree tab when nobody is left. Set during
+  // render, so the old tab is never drawn first.
+  const [tabSelection, setTabSelection] = useState(selectedIds);
+  if (tabSelection !== selectedIds) {
+    setTabSelection(selectedIds);
+    setTab(anyone ? "person" : "pedigree");
+  }
   // Several selected: the batch panel.
   const multiple = selectedIds.length > 1;
   const onPerson = tab === "person" && (anyone || small);

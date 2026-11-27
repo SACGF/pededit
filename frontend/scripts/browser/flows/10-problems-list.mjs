@@ -14,6 +14,9 @@ export default {
     t.match(await t.text('[data-problem-item="proband-unaffected:p"] [data-problem-subject]'), /^II-1, /, "people are named by pedigree number");
     await t.hover('[data-problem-item="consultand-deceased:q"]');
     t.equal(await t.count('[data-individual-id="q"][data-problem-highlight]'), 1, "hovering an item outlines the person on the canvas");
+    await t.press("Escape");
+    t.equal(await t.count("[data-problem-highlight]"), 0, "closing the list takes the outline away");
+    await t.click('[data-testid="problems-menu"]');
 
     await t.click('[data-problem-item="proband-unaffected:p"] [data-problem-fix="Mark affected"]');
     t.ok(!(await problems()).includes("proband-unaffected:p"), "a fix clears its problem");

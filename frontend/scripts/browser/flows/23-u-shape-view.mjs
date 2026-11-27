@@ -78,6 +78,14 @@ export default {
     t.ok((await t.count(".react-flow")) === 1, "and the chart is back");
     await t.click('[data-testid="u-shape-toggle"]');
     t.equal((await state()).on, true, "the button turns it on again");
+    // Picking is done on the chart: starting it from the Person tab leaves the U.
+    await t.click(person(pick));
+    await t.click('[data-testid="person-actions"] button:has-text("More")');
+    await t.click('text="Add existing partner..."');
+    t.equal((await state()).on, false, "Add existing partner... on the Person tab goes back to the standard chart");
+    t.equal(await t.eval(() => window.__pededit.usePedigreeStore.getState().picking?.kind), "partner", "to pick the partner there");
+    t.match(await notice(), /U-shape view was turned off/, "and says why");
+    await t.press("Escape");
     await t.reload();
     t.equal((await state()).on, false, "a reload opens the standard chart: the view is not saved");
     const stored = (await t.stored(id)).data;

@@ -326,8 +326,8 @@ the flow. They run in CI.
 | `exports` | SVG, PNG, PDF, U-shape, de-identified, CSV, JSON, PED: each file read back |
 | `imports` | PED and JSON by upload; a refused file |
 | `hide-and-filter` | hide descendants, the group symbol, each view filter, nobody deleted |
-| `problems-list` | the problems list, a fix, "Fix all like this", F8 |
-| `person-tab-saves` | typing on the Person tab, auto-save, reload |
+| `problems-list` | the problems list: hovering an item outlines the person and closing the list takes the outline away, a fix, "Fix all like this", F8 |
+| `person-tab-saves` | the side panel's tab follows each new selection (#239), typing on the Person tab, auto-save, reload |
 | `signed-in` | as the agent user: Your pedigrees, rename, delete, an example link gives an owned copy |
 | `example-link` | `/example/<slug>` (#150, #151): the landing page's links, nothing saved on open, the first edit saves one copy at `/p/<id>` with undo kept, a failed create keeps the edits, unknown slug |
 | `error-reporting-off` | with no Rollbar token, an uncaught error sends no request off the site and loads no reporter (#49) |
@@ -339,10 +339,11 @@ the flow. They run in CI.
 | `draw-couple-beside` | "Draw this couple beside" on a couple line in a family with a loop: who is drawn twice changes, the notice, undo, saved and reloaded; not offered for a couple with a partner who married in (#205). The same choice on a partner's own menu, and the couple's items on the menu of both partners selected (#207) |
 | `export-selected` | two siblings selected: the export dialog's "Only the 2 selected people (+2 to connect them)", off by default; the SVG and U-shape have them and their parents only, the key only their condition; pedigree, canvas and CSV unchanged (#215) |
 | `translated-page` | every text node replaced the way browser page translation does it (not Chrome's translator): opening and closing Clinical details and marking a person affected do not reach the error boundary (`src/domGuard.ts`) |
-| `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, not saved over a reload |
+| `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, "Add existing partner..." on the Person tab leaves the U to pick on the chart (#239), not saved over a reload |
 | `text-under-symbols` | names and details under the symbols are SVG text at the export's baselines (#145); hovering a cut name shows it in full without the pill's buttons, clicking it selects, an uncut name lets the mouse through (#68) |
 | `tag-library` | signed in: a hatched trait saved to My library from the Conditions and tags dialog is added to another pedigree still hatched and still a trait (#131) |
 | `ped-text` | the import dialog's PED text box (#218): mixed spaces and tabs drawn in the preview, a half-typed row shows its error and keeps the drawing, Open in editor; "View as text" shows what Export PED writes, and Copy |
+| `touch-pill` | a tablet-sized touch screen: a tap on a person selects them and opens the hover pill, a tap on the empty canvas closes it, and selecting them again without a tap leaves it shut (#239) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
 
@@ -352,6 +353,7 @@ export default {
   about: "One line for --list: what journey, what it proves",
   // asAgent: true,   // signed in as claude_agent
   // asAgent: "throwaway",   // as claude_agent_throwaway, which the flow may delete
+  // viewport: { width: 1180, height: 820 }, device: { hasTouch: true },   // a touch screen (touch-pill)
   async run(t) {
     const id = await t.openFixture("test-data/pedigrees/structure/three-partners.json");
     await t.menu("[data-partnership-id=\"p1\"]", "Swap sides");

@@ -173,3 +173,22 @@ describe("batch pin, lock and unlock (#21)", () => {
     expectNoEdit(() => get().unlockIndividuals(["dad"]));
   });
 });
+
+describe("picking from the U-shape view", () => {
+  beforeEach(() => { get().initialize(family()); get().setUShapeView(false); get().setNotice(null); });
+
+  it("leaves the U-shape view and says why", () => {
+    get().setUShapeView(true);
+    get().startPickingParents("aunt");
+    expect(get().uShapeView).toBe(false);
+    expect(get().picking).toEqual({ kind: "parents", childId: "aunt", picked: [] });
+    expect(get().selectedIds).toEqual(["aunt"]);
+    expect(get().notice?.text).toMatch(/U-shape view was turned off/);
+  });
+
+  it("on the standard chart says nothing", () => {
+    get().startPickingPartner("dad");
+    expect(get().picking).toEqual({ kind: "partner", individualId: "dad" });
+    expect(get().notice).toBeNull();
+  });
+});

@@ -6,6 +6,17 @@ export default {
     const id = await t.openFixture("test-data/pedigrees/structure/cousin-couple.json");
     await t.click('[data-individual-id="k1"]');
     t.match(await t.text('[data-testid="panel-person"]'), /Affected/, "clicking a person opens the Person tab");
+    // The tab follows each new selection, and a tab chosen by hand stays until then.
+    await t.click('[data-testid="panel-tab-pedigree"]');
+    t.equal(await t.count('[data-testid="panel-pedigree"]'), 1, "the Pedigree tab opens with someone selected");
+    await t.click('[data-individual-id="k2"]');
+    t.equal(await t.count('[data-testid="panel-person"]'), 1, "selecting someone else shows the Person tab again");
+    await t.click('[data-testid="panel-tab-pedigree"]');
+    await t.click('[data-individual-id="k2"]');
+    t.equal(await t.count('[data-testid="panel-person"]'), 1, "and so does clicking the selected person");
+    await t.press("Escape");
+    t.equal(await t.count('[data-testid="panel-pedigree"]'), 1, "selecting nobody shows the Pedigree tab");
+    await t.click('[data-individual-id="k1"]');
     const name = "Élodie O'Brien <Jr> & co";
     const notes = "Line one\nLine two";
     await t.fill('input[aria-label="Name"]', name);
