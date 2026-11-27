@@ -407,7 +407,9 @@ reporting is off, and the dev server never reports.
 - `components/` — Toolbar, EditPanel (Person and Pedigree tabs, #135: any
   change of selection switches tab, to Person when someone is selected, to
   Pedigree when it is cleared, but choosing a tab never changes the
-  selection. Pedigree holds the chart title field, #20, and under it the
+  selection. Pedigree holds the name, #247 (`renameActivePedigree`: anyone who can
+  edit the pedigree renames it, signed in or not; on an open example it
+  saves the copy under that name), the chart title field, #20, and under it the
   folded "Clinical details" section, #102, whose fields, order and labels
   come from `pedigree/clinicalDetails.ts`. Whole-pedigree fields go on the
   Pedigree tab, not in Settings, which is only how the chart is drawn, and

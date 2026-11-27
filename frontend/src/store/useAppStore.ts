@@ -63,6 +63,12 @@ interface AppState {
   /** The last save attempt failed (offline, server error). Cleared by a save that works. */
   lastSaveFailed: boolean;
   renamePedigree: (id: string, title: string) => Promise<void>;
+  /**
+   * Rename the pedigree open in the editor (#247), signed in or not. On an
+   * example with no saved copy yet this is its first edit: the copy is
+   * saved under the new name. A blank name changes nothing.
+   */
+  renameActivePedigree: (title: string) => Promise<void>;
 }
 
 /**
@@ -325,6 +331,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
       .catch(() => set({ lastSaveFailed: true }))
       .finally(() => { if (keepaliveFor === pedigree) keepaliveFor = null; });
     return "keepalive";
+  },
+
+  renameActivePedigree: async (title) => {
+    const name = title.trim();
+    const { activePedigreeId, example, activeTitle } = get();
+    if (!name || name === activeTitle) return;
+    if (activePedigreeId) return get().renamePedigree(activePedigreeId, name);
+    if (!example) return;
+    set({ example: { ...example, label: name }, activeTitle: name });
+    await get().saveActivePedigree();
   },
 
   renamePedigree: async (id, title) => {

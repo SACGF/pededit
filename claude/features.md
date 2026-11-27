@@ -45,6 +45,7 @@ checked by `npm run check` (`scripts/check-doc-paths.mjs`).
 | Feature | Issues | Start at | Guide |
 |---|---|---|---|
 | Drag, pin, unpin, reset layout | | `frontend/src/pedigree/PedigreeCanvas.tsx` | `frontend/src/pedigree/AGENTS.md` |
+| Rename a pedigree (Pedigree tab, signed in or not) | #247 | `frontend/src/components/panel/PedigreeTab.tsx` | `frontend/AGENTS.md` |
 | Multi-select and batch edits | #21, #35 | `frontend/src/pedigree/batch.ts` | `frontend/AGENTS.md` |
 | Swap sides | #106 | `layout-engine/src/partnerSides.ts` | `layout-engine/AGENTS.md`, `frontend/AGENTS.md` |
 | Draw this couple beside | #205 | `frontend/src/pedigree/partners.ts` | `layout-engine/AGENTS.md`, `frontend/AGENTS.md` |
