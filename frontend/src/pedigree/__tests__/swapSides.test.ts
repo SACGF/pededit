@@ -112,5 +112,7 @@ describe("swap sides (#106)", () => {
     }
     console.log(`swap sides over the examples: ${swapped} swapped, ${refused} refused`);
     expect(swapped).toBeGreaterThan(refused);
-  });
+    // About 13 s on its own, lays out every example many times; over the
+    // default 30 s while the suite runs beside the page-check servers.
+  }, 120_000);
 });
