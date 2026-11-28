@@ -1,10 +1,10 @@
-<svg height="565" viewBox="0 0 681 565" width="681" xmlns="http://www.w3.org/2000/svg">
+<svg height="520" viewBox="0 0 681 520" width="681" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="proband-arrowhead" markerHeight="6" markerWidth="6" orient="auto" refX="6" refY="3">
       <path d="M 0 0 L 6 3 L 0 6 Z" fill="black"/>
     </marker>
   </defs>
-  <rect fill="white" height="565" width="681"/>
+  <rect fill="white" height="520" width="681"/>
   <g class="chart-title">
     <text fill="black" font-family="sans-serif" font-size="14" font-weight="bold" style="user-select:none" text-anchor="middle" x="340.5" y="56">Double second cousins (A)</text>
   </g>
@@ -208,7 +208,7 @@
       </g>
     </g>
   </g>
-  <g class="pedigree-key" data-box="40 477 232 48" data-key-position="bottom-left" transform="translate(0 477)">
+  <g class="pedigree-key" data-box="40 432 232 48" data-key-position="bottom-left" transform="translate(0 432)">
     <g transform="translate(56 12) scale(0.667) translate(-14 -14)">
       <svg height="28" viewBox="-2 -2 28 28" width="28">
         <rect fill="black" height="22" stroke="black" stroke-width="2" width="22" x="1" y="1"/>

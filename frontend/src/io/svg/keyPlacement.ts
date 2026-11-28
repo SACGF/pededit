@@ -130,7 +130,13 @@ export function placeKey(
   return { position, x, y: padding, growTop: grow, growBottom: 0 };
 }
 
-/** The corner that grows the figure least (`KEY_POSITIONS` order on a tie), or `position` when one is asked for. */
+/**
+ * The corner that grows the figure least, or `position` when one is asked
+ * for. A top corner that grows the figure puts the key above everything,
+ * the title too, so it counts half the padding (the key's clearance) worse
+ * than it is: it wins only on a real saving, not on where text boxes start.
+ * `KEY_POSITIONS` order on a tie.
+ */
 export function chooseKeyPlace(
   boxes: Box[], figure: { width: number; height: number }, key: { width: number; height: number },
   padding: number, position?: KeyPosition,
@@ -139,7 +145,8 @@ export function chooseKeyPlace(
   let best: KeyPlace | null = null;
   for (const p of KEY_POSITIONS) {
     const place = placeKey(boxes, figure, key, padding, p);
-    if (!best || place.growTop + place.growBottom < best.growTop + best.growBottom) best = place;
+    const cost = (k: KeyPlace) => k.growBottom + (k.growTop > 0 ? k.growTop + padding / 2 : 0);
+    if (!best || cost(place) < cost(best)) best = place;
   }
   return best!;
 }
@@ -164,8 +171,10 @@ export function withKey(
     ...inner,
     `</svg>`,
   ].join("\n");
+  const boxes = drawnBoxes(doc(figure.width, figure.height, body));
+  figure = trimBottom(boxes, figure, padding);
   if (key.height <= 0) return { svg: doc(figure.width, figure.height, body) };
-  const place = chooseKeyPlace(drawnBoxes(doc(figure.width, figure.height, body)), figure, key, padding, position);
+  const place = chooseKeyPlace(boxes, figure, key, padding, position);
   const height = figure.height + place.growTop + place.growBottom;
   const moved = place.growTop > 0 ? [`<g transform="translate(0 ${place.growTop})">`, ...body, `</g>`] : body;
   const keyGroup = [
@@ -174,6 +183,18 @@ export function withKey(
     `</g>`,
   ];
   return { svg: doc(figure.width, height, [...moved, ...keyGroup]), position: place.position };
+}
+
+/**
+ * The figure ending `padding` under the lowest thing drawn. The exporters
+ * size a figure from the scene's bounds, which allow under the lowest row
+ * for the most lines of text anyone has; when the lowest row has fewer,
+ * that room would be blank, under the chart or under a bottom corner's key.
+ */
+function trimBottom(boxes: Box[], figure: { width: number; height: number }, padding: number): { width: number; height: number } {
+  if (boxes.length === 0) return figure;
+  const lowest = Math.max(...boxes.map(b => b.y2));
+  return { width: figure.width, height: Math.min(figure.height, Math.ceil(lowest + padding)) };
 }
 
 const round = (n: number) => Math.round(n * 100) / 100;

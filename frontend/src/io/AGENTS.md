@@ -213,15 +213,19 @@ in `io/__tests__/` (parser, validator, converter, exporter, roundtrip).
 - The key's corner (#241, `keyPlacement.ts`): both exporters draw the
   figure without the key, then `withKey` reads back the box of everything
   drawn (`drawnBoxes`, parsing the SVG with its transforms through
-  `svgGeometry.ts`, so the U-shape's turned text is boxed where it lands)
-  and puts the key in a corner, its left or right edge on the padding.
+  `svgGeometry.ts`, so the U-shape's turned text is boxed where it lands),
+  ends the figure the padding under the lowest thing drawn (the scene's
+  bounds allow for more text under the lowest row than it may have), and
+  puts the key in a corner, its left or right edge on the padding.
   Over the key's width (plus half the padding either side) the drawn thing
   nearest that edge decides: the key goes against the edge when the gap
   holds it plus half the padding, otherwise the figure grows at that edge
   by the shortfall (a top corner moves everything else down). Only a clear
   run to the edge counts, never a pocket enclosed by lines. With no
   `keyPosition` the corner that grows the figure least is used, bottom left
-  first on a tie, so it is never taller than the old band under the chart.
+  first on a tie; a top corner that grows the figure (the key above the
+  title) must save more than half the padding to win. A figure is never
+  taller than with the old band under the chart.
   The key's group says its corner (`data-key-position`, which the export
   dialog reads to show it) and its box (`data-box`, for
   `keyPlacementProblems`, run by `lintExport` and `lintUShape` as
