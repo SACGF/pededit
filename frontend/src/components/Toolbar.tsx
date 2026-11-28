@@ -3,7 +3,7 @@ import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { exportLosses, lossLines } from "../io/losses.js";
 import { exportPhenopackets } from "../io/phenopackets/index.js";
@@ -62,9 +62,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const hasPedigree = useAppStore(s => s.activePedigreeId !== null || s.example !== null);
   const hasPins = Object.keys(pedigree.pinnedPositions ?? {}).length > 0;
   const activeTitle = useAppStore(s => s.activeTitle) ?? undefined;
-  const [pedMenuOpen, setPedMenuOpen] = useState(false);
   const [pedTextOpen, setPedTextOpen] = useState(false);
-  // Small screens: the four export buttons, most of the toolbar's width, are one menu.
   const small = useSmallScreen();
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
@@ -85,7 +83,6 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   const dim = uShapeView ? "opacity-40" : "";
 
   function handleExportPedClick(dialect: PedDialect) {
-    setPedMenuOpen(false);
     const lines = lossLines(exportLosses(pedigree, dialect));
     if (lines.length === 0) handleExportPed(dialect);
     else setPedWarning({ dialect, lines });
@@ -109,7 +106,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   }
 
   return (
-    // Small screens: no dividers and the exports in one menu, so the row fits a
+    // Small screens: no dividers, so the row fits a
     // phone; with "Reset layout" or the problems list it scrolls sideways.
     <div className="flex items-center gap-1 max-lg:gap-0.5 px-2 max-lg:px-1 py-1 border-b bg-white max-lg:overflow-x-auto max-lg:*:shrink-0 max-lg:[scrollbar-width:none]" data-testid="toolbar">
       <Button
@@ -126,7 +123,7 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
           <DialogHeader>
             <DialogTitle>{pedWarningFormat} cannot carry everything in this pedigree</DialogTitle>
             <DialogDescription>
-              {pedWarningFormat} has no place for what is listed here, so it will be lost or changed when the file is read back. Download JSON keeps everything.
+              {pedWarningFormat} has no place for what is listed here, so it will be lost or changed when the file is read back. JSON keeps everything.
             </DialogDescription>
           </DialogHeader>
           <ul className="text-xs text-gray-700 max-h-60 overflow-y-auto list-disc pl-5" data-testid="export-losses">
@@ -135,9 +132,9 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
           <DialogFooter className="gap-2">
             <Button variant="outline" size="sm" onClick={() => setPedWarning(null)}>Cancel</Button>
             <Button variant="outline" size="sm" onClick={() => { setPedWarning(null); handleExportJson(); }}>
-              Download JSON
+              Export JSON instead
             </Button>
-            <Button size="sm" onClick={() => pedWarning && handleExportPed(pedWarning.dialect)}>{pedWarning?.dialect === "phenopackets" ? "Export anyway" : "Export PED anyway"}</Button>
+            <Button size="sm" onClick={() => pedWarning && handleExportPed(pedWarning.dialect)}>Export anyway</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -225,108 +222,38 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         U-shape
       </Button>}
 
-      {small ? (
-        <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost" size="sm"
-              className="h-7 px-2 gap-1 text-xs"
-              title="Export"
-              disabled={!hasPedigree}
-              data-testid="export-menu"
-            >
-              <Download size={12} />
-              Export
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-1" side="bottom" align="end" data-testid="export-menu-items">
-            <PedFormatItem label="SVG, PNG or PDF" detail="the chart as a figure" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
-            <PedFormatItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
-            <PedFormatItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
-            <PedFormatItem label="Phenopackets family (JSON)" detail="GA4GH v2 Family, a phenopacket per person" onClick={() => { setExportMenuOpen(false); handleExportPedClick("phenopackets"); }} />
-            <PedFormatItem label="CSV" detail="one row per person" onClick={() => { setExportMenuOpen(false); handleExportCsv(); }} />
-            <PedFormatItem label="JSON" detail="lossless, re-importable" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
-          </PopoverContent>
-        </Popover>
-      ) : (
-        <>
-        {/* Export PED: PLINK layout or the R dialect read by pedtools and kinship2 */}
-        <Popover open={pedMenuOpen} onOpenChange={setPedMenuOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost" size="sm"
-              className="h-7 px-2 gap-1 text-xs"
-              title="Export as PED file or Phenopackets family (neither carries everything: the export says what it leaves out)"
-              disabled={!hasPedigree}
-            >
-              <Download size={12} />
-              Export PED
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-1" side="bottom" align="end">
-            <PedFormatItem
-              label="PLINK"
-              detail="FID IID PAT MAT SEX PHENO, no header"
-              onClick={() => handleExportPedClick("plink")}
-            />
-            <PedFormatItem
-              label="R (pedtools, kinship2)"
-              detail="id fid mid sex aff, tabs, header"
-              onClick={() => handleExportPedClick("r")}
-            />
-            <PedFormatItem
-              label="Phenopackets family (JSON)"
-              detail="GA4GH v2 Family, a phenopacket per person"
-              onClick={() => handleExportPedClick("phenopackets")}
-            />
-            {/* Desktop only, like the rest of text mode (#218). */}
+      {/* Every export in one menu: the chart as a figure, then the data
+          files, then (desktop only, like the rest of text mode) the PED as text. */}
+      <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost" size="sm"
+            className="h-7 px-2 gap-1 text-xs"
+            title="Export the chart as a figure, or the pedigree as a PED, Phenopackets, CSV or JSON file"
+            disabled={!hasPedigree}
+            data-testid="export-menu"
+          >
+            <Download size={12} />
+            Export
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-1" side="bottom" align="end" data-testid="export-menu-items">
+          <ExportMenuHeading>Chart</ExportMenuHeading>
+          <ExportItem label="SVG, PNG or PDF…" detail="the chart as a figure" title="Export as SVG, PNG or PDF" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
+          <div className="my-1 border-t" />
+          <ExportMenuHeading>Pedigree data</ExportMenuHeading>
+          <ExportItem label="JSON" detail="lossless, re-importable" title="Export as JSON (lossless, re-importable)" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
+          <ExportItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" title="Export as PED file (PLINK)" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
+          <ExportItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" title="Export as PED file (R)" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
+          <ExportItem label="Phenopackets family (JSON)" detail="GA4GH v2 Family, a phenopacket per person" title="Export as Phenopackets family" onClick={() => { setExportMenuOpen(false); handleExportPedClick("phenopackets"); }} />
+          <ExportItem label="CSV" detail="one row per person" title="Export as CSV file" onClick={() => { setExportMenuOpen(false); handleExportCsv(); }} />
+          {!small && <>
             <div className="my-1 border-t" />
-            <PedFormatItem
-              label="View as text"
-              detail="the PLINK PED, to read or copy"
-              onClick={() => { setPedMenuOpen(false); setPedTextOpen(true); }}
-            />
-          </PopoverContent>
-        </Popover>
-        <PedTextViewDialog pedigree={pedigree} open={pedTextOpen} onClose={() => setPedTextOpen(false)} />
-
-        {/* Export CSV */}
-        <Button
-          variant="ghost" size="sm"
-          className="h-7 px-2 gap-1 text-xs"
-          title="Export as CSV file"
-          disabled={!hasPedigree}
-          onClick={handleExportCsv}
-        >
-          <Download size={12} />
-          Export CSV
-        </Button>
-
-        {/* Download JSON (lossless, see docs/pedigree-json-format.md) */}
-        <Button
-          variant="ghost" size="sm"
-          className="h-7 px-2 gap-1 text-xs"
-          title="Download as JSON (lossless, re-importable)"
-          disabled={!hasPedigree}
-          onClick={handleExportJson}
-        >
-          <Download size={12} />
-          Download JSON
-        </Button>
-
-        {/* Export SVG/PNG */}
-        <Button
-          variant="ghost" size="sm"
-          className="h-7 px-2 gap-1 text-xs"
-          title="Export as SVG or PNG"
-          disabled={!hasPedigree}
-          onClick={onExportSvgClick}
-        >
-          <Image size={12} />
-          SVG/PNG
-        </Button>
-        </>
-      )}
+            <ExportItem label="View PED as text" detail="the PLINK PED, to read or copy" title="View the PLINK PED as text" onClick={() => { setExportMenuOpen(false); setPedTextOpen(true); }} />
+          </>}
+        </PopoverContent>
+      </Popover>
+      {!small && <PedTextViewDialog pedigree={pedigree} open={pedTextOpen} onClose={() => setPedTextOpen(false)} />}
 
       <div className="w-px h-5 bg-gray-200 mx-0.5 max-lg:hidden" />
 
@@ -344,10 +271,15 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
   );
 }
 
-function PedFormatItem({ label, detail, onClick }: { label: string; detail: string; onClick: () => void }) {
+function ExportMenuHeading({ children }: { children: string }) {
+  return <div className="px-2 pt-1 text-[10px] uppercase tracking-wide text-gray-400">{children}</div>;
+}
+
+function ExportItem({ label, detail, title, onClick }: { label: string; detail: string; title: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
+      title={title}
       className="w-full text-left px-2 py-1 rounded-sm hover:bg-gray-100"
     >
       <div className="text-xs">{label}</div>

@@ -28,7 +28,7 @@ export default {
     t.equal(writes, 0, "and writes nothing to the server, even after the auto-save delay");
     t.equal(await t.people(), targaryen.people, "the editor draws the example's people");
     t.ok(await t.visible('[data-testid="example-notice"]'), "with a line saying the copy is saved on the first change");
-    t.ok(await t.page.locator('button[title="Export as SVG or PNG"]').isEnabled(), "and exporting works before any save");
+    t.ok(await t.page.locator('[data-testid="export-menu"]').isEnabled(), "and exporting works before any save");
 
     await t.page.goBack();
     await t.sleep(800);

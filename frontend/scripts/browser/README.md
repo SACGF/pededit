@@ -342,7 +342,7 @@ the flow. They run in CI.
 | `u-shape-view` | the toolbar's U-shape button (#220): the U replaces the chart and counts who it draws, a click selects, the Person tab edits and adds a son and the U redraws, drag, right-click, Shift+drag and Add male give their notices and change nothing, Back to standard chart, "Add existing partner..." on the Person tab leaves the U to pick on the chart (#239), not saved over a reload |
 | `text-under-symbols` | names and details under the symbols are SVG text at the export's baselines (#145); hovering a cut name shows it in full without the pill's buttons, clicking it selects, an uncut name lets the mouse through (#68) |
 | `tag-library` | signed in: a hatched trait saved to My library from the Conditions and tags dialog is added to another pedigree still hatched and still a trait (#131) |
-| `ped-text` | the import dialog's PED text box (#218): mixed spaces and tabs drawn in the preview, a half-typed row shows its error and keeps the drawing, Open in editor; "View as text" shows what Export PED writes, and Copy |
+| `ped-text` | the import dialog's PED text box (#218): mixed spaces and tabs drawn in the preview, a half-typed row shows its error and keeps the drawing, Open in editor; "View PED as text" shows what the PED export writes, and Copy |
 | `touch-pill` | a tablet-sized touch screen: a tap on a person selects them and opens the hover pill, a tap on the empty canvas closes it, and selecting them again without a tap leaves it shut (#239) |
 
 **Adding a flow.** A file in `flows/`, numbered for order:
@@ -577,7 +577,7 @@ PATCHes go to the in-memory copy. SPEC is one of:
   symbol, line and label (`fixture:status`, `fixture:couples`,
   `fixture:text-2008`...). An unknown slug lists them.
 - a `.ped` file, optionally `FILE.ped#FAMID` (imported with the app's own `importPed`)
-- a `.json` file: the app's own Download JSON envelope (`{format, version,
+- a `.json` file: the app's own JSON export envelope (`{format, version,
   pedigree}`) or a bare Pedigree, both read with the app's `importJson`, or
   an API payload `{ "title", "data": Pedigree }`
 
@@ -655,7 +655,7 @@ before the first load, for settings kept there such as `compactLayout=true`.
 It seeds once per tab, so `--reload` keeps what the app wrote.
 
 Selectors are [playwright selectors](https://playwright.dev/docs/locators):
-CSS, `text=Export PED`, `role=button[name="Undo"]`. Prefer
+CSS, `text=Export`, `role=button[name="Undo"]`. Prefer
 `button:has-text("Add")` over `:text()`, which matches the smallest element
 containing the text.
 

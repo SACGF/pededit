@@ -183,7 +183,7 @@ reporting is off, and the dev server never reports.
   Pregnancy and loss symbols exist (`pedigree/lifeStatus.ts`) and adoption
   brackets (`Individual.adopted`, `pedigree/adoption.ts`, #12: "in" also
   dashes the line from the adoptive parents); PED cannot carry either, so
-  Export PED warns first. Assisted reproduction (#45, `pedigree/assisted.ts`):
+  the PED export warns first. Assisted reproduction (#45, `pedigree/assisted.ts`):
   "Add sperm donor" / "Add egg donor" / "Add surrogate" in the more menu;
   the donor becomes the child's genetic parent (so kinship is right) and
   the parent replaced stays linked as carrier or social parent. "Remove
@@ -222,7 +222,7 @@ reporting is off, and the dev server never reports.
   pill's buttons (`components/PersonActions.tsx`, #214), and a tap shows no
   pill there: it sat over the name of the person tapped. When the canvas shrinks,
   `KeepSelectedInView` in `PedigreeCanvas.tsx` pans the selected person back
-  onto the smaller canvas), folds the toolbar's exports into one "Export"
+  onto the smaller canvas), leaves "View PED as text" out of the Export
   menu, moves the U-shape view's switch (#220) into the Filter menu and
   drops its dividers so it fits 360px (it scrolls sideways once
   "Reset layout" or the problems list is added), words the sidebar's "Using

@@ -8,7 +8,7 @@ export default {
   async run(t) {
     await t.openFixture("fixture:text");
     const box = '[data-testid="export-only-selected"]';
-    const openDialog = () => t.click('button[title="Export as SVG or PNG"]');
+    const openDialog = async () => t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     const cancel = () => t.click('[role="dialog"] button:has-text("Cancel")');
     const before = await t.pedigree();
 
@@ -57,7 +57,7 @@ export default {
 
     t.equal(await t.pedigree(), before, "the pedigree is unchanged");
     t.equal((await t.drawn()).sort(), before.individuals.map(i => i.id).sort(), "and the canvas still draws everyone");
-    const csv = readFileSync(await t.download('button[title="Export as CSV file"]'), "utf8");
+    const csv = readFileSync(await t.download(await t.exportMenu("Export as CSV file")), "utf8");
     t.equal(csv.trim().split("\n").length, before.individuals.length + 1, "CSV keeps everyone with people selected");
   },
 };

@@ -1,10 +1,10 @@
 // Text mode (#218): PED typed into the import dialog's box is drawn as it is
 // typed, a bad row keeps the last good drawing and says why, and the result
-// opens in the editor. "View as text" in the Export PED menu shows the PED
+// opens in the editor. "View PED as text" in the Export menu shows the PED
 // the export writes, with Copy.
 export default {
   name: "ped-text",
-  about: "Type PED with mixed spaces and tabs: the preview draws it, a bad row shows its error and keeps the drawing, Open in editor; View as text shows the exported PED and copies it",
+  about: "Type PED with mixed spaces and tabs: the preview draws it, a bad row shows its error and keeps the drawing, Open in editor; View PED as text shows the exported PED and copies it",
   async run(t) {
     const box = '[role="dialog"] [data-testid="ped-text-input"]';
     const symbols = () => t.count('[data-testid="ped-text-preview"] g.symbols > g');
@@ -37,12 +37,11 @@ export default {
     t.equal(p.individuals.find(i => i.name === "kid")?.affected, true, "with the affected column read");
     t.equal((await t.drawn()).length, 4, "and all drawn on the canvas");
 
-    // View as text: what the PED export writes, read-only, with Copy.
-    await t.click('button[title^="Export as PED file"]');
-    await t.click('button:has-text("View as text")');
+    // View PED as text: what the PED export writes, read-only, with Copy.
+    await t.click(await t.exportMenu("View the PLINK PED as text"));
     const shown = await t.eval(sel => ({ value: document.querySelector(sel).value, readOnly: document.querySelector(sel).readOnly }), box);
     const exported = await t.eval(() => window.__pededit.exportPed(window.__pededit.pedigree(), { familyId: "1" }));
-    t.equal(shown.value, exported, "View as text shows what Export PED writes");
+    t.equal(shown.value, exported, "View PED as text shows what the PED export writes");
     t.ok(shown.readOnly, "read-only");
     await t.sleep(300);
     t.equal(await symbols(), 4, "with the chart the PED draws");

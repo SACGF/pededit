@@ -7,7 +7,7 @@ import { exportLosses, lossLines } from "../io/losses.js";
 import { PedTextBox } from "./PedTextBox";
 
 /**
- * "View as text" in the Export PED menu (#218): the PED the PLINK export
+ * "View PED as text" in the Export menu (#218): the PED the PLINK export
  * writes, read-only in the text box beside the chart it draws, with Copy.
  */
 export function PedTextViewDialog({ pedigree, open, onClose }: { pedigree: Pedigree; open: boolean; onClose: () => void }) {

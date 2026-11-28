@@ -139,7 +139,7 @@ describe("feature fixtures draw cleanly", () => {
 
 describe("feature fixtures are valid pedigrees", () => {
   for (const fx of FEATURE_FIXTURES) {
-    it(`${fx.slug}: survives Download JSON and import unchanged`, () => {
+    it(`${fx.slug}: survives JSON export and import unchanged`, () => {
       const result = importJson(exportJson(fx.data, { title: fx.label }));
       expect(result.issues.filter(i => i.severity === "error")).toEqual([]);
       expect(result.pedigree).toEqual(fx.data);

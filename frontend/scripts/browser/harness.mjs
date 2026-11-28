@@ -54,7 +54,7 @@ const STEPS = {
     run: (page, step) => page.keyboard.up(step.arg) },
   fill: { value: "'SEL=>TEXT'", help: "Type into an input (replaces its value).", run: fillStep },
   select: { value: "'SEL=>V'", help: "Choose an option of a native <select> by value or label.", run: selectStep },
-  choose: { value: "'SEL=>TEXT'", help: "Click SEL (a Radix popover or menu trigger, such as the\nmore menu \"···\" or Export PED), then the item in the\npopover, menu or listbox it opened whose text (or first\nline, or title) is TEXT; a unique substring also works.", run: chooseStep },
+  choose: { value: "'SEL=>TEXT'", help: "Click SEL (a Radix popover or menu trigger, such as the\nmore menu \"···\" or Export), then the item in the\npopover, menu or listbox it opened whose text (or first\nline, or title) is TEXT; a unique substring also works.", run: chooseStep },
   drag: { value: "'SEL=>DX,DY'", help: "Drag an element by DX,DY screen pixels.", run: dragStep },
   upload: { value: "'SEL=>FILE'", help: "Set a file input, or click SEL and answer the file chooser.", run: uploadStep },
   download: { value: "'SEL[=>PATH]'", help: "Click SEL and save the download (default\n<--out-dir or frontend/test-output/browser/downloads>/<name>).", run: downloadStep },
@@ -150,7 +150,7 @@ export class UsageError extends Error {}
 export const COMMON_HELP = `
 Common options:
   --fixture SPEC      Serve a pedigree at /p/fixture without the backend. SPEC is
-                      a .json Pedigree or Download JSON file, a .ped file
+                      a .json Pedigree or JSON export, a .ped file
                       (optionally FILE.ped#FAMID), example:N / example:LABEL
                       from src/data/examples.ts, or fixture:SLUG from
                       src/fixtures/features.ts. The URL defaults to /p/fixture.
@@ -369,7 +369,7 @@ export async function loadFixture(spec, context, base) {
     return { label: spec, title, pedigree: fam.pedigree, warnings };
   }
 
-  // JSON: a bare Pedigree, the app's Download JSON envelope ({format, pedigree}),
+  // JSON: a bare Pedigree, the app's JSON export envelope ({format, pedigree}),
   // or an API payload ({title, data}). The first two go through the app's importJson.
   let json;
   try { json = JSON.parse(text); } catch (e) { throw new UsageError(`${file} is not JSON: ${e.message}`); }

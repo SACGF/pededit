@@ -914,7 +914,7 @@ The drawing of a pedigree: the scene, the canvas and the NSGC symbols.
   lint skips), the U-shape (`endedSegs`, along the track), and the legend and export key
   ("Relationship ended"). Set from the panel's "Relationship" section and
   the "Relationship" / couple-line items of the more and right-click menus
-  (`setPartnershipEnded`). PED cannot carry it; Export PED warns.
+  (`setPartnershipEnded`). PED cannot carry it; the PED export warns.
 
 Below a symbol, top to bottom: "SB" / "ECT" caption, the row of dot tags,
 name (one or two lines, **bold**), then the detail lines, in regular

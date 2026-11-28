@@ -1,5 +1,5 @@
 // Download every export and read the file: SVG, PNG, PDF, U-shape and
-// de-identified from the dialog; CSV, PED, Phenopackets and JSON from the toolbar.
+// de-identified from the dialog; CSV, PED, Phenopackets and JSON from the toolbar's Export menu.
 import { readFileSync } from "node:fs";
 
 export default {
@@ -8,7 +8,7 @@ export default {
   async run(t) {
     await t.openFixture("fixture:text");
     const dialogDownload = async options => {
-      await t.click('button[title="Export as SVG or PNG"]');
+      await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
       for (const label of options) await t.click(`[role="dialog"] label:has-text("${label}")`);
       const file = await t.download('[role="dialog"] button:has-text("Download")');
       if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
@@ -43,7 +43,7 @@ export default {
     t.match(ushape, /^<svg /, "U-shape: an SVG document");
     t.ok(ushape !== svg, "U-shape: not the standard drawing");
     t.match(ushape, /rotate\(/, "U-shape: symbols turned along the track");
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     await t.click('[role="dialog"] label:has-text("Render in U shape")');
     await t.click('[role="dialog"] button:has-text("Cancel")');
 
@@ -52,14 +52,14 @@ export default {
     t.match(anon, />II-2</, "de-identified: pedigree numbers in place of names");
     t.notMatch(anon, /1985|1931|Cornish|Counsellor/, "de-identified: no dates of birth and no clinical details");
     // Each clinical detail can be added back on its own.
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-clinical-maternalAncestry"]').checked), false, "de-identified: Include maternal ancestry is offered, unticked");
     await t.click('[data-testid="deidentify-keep-clinical-maternalAncestry"]');
     const ancestry = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
     if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
     t.match(ancestry, /Cornish/, "de-identified: the maternal ancestry ticked is in the key");
     t.notMatch(ancestry, /Counsellor|Not known|multiple sclerosis|2026-11-16/, "de-identified: the other clinical details are not");
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     await t.click('[data-testid="deidentify-keep-clinical-maternalAncestry"]');
     const dropped = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
     if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
@@ -74,36 +74,34 @@ export default {
     t.ok(ids.every(id => !anonU.includes(`"${id}"`)), "de-identified U-shape: no id in any attribute");
     for (const name of names) t.ok(!anonU.includes(name.split(" ")[0]), `de-identified U-shape: no "${name.split(" ")[0]}"`);
     t.notMatch(readFileSync(await dialogDownload(["SVG", "De-identify"]), "utf8"), /data-id=|data-dup-of=/, "U-shape: no person ids");
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     await t.click('[role="dialog"] label:has-text("Render in U shape")');
     await t.click('[role="dialog"] button:has-text("Cancel")');
 
-    const csv = readFileSync(await t.download('button[title="Export as CSV file"]'), "utf8");
+    const csv = readFileSync(await t.download(await t.exportMenu("Export as CSV file")), "utf8");
     const rows = csv.trim().split("\n");
     t.equal(rows.length, (await t.people()) + 1, "CSV: a header and one row a person");
     t.match(rows[0], /pedigree_number/, "CSV: the pedigree_number column");
     t.match(csv, /Wilhelmina/, "CSV: the names");
 
-    const json = JSON.parse(readFileSync(await t.download('button[title^="Download as JSON"]'), "utf8"));
+    const json = JSON.parse(readFileSync(await t.download(await t.exportMenu("Export as JSON")), "utf8"));
     t.equal(json.format, "pededit-pedigree", "JSON: the envelope");
     t.equal(json.pedigree, await t.pedigree(), "JSON: the whole pedigree, unchanged");
 
     // PED cannot carry the stillbirth, the adoption, the dates or the notes, so it warns first and names them.
-    await t.click('button[title^="Export as PED file"]');
-    if (await t.visible('[data-radix-popper-content-wrapper]')) await t.click('[data-radix-popper-content-wrapper] button >> nth=0');
+    await t.click(await t.exportMenu("Export as PED file (PLINK)"));
     t.match(await t.text('[role="dialog"]'), /PED cannot carry/, "PED: a warning says what the format cannot carry");
     const pedLosses = await t.text('[data-testid="export-losses"]');
     for (const what of [/stillbirth/, /adopted in/, /deceased/, /date of birth/, /notes/, /an evaluation|evaluations/, /proband/, /chart title/])
       t.match(pedLosses, what, `PED: the warning names ${what.source}`);
-    const ped = readFileSync(await t.download('[role="dialog"] button:has-text("Export PED anyway")'), "utf8");
+    const ped = readFileSync(await t.download('[role="dialog"] button:has-text("Export anyway")'), "utf8");
     const lines = ped.trim().split("\n").filter(l => !l.startsWith("#"));
     t.equal(lines.length, await t.people(), "PED: one line a person");
     t.ok(lines.every(l => l.split(/\s+/).length === 6), "PED: six columns");
 
     // A Phenopackets Family carries more than PED (#23): its warning names only what it drops.
     const before = await t.pedigree();
-    await t.click('button[title^="Export as PED file"]');
-    await t.click('[data-radix-popper-content-wrapper] button:has-text("Phenopackets family")');
+    await t.click(await t.exportMenu("Export as Phenopackets family"));
     t.match(await t.text('[role="dialog"]'), /Phenopackets file cannot carry/, "Phenopackets: a warning says what the format cannot carry");
     const ppLosses = await t.text('[data-testid="export-losses"]');
     for (const what of [/notes/, /an evaluation|evaluations/, /stillbirth/, /tags \(Genotype\)/, /date of birth "1934"/, /chart title/])
@@ -150,7 +148,7 @@ export default {
     const pressed = () => t.eval(() => document.querySelector('[data-testid="key-corner-picker"] [aria-checked="true"]')?.getAttribute("data-key-corner"));
     const keyAt = svgText => /data-key-position="([a-z-]+)"/.exec(svgText)?.[1];
     const keyProblems = svgText => t.eval(async text => (await import("/src/io/svg/keyPlacement.ts")).keyPlacementProblems(text), svgText);
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     const best = await pressed();
     t.ok(!!best, `the dialog shows the key's corner (${best})`);
     const bestSvg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
@@ -158,21 +156,21 @@ export default {
     t.equal(keyAt(bestSvg), best, "the file has the key in that corner");
     t.equal(await keyProblems(bestSvg), [], "clear of everything drawn");
     const other = ["bottom-left", "bottom-right", "top-left", "top-right"].find(c => c !== best);
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     await t.click(`[data-key-corner="${other}"]`);
     t.equal(await pressed(), other, "a click picks another corner");
     const otherSvg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
     if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
     t.equal(keyAt(otherSvg), other, "the file has the key there");
     t.equal(await keyProblems(otherSvg), [], "still clear of everything drawn");
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     t.equal(await pressed(), best, "reopened, the dialog follows the setting again (Auto)");
     await t.click('[role="dialog"] button:has-text("Cancel")');
     await t.click('button[title="Pedigree settings"]');
     await t.select('select[name="keyPosition"]', "Top right");
     await t.press("Escape");
     await t.reload();
-    await t.click('button[title="Export as SVG or PNG"]');
+    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
     t.equal(await pressed(), "top-right", "with Top right in Settings, kept after a reload, the dialog opens on it");
     await t.click('[role="dialog"] button:has-text("Cancel")');
   },

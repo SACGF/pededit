@@ -62,7 +62,7 @@ no row at all.
 or Phenopackets file would drop or change, field by field, and `lossLines`
 groups it into one line per person, couple or the pedigree ("II-2, Mary:
 notes; age of onset "40s"). The toolbar shows the lines before writing
-either format, and "View as text" shows PED's. Every field of `Individual`,
+either format, and "View PED as text" shows PED's. Every field of `Individual`,
 `Partnership` and `Pedigree` has a rule per format (`"kept"`, `"internal"`
 or a function giving the words), typed as `Record<keyof T, ...>`, so a new
 field fails the type check until its rule is written. `__tests__/losses.test.ts`
@@ -90,7 +90,7 @@ into the text box (`components/PedTextBox.tsx`) with `importPed`, for a live
 drawing. While the text has errors it returns the last good pedigree, so the
 drawing stays; with several families it takes the first and says so. The box
 is in the import dialog ("or type or paste PED text") and, read-only with
-Copy, under "View as text" in the Export PED menu; neither is offered below
+Copy, under "View PED as text" in the Export menu; neither is offered below
 1024px. Opening the text in the editor makes a new pedigree: an existing one
 is never edited from text yet.
 

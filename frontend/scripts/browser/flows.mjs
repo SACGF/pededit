@@ -126,6 +126,11 @@ function makeT({ context, base, flags, outDir, name }) {
       await t.click(`button[title="${title}"]`);
       await t.mouseAway();
     },
+    /** Open the toolbar's Export menu; returns the selector of its item with this title, to click or download. */
+    async exportMenu(title) {
+      await t.click('[data-testid="export-menu"]');
+      return `[data-testid="export-menu-items"] button[title^="${title}"]`;
+    },
     /** Right-click a person (or any selector) and click an item of the menu that opens. */
     async menu(sel, item) {
       await t.rightClick(sel.startsWith("[") || sel.startsWith(".") ? sel : t.person(sel));
