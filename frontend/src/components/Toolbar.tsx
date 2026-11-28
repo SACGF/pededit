@@ -3,7 +3,7 @@ import { usePedigreeFields } from "../store/usePedigreeStore";
 import { useAppStore } from "../store/useAppStore";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { RotateCcw, RotateCw, Settings, Download, Menu } from "lucide-react";
+import { RotateCcw, RotateCw, Settings, Download, Image, Menu } from "lucide-react";
 import { exportPed, type ExportOptions } from "../io/ped/index.js";
 import { exportLosses, lossLines } from "../io/losses.js";
 import { exportPhenopackets } from "../io/phenopackets/index.js";
@@ -222,14 +222,14 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         U-shape
       </Button>}
 
-      {/* Every export in one menu: the chart as a figure, then the data
-          files, then (desktop only, like the rest of text mode) the PED as text. */}
+      {/* The data files in one menu. The figure has its own button, except on
+          a phone, where the toolbar has room for only one and the menu leads with it. */}
       <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="ghost" size="sm"
             className="h-7 px-2 gap-1 text-xs"
-            title="Export the chart as a figure, or the pedigree as a PED, Phenopackets, CSV or JSON file"
+            title="Export the pedigree as a JSON, PED, Phenopackets or CSV file"
             disabled={!hasPedigree}
             data-testid="export-menu"
           >
@@ -238,10 +238,10 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64 p-1" side="bottom" align="end" data-testid="export-menu-items">
-          <ExportMenuHeading>Chart</ExportMenuHeading>
-          <ExportItem label="SVG, PNG or PDF…" detail="the chart as a figure" title="Export as SVG, PNG or PDF" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
-          <div className="my-1 border-t" />
-          <ExportMenuHeading>Pedigree data</ExportMenuHeading>
+          {small && <>
+            <ExportItem label="SVG, PNG or PDF…" detail="the chart as a figure" title="Export as SVG, PNG or PDF" onClick={() => { setExportMenuOpen(false); onExportSvgClick(); }} />
+            <div className="my-1 border-t" />
+          </>}
           <ExportItem label="JSON" detail="lossless, re-importable" title="Export as JSON (lossless, re-importable)" onClick={() => { setExportMenuOpen(false); handleExportJson(); }} />
           <ExportItem label="PED, PLINK" detail="FID IID PAT MAT SEX PHENO, no header" title="Export as PED file (PLINK)" onClick={() => { setExportMenuOpen(false); handleExportPedClick("plink"); }} />
           <ExportItem label="PED, R (pedtools, kinship2)" detail="id fid mid sex aff, tabs, header" title="Export as PED file (R)" onClick={() => { setExportMenuOpen(false); handleExportPedClick("r"); }} />
@@ -254,6 +254,17 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
         </PopoverContent>
       </Popover>
       {!small && <PedTextViewDialog pedigree={pedigree} open={pedTextOpen} onClose={() => setPedTextOpen(false)} />}
+
+      {!small && <Button
+        variant="ghost" size="sm"
+        className="h-7 px-2 gap-1 text-xs"
+        title="Export as SVG, PNG or PDF"
+        disabled={!hasPedigree}
+        onClick={onExportSvgClick}
+      >
+        <Image size={12} />
+        SVG/PNG/PDF
+      </Button>}
 
       <div className="w-px h-5 bg-gray-200 mx-0.5 max-lg:hidden" />
 
@@ -269,10 +280,6 @@ export function Toolbar({ onSettingsClick, onExportSvgClick, onMenuClick }: Tool
       </Button>
     </div>
   );
-}
-
-function ExportMenuHeading({ children }: { children: string }) {
-  return <div className="px-2 pt-1 text-[10px] uppercase tracking-wide text-gray-400">{children}</div>;
 }
 
 function ExportItem({ label, detail, title, onClick }: { label: string; detail: string; title: string; onClick: () => void }) {

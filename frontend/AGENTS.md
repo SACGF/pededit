@@ -222,8 +222,8 @@ reporting is off, and the dev server never reports.
   pill's buttons (`components/PersonActions.tsx`, #214), and a tap shows no
   pill there: it sat over the name of the person tapped. When the canvas shrinks,
   `KeepSelectedInView` in `PedigreeCanvas.tsx` pans the selected person back
-  onto the smaller canvas), leaves "View PED as text" out of the Export
-  menu, moves the U-shape view's switch (#220) into the Filter menu and
+  onto the smaller canvas), moves the figure export into the Export
+  menu and leaves "View PED as text" out of it, moves the U-shape view's switch (#220) into the Filter menu and
   drops its dividers so it fits 360px (it scrolls sideways once
   "Reset layout" or the problems list is added), words the sidebar's "Using
   the canvas" for touch under `pointer-coarse:` (multi-select has no touch

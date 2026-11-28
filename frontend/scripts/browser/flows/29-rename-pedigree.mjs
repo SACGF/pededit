@@ -18,7 +18,7 @@ export default {
     await t.sleep(500);
     t.equal((await t.stored(id)).title, "Okafor family", "the server has the new name");
     t.equal(await t.eval(() => document.querySelector('input[aria-label="Chart title"]')?.value), "Okafor family", "the chart title follows the name");
-    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    await t.click('button[title="Export as SVG, PNG or PDF"]');
     const file = await t.download('[role="dialog"] button:has-text("Download")');
     if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
     t.match(file, /Okafor family\.svg$/, "the export file is named after it");

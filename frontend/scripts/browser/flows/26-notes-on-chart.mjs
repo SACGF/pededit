@@ -15,7 +15,7 @@ export default {
     t.equal((await t.individual("gf")).notes, note, "Bartholomew has a note");
     const detail = () => t.eval(() => [...document.querySelectorAll('[data-individual-id="gf"] [data-detail-label] text')].map(e => e.textContent).join(" "));
     const exportSvg = async (options = []) => {
-      await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+      await t.click('button[title="Export as SVG, PNG or PDF"]');
       for (const label of options) await t.click(`[role="dialog"] label:has-text("${label}")`);
       const svg = readFileSync(await t.download('[role="dialog"] button:has-text("Download")'), "utf8");
       if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
@@ -23,7 +23,7 @@ export default {
     };
 
     t.notMatch(await detail(), /Notes/, "turned off: the note is not drawn on the canvas");
-    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    await t.click('button[title="Export as SVG, PNG or PDF"]');
     t.match(await t.text('[data-testid="export-notes-hint"]'), /Notes are not drawn; turn on Show notes on the chart in Settings/, "the export dialog says how to draw them");
     await t.click('[role="dialog"] label:has-text("De-identify")');
     t.equal(await t.count('[data-testid="export-notes-hint"]'), 1, "and still does with De-identify ticked");
@@ -39,7 +39,7 @@ export default {
     t.match(await detail(), /Notes are hidden/, "the note is drawn under the symbol on the canvas");
     const svg = await exportSvg();
     t.match(svg, /Notes are[\s\S]*hidden here\./, "and in the SVG");
-    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    await t.click('button[title="Export as SVG, PNG or PDF"]');
     t.equal(await t.count('[data-testid="export-notes-hint"]'), 0, "the dialog's hint is gone");
     await t.click('[role="dialog"] button:has-text("Cancel")');
     const findings = await t.eval(async text => {
@@ -51,7 +51,7 @@ export default {
     t.notMatch(await exportSvg(["De-identify"]), /Notes are/, "a de-identified SVG has no notes by default");
     // The dialog keeps De-identify ticked; Include notes draws them, with a warning.
     const name = (await t.individual("gf")).name;
-    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    await t.click('button[title="Export as SVG, PNG or PDF"]');
     t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-notes"]').checked), false, "Include notes is offered, unticked");
     t.equal(await t.count('[data-testid="export-notes-warning"]'), 0, "with no warning");
     await t.click('[data-testid="deidentify-keep-notes"]');
@@ -60,7 +60,7 @@ export default {
     if (await t.visible('[role="dialog"]')) await t.click('[role="dialog"] button:has-text("Cancel")');
     t.match(keptSvg, /Notes are[\s\S]*hidden here\./, "the de-identified SVG has the notes");
     t.notMatch(keptSvg, new RegExp(name), "and still no names");
-    await t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    await t.click('button[title="Export as SVG, PNG or PDF"]');
     t.equal(await t.eval(() => document.querySelector('[data-testid="deidentify-keep-notes"]').checked), false, "reopened, Include notes is unticked again");
     await t.click('[role="dialog"] label:has-text("De-identify")');
     await t.click('[role="dialog"] button:has-text("Cancel")');

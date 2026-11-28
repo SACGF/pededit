@@ -8,7 +8,7 @@ export default {
   async run(t) {
     await t.openFixture("fixture:text");
     const box = '[data-testid="export-only-selected"]';
-    const openDialog = async () => t.click(await t.exportMenu("Export as SVG, PNG or PDF"));
+    const openDialog = () => t.click('button[title="Export as SVG, PNG or PDF"]');
     const cancel = () => t.click('[role="dialog"] button:has-text("Cancel")');
     const before = await t.pedigree();
 
